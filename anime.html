@@ -1,0 +1,115 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>The HTML5 Herald</title>
+    <script src="anime.min.js"></script>
+    <script>
+        var ar = [];
+        // window.onload = function () {
+        // window.onload = () => {
+        //     // ここに読み込み完了時に実行してほしい内容を書く。
+        //     var comment = document.createElement('div');
+        //     comment.innerHTML = 'テキスト内容を入力';
+        //     comment.setAttribute('id', 'element-id');
+        //     // comment.setAttribute('visibility', 'hidden');
+        //     //comment.style.visibility='hidden'
+        //     comment.style.display = 'none'
+        //     let bb = document.getElementById('app');
+        //     bb.appendChild(comment);
+
+        //     var kickBall2 = anime({
+        //         targets: '#element-id',
+        //         translateX: 0,
+        //         //opacity: .8, 
+        //         duration: 3000,
+        //         //delay: 1000,
+        //         easing: 'easeInCubic',
+        //         autoplay: false,
+        //         begin: function (anim) {
+        //             console.log(anim.began); // true after 1000ms
+        //             //anim.
+        //             //comment.style.visibility='visible'
+        //             comment.style.display = 'inline'
+        //         },
+        //         complete: function (anim) {
+        //             console.log(anim.completed);
+        //             //comment.style.visibility='hidden'
+        //             comment.style.display = 'none'
+        //         }
+        //     });
+        //     ar.push(kickBall2)
+
+        //     var obj2 = document.getElementById("ev2");
+        //     //console.log(obj2);
+        //     obj2.onclick = () => {
+        //         console.log("kickBall2");
+        //         // kickBall2.play();
+        //         ar[0].play();
+        //     };
+        // };
+        window.onload = () => {
+            var combinedFunctionBasedProp = anime({
+                targets: '.el',
+                translateX: function (el) {
+                    return el.getAttribute('data-x');
+                },
+                translateY: function (el, i) {
+                    return  (30 * i);
+                },
+                //rotate: 180,
+                duration: function (target) {
+                    // Duration based on every div 'data-duration' attribute
+                    return target.getAttribute('data-duration');
+                },
+                delay: function (target, index) {
+                    // 100ms delay multiplied by every div index, in ascending order
+                    return index * 100;
+                },
+                // elasticity: function (target, index, totalTargets) {
+                //     // Elasticity multiplied by every div index, in descending order
+                //     return 200 + ((totalTargets - index) * 200);
+                // },
+                // direction: 'alternate',
+                easing: 'linear',
+                loop: false
+            });
+        };
+    </script>
+    <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
+</head>
+
+<body>
+
+    <!--<button id="ev2" onclick="addFunc()">１を足す</button>-->
+    <button id="ev2">１を足す</button>
+
+    <div id="app">
+        <div class="el" data-x="100" data-duration="5000" style="width : 100px">test1</div>
+        <div class="el" data-x="300" data-duration="5000" style="width : 100px">test2</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test3</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test4</div>
+        <div class="el" data-x="500" data-duration="5000" style="width : 100px">test5</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test6</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test7</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test8</div>
+        <div class="el" data-x="500" data-duration="5000" style="width : 100px">test9</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test10</div>
+        <div class="el" data-x="500" data-duration="5000" style="width : 100px">test11</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test12</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test1</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+        <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>
+    </div>
+    <div id="dummy"></div>
+</body>
+
+</html>

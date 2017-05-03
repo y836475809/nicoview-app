@@ -7,17 +7,27 @@ class nico_comment {
         }
     }
 
-    set comments(comments) {
-        this.comments = comments
+    set comments(val) {
+        this._comments = val
+    }
+
+    get comments() {
+        return this._comments
+    }
+
+    set width(val) {
+        this._width = val
     }
 
     calc_comment() {
-        this.comments.forEach((c) => {
-            _update_lane(c.vpos)
-            const index = _get_index_of_priority_lane()
+        this._comments.forEach((c) => {
+            this._update_lane(c.vpos)
+
+            const index = this._get_index_of_priority_lane()
             c.lane_index = index;
-            lanes[index].no = c.no
-            lanes[index].nokori = window_w + c.width
+
+            this.lanes[index].no = c.no
+            this.lanes[index].nokori = this._width + c.width
         })
     }
 
@@ -25,14 +35,17 @@ class nico_comment {
         this.lanes.forEach((lane, index) => {
             if (lane.no !== -1) {
                 const no = lane.no
-                const vops = comments[no].vpos
-                const time = vops - cu_vops
-                const pos = window_w + comments[no].width - time * comments[no].speed
-                if (ops <= 0) {
+                const vops = this._comments[no].vpos
+                const time = cu_vops - vops
+                const pos =
+                    this._width
+                    + this._comments[no].width
+                    - time * this._comments[no].speed
+                if (pos <= 0) {
                     lane.no = -1
                     lane.nokori = 0
                 } else {
-                    lane.nokori = ops
+                    lane.nokori = pos
                 }
             }
         })
@@ -44,10 +57,10 @@ class nico_comment {
                 return i
             }
         }
-        return this.lanes.indexOf(Math.min.apply(null, this.lanes.map(function (o) { return o.nokori })))
+        let rems = this.lanes.map(function (o) { return o.nokori })
+        let index = rems.indexOf(Math.min.apply(null, rems))
+        return index
     }
-
-
 }
 
 module.exports = nico_comment

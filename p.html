@@ -3,17 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
+    <script src="lib/jquery-3.2.1.min.js"></script>
+    <script src="lib/resize-end.min.js"></script>
+    <script src="player.js"></script>
     <link rel="stylesheet" href="css/p.css">
     <title>Document</title>
 </head>
 
 <body>
     <div id="container">
-        <div class="inner">
-            中央に配置したい要素
-        </div>
+        <video id="player" preload='metadata' controls>
+        </video>
     </div>
-    <div>test</div>
+    <div id="player-ctr">
+        <button id="play-btn">start</button>
+        <button id="stop-btn">stop</button>
+    </div>
 </body>
 
 </html>

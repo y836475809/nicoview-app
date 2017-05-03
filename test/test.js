@@ -1,12 +1,5 @@
-var assert = require("power-assert"); // assertモジュールのinclude
-
+var assert = require("power-assert");
 var nico_comment = require("../nico_comment");
-
-// var author = "hoo";
-// it("is power-assert", function () {
-//     //assert(author === 'hoo');
-//     assert(author === 'hoo');  // ← 不一致エラー
-// });
 
 it("is init", function () {
     let m = new nico_comment(5)
@@ -17,51 +10,26 @@ it("is init", function () {
     }
 })
 
-// let comments = [
-//     { no: 1, vpos: 0, width: 20, speed: 10, lane_index: 0 },
-//     { no: 2, vpos: 5, width: 20, speed: 10, lane_index: 0 },
-//     { no: 3, vpos: 20, width: 20, speed: 10, lane_index: 0 },
-//     { no: 4, vpos: 25, width: 20, speed: 10, lane_index: 0 }
-// ]
+it("calc", function () {
+    let comments = [
+        { no: 1, vpos: 0, width: 20, speed: 1, lane_index: 0 },
+        { no: 2, vpos: 5, width: 20, speed: 1, lane_index: 0 },
+        { no: 3, vpos: 10, width: 20, speed: 1, lane_index: 0 },
+        { no: 4, vpos: 15, width: 20, speed: 1, lane_index: 0 }
+    ]
 
-// let lanes = [
-//     { no: -1, nokori: 0 },
-//     { no: -1, nokori: 0 },
-//     { no: -1, nokori: 0 }
-// ]
+    const num = 3
+    let cm = new nico_comment(num)
+    cm.width = 100
+    cm.comments = comments
+    cm.calc_comment()
 
-// let window_w = 500
+    let calc_cm = cm.comments
+    console.log(calc_cm)
+    assert(calc_cm[0].lane_index === 0)
+    assert(calc_cm[1].lane_index === 1)
+    assert(calc_cm[2].lane_index === 2)
+    assert(calc_cm[3].lane_index === 0)
 
-// const update_lane = (cu_vops) => {
-//     lanes.forEach((lane, index) => {
-//         if (lane.no !== -1) {
-//             const no = lane.no
-//             const vops = comments[no].vpos
-//             const time = vops - cu_vops
-//             const pos = window_w + comments[no].width - time * comments[no].speed
-//             if (ops <= 0) {
-//                 lane.no = -1
-//                 lane.nokori = 0
-//             } else {
-//                 lane.nokori = ops
-//             }
-//         }
-//     })
-// }
 
-// const get_index_of_priority_lane = () => {
-//     for (let i = 0; i < lanes.length; i++) {
-//         if (lanes[i].no === -1) {
-//             return i
-//         }
-//     }
-//     return lanes.indexOf(Math.min.apply(null, lanes.map(function (o) { return o.nokori })))
-// }
-
-// comments.forEach((c) => {
-//     update_lane(c.vpos)
-//     const index = get_index_of_priority_lane()
-//     c.lane_index = index;
-//     lanes[index].no = c.no
-//     lanes[index].nokori = window_w + c.width
-// })
+})

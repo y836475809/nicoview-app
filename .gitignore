@@ -1,4 +1,6 @@
 node_modules/
+lib/
 tmp/
+*.mp4
 anime.min.js
 riot+compiler.min.js

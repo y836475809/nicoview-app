@@ -1,22 +1,43 @@
-/*html,
-body {
-  height: 100%;
+
+/*#container{
+  
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  width: 100%;
+  height: 200px;
+  background-color: #cccccc;
 }*/
 
+
 #container{
-display: flex;
-justify-content: center; 
-align-items: center; 
-width: 100%;
-/*height: 100%;*/
-height: 200px;
-background-color: #cccccc;
+  position: absolute;
+  /*margin: 0px;*/
+  width: 100%;
+  background-color: #cccccc;
 }
 
-.inner{
-background-color: #FF6600;
+#player{
+  position: absolute;
+  /*width: 100%;*/
+  /*background-color: #cccccc;*/
 }
 
 #player-ctr{
-background-color: #FF6600;
+  position: absolute;
+  /*margin: 0px;*/
+  /*width: 100%;*/
+  /*background-color: #FF6600;*/
+}
+
+.comment{
+  position: absolute;
+  /*position: relative;*/
+  border: 1px solid #FF6600;
+}
+
+.fix_comment{
+  position: absolute;
+  /*position: relative;*/
+  border: 1px solid #FF6600;
 }

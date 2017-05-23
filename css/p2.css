@@ -1,0 +1,39 @@
+/*body , html {
+	height: 100%;
+}*/
+
+*{
+  margin:0;
+  padding:0;
+}
+body{
+  width:100%;
+}
+
+header{
+  position:fixed;
+  top:0;
+  left:0;
+  z-index:10;
+  width:100%;
+  height:50px;
+}
+
+#container{
+  padding-top:10px;
+  margin-top:50px;
+  height:auto;
+  padding-bottom:10px;
+  margin-bottom:80px;
+  background-color: #ccc000;
+}
+
+#player-ctr{
+    background-color: #cccccc;
+  position:fixed;
+  bottom:0;
+  left:0;
+  z-index:10;
+  width:100%;
+  height:80px;
+}

@@ -1,21 +1,34 @@
 <player>
+    <header>test</header>
     <div id="container">
-        <style scoped>
+        <!--<style scoped>
              :scope {
-                position: absolute;
+                /*position: absolute;*/
                 width: 100%;
                 background-color: #cccccc;
+                padding-top: 10px;
+                margin-top: 50px;
+                height: auto;
+                padding-bottom: 10px;
+                margin-bottom: 80px;
             }
-        </style>
+        </style>-->
         <video ref="palyermain" id="player" preload='metadata' controls style="position:absolute;">
         </video>
     </div>
     <div ref="playerctr" id="player-ctr">
-        <style scoped>
+        <!--<style scoped>
              :scope {
-                position: absolute;
+                /*position: absolute;*/
+                position: fixed;
+                background-color: #cccccc;
+                bottom: 0;
+                left: 0;
+                z-index: 10;
+                width: 100%;
+                height: 80px;
             }
-        </style>
+        </style>-->
         <button id="play-btn" onclick='{ invert }'>start</button>
         <button id="stop-btn">stop</button>
         <button id="add-btn">add</button>
@@ -25,8 +38,8 @@
         var video_size = {}
 
         let getContentSize = () => {
-            let w = window.innerWidth - 16
-            let h = window.innerHeight - 16
+            let w = window.innerWidth //- 16
+            let h = window.innerHeight- 60-16
             return { width: w, height: h }
         }
 
@@ -50,14 +63,14 @@
         var setPlayerContainerSize = () => {
             let h = getContentSize().height
             let w = getContentSize().width
-            let player_ctr_h = this.refs.playerctr.clientHeight
+            let player_ctr_h = this.refs.playerctr.clientHeight //-60
 
             let v_size = getVideoSize()
             // console.log("v_size=", v_size)
 
             let player = this.refs.palyermain //document.getElementById("player")
             // play.style.left = (h - player_ctr_h)  + "px"
-            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2
+            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 +60
             let play_left = w / 2 - (v_size.width) / 2
             //player.style.position = 'absolute';
             player.style.top = play_top + "px"
@@ -75,9 +88,9 @@
 
             // let ctr = $('#player-ctr').get(0)
             // ctr.style.top = (h + 8 - player_ctr_h) + "px"
-            this.refs.playerctr.style.position = 'absolute';
+            // this.refs.playerctr.style.position = 'absolute';
             //this.refs.playerctr.style.top = (h + 8 - player_ctr_h) + "px"
-            this.refs.playerctr.style.top = (h - player_ctr_h) + "px"
+            // this.refs.playerctr.style.top = (h - player_ctr_h) + "px"
         }
 
         invert = () => {

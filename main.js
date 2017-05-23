@@ -12,7 +12,7 @@ function createWindow() {
     console.log(process.argv)
     
     // ブラウザウィンドウの作成
-    win = new BrowserWindow({ width: 800, height: 600 })
+    win = new BrowserWindow({ width: 1000, height: 600 })
 
     // アプリケーションのindex.htmlの読み込み
     win.loadURL(`file://${__dirname}/index.html`)

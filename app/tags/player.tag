@@ -1,6 +1,6 @@
 <player>
     <header>test</header>
-    <div id="container">
+    <div ref="palyercontainer" id="container">
         <!--<style scoped>
              :scope {
                 /*position: absolute;*/
@@ -15,6 +15,7 @@
         </style>-->
         <video ref="palyermain" id="player" preload='metadata' controls style="position:absolute;">
         </video>
+        <!--<div id="telop"></div>-->
     </div>
     <div ref="playerctr" id="player-ctr">
         <!--<style scoped>
@@ -47,10 +48,12 @@
         }
 
         add = () => {
+            // const parent_id = "telop"
+            const parent_id = "container"
             const top = 50
             const duration = 5000
             let w = getContentSize().width
-            let params = create_comment_elm("container", "message", w, duration)
+            let params = create_comment_elm(parent_id, "message", w, duration)
             let sp = params.sp
             let ele = params.ele
             // document.getElementById("container").appendChild(ele);
@@ -61,7 +64,7 @@
             // let param = set_comment(ele, "container", top, w, duration)
 
             // console.log(rect)
-            let params2 = create_comment_elm("container", "message", w, duration)
+            let params2 = create_comment_elm(parent_id, "message", w, duration)
             let ele2 = params2.ele
             // document.getElementById("container").appendChild(ele);
             // let rect = ele.getBoundingClientRect()
@@ -138,14 +141,17 @@
 
         var setVideoContainerSize = () => {
             let h = getContentSize().height
-            let w = getContentSize().width
+            let w = getContentSize().width -200
             let player_ctr_h = this.refs.playerctr.clientHeight
 
-            let con = document.getElementById("container")
-            //  con.style.position = "absolute"
+            //let con = document.getElementById("container")
+            //  
+            let con = this.refs.palyercontainer
+            // con.style.position = "absolute"
+
             con.style.height = (h - player_ctr_h) + "px"
-            con.style.clip = "rect(0px " + w + "px " + (h - player_ctr_h) + "px 0px)"
-console.log("con.style=", con.style)
+            // con.style.clip = "rect(0px " + w + "px " + (h- player_ctr_h) + "px 0px)"
+// console.log("con.style=", con.style)
             // let ctr = $('#player-ctr').get(0)
             // ctr.style.top = (h + 8 - player_ctr_h) + "px"
             // this.refs.playerctr.style.position = 'absolute';

@@ -8,6 +8,7 @@
 }
 body{
   width:100%;
+  overflow: hidden;
 }
 
 header{
@@ -27,6 +28,9 @@ header{
   padding-bottom:10px;
   margin-bottom:80px;
   background-color: #ccc000;
+  /*clip : rect(26px 384px 242px 0px);*/
+  /*overflow: hidden;*/
+  
 }
 
 #player-ctr{
@@ -39,9 +43,22 @@ header{
   height:80px;
 }
 
+#telop {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	/*width : 384px;
+	height: 30px;*/
+	font-size: 24pt;
+	/*font-weight: bold;*/
+	color : white;
+	text-align : left;
+	text-shadow: 2px 2px 2px #000000;
+  /*overflow: hidden;*/
+}
 
 .comment{
-  position: absolute;
+  /*position: absolute;*/
   /*position: relative;*/
   border: 1px solid #FF6600;
 }

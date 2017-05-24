@@ -31,15 +31,74 @@
         </style>-->
         <button id="play-btn" onclick='{ invert }'>start</button>
         <button id="stop-btn">stop</button>
-        <button id="add-btn">add</button>
+        <button id="add-btn" onclick='{ add }'>add</button>
     </div>
 
     <script>
+        var create_comment_elm = require('../../comment')
+
+        invert = () => {
+            console.log('invert')
+            let video = this.refs.palyermain
+            video.src = "mov/test.mp4"
+            // video.src = "mov/oc.mp4"
+            video.type = "video/mp4"
+            video.load();
+        }
+
+        add = () => {
+            const top = 50
+            const duration = 5000
+            let w = getContentSize().width
+            let params = create_comment_elm("container", "message", w, duration)
+            let sp = params.sp
+            let ele = params.ele
+            // document.getElementById("container").appendChild(ele);
+            // let rect = ele.getBoundingClientRect()
+            ele.style.position = "absolute"
+            ele.style.top = top + "px"
+            // const duration = 5000
+            // let param = set_comment(ele, "container", top, w, duration)
+
+            // console.log(rect)
+            let params2 = create_comment_elm("container", "message", w, duration)
+            let ele2 = params2.ele
+            // document.getElementById("container").appendChild(ele);
+            // let rect = ele.getBoundingClientRect()
+            ele2.style.position = "absolute"
+            ele2.style.top = top * 2 + "px"
+            // const duration = 5000
+            // let param = set_comment(ele, "container", top, w, duration)
+
+            var comment_anime = anime({
+                targets: '.comment',
+                translateX: function (el) {
+                    return el.getAttribute('data-x')
+                },
+                // translateY: function (el, i) {
+                //     // return (30 * i);
+                //     return 50;
+                // },
+                duration: function (target) {
+                    return target.getAttribute('data-duration')
+                },
+                delay: function (target, index) {
+                    // console.log(index)
+                    return index * 1000
+                },
+                easing: 'linear',
+                loop: false,
+                autoplay: false
+            });
+
+            comment_anime.play()
+        }
+
         var video_size = {}
 
         let getContentSize = () => {
             let w = window.innerWidth //- 16
-            let h = window.innerHeight- 60-16
+            let h = window.innerHeight - 60 - 16
             return { width: w, height: h }
         }
 
@@ -70,7 +129,7 @@
 
             let player = this.refs.palyermain //document.getElementById("player")
             // play.style.left = (h - player_ctr_h)  + "px"
-            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 +60
+            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 60
             let play_left = w / 2 - (v_size.width) / 2
             //player.style.position = 'absolute';
             player.style.top = play_top + "px"
@@ -83,9 +142,10 @@
             let player_ctr_h = this.refs.playerctr.clientHeight
 
             let con = document.getElementById("container")
+            //  con.style.position = "absolute"
             con.style.height = (h - player_ctr_h) + "px"
             con.style.clip = "rect(0px " + w + "px " + (h - player_ctr_h) + "px 0px)"
-
+console.log("con.style=", con.style)
             // let ctr = $('#player-ctr').get(0)
             // ctr.style.top = (h + 8 - player_ctr_h) + "px"
             // this.refs.playerctr.style.position = 'absolute';
@@ -93,14 +153,7 @@
             // this.refs.playerctr.style.top = (h - player_ctr_h) + "px"
         }
 
-        invert = () => {
-            console.log('invert')
-            let video = this.refs.palyermain
-            video.src = "mov/test.mp4"
-            // video.src = "mov/oc.mp4"
-            video.type = "video/mp4"
-            video.load();
-        }
+
 
         this.on('mount', function () {
             console.log('mount')

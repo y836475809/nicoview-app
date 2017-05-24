@@ -12,23 +12,23 @@
 //     });
 // }
 
-class comment_anime{
-    constructor(parent_id){
-        this.parent_id = parent_id
-    }
+// class comment_anime{
+//     constructor(parent_id){
+//         this.parent_id = parent_id
+//     }
 
-    delete_elm(){
+//     delete_elm(){
 
-    }
+//     }
     
-    create_flow(text, width, duration){
+//     create_flow(text, width, duration){
         
-    }
+//     }
 
-    create_fix(){
+//     create_fix(){
 
-    }
-}
+//     }
+// }
 
 let create_comment_elm = (parent_id,  text, width, duration) => {
     let ele = document.createElement("div")
@@ -98,4 +98,4 @@ let set_comment_param = (text, left, top) => {
 
 }
 
-// module.exports = create_comment_elm
+module.exports = create_comment_elm

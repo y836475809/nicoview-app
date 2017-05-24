@@ -1,5 +1,7 @@
 var riot = require('riot')
+var anime = require('animejs')
 require('./app/tags/player.tag')
+
 
 var obs = riot.observable();
 

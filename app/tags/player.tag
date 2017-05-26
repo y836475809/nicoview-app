@@ -11,12 +11,12 @@
         }
 
          :scope #container {
-            padding-top: 10px;
-            margin-top: 50px;
-            height: auto;
-            padding-bottom: 10px;
-            margin-bottom: 80px;
             background-color: #ccc000;
+            position: absolute;
+            top: 50px;
+            bottom: 300px;
+            width: 100%;
+            height: calc(100% - 50px - 80px);
         }
 
          :scope #player-ctr {
@@ -91,8 +91,9 @@
         var video_size = {}
 
         let getContentSize = () => {
-            let w = window.innerWidth //- 16
-            let h = window.innerHeight - 60 - 16
+            let con = this.refs.palyercontainer
+            let w = con.clientWidth
+            let h = con.clientHeight
             return { width: w, height: h }
         }
 
@@ -121,20 +122,11 @@
             let v_size = getVideoSize()
 
             let player = this.refs.palyermain //document.getElementById("player")
-            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 60
+            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 50
             let play_left = w / 2 - (v_size.width) / 2
             player.style.top = play_top + "px"
             player.style.left = play_left + "px"
         }
-
-        var setVideoContainerSize = () => {
-            let h = getContentSize().height
-            let player_ctr_h = this.refs.playerctr.clientHeight
-
-            let con = this.refs.palyercontainer
-            con.style.height = (h - player_ctr_h) + "px"
-        }
-
 
         this.on('mount', function () {
             console.log('mount')
@@ -152,11 +144,7 @@
                 this.refs.palyermain.style.height = v_size.height + "px"
             });
 
-
-            setVideoContainerSize()
-
             let ff = () => {
-                setVideoContainerSize()
                 setPlayerContainerSize()
 
                 const v_size = getVideoSize()

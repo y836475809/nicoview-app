@@ -21,3 +21,7 @@ class CommmentFlow {
 
 let m = new CommmentFlow("test", 12)
 let m2 = new CommmentFlow("test", "12")
+
+/** @type {HTMLElement} */
+var elm
+elm.

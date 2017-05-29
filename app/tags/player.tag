@@ -19,7 +19,7 @@
             height: calc(100% - 50px - 80px);
         }
 
-         :scope #player-ctr {
+         /*:scope #player-ctr {
             background-color: #cccccc;
             position: fixed;
             bottom: 0;
@@ -27,18 +27,18 @@
             z-index: 10;
             width: 100%;
             height: 80px;
-        }
+        }*/
     </style>
     <header>test</header>
     <div ref="palyercontainer" id="container">
         <video ref="palyermain" id="player" preload='metadata' controls style="position:absolute;">
         </video>
     </div>
-    <div ref="playerctr" id="player-ctr">
+    <!--<div ref="playerctr" id="player-ctr">
         <button id="play-btn" onclick='{ invert }'>start</button>
         <button id="stop-btn">stop</button>
         <button id="add-btn" onclick='{ add }'>add</button>
-    </div>
+    </div>-->
 
     <script>
         var create_comment_elm = require('../../comment')
@@ -100,7 +100,7 @@
         let getVideoSize = () => {
             let c_size = getContentSize()
             let w_h = c_size.height
-            let ctr_h = this.refs.playerctr.clientHeight
+            let ctr_h = 80 //this.refs.playerctr.clientHeight
 
             let v_h = w_h - ctr_h
             let v_w = video_size.width / video_size.height * v_h
@@ -117,7 +117,7 @@
         var setPlayerContainerSize = () => {
             let h = getContentSize().height
             let w = getContentSize().width
-            let player_ctr_h = this.refs.playerctr.clientHeight //-60
+            let player_ctr_h = 80//this.refs.playerctr.clientHeight //-60
 
             let v_size = getVideoSize()
 

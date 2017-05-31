@@ -18,8 +18,7 @@
             width: 100%;
             height: calc(100% - 50px - 80px);
         }
-
-         /*:scope #player-ctr {
+        /*:scope #player-ctr {
             background-color: #cccccc;
             position: fixed;
             bottom: 0;
@@ -43,6 +42,15 @@
     <script>
         var create_comment_elm = require('../../comment')
 
+        obs.on("receivedData",  (data)=> {
+            console.log('data=', data)
+            
+            let video = this.refs.palyermain
+            video.src = data.src
+            video.type = data.type
+            video.load()
+        })
+
         invert = () => {
             console.log('invert')
             let video = this.refs.palyermain
@@ -53,6 +61,8 @@
         }
 
         add = () => {
+
+
             const parent_id = "container"
             const top = 50
             const duration = 5000
@@ -142,6 +152,10 @@
                 const v_size = getVideoSize()
                 this.refs.palyermain.style.width = v_size.width + "px"
                 this.refs.palyermain.style.height = v_size.height + "px"
+            });
+
+            this.refs.palyermain.addEventListener('loadeddata', (event) => {
+                console.log('loadeddata event=', event);
             });
 
             let ff = () => {

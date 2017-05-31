@@ -40,7 +40,9 @@
     </div>-->
 
     <script>
-        var create_comment_elm = require('../../comment')
+        let my=[]
+        // var create_comment_elm = require('../../comment')
+        let comment_elm = require('../../comment')
 
         obs.on("receivedData",  (data)=> {
             console.log('data=', data)
@@ -49,6 +51,19 @@
             video.src = data.src
             video.type = data.type
             video.load()
+
+            const parent_id = "container"
+            const width = getContentSize().width
+            const duration = 5000
+            let commnets = data.commnets
+            let cm_elm = new comment_elm(parent_id, width, duration)
+            commnets.forEach((cm)=> {
+                const text = cm.text
+                const delay = cm.vpos
+                cm_elm.cretae_flow(text, delay)
+                
+            });
+            
         })
 
         invert = () => {

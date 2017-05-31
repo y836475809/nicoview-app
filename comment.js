@@ -110,4 +110,5 @@ let set_comment_param = (text, left, top) => {
 
 }
 
-module.exports = create_comment_elm
+// @ts-ignore
+module.exports = comment_elm

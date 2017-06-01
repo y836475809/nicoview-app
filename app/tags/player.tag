@@ -40,30 +40,68 @@
     </div>-->
 
     <script>
-        let my=[]
+        let comment_anime
+        let my = []
         // var create_comment_elm = require('../../comment')
         let comment_elm = require('../../comment')
+        let nico_comment = require('../../nico_comment')
 
-        obs.on("receivedData",  (data)=> {
+        obs.on("receivedData", (data) => {
             console.log('data=', data)
-            
+
             let video = this.refs.palyermain
             video.src = data.src
             video.type = data.type
             video.load()
 
+            let nc_elms = []
+            let nc_params = []
             const parent_id = "container"
             const width = getContentSize().width
             const duration = 5000
             let commnets = data.commnets
             let cm_elm = new comment_elm(parent_id, width, duration)
-            commnets.forEach((cm)=> {
+            commnets.forEach((cm) => {
+                const no = cm.no
                 const text = cm.text
                 const delay = cm.vpos
-                cm_elm.cretae_flow(text, delay)
-                
+                ret = cm_elm.cretae_flow(no, text, delay)
+                nc_elms.push(ret.ele)
+                nc_params.push(ret.params)
+
             });
-            
+
+            const num = 3
+            let cm = new nico_comment(num)
+            cm.width = width
+            cm.comments = nc_params
+            cm.calc_comment()
+
+            let lanes_map
+            let calc_cms = cm.comments
+            calc_cms.forEach((cm, index) => {
+                // lanes_map[cm.no] = cm.lane_index
+                let em = nc_elms[index]
+                em.style.position = "absolute"
+                em.style.top = (cm.lane_index * 50) + "px"
+            });
+
+
+            comment_anime = anime({
+                targets: '.comment',
+                translateX: function (el) {
+                    return el.getAttribute('data-x')
+                },
+                duration: function (target) {
+                    return duration
+                },
+                delay: function (target, index) {
+                    return target.getAttribute('data-delay')
+                },
+                easing: 'linear',
+                loop: false,
+                autoplay: false
+            });
         })
 
         invert = () => {
@@ -76,41 +114,41 @@
         }
 
         add = () => {
-
-
-            const parent_id = "container"
-            const top = 50
-            const duration = 5000
-            let w = getContentSize().width
-
-            let params = create_comment_elm(parent_id, "message", w, duration)
-            let sp = params.sp
-            let ele = params.ele
-            ele.style.position = "absolute"
-            ele.style.top = top + "px"
-
-            let params2 = create_comment_elm(parent_id, "message", w, duration)
-            let ele2 = params2.ele
-            ele2.style.position = "absolute"
-            ele2.style.top = top * 2 + "px"
-
-            var comment_anime = anime({
-                targets: '.comment',
-                translateX: function (el) {
-                    return el.getAttribute('data-x')
-                },
-                duration: function (target) {
-                    return target.getAttribute('data-duration')
-                },
-                delay: function (target, index) {
-                    return index * 1000
-                },
-                easing: 'linear',
-                loop: false,
-                autoplay: false
-            });
-
             comment_anime.play()
+
+            // const parent_id = "container"
+            // const top = 50
+            // const duration = 5000
+            // let w = getContentSize().width
+
+            // let params = create_comment_elm(parent_id, "message", w, duration)
+            // let sp = params.sp
+            // let ele = params.ele
+            // ele.style.position = "absolute"
+            // ele.style.top = top + "px"
+
+            // let params2 = create_comment_elm(parent_id, "message", w, duration)
+            // let ele2 = params2.ele
+            // ele2.style.position = "absolute"
+            // ele2.style.top = top * 2 + "px"
+
+            // var comment_anime = anime({
+            //     targets: '.comment',
+            //     translateX: function (el) {
+            //         return el.getAttribute('data-x')
+            //     },
+            //     duration: function (target) {
+            //         return target.getAttribute('data-duration')
+            //     },
+            //     delay: function (target, index) {
+            //         return index * 1000
+            //     },
+            //     easing: 'linear',
+            //     loop: false,
+            //     autoplay: false
+            // });
+
+            // comment_anime.play()
         }
 
         var video_size = {}

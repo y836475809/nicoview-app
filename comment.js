@@ -20,7 +20,7 @@ class comment_elm {
      * @param {number} delay
      * @returns {{elm:HTMLElement, width:number, speed:number}} 
      */
-    cretae_flow(text, delay) {
+    cretae_flow(no, text, delay) {
         let ele = document.createElement("div")
         ele.innerHTML = text
         ele.className = "comment"
@@ -33,11 +33,13 @@ class comment_elm {
 
         ele.style.left = left + "px"
         
+        ele.setAttribute("data-no", no.toString())
         ele.setAttribute("data-x", (-len).toString())
         // ele.setAttribute("data-duration", this.duration.toString())
         ele.setAttribute("data-delay", delay.toString())
 
-        return { ele: ele, width:rect.width, speed: sp }
+        return { ele: ele, params:{no: no, vpos: delay, width: rect.width, speed: sp, lane_index: -1} }
+        // return { ele: ele, width:rect.width, speed: sp }
     }
 }
 

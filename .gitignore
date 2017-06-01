@@ -4,3 +4,4 @@ tmp/
 *.mp4
 anime.min.js
 riot+compiler.min.js
+/*.log

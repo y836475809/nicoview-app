@@ -210,7 +210,14 @@
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
                 console.log('loadeddata event=', event);
             });
-
+            this.refs.palyermain.addEventListener('play', ()=>{
+                // console.log('addEventListenerによるイベント発火')
+                comment_anime.play()
+            })
+            this.refs.palyermain.addEventListener('pause', ()=>{
+                console.log('addEventListenerによるイベント発火')
+                comment_anime.pause()
+            })
             let ff = () => {
                 setPlayerContainerSize()
 

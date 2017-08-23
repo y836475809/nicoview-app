@@ -1,10 +1,11 @@
 {
-  "name": "riot",
+  "name": "riot_test",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "main.js",
   "scripts": {
-    "test": "mocha --require intelli-espower-loader"
+    "test": "mocha --require intelli-espower-loader",
+    "test2": "./node_modules/.bin/electron-mocha --renderer --require intelli-espower-loader"
   },
   "directories": {
     "test": "test/"
@@ -12,8 +13,13 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "electron-mocha": "^3.4.0",
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^3.2.0",
-    "power-assert": "^1.4.2"
+    "power-assert": "^1.4.2",
+    "riot": "^3.5.0"
+  },
+  "dependencies": {
+    "animejs": "^2.0.2"
   }
 }

@@ -1,36 +1,50 @@
+// @ts-check
 
-// window.onload = () => {
-//     $('#add-btn').on("click", () => {
-//         var ele = document.createElement("div")
-//         ele.innerHTML = "message"
-//         ele.className = "comment"
-//         ele.style.left = 300 + "px"
-//         ele.style.top = 50 + "px"
-//         console.log('aaaaaaaaaaaaaaa')
-//         // $('#container').appendChild(ele)
-//         document.getElementById("container").appendChild(ele);
-//     });
-// }
-
-class comment_anime{
-    constructor(parent_id){
+class comment_elm {
+    /**
+     * @param {string} parent_id
+     * @param {number} width
+     * @param {number} duration
+     */
+    constructor(parent_id, width, duration) {
         this.parent_id = parent_id
+
+        /** @type {number} */
+        this.width = width
+        this.duration = duration
     }
 
-    delete_elm(){
+    /**
+     * 
+     * @param {string} text 
+     * @param {number} delay
+     * @returns {{elm:HTMLElement, width:number, speed:number}} 
+     */
+    cretae_flow(no, text, delay) {
+        let ele = document.createElement("div")
+        ele.innerHTML = text
+        ele.className = "comment"
 
-    }
-    
-    create_flow(text, width, duration){
+        document.getElementById(this.parent_id).appendChild(ele);
+        let rect = ele.getBoundingClientRect()
+        let left = this.width
+        let len = this.width + rect.width
+        let sp = len / this.duration
+
+        ele.style.left = left + "px"
         
-    }
+        ele.setAttribute("data-no", no.toString())
+        ele.setAttribute("data-x", (-len).toString())
+        // ele.setAttribute("data-duration", this.duration.toString())
+        ele.setAttribute("data-delay", delay.toString())
 
-    create_fix(){
-
+        return { ele: ele, params:{no: no, vpos: delay, width: rect.width, speed: sp, lane_index: -1} }
+        // return { ele: ele, width:rect.width, speed: sp }
     }
 }
 
-let create_comment_elm = (parent_id,  text, width, duration) => {
+
+let create_comment_elm = (parent_id, text, width, duration) => {
     let ele = document.createElement("div")
     ele.innerHTML = text
     ele.className = "comment"
@@ -50,11 +64,11 @@ let create_comment_elm = (parent_id,  text, width, duration) => {
     ele.setAttribute("data-x", -len)
     ele.setAttribute("data-duration", duration)
 
-    return {ele:ele, sp:sp}
+    return { ele: ele, sp: sp }
     // document.getElementById("container").appendChild(ele);
 }
 
-let create_fix_comment = (parent_id,  text, width, duration) => {
+let create_fix_comment = (parent_id, text, width, duration) => {
     let ele = document.createElement("div")
     ele.innerHTML = text
     ele.className = "fix_comment"
@@ -74,7 +88,7 @@ let create_fix_comment = (parent_id,  text, width, duration) => {
     ele.setAttribute("data-x", -len)
     ele.setAttribute("data-duration", duration)
 
-    return {ele:ele, sp:sp}
+    return { ele: ele, sp: sp }
     // document.getElementById("container").appendChild(ele);
 }
 
@@ -98,4 +112,5 @@ let set_comment_param = (text, left, top) => {
 
 }
 
-// module.exports = create_comment_elm
+// @ts-ignore
+module.exports = comment_elm

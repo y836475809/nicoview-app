@@ -10,12 +10,17 @@ let win
 
 function createWindow() {
     console.log(process.argv)
+
+    let html = "html/index.html"
+    if(process.argv.length>2){
+        html = process.argv[2]
+    }
     
     // ブラウザウィンドウの作成
     win = new BrowserWindow({ width: 1000, height: 600 })
 
     // アプリケーションのindex.htmlの読み込み
-    win.loadURL(`file://${__dirname}/index.html`)
+    win.loadURL(`file://${__dirname}/${html}`)
 
     // DevToolsを開く
     win.webContents.openDevTools()

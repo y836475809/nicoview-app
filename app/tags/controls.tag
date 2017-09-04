@@ -27,7 +27,7 @@
 
         send_data_f(e){
             obs.trigger("receivedData",
-                { src: "mov/test.mp4", type: "video/mp4" , commnets:commnets})
+                { src: "../mov/test.mp4", type: "video/mp4" , commnets:commnets})
         }
     </script>
 </controls>

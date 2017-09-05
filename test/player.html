@@ -21,6 +21,7 @@
         document.write(process.versions.electron)
     </script>.-->
     <!--<debug></debug>-->
+    <player-tags></player-tags>
     <player></player>
     <controls></controls>
 </body>
@@ -29,11 +30,14 @@
 <script>
     var riot = require('riot')
     var anime = require('animejs')
+
+    require('../app/tags/player-tags.tag')
     require('../app/tags/player.tag')
     require('../app/tags/controls.tag')
 
     var obs = riot.observable();
 
+    riot.mount('player-tags');
     riot.mount('player');
     riot.mount('controls');
 

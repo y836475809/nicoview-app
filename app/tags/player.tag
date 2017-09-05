@@ -28,7 +28,7 @@
             height: 80px;
         }*/
     </style>
-    <header>test</header>
+    <!-- <header>test</header> -->
     <div ref="palyercontainer" id="container">
         <video ref="palyermain" id="player" preload='metadata' controls style="position:absolute;">
         </video>
@@ -72,6 +72,7 @@
             });
 
             const num = 3
+            const c_top = this.refs.palyercontainer.offsetTop
             let cm = new nico_comment(num)
             cm.width = width
             cm.comments = nc_params
@@ -83,7 +84,7 @@
                 // lanes_map[cm.no] = cm.lane_index
                 let em = nc_elms[index]
                 em.style.position = "absolute"
-                em.style.top = (cm.lane_index * 50) + "px"
+                em.style.top = (cm.lane_index * 50 + 50) + "px"
             });
 
 
@@ -152,7 +153,7 @@
         }
 
         var video_size = {}
-
+// 
         let getContentSize = () => {
             let con = this.refs.palyercontainer
             let w = con.clientWidth
@@ -163,7 +164,7 @@
         let getVideoSize = () => {
             let c_size = getContentSize()
             let w_h = c_size.height
-            let ctr_h = 80 //this.refs.playerctr.clientHeight
+            let ctr_h = 0 //this.refs.playerctr.clientHeight
 
             let v_h = w_h - ctr_h
             let v_w = video_size.width / video_size.height * v_h
@@ -180,12 +181,12 @@
         var setPlayerContainerSize = () => {
             let h = getContentSize().height
             let w = getContentSize().width
-            let player_ctr_h = 80//this.refs.playerctr.clientHeight //-60
+            let player_ctr_h = 0//this.refs.playerctr.clientHeight //-60
 
             let v_size = getVideoSize()
 
             let player = this.refs.palyermain //document.getElementById("player")
-            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 50
+            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 0
             let play_left = w / 2 - (v_size.width) / 2
             player.style.top = play_top + "px"
             player.style.left = play_left + "px"

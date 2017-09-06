@@ -12,16 +12,9 @@
 
 <script>
     const ipc = require('electron').ipcRenderer
-    const BrowserWindow = require('electron').remote.BrowserWindow
-    const path = require('path')
 
     let showPlayer = () => {
-        const player_path = path.join('file://', __dirname, '../html/player.html')
-        // console.log("showPlayer player_path=", player_path)
-        let win = new BrowserWindow({ width: 800, height: 600 })
-        win.on('close', function () { win = null })
-        win.loadURL(player_path)
-        win.show()
+        ipc.send('request-show-player', null)
     }
 
     let sendData = () => {
@@ -37,12 +30,7 @@
             type: "video/mp4",
             commnets: commnets
         }
-        ipc.send('send-data', data)
-
-        // ipc.on('asynchronous-reply', (event, arg) => {
-        //     console.log("player data = ", arg)
-
-        // })
+        ipc.send('request-show-player', data)
     }
 
 </script>

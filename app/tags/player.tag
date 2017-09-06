@@ -212,11 +212,11 @@
                 console.log('loadeddata event=', event);
             });
             this.refs.palyermain.addEventListener('play', ()=>{
-                // console.log('addEventListenerによるイベント発火')
+                console.log('addEventListener playによるイベント発火')
                 comment_anime.play()
             })
             this.refs.palyermain.addEventListener('pause', ()=>{
-                console.log('addEventListenerによるイベント発火')
+                console.log('addEventListener pauseによるイベント発火')
                 comment_anime.pause()
             })
             let ff = () => {
@@ -226,6 +226,11 @@
                 this.refs.palyermain.style.width = v_size.width + "px"
                 this.refs.palyermain.style.height = v_size.height + "px"
             }
+
+            obs.on("play", ()=> {
+                console.log("player.tag play")
+                this.refs.palyermain.play()
+            })
 
             obs.on("resizeEndEvent", function (wsize) {
                 ff()

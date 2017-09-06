@@ -51,11 +51,10 @@
         }, timeout);
     })
 
-    ipc.on('asynchronous-reply', (event, arg) => {
-        console.log("player data = ", arg)
-        const data = arg
-        
-        obs.trigger("receivedData", data)
+    ipc.on('request-send-video-data', (event, arg) => {
+        console.log("request-send-video-data, data = ", arg)
+        // const data = arg 
+        obs.trigger("receivedData", arg)
     })
 
 </script>

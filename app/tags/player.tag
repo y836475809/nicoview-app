@@ -30,7 +30,7 @@
     </style>
     <!-- <header>test</header> -->
     <div ref="palyercontainer" id="container">
-        <video ref="palyermain" id="player" preload='metadata' controls style="position:absolute;">
+        <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
         </video>
     </div>
     <!--<div ref="playerctr" id="player-ctr">

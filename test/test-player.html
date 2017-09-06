@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+</head>
+
+<body>
+    <input type="button" value="show" onClick=showPlayer()>
+    <input type="button" value="data" onClick=sendData()>
+</body>
+
+<script>
+    const ipc = require('electron').ipcRenderer
+    const BrowserWindow = require('electron').remote.BrowserWindow
+    const path = require('path')
+
+    let showPlayer = () => {
+        const player_path = path.join('file://', __dirname, '../html/player.html')
+        // console.log("showPlayer player_path=", player_path)
+        let win = new BrowserWindow({ width: 800, height: 600 })
+        win.on('close', function () { win = null })
+        win.loadURL(player_path)
+        win.show()
+    }
+
+    let sendData = () => {
+        let commnets = [
+            { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "aaa" },
+            { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "aaa" },
+            { no: 2, vpos: 1000, date: 1000, user_id: "aaa", text: "aaa" },
+            { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "aaa" },
+            { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "aaa" },
+        ]
+        const data = {
+            src: "../mov/test.mp4",
+            type: "video/mp4",
+            commnets: commnets
+        }
+        ipc.send('send-data', data)
+
+        // ipc.on('asynchronous-reply', (event, arg) => {
+        //     console.log("player data = ", arg)
+
+        // })
+    }
+
+</script>
+
+</html>

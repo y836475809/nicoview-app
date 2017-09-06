@@ -28,6 +28,7 @@
 <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
 <!--<script src="app/app.js"></script>-->
 <script>
+    var ipc = require('electron').ipcRenderer
     var riot = require('riot')
     var anime = require('animejs')
 
@@ -49,6 +50,14 @@
             obs.trigger("resizeEndEvent", { w: window.innerWidth, h: window.innerHeight });
         }, timeout);
     })
+
+    ipc.on('asynchronous-reply', (event, arg) => {
+        console.log("player data = ", arg)
+        const data = arg
+        
+        obs.trigger("receivedData", data)
+    })
+
 </script>
 
 </html>

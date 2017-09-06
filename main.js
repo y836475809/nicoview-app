@@ -4,6 +4,8 @@ const { app } = electron
 // ネイティブブラウザウィンドウを作成するモジュール
 const { BrowserWindow } = electron
 
+const { ipcMain } = electron
+
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win
@@ -50,4 +52,10 @@ app.on('activate', () => {
     if (win === null) {
         createWindow()
     }
+})
+
+ipcMain.on('send-data', (event, arg) => {
+    // console.log(arg)  // prints "ping"
+    // event.returnValue = 'pong'
+    event.sender.send('asynchronous-reply', arg)
 })

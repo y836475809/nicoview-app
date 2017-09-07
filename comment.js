@@ -32,7 +32,7 @@ class comment_elm {
         let sp = len / this.duration
 
         ele.style.left = left + "px"
-        
+        ele.style.width = rect.width + "px"
         ele.setAttribute("data-no", no.toString())
         ele.setAttribute("data-x", (-len).toString())
         // ele.setAttribute("data-duration", this.duration.toString())

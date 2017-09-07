@@ -52,8 +52,6 @@
     })
 
     ipc.on('request-send-video-data', (event, arg) => {
-        console.log("request-send-video-data, data = ", arg)
-        // const data = arg 
         obs.trigger("receivedData", arg)
     })
 

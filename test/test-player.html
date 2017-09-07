@@ -7,7 +7,8 @@
 
 <body>
     <input type="button" value="show" onClick=showPlayer()>
-    <input type="button" value="data" onClick=sendData()>
+    <input type="button" value="data1" onClick=sendData1()>
+    <input type="button" value="data2" onClick=sendData2()>
 </body>
 
 <script>
@@ -17,7 +18,7 @@
         ipc.send('request-show-player', null)
     }
 
-    let sendData = () => {
+    let sendData1 = () => {
         let commnets = [
             { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "aaa" },
             { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "aaa" },
@@ -32,7 +33,21 @@
         }
         ipc.send('request-show-player', data)
     }
-
+    let sendData2 = () => {
+        let commnets = [
+            { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "あああ" },
+            { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "ああああああ" },
+            { no: 2, vpos: 1000, date: 1000, user_id: "aaa", text: "あ" },
+            { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "あああああああああ" },
+            { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "あああ" },
+        ]
+        const data = {
+            src: "../mov/test.mp4",
+            type: "video/mp4",
+            commnets: commnets
+        }
+        ipc.send('request-show-player', data)
+    }
 </script>
 
 </html>

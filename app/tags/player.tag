@@ -247,6 +247,13 @@
                 this.refs.palyermain.play()
             })
 
+            obs.on("on_seeked", (current)=> {
+                // this.refs.palyermain.pause()
+                console.log('player stop currente=', current)
+                // $('#player')[0].currentTime = current
+                this.refs.palyermain.currentTime = current
+            })
+
             obs.on("resizeEndEvent", function (wsize) {
                 ff()
             })

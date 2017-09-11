@@ -1,15 +1,17 @@
 <seek>
     <style scoped>
-        :scope #seek-container {
+         :scope #seek-container {
             display: grid;
             grid-template-rows: 30px;
             grid-template-columns: 1fr 50px 5px 50px;
         }
-        :scope #current {
+
+         :scope #current {
             text-align: right;
             background-color: #57E79F;
         }
-        :scope #duration {
+
+         :scope #duration {
             text-align: right;
             background-color: #ccc000;
         }
@@ -36,12 +38,30 @@
         })
         // var that = this
         obs.on('seek_reload', (duration) => {
+            this.current = 0
             this.duration = duration
+
+            $("#slider").slider({
+                range: 'min',
+                value: 0,
+                min: 0,
+                max: this.duration,
+                step: 1,
+                stop: function(event, ui) {
+                    console.log('slider stop ui.value=', ui.value)
+                    obs.trigger('on_seeked', ui.value)
+                }
+            })
+
+            // $('#slider').slider('value', this.current);
+
             this.update()
         })
 
         obs.on('seek_update_current', (current) => {
             this.current = current
+            $('#slider').slider('value', this.current);
+
             this.update()
         })
     </script>

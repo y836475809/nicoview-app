@@ -10,7 +10,7 @@
             border: 2px solid black;
         }
 
-         :scope #container {
+         :scope #palyer-container {
             background-color: #ccc000;
             position: absolute;
             top: 50px;
@@ -29,7 +29,7 @@
         }*/
     </style>
     <!-- <header>test</header> -->
-    <div ref="palyercontainer" id="container">
+    <div ref="palyercontainer" id="palyer-container">
         <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
         </video>
     </div>
@@ -40,13 +40,19 @@
     </div>-->
 
     <script>
-        let comment_anime
+        var $ = jQuery = require("jquery")
+        let comment_anime = null
         let my = []
         // var create_comment_elm = require('../../comment')
         let comment_elm = require('../../comment')
         let nico_comment = require('../../nico_comment')
 
         obs.on("receivedData", (data) => {
+            if(comment_anime!==null){
+                anime.remove('.comment');
+                $('.comment').remove();
+            }
+
             console.log('data=', data)
 
             let video = this.refs.palyermain
@@ -56,7 +62,7 @@
 
             let nc_elms = []
             let nc_params = []
-            const parent_id = "container"
+            const parent_id = "palyer-container"
             const width = getContentSize().width
             const duration = 5000
             let commnets = data.commnets
@@ -72,7 +78,7 @@
             });
 
             const num = 3
-            const c_top = this.refs.palyercontainer.offsetTop
+            // const c_top = this.refs.palyercontainer.offsetTop
             let cm = new nico_comment(num)
             cm.width = width
             cm.comments = nc_params
@@ -84,7 +90,7 @@
                 // lanes_map[cm.no] = cm.lane_index
                 let em = nc_elms[index]
                 em.style.position = "absolute"
-                em.style.top = (cm.lane_index * 50 + 50) + "px"
+                em.style.top = (cm.lane_index * 50) + "px"
             });
 
 
@@ -194,7 +200,7 @@
 
         this.on('mount', function () {
             console.log('mount')
-
+            let self = this
             this.refs.palyermain.addEventListener('loadedmetadata', (event) => {
                 let w = event.target.videoWidth
                 let h = event.target.videoHeight
@@ -206,6 +212,10 @@
                 const v_size = getVideoSize()
                 this.refs.palyermain.style.width = v_size.width + "px"
                 this.refs.palyermain.style.height = v_size.height + "px"
+                
+                const duration = event.target.duration
+                console.log("play duration=", duration)
+                obs.trigger('seek_reload', duration)
             });
 
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
@@ -218,6 +228,11 @@
             this.refs.palyermain.addEventListener('pause', ()=>{
                 console.log('addEventListener pauseによるイベント発火')
                 comment_anime.pause()
+            })
+
+            this.refs.palyermain.addEventListener('timeupdate', ()=>{
+                const current = this.refs.palyermain.currentTime
+                obs.trigger('seek_update_current', current)
             })
             let ff = () => {
                 setPlayerContainerSize()

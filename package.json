@@ -20,6 +20,8 @@
     "riot": "^3.5.0"
   },
   "dependencies": {
-    "animejs": "^2.0.2"
+    "animejs": "^2.0.2",
+    "jquery": "^3.2.1",
+    "jquery-ui": "^1.12.1"
   }
 }

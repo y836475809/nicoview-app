@@ -15,6 +15,20 @@
             text-align: right;
             background-color: #ccc000;
         }
+
+         :scope #seek-container {
+            padding-left: 10px;
+            padding-right: 10px;
+        }
+
+         :scope #slider .ui-slider-handle {
+            /* border-color: #c0c0c0; */
+            /* background: #E38692; */
+            height: 10px;
+            width: 10px;
+            margin-top:5px;
+            border-radius: 5px;
+        }
     </style>
     <div id="seek-container">
         <div id="slider"></div>
@@ -47,7 +61,7 @@
                 min: 0,
                 max: this.duration,
                 step: 1,
-                stop: function(event, ui) {
+                stop: function (event, ui) {
                     console.log('slider stop ui.value=', ui.value)
                     obs.trigger('on_seeked', ui.value)
                 }

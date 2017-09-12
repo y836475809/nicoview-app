@@ -252,6 +252,7 @@
                 console.log('player stop currente=', current)
                 // $('#player')[0].currentTime = current
                 this.refs.palyermain.currentTime = current
+                comment_anime.seek(current*1000)
             })
 
             obs.on("resizeEndEvent", function (wsize) {

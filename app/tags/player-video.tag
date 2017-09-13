@@ -1,4 +1,4 @@
-<player>
+<player-video>
     <style scoped>
          :scope header {
             position: fixed;
@@ -260,4 +260,4 @@
             })
         })
     </script>
-</player>
+</player-video>

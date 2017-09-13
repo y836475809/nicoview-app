@@ -1,4 +1,4 @@
-<controls>
+<player-controls>
     <style scoped>
          :scope #player-ctr {
             background-color: #cccccc;
@@ -28,4 +28,4 @@
         }
         add = () => { }
     </script>
-</controls>
+</player-controls>

@@ -1,6 +1,6 @@
-<player-video id="player-video">>
+<player-video id="player-video">
     <style scoped>
-         /* :scope header {
+        /* :scope header {
             position: fixed;
             top: 0;
             left: 0;
@@ -13,10 +13,11 @@
          :scope {
             background-color: #ccc000;
             position: absolute;
-            top: 50px;
+            /* top: 50px; */
             /* bottom: 300px; */
             width: 100%;
-            height: calc(100% - 50px - 80px);
+            height: 100%;
+            /* height: calc(100% - 50px - 80px); */
         }
         /*:scope #player-ctr {
             background-color: #cccccc;
@@ -30,8 +31,8 @@
     </style>
     <!-- <header>test</header> -->
     <!-- <div ref="palyercontainer" id="palyer-container"> -->
-        <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
-        </video>
+    <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
+    </video>
     <!-- </div> -->
     <!--<div ref="playerctr" id="player-ctr">
         <button id="play-btn" onclick='{ invert }'>start</button>
@@ -41,6 +42,11 @@
 
     <script>
         var $ = jQuery = require("jquery")
+
+        $(this.root).css("top", opts.h1)
+        let kk = opts.h1 + opts.h2
+        $(this.root).css("height",`calc(100% - ${kk}px)`)
+
         let comment_anime = null
         let my = []
         // var create_comment_elm = require('../../comment')
@@ -48,7 +54,7 @@
         let nico_comment = require('../../nico_comment')
 
         obs.on("receivedData", (data) => {
-            if(comment_anime!==null){
+            if (comment_anime !== null) {
                 anime.remove('.comment');
                 $('.comment').remove();
             }
@@ -159,7 +165,7 @@
         }
 
         var video_size = {}
-// 
+        // 
         let getContentSize = () => {
             let con = this.root
             let w = con.clientWidth
@@ -200,7 +206,7 @@
 
         this.on('mount', function () {
             console.log('mount')
-            let self = this
+
             this.refs.palyermain.addEventListener('loadedmetadata', (event) => {
                 let w = event.target.videoWidth
                 let h = event.target.videoHeight
@@ -212,7 +218,7 @@
                 const v_size = getVideoSize()
                 this.refs.palyermain.style.width = v_size.width + "px"
                 this.refs.palyermain.style.height = v_size.height + "px"
-                
+
                 const duration = event.target.duration
                 console.log("play duration=", duration)
                 obs.trigger('seek_reload', duration)
@@ -221,16 +227,16 @@
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
                 console.log('loadeddata event=', event);
             });
-            this.refs.palyermain.addEventListener('play', ()=>{
+            this.refs.palyermain.addEventListener('play', () => {
                 console.log('addEventListener playによるイベント発火')
                 comment_anime.play()
             })
-            this.refs.palyermain.addEventListener('pause', ()=>{
+            this.refs.palyermain.addEventListener('pause', () => {
                 console.log('addEventListener pauseによるイベント発火')
                 comment_anime.pause()
             })
 
-            this.refs.palyermain.addEventListener('timeupdate', ()=>{
+            this.refs.palyermain.addEventListener('timeupdate', () => {
                 const current = this.refs.palyermain.currentTime
                 obs.trigger('seek_update_current', current)
             })
@@ -242,17 +248,17 @@
                 this.refs.palyermain.style.height = v_size.height + "px"
             }
 
-            obs.on("play", ()=> {
+            obs.on("play", () => {
                 console.log("player.tag play")
                 this.refs.palyermain.play()
             })
 
-            obs.on("on_seeked", (current)=> {
+            obs.on("on_seeked", (current) => {
                 // this.refs.palyermain.pause()
                 console.log('player stop currente=', current)
                 // $('#player')[0].currentTime = current
                 this.refs.palyermain.currentTime = current
-                comment_anime.seek(current*1000)
+                comment_anime.seek(current * 1000)
             })
 
             obs.on("resizeEndEvent", function (wsize) {

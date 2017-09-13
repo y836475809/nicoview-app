@@ -10,5 +10,5 @@
             border: 2px solid black;
         }
     </style>
-    <div id="container">test</div>
+    <div>test</div>
 </player-tags>

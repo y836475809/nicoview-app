@@ -1,6 +1,6 @@
-<player-video>
+<player-video id="player-video">>
     <style scoped>
-         :scope header {
+         /* :scope header {
             position: fixed;
             top: 0;
             left: 0;
@@ -8,13 +8,13 @@
             width: calc(100% - 4px);
             height: 50px;
             border: 2px solid black;
-        }
+        } */
 
-         :scope #palyer-container {
+         :scope {
             background-color: #ccc000;
             position: absolute;
             top: 50px;
-            bottom: 300px;
+            /* bottom: 300px; */
             width: 100%;
             height: calc(100% - 50px - 80px);
         }
@@ -29,10 +29,10 @@
         }*/
     </style>
     <!-- <header>test</header> -->
-    <div ref="palyercontainer" id="palyer-container">
+    <!-- <div ref="palyercontainer" id="palyer-container"> -->
         <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
         </video>
-    </div>
+    <!-- </div> -->
     <!--<div ref="playerctr" id="player-ctr">
         <button id="play-btn" onclick='{ invert }'>start</button>
         <button id="stop-btn">stop</button>
@@ -62,7 +62,7 @@
 
             let nc_elms = []
             let nc_params = []
-            const parent_id = "palyer-container"
+            const parent_id = "player-video"
             const width = getContentSize().width
             const duration = 5000
             let commnets = data.commnets
@@ -161,7 +161,7 @@
         var video_size = {}
 // 
         let getContentSize = () => {
-            let con = this.refs.palyercontainer
+            let con = this.root
             let w = con.clientWidth
             let h = con.clientHeight
             return { width: w, height: h }

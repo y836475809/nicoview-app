@@ -2,7 +2,7 @@
   <thumb>
     <video_id>sm1000</video_id>
     <title>sample.mp4</title>
-    <description>テスト用サンプル</description>
+    <description>投稿コメントサンプル。他sm2000リストmylist/3000</description>
     <thumbnail_url>http://tn-skr2.smilevideo.jp/smile?i=1000</thumbnail_url>
     <first_retrieve>2000-01-01T01:02:03+09:00</first_retrieve>
     <length>00:45</length>
@@ -12,7 +12,7 @@
     <view_counter>500</view_counter>
     <comment_num>10</comment_num>
     <mylist_counter>5</mylist_counter>
-    <last_res_body>投稿コメントサンプル。他sm2000リストmylist/3000</last_res_body>
+    <last_res_body>最新コメント1 最新コメント2</last_res_body>
     <watch_url>http://www.nicovideo.jp/watch/sm1000</watch_url>
     <thumb_type>video</thumb_type>
     <embeddable>1</embeddable>

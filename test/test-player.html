@@ -13,23 +13,34 @@
 
 <script>
     const ipc = require('electron').ipcRenderer
+    const DB = require('../app/js/DB')
+
+    let db = new DB()
 
     let showPlayer = () => {
         ipc.send('request-show-player', null)
     }
 
     let sendData1 = () => {
-        let commnets = [
-            { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "aaa" },
-            { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "aaa" },
-            { no: 2, vpos: 1000, date: 1000, user_id: "aaa", text: "aaa" },
-            { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "aaa" },
-            { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "aaa" },
-            { no: 5, vpos: 25000, date: 1000, user_id: "aaa", text: "aaa" },
-        ]
+        
+        // let commnets = [
+        //     { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "aaa" },
+        //     { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "aaa" },
+        //     { no: 2, vpos: 1000, date: 1000, user_id: "aaa", text: "aaa" },
+        //     { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "aaa" },
+        //     { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "aaa" },
+        //     { no: 5, vpos: 25000, date: 1000, user_id: "aaa", text: "aaa" },
+        // ]
+        // const data = {
+        //     src: "../mov/test.mp4",
+        //     type: "video/mp4",
+        //     commnets: commnets
+        // }
+        const commnets = db.findComments("")
+        const video_info = db.findVideoInfo("")
         const data = {
-            src: "../mov/test.mp4",
-            type: "video/mp4",
+            src: video_info.src,
+            type: video_info.type,
             commnets: commnets
         }
         ipc.send('request-show-player', data)

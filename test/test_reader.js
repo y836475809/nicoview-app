@@ -4,14 +4,14 @@ const fs = require('fs');
 const reader = require("../app/js/reader")
 
 
-it("Xml2js comment", function () {
+it("read comment", function () {
     const xml = fs.readFileSync("./sample/sample.xml", "utf-8");
     const obj = reader.comment(xml)
     assert.deepStrictEqual(obj[0], {no:1, vpos:400, date:1505310000, user_id:"AAA", mail:"naka medium 184", text:"AAAテスト"})
 
 })
 
-it("Xml2js info", function () {
+it("read thumb info", function () {
     const xml = fs.readFileSync("./sample/sample[ThumbInfo].xml", "utf-8");
     const obj = reader.thumb_info(xml)
 

@@ -76,7 +76,7 @@
             commnets.forEach((cm) => {
                 const no = cm.no
                 const text = cm.text
-                const delay = cm.vpos
+                const delay = cm.vpos*10
                 ret = cm_elm.cretae_flow(no, text, delay)
                 nc_elms.push(ret.ele)
                 nc_params.push(ret.params)

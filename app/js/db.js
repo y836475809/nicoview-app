@@ -2,6 +2,10 @@ const fs = require('fs')
 const reader = require("./reader")
 
 class DB {
+    constructor() {
+
+    }
+
     /**
      * 
      * @param {string} id 
@@ -9,18 +13,23 @@ class DB {
     findVideoInfo(id) {
         return {
             src: "../mov/test.mp4",
-            type: "video/mp4",
-            commnets: commnets
+            type: "video/mp4"
         }
-    }    
+    }
 
     /**
      * 
      * @param {string} id 
      */
     findComments(id) {
-        const xml = fs.readFileSync("../sample/sample.xml", "utf-8");
-        return reader.comment(xml)
+        const xml = fs.readFileSync("./sample/sample.xml", "utf-8");
+        let comments = reader.comment(xml)
+        comments.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        })
+        return comments
     }
 
     /**
@@ -28,7 +37,7 @@ class DB {
      * @param {string} id 
      */
     findThumbInfo(id) {
-        const xml = fs.readFileSync("../sample/sample[ThumbInfo].xml", "utf-8");
+        const xml = fs.readFileSync("./sample/sample[ThumbInfo].xml", "utf-8");
         return reader.thumb_info(xml)
     }
 }

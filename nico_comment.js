@@ -9,6 +9,11 @@ class nico_comment {
 
     set comments(val) {
         this._comments = val
+
+        this.m = new Map()
+        this._comments.forEach((c, index) => {
+            this.m.set(c.no, index)
+        })
     }
 
     get comments() {
@@ -31,16 +36,17 @@ class nico_comment {
         })
     }
 
-    _update_lane(cu_vops) {
+    _update_lane(cu_vpos) {
         this.lanes.forEach((lane, index) => {
             if (lane.no !== -1) {
                 const no = lane.no
-                const vops = this._comments[no].vpos
-                const time = cu_vops - vops
+                const index = this.m.get(no)
+                const vpos = this._comments[index].vpos
+                const time = cu_vpos - vpos
                 const pos =
                     this._width
-                    + this._comments[no].width
-                    - time * this._comments[no].speed
+                    + this._comments[index].width
+                    - time * this._comments[index].speed
                 if (pos <= 0) {
                     lane.no = -1
                     lane.nokori = 0

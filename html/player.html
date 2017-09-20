@@ -30,13 +30,15 @@
 <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
 <!--<script src="app/app.js"></script>-->
 <script>
+    const remote = require('electron').remote
+    const base_dir = remote.getGlobal('sharedObj').base_dir
     var ipc = require('electron').ipcRenderer
     var riot = require('riot')
     var anime = require('animejs')
 
-    require('../app/tags/player-tags.tag')
-    require('../app/tags/player-video.tag')
-    require('../app/tags/player-controls.tag')
+    require(`${base_dir}/app/tags/player-tags.tag`)
+    require(`${base_dir}/app/tags/player-video.tag`)
+    require(`${base_dir}/app/tags/player-controls.tag`)
     // require('../app/tags/seek.tag')
 
     var obs = riot.observable();

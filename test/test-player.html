@@ -12,8 +12,10 @@
 </body>
 
 <script>
+    const remote = require('electron').remote
+    const base_dir = remote.getGlobal('sharedObj').base_dir
     const ipc = require('electron').ipcRenderer
-    const DB = require('../app/js/db').DB
+    const DB = require(`${base_dir}/app/js/db`).DB
     
     let db = new DB()
 

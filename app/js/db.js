@@ -1,5 +1,8 @@
+
+const remote = require('electron').remote
+const base_dir = remote.getGlobal('sharedObj').base_dir
 const fs = require('fs')
-const reader = require("./reader")
+const reader = require(`${base_dir}/app/js/reader`)
 
 class DB {
     constructor() {

@@ -41,6 +41,8 @@
     </div>-->
 
     <script>
+        const remote = require('electron').remote
+        const base_dir = remote.getGlobal('sharedObj').base_dir
         var $ = jQuery = require("jquery")
 
         $(this.root).css("top", opts.h1)
@@ -50,8 +52,8 @@
         let comment_anime = null
         let my = []
         // var create_comment_elm = require('../../comment')
-        let comment_elm = require('../../comment')
-        let nico_comment = require('../../nico_comment')
+        let comment_elm = require(`${base_dir}/comment`)
+        let nico_comment = require(`${base_dir}/nico_comment`)
 
         obs.on("receivedData", (data) => {
             if (comment_anime !== null) {

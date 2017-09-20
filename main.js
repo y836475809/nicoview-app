@@ -13,6 +13,7 @@ let player_win = null
 
 function createWindow() {
     console.log(process.argv)
+    global.sharedObj = {base_dir: __dirname};
 
     let html = "html/index.html"
     if (process.argv.length > 2) {
@@ -54,6 +55,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
     // macOS では、ドックをクリックされた時にウィンドウがなければ新しく作成する。
     if (win === null) {
+        
         createWindow()
     }
 })

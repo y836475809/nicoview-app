@@ -5,3 +5,4 @@ tmp/
 anime.min.js
 riot+compiler.min.js
 /*.log
+package-lock.json

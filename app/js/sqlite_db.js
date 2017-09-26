@@ -6,12 +6,8 @@ class SQLiteDB {
      * 
      * @param {string} db_file_path 
      */
-    constructor(db_file_path) {
-        this.db_file_path = db_file_path
-    }
-
-    init() {
-        const sqlite_db = fs.readFileSync(this.db_file_path)
+    init(db_file_path) {
+        const sqlite_db = fs.readFileSync(db_file_path)
         const uint_8array = new Uint8Array(sqlite_db)
         this.db = new sql.Database(uint_8array)
     }

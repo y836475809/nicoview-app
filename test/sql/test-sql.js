@@ -4,8 +4,8 @@ var SQLiteDB = require("../../app/js/sqlite_db")
 const db_file_path = "./test/sql/sample.db"
 
 it("sqlite db dirpath", function () {
-    let db = new SQLiteDB(db_file_path)
-    db.init()
+    let db = new SQLiteDB()
+    db.init(db_file_path)
     db.read_dirpath()
     const dirpath_map = db.get_dirpath()
     assert.deepStrictEqual(dirpath_map,
@@ -25,8 +25,8 @@ it("sqlite db dirpath", function () {
 })
 
 it("sqlite db tag", function () {
-    let db = new SQLiteDB(db_file_path)
-    db.init()
+    let db = new SQLiteDB()
+    db.init(db_file_path)
     db.read_tag_string()
     db.read_tag()
     const tag_map = db.tag_map
@@ -41,8 +41,8 @@ it("sqlite db tag", function () {
 })
 
 it("sqlite db video", function () {
-    let db = new SQLiteDB(db_file_path)
-    db.init()
+    let db = new SQLiteDB()
+    db.init(db_file_path)
     db.read()
     const video_map = db.get_video()
 

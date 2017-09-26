@@ -11,6 +11,16 @@ class DB {
 
     /**
      * 
+     * @param {Map} dir_path 
+     * @param {Map} video_info 
+     */
+    setData(dir_path, video_info) {
+        this.dir_path = dir_path
+        this.video_info = video_info
+    }
+
+    /**
+     * 
      * @param {string} id 
      */
     findVideoInfo(id) {

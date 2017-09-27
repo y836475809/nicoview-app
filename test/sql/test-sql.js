@@ -58,6 +58,9 @@ it("sqlite db video", function () {
     const sm4 = video_map.get("sm4")
     const sm5 = video_map.get("sm5")
 
+    // assert.equal(sm1.video_fname, "サンプル1 - [sm1].mp4")
+    assert.equal(sm1.video_type, "mp4")
+
     assert.deepStrictEqual(sm1.tags, ["タグ1", "タグ2"])
     assert.deepStrictEqual(sm2.tags, ["タグ1", "タグ2", "タグ3"])
     assert.deepStrictEqual(sm3.tags, ["タグ4"])

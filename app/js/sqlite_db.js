@@ -1,5 +1,8 @@
 const sql = require('sql.js')
 const fs = require('fs')
+const path = require('path')
+
+
 
 class SQLiteDB {
     /**
@@ -86,12 +89,17 @@ class SQLiteDB {
             const yet_reading = value[12]
             const pub_date = value[13]
 
+            // const video_fname = path.basename(decodeURI(uri))
+            const video_type = path.extname(uri).slice(1)
+
             const tags = this.tag_map.get(id)
             this.video_map.set(key,
                 {
                     uri: uri,
                     dirpath_id: dirpath_id,
                     video_name: video_name,
+                    // video_fname: video_fname,
+                    video_type: video_type,
                     is_economy: is_economy,
                     modification_date: modification_date,
                     creation_date: creation_date,

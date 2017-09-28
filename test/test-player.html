@@ -19,10 +19,10 @@
     const base_dir = remote.getGlobal('sharedObj').base_dir
     const ipc = require('electron').ipcRenderer
     const DB = require(`${base_dir}/app/js/db`).DB
-    const SQLiteDB = require(`${base_dir}/app/js/sqlite_db`).SQLiteDB
+    const SQLiteDB = require(`${base_dir}/app/js/sqlite_db`)
     const serializer = require(`${base_dir}/app/js/serializer`)
 
-    let sqlite_db = SQLiteDB()
+    let sqlite_db = new SQLiteDB()
     let db = new DB()
 
     let showPlayer = () => {

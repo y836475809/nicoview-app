@@ -24,26 +24,26 @@ class DB {
      * 
      * @param {string} id 
      */
-    findVideoInfo(id) {
-        if(this.video_info.has(id)){
-            throw Error("not find video_info")
-        }
+    // findVideoInfo(id) {
+    //     if(this.video_info.has(id)){
+    //         throw Error("not find video_info")
+    //     }
 
-        const video_info = this.video_info.get(id)
+    //     const video_info = this.video_info.get(id)
 
-        if(this.dir_path.has(video_info.id)){
-            throw Error("not find dir_path")
-        }
+    //     if(this.dir_path.has(video_info.id)){
+    //         throw Error("not find dir_path")
+    //     }
 
-        const dir_path = this.dir_path.get(video_info.id)
-        const src = path.join(dir_path,  `${video_info.video_name} - [${id}].${video_info.video_type}`)
-        const type = `video/${video_info.video_type}`
+    //     const dir_path = this.dir_path.get(video_info.id)
+    //     const src = path.join(dir_path,  `${video_info.video_name} - [${id}].${video_info.video_type}`)
+    //     const type = `video/${video_info.video_type}`
         
-        return {
-            src: src,
-            type: type
-        }
-    }
+    //     return {
+    //         src: src,
+    //         type: type
+    //     }
+    //}
 
     /**
      * 
@@ -81,6 +81,59 @@ class DB {
         const xml = fs.readFileSync("./sample/sample[ThumbInfo].xml", "utf-8");
         return reader.thumb_info(xml)
     }
+
+    findLibrary(){
+        let ret = []
+        this.video_info.forEach((value, key) => {
+            let copyObj = {}
+            Object.assign(copyObj , value)
+            copyObj.id = key
+            const video_fname = this.getVideoFileName(key, value.video_name)
+            copyObj.video_fname = video_fname
+            copyObj.video_url = this.getPath(key, video_fname)
+            copyObj.thumb_url = this.getPath(key, this.getThumbFileName(key, value.video_name))
+            ret.push(copyObj)
+        })
+        return ret
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} filename 
+     */
+    getPath(id, filename){
+        const dir_path = this.dir_path.get(id)
+        return path.join(dir_path,  filename)       
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} video_name 
+     * @param {string} video_type 
+     */
+    getVideoFileName(id, video_name, video_type){
+        return `${video_name} - [${id}].${video_type}`
+    }
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} video_name 
+     */
+    getCommentFileName(id, video_name){
+        return `${video_name} - [${id}].xml`
+    }
+
+    /**
+     * 
+     * @param {string} id 
+     * @param {string} video_name 
+     */
+    getThumbFileName(id, video_name){
+        return `${video_name} - [${id}][ThumbImg].jpeg`
+    }
+
 }
 
 module.exports.DB = DB

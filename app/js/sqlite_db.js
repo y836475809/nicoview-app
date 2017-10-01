@@ -90,12 +90,13 @@ class SQLiteDB {
             const pub_date = value[13]
 
             // const video_fname = path.basename(decodeURI(uri))
-            const video_type = path.extname(uri).slice(1)
+            // const video_type = path.extname(uri).slice(1)
+            const video_type = `video/${path.extname(uri).slice(1)}`
 
             const tags = this.tag_map.get(id)
             this.video_map.set(key,
                 {
-                    uri: uri,
+                    //uri: uri,
                     dirpath_id: dirpath_id,
                     video_name: video_name,
                     // video_fname: video_fname,
@@ -103,7 +104,7 @@ class SQLiteDB {
                     is_economy: is_economy,
                     modification_date: modification_date,
                     creation_date: creation_date,
-                    thumb_url: thumb_url,
+                    // thumb_url: thumb_url,
                     play_cont: play_cont,
                     time: time,
                     last_play_date: last_play_date,

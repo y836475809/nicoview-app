@@ -89,8 +89,7 @@ class SQLiteDB {
             const yet_reading = value[12]
             const pub_date = value[13]
 
-            // const video_fname = path.basename(decodeURI(uri))
-            // const video_type = path.extname(uri).slice(1)
+            const video_filename = path.basename(decodeURI(uri))
             const video_type = `video/${path.extname(uri).slice(1)}`
 
             const tags = this.tag_map.get(id)
@@ -99,7 +98,7 @@ class SQLiteDB {
                     //uri: uri,
                     dirpath_id: dirpath_id,
                     video_name: video_name,
-                    // video_fname: video_fname,
+                    video_filename: video_filename,
                     video_type: video_type,
                     is_economy: is_economy,
                     modification_date: modification_date,

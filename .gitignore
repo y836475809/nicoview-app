@@ -6,3 +6,5 @@ anime.min.js
 riot+compiler.min.js
 /*.log
 package-lock.json
+/test/sql/*.json
+/sample/*.json

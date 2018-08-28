@@ -3,18 +3,22 @@
 
 <head>
     <meta charset="UTF-8">
-    <!-- <script type="text/javascript" src="../../lib/jquery-3.2.1.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../../lib/DataTables/datatables.css">
-    <script type="text/javascript" charset="utf8" src="../../lib/DataTables/datatables.js"></script>
-    <script type="text/javascript" language="javascript" src="../../lib/colResize/dataTables.colResize.js"></script> -->
+    <!-- <script type="text/javascript" src="../../lib/jquery-3.2.1.min.js"></script> -->
+    <!-- <link rel="stylesheet" type="text/css" href="../../lib/DataTables/datatables.css"> -->
+    <!-- <script type="text/javascript" charset="utf8" src="../../lib/DataTables/datatables.js"></script> -->
+    <!-- <script type="text/javascript" language="javascript" src="../../lib/colResize/dataTables.colResize.js"></script> -->
     <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
+
+    <!-- <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.min.css"> -->
+    <!-- <script type="text/javascript" src="../../node_modules/dt-colresize/js/dataTables.colResize.js"></script> -->
+    <!-- <link rel="stylesheet" type="text/css" href="../../node_modules/dt-colresize/css/dataTables.colResize.css"> -->
 </head>
 <script>
     const remote = require('electron').remote
     const base_dir = remote.getGlobal('sharedObj').base_dir
     var $  = require( 'jquery' );
-    // var dt = require( 'datatables.net' )();
     var dt = require('datatables.net-dt' )(window, $);
+    // require('dt-colresize')(window, $);
 
     function Employee(image, name, position, salary, office) {
         this.image = image;
@@ -27,12 +31,13 @@
             return this._office;
         }
     };
+
     $(function () {
         $('#table_id').DataTable({
             dom: 'Zlfrtip',
             // data: [
-            //     new Employee("Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
-            //     new Employee("Garrett Winters", "Director", "$5,300", "Edinburgh")
+            // new Employee(`${base_dir}/test/datatables/data/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
+            // new Employee(`${base_dir}/test/datatables/data/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh")
             // ],
             columns: [
                 { title: 'image' },
@@ -41,26 +46,32 @@
                 { title: 'office' },
                 { title: 'position' }
             ],
-            "columnDefs": [{
+            columnDefs: [{
                 "targets": 0,
                 "data": "image",
                 "render": function (data, type, row, meta) {
                     return `<img src='${data}'>`
-                }
+                },
+                "width": "200px" ,
             },
             { targets: 1, data: "name" },
             { targets: 2, data: "salary" },
             { targets: 3, data: "office" },
-            { targets: 4, data: "position" }]
+            { targets: 4, data: "position" }],
+
+            // colResize: true,
+            // autoWidth: false,
+            // scrollX: false,      
         })
     })
     function showPlayer() {
         let table = $('#table_id').DataTable()
+        $('#table_id thead th:eq(0)').width('10');
         table.clear().rows.add([
             new Employee(`${base_dir}/test/datatables/data/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${base_dir}/test/datatables/data/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh")
         ])
-            .draw()
+        .draw()
     }
 
 </script>

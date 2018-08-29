@@ -21,6 +21,9 @@
 
     <!-- <script  type="text/javascript" src="../../lib/ColReorderWithResize-2.1/ColReorderWithResize.js"></script> -->
     <script  type="text/javascript" src="../../lib/colResize/dataTables.colResize.js"></script>
+
+    <!-- <script  type="text/javascript" src="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script> -->
+    <link rel="stylesheet" type="text/css" href="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">
 </head>
 <script>  
     const remote = require('electron').remote
@@ -32,6 +35,7 @@
     // require(`${base_dir}/lib/colResize/dataTables.colResize.js` )
     // require('dt-colresize')(window, $);
     // require('colresizable' );
+    require('jquery-contextmenu');
 
     function Employee(image, name, position, salary, office) {
         this.image = image;
@@ -75,8 +79,28 @@
             { targets: 3, data: "office" },
             { targets: 4, data: "position" }],
 
+            drawCallback : function() 
+            {
+                $.contextMenu({
+                    selector: 'tbody tr td', 
+                    callback: function(key, options) {
+                        // var id = options.$trigger[0].parentElement.id;
+                        var m = "clicked: " + key + ' ' + selected_id;
+                        console.log(m); 
+                    },
+                    items: {
+                        "edit": {name: "Edit", icon: "edit"},
+                        "cut": {name: "Cut", icon: "cut"},
+                        "copy": {name: "Copy", icon: "copy"},
+                        "paste": {name: "Paste", icon: "paste"},
+                        "delete": {name: "Delete", icon: "delete"}
+                    }
+                });
+            },
+
             // colResize: true,
             autoWidth: true,
+            paging: false
             // scrollX: false,
             // colResize: {
             //     // scrollY: 200,       //cannot be used with DT scrollY
@@ -84,6 +108,38 @@
             //     resizeTable: false
             // },
         })
+
+        let selected_id;
+        $('#table_id tbody').on( 'mousedown', 'tr',  function() {
+            let table = $('#table_id').DataTable()
+            var data = table.row(this).data();
+            if ( $(this).hasClass('selected') ) {
+                if(selected_id!==data.name)
+                {
+                    $(this).removeClass('selected');
+                }     
+            }else {
+                table.$('tr.selected').removeClass('selected');
+                $(this).addClass('selected');
+                // var data = table.row(this).data();
+                selected_id = data.name;
+            }
+        } );
+
+        // let table = $('#table_id').DataTable()
+        $('#table_id tbody').on('dblclick', 'tr', function (){
+            let table = $('#table_id').DataTable()
+            var data = table.row(this).data();
+            console.log(data.name);
+            // alert( 'You clicked on '+data[1]+'\'s row' );
+        } );
+
+        $('#table_id tbody').on('dblclick', 'tr', function (){
+            let table = $('#table_id').DataTable()
+            var data = table.row(this).data();
+            console.log(data.name);
+            // alert( 'You clicked on '+data[1]+'\'s row' );
+        } );
 
         // let table = $('#table_id').DataTable()
         // table.colResizable({
@@ -106,10 +162,13 @@
     })
     function showPlayer() {
         let table = $('#table_id').DataTable()
-        
+        const data_dir = `${base_dir}/test/datatables/data`
         table.clear().rows.add([
-            new Employee(`${base_dir}/test/datatables/data/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
-            new Employee(`${base_dir}/test/datatables/data/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh")
+            new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
         ])
         .draw()
 
@@ -127,7 +186,7 @@
 <body>
     <input type="button" value="show" onClick="showPlayer()">
     <input type="button" value="width" onClick="setWidth()">
-    <table id="table_id" class="display" style="width:100%"></table>
+    <table id="table_id" class="cell-border stripe hover" style="width:100%"></table>
 </body>
 
 </html>

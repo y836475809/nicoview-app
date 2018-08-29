@@ -3,190 +3,37 @@
 
 <head>
     <meta charset="UTF-8">
-        <script>
-            window.jQuery = window.$ = require('jquery');
+    <script>
+        window.jQuery = window.$ = require('jquery');
     </script>
-    <!-- <link rel="stylesheet" type="text/css" href="../../lib/DataTables/datatables.css"> -->
-    <!-- <script type="text/javascript" charset="utf8" src="../../lib/DataTables/datatables.js"></script> -->
-    <!-- <script type="text/javascript" language="javascript" src="../../lib/colResize/dataTables.colResize.js"></script> -->
-    <!-- <script  type="text/javascript" src="../../node_modules/datatables.net-dt/js/dataTables.dataTables.min.js"></script> -->
     <script  type="text/javascript" src="../../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
-
-    <!-- <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-fixedcolumns-dt/css/fixedColumns.dataTables.min.css"> -->
-    <!-- <script type="text/javascript" src="../../node_modules/dt-colresize/js/dataTables.colResize.js"></script> -->
-    <!-- <link rel="stylesheet" type="text/css" href="../../node_modules/dt-colresize/css/dataTables.colResize.css"> -->
-    <!-- <link rel="stylesheet" type="text/css" href="style.css"> -->
-    <!-- <script type="text/javascript" src="../../lib/jquery-3.2.1.min.js"></script> -->
-
-    <!-- <script  type="text/javascript" src="../../lib/ColReorderWithResize-2.1/ColReorderWithResize.js"></script> -->
     <script  type="text/javascript" src="../../lib/colResize/dataTables.colResize.js"></script>
-
-    <!-- <script  type="text/javascript" src="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.js"></script> -->
     <link rel="stylesheet" type="text/css" href="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">
 </head>
-<script>  
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
-    // var $  = require( 'jquery' );
-    // var dt = require('datatables.net-dt' )(window, $);
-    // require('datatables.net' )(window, $);
-    // require(`${base_dir}/lib/ColReorderWithResize-2.1/ColReorderWithResize.js` )
-    // require(`${base_dir}/lib/colResize/dataTables.colResize.js` )
-    // require('dt-colresize')(window, $);
-    // require('colresizable' );
-    require('jquery-contextmenu');
-
-    function Employee(image, name, position, salary, office) {
-        this.image = image;
-        this.name = name;
-        this.position = position;
-        this.salary = salary;
-        this._office = office;
-
-        this.office = function () {
-            return this._office;
-        }
-    };
-
-    $(function () {
-        $('#table_id').DataTable({
-            dom: 'Zlfrtip',
-            // dom: 'Rlfrtip',
-            // 'sDom': 'Rlfrtip',
-
-            // data: [
-            // new Employee(`${base_dir}/test/datatables/data/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
-            // new Employee(`${base_dir}/test/datatables/data/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh")
-            // ],
-            columns: [
-                { title: 'image' },
-                { title: 'name' },
-                { title: 'salary' },
-                { title: 'office' },
-                { title: 'position' }
-            ],
-            columnDefs: [{
-                "targets": 0,
-                "data": "image",
-                "render": function (data, type, row, meta) {
-                    return `<img src='${data}'>`
-                },
-                // "width": "200px" ,
-            },
-            { targets: 1, data: "name" },
-            { targets: 2, data: "salary" },
-            { targets: 3, data: "office" },
-            { targets: 4, data: "position" }],
-
-            drawCallback : function() 
-            {
-                $.contextMenu({
-                    selector: 'tbody tr td', 
-                    callback: function(key, options) {
-                        // var id = options.$trigger[0].parentElement.id;
-                        var m = "clicked: " + key + ' ' + selected_id;
-                        console.log(m); 
-                    },
-                    items: {
-                        "edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
-                        "copy": {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},
-                        "delete": {name: "Delete", icon: "delete"}
-                    }
-                });
-            },
-
-            // colResize: true,
-            autoWidth: true,
-            paging: false
-            // scrollX: false,
-            // colResize: {
-            //     // scrollY: 200,       //cannot be used with DT scrollY
-            //     // minColumnWidth: 50
-            //     resizeTable: false
-            // },
-        })
-
-        let selected_id;
-        $('#table_id tbody').on( 'mousedown', 'tr',  function() {
-            let table = $('#table_id').DataTable()
-            var data = table.row(this).data();
-            if ( $(this).hasClass('selected') ) {
-                if(selected_id!==data.name)
-                {
-                    $(this).removeClass('selected');
-                }     
-            }else {
-                table.$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-                // var data = table.row(this).data();
-                selected_id = data.name;
-            }
-        } );
-
-        // let table = $('#table_id').DataTable()
-        $('#table_id tbody').on('dblclick', 'tr', function (){
-            let table = $('#table_id').DataTable()
-            var data = table.row(this).data();
-            console.log(data.name);
-            // alert( 'You clicked on '+data[1]+'\'s row' );
-        } );
-
-        $('#table_id tbody').on('dblclick', 'tr', function (){
-            let table = $('#table_id').DataTable()
-            var data = table.row(this).data();
-            console.log(data.name);
-            // alert( 'You clicked on '+data[1]+'\'s row' );
-        } );
-
-        // let table = $('#table_id').DataTable()
-        // table.colResizable({
-		// 	liveDrag:true, 
-		// 	gripInnerHtml:"<div class='grip'></div>", 
-		// 	draggingClass:"dragging", 
-        //     resizeMode:'fit'
-        // });
-        // table.on("column-resized.dt", function(event, columnIndex, newColumnWidth) {
-        //     console.log(newColumnWidth)
-        //     table.width = window.width
-        // });
-
-        // $("#table_id").colResizable({
-		// 	liveDrag:true, 
-		// 	gripInnerHtml:"<div class='grip'></div>", 
-		// 	draggingClass:"dragging", 
-        //     resizeMode:'fit'
-        // });
-    })
-    function showPlayer() {
-        let table = $('#table_id').DataTable()
-        const data_dir = `${base_dir}/test/datatables/data`
-        table.clear().rows.add([
-            new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
-            new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
-        ])
-        .draw()
-
-        // $('#table_id thead th:eq(1)').width('10');
-        // $('#table_id thead th:eq(2)').width('10');
-        // table.draw();
-    }
-
-    function setWidth() {
-        $('#table_id thead th:eq(1)').width('50');
-    }
-
-</script>
-
 <body>
     <input type="button" value="show" onClick="showPlayer()">
     <input type="button" value="width" onClick="setWidth()">
-    <table id="table_id" class="cell-border stripe hover" style="width:100%"></table>
+    <library-datatable></library-datatable>
 </body>
+
+<script>  
+    const remote = require('electron').remote
+    const base_dir = remote.getGlobal('sharedObj').base_dir
+    var riot = require('riot')
+    require('jquery-contextmenu');
+    require(`${base_dir}/app/tags/library-datatable.tag`)
+    var obs = riot.observable();
+
+    riot.mount('library-datatable');
+
+    let showPlayer = () => {
+        obs.trigger("showPlayer")
+    }
+
+    let setWidth = () => {
+        obs.trigger("setWidth")
+    }
+</script>
 
 </html>

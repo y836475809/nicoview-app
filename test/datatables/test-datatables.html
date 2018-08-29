@@ -20,19 +20,39 @@
 <script>  
     const remote = require('electron').remote
     const base_dir = remote.getGlobal('sharedObj').base_dir
-    var riot = require('riot')
     require('jquery-contextmenu');
+    
+    var riot = require('riot')
     require(`${base_dir}/app/tags/library-datatable.tag`)
     var obs = riot.observable();
 
     riot.mount('library-datatable');
 
-    let showPlayer = () => {
-        obs.trigger("showPlayer")
-    }
-
     let setWidth = () => {
         obs.trigger("setWidth")
+    }
+
+    function Employee(image, name, position, salary, office) {
+         this.image = image;
+         this.name = name;
+         this.position = position;
+         this.salary = salary;
+         this._office = office;
+
+         this.office = function () {
+             return this._office;
+         }
+    };
+    let showPlayer = () => {
+        const data_dir = `${base_dir}/test/datatables/data`
+        const datas = [
+            new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
+        ]
+        obs.trigger("receivedData", datas)
     }
 </script>
 

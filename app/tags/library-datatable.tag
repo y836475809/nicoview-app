@@ -9,29 +9,9 @@ class="cell-border stripe hover" style="width:100%"></table>
 
     require('jquery-contextmenu');
 
-    function Employee(image, name, position, salary, office) {
-         this.image = image;
-         this.name = name;
-         this.position = position;
-         this.salary = salary;
-         this._office = office;
-
-         this.office = function () {
-             return this._office;
-         }
-    };
-
-    obs.on("showPlayer", () => {
+    obs.on("receivedData", (datas) => {
         let table = $('#table_id').DataTable()
-        const data_dir = `${base_dir}/test/datatables/data`
-        table.clear().rows.add([
-            new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
-            new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
-        ])
-        .draw()
+        table.clear().rows.add(datas).draw()
     })
 
     obs.on("setWidth", () => {

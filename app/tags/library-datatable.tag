@@ -1,7 +1,22 @@
 <library-datatable id="library-datatable">
+    <style scoped>
+        :scope table.dataTable thead tr th:first-child, 
+               table.dataTable tbody tr td:first-child {  
+            border-left: 1px solid #e3e7e8;
+        }
+
+        :scope table.dataTable thead tr th {  
+            border-top: 1px solid #e3e7e8;
+            border-right: 1px solid #e3e7e8;
+            border-bottom: 1px solid #e3e7e8;
+        }
+        :scope table.dataTable tbody td {
+            border-right: 1px solid #e3e7e8;
+        }
+    </style>
 
 <table ref="librarytable" id="table_id" 
-class="cell-border stripe hover" style="width:100%"></table>
+class="stripe hover" style="width:100%"></table>
 
 <script>
     const remote = require('electron').remote
@@ -31,6 +46,7 @@ class="cell-border stripe hover" style="width:100%"></table>
             ],
             columnDefs: [{
                 "targets": 0,
+                "orderable": false,
                 "data": "image",
                 "render": function (data, type, row, meta) {
                     return `<img src='${data}'>`

@@ -16,7 +16,7 @@
     </style>
 
 <table ref="librarytable" id="table_id" 
-class="stripe hover" style="width:100%"></table>
+class="display stripe hover" style="width:100%"></table>
 
 <script>
     const remote = require('electron').remote
@@ -30,12 +30,19 @@ class="stripe hover" style="width:100%"></table>
     })
 
     obs.on("setWidth", () => {
-        $('#table_id thead th:eq(1)').width('50');
+        //$('#table_id thead th:eq(1)').width('50');
+        //   $("#table_id").DataTable({scrollY: 100}); 
+        // ...
+        $("#table_id").DataTable({retrieve: true}).destroy();
+        // ...
+        $("#table_id").DataTable({scrollY: 300});
     })
   
     this.on('mount', function () {
         
         $('#table_id').DataTable({
+        scrollY:'100px',
+        scrollCollapse:true,
             dom: 'Zlfrtip',
             columns: [
                 { title: 'image' },

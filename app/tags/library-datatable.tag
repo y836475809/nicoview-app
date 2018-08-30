@@ -34,6 +34,8 @@ class="display stripe hover" style="width:100%"></table>
         let table = $('#table_id').DataTable()
         table.clear().rows.add(datas).draw()
 
+        window.resizeBy(1, 0);
+        window.resizeBy(-1, 0); 
     })
 
     obs.on("setWidth", () => {
@@ -46,7 +48,7 @@ class="display stripe hover" style="width:100%"></table>
         
         table = $('#table_id').DataTable({
         scrollY:'400px',
-        scrollCollapse:true,
+        scrollCollapse:false,
             dom: 'Zlfrtip',
             columns: [
                 { title: 'image' },
@@ -88,24 +90,19 @@ class="display stripe hover" style="width:100%"></table>
                 });
             },
             colResize: {
+                "handleWidth": 10,
+                "exclude": [0],
                 "resizeCallback": function(column) {
                     console.log("Column Resized = ", column);
                 }
             },
-            //initComplete: function(settings, json) {
-           //     console.log( 'DataTables has finished its initialisation.' );
-            //},
 
             autoWidth: true,
             paging: true,
             deferRender: true,
+            stateSave: true,
             displayLength: 4
         })
-        //table.on( 'draw', function () {
-        //    console.log( 'DataTables has finished draw.' );
-        //    let table = $('#table_id').DataTable()
-        //    table.columns.adjust()
-        //})
         table.on( 'page.dt',   function () { 
             $("#table-base div.dataTables_scrollBody").scrollTop(0);
          } )

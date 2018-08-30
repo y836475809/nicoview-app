@@ -45,12 +45,16 @@
     };
     let showPlayer = () => {
         const data_dir = `${base_dir}/test/datatables/data`
+        const data_http1 = "http://localhost:8000/brie1"
+        const data_http2 = "http://localhost:8000/brie2"
         const datas = [
+            new Employee(data_http1, "http Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(data_http2, "http Winters", "Director", "$5,300", "Edinburgh"),
         ]
         obs.trigger("receivedData", datas)
     }

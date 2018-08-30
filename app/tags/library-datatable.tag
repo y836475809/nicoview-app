@@ -13,11 +13,17 @@
         :scope table.dataTable tbody td {
             border-right: 1px solid #e3e7e8;
         }
-    </style>
 
+        :scope #table-base {
+            background-color: #cccccc;
+            width: 100%;
+            height: 100%;
+        } 
+    </style>
+<div id="table-base">
 <table ref="librarytable" id="table_id" 
 class="display stripe hover" style="width:100%"></table>
-
+</div>
 <script>
     const remote = require('electron').remote
     const base_dir = remote.getGlobal('sharedObj').base_dir
@@ -27,21 +33,19 @@ class="display stripe hover" style="width:100%"></table>
     obs.on("receivedData", (datas) => {
         let table = $('#table_id').DataTable()
         table.clear().rows.add(datas).draw()
+
     })
 
     obs.on("setWidth", () => {
-        //$('#table_id thead th:eq(1)').width('50');
-        //   $("#table_id").DataTable({scrollY: 100}); 
-        // ...
-        $("#table_id").DataTable({retrieve: true}).destroy();
-        // ...
-        $("#table_id").DataTable({scrollY: 300});
+        //table.columns.adjust()
+        $("#table-base div.dataTables_scrollBody").scrollTop(0);
+
     })
-  
+
     this.on('mount', function () {
         
-        $('#table_id').DataTable({
-        scrollY:'100px',
+        table = $('#table_id').DataTable({
+        scrollY:'400px',
         scrollCollapse:true,
             dom: 'Zlfrtip',
             columns: [
@@ -55,6 +59,8 @@ class="display stripe hover" style="width:100%"></table>
                 "targets": 0,
                 "orderable": false,
                 "data": "image",
+                // width: 100,
+                //"width": "40%",
                 "render": function (data, type, row, meta) {
                     return `<img src='${data}'>`
                 },
@@ -81,9 +87,28 @@ class="display stripe hover" style="width:100%"></table>
                     }
                 });
             },
+            colResize: {
+                "resizeCallback": function(column) {
+                    console.log("Column Resized = ", column);
+                }
+            },
+            //initComplete: function(settings, json) {
+           //     console.log( 'DataTables has finished its initialisation.' );
+            //},
+
             autoWidth: true,
-            paging: false
+            paging: true,
+            deferRender: true,
+            displayLength: 4
         })
+        //table.on( 'draw', function () {
+        //    console.log( 'DataTables has finished draw.' );
+        //    let table = $('#table_id').DataTable()
+        //    table.columns.adjust()
+        //})
+        table.on( 'page.dt',   function () { 
+            $("#table-base div.dataTables_scrollBody").scrollTop(0);
+         } )
 
         let selected_id;
         $('#table_id tbody').on( 'mousedown', 'tr',  function() {

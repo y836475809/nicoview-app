@@ -20,11 +20,12 @@
             height: 100%;
         } 
     </style>
-<div id="table-base">
+<div id="table-base" show={ is_display }>
 <table ref="librarytable" id="table_id" 
 class="display stripe hover" style="width:100%"></table>
 </div>
 <script>
+this.is_display = true
     const remote = require('electron').remote
     const base_dir = remote.getGlobal('sharedObj').base_dir
 
@@ -40,8 +41,9 @@ class="display stripe hover" style="width:100%"></table>
 
     obs.on("setWidth", () => {
         //table.columns.adjust()
-        $("#table-base div.dataTables_scrollBody").scrollTop(0);
-
+        //$("#table-base div.dataTables_scrollBody").scrollTop(0);
+        this.is_display = !this.is_display
+        this.update()
     })
 
     this.on('mount', function () {

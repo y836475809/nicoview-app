@@ -20,7 +20,7 @@
             height: 100%;
         } 
     </style>
-<div id="table-base" show={ is_display }>
+<div id="table-base">
 <table ref="librarytable" id="table_id" 
 class="display stripe hover" style="width:100%"></table>
 </div>

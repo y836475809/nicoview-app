@@ -82,6 +82,17 @@ this.is_display = true
                         var m = "clicked: " + key + ' ' + selected_id;
                         console.log(m); 
                     },
+                    events: {
+                    show : function(options){
+                        const cellIndex = parseInt(options.$trigger[0].cellIndex);
+                        const row = table.row(options.$trigger[0].parentNode);
+                        const rowIndex = row.index();
+                        console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
+                        selselect(options.$trigger[0].parentNode)
+
+                        return true;
+                    },
+                    },
                     items: {
                         "edit": {name: "Edit", icon: "edit"},
                         "cut": {name: "Cut", icon: "cut"},
@@ -111,8 +122,10 @@ this.is_display = true
 
         let selected_id;
         $('#table_id tbody').on( 'mousedown', 'tr',  function() {
+            /*
             let table = $('#table_id').DataTable()
             var data = table.row(this).data();
+             console.log("mousedown ", table.row(this).index()); 
             if ( $(this).hasClass('selected') ) {
                 if(selected_id!==data.name)
                 {
@@ -123,7 +136,25 @@ this.is_display = true
                 $(this).addClass('selected');
                 selected_id = data.name;
             }
+            */
+            selselect(this);
         } );
+
+        let selselect = (elm)=>{
+            let table = $('#table_id').DataTable()
+            var data = table.row(elm).data();
+             console.log("mousedown ", table.row(elm).index()); 
+            if ( $(elm).hasClass('selected') ) {
+                if(selected_id!==data.name)
+                {
+                    $(elm).removeClass('selected');
+                }     
+            }else {
+                table.$('tr.selected').removeClass('selected');
+                $(elm).addClass('selected');
+                selected_id = data.name;
+            }            
+        }
 
         $('#table_id tbody').on('dblclick', 'tr', function (){
             let table = $('#table_id').DataTable()

@@ -25,10 +25,6 @@
 class="display stripe hover" style="width:100%"></table>
 </div>
 <script>
-this.is_display = true
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
-
     require('jquery-contextmenu');
 
     obs.on("receivedData", (datas) => {
@@ -39,18 +35,60 @@ this.is_display = true
         window.resizeBy(-1, 0); 
     })
 
-    obs.on("setWidth", () => {
+    obs.on("setSize", () => {
         //table.columns.adjust()
         //$("#table-base div.dataTables_scrollBody").scrollTop(0);
-        this.is_display = !this.is_display
-        this.update()
+        //this.is_display = !this.is_display
+        //this.update()
+
+        //settings.scrollY= "600px";
+        //table.destroy();
+        //$('#table_id').DataTable(settings);
+        let table = $('#table_id').DataTable();
+        let settings = table.settings();
+        //settings[0].oFeatures.bPaginate = true;
+        //settings[0].oInit.sScrollY = "600px";
+        $("#table_id").DataTable({retrieve: true}).destroy();
+        $("#table_id").DataTable({
+                scrollY: "600px",
+                dom: 'Zlfrtip',
+                scrollCollapse:false,
+                autoWidth: true,
+                paging: false,
+                deferRender: true,
+                stateSave: true,
+            });
+        //$("#table_id").DataTable(settings);
+        //this.update();
+
+
+        console.log("settings = ", settings[0]); 
     })
 
-    this.on('mount', function () {
-        
+    var selselect = function(){
+            let selindex=0;
+
+            return function(elm){
+                let table = $('#table_id').DataTable()
+                var data = table.row(elm).data();
+                let new_index = table.row(elm).index();
+                console.log("mousedown ", table.row(elm).index()); 
+                if ( $(elm).hasClass('selected') ) {
+                    if(selindex!==new_index)
+                    {
+                        $(elm).removeClass('selected');
+                    }     
+                }else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(elm).addClass('selected');
+                } 
+                selindex=new_index;        
+            };
+        }();
+
+    this.on('mount', function () {   
         table = $('#table_id').DataTable({
-        scrollY:'400px',
-        scrollCollapse:false,
+
             dom: 'Zlfrtip',
             columns: [
                 { title: 'image' },
@@ -109,53 +147,23 @@ this.is_display = true
                     console.log("Column Resized = ", column);
                 }
             },
-
+            scrollY:'400px',
+            scrollCollapse:false,
             autoWidth: true,
-            paging: true,
+            paging: false,
             deferRender: true,
             stateSave: true,
-            displayLength: 4
+            //displayLength: 4
         })
         table.on( 'page.dt',   function () { 
             $("#table-base div.dataTables_scrollBody").scrollTop(0);
          } )
 
-        let selected_id;
+
         $('#table_id tbody').on( 'mousedown', 'tr',  function() {
-            /*
-            let table = $('#table_id').DataTable()
-            var data = table.row(this).data();
-             console.log("mousedown ", table.row(this).index()); 
-            if ( $(this).hasClass('selected') ) {
-                if(selected_id!==data.name)
-                {
-                    $(this).removeClass('selected');
-                }     
-            }else {
-                table.$('tr.selected').removeClass('selected');
-                $(this).addClass('selected');
-                selected_id = data.name;
-            }
-            */
             selselect(this);
         } );
-
-        let selselect = (elm)=>{
-            let table = $('#table_id').DataTable()
-            var data = table.row(elm).data();
-             console.log("mousedown ", table.row(elm).index()); 
-            if ( $(elm).hasClass('selected') ) {
-                if(selected_id!==data.name)
-                {
-                    $(elm).removeClass('selected');
-                }     
-            }else {
-                table.$('tr.selected').removeClass('selected');
-                $(elm).addClass('selected');
-                selected_id = data.name;
-            }            
-        }
-
+   
         $('#table_id tbody').on('dblclick', 'tr', function (){
             let table = $('#table_id').DataTable()
             var data = table.row(this).data();

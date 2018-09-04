@@ -26,10 +26,15 @@
         <select-page-tabs></select-page-tabs>
         <div show="{ index===0 }">
             <input type="button" value="show" onClick="{showPlayer}">     
+            <input type="button" value="size" onClick="{setSize}">     
             <library-datatable></library-datatable>
         </div>
-        <search-datatable show="{ index===1 }"><div>test2</div></search-datatable>
-        <search-datatable show="{ index===2 }"><div>test3</div></search-datatable>
+        <div show="{ index===1 }">
+            <search-datatable></search-datatable>
+        </div>
+        <div show="{ index===2 }">
+            test
+        </div>
         obs.on("update", () => {
             console.log("main update")
             this.update()
@@ -77,6 +82,9 @@
         ]
         obs.trigger("receivedData", datas)
     }
+    this.setSize = () => {
+        obs.trigger("setSize");
+    };
     riot.mount('*');
 </script>
 

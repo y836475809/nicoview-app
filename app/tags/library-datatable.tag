@@ -28,6 +28,7 @@ class="display stripe hover" style="width:100%"></table>
     require('jquery-contextmenu');
 
     const datatable_id = `#${opts.id}`;
+    const opts_columns = opts.columns;
 
     let getDataTableElm = function(){
         return $(`#${opts.id}`);
@@ -99,20 +100,21 @@ class="display stripe hover" style="width:100%"></table>
         let table = getDataTableElm();
         table.DataTable({
             dom: 'Zlfrtip',
-            columns: [
+            columns: opts_columns,
+            /*
+            [
                 { title: 'image' },
                 { title: 'name' },
                 { title: 'salary' },
                 { title: 'office' },
                 { title: 'position' }
             ],
+            */
             columnDefs: [{
-                "targets": 0,
-                "orderable": false,
-                "data": "image",
-                // width: 100,
-                //"width": "40%",
-                "render": function (data, type, row, meta) {
+                targets: 0,
+                orderable: false,
+                data: "image",
+                render: function (data, type, row, meta) {
                     return `<img src='${data}'>`
                 },
             },

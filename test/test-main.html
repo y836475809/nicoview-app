@@ -49,8 +49,11 @@
 </body>
 
 <script>
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
+    const remote = require('electron').remote;
+    const base_dir = remote.getGlobal('sharedObj').base_dir;
+
+    const time_format = require("../app/js/time_format");
+    console.log(time_format.format(1332592373506));
 
     require('jquery-contextmenu');
     var obs = riot.observable();
@@ -110,7 +113,22 @@
         obs.trigger("setSize");
     };
     riot.mount('select-page-tabs');
-    riot.mount('#page1 library-datatable', {id:"table_id"});
+    riot.mount('#page1 library-datatable', 
+        {
+            id:"table_id", 
+            columns:[                
+                { title: 'image' },
+                { title: 'name' },
+                { title: 'created' },
+                { title: 'posted' },
+                { title: 'time' },
+                { title: 'play count' },
+                { title: 'play count' }
+            ],
+            columnDefs:[
+                
+            ]
+        });
     riot.mount('#page2 search-datatable');
 </script>
 

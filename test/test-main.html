@@ -15,32 +15,39 @@
     <script type="riot/tag" src="../app/tags/select-page-tabs.tag"></script>
     <script type="riot/tag" src="../app/tags/library-datatable.tag"></script>
     <script type="riot/tag" src="../app/tags/search-datatable.tag"></script>
+
+    <!-- <style type="text/css">
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        #page1 {
+            /* height: 100%; */
+        }        
+    </style> -->
 </head>
 
 <body>
-    <main></main>
+    <select-page-tabs></select-page-tabs>
+    <div id="page1">
+        <input type="button" value="show" onClick="showPlayer();">     
+        <input type="button" value="size" onClick="setSize();">     
+        <library-datatable></library-datatable>
+    </div>
+    <div id="page2">
+        <search-datatable></search-datatable>
+    </div>
+    <div id="page3">
+        test
+        <!-- <search-datatable></search-datatable> -->
+    </div>
 </body>
 
-<script type="riot/tag">
-    <main>
-        <select-page-tabs></select-page-tabs>
-        <div show="{ index===0 }">
-            <input type="button" value="show" onClick="{showPlayer}">     
-            <input type="button" value="size" onClick="{setSize}">     
-            <library-datatable></library-datatable>
-        </div>
-        <div show="{ index===1 }">
-            <search-datatable></search-datatable>
-        </div>
-        <div show="{ index===2 }">
-            test
-        </div>
-        obs.on("update", () => {
-            console.log("main update")
-            this.update()
-        })      
-    </main>
-</script>
 <script>
     const remote = require('electron').remote
     const base_dir = remote.getGlobal('sharedObj').base_dir
@@ -49,10 +56,27 @@
     var obs = riot.observable();
     
     this.index = 0;
+    let selectPage = (index)=>{
+        let page1 = document.getElementById("page1");
+        let page2 = document.getElementById("page2");
+        let page3 = document.getElementById("page3");
+
+        let list = ["none", "none", "none"];
+        list[index] = "block";
+        //obs.trigger("update")
+        page1.style.display = list[0];
+        page2.style.display = list[1];
+        page3.style.display = list[2];       
+    };
+
+    selectPage(this.index);
+
+
     obs.on("selindex", (index) => {
-        //console.log("selindex = ", index)
-        this.index = index
-        obs.trigger("update")
+        console.log("selindex = ", index)
+        this.index = index;
+        
+        selectPage(index)
     })
     
     function Employee(image, name, position, salary, office) {
@@ -66,7 +90,7 @@
              return this._office;
          }
     };
-    this.showPlayer = () => {
+    let showPlayer = () => {
         console.log("showPlayer")
         const data_dir = `${base_dir}/test/datatables/data`
         const data_http1 = "http://localhost:8000/brie1"
@@ -82,10 +106,12 @@
         ]
         obs.trigger("receivedData", datas)
     }
-    this.setSize = () => {
+    let setSize = () => {
         obs.trigger("setSize");
     };
-    riot.mount('*');
+    riot.mount('select-page-tabs');
+    riot.mount('#page1 library-datatable', {id:"table_id"});
+    riot.mount('#page2 search-datatable');
 </script>
 
 </html>

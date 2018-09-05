@@ -5,3 +5,7 @@ tmp/
 anime.min.js
 riot+compiler.min.js
 /*.log
+/sample/*.json
+/test/datatables/data/*.jpg
+/test/sql/*.json
+/package-lock.json

@@ -14,21 +14,30 @@
             border-right: 1px solid #e3e7e8;
         }
 
-        :scope #table-base {
+        :scope .table-base {
             background-color: #cccccc;
             width: 100%;
             height: 100%;
         } 
     </style>
-<div id="table-base">
-<table ref="librarytable" id="table_id" 
+<div class="table-base">
+<table ref="datatable" id="{opts.id}"
 class="display stripe hover" style="width:100%"></table>
 </div>
 <script>
     require('jquery-contextmenu');
 
+    const datatable_id = `#${opts.id}`;
+
+    let getDataTableElm = function(){
+        return $(`#${opts.id}`);
+    };
+    let getDataTable = function(){
+        return getDataTableElm().DataTable();
+    };
+
     obs.on("receivedData", (datas) => {
-        let table = $('#table_id').DataTable()
+        let table = getDataTable();
         table.clear().rows.add(datas).draw()
 
         window.resizeBy(1, 0);
@@ -44,12 +53,13 @@ class="display stripe hover" style="width:100%"></table>
         //settings.scrollY= "600px";
         //table.destroy();
         //$('#table_id').DataTable(settings);
-        let table = $('#table_id').DataTable();
+        //let table = $('#table_id').DataTable();
+        let table = getDataTable();
         let settings = table.settings();
         //settings[0].oFeatures.bPaginate = true;
         //settings[0].oInit.sScrollY = "600px";
-        $("#table_id").DataTable({retrieve: true}).destroy();
-        $("#table_id").DataTable({
+        table.DataTable({retrieve: true}).destroy();
+        table.DataTable({
                 scrollY: "600px",
                 dom: 'Zlfrtip',
                 scrollCollapse:false,
@@ -60,8 +70,6 @@ class="display stripe hover" style="width:100%"></table>
             });
         //$("#table_id").DataTable(settings);
         //this.update();
-
-
         console.log("settings = ", settings[0]); 
     })
 
@@ -69,7 +77,8 @@ class="display stripe hover" style="width:100%"></table>
             let selindex=0;
 
             return function(elm){
-                let table = $('#table_id').DataTable()
+                //let table = $('#table_id').DataTable()
+                let table = getDataTable(); 
                 var data = table.row(elm).data();
                 let new_index = table.row(elm).index();
                 console.log("mousedown ", table.row(elm).index()); 
@@ -86,9 +95,9 @@ class="display stripe hover" style="width:100%"></table>
             };
         }();
 
-    this.on('mount', function () {   
-        table = $('#table_id').DataTable({
-
+    this.on('mount', function () {  
+        let table = getDataTableElm();
+        table.DataTable({
             dom: 'Zlfrtip',
             columns: [
                 { title: 'image' },
@@ -117,13 +126,13 @@ class="display stripe hover" style="width:100%"></table>
                 $.contextMenu({
                     selector: 'tbody tr td', 
                     callback: function(key, options) {
-                        var m = "clicked: " + key + ' ' + selected_id;
+                        var m = "clicked: " + key;
                         console.log(m); 
                     },
                     events: {
                     show : function(options){
                         const cellIndex = parseInt(options.$trigger[0].cellIndex);
-                        const row = table.row(options.$trigger[0].parentNode);
+                        const row = getDataTable().row(options.$trigger[0].parentNode);
                         const rowIndex = row.index();
                         console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
                         selselect(options.$trigger[0].parentNode)
@@ -155,17 +164,18 @@ class="display stripe hover" style="width:100%"></table>
             stateSave: true,
             //displayLength: 4
         })
+
         table.on( 'page.dt',   function () { 
             $("#table-base div.dataTables_scrollBody").scrollTop(0);
          } )
 
-
-        $('#table_id tbody').on( 'mousedown', 'tr',  function() {
+        $(`${datatable_id} tbody`).on( 'mousedown', 'tr',  function() {
             selselect(this);
         } );
    
-        $('#table_id tbody').on('dblclick', 'tr', function (){
-            let table = $('#table_id').DataTable()
+        $(`${datatable_id} tbody`).on('dblclick', 'tr', function (){
+            //let table = $('#table_id').DataTable()
+            let table = getDataTable(); 
             var data = table.row(this).data();
             console.log(data.name);
         } );

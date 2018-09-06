@@ -100,36 +100,21 @@
         const data_http1 = "http://localhost:8000/brie1"
         const data_http2 = "http://localhost:8000/brie2"
         const datas = [
-            new Employee(data_http1, "http Nixon", "System Architect", "$3,120", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "http Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(data_http2, "http Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "http Winters", "Director", "$5,300", "Edinburgh"),
         ]
         obs.trigger("receivedData", datas)
     }
     let setSize = () => {
-        obs.trigger("setSize");
+        obs.trigger("setSize-p1");
     };
     riot.mount('select-page-tabs');
-    riot.mount('#page1 library-datatable', 
-        {
-            id:"table_id", 
-            columns:[                
-                { title: 'image' },
-                { title: 'name' },
-                { title: 'created' },
-                { title: 'posted' },
-                { title: 'time' },
-                { title: 'play count' },
-                { title: 'play count' }
-            ],
-            columnDefs:[
-                
-            ]
-        });
+    riot.mount('#page1 library-datatable');
     riot.mount('#page2 search-datatable');
 </script>
 

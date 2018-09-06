@@ -1,49 +1,53 @@
 <library-datatable id="library-datatable">
-    <!--  <style scoped>
-        :scope table.dataTable thead tr th:first-child, 
-               table.dataTable tbody tr td:first-child {  
-            border-left: 1px solid #e3e7e8;
-        }
-
-        :scope table.dataTable thead tr th {  
-            border-top: 1px solid #e3e7e8;
-            border-right: 1px solid #e3e7e8;
-            border-bottom: 1px solid #e3e7e8;
-        }
-        :scope table.dataTable tbody td {
-            border-right: 1px solid #e3e7e8;
-        }
-
+    <style scoped>
         :scope .table-base {
             background-color: #cccccc;
             width: 100%;
             height: 100%;
         } 
-    </style>  -->
+    </style>
 <div class="table-base">
 <!--  <table ref="datatable" id="{opts.id}"
 class="display stripe hover" style="width:100%"></table>  -->
-<base-datatable>
+<base-datatable my_datatable_id="lib-table-id">
 <!--  <p>{ parent.opts.message }</p>  -->
 </base-datatable>
 </div>
 <script>
-    this.opts = opts;
-    this.columns = [
-        { title: 'image' },
-        { title: 'name' },
-        { title: 'salary' },
-        { title: 'office' },
-        { title: 'position' }
-        ];
-    this.datatable_opts = {
+    this.datatable_params = {
+        columns : [
+            { title: 'image' },
+            { title: 'name' },
+            { title: 'salary' },
+            { title: 'office' },
+            { title: 'position' }
+        ],
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                data: "image",
+                render: function (data, type, row, meta) {
+                    return `<img src='${data}'>`
+                },
+            },
+            { targets: 1, data: "name" },
+            { targets: 2, data: "salary" },
+            { targets: 3, data: "office" },
+            { targets: 4, data: "position" }
+        ], 
+        colResize : {
+            exclude: [0],
+        },      
         scrollY:'400px',
         scrollCollapse:false,
         autoWidth: true,
         paging: true,
         deferRender: true,
         stateSave: true,
-        displayLength: 4        
+        displayLength: 2,
+
+        //dblclick      
     };
 
     this.dblclick_f = (data)=>{

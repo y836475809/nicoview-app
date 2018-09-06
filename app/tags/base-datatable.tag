@@ -1,5 +1,8 @@
-<library-datatable id="library-datatable">
-    <!--  <style scoped>
+
+
+
+<base-datatable>
+    <style scoped>
         :scope table.dataTable thead tr th:first-child, 
                table.dataTable tbody tr td:first-child {  
             border-left: 1px solid #e3e7e8;
@@ -19,44 +22,21 @@
             width: 100%;
             height: 100%;
         } 
-    </style>  -->
-<div class="table-base">
-<!--  <table ref="datatable" id="{opts.id}"
-class="display stripe hover" style="width:100%"></table>  -->
-<base-datatable>
-<!--  <p>{ parent.opts.message }</p>  -->
-</base-datatable>
-</div>
+    </style>
+
+<table ref="datatable" id="{this.parent.opts.id}"
+class="display stripe hover" style="width:100%"></table>
+
 <script>
-    this.opts = opts;
-    this.columns = [
-        { title: 'image' },
-        { title: 'name' },
-        { title: 'salary' },
-        { title: 'office' },
-        { title: 'position' }
-        ];
-    this.datatable_opts = {
-        scrollY:'400px',
-        scrollCollapse:false,
-        autoWidth: true,
-        paging: true,
-        deferRender: true,
-        stateSave: true,
-        displayLength: 4        
-    };
-
-    this.dblclick_f = (data)=>{
-        console.log(data.name);
-    };
-/*
+    console.log("m-datatable opt = ", this.parent.opts);
+    let my_opts = this.parent.opts;
+    let self = this;
     require('jquery-contextmenu');
-
-    const datatable_id = `#${opts.id}`;
-    const opts_columns = opts.columns;
+    const datatable_id = `#${my_opts.id}`;
+    const opts_columns = my_opts.columns;
 
     let getDataTableElm = function(){
-        return $(`#${opts.id}`);
+        return $(`#${my_opts.id}`);
     };
     let getDataTable = function(){
         return getDataTableElm().DataTable();
@@ -68,7 +48,7 @@ class="display stripe hover" style="width:100%"></table>  -->
 
         window.resizeBy(1, 0);
         window.resizeBy(-1, 0); 
-    })
+    });
 
     obs.on("setSize", () => {
         //table.columns.adjust()
@@ -125,8 +105,8 @@ class="display stripe hover" style="width:100%"></table>  -->
         let table = getDataTableElm();
         table.DataTable({
             dom: 'Zlfrtip',
-            //columns: opts_columns,
-            
+            columns: this.parent.columns,
+            /*
             columns: [
                 { title: 'image' },
                 { title: 'name' },
@@ -134,7 +114,7 @@ class="display stripe hover" style="width:100%"></table>  -->
                 { title: 'office' },
                 { title: 'position' }
             ],
-            
+            */
             columnDefs: [{
                 targets: 0,
                 orderable: false,
@@ -204,11 +184,9 @@ class="display stripe hover" style="width:100%"></table>  -->
             //let table = $('#table_id').DataTable()
             let table = getDataTable(); 
             var data = table.row(this).data();
-            console.log(data.name);
+            //console.log(data.name);
+            self.parent.dblclick_f(data);
         } );
-    })
-    */
-</script>
-
-
-</library-datatable>
+    })    
+</script>  
+</base-datatable>

@@ -1,6 +1,4 @@
 
-
-
 <base-datatable>
     <style scoped>
         :scope table.dataTable thead tr th:first-child, 
@@ -22,19 +20,15 @@
 class="display stripe hover" style="width:100%"></table>
 
 <script>
-    console.log("m-datatable datatable_id = ", this.opts.my_datatable_id);
-    let datatable_params = this.parent.datatable_params;
-    let self = this;
     require('jquery-contextmenu');
-    
-    this.datatable_id = this.opts.my_datatable_id;
-    const opts_columns = datatable_params.columns;
+
+    const datatable_id = this.opts.my_datatable_id;
+    const params = this.parent.datatable_params;
 
     let getDataTableElm = function(){
-        return $(`#${self.datatable_id}`);
+        return $(`#${datatable_id}`);
     };
     let getDataTable = function(){
-        //let k = getDataTableElm().DataTable();
         return getDataTableElm().DataTable();
     };
 
@@ -52,13 +46,12 @@ class="display stripe hover" style="width:100%"></table>
         //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
         const h = $(window).height() - 200;
         $(`#${id} div.dataTables_scrollBody`).css('height', h);
-    })
+    });
 
     var selselect = function(){
             let selindex=0;
 
             return function(elm){
-                //let table = $('#table_id').DataTable()
                 let table = getDataTable(); 
                 var data = table.row(elm).data();
                 let new_index = table.row(elm).index();
@@ -79,30 +72,9 @@ class="display stripe hover" style="width:100%"></table>
     this.on('mount', function () {  
         let table = getDataTableElm();
         table.DataTable({
-            dom: 'Zlfrtip',
-            columns: opts_columns,
-            /*
-            columns: [
-                { title: 'image' },
-                { title: 'name' },
-                { title: 'salary' },
-                { title: 'office' },
-                { title: 'position' }
-            ],
-            */
-            columnDefs: [{
-                targets: 0,
-                orderable: false,
-                data: "image",
-                render: function (data, type, row, meta) {
-                    return `<img src='${data}'>`
-                },
-            },
-            { targets: 1, data: "name" },
-            { targets: 2, data: "salary" },
-            { targets: 3, data: "office" },
-            { targets: 4, data: "position" }],
-
+            dom: params.dom,
+            columns: params.columns,
+            columnDefs: params.columnDefs,
             drawCallback : function() 
             {
                 $.contextMenu({
@@ -117,7 +89,7 @@ class="display stripe hover" style="width:100%"></table>
                         const row = getDataTable().row(options.$trigger[0].parentNode);
                         const rowIndex = row.index();
                         console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
-                        selselect(options.$trigger[0].parentNode)
+                        selselect(options.$trigger[0].parentNode);
 
                         return true;
                     },
@@ -131,40 +103,31 @@ class="display stripe hover" style="width:100%"></table>
                     }
                 });
             },
-            colResize: {
-                handleWidth: 10,
-                exclude: [0],
-                //"resizeCallback": function(column) {
-                //    console.log("Column Resized = ", column);
-                //}
-            },
+            colResize: params.colResize,
             //scrollY:'50vh',
             scrollY: ($(window).height() - 200),
-            scrollCollapse:false,
-            autoWidth: true,
-            paging: true,
-            deferRender: true,
-            stateSave: true,
-            //pageLength: 2,
-            lengthMenu: [ 2, 4, 10, 20, 30, 40, 50 ],
-            displayLength: 4,  
+            scrollCollapse: params.scrollCollapse,
+            autoWidth: params.autoWidth,
+            paging: params.paging,
+            deferRender: params.deferRender,
+            stateSave: params.stateSave,
+            lengthMenu: params.lengthMenu,
+            displayLength: params.displayLength,
         })
 
-        table.on( 'page.dt',   function () {
+        table.on('page.dt', function(){
             $("div.dataTables_scrollBody").scrollTop(0);
-         } )
+         });
 
-        $(`#${this.datatable_id} tbody`).on( 'mousedown', 'tr',  function() {
+        $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(){
             selselect(this);
-        } );
+        });
    
-        $(`#${this.datatable_id} tbody`).on('dblclick', 'tr', function (){
-            //let table = $('#table_id').DataTable()
+        $(`#${datatable_id} tbody`).on('dblclick', 'tr', function (){
             let table = getDataTable(); 
-            var data = table.row(this).data();
-            //console.log(data.name);
-            self.parent.dblclick_f(data);
-        } );
-    })    
+            const data = table.row(this).data();
+            obs.trigger("dblclick-row", {id:datatable_id, data:data});
+        });
+    });    
 </script>  
 </base-datatable>

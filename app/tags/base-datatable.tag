@@ -31,7 +31,6 @@ class="display stripe hover" style="width:100%"></table>
     const opts_columns = datatable_params.columns;
 
     let getDataTableElm = function(){
-        //let mm = $(`#${self.datatable_id}`);
         return $(`#${self.datatable_id}`);
     };
     let getDataTable = function(){
@@ -40,7 +39,6 @@ class="display stripe hover" style="width:100%"></table>
     };
 
     obs.on("receivedData", (datas) => {
-
         let table = getDataTable();
         table.clear().rows.add(datas).draw()
 
@@ -49,59 +47,11 @@ class="display stripe hover" style="width:100%"></table>
     });
 
     obs.on("setSize-p1", () => {
-        //https://stackoverflow.com/questions/39910855/how-to-update-row-data-in-datatable
-        let table = getDataTableElm();
-        let datas = table.DataTable().data().toArray();
-        //let settings = table.DataTable().settings();
-        //let nn = settings["0"].oScroll;
-        //settings["0"].oScroll.sY =  "600px";
-        //table.DataTable().settings(settings);
-        //table.DataTable({retrieve: true}).destroy();
-        //table.DataTable(settings["0"]);
-        
-         //table.DataTable().draw();
-        //settings[0].oFeatures.bPaginate = true;
-        //settings[0].oInit.sScrollY = "600px";
-        table.DataTable().clear();
-        table.DataTable({retrieve: true}).destroy();
-
-        $("#lib-table-id").DataTable({
-
-            columns: opts_columns,
-            columnDefs: [{
-                targets: 0,
-                orderable: false,
-                data: "image",
-                render: function (data, type, row, meta) {
-                    return `<img src='${data}'>`
-                },
-            },
-            { targets: 1, data: "name" },
-            { targets: 2, data: "salary" },
-            { targets: 3, data: "office" },
-            { targets: 4, data: "position" }],
-                        colResize: {
-                handleWidth: 10,
-                exclude: [0],
-                //"resizeCallback": function(column) {
-                //    console.log("Column Resized = ", column);
-                //}
-            },
-            scrollY: "600px",
-            dom: 'Zlfrtip',
-            scrollCollapse:false,
-            autoWidth: true,
-            paging: true,
-            deferRender: true,
-            stateSave: true,
-            lengthMenu: [ 2, 4, 10, 20, 30, 40, 50 ],
-            displayLength: 4,  
-        });
-            
-        //$("#table_id").DataTable(settings);
-        //this.update();
-        //console.log("settings = ", settings[0]); 
-        table.DataTable().clear().rows.add(datas).draw();
+        let table = getDataTable(); 
+        const id = $(table.table().container()).attr('id');
+        //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
+        const h = $(window).height() - 200;
+        $(`#${id} div.dataTables_scrollBody`).css('height', h);
     })
 
     var selselect = function(){
@@ -188,7 +138,8 @@ class="display stripe hover" style="width:100%"></table>
                 //    console.log("Column Resized = ", column);
                 //}
             },
-            scrollY:'200px',
+            //scrollY:'50vh',
+            scrollY: ($(window).height() - 200),
             scrollCollapse:false,
             autoWidth: true,
             paging: true,

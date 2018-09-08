@@ -80,8 +80,10 @@ class="display stripe hover" style="width:100%"></table>
                 $.contextMenu({
                     selector: 'tbody tr td', 
                     callback: function(key, options) {
-                        var m = "clicked: " + key;
-                        console.log(m); 
+                        const target_elm = options.$trigger[0].parentNode
+                        const data = getDataTable().row(target_elm).data();
+
+                        console.log( "clicked: " + key, ", data:", data); 
                     },
                     events: {
                     show : function(options){

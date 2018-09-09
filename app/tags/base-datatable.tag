@@ -14,6 +14,13 @@
         :scope table.dataTable tbody td {
             border-right: 1px solid #e3e7e8;
         }
+        .dataTables_scrollBody{
+            overflow-y: scroll !important;
+        }
+        table.dataTable thead th, table.dataTable thead td {
+            padding: 4px 4px;
+            border-bottom: 1px solid #111;
+        }
     </style>
 
 <table ref="datatable" id={this.opts.my_datatable_id}
@@ -34,10 +41,7 @@ class="display stripe hover" style="width:100%"></table>
 
     obs.on("receivedData", (datas) => {
         let table = getDataTable();
-        table.clear().rows.add(datas).draw()
-
-        window.resizeBy(1, 0);
-        window.resizeBy(-1, 0); 
+        table.clear().rows.add(datas).draw() 
     });
 
     obs.on("setSize-p1", () => {
@@ -46,6 +50,7 @@ class="display stripe hover" style="width:100%"></table>
         //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
         const h = $(window).height() - 200;
         $(`#${id} div.dataTables_scrollBody`).css('height', h);
+        table.columns.adjust();
     });
 
     var selselect = function(){

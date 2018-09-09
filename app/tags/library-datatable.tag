@@ -35,7 +35,7 @@
             { targets: 4, data: "position" }
         ], 
         colResize : {
-            exclude: [0],
+            handleWidth: 10,
             exclude: [0],
         },
         dom: 'Zlfrtip',  

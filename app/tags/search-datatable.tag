@@ -30,8 +30,8 @@
         let table = $('#search-table').DataTable()
         table.clear().rows.add(datas).draw()
 
-        window.resizeBy(1, 0);
-        window.resizeBy(-1, 0); 
+        //window.resizeBy(1, 0);
+        //window.resizeBy(-1, 0); 
     })
 
     var selselect = function(){

@@ -113,7 +113,7 @@
     let setSize = () => {
         obs.trigger("setSize-p1");
     };
-    riot.mount('select-page-tabs');
+    riot.mount('select-page-tabs', {tabs:['Tab 1','Tab 2','Tab 3']});
     riot.mount('#page1 library-datatable');
     riot.mount('#page2 search-datatable');
 </script>

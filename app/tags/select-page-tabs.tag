@@ -51,11 +51,8 @@
         var self = this;
     
         // タブのタイトルを配列で管理
-        self.tabs = [
-            'Tab 1',
-            'Tab 2',
-            'Tab 3'
-        ];
+        self.tabs = opts.tabs;
+        
         // 初回表示時は0番目のタブを表示
         self.index = 0;
     

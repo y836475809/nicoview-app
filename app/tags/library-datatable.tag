@@ -47,13 +47,23 @@
         stateSave: true,
         displayLength: 2,
         lengthMenu: [ 2, 4, 10, 20, 30, 40, 50 ],
-        displayLength: 4,      
+        displayLength: 4,
+        contextMenu: {
+            items: {
+                "edit": {name: "Edit", icon: "edit"},
+                "cut": {name: "Cut", icon: "cut"},
+                "copy": {name: "Copy", icon: "copy"},
+                "paste": {name: "Paste", icon: "paste"},
+                "delete": {name: "Delete", icon: "delete"}
+            },
+            callback: function(key, data){
+                console.log( "clicked: " + key, ", data:", data); 
+            }
+        },
+        dblclickRow: function(data){
+            console.log( "dblclickRow data:", data); 
+        }        
     };
-
-    obs.on("dblclick-row", (e) => {
-        console.log("dblclick-row id=", e.id);
-        console.log("dblclick-row data=", e.data);
-    });
 
 </script>
 </library-datatable>

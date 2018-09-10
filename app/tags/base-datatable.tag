@@ -41,7 +41,7 @@ class="display stripe hover" style="width:100%"></table>
 
     obs.on("receivedData", (datas) => {
         let table = getDataTable();
-        table.clear().rows.add(datas).draw() 
+        table.clear().rows.add(datas).draw();
     });
 
     obs.on("setSize-p1", () => {
@@ -87,27 +87,19 @@ class="display stripe hover" style="width:100%"></table>
                     callback: function(key, options) {
                         const target_elm = options.$trigger[0].parentNode
                         const data = getDataTable().row(target_elm).data();
-
-                        console.log( "clicked: " + key, ", data:", data); 
+                        params.contextMenu.callback(key, data);
                     },
                     events: {
                     show : function(options){
                         const cellIndex = parseInt(options.$trigger[0].cellIndex);
                         const row = getDataTable().row(options.$trigger[0].parentNode);
                         const rowIndex = row.index();
-                        console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
                         selselect(options.$trigger[0].parentNode);
 
                         return true;
                     },
                     },
-                    items: {
-                        "edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
-                        "copy": {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},
-                        "delete": {name: "Delete", icon: "delete"}
-                    }
+                    items: params.contextMenu.items
                 });
             },
             colResize: params.colResize,
@@ -129,11 +121,11 @@ class="display stripe hover" style="width:100%"></table>
         $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(){
             selselect(this);
         });
-   
+
         $(`#${datatable_id} tbody`).on('dblclick', 'tr', function (){
             let table = getDataTable(); 
             const data = table.row(this).data();
-            obs.trigger("dblclick-row", {id:datatable_id, data:data});
+            params.dblclickRow(data);
         });
     });    
 </script>  

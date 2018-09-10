@@ -1,4 +1,4 @@
-<search-datatable>
+<search-page>
 <style scoped>
     :scope table.dataTable thead tr th:first-child, 
             table.dataTable tbody tr td:first-child {  
@@ -134,4 +134,4 @@
         } );
     })
 </script>
-</search-datatable>
+</search-page>

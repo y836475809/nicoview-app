@@ -1,4 +1,4 @@
-<library-datatable id="library-datatable">
+<library-page id="library-page">
     <style scoped>
         :scope .table-base {
             background-color: #cccccc;
@@ -67,4 +67,4 @@
     };
 
 </script>
-</library-datatable>
+</library-page>

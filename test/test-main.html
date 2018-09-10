@@ -38,10 +38,10 @@
     <div id="page1">
         <input type="button" value="show" onClick="showPlayer();">     
         <input type="button" value="size" onClick="setSize();">     
-        <library-datatable></library-datatable>
+        <library-page></library-page>
     </div>
     <div id="page2">
-        <search-datatable></search-datatable>
+        <search-page></search-page>
     </div>
     <div id="page3">
         test
@@ -114,8 +114,8 @@
         obs.trigger("setSize-p1");
     };
     riot.mount('select-page-tabs', {tabs:['Tab 1','Tab 2','Tab 3']});
-    riot.mount('#page1 library-datatable');
-    riot.mount('#page2 search-datatable');
+    riot.mount('#page1 library-page');
+    riot.mount('#page2 search-page');
 </script>
 
 </html>

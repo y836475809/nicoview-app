@@ -26,7 +26,7 @@
                 orderable: false,
                 data: "image",
                 render: function (data, type, row, meta) {
-                    return `<img src='${data}'>`
+                    return `<img src='${data}' width="240" height="240">`
                 },
             },
             { targets: 1, data: "name" },

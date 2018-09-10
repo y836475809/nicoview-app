@@ -8,7 +8,7 @@
     </style>
 
 <div class="table-base">
-    <base-datatable my_datatable_id="lib-table-id"></base-datatable>
+    <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
 </div>
 
 <script>
@@ -65,6 +65,13 @@
             console.log( "dblclickRow data:", data); 
         }        
     };
+
+    this.on('mount', function () {
+        let child = this.refs.lib;
+        obs.on('resizeEndEvent', function (size) {
+            child.resize(size);
+        });
+    });
 
 </script>
 </library-page>

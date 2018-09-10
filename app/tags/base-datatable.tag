@@ -53,6 +53,15 @@ class="display stripe hover" style="width:100%"></table>
         table.columns.adjust();
     });
 
+    resize(size){
+        let table = getDataTable(); 
+        const id = $(table.table().container()).attr('id');
+        //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
+        const h = size.h;
+        $(`#${id} div.dataTables_scrollBody`).css('height', h);
+        table.columns.adjust();
+    };
+
     var selselect = function(){
             let selindex=0;
 

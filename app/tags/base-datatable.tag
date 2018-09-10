@@ -30,7 +30,7 @@ class="display stripe hover" style="width:100%"></table>
     require('jquery-contextmenu');
 
     const datatable_id = this.opts.my_datatable_id;
-    const params = this.parent.datatable_params;
+    const params = this.parent.datatable_params[datatable_id];
 
     let getDataTableElm = function(){
         return $(`#${datatable_id}`);

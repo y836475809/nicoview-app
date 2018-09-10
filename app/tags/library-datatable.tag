@@ -12,7 +12,8 @@
 </div>
 
 <script>
-    this.datatable_params = {
+    this.datatable_params ={};
+    this.datatable_params["lib-table-id"] = {
         columns : [
             { title: 'image' },
             { title: 'name' },

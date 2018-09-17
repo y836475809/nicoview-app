@@ -8,3 +8,4 @@ tmp/
 /test/datatables/data/*.jpg
 /test/sql/*.json
 /package-lock.json
+/test/dummy_server/data/img/*.jpeg

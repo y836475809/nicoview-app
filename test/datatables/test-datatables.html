@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script>
+        window.jQuery = window.$ = require('jquery');
+    </script>
+    <script  type="text/javascript" src="../../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
+    <script  type="text/javascript" src="../../lib/colResize/dataTables.colResize.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">
+</head>
+<body>
+    <input type="button" value="show" onClick="showPlayer()">
+    <input type="button" value="width" onClick="setWidth()">
+    <library-datatable></library-datatable>
+</body>
+
+<script>  
+    const remote = require('electron').remote
+    const base_dir = remote.getGlobal('sharedObj').base_dir
+    require('jquery-contextmenu');
+    
+    var riot = require('riot')
+    require(`${base_dir}/app/tags/library-datatable.tag`)
+    var obs = riot.observable();
+
+    riot.mount('library-datatable');
+
+    let setWidth = () => {
+        obs.trigger("setWidth")
+    }
+
+    function Employee(image, name, position, salary, office) {
+         this.image = image;
+         this.name = name;
+         this.position = position;
+         this.salary = salary;
+         this._office = office;
+
+         this.office = function () {
+             return this._office;
+         }
+    };
+    let showPlayer = () => {
+        const data_dir = `${base_dir}/test/datatables/data`
+        const data_http1 = "http://localhost:8000/brie1"
+        const data_http2 = "http://localhost:8000/brie2"
+        const datas = [
+            new Employee(data_http1, "http Nixon", "System Architect", "$3,120", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
+            new Employee(data_http2, "http Winters", "Director", "$5,300", "Edinburgh"),
+        ]
+        obs.trigger("receivedData", datas)
+    }
+</script>
+
+</html>

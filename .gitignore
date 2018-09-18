@@ -1,7 +1,11 @@
+.vscode
 node_modules/
 lib/
 tmp/
 *.mp4
-anime.min.js
-riot+compiler.min.js
 /*.log
+/sample/*.json
+/test/datatables/data/*.jpg
+/test/sql/*.json
+/package-lock.json
+/test/dummy_server/data/img/*.jpeg

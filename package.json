@@ -22,7 +22,10 @@
   "dependencies": {
     "animejs": "^2.0.2",
     "cheerio": "^1.0.0-rc.2",
-    "jquery": "^3.2.1",
+    "datatables.net": "^1.10.19",
+    "datatables.net-dt": "^1.10.19",
+    "jquery": "^3.3.1",
+    "jquery-contextmenu": "^2.7.0",
     "jquery-ui": "^1.12.1"
   }
 }

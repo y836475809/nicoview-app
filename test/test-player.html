@@ -9,6 +9,9 @@
     <input type="button" value="show" onClick=showPlayer()>
     <input type="button" value="data1" onClick=sendData1()>
     <input type="button" value="data2" onClick=sendData2()>
+    <input type="button" value="read_db" onClick=readdb()>
+    <input type="button" value="dump" onClick=dump()>
+    <input type="button" value="read_json" onClick=read_json()>
 </body>
 
 <script>
@@ -16,7 +19,10 @@
     const base_dir = remote.getGlobal('sharedObj').base_dir
     const ipc = require('electron').ipcRenderer
     const DB = require(`${base_dir}/app/js/db`).DB
-    
+    const SQLiteDB = require(`${base_dir}/app/js/sqlite_db`)
+    const serializer = require(`${base_dir}/app/js/serializer`)
+
+    let sqlite_db = new SQLiteDB()
     let db = new DB()
 
     let showPlayer = () => {
@@ -24,8 +30,8 @@
     }
 
     let sendData1 = () => {
-        const commnets = db.findComments("")
-        const video_info = db.findVideoInfo("")
+        const commnets = db.findComments("sm1")
+        const video_info = db.findVideoInfo("sm1")
         const data = {
             src: video_info.src,
             type: video_info.type,
@@ -49,6 +55,22 @@
         }
         ipc.send('request-show-player', data)
     }
+    let readdb = () => {
+        sqlite_db.init(`${base_dir}/test/sql/sample.db`)
+        sqlite_db.read()
+
+        db.setData(sqlite_db.get_dirpath(), sqlite_db.get_video())
+    }
+    let dump = () => {
+        serializer.save(`${base_dir}/sample/dirpath.json`, sqlite_db.get_dirpath())
+        serializer.save(`${base_dir}/sample/video.json`, sqlite_db.get_video())
+    }
+    let read_json = () => {
+        const dirpath = serializer.load(`${base_dir}/sample/dirpath.json`)
+        const video = serializer.load(`${base_dir}/sample/video.json`)
+        db.setData(dirpath, video)
+    }
+
 </script>
 
 </html>

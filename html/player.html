@@ -4,28 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
-    <link rel="stylesheet" href="../css/p2.css">
-    <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
     <link rel="stylesheet" href="../node_modules/jquery-ui/themes/base/all.css">
+    <style type="text/css">
+        html, body{
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        .comment{
+            float:left;
+            border: 1px solid #FF6600;
+        }
+    </style>
 </head>
 
 <body>
-    <!--<h1>Hello World!</h1>-->
-    <!--We are using node-->
-    <!--<script>
-        document.write(process.versions.node)
-    </script>, Chrome
-    <script>
-        document.write(process.versions.chrome)
-    </script>, and Electron
-    <script>
-        document.write(process.versions.electron)
-    </script>.-->
-    <!--<debug></debug>-->
-    <!-- <seek></seek> -->
-    <player-tags></player-tags>
-    <player-video></player-video>
-    <player-controls></player-controls>
+    <player-page></player-page>
 </body>
 <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
 <!--<script src="app/app.js"></script>-->
@@ -34,20 +28,12 @@
     const base_dir = remote.getGlobal('sharedObj').base_dir
     var ipc = require('electron').ipcRenderer
     var riot = require('riot')
-    var anime = require('animejs')
-
-    require(`${base_dir}/app/tags/player-tags.tag`)
-    require(`${base_dir}/app/tags/player-video.tag`)
-    require(`${base_dir}/app/tags/player-controls.tag`)
-    // require('../app/tags/seek.tag')
 
     var obs = riot.observable();
 
-    riot.mount('player-tags');
-    riot.mount('player-video', {h1:50, h2:80});
-    riot.mount('player-controls');
-    // riot.mount('seek');
-
+    require(`${base_dir}/app/tags/player-page.tag`)
+    riot.mount('player-page');
+    
     const timeout = 200
     let timer
     window.addEventListener('resize', () => {

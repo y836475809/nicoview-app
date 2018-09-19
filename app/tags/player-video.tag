@@ -1,53 +1,25 @@
-<player-video id="player-video">
+<player-video >
     <style scoped>
-        /* :scope header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 10;
-            width: calc(100% - 4px);
-            height: 50px;
-            border: 2px solid black;
-        } */
-
-         :scope {
-            background-color: #ccc000;
-            position: absolute;
-            /* top: 50px; */
-            /* bottom: 300px; */
+        #player-video-screen {
             width: 100%;
-            height: 100%;
-            /* height: calc(100% - 50px - 80px); */
+            height: 100%;   
+        }      
+        #player {
+            width: 100%;
+            height: 100%;         
         }
-        /*:scope #player-ctr {
-            background-color: #cccccc;
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            z-index: 10;
-            width: 100%;
-            height: 80px;
-        }*/
     </style>
-    <!-- <header>test</header> -->
-    <!-- <div ref="palyercontainer" id="palyer-container"> -->
-    <video ref="palyermain" id="player" autoplay preload='metadata' controls style="position:absolute;">
-    </video>
-    <!-- </div> -->
-    <!--<div ref="playerctr" id="player-ctr">
-        <button id="play-btn" onclick='{ invert }'>start</button>
-        <button id="stop-btn">stop</button>
-        <button id="add-btn" onclick='{ add }'>add</button>
-    </div>-->
+
+    <div id="player-video-screen">
+        <video ref="palyermain" id="player" autoplay preload='metadata' controls>
+        </video>
+    </div>
 
     <script>
         const remote = require('electron').remote
         const base_dir = remote.getGlobal('sharedObj').base_dir
         var $ = jQuery = require("jquery")
-
-        $(this.root).css("top", opts.h1)
-        let kk = opts.h1 + opts.h2
-        $(this.root).css("height",`calc(100% - ${kk}px)`)
+        var anime = require('animejs')
 
         let comment_anime = null
         let my = []
@@ -70,8 +42,10 @@
 
             let nc_elms = []
             let nc_params = []
-            const parent_id = "player-video"
-            const width = getContentSize().width
+            const parent_id = "player-video-screen"
+            // const parent_id = "player-video-content";
+            // const width = getContentSize().width;
+            const width = window.innerWidth;
             const duration = 5000
             let commnets = data.commnets
             let cm_elm = new comment_elm(parent_id, width, duration)
@@ -166,65 +140,8 @@
             // comment_anime.play()
         }
 
-        var video_size = {}
-        // 
-        let getContentSize = () => {
-            let con = this.root
-            let w = con.clientWidth
-            let h = con.clientHeight
-            return { width: w, height: h }
-        }
-
-        let getVideoSize = () => {
-            let c_size = getContentSize()
-            let w_h = c_size.height
-            let ctr_h = 0 //this.refs.playerctr.clientHeight
-
-            let v_h = w_h - ctr_h
-            let v_w = video_size.width / video_size.height * v_h
-
-            if (v_w < c_size.width) {
-                return { width: v_w, height: v_h }
-            } else {
-                let w = c_size.width
-                let h = video_size.height / video_size.width * w
-                return { width: w, height: h }
-            }
-        }
-
-        var setPlayerContainerSize = () => {
-            let h = getContentSize().height
-            let w = getContentSize().width
-            let player_ctr_h = 0//this.refs.playerctr.clientHeight //-60
-
-            let v_size = getVideoSize()
-
-            let player = this.refs.palyermain //document.getElementById("player")
-            let play_top = (h - player_ctr_h) / 2 - (v_size.height) / 2 + 0
-            let play_left = w / 2 - (v_size.width) / 2
-            player.style.top = play_top + "px"
-            player.style.left = play_left + "px"
-        }
-
         this.on('mount', function () {
             console.log('mount')
-
-            this.refs.palyermain.addEventListener('loadedmetadata', (event) => {
-                let w = event.target.videoWidth
-                let h = event.target.videoHeight
-
-                video_size = { width: w, height: h }
-
-                setPlayerContainerSize()
-
-                const v_size = getVideoSize()
-                this.refs.palyermain.style.width = v_size.width + "px"
-                this.refs.palyermain.style.height = v_size.height + "px"
-
-                const duration = event.target.duration
-                console.log("play duration=", duration)
-                obs.trigger('seek_reload', duration)
-            });
 
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
                 console.log('loadeddata event=', event);
@@ -242,13 +159,6 @@
                 const current = this.refs.palyermain.currentTime
                 obs.trigger('seek_update_current', current)
             })
-            let ff = () => {
-                setPlayerContainerSize()
-
-                const v_size = getVideoSize()
-                this.refs.palyermain.style.width = v_size.width + "px"
-                this.refs.palyermain.style.height = v_size.height + "px"
-            }
 
             obs.on("play", () => {
                 console.log("player.tag play")
@@ -264,7 +174,7 @@
             })
 
             obs.on("resizeEndEvent", function (wsize) {
-                ff()
+                // ff()
             })
         })
     </script>

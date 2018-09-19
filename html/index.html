@@ -1,31 +1,32 @@
 <!DOCTYPE html>
 <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Hello World!</title>
+        <script>window.jQuery = window.$ = require('jquery');</script>
+        <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
+        <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
+        <link rel="stylesheet" type="text/css" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">
+        <script src="../node_modules/riot/riot+compiler.min.js"></script>
 
-<head>
-    <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <link rel="stylesheet" href="../css/p2.css">
-    <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
-</head>
+        <script type="riot/tag" src="../app/tags/main-page.tag"></script>
 
-<body>
-    <!--<h1>Hello World!</h1>-->
-    <!--We are using node-->
-    <!--<script>
-        document.write(process.versions.node)
-    </script>, Chrome
+        <style type="text/css">
+            html, body{
+                height: 100%;
+                width:100%;
+                margin: 0;
+            }
+        </style>
+    </head>
+
+    <body>
+        <main-page></main-page>
+    </body>
+
     <script>
-        document.write(process.versions.chrome)
-    </script>, and Electron
-    <script>
-        document.write(process.versions.electron)
-    </script>.-->
-    <!--<debug></debug>-->
-    <player></player>
-    <controls></controls>
-</body>
-<!--<script src="lib/jquery-3.2.1.min.js"></script>-->
-    <!--<script src="app/app.js"></script>-->
-    <script src="../app/player.js"></script>
-
+        require('jquery-contextmenu');
+        riot.mount('main-page');
+    </script>
 </html>

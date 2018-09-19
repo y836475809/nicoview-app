@@ -8,10 +8,15 @@
     </style>
 
 <div class="table-base">
+    <input type="button" value="show" onClick={read}>  
     <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
 </div>
 
 <script>
+    let read = ()=>{
+      console.log("read");  
+    };
+
     this.datatable_params ={};
     this.datatable_params["lib-table-id"] = {
         columns : [

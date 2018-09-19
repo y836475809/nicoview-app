@@ -1,0 +1,2 @@
+https://github.com/nathancahill/Split.js
+https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname

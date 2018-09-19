@@ -9,4 +9,5 @@ tmp/
 /test/sql/*.json
 /package-lock.json
 /test/dummy_server/data/img/*.jpeg
+/data/
 package-lock.json

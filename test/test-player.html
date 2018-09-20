@@ -3,43 +3,41 @@
 
 <head>
     <meta charset="UTF-8">
+    <script src="../node_modules/riot/riot+compiler.min.js"></script>
+    <style type="text/css">
+        html,body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        .comment{
+            float:left;
+            border: 1px solid #FF6600;
+        }
+        #sbtn{
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 20;
+        }
+    </style>
 </head>
 
 <body>
-    <input type="button" value="show" onClick=showPlayer()>
-    <input type="button" value="data1" onClick=sendData1()>
-    <input type="button" value="data2" onClick=sendData2()>
-    <input type="button" value="read_db" onClick=readdb()>
-    <input type="button" value="dump" onClick=dump()>
-    <input type="button" value="read_json" onClick=read_json()>
+    <input id="sbtn" type="button" value="show" onClick="start()">
+    <player-page></player-page>
 </body>
 
 <script>
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
-    const ipc = require('electron').ipcRenderer
-    const DB = require(`${base_dir}/app/js/db`).DB
-    const SQLiteDB = require(`${base_dir}/app/js/sqlite_db`)
-    const serializer = require(`${base_dir}/app/js/serializer`)
+    const remote = require('electron').remote;
+    const base_dir = remote.getGlobal('sharedObj').base_dir;
+    var riot = require('riot');
+    var obs = riot.observable();
+    require(`${base_dir}/app/tags/player-page.tag`);
+    riot.mount('player-page');
 
-    let sqlite_db = new SQLiteDB()
-    let db = new DB()
-
-    let showPlayer = () => {
-        ipc.send('request-show-player', null)
-    }
-
-    let sendData1 = () => {
-        const commnets = db.findComments("sm1")
-        const video_info = db.findVideoInfo("sm1")
-        const data = {
-            src: video_info.src,
-            type: video_info.type,
-            commnets: commnets
-        }
-        ipc.send('request-show-player', data)
-    }
-    let sendData2 = () => {
+    let start = () => {
         let commnets = [
             { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "あああ" },
             { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "ああああああ" },
@@ -47,30 +45,14 @@
             { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "あああああああああ" },
             { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "あああ" },
             { no: 5, vpos: 25000, date: 1000, user_id: "aaa", text: "aaa" },
-        ]
+        ];
         const data = {
-            src: `${base_dir}/mov/test.mp4`,
+            src: `${base_dir}/data/_test0.mp4`,
             type: "video/mp4",
             commnets: commnets
-        }
-        ipc.send('request-show-player', data)
-    }
-    let readdb = () => {
-        sqlite_db.init(`${base_dir}/test/sql/sample.db`)
-        sqlite_db.read()
-
-        db.setData(sqlite_db.get_dirpath(), sqlite_db.get_video())
-    }
-    let dump = () => {
-        serializer.save(`${base_dir}/sample/dirpath.json`, sqlite_db.get_dirpath())
-        serializer.save(`${base_dir}/sample/video.json`, sqlite_db.get_video())
-    }
-    let read_json = () => {
-        const dirpath = serializer.load(`${base_dir}/sample/dirpath.json`)
-        const video = serializer.load(`${base_dir}/sample/video.json`)
-        db.setData(dirpath, video)
-    }
-
+        };
+        obs.trigger("receivedData", data);  
+    };
 </script>
 
 </html>

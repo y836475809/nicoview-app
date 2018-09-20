@@ -8,17 +8,24 @@
     </style>
 
 <div class="table-base">
-    <input type="button" value="show" onClick={read}>  
+    <input type="button" value="show" onclick={read}>  
     <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
 </div>
 
 <script>
-    let read = ()=>{
-      console.log("read");  
-    };
+    const remote = require('electron').remote;
+    const shared_obj = remote.getGlobal('sharedObj');
+    const base_dir = shared_obj.base_dir;
+    require(`${base_dir}/app/tags/base-datatable.tag`);
 
-    this.datatable_params ={};
-    this.datatable_params["lib-table-id"] = {
+    let self = this;
+    const config = opts.config;
+
+    read(){
+      console.log("read config", config.pp);  
+    };
+    this.params = {}
+    this.params.dt = {
         columns : [
             { title: 'image' },
             { title: 'name' },
@@ -72,11 +79,13 @@
     };
 
     this.on('mount', function () {
-        let child = this.refs.lib;
-        obs.on('resizeEndEvent', function (size) {
-            child.resize(size);
-        });
+        // console.log(this.refs.lib);
     });
 
+    obs.on('pageResizedEvent', function (size) {
+        if(self.refs!==undefined){
+            self.refs.lib.ress(size);
+        }
+    });
 </script>
 </library-page>

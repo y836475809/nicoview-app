@@ -29,8 +29,8 @@ class="display stripe hover" style="width:100%"></table>
 <script>
     require('jquery-contextmenu');
 
-    const datatable_id = this.opts.my_datatable_id;
-    const params = this.parent.datatable_params[datatable_id];
+    const datatable_id = opts.my_datatable_id;
+    const params = this.parent.params.dt;
 
     let getDataTableElm = function(){
         return $(`#${datatable_id}`);
@@ -53,14 +53,21 @@ class="display stripe hover" style="width:100%"></table>
         table.columns.adjust();
     });
 
-    resize(size){
+    // obs.on('resizeEndEvent2', function (size) {
+    //     let table = getDataTable(); 
+    //     const id = $(table.table().container()).attr('id');
+    //     const h = size.h;
+    //     $(`#${id} div.dataTables_scrollBody`).css('height', h);
+    //     table.columns.adjust();
+    // });
+    this.ress = (size)=> {
         let table = getDataTable(); 
         const id = $(table.table().container()).attr('id');
-        //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
         const h = size.h;
         $(`#${id} div.dataTables_scrollBody`).css('height', h);
         table.columns.adjust();
     };
+    // this.item="nnnnn";
 
     var selselect = function(){
             let selindex=0;

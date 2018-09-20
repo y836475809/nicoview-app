@@ -104,6 +104,13 @@ class DB {
     //     const dir_path = this.dir_path.get(id)
     //     return path.join(dir_path,  filename)       
     // }
+    getVideoType(id){
+        if (!this.video_info.has(id)) {
+            throw Error(`not find video_info, id=${id}`);
+        }
+        const video_info = this.getVideoInfo(id);
+        return video_info.video_type;
+    }
 
     /**
      * 
@@ -129,10 +136,8 @@ class DB {
     /**
      * 
      * @param {string} id 
-     * @param {string} video_name 
-     * @param {string} video_type 
      */
-    getVideoPath(id, video_filename) {
+    getVideoPath(id) {
         const video_info = this.getVideoInfo(id)
         return this.getPath(video_info.dirpath_id, video_info.video_filename)
     }

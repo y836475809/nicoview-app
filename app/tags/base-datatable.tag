@@ -60,6 +60,11 @@ class="display stripe hover" style="width:100%"></table>
     //     $(`#${id} div.dataTables_scrollBody`).css('height', h);
     //     table.columns.adjust();
     // });
+    this.setData = (datas)=> {
+        let table = getDataTable();
+        table.clear().rows.add(datas).draw();      
+    };
+
     this.ress = (size)=> {
         let table = getDataTable(); 
         const id = $(table.table().container()).attr('id');

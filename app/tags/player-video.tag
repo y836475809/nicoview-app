@@ -11,6 +11,10 @@
             width: 100%;
             height: 100%;         
         }
+        .comment{
+            float:left;
+            border: 1px solid #FF6600;
+        }
     </style>
 
     <div id="player-video-screen">

@@ -21,6 +21,7 @@
 </body>
 
 <script>
+    const fs = require('fs');
     const remote = require('electron').remote;
     const base_dir = remote.getGlobal('sharedObj').base_dir;
     var riot = require('riot');
@@ -29,14 +30,7 @@
     riot.mount('player-page');
 
     let start = () => {
-        let commnets = [
-            { no: 0, vpos: 0, date: 1000, user_id: "aaa", text: "あああ" },
-            { no: 1, vpos: 500, date: 1000, user_id: "aaa", text: "ああああああ" },
-            { no: 2, vpos: 1000, date: 1000, user_id: "aaa", text: "あ" },
-            { no: 3, vpos: 1500, date: 1000, user_id: "aaa", text: "あああああああああ" },
-            { no: 4, vpos: 2000, date: 1000, user_id: "aaa", text: "あああ" },
-            { no: 5, vpos: 25000, date: 1000, user_id: "aaa", text: "aaa" },
-        ];
+        let commnets = JSON.parse(fs.readFileSync(`${base_dir}/data/_test_comment.json`, {encoding: "utf8"}));
         const data = {
             src: `${base_dir}/data/_test0.mp4`,
             type: "video/mp4",

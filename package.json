@@ -20,7 +20,7 @@
     "riot": "^3.5.0"
   },
   "dependencies": {
-    "animejs": "^2.0.2",
+    "animejs": "^2.2.0",
     "cheerio": "^1.0.0-rc.2",
     "datatables.net": "^1.10.19",
     "datatables.net-dt": "^1.10.19",

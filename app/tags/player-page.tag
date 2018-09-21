@@ -44,14 +44,14 @@
     </div>
 
     <script>
-        const remote = require('electron').remote
-        const base_dir = remote.getGlobal('sharedObj').base_dir
+        const remote = require('electron').remote;
+        const base_dir = remote.getGlobal('sharedObj').base_dir;
 
-        require(`${base_dir}/app/tags/player-tags.tag`)
-        require(`${base_dir}/app/tags/player-video.tag`)
-        require(`${base_dir}/app/tags/player-controls.tag`)
+        require(`${base_dir}/app/tags/player-tags.tag`);
+        require(`${base_dir}/app/tags/player-video.tag`);
+        require(`${base_dir}/app/tags/player-controls.tag`);
 
-        let riot = require('riot')
+        let riot = require('riot');
         riot.mount('player-tags');
         riot.mount('player-video');
         riot.mount('player-controls');

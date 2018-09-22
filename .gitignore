@@ -10,4 +10,6 @@ tmp/
 /package-lock.json
 /test/dummy_server/data/img/*.jpeg
 /data/
+test/data/
 package-lock.json
+*.lnk

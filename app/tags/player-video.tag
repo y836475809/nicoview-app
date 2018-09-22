@@ -150,6 +150,14 @@
         this.on('mount', function () {
             console.log('mount');
 
+            this.refs.palyermain.addEventListener('loadedmetadata', (event) => {
+                video_size = {
+                    width: event.target.videoWidth,
+                    height: event.target.videoHeight
+                }
+                obs.trigger('resizePlayer', video_size);
+            });
+
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
                 console.log('loadeddata event=', event);
             });
@@ -166,7 +174,18 @@
                 const current = this.refs.palyermain.currentTime;
                 obs.trigger('seek_update_current', current);
             });
-
+            this.refs.palyermain.addEventListener('progress', function(){
+                console.log('addEventListener progressによるイベント発火');
+            }); 
+            this.refs.palyermain.addEventListener('waiting', function(){
+                console.log('addEventListener waitingによるイベント発火');
+            }); 
+            this.refs.palyermain.addEventListener('canplay', function(){
+                console.log('addEventListener canplayによるイベント発火');
+            }); 
+            this.refs.palyermain.addEventListener('playing', function(){
+                console.log('addEventListener playingによるイベント発火');
+            });
             obs.on("play", () => {
                 console.log("player.tag play");
                 this.refs.palyermain.play();

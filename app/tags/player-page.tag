@@ -44,14 +44,23 @@
     </div>
 
     <script>
-        const remote = require('electron').remote;
         const base_dir = remote.getGlobal('sharedObj').base_dir;
+        let riot = require('riot');
 
         require(`${base_dir}/app/tags/player-tags.tag`);
         require(`${base_dir}/app/tags/player-video.tag`);
         require(`${base_dir}/app/tags/player-controls.tag`);
+        
+        obs.on("resizePlayer", (video_size) => {    
+            const dh =  window.outerHeight - this.root.offsetHeight;
+            const new_height = video_size.height + 200 + dh;
 
-        let riot = require('riot');
+            const dw = video_size.width - window.innerWidth;
+            const new_width = window.outerWidth + dw;
+
+            window.resizeTo(new_width, new_height);
+        });
+        
         riot.mount('player-tags');
         riot.mount('player-video');
         riot.mount('player-controls');

@@ -32,6 +32,10 @@ def static(filename):
     return static_file(filename, root="./data/img")
 
 
+@route('/data/video/<filename:path>')
+def static(filename):
+    return static_file(filename, root="./data/video")
+
 # @route('/counter')
 # def counter():
 #     count = int(request.cookies.get('counter', '0'))

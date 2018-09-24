@@ -58,7 +58,7 @@
             const dw = video_size.width - window.innerWidth;
             const new_width = window.outerWidth + dw;
 
-            window.resizeTo(new_width, new_height);
+            //window.resizeTo(new_width, new_height);
         });
         
         riot.mount('player-tags');

@@ -23,16 +23,25 @@
 <script>
     const fs = require('fs');
     const remote = require('electron').remote;
-    const base_dir = remote.getGlobal('sharedObj').base_dir;
+    const shared_obj = remote.getGlobal('sharedObj');
+    const base_dir = shared_obj.base_dir;
+    const video_src = shared_obj.config.video_src;
     var riot = require('riot');
     var obs = riot.observable();
     require(`${base_dir}/app/tags/player-page.tag`);
+    const reader = require("../app/js/reader");
+
     riot.mount('player-page');
 
     let start = () => {
-        let commnets = JSON.parse(fs.readFileSync(`${base_dir}/data/_test_comment.json`, {encoding: "utf8"}));
+        // let commnets = []
+        const comment_path = `${base_dir}/test/data/test1-comment.xml`;
+        const xml = fs.readFileSync(comment_path, "utf-8");
+        const commnets = reader.comment(xml);
+        // let commnets = JSON.parse(fs.readFileSync(`${base_dir}/data/_test_comment.json`, {encoding: "utf8"}));
         const data = {
-            src: `${base_dir}/data/_test0.mp4`,
+            src: `${base_dir}/test/data/test1.mp4`,
+            // src: `${video_src}/test.mp4`,
             type: "video/mp4",
             commnets: commnets
         };

@@ -13,6 +13,7 @@
         }
         .comment{
             float:left;
+            color: white;
             border: 1px solid #FF6600;
         }
     </style>
@@ -66,7 +67,7 @@
 
             });
 
-            const num = 3;
+            const num = 12;
             // const c_top = this.refs.palyercontainer.offsetTop
             let cm = new nico_comment(num);
             cm.width = width;

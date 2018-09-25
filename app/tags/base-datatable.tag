@@ -101,28 +101,28 @@ class="display stripe hover" style="width:100%"></table>
             dom: params.dom,
             columns: params.columns,
             columnDefs: params.columnDefs,
-            drawCallback : function() 
-            {
-                $.contextMenu({
-                    selector: 'tbody tr td', 
-                    callback: function(key, options) {
-                        const target_elm = options.$trigger[0].parentNode
-                        const data = getDataTable().row(target_elm).data();
-                        params.contextMenu.callback(key, data);
-                    },
-                    events: {
-                    show : function(options){
-                        const cellIndex = parseInt(options.$trigger[0].cellIndex);
-                        const row = getDataTable().row(options.$trigger[0].parentNode);
-                        const rowIndex = row.index();
-                        selselect(options.$trigger[0].parentNode);
+            // drawCallback : function() 
+            // {
+            //     $.contextMenu({
+            //         selector: 'tbody tr td', 
+            //         callback: function(key, options) {
+            //             const target_elm = options.$trigger[0].parentNode
+            //             const data = getDataTable().row(target_elm).data();
+            //             params.contextMenu.callback(key, data);
+            //         },
+            //         events: {
+            //         show : function(options){
+            //             const cellIndex = parseInt(options.$trigger[0].cellIndex);
+            //             const row = getDataTable().row(options.$trigger[0].parentNode);
+            //             const rowIndex = row.index();
+            //             selselect(options.$trigger[0].parentNode);
 
-                        return true;
-                    },
-                    },
-                    items: params.contextMenu.items
-                });
-            },
+            //             return true;
+            //         },
+            //         },
+            //         items: params.contextMenu.items
+            //     });
+            // },
             colResize: params.colResize,
             //scrollY:'50vh',
             scrollY: ($(window).height() - 200),
@@ -139,14 +139,26 @@ class="display stripe hover" style="width:100%"></table>
             $("div.dataTables_scrollBody").scrollTop(0);
          });
 
-        $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(){
+        $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(e){
+            // console.log("e.which=", e.which);
             selselect(this);
+            params.contextMenu.hide(e);
+            // e.stopPropagation();
+            // e.preventDefault();
+            return false;
+        });
+
+        $(`#${datatable_id} tbody`).contextmenu(function(e) {
+            console.log( "Handler for .contextmenu() called." );
+            params.contextMenu.show(e);
+            return false;
         });
 
         $(`#${datatable_id} tbody`).on('dblclick', 'tr', function (){
             let table = getDataTable(); 
             const data = table.row(this).data();
             params.dblclickRow(data);
+            return false;
         });
     });    
 </script>  

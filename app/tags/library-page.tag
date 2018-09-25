@@ -5,11 +5,37 @@
             width: 100%;
             height: 100%;
         } 
+        #conmenu{
+            width:130px;
+            background-color:#f0f0f0;
+            border:1px solid #999999;
+            display:none;
+            position:fixed;
+        }
+        #conmenu.on{
+            display:block;
+        }
+        #conmenu ul{
+            list-style:none;
+            margin:0px;
+            padding:5px;
+        }
+        #conmenu .conmenu-item:hover{
+            color: white;
+            background-color:#0465f5;
+        }        
     </style>
 
 <div class="table-base">
     <input type="button" value="show" onclick={read}>  
     <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
+</div>
+<div id="conmenu">
+    <ul>
+        <li><div class="conmenu-item" data-itemkey="itme1">Google</div></li>
+        <li><div class="conmenu-item" data-itemkey="itme2">Yahoo</div></li>
+        <li><div class="conmenu-item" data-itemkey="itme3">goo</div></li>
+    </ul>
 </div>
 
 <script>
@@ -105,16 +131,30 @@
         //displayLength: 2,
         //lengthMenu: [ 2, 4, 10, 20, 30, 40, 50 ],
         //displayLength: 4,
+        // contextMenu: {
+        //     items: {
+        //         "edit": {name: "Edit", icon: "edit"},
+        //         "cut": {name: "Cut", icon: "cut"},
+        //         "copy": {name: "Copy", icon: "copy"},
+        //         "paste": {name: "Paste", icon: "paste"},
+        //         "delete": {name: "Delete", icon: "delete"}
+        //     },
+        //     callback: function(key, data){
+        //         console.log( "clicked: " + key, ", data:", data); 
+        //     }
+        // },
         contextMenu: {
-            items: {
-                "edit": {name: "Edit", icon: "edit"},
-                "cut": {name: "Cut", icon: "cut"},
-                "copy": {name: "Copy", icon: "copy"},
-                "paste": {name: "Paste", icon: "paste"},
-                "delete": {name: "Delete", icon: "delete"}
+            show: function(e){
+                menu = document.getElementById('conmenu');
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+                menu.classList.add('on');
             },
-            callback: function(key, data){
-                console.log( "clicked: " + key, ", data:", data); 
+            hide: function(e){
+                menu = document.getElementById('conmenu');
+                if(menu.classList.contains('on')){
+                    menu.classList.remove('on');
+                }
             }
         },
         dblclickRow: function(data){
@@ -131,8 +171,24 @@
         }
     };
 
+
     this.on('mount', function () {
         // console.log(this.refs.lib);
+        $("#conmenu .conmenu-item").on('click',function(e){
+            // console.log("e.which=", e.which);
+            const target = $(e.target);
+            console.log("#conmenu .conmenu-item click=", target);
+            const key = target.attr("data-itemkey");
+            console.log("#conmenu .conmenu-item key=", key);
+
+            // e.stopPropagation();
+            // e.preventDefault();
+            if(menu.classList.contains('on')){
+                    menu.classList.remove('on');
+            }
+            return false;
+        });
+
     });
 
     obs.on('pageResizedEvent', function (size) {

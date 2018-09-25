@@ -5,7 +5,7 @@
 <head>
     <meta charset="utf-8">
     <title>The HTML5 Herald</title>
-    <script src="anime.min.js"></script>
+    <script src="../node_modules/animejs/anime.min.js"></script>
     <script>
         var ar = [];
         // window.onload = function () {
@@ -135,13 +135,38 @@
     </script>
     <!--<link rel="stylesheet" href="css/styles.css?v=1.0">-->
 </head>
+<script>
+    let ani;
+    window.onload = () => {
+        ani = anime({
+            targets: '.el2',
+            translateX: function(el) {
+                return el.getAttribute('data-x');
+            }, 
+            duration: function (target) {
+                return 1000;
+            },
+            delay: function (target, index) {
+                return 2000;
+            },
+            begin: function(anim) {
+                anim.animatables[0].target.style.visibility = "visible";
+            },
+            easing: 'linear',
+            loop: false,
+            autoplay: false   
+        });
+    };
 
+    let play2 = ()=>{
+        ani.play();
+    };
+</script>
 <body>
 
     <!--<button id="ev2" onclick="addFunc()">１を足す</button>-->
     <button id="ani_play">start</button>
     <button id="ani_pause">pause</button>
-
     <div id="app">
         <div id="com1" class="el" data-x="100" data-duration="5000" style="width : 100px">test1</div>
         <div id="com2" class="el" data-x="300" data-duration="5000" style="width : 100px">test2</div>
@@ -166,6 +191,12 @@
         <div class="el" data-x="1000" data-duration="5000" style="width : 100px">test13</div>-->
     </div>
     <div id="dummy"></div>
+    <hr>
+    <button type=button onclick="play2();">start</button>
+    <button>pause</button>
+    <div>
+        <div id="com3" class="el2" data-x="300" data-duration="5000" style="width:100px; visibility:hidden">test3</div>
+    </div>
 </body>
 
 </html>

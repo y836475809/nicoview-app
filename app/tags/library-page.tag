@@ -11,18 +11,19 @@
             border:1px solid #999999;
             display:none;
             position:fixed;
+            box-shadow: 2px 2px 4px;
         }
         #conmenu.on{
             display:block;
         }
-        #conmenu ul{
+        #conmenu .conmenu-item{
             list-style:none;
             margin:0px;
             padding:5px;
         }
         #conmenu .conmenu-item:hover{
             color: white;
-            background-color:#0465f5;
+            background-color:#3eb2e7;
         }        
     </style>
 
@@ -30,12 +31,12 @@
     <input type="button" value="show" onclick={read}>  
     <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
 </div>
+
 <div id="conmenu">
-    <ul>
-        <li><div class="conmenu-item" data-itemkey="itme1">Google</div></li>
-        <li><div class="conmenu-item" data-itemkey="itme2">Yahoo</div></li>
-        <li><div class="conmenu-item" data-itemkey="itme3">goo</div></li>
-    </ul>
+    <div class="conmenu-item" data-itemkey="itme1">play</div>
+    <div class="conmenu-item" data-itemkey="itme2">edit</div>
+    <hr>
+    <div class="conmenu-item" data-itemkey="itme3">delete</div>
 </div>
 
 <script>
@@ -145,13 +146,13 @@
         // },
         contextMenu: {
             show: function(e){
-                menu = document.getElementById('conmenu');
+                let menu = document.getElementById('conmenu');
                 menu.style.left = e.pageX + 'px';
                 menu.style.top = e.pageY + 'px';
                 menu.classList.add('on');
             },
             hide: function(e){
-                menu = document.getElementById('conmenu');
+                let menu = document.getElementById('conmenu');
                 if(menu.classList.contains('on')){
                     menu.classList.remove('on');
                 }
@@ -177,23 +178,33 @@
         $("#conmenu .conmenu-item").on('click',function(e){
             // console.log("e.which=", e.which);
             const target = $(e.target);
-            console.log("#conmenu .conmenu-item click=", target);
             const key = target.attr("data-itemkey");
-            console.log("#conmenu .conmenu-item key=", key);
-
-            // e.stopPropagation();
-            // e.preventDefault();
+            //console.log("#conmenu .conmenu-item key=", key);
+            const datas = self.refs.lib.getSelectedDatas();
+            console.log("#conmenu data=", datas);
+            let menu = document.getElementById('conmenu');
             if(menu.classList.contains('on')){
-                    menu.classList.remove('on');
+                menu.classList.remove('on');
             }
             return false;
         });
-
+        
     });
 
     obs.on('pageResizedEvent', function (size) {
         if(self.refs!==undefined){
             self.refs.lib.ress(size);
+        }
+    });
+
+    obs.on("bodyMousedownEvent", function (e) {
+        const elms = $("#conmenu .conmenu-item:hover");
+        if(elms.length>0){
+            return;
+        }
+        let menu = document.getElementById('conmenu');
+        if(menu.classList.contains('on')){
+            menu.classList.remove('on');
         }
     });
 </script>

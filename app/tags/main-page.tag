@@ -65,6 +65,11 @@
             riot.mount('#page1 library-page', { "config": config });
             riot.mount('#page2 search-page');             
             select_page(this.index);
+            
+            this.root.addEventListener('mousedown', function(e){
+                obs.trigger("bodyMousedownEvent", e);   
+                return false;
+            });
         });
 
         obs.on("selindex", (index) => {

@@ -27,8 +27,6 @@
 class="display stripe hover" style="width:100%"></table>
 
 <script>
-    require('jquery-contextmenu');
-
     const datatable_id = opts.my_datatable_id;
     const params = this.parent.params.dt;
 
@@ -95,6 +93,15 @@ class="display stripe hover" style="width:100%"></table>
             };
         }();
 
+    this.getSelectedDatas = ()=>{
+        const table = getDataTable(); 
+        const elms = table.$('tr.selected').toArray();
+        var datas = elms.map((elm)=>{
+            return table.row(elm).data();
+        });
+        return datas;
+    };
+
     this.on('mount', function () {  
         let table = getDataTableElm();
         table.DataTable({
@@ -140,16 +147,12 @@ class="display stripe hover" style="width:100%"></table>
          });
 
         $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(e){
-            // console.log("e.which=", e.which);
             selselect(this);
             params.contextMenu.hide(e);
-            // e.stopPropagation();
-            // e.preventDefault();
             return false;
         });
 
         $(`#${datatable_id} tbody`).contextmenu(function(e) {
-            console.log( "Handler for .contextmenu() called." );
             params.contextMenu.show(e);
             return false;
         });

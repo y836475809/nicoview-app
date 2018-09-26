@@ -1,2 +1,5 @@
 https://github.com/nathancahill/Split.js
 https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname
+
+https://www.webprofessional.jp/jquery-pagination-plugins/
+https://voyager-jp.com/blog/jquery/pagination-js/

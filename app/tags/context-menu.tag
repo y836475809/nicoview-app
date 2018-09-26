@@ -30,7 +30,7 @@
     <script>
         let self = this;
         this.show = (e)=>{
-            let menu = document.querySelector('div.conmenu');
+            let menu = this.root.querySelector('div.conmenu');
             menu.style.left = e.pageX + 'px';
             menu.style.top = e.pageY + 'px';
             menu.classList.add('on');              
@@ -39,9 +39,9 @@
         this.callback = (e)=>{};
 
         this.on('mount', function () {
-            let menu = document.querySelector('div.conmenu');
-            
-            let elms = document.querySelectorAll('div.conmenu .conmenu-item');
+            let menu = this.root.querySelector('div.conmenu');
+
+            let elms = this.root.querySelectorAll('div.conmenu .conmenu-item');
             elms.forEach((elem)=>{
                 elem.addEventListener("click", function(e){
                     const target = e.target;
@@ -57,7 +57,8 @@
 
             $("html").mousedown(()=>{
                 console.log("html click");
-                const elms = $("div.conmenu .conmenu-item:hover");
+                // const elms = $("div.conmenu .conmenu-item:hover");
+                const elms = this.root.querySelectorAll('div.conmenu .conmenu-item:hover');
                 if(elms.length===0 && menu.classList.contains('on')){
                     menu.classList.remove('on');
                 }       

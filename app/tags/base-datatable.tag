@@ -71,6 +71,11 @@ class="display stripe hover" style="width:100%"></table>
         table.columns.adjust();
     };
 
+    // this.adjust_columns = ()=>{
+    //     let table = getDataTable();
+    //     table.columns.adjust(); 
+    // };
+
     this.showContextMenu = (e)=>{};
     // this.item="nnnnn";
 

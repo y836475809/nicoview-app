@@ -5,41 +5,20 @@
             width: 100%;
             height: 100%;
         } 
-        #conmenu{
-            width:130px;
-            background-color:#f0f0f0;
-            border:1px solid #999999;
-            display:none;
-            position:fixed;
-            box-shadow: 2px 2px 4px;
-        }
-        #conmenu.on{
-            display:block;
-        }
-        #conmenu .conmenu-item{
-            list-style:none;
-            margin:0px;
-            padding:5px;
-        }
-        #conmenu .conmenu-item:hover{
-            color: white;
-            background-color:#3eb2e7;
-        }        
     </style>
 
 <div class="table-base">
     <input type="button" value="show" onclick={read}>  
     <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
 </div>
-
-<div id="conmenu">
-    <div class="conmenu-item" data-itemkey="itme1">play</div>
-    <div class="conmenu-item" data-itemkey="itme2">edit</div>
-    <hr>
-    <div class="conmenu-item" data-itemkey="itme3">delete</div>
-</div>
+<context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
+    this.items = [
+        { title: 'First item' , itemkey: "First"},
+        { title: 'Second item', itemkey: "Second"},
+        { title: 'Third item', itemkey: "Third"}
+    ];
     const remote = require('electron').remote;
     const ipc = require('electron').ipcRenderer;
 
@@ -51,11 +30,13 @@
     const time_format = require(`${base_dir}/app/js/time_format`);
 
     require(`${base_dir}/app/tags/base-datatable.tag`);
+    require(`${base_dir}/app/tags/context-menu.tag`);
 
     let db = new DB();
 
     let self = this;
     const config = opts.config;
+    let contextmenu;
 
     read(){
         const data_path = config.library_path;
@@ -129,35 +110,6 @@
         paging: false,
         deferRender: true,
         stateSave: true,
-        //displayLength: 2,
-        //lengthMenu: [ 2, 4, 10, 20, 30, 40, 50 ],
-        //displayLength: 4,
-        // contextMenu: {
-        //     items: {
-        //         "edit": {name: "Edit", icon: "edit"},
-        //         "cut": {name: "Cut", icon: "cut"},
-        //         "copy": {name: "Copy", icon: "copy"},
-        //         "paste": {name: "Paste", icon: "paste"},
-        //         "delete": {name: "Delete", icon: "delete"}
-        //     },
-        //     callback: function(key, data){
-        //         console.log( "clicked: " + key, ", data:", data); 
-        //     }
-        // },
-        contextMenu: {
-            show: function(e){
-                let menu = document.getElementById('conmenu');
-                menu.style.left = e.pageX + 'px';
-                menu.style.top = e.pageY + 'px';
-                menu.classList.add('on');
-            },
-            hide: function(e){
-                let menu = document.getElementById('conmenu');
-                if(menu.classList.contains('on')){
-                    menu.classList.remove('on');
-                }
-            }
-        },
         dblclickRow: function(data){
             console.log( "dblclickRow data:", data); 
             const video_file_path = db.getVideoPath(data.id);
@@ -174,37 +126,23 @@
 
 
     this.on('mount', function () {
-        // console.log(this.refs.lib);
-        $("#conmenu .conmenu-item").on('click',function(e){
-            // console.log("e.which=", e.which);
-            const target = $(e.target);
-            const key = target.attr("data-itemkey");
-            //console.log("#conmenu .conmenu-item key=", key);
+        contextmenu = this.refs.ctm;
+
+        self.refs.lib.showContextMenu=(e)=>{
+            contextmenu.show(e);
+        };
+
+        contextmenu.callback = (e)=>{
+            const key = e.key;
             const datas = self.refs.lib.getSelectedDatas();
+            console.log("#conmenu key=", key);
             console.log("#conmenu data=", datas);
-            let menu = document.getElementById('conmenu');
-            if(menu.classList.contains('on')){
-                menu.classList.remove('on');
-            }
-            return false;
-        });
-        
+        };        
     });
 
     obs.on('pageResizedEvent', function (size) {
         if(self.refs!==undefined){
             self.refs.lib.ress(size);
-        }
-    });
-
-    obs.on("bodyMousedownEvent", function (e) {
-        const elms = $("#conmenu .conmenu-item:hover");
-        if(elms.length>0){
-            return;
-        }
-        let menu = document.getElementById('conmenu');
-        if(menu.classList.contains('on')){
-            menu.classList.remove('on');
         }
     });
 </script>

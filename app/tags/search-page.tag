@@ -24,7 +24,7 @@
 </table>
 </div>
 <script>
-    require('jquery-contextmenu');
+    // require('jquery-contextmenu');
 
     obs.on("receivedData", (datas) => {
         let table = $('#search-table').DataTable()
@@ -80,34 +80,34 @@
             { targets: 3, data: "office" },
             { targets: 4, data: "position" }],
 
-            drawCallback : function() 
-            {
-                $.contextMenu({
-                    selector: 'tbody tr td', 
-                    callback: function(key, options) {
-                        var m = "clicked: " + key + ' ' + selected_id;
-                        console.log(m); 
-                    },
-                    events: {
-                    show : function(options){
-                        const cellIndex = parseInt(options.$trigger[0].cellIndex);
-                        const row = table.row(options.$trigger[0].parentNode);
-                        const rowIndex = row.index();
-                        console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
-                        selselect(options.$trigger[0].parentNode)
+            // drawCallback : function() 
+            // {
+            //     $.contextMenu({
+            //         selector: 'tbody tr td', 
+            //         callback: function(key, options) {
+            //             var m = "clicked: " + key + ' ' + selected_id;
+            //             console.log(m); 
+            //         },
+            //         events: {
+            //         show : function(options){
+            //             const cellIndex = parseInt(options.$trigger[0].cellIndex);
+            //             const row = table.row(options.$trigger[0].parentNode);
+            //             const rowIndex = row.index();
+            //             console.log("rowIndex=", rowIndex, ", cellIndex=", cellIndex); 
+            //             selselect(options.$trigger[0].parentNode)
 
-                        return true;
-                    },
-                    },
-                    items: {
-                        "edit": {name: "Edit", icon: "edit"},
-                        "cut": {name: "Cut", icon: "cut"},
-                        "copy": {name: "Copy", icon: "copy"},
-                        "paste": {name: "Paste", icon: "paste"},
-                        "delete": {name: "Delete", icon: "delete"}
-                    }
-                });
-            },
+            //             return true;
+            //         },
+            //         },
+            //         items: {
+            //             "edit": {name: "Edit", icon: "edit"},
+            //             "cut": {name: "Cut", icon: "cut"},
+            //             "copy": {name: "Copy", icon: "copy"},
+            //             "paste": {name: "Paste", icon: "paste"},
+            //             "delete": {name: "Delete", icon: "delete"}
+            //         }
+            //     });
+            // },
             colResize: {
                 "handleWidth": 10,
                 "exclude": [0]

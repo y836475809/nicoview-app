@@ -70,6 +70,8 @@ class="display stripe hover" style="width:100%"></table>
         $(`#${id} div.dataTables_scrollBody`).css('height', h);
         table.columns.adjust();
     };
+
+    this.showContextMenu = (e)=>{};
     // this.item="nnnnn";
 
     var selselect = function(){
@@ -148,12 +150,12 @@ class="display stripe hover" style="width:100%"></table>
 
         $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(e){
             selselect(this);
-            params.contextMenu.hide(e);
-            return false;
+            //return false;
         });
 
-        $(`#${datatable_id} tbody`).contextmenu(function(e) {
-            params.contextMenu.show(e);
+        $(`#${datatable_id} tbody`).contextmenu((e)=>{
+            console.log(`#${datatable_id} tbody contextmenu = `, e);
+            this.showContextMenu(e);
             return false;
         });
 

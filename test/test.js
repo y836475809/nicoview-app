@@ -34,6 +34,51 @@ it("calc", function () {
 
 })
 
+it("calc2", function () {
+    let comments = [
+        { no: 1, vpos: 0, width: 10, speed: 1, lane_index: 0 },
+        { no: 2, vpos: 1, width: 2, speed: 1, lane_index: 0 },
+        { no: 3, vpos: 2, width: 3, speed: 1, lane_index: 0 },
+        { no: 4, vpos: 3, width: 10, speed: 1, lane_index: 0 },
+        { no: 5, vpos: 4, width: 10, speed: 1, lane_index: 0 }
+    ];
+
+    const num = 3;
+    let cm = new nico_comment(num);
+    cm.width = 10;
+    cm.comments = comments;
+    cm.calc_comment();
+
+    let calc_cm = cm.comments;
+    assert(calc_cm[0].lane_index === 0);
+    assert(calc_cm[1].lane_index === 1);
+    assert(calc_cm[2].lane_index === 2);
+    assert(calc_cm[3].lane_index === 1);
+    assert(calc_cm[4].lane_index === 2);
+});
+
+
+it("calc3", function () {
+    let comments = [
+        { no: 1, vpos: 0, width: 10, speed: 1, lane_index: 0 },
+        { no: 2, vpos: 1, width: 2, speed: 1, lane_index: 0 },
+        { no: 3, vpos: 2, width: 3, speed: 1, lane_index: 0 },
+        { no: 4, vpos: 300, width: 10, speed: 1, lane_index: 0 }
+    ];
+
+    const num = 3;
+    let cm = new nico_comment(num);
+    cm.width = 10;
+    cm.comments = comments;
+    cm.calc_comment();
+
+    let calc_cm = cm.comments;
+    assert(calc_cm[0].lane_index === 0);
+    assert(calc_cm[1].lane_index === 1);
+    assert(calc_cm[2].lane_index === 2);
+    assert(calc_cm[3].lane_index === 0);
+});
+
 it("calc sort by vpos", function () {
     let comments = [
         { no: 1, vpos: 10, width: 20, speed: 1, lane_index: 0 },

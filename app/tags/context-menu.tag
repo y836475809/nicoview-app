@@ -15,10 +15,11 @@
             list-style:none;
             margin:0px;
             padding:5px;
+            font-size: 12px;
+            font-family: "Meiryo";
         }
         .conmenu .conmenu-item:hover{
-            color: white;
-            background-color:#3eb2e7;
+            background-color:rgba(62, 177, 231, 0.2);
         }   
     </style>
     
@@ -56,8 +57,7 @@
             });
 
             $("html").mousedown(()=>{
-                console.log("html click");
-                // const elms = $("div.conmenu .conmenu-item:hover");
+                // console.log("html click");
                 const elms = this.root.querySelectorAll('div.conmenu .conmenu-item:hover');
                 if(elms.length===0 && menu.classList.contains('on')){
                     menu.classList.remove('on');

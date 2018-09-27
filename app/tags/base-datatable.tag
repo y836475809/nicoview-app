@@ -23,15 +23,13 @@
         }
     </style>
 
-<table ref="datatable" id={this.opts.my_datatable_id}
-class="display stripe hover" style="width:100%"></table>
+<table ref="dt" class="display stripe hover" style="width:100%"></table>
 
 <script>
-    const datatable_id = opts.my_datatable_id;
-    const params = this.parent.params.dt;
+    const params = opts.params.dt;
 
-    let getDataTableElm = function(){
-        return $(`#${datatable_id}`);
+    let getDataTableElm = ()=>{
+        return $(this.refs.dt);
     };
     let getDataTable = function(){
         return getDataTableElm().DataTable();
@@ -42,32 +40,17 @@ class="display stripe hover" style="width:100%"></table>
         table.clear().rows.add(datas).draw();
     });
 
-    obs.on("setSize-p1", () => {
-        let table = getDataTable(); 
-        const id = $(table.table().container()).attr('id');
-        //$('.dataTables_scrollBody').css('height', ($(window).height() - 200));
-        const h = $(window).height() - 200;
-        $(`#${id} div.dataTables_scrollBody`).css('height', h);
-        table.columns.adjust();
-    });
-
-    // obs.on('resizeEndEvent2', function (size) {
-    //     let table = getDataTable(); 
-    //     const id = $(table.table().container()).attr('id');
-    //     const h = size.h;
-    //     $(`#${id} div.dataTables_scrollBody`).css('height', h);
-    //     table.columns.adjust();
-    // });
     this.setData = (datas)=> {
         let table = getDataTable();
         table.clear().rows.add(datas).draw();      
     };
 
     this.ress = (size)=> {
-        let table = getDataTable(); 
-        const id = $(table.table().container()).attr('id');
         const h = size.h;
-        $(`#${id} div.dataTables_scrollBody`).css('height', h);
+        let scroll_body = this.root.querySelector("div.dataTables_scrollBody");
+        $(scroll_body).css('height', h);
+
+        let table = getDataTable();
         table.columns.adjust();
     };
 
@@ -77,28 +60,27 @@ class="display stripe hover" style="width:100%"></table>
     // };
 
     this.showContextMenu = (e)=>{};
-    // this.item="nnnnn";
 
     var selselect = function(){
-            let selindex=0;
+        let selindex=0;
 
-            return function(elm){
-                let table = getDataTable(); 
-                var data = table.row(elm).data();
-                let new_index = table.row(elm).index();
-                console.log("mousedown ", table.row(elm).index()); 
-                if ( $(elm).hasClass('selected') ) {
-                    if(selindex!==new_index)
-                    {
-                        $(elm).removeClass('selected');
-                    }     
-                }else {
-                    table.$('tr.selected').removeClass('selected');
-                    $(elm).addClass('selected');
-                } 
-                selindex=new_index;        
-            };
-        }();
+        return function(elm){
+            let table = getDataTable(); 
+            var data = table.row(elm).data();
+            let new_index = table.row(elm).index();
+            console.log("mousedown ", table.row(elm).index()); 
+            if ( $(elm).hasClass('selected') ) {
+                if(selindex!==new_index)
+                {
+                    $(elm).removeClass('selected');
+                }     
+            }else {
+                table.$('tr.selected').removeClass('selected');
+                $(elm).addClass('selected');
+            } 
+            selindex=new_index;        
+        };
+    }();
 
     this.getSelectedDatas = ()=>{
         const table = getDataTable(); 
@@ -115,28 +97,6 @@ class="display stripe hover" style="width:100%"></table>
             dom: params.dom,
             columns: params.columns,
             columnDefs: params.columnDefs,
-            // drawCallback : function() 
-            // {
-            //     $.contextMenu({
-            //         selector: 'tbody tr td', 
-            //         callback: function(key, options) {
-            //             const target_elm = options.$trigger[0].parentNode
-            //             const data = getDataTable().row(target_elm).data();
-            //             params.contextMenu.callback(key, data);
-            //         },
-            //         events: {
-            //         show : function(options){
-            //             const cellIndex = parseInt(options.$trigger[0].cellIndex);
-            //             const row = getDataTable().row(options.$trigger[0].parentNode);
-            //             const rowIndex = row.index();
-            //             selselect(options.$trigger[0].parentNode);
-
-            //             return true;
-            //         },
-            //         },
-            //         items: params.contextMenu.items
-            //     });
-            // },
             colResize: params.colResize,
             //scrollY:'50vh',
             scrollY: ($(window).height() - 200),
@@ -153,18 +113,18 @@ class="display stripe hover" style="width:100%"></table>
             $("div.dataTables_scrollBody").scrollTop(0);
          });
 
-        $(`#${datatable_id} tbody`).on('mousedown', 'tr', function(e){
+        let table_body = this.root.querySelector("table tbody");
+        $(table_body).on('mousedown', 'tr', function(e){
             selselect(this);
             //return false;
         });
 
-        $(`#${datatable_id} tbody`).contextmenu((e)=>{
-            console.log(`#${datatable_id} tbody contextmenu = `, e);
+        $(table_body).contextmenu((e)=>{
             this.showContextMenu(e);
             return false;
         });
 
-        $(`#${datatable_id} tbody`).on('dblclick', 'tr', function (){
+        $(table_body).on('dblclick', 'tr', function (){
             let table = getDataTable(); 
             const data = table.row(this).data();
             params.dblclickRow(data);

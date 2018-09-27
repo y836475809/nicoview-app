@@ -9,7 +9,7 @@
 
 <div class="table-base">
     <input type="button" value="show" onclick={read}>  
-    <base-datatable ref="lib" my_datatable_id="lib-table-id"></base-datatable>
+    <base-datatable ref="dt" params={this.params}></base-datatable>
 </div>
 <context-menu ref="ctm" items={this.items}></context-menu>
 
@@ -34,9 +34,7 @@
 
     let db = new DB();
 
-    let self = this;
     const config = opts.config;
-    let contextmenu;
 
     read(){
         const data_path = config.library_path;
@@ -57,7 +55,7 @@
             );
         });
 
-        self.refs.lib.setData(datas);
+        this.refs.dt.setData(datas);
     };
 
     this.params = {}
@@ -111,7 +109,7 @@
         deferRender: true,
         stateSave: true,
         dblclickRow: function(data){
-            console.log( "dblclickRow data:", data); 
+            console.log("lib dblclickRow data:", data); 
             const video_file_path = db.getVideoPath(data.id);
             const video_type = db.getVideoType(data.id);
             const commnets = db.findComments(data.id);
@@ -126,23 +124,23 @@
 
 
     this.on('mount', function () {
-        contextmenu = this.refs.ctm;
+        let contextmenu = this.refs.ctm;
 
-        self.refs.lib.showContextMenu=(e)=>{
+        this.refs.dt.showContextMenu=(e)=>{
             contextmenu.show(e);
         };
 
         contextmenu.callback = (e)=>{
             const key = e.key;
-            const datas = self.refs.lib.getSelectedDatas();
-            console.log("#conmenu key=", key);
-            console.log("#conmenu data=", datas);
+            const datas = this.refs.dt.getSelectedDatas();
+            console.log("lib conmenu key=", key);
+            console.log("lib conmenu data=", datas);
         };        
     });
 
-    obs.on('pageResizedEvent', function (size) {
-        if(self.refs!==undefined){
-            self.refs.lib.ress(size);
+    obs.on('pageResizedEvent', (size)=> {
+        if(this.refs!==undefined){
+            this.refs.dt.ress(size);
         }
     });
 </script>

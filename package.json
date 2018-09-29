@@ -4,8 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "jest",
-    "test2": "./node_modules/.bin/electron-mocha --renderer --require intelli-espower-loader"
+    "test": "jest"
   },
   "directories": {
     "test": "test/"

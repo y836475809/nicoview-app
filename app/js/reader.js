@@ -39,6 +39,7 @@ function thumb_info(xml) {
     let video_id = $("video_id").text()
     let title = $("title").text()
     let description = $("description").text()
+    let thumbnail_url = $("thumbnail_url").text()
     let first_retrieve = $("first_retrieve").text()
     let length = $("length").text()
     let movie_type = $("movie_type").text()
@@ -50,6 +51,10 @@ function thumb_info(xml) {
     let comment_num = parseInt($("comment_num").text())
     let mylist_counter = parseInt($("mylist_counter").text())
     let last_res_body = $("last_res_body").text()
+    let watch_url = $("watch_url").text()
+    let thumb_type = $("thumb_type").text()
+    let embeddable = parseInt($("embeddable").text())
+    let no_live_play = parseInt($("no_live_play").text())
 
     let tags = []
     $("tag").each(function (i, el) {
@@ -67,6 +72,7 @@ function thumb_info(xml) {
         video_id: video_id,
         title: title,
         description: description,
+        thumbnail_url: thumbnail_url,
         first_retrieve: first_retrieve,
         length: length,
         movie_type: movie_type,
@@ -76,6 +82,10 @@ function thumb_info(xml) {
         comment_num: comment_num,
         mylist_counter: mylist_counter,
         last_res_body: last_res_body,
+        watch_url: watch_url,
+        thumb_type: thumb_type,
+        embeddable: embeddable,
+        no_live_play: no_live_play,
         tags: tags,
         user_id: user_id,
         user_nickname: user_nickname,

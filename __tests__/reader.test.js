@@ -24,6 +24,7 @@ test("read thumb info", function () {
     expect(obj.video_id).toEqual("sm1000");
     expect(obj.title).toEqual("sample.mp4");
     expect(obj.description).toEqual("投稿コメントサンプル。他sm2000リストmylist/3000");
+    expect(obj.thumbnail_url).toEqual("http://tn-skr2.smilevideo.jp/smile?i=1000");
     expect(obj.first_retrieve).toEqual("2000-01-01T01:02:03+09:00");
     expect(obj.length).toEqual("00:45");
     expect(obj.movie_type).toEqual("mp4");
@@ -33,6 +34,10 @@ test("read thumb info", function () {
     expect(obj.comment_num).toBe(10);
     expect(obj.mylist_counter).toBe(5);
     expect(obj.last_res_body).toEqual("最新コメント1 最新コメント2");
+    expect(obj.watch_url).toEqual("http://www.nicovideo.jp/watch/sm1000");
+    expect(obj.thumb_type).toEqual("video");
+    expect(obj.embeddable).toBe(1);
+    expect(obj.no_live_play).toBe(0);
     expect(obj.tags).toEqual([
         {tag:"タグ1", lock:"1"},
         {tag:"タグ2", lock:""},

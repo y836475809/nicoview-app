@@ -9,55 +9,87 @@
     <script  type="text/javascript" src="../../node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
     <script  type="text/javascript" src="../../lib/colResize/dataTables.colResize.js"></script>
-    <link rel="stylesheet" type="text/css" href="../../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css">
+    <style type="text/css">
+        html, body{
+            height: 100%;
+            width:100%;
+            margin: 0;
+        }
+    </style>
 </head>
+
 <body>
     <input type="button" value="show" onClick="showPlayer()">
-    <input type="button" value="width" onClick="setWidth()">
-    <library-datatable></library-datatable>
+    <base-datatable ref="dt"></base-datatable>
 </body>
 
 <script>  
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
-    require('jquery-contextmenu');
+    const remote = require('electron').remote;
+    const base_dir = remote.getGlobal('sharedObj').base_dir;
     
-    var riot = require('riot')
-    require(`${base_dir}/app/tags/library-datatable.tag`)
+    var riot = require('riot');
     var obs = riot.observable();
+    require(`${base_dir}/app/tags/base-datatable.tag`);
 
-    riot.mount('library-datatable');
-
-    let setWidth = () => {
-        obs.trigger("setWidth")
-    }
+    this.params = {};
+    this.params.dt = {
+        columns : [
+            { title: 'image' },
+            { title: 'name' },
+            { title: 'position' },
+            { title: 'salary' },
+            { title: 'office' }
+        ],
+        columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                data: "image",
+                render: function (data, type, row, meta) {
+                    return `<img src='${data}' width="130" height="100">`
+                },
+            },
+            { targets: 1, data: "name" },
+            { targets: 2, data: "position" },
+            { targets: 3, data: "salary" },
+            { targets: 4, data: "office" }
+        ], 
+        dom: 'Zlfrtip', 
+        colResize : {
+            handleWidth: 10,
+            exclude: [0],
+        },
+        autoWidth: true,
+        scrollCollapse:false,
+        paging: false,
+        deferRender: true,
+        stateSave: true,
+        dblclickRow: function(data){
+            console.log("dblclickRow data:", data); 
+        }
+    };
 
     function Employee(image, name, position, salary, office) {
          this.image = image;
          this.name = name;
          this.position = position;
          this.salary = salary;
-         this._office = office;
-
-         this.office = function () {
-             return this._office;
-         }
+         this.office = office;
     };
+
     let showPlayer = () => {
-        const data_dir = `${base_dir}/test/datatables/data`
-        const data_http1 = "http://localhost:8000/brie1"
-        const data_http2 = "http://localhost:8000/brie2"
+        const data_dir = `${base_dir}/test/datatables/data`;
         const datas = [
-            new Employee(data_http1, "http Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Tiger Nixon", "System Architect", "$3,120", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "Garrett Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Garrett", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/brie.jpg`, "Winters", "Director", "$5,300", "Edinburgh"),
             new Employee(`${data_dir}/cheddar.jpg`, "t Winters", "Director", "$5,300", "Edinburgh"),
-            new Employee(data_http2, "http Winters", "Director", "$5,300", "Edinburgh"),
-        ]
-        obs.trigger("receivedData", datas)
-    }
+        ];
+        obs.trigger("receivedData", datas);
+    };
+
+    riot.mount('base-datatable', {params: this.params});
 </script>
 
 </html>

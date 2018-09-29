@@ -10,7 +10,7 @@
     "test": "test/"
   },
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "devDependencies": {
     "jest": "^23.6.0"
   },

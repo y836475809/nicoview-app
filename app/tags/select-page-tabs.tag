@@ -59,7 +59,7 @@
         // タブをクリックでindexを切り替え
         changeTab(event) {
             self.index = event.item.i;
-            obs.trigger("selindex", self.index)
+            obs.trigger("selindex", self.index);
         }
     </script>
 </select-page-tabs>

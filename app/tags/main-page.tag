@@ -69,7 +69,7 @@
 
         obs.on("selindex", (index) => {
             this.index = index;      
-            select_page(index)
+            select_page(index);
         });
         
         obs.on('resizeEndEvent', function (size) {

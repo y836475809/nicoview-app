@@ -1,10 +1,6 @@
 
-// const remote = require('electron').remote
-// const base_dir = remote.getGlobal('sharedObj').base_dir
-const fs = require('fs')
-const path = require('path')
-// const reader = require(`${base_dir}/app/js/reader`)
-const reader = require('./reader')
+const fs = require('fs');
+const reader = require('./reader');
 
 class DB {
     constructor() {
@@ -17,8 +13,8 @@ class DB {
      * @param {Map} video_info 
      */
     setData(dir_path, video_info) {
-        this.dir_path = dir_path
-        this.video_info = video_info
+        this.dir_path = dir_path;
+        this.video_info = video_info;
     }
 
     /**
@@ -64,15 +60,15 @@ class DB {
         // const dir_path = this.dir_path.get(video_info.id)
         // const file_path = path.join(dir_path, `${video_info.video_name} - [${id}].xml`)
         
-        const file_path = this.getCommentPath(id)
+        const file_path = this.getCommentPath(id);
         const xml = fs.readFileSync(file_path, "utf-8");
-        let comments = reader.comment(xml)
+        let comments = reader.comment(xml);
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;
             return 0;
-        })
-        return comments
+        });
+        return comments;
     }
 
     /**
@@ -81,7 +77,7 @@ class DB {
      */
     findThumbInfo(id) {
         const xml = fs.readFileSync("./sample/sample[ThumbInfo].xml", "utf-8");
-        return reader.thumb_info(xml)
+        return reader.thumb_info(xml);
     }
 
     // findLibrary(){
@@ -119,18 +115,17 @@ class DB {
      */
     getPath(dirpath_id, filename) {
         if (!this.dir_path.has(dirpath_id)) {
-            throw Error(`not find dir_path, dirpath_id=${dirpath_id}`)
+            throw Error(`not find dir_path, dirpath_id=${dirpath_id}`);
         }
-        const dir_path = this.dir_path.get(dirpath_id)
-        // return path.join(dir_path, filename)
-        return `${dir_path}/${filename}`
+        const dir_path = this.dir_path.get(dirpath_id);
+        return `${dir_path}/${filename}`;
     }
 
     getVideoInfo(id) {
         if (!this.video_info.has(id)) {
-            throw Error(`not find video_info, id=${id}`)
+            throw Error(`not find video_info, id=${id}`);
         }
-        return this.video_info.get(id)
+        return this.video_info.get(id);
     }
 
     /**
@@ -138,21 +133,27 @@ class DB {
      * @param {string} id 
      */
     getVideoPath(id) {
-        const video_info = this.getVideoInfo(id)
-        return this.getPath(video_info.dirpath_id, video_info.video_filename)
+        const video_info = this.getVideoInfo(id);
+        return this.getPath(
+            video_info.dirpath_id, 
+            video_info.video_filename);
     }
     /**
      * 
      * @param {string} id 
      */
     getCommentPath(id) {
-        const video_info = this.getVideoInfo(id)
-        return this.getPath(video_info.dirpath_id, `${video_info.video_name} - [${id}].xml`)
+        const video_info = this.getVideoInfo(id);
+        return this.getPath(
+            video_info.dirpath_id, 
+            `${video_info.video_name} - [${id}].xml`);
     }
 
     getThumbInfoPath(id) {
-        const video_info = this.getVideoInfo(id)
-        return this.getPath(video_info.dirpath_id, `${video_info.video_name} - [${id}][ThumbInfo].xml`)
+        const video_info = this.getVideoInfo(id);
+        return this.getPath(
+            video_info.dirpath_id, 
+            `${video_info.video_name} - [${id}][ThumbInfo].xml`);
     }
 
     /**
@@ -160,8 +161,10 @@ class DB {
      * @param {string} id 
      */
     getThumbPath(id) {
-        const video_info = this.getVideoInfo(id)
-        return this.getPath(video_info.dirpath_id, `${video_info.video_name} - [${id}][ThumbImg].jpeg`)
+        const video_info = this.getVideoInfo(id);
+        return this.getPath(
+            video_info.dirpath_id, 
+            `${video_info.video_name} - [${id}][ThumbImg].jpeg`);
     }
 
 
@@ -173,7 +176,7 @@ class DB {
      * @param {string} video_type 
      */
     getVideoFileName(id, video_name, video_type) {
-        return `${video_name} - [${id}].${video_type}`
+        return `${video_name} - [${id}].${video_type}`;
     }
     /**
      * 
@@ -181,11 +184,11 @@ class DB {
      * @param {string} video_name 
      */
     getCommentFileName(id, video_name) {
-        return `${video_name} - [${id}].xml`
+        return `${video_name} - [${id}].xml`;
     }
 
     getThumbInfoFileName(id, video_name) {
-        return `${video_name} - [${id}][ThumbInfo].xml`
+        return `${video_name} - [${id}][ThumbInfo].xml`;
     }
 
     /**
@@ -194,9 +197,8 @@ class DB {
      * @param {string} video_name 
      */
     getThumbFileName(id, video_name) {
-        return `${video_name} - [${id}][ThumbImg].jpeg`
+        return `${video_name} - [${id}][ThumbImg].jpeg`;
     }
-
 }
 
-module.exports.DB = DB
+module.exports.DB = DB;

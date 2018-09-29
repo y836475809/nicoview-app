@@ -7,15 +7,15 @@ const cheerio = require('cheerio');
  */
 function comment(xml) {
     let $ = cheerio.load(xml);
-    let commnets = []
+    let commnets = [];
     $("chat").each(function (i, el) {
-        const item = $(el)
-        const text = item.text()
-        const no = parseInt(item.attr('no'))
-        const vpos = parseInt(item.attr('vpos'))
-        const date = parseInt(item.attr('date'))
-        const user_id = item.attr('user_id')
-        const mail = item.attr('mail')
+        const item = $(el);
+        const text = item.text();
+        const no = parseInt(item.attr('no'));
+        const vpos = parseInt(item.attr('vpos'));
+        const date = parseInt(item.attr('date'));
+        const user_id = item.attr('user_id');
+        const mail = item.attr('mail');
         commnets.push({
             no: no,
             vpos: vpos,
@@ -23,11 +23,11 @@ function comment(xml) {
             user_id: user_id,
             mail: mail,
             text: text
-        })
-    })
+        });
+    });
 
-    return commnets
-}
+    return commnets;
+};
 
 /**
  * 
@@ -36,37 +36,37 @@ function comment(xml) {
 function thumb_info(xml) {
     let $ = cheerio.load(xml);
 
-    let video_id = $("video_id").text()
-    let title = $("title").text()
-    let description = $("description").text()
-    let thumbnail_url = $("thumbnail_url").text()
-    let first_retrieve = $("first_retrieve").text()
-    let length = $("length").text()
-    let movie_type = $("movie_type").text()
+    const video_id = $("video_id").text();
+    const title = $("title").text();
+    const description = $("description").text();
+    const thumbnail_url = $("thumbnail_url").text();
+    const first_retrieve = $("first_retrieve").text();
+    const length = $("length").text();
+    const movie_type = $("movie_type").text();
 
-    let size_high = parseInt($("size_high").text())
-    let size_low = parseInt($("size_low").text())
+    const size_high = parseInt($("size_high").text());
+    const size_low = parseInt($("size_low").text());
 
-    let view_counter = parseInt($("view_counter").text())
-    let comment_num = parseInt($("comment_num").text())
-    let mylist_counter = parseInt($("mylist_counter").text())
-    let last_res_body = $("last_res_body").text()
-    let watch_url = $("watch_url").text()
-    let thumb_type = $("thumb_type").text()
-    let embeddable = parseInt($("embeddable").text())
-    let no_live_play = parseInt($("no_live_play").text())
+    const view_counter = parseInt($("view_counter").text());
+    const comment_num = parseInt($("comment_num").text());
+    const mylist_counter = parseInt($("mylist_counter").text());
+    const last_res_body = $("last_res_body").text();
+    const watch_url = $("watch_url").text();
+    const thumb_type = $("thumb_type").text();
+    const embeddable = parseInt($("embeddable").text());
+    const no_live_play = parseInt($("no_live_play").text());
 
     let tags = []
     $("tag").each(function (i, el) {
-        const item = $(el)
-        const text = item.text()
-        const lock = item.attr('lock')
-        tags.push({ tag: text, lock: lock !== undefined ? lock : "" })
-    })
+        const item = $(el);
+        const text = item.text();
+        const lock = item.attr('lock');
+        tags.push({ tag: text, lock: lock !== undefined ? lock : "" });
+    });
 
-    let user_id = $("user_id").text()
-    let user_nickname = $("user_nickname").text()
-    let user_icon_url = $("user_icon_url").text()
+    const user_id = $("user_id").text();
+    const user_nickname = $("user_nickname").text();
+    const user_icon_url = $("user_icon_url").text();
 
     return {
         video_id: video_id,
@@ -90,8 +90,8 @@ function thumb_info(xml) {
         user_id: user_id,
         user_nickname: user_nickname,
         user_icon_url: user_icon_url
-    }
-}
+    };
+};
 
-module.exports.comment = comment
-module.exports.thumb_info = thumb_info
+module.exports.comment = comment;
+module.exports.thumb_info = thumb_info;

@@ -1,0 +1,29 @@
+<nicovideo_thumb_response status="ok">
+  <thumb>
+    <video_id>sm1000</video_id>
+    <title>sample.mp4</title>
+    <description>投稿コメントサンプル。他sm2000リストmylist/3000</description>
+    <thumbnail_url>http://tn-skr2.smilevideo.jp/smile?i=1000</thumbnail_url>
+    <first_retrieve>2000-01-01T01:02:03+09:00</first_retrieve>
+    <length>00:45</length>
+    <movie_type>mp4</movie_type>
+    <size_high>1000</size_high>
+    <size_low>500</size_low>
+    <view_counter>100</view_counter>
+    <comment_num>10</comment_num>
+    <mylist_counter>5</mylist_counter>
+    <last_res_body>最新コメント1 最新コメント2</last_res_body>
+    <watch_url>http://www.nicovideo.jp/watch/sm1000</watch_url>
+    <thumb_type>video</thumb_type>
+    <embeddable>1</embeddable>
+    <no_live_play>0</no_live_play>
+    <tags domain="jp">
+      <tag lock="1">タグ1</tag>
+      <tag>タグ2</tag>
+      <tag>タグ3</tag>
+    </tags>
+    <user_id>00000</user_id>
+    <user_nickname>ニックネーム</user_nickname>
+    <user_icon_url>https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg</user_icon_url>
+  </thumb>
+</nicovideo_thumb_response>

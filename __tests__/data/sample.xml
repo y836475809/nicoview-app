@@ -1,0 +1,17 @@
+<packet>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <leaf thread="1505300000" count="10"/>
+  <leaf thread="1505300000" leaf="1" count="2"/>
+  <leaf thread="1505300000" leaf="2" count="1"/>
+  <leaf thread="1505300000" leaf="4" count="1"/>
+  <leaf thread="1505300000" leaf="5" count="2"/>
+  <leaf thread="1505300000" leaf="8" count="1"/>
+  <leaf thread="1505300000" leaf="10" count="2"/>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <chat thread="1505300000" no="1" vpos="400" date="0" date_usec="0" premium="1" anonymity="1" user_id="AAA" mail="naka medium 184">AAAテスト</chat>
+  <chat thread="1505300000" no="2" vpos="300" date="1" date_usec="0" premium="1" anonymity="1" user_id="BBB" mail="184">BBBあ</chat>
+  <chat thread="1505300000" no="3" vpos="1500" date="2" date_usec="0" premium="1" anonymity="1" user_id="CCC" mail="184">CCCテスト</chat>
+  <chat thread="1505300000" no="4" vpos="4000" date="3" date_usec="0" premium="1" anonymity="1" user_id="CCC" mail="184">CCCテストテスト</chat>
+  <chat thread="1505300000" no="5" vpos="100" date="4" date_usec="0" anonymity="1" user_id="DDD" mail="184 device:3DS">DDDテスト</chat>
+  <chat thread="1505300000" no="6" vpos="4500" leaf="1" date="5" date_usec="0" premium="1" anonymity="1" user_id="EEE" mail="184">EEEテスト</chat>
+</packet>

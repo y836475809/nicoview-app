@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test": "mocha --require intelli-espower-loader",
+    "test": "jest",
     "test2": "./node_modules/.bin/electron-mocha --renderer --require intelli-espower-loader"
   },
   "directories": {
@@ -15,6 +15,7 @@
   "devDependencies": {
     "electron-mocha": "^3.4.0",
     "intelli-espower-loader": "^1.0.1",
+    "jest": "^23.6.0",
     "mocha": "^3.2.0",
     "power-assert": "^1.4.2"
   },

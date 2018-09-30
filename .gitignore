@@ -1,6 +1,5 @@
 .vscode
 node_modules/
-lib/
 tmp/
 *.mp4
 /*.log
@@ -13,3 +12,6 @@ tmp/
 test/data/
 package-lock.json
 *.lnk
+lib/colResize/examples/
+lib/colResize/bower.json
+lib/colResize/README.md

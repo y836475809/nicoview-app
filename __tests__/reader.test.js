@@ -17,6 +17,17 @@ test("read comment", function () {
         ]);
 });
 
+test("read comment deleted", function () {
+    const xml = fs.readFileSync(`${dir}/sample_deleted.xml`, "utf-8");
+    const obj = reader.comment(xml);
+    expect(obj).toEqual(
+        [
+            {no:1,  vpos:100, date:10, user_id:"AAA", mail:"184", text:"AAAテスト"},
+            {no:3,  vpos:300, date:30, user_id:"BBB", mail:"184", text:"BBBテスト"},
+            {no:4,  vpos:400, date:40, user_id:"CCC", mail:"184", text:"CCCテスト"},
+        ]);
+});
+
 test("read thumb info", function () {
     const xml = fs.readFileSync(`${dir}/sample[ThumbInfo].xml`, "utf-8");
     const obj = reader.thumb_info(xml);

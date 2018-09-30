@@ -10,20 +10,22 @@ function comment(xml) {
     let commnets = [];
     $("chat").each(function (i, el) {
         const item = $(el);
-        const text = item.text();
-        const no = parseInt(item.attr('no'));
-        const vpos = parseInt(item.attr('vpos'));
-        const date = parseInt(item.attr('date'));
-        const user_id = item.attr('user_id');
-        const mail = item.attr('mail');
-        commnets.push({
-            no: no,
-            vpos: vpos,
-            date: date,
-            user_id: user_id,
-            mail: mail,
-            text: text
-        });
+        if(!item.attr('deleted')){
+            const text = item.text();
+            const no = parseInt(item.attr('no'));
+            const vpos = parseInt(item.attr('vpos'));
+            const date = parseInt(item.attr('date'));
+            const user_id = item.attr('user_id');
+            const mail = item.attr('mail');
+            commnets.push({
+                no: no,
+                vpos: vpos,
+                date: date,
+                user_id: user_id,
+                mail: mail,
+                text: text
+            });
+        }
     });
 
     return commnets;

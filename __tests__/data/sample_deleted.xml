@@ -1,0 +1,16 @@
+<packet>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <leaf thread="1505300000" count="10"/>
+  <leaf thread="1505300000" leaf="1" count="2"/>
+  <leaf thread="1505300000" leaf="2" count="1"/>
+  <leaf thread="1505300000" leaf="4" count="1"/>
+  <leaf thread="1505300000" leaf="5" count="2"/>
+  <leaf thread="1505300000" leaf="8" count="1"/>
+  <leaf thread="1505300000" leaf="10" count="2"/>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <chat thread="1505300000" no="1" vpos="100" date="10" date_usec="0" premium="1" anonymity="1" user_id="AAA" mail="184">AAAテスト</chat>
+  <chat thread="1505300000" no="2" vpos="200" date="20" date_usec="0" anonymity="1" deleted="2"/>
+  <chat thread="1505300000" no="3" vpos="300" date="30" date_usec="0" premium="1" anonymity="1" user_id="BBB" mail="184">BBBテスト</chat>
+  <chat thread="1505300000" no="4" vpos="400" date="40" date_usec="0" premium="1" anonymity="1" user_id="CCC" mail="184">CCCテスト</chat>
+
+</packet>

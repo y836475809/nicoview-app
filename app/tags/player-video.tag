@@ -157,6 +157,7 @@
                     height: event.target.videoHeight
                 }
                 obs.trigger('resizePlayer', video_size);
+                obs.trigger('seek_reload', this.refs.palyermain.duration);
             });
 
             this.refs.palyermain.addEventListener('loadeddata', (event) => {
@@ -173,7 +174,7 @@
 
             this.refs.palyermain.addEventListener('timeupdate', () => {
                 const current = this.refs.palyermain.currentTime;
-                obs.trigger('seek_update_current', current);
+                obs.trigger('seek_update', current);
             });
             this.refs.palyermain.addEventListener('progress', function(){
                 console.log('addEventListener progressによるイベント発火');
@@ -194,10 +195,22 @@
 
             obs.on("on_seeked", (current) => {
                 // this.refs.palyermain.pause();
-                console.log('player stop currente=', current);
                 // $('#player')[0].currentTime = current;
-                this.refs.palyermain.currentTime = current;
-                comment_anime.seek(current * 1000);
+                
+                if(this.refs.palyermain.paused){
+                    this.refs.palyermain.currentTime = current;
+                    comment_anime.seek(current * 1000);
+                }else{
+                    console.log('player paused');
+                    this.refs.palyermain.pause();
+                    comment_anime.pause();
+
+                    this.refs.palyermain.currentTime = current;
+                    comment_anime.seek(current * 1000);
+
+                    this.refs.palyermain.play();
+                    comment_anime.play();
+                }    
             });
 
             obs.on("resizeEndEvent", function (wsize) {

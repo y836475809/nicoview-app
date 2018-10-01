@@ -1,4 +1,4 @@
-<seek>
+<player-seek>
     <style scoped>
         :scope {
             display:grid;
@@ -108,4 +108,4 @@
             updateSeek(current);
         });
     </script>
-</seek>
+</player-seek>

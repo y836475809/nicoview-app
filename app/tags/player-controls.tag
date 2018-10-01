@@ -11,11 +11,11 @@
         <button id="play-btn" onclick='{ play }'>start</button>
         <button id="stop-btn">stop</button>
         <button id="add-btn" onclick='{ add }'>add</button>
-        <seek></seek>
+        <player-seek></player-seek>
     </div>
     <script>
-        require('./seek.tag');
-        riot.mount('seek');
+        require('./player-seek.tag');
+        riot.mount('player-seek');
         // this.on('mount', () => {
         //     $("#slider").slider();
         // })

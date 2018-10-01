@@ -192,6 +192,10 @@
                 console.log("player.tag play");
                 this.refs.palyermain.play();
             });
+            obs.on("pause", () => {
+                console.log("player.tag pause");
+                this.refs.palyermain.pause();
+            });
 
             obs.on("on_seeked", (current) => {
                 // this.refs.palyermain.pause();

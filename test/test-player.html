@@ -16,7 +16,6 @@
 </head>
 
 <body>
-    <input id="sbtn" type="button" value="show" onClick="start()">
     <player-page></player-page>
 </body>
 
@@ -47,6 +46,22 @@
         };
         obs.trigger("receivedData", data);  
     };
+    obs.on("loadplaydata", () => {
+        start();
+    });
+
+    const timeout = 200;
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            obs.trigger("resizeEndEvent", {
+                    w: window.innerWidth, 
+                    h: window.innerHeight 
+                 });
+        }, timeout);
+    });
+
 </script>
 
 </html>

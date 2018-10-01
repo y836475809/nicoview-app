@@ -79,6 +79,10 @@
             obs.trigger("on_seeked", current);
         };
 
+        this.redraw = ()=>{
+            updateSeek(this.current);
+        };
+
         let updateSeek = (current)=>{
             this.current = current;
             const per = this.current / this.duration;

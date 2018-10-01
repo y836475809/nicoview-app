@@ -68,10 +68,11 @@
             }
 
             let picker = document.querySelector("div.picker");
-            picker.style.left = e.clientX + "px";
+            const left = e.layerX;
+            picker.style.left = left + "px";
 
             let slider = document.querySelector("div.slider");
-            const per = e.clientX / slider.clientWidth;
+            const per = left / slider.clientWidth;
             const current = per * this.duration;
             updateSeek(current);
 

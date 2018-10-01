@@ -3,32 +3,42 @@
         :scope {
             display:grid;
             grid-template-rows: 1fr 1fr 1fr;
-            grid-template-columns: 1fr 50px 10px 50px;
+            grid-template-columns: 1fr 70px 10px 60px;
             width: 100%;
             height: 30px;
             margin: 0;
-            background-color: #61c853;
-        }
+            font-family: "Meiryo";
+            user-select: none;
+            cursor: default;
+        } 
         .slider{
             grid-row: 2 / 3;
             grid-column: 1 / 2;
-            background-color: #537cc8;
+            background-color: #797b80;
             position: relative;
             height: 10px;
         }
         .current {
-            grid-row: 1 / 4;
+            grid-row: 2 / 3;
             grid-column: 2 / 3;
-            text-align: right;
+            text-align: center;
+            font-size: 12px;
+            line-height: 10px;
+            margin-left: 10px;
         }
-        .sep {
-            grid-row: 1 / 4;
+        .slash {
+            grid-row: 2 / 3;
             grid-column: 3 / 4;
+            text-align: center;
+            font-size: 12px;
+            line-height: 10px;
         }  
         .duration {
-            grid-row: 1 / 4;
+            grid-row: 2 / 3;
             grid-column: 4 / 5;
-            text-align: right;
+            text-align: center;
+            font-size: 12px;
+            line-height: 10px;
         }
         .picker {
             position: relative;
@@ -36,37 +46,33 @@
             left: 0px;
 			width: 8px;
 			height: 20px;
-			background-color: #c85399;
+			background-color: #e7e7e7;
 			border-radius: 2px;
+            border: 1px solid #b8b8b8;
         }
     </style>
-    <!-- <div id="seek-container"> -->
-        <div class="slider" onmousedown={mousedown}>
-            <div class="picker"></div>
-        </div>
-        <!--  -->
-        <div class="current">{this.current}</div>
-        <div class="sep">/</div>
-        <div class="duration">{this.duration}</div>
-    <!-- </div> -->
+
+    <div class="slider" onmousedown={mousedown}>
+        <div class="picker"></div>
+    </div>
+    <div class="current">{this.fmt_current}</div>
+    <div class="slash">/</div>
+    <div class="duration">{this.fmt_duration}</div>
+
     <script>
-        // var $ = jQuery = require("jquery")
-        // require("jquery-ui")
-        // // require('jquery-ui/ui/core')
-        // require('jquery-ui/ui/widget')
-        // require('jquery-ui/ui/widgets/mouse')
-        // require('jquery-ui/ui/widgets/slider')
+        const time_format = require("../../app/js/time_format");
+
         mousedown(e){
+            if(this.duration===0){
+                return;
+            }
+
             let picker = document.querySelector("div.picker");
             picker.style.left = e.clientX + "px";
 
             let slider = document.querySelector("div.slider");
             const per = e.clientX / slider.clientWidth;
             const current = per * this.duration;
-            // console.log("mousedown current=" ,current, ", duration=", this.duration,
-            // ", e.clientX= ", e.clientX,
-            // ", slider.clientWidth= ", slider.clientWidth,
-            // ", per= ", per);
             updateSeek(current);
 
             obs.trigger("on_seeked", current);
@@ -74,49 +80,32 @@
 
         let updateSeek = (current)=>{
             this.current = current;
-            //this.duration = duration;
             const per = this.current / this.duration;
-            // console.log("updateSeek current=" ,current, ", duration=", this.duration, ", per= ", per);
-
             let picker = document.querySelector("div.picker");
             let slider = document.querySelector("div.slider");
             picker.style.left = (per * slider.clientWidth) + "px";
+
+            this.fmt_current = time_format.toPlayTime(this.current);
+            this.fmt_duration = time_format.toPlayTime(this.duration);
 
             this.update();
         };
 
         this.on('mount', () => {
-            // $("#slider").slider()
-            // this.current = 10;
-            // this.duration = 0;
-            updateSeek(0, 0);
-            
-        })
-        // var that = this
+            this.duration = 0;
+            updateSeek(0);
+            this.update();
+        });
+
         obs.on('seek_reload', (duration) => {
-            //this.current = 0
             this.duration = duration;
             updateSeek(0);
-            
-            // $("#slider").slider({
-            //     range: 'min',
-            //     value: 0,
-            //     min: 0,
-            //     max: this.duration,
-            //     step: 1,
-            //     stop: function (event, ui) {
-            //         console.log('slider stop ui.value=', ui.value)
-            //         obs.trigger('on_seeked', ui.value)
-            //     }
-            // })
 
-            // $('#slider').slider('value', this.current);
-
-            this.update()
-        })
+            this.update();
+        });
 
         obs.on('seek_update', (current) => {
             updateSeek(current);
-        })
+        });
     </script>
 </seek>

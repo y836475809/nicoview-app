@@ -13,7 +13,7 @@ function format(time_ms) {
 
 function toPlayTime(time_sec){
     const sec = parseInt(time_sec % 60);
-    let min = time_sec / 60;
+    let min = parseInt(time_sec / 60);
     if(min >=60){
         min -= 60; 
     }
@@ -27,3 +27,4 @@ function toPlayTime(time_sec){
 }
 
 exports.format = format;
+exports.toPlayTime = toPlayTime;

@@ -17,6 +17,11 @@
             width: 70%;
             border: 1px solid #000000;
         }
+        .comment{
+            float:left;
+            color: #000000;
+            border: 1px solid #FF6600;
+        }
     </style>
 </head>
 
@@ -31,28 +36,85 @@
 
 <script>
     var anime = require('animejs');
+    var comment_elm = require("../comment");
+    var nico_comment = require("../nico_comment");
 
-    let ani = anime({
-        targets: '.el2',
-        translateX: function(el) {
+    // let ani = anime({
+    //     targets: '.el2',
+    //     translateX: function(el) {
+    //         return el.getAttribute('data-x');
+    //     }, 
+    //     duration: function (target) {
+    //         return 1000;
+    //     },
+    //     delay: function (target, index) {
+    //         return 2000;
+    //     },
+    //     begin: function(anim) {
+    //         anim.animatables[0].target.style.visibility = "visible";
+    //     },
+    //     easing: 'linear',
+    //     loop: false,
+    //     autoplay: false   
+    // });
+
+    let commnets = [
+        { no: 1, vpos: 0, text: "0" },
+        { no: 2, vpos: 0, text: "AAAAA" },
+        { no: 3, vpos: 2, text: "0 "},
+        { no: 4, vpos: 300, text: "0" }
+    ];
+
+    let nc_elms = [];
+    let nc_params = [];
+    const parent_id = "area";
+    let area = document.querySelector("#area");
+    const width = area.clientWidth;
+    const duration = 5000;
+    
+    let cm_elm = new comment_elm(parent_id, width, duration);
+    commnets.forEach((cm) => {
+        const no = cm.no;
+        const text = cm.text;
+        const delay = cm.vpos*10;
+        ret = cm_elm.cretae_flow(no, text, delay);
+        nc_elms.push(ret.ele);
+        nc_params.push(ret.params);
+
+    });
+
+    const num = 12;
+    let cm = new nico_comment(num);
+    cm.width = width;
+    cm.comments = nc_params;
+    cm.calc_comment();
+
+    let lanes_map;
+    let calc_cms = cm.comments;
+    calc_cms.forEach((cm, index) => {
+        let em = nc_elms[index];
+        em.style.position = "absolute";
+        em.style.top = (cm.lane_index * 50) + "px";
+    });
+
+    let comment_anime = anime({
+        targets: '.comment',
+        translateX: function (el) {
             return el.getAttribute('data-x');
-        }, 
+        },
         duration: function (target) {
-            return 1000;
+            return duration;
         },
         delay: function (target, index) {
-            return 2000;
-        },
-        begin: function(anim) {
-            anim.animatables[0].target.style.visibility = "visible";
+            return target.getAttribute('data-delay');
         },
         easing: 'linear',
         loop: false,
-        autoplay: false   
+        autoplay: false
     });
 
     let play2 = ()=>{
-        ani.play();
+        comment_anime.play();
     };
 </script>
 

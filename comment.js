@@ -14,6 +14,41 @@ class comment_elm {
         this.duration = duration
     }
 
+    createElm(text){
+        let elm = document.createElement("div");
+        elm.innerHTML = text;
+        elm.className = "comment";
+        document.getElementById(this.parent_id).appendChild(elm);
+        return elm;    
+    }
+
+    /**
+     * 
+     * @param {HTMLElement} elm 
+     * @param {number} no 
+     * @param {number} delay
+     * @returns {{no:number, vpos:number, width:number, speed:number}} 
+     */
+    createFlowParam(elm, no, delay) {
+        let rect = elm.getBoundingClientRect();
+        let left = this.width;
+        let len = this.width + rect.width;
+        let sp = len / this.duration;
+
+        elm.style.left = left + "px";
+        elm.style.width = rect.width + "px";
+        elm.setAttribute("data-no", no.toString());
+        elm.setAttribute("data-x", (-len).toString());
+        elm.setAttribute("data-delay", delay.toString());
+
+        return {
+            no: no, 
+            vpos: delay, 
+            width: rect.width, 
+            speed: sp
+        };
+    }
+
     /**
      * 
      * @param {string} text 

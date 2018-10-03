@@ -8,6 +8,7 @@
             height: 100%;
             width: 100%;
             margin: 0;
+            overflow: hidden;
         }
         #area{
             position: relative;
@@ -37,15 +38,16 @@
 </body>
 
 <script>
+    let self = this;
     var anime = require('animejs');
     var comment_elm = require("../comment");
     var nico_comment = require("../nico_comment");
 
     let commnets = [
-        { no: 1, vpos: 0, text: "0" },
-        { no: 2, vpos: 0, text: "AAAAA" },
-        { no: 3, vpos: 2, text: "0 "},
-        { no: 4, vpos: 300, text: "0" }
+        { no: 1, vpos: 100, text: "AAAAAAAAAAAAAAA" },
+        { no: 2, vpos: 250, text: "AAAAA" },
+        { no: 3, vpos: 300, text: "AAAAAAAAAAAAAAA "},
+        { no: 4, vpos: 450, text: "0" }
     ];
 
     let nc_elms = [];
@@ -76,14 +78,18 @@
     let calc_cms = cm.comments;
     calc_cms.forEach((cm, index) => {
         let em = nc_elms[index];
+        em.style.opacity = 0;
+        em.classList.add("flow");
         em.style.position = "absolute";
         em.style.top = (cm.lane_index * 50) + "px";
     });
 
-    let comment_anime = anime({
-        targets: '.comment',
+    self.comment_anime = anime({
+        targets: '.flow',
         translateX: function (el) {
-            return el.getAttribute('data-x');
+            console.log("eww =", area.clientWidth + el.getBoundingClientRect().width);
+            return -(area.clientWidth + el.getBoundingClientRect().width);
+            // return el.getAttribute('data-x');
         },
         duration: function (target) {
             return duration;
@@ -95,6 +101,49 @@
         loop: false,
         autoplay: false
     });
+    
+    var TLflow = anime.timeline({
+        targets: '.comment.flow',
+        delay: function(el, i) {
+            return el.getAttribute('data-delay');
+        },
+        // translateX: function (el) {
+        //     return el.getAttribute('data-x');
+        // },
+        // duration: 3000,
+        // easing: 'easeOutExpo',
+        // direction: 'alternate',
+        easing: 'linear',
+        loop: false,
+        autoplay: false
+    });
+
+    TLflow
+        .add({
+            opacity: [0, 1],
+            duration: 1,
+            // offset: 1000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        .add({
+            opacity: 1,
+            // duration: 1000,
+            // offset: 3000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        // .add({
+        //     // opacity: [1, 0],
+        //     opacity:0,
+        //     duration: 1,
+        //     offset: 5100,
+        //     // offset: 5000,
+        //     // offset: '+=3000'
+        //     // display: 'none',
+        //     // visibility : "hidden"
+        // });
+
 
     let elm = document.createElement("div");
     elm.innerHTML = "fix text";
@@ -192,14 +241,16 @@
             document.querySelector('#timer').textContent=time_count;
         },timer_step);
 
-        comment_anime.play();
+        self.comment_anime.play();
+        TLflow.play();
         TLParamsInheritance.play();
     };
 
     let pause = ()=>{
         clearInterval(timer_id);
 
-        comment_anime.pause();
+        self.comment_anime.pause();
+        TLflow.pause();
         TLParamsInheritance.pause();
     };
 
@@ -207,9 +258,154 @@
         const target = document.getElementById("seek");
         const time_ms = parseInt(target.value);
         console.log("time_ms=", time_ms);
-        comment_anime.seek(time_ms);
+        self.comment_anime.seek(time_ms);
+        TLflow.seek(time_ms);
         TLParamsInheritance.seek(time_ms);
     };
+
+    let beginw = ()=>{
+        console.log("beginw");
+        
+    };
+    let emp = ()=>{
+    };
+    let oncef = beginw;
+    console.log("11eww =", document.querySelector("#area").clientWidth);
+    let rr = ()=>{
+        self.comment_anime.pause();
+        self.comment_anime.reset();
+        self.comment_anime=null;
+
+        //let area = document.querySelector("#area");
+        let elms = document.querySelectorAll('.flow');
+        for(i=0; i<elms.length; i++){
+            area.removeChild(elms[i]);
+        }
+        // elms.forEach((ee) => {
+        //     area.remove(ee);
+        // });
+
+        let nc_elms = [];
+        let nc_params = [];
+        const parent_id = "area";
+        
+        const width = area.clientWidth;
+        const duration = 5000;
+        
+        let cm_elm = new comment_elm(parent_id, width, duration);
+        commnets.forEach((cm) => {
+            const no = cm.no;
+            const text = cm.text;
+            const delay = cm.vpos*10;
+            ret = cm_elm.cretae_flow(no, text, delay);
+            nc_elms.push(ret.ele);
+            nc_params.push(ret.params);
+
+        });
+
+        const num = 12;
+        let cm = new nico_comment(num);
+        cm.width = width;
+        cm.comments = nc_params;
+        cm.calc_comment();
+
+        let lanes_map;
+        let calc_cms = cm.comments;
+        calc_cms.forEach((cm, index) => {
+            let em = nc_elms[index];
+            em.style.opacity = 0;
+            em.classList.add("flow");
+            em.style.position = "absolute";
+            em.style.top = (cm.lane_index * 50) + "px";
+        });
+
+        //return;
+        
+        // console.log("elms.len=", elms.length);
+        // const ww = document.querySelector("#area").clientWidth;
+        // elms.forEach((elem)=>{
+        //     elm.style.left = ww + "px";
+        //     console.log("elm.style.left =", elm.style.left );
+        // });
+        // console.log("rr");
+        self.comment_anime = anime({
+        targets: '.flow',
+        translateX:  (el)=> {
+            // const ww2 = document.querySelector("#area").clientWidth;
+            // console.log("eww =",  ww2);//el.getBoundingClientRect().width);
+            // return -(ww2 + el.getBoundingClientRect().width);
+            return el.getAttribute('data-x');
+        },
+        duration: function (target) {
+            return 5000;
+        },
+        delay: function (target, index) {
+            return target.getAttribute('data-delay');
+        },
+        easing: 'linear',
+        loop: false,
+        autoplay: false
+        });
+        // self.comment_anime.reset();
+        // comment_anime.restart();
+        TLflow = anime.timeline({
+        targets: '.comment.flow',
+        delay: function(el, i) {
+            return el.getAttribute('data-delay');
+        },
+        // translateX: function (el) {
+        //     return el.getAttribute('data-x');
+        // },
+        // duration: 3000,
+        // easing: 'easeOutExpo',
+        // direction: 'alternate',
+        easing: 'linear',
+        loop: false,
+        autoplay: false
+    });
+
+    TLflow
+        .add({
+            opacity: [0, 1],
+            duration: 1,
+            // offset: 1000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        .add({
+            opacity: 1,
+            // duration: 1000,
+            // offset: 3000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        .add({
+            // opacity: [1, 0],
+            opacity:0,
+            duration: 1,
+            offset: 5100,
+            // offset: 5000,
+            // offset: '+=3000'
+            // display: 'none',
+            // visibility : "hidden"
+        });
+    }
+
+    const timeout = 200;
+    window.addEventListener('resize', () => {
+        oncef();
+        oncef = emp;
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            oncef = beginw;
+            rr();
+
+            // obs.trigger("resizeEndEvent", {
+            //         w: window.innerWidth, 
+            //         h: window.innerHeight 
+            //      });
+        }, timeout);       
+    });
 </script>
 
 </html>

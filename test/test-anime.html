@@ -26,8 +26,10 @@
 </head>
 
 <body>
+    <div id="timer">0</div>
     <button type=button onclick="play2();">start</button>
-    <button>pause</button>
+    <button type=button onclick="pause();">pause</button>
+    <input type="number" id="seek" /><button type=button onclick="seek();">seek</button>
     <div id="area"></div>
     <div>
         <div id="com3" class="el2" data-x="300" data-duration="5000" style="width:100px; visibility:hidden">test3</div>
@@ -38,25 +40,6 @@
     var anime = require('animejs');
     var comment_elm = require("../comment");
     var nico_comment = require("../nico_comment");
-
-    // let ani = anime({
-    //     targets: '.el2',
-    //     translateX: function(el) {
-    //         return el.getAttribute('data-x');
-    //     }, 
-    //     duration: function (target) {
-    //         return 1000;
-    //     },
-    //     delay: function (target, index) {
-    //         return 2000;
-    //     },
-    //     begin: function(anim) {
-    //         anim.animatables[0].target.style.visibility = "visible";
-    //     },
-    //     easing: 'linear',
-    //     loop: false,
-    //     autoplay: false   
-    // });
 
     let commnets = [
         { no: 1, vpos: 0, text: "0" },
@@ -113,8 +96,119 @@
         autoplay: false
     });
 
+    let elm = document.createElement("div");
+    elm.innerHTML = "fix text";
+    elm.classList.add("comment", "fix");
+    elm.id = "elm1";
+    // elm.style.display = 'none';
+    // elm.style.visibility = "hidden";
+    elm.style.opacity = 0;
+    area.appendChild(elm);
+    elm.style.position = "absolute";
+    elm.style.left = 100 + "px";
+    elm.setAttribute("data-x", (100).toString());
+    elm.setAttribute("data-delay", (1000).toString());
+
+    let elm2= document.createElement("div");
+    elm2.innerHTML = "fix text2";
+    elm2.classList.add("comment", "fix");
+    elm2.id = "elm2";
+    // elm2.style.display = 'none';
+    // elm2.style.visibility = "hidden";
+    elm2.style.opacity = 0;
+    area.appendChild(elm2);
+    elm2.style.position = "absolute";
+    elm2.style.left = 100 + "px";
+    elm2.style.top = 50 + "px";
+    elm2.setAttribute("data-x", (100).toString());
+    elm2.setAttribute("data-delay", (2000).toString());
+
+    var TLParamsInheritance = anime.timeline({
+        targets: '.comment.fix',
+        delay: function(el, i) {
+            return el.getAttribute('data-delay');
+        },
+        // duration: 3000,
+        // easing: 'easeOutExpo',
+        // direction: 'alternate',
+        loop: false,
+        autoplay: false
+    });
+
+    TLParamsInheritance
+        .add({
+            opacity: [0, 1],
+            duration: 1,
+            // offset: 1000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        .add({
+            opacity: 1,
+            // duration: 1000,
+            // offset: 3000,
+            // display: 'inline',
+            // visibility : "visible"
+        })
+        .add({
+            opacity: [1, 0],
+            duration: 1,
+            offset: 3000,
+            // offset: '+=3000'
+            // display: 'none',
+            // visibility : "hidden"
+        });
+
+    let timer_id;
+    let time_count = 0;
+    const timer_step = 10;
+    let flg1_opa0 = 0;
+    let flg1_opa1 = 0;
+    let flg2_opa0 = 0;
+    let flg2_opa1 = 0;
     let play2 = ()=>{
+        timer_id = setInterval(()=>{
+            if(flg1_opa0===0 && flg1_opa1 === 1 && document.querySelector('#elm1').style.opacity == "0")
+            {
+                console.log("elm opacity 0 = ", time_count);
+                flg1_opa0 = 1;
+            }
+            if(flg1_opa1===0 && document.querySelector('#elm1').style.opacity == "1")
+            {
+                console.log("elm opacity 1 = ", time_count);
+                flg1_opa1 = 1;
+            }
+            if(flg2_opa0===0 && flg2_opa1 === 1 && document.querySelector('#elm2').style.opacity== "0")
+            {
+                console.log("elm2 opacity 0 = ", time_count);
+                flg2_opa0 = 1;
+            }
+            if(flg2_opa1===0 && document.querySelector('#elm2').style.opacity == "1")
+            {
+                console.log("elm2 opacity 1 = ", time_count);
+                flg2_opa1 = 1;
+            }
+            time_count+=timer_step;
+            document.querySelector('#timer').textContent=time_count;
+        },timer_step);
+
         comment_anime.play();
+        TLParamsInheritance.play();
+    };
+
+    let pause = ()=>{
+        clearInterval(timer_id);
+
+        comment_anime.pause();
+        TLParamsInheritance.pause();
+    };
+
+    let seek = ()=>{
+        const target = document.getElementById("seek");
+        const time_ms = parseInt(target.value);
+        console.log("time_ms=", time_ms);
+        comment_anime.seek(time_ms);
+        TLParamsInheritance.seek(time_ms);
     };
 </script>
 

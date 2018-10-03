@@ -24,30 +24,48 @@ class comment_elm {
 
     /**
      * 
-     * @param {HTMLElement} elm 
+     * @param {string} text 
      * @param {number} no 
      * @param {number} delay
-     * @returns {{no:number, vpos:number, width:number, speed:number}} 
+     * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number}} 
      */
-    createFlowParam(elm, no, delay) {
-        let rect = elm.getBoundingClientRect();
-        let left = this.width;
-        let len = this.width + rect.width;
-        let sp = len / this.duration;
-
+    createFlowElm(text, no, delay) {
+        let elm = this.createElm(text);
+        const rect = elm.getBoundingClientRect();
+        const elm_width = rect.width;
+        const len = this.width + elm_width;
+        const sp = len / this.duration;
+        const left = this.width;
+        
+        elm.style.position = "absolute";
         elm.style.left = left + "px";
-        elm.style.width = rect.width + "px";
+        // elm.style.width = param.width + "px";
         elm.setAttribute("data-no", no.toString());
         elm.setAttribute("data-x", (-len).toString());
         elm.setAttribute("data-delay", delay.toString());
 
         return {
+            elm: elm,
             no: no, 
             vpos: delay, 
-            width: rect.width, 
+            width: elm_width, 
             speed: sp
         };
     }
+
+    setFlowParam(elm, param)
+    {
+        const left = this.width;
+        const len = this.width + param.width;
+        
+        elm.style.position = "absolute";
+        elm.style.left = left + "px";
+        elm.style.width = param.width + "px";
+        elm.setAttribute("data-no", param.no.toString());
+        elm.setAttribute("data-x", (-len).toString());
+        elm.setAttribute("data-delay", param.delay.toString());
+    }
+
 
     /**
      * 

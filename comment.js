@@ -17,7 +17,8 @@ class comment_elm {
     createElm(text){
         let elm = document.createElement("div");
         elm.innerHTML = text;
-        elm.className = "comment";
+        elm.style.opacity = "0";
+        // elm.className = "comment";
         document.getElementById(this.parent_id).appendChild(elm);
         return elm;    
     }
@@ -31,25 +32,21 @@ class comment_elm {
      */
     createFlowElm(text, no, delay) {
         let elm = this.createElm(text);
+        elm.classList.add("comment", "flow");
+        elm.style.position = "absolute";
+        elm.setAttribute("data-delay", delay.toString());
+
         const rect = elm.getBoundingClientRect();
         const elm_width = rect.width;
         const len = this.width + elm_width;
-        const sp = len / this.duration;
-        const left = this.width;
-        
-        elm.style.position = "absolute";
-        elm.style.left = left + "px";
-        // elm.style.width = param.width + "px";
-        elm.setAttribute("data-no", no.toString());
-        elm.setAttribute("data-x", (-len).toString());
-        elm.setAttribute("data-delay", delay.toString());
+        const speed = len / this.duration;
 
         return {
             elm: elm,
             no: no, 
             vpos: delay, 
             width: elm_width, 
-            speed: sp
+            speed: speed
         };
     }
 

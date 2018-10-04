@@ -11,11 +11,11 @@
             overflow: hidden;
         }
         #area{
-            position: relative;
+            position: absolute;
             left: 100px;
             top: 50px;
             height: 80%;
-            width: 70%;
+            width: 60%;
             border: 1px solid #000000;
         }
         .comment{
@@ -34,13 +34,13 @@
 </body>
 
 <script>
-    let self = this;
+    // @ts-check
     var anime = require('animejs');
     var comment_elm = require("../comment");
     var nico_comment = require("../nico_comment");
 
     let commnets = [
-        { no: 1, vpos: 100, text: "AAAAA AAAAAAAAAA" },
+        { no: 1, vpos: 0, text: "AAAAA AAAAAAAAAA" },
         { no: 2, vpos: 250, text: "AAAAA" },
         { no: 3, vpos: 300, text: "AAAAAAAAAAAAAAA "},
         { no: 4, vpos: 450, text: "0" }
@@ -61,7 +61,6 @@
         ret = cm_elm.cretae_flow(no, text, delay);
         nc_elms.push(ret.ele);
         nc_params.push(ret.params);
-
     });
 
     const num = 12;
@@ -80,59 +79,6 @@
         em.style.top = (cm.lane_index * 50) + "px";
     });
 
-    let createAnime = ()=>
-    {
-        
-    };
-
-    // self.comment_anime = anime({
-    //     targets: '.flow',
-    //     translateX: function (el) {
-    //         console.log("eww =", area.clientWidth + el.getBoundingClientRect().width);
-    //         return -(area.clientWidth + el.getBoundingClientRect().width);
-    //         // return el.getAttribute('data-x');
-    //     },
-    //     duration: function (target) {
-    //         return duration;
-    //     },
-    //     delay: function (target, index) {
-    //         return target.getAttribute('data-delay');
-    //     },
-    //     easing: 'linear',
-    //     loop: false,
-    //     autoplay: false
-    // });
-    
-    // var TLflow = anime.timeline({
-    //     targets: '.comment.flow',
-    //     delay: function(el, i) {
-    //         return el.getAttribute('data-delay');
-    //     },
-
-    //     easing: 'linear',
-    //     loop: false,
-    //     autoplay: false
-    // });
-
-    // TLflow
-    //     .add({
-    //         opacity: [1, 1],
-    //         duration: 1,
-    //     })
-    //     .add({
-    //         opacity: 1,
-    //     })
-        // .add({
-        //     // opacity: [1, 0],
-        //     opacity:0,
-        //     duration: 1,
-        //     offset: 5100,
-        //     // offset: 5000,
-        //     // offset: '+=3000'
-        //     // display: 'none',
-        //     // visibility : "hidden"
-        // });
-    //let area_w = document.querySelector("#area").clientWidth;
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
     elm.innerHTML = "fix textsssss";
@@ -140,11 +86,11 @@
     // elm.id = "elm1";
     // elm.style.display = 'none';
     // elm.style.visibility = "hidden";
-    // elm.style.opacity = 0;
+    elm.style.opacity = 0;
     areabyid.appendChild(elm);
     let el1_w = elm.getBoundingClientRect();
     elm.style.position = "absolute";
-    elm.style.left = width + "px";
+    // elm.style.left = width + "px";
     elm.style.width = el1_w.width + "px";
     elm.setAttribute("data-x", (100).toString());
     elm.setAttribute("data-delay", (1000).toString());
@@ -155,76 +101,167 @@
     elm2.id = "elm2";
     // elm2.style.display = 'none';
     // elm2.style.visibility = "hidden";
-    // elm2.style.opacity = 0;
+    elm2.style.opacity = 0;
     areabyid.appendChild(elm2);
     let el2_w = elm2.getBoundingClientRect();
     elm2.style.position = "absolute";
-    elm2.style.left = width + "px";
+    // elm2.style.left = width + "px";
     elm2.style.width = el2_w.width+ "px";
     elm2.style.top = 50 + "px";
     elm2.setAttribute("data-x", (100).toString());
-    elm2.setAttribute("data-delay", (3000).toString());
+    elm2.setAttribute("data-delay", (3000).toString());    
 
-    
-    var TLParamsInheritance = anime.timeline({
-        // targets: '.comment.fix',
-        targets: '.fix',
-        translateX: function (el, i) {
-            return [
-            width-parseInt(el.style.left),
-                 //0,
-                -(width + el.getBoundingClientRect().width)
-            ];
-            // console.log("el =", el, ", i=", i);
-            // return [300, 100];
-        },
-        delay: function(el, i) {
-            return el.getAttribute('data-delay');
-        },
-        easing: 'linear',
-        duration: 3000,
-        // easing: 'easeOutExpo',
-        // direction: 'alternate',
-        loop: false,
-        autoplay: false
-    });
+    class CommemtTimeLine{
+        /**
+         * @param {string} parent_selector
+         * @param {{selector: string, duration: number}} flow_params
+         * @param {{selector: string, duration: number}} fix_params
+         */
+        constructor(parent_selector, flow_params, fix_params) {
+            this.parent_selector = parent_selector;
+            this.flow_params = flow_params;
+            this.fix_params = fix_params;
+            this.flow_timeline = null;
+            this.fix_timeline = null;
+        }
 
-    TLParamsInheritance
-        .add({
-            translateX: 0,
-            translateY: 0,
-            opacity: [1, 1],
-            // delay:1,
-            duration: 1,
-        })
-        .add({
-            translateY: 0,
-            opacity: 1,
-            // duration: 5000,
-        })
-        .add({
-            translateX: 0,
-            translateY: 0,
-            opacity: [1, 0],
-            duration: 1,
-            // delay:1
-            // offset: 3000,
-        });
+        createFlow(){
+            const selector = this.flow_params.selector;
+            const duration = this.flow_params.duration;
 
-    // self.comment_anime.pause();
-    // self.comment_anime.reset();
-    // anime.remove('.comment');
+            if(this.flow_timeline != null){
+                this.flow_timeline.pause();
+                this.flow_timeline.reset();
+                anime.remove(selector);
+            }
+
+            const area = document.querySelector(this.parent_selector);
+            const area_width = area.clientWidth;
+            let elms = document.querySelectorAll(selector);
+            elms.forEach((elm)=>{
+                elm.style.opacity = 0;
+                elm.style.left = area_width + "px";
+            });
+
+            this.flow_timeline = anime.timeline({
+                targets: selector,
+                translateX: (el, i) => {
+                    return -(area_width + el.getBoundingClientRect().width);
+                },
+                delay: (el, i) => {
+                    return el.getAttribute('data-delay');
+                },
+                easing: 'linear',
+                duration: duration,
+                loop: false,
+                autoplay: false
+            });
+
+            this.flow_timeline
+            .add({
+                translateX: 0,
+                translateY: 0,
+                opacity: 1,
+                duration: 1
+            })
+            .add({
+                translateY: 0,
+                opacity: 1 
+            });
+        }
+
+        createFix(){
+            const selector = this.fix_params.selector;
+            const duration = this.fix_params.duration;
+
+            if(this.fix_timeline != null){
+                this.fix_timeline.pause();
+                this.fix_timeline.reset();
+                anime.remove(selector);
+            }
+
+            const area = document.querySelector(this.parent_selector);
+            const area_width = area.clientWidth;
+           
+            let elms = document.querySelectorAll(selector);
+            elms.forEach((elm)=>{
+                elm.style.opacity = 0;
+                const elm_rect = elm.getBoundingClientRect();
+                elm.style.left = (area_width/2 - elm_rect.width/2) + "px";
+            });
+
+            this.fix_timeline = anime.timeline({
+                targets: selector,
+                delay: (el, i) => {
+                    return el.getAttribute('data-delay');
+                },
+                // easing: 'linear',
+                // duration: duration,
+                loop: false,
+                autoplay: false
+            });
+
+            this.fix_timeline
+            .add({
+                opacity: 1,
+                duration: 1
+            })
+            .add({
+                // opacity: 1,
+                duration: duration
+            })
+            .add({
+                opacity: 0,
+                duration: 1,
+            }); 
+  
+        }
+
+        play(){
+            if(!this._hasTimeline()) return;
+            
+            this.flow_timeline.play();
+            this.fix_timeline.play();
+        }
+
+        pause(){
+            if(!this._hasTimeline()) return;
+
+            this.flow_timeline.pause();
+            this.fix_timeline.pause();
+        }
+
+        seek(time_ms){
+            if(!this._hasTimeline()) return;
+
+            this.flow_timeline.seek(time_ms);
+            this.fix_timeline.seek(time_ms);
+        }
+
+        _hasTimeline(){
+            if(this.flow_timeline == null) return false;
+            if(this.fix_timeline == null) return false;
+            
+            return true;
+        }
+    };
+
+    let ctl = new CommemtTimeLine("#area", 
+        {selector: ".flow", duration: 5000}, 
+        {selector: ".fix", duration: 3000});
+    ctl.createFlow();
+    ctl.createFix();
 
     let play2 = ()=>{
         //self.comment_anime.play();
         //TLflow.play();
-        TLParamsInheritance.play();
+        ctl.play();
     };
 
     let pause = ()=>{
         //self.comment_anime.pause();
         //TLflow.pause();
-        TLParamsInheritance.pause();
+        ctl.pause();
     };
 
     let seek = ()=>{
@@ -233,116 +270,12 @@
 
         //self.comment_anime.seek(time_ms);
         //TLflow.seek(time_ms);
-        TLParamsInheritance.seek(time_ms);
+        ctl.seek(time_ms);
     };
 
     let rr = ()=>{
-        let area = document.querySelector("#area");
-        const width = area.clientWidth;
-
-        TLParamsInheritance.reset();
-        anime.remove(".flow");
-        let elms = document.querySelectorAll('.flow');
-        for(i=0; i<elms.length; i++){
-            elms[i].style.left = width + "px";
-        }
-
-        TLParamsInheritance = anime.timeline({
-        // targets: '.comment.fix',
-        targets: '.fix',
-        translateX: function (el, i) {
-            return [
-            width-parseInt(el.style.left),
-                 //0,
-                -(width + el.getBoundingClientRect().width)
-            ];
-            // console.log("el =", el, ", i=", i);
-            // return [300, 100];
-        },
-        delay: function(el, i) {
-            return el.getAttribute('data-delay');
-        },
-        easing: 'linear',
-        duration: 3000,
-        // easing: 'easeOutExpo',
-        // direction: 'alternate',
-        loop: false,
-        autoplay: false
-    });
-
-    TLParamsInheritance
-        .add({
-            translateX: 0,
-            translateY: 0,
-            opacity: [1, 1],
-            // delay:1,
-            duration: 1,
-        })
-        .add({
-            translateY: 0,
-            opacity: 1,
-            // duration: 5000,
-        })
-        .add({
-            translateX: 0,
-            translateY: 0,
-            opacity: [1, 0],
-            duration: 1,
-            // delay:1
-            // offset: 3000,
-        });
-    //     self.comment_anime.pause();
-    //     self.comment_anime.reset();
-
-    //     anime.remove(".flow");
-    //     let area_w = document.querySelector("#area").clientWidth;
-    //     let elms = document.querySelectorAll('.flow');
-    //     for(i=0; i<elms.length; i++){
-    //         elms[i].style.left = area_w + "px";
-    //     }
-
-    //     self.comment_anime = anime({
-    //     targets: '.flow',
-    //     translateX:  (el)=> {
-    //         return -(area_w + el.getBoundingClientRect().width);
-    //         // return [
-    //         //      area_w-parseInt(el.style.left),
-    //         //     -(area_w + el.getBoundingClientRect().width)
-    //         // ];
-    //         // return el.getAttribute('data-x');
-    //     },
-    //     duration: function (target) {
-    //         return 5000;
-    //     },
-    //     delay: function (target, index) {
-    //         return target.getAttribute('data-delay');
-    //     },
-    //     easing: 'linear',
-    //     loop: false,
-    //     autoplay: false
-    //     });
-
-    //     TLflow = anime.timeline({
-    //     targets: '.comment.flow',
-    //     delay: function(el, i) {
-    //         return el.getAttribute('data-delay');
-    //     },
-
-    //     easing: 'linear',
-    //     loop: false,
-    //     autoplay: false
-    // });
-
-    // TLflow
-    //     .add({
-    //         opacity: [1, 1],
-    //         duration: 1,
-
-    //     })
-    //     .add({
-    //         opacity: 1,
-
-    //     });
+        ctl.createFlow();
+        ctl.createFix();
     }
 
     let timer;

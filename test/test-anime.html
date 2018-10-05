@@ -19,15 +19,22 @@
             border: 1px solid #000000;
         }
         .comment{
-            float:left;
+            /* float:left; */
             color: #000000;
             border: 1px solid #FF6600;
+            /* display:inline; */
+            /* white-space: nowrap */
+        }
+        .fix{
+            float:left;
+            /* color: #000000; */
+            /* border: 1px solid #FF6600; */
         }
     </style>
 </head>
 
 <body>
-    <button type=button onclick="play2();">start</button>
+    <button type=button onclick="play();">start</button>
     <button type=button onclick="pause();">pause</button>
     <input type="number" id="seek" /><button type=button onclick="seek();">seek</button>
     <div id="area"></div>
@@ -46,70 +53,47 @@
         { no: 4, vpos: 450, text: "0" }
     ];
 
-    let nc_elms = [];
-    let nc_params = [];
     const parent_id = "area";
     let area = document.querySelector("#area");
     const width = area.clientWidth;
     const duration = 5000;
     
     let cm_elm = new comment_elm(parent_id, width, duration);
+    let flow_params = [];
     commnets.forEach((cm) => {
         const no = cm.no;
         const text = cm.text;
         const delay = cm.vpos*10;
-        ret = cm_elm.cretae_flow(no, text, delay);
-        nc_elms.push(ret.ele);
-        nc_params.push(ret.params);
+        flow_params.push(cm_elm.createFlowElm(text, no, delay));
     });
 
     const num = 12;
     let cm = new nico_comment(num);
     cm.width = width;
-    cm.comments = nc_params;
+    cm.comments = flow_params;
     cm.calc_comment();
 
-    let lanes_map;
-    let calc_cms = cm.comments;
-    calc_cms.forEach((cm, index) => {
-        let em = nc_elms[index];
-        // em.style.opacity = 0;
-        em.classList.add("flow");
-        em.style.position = "absolute";
-        em.style.top = (cm.lane_index * 50) + "px";
+    cm.comments.forEach((cm, index) => {
+        cm.elm.setAttribute("data-rowindex", (cm.lane_index).toString());
     });
 
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
     elm.innerHTML = "fix textsssss";
     elm.classList.add("comment", "fix");
-    // elm.id = "elm1";
-    // elm.style.display = 'none';
-    // elm.style.visibility = "hidden";
     elm.style.opacity = 0;
     areabyid.appendChild(elm);
-    let el1_w = elm.getBoundingClientRect();
     elm.style.position = "absolute";
-    // elm.style.left = width + "px";
-    elm.style.width = el1_w.width + "px";
-    elm.setAttribute("data-x", (100).toString());
     elm.setAttribute("data-delay", (1000).toString());
 
     let elm2= document.createElement("div");
     elm2.innerHTML = "fix text2";
     elm2.classList.add("comment", "fix");
-    elm2.id = "elm2";
-    // elm2.style.display = 'none';
-    // elm2.style.visibility = "hidden";
     elm2.style.opacity = 0;
     areabyid.appendChild(elm2);
-    let el2_w = elm2.getBoundingClientRect();
     elm2.style.position = "absolute";
-    // elm2.style.left = width + "px";
-    elm2.style.width = el2_w.width+ "px";
     elm2.style.top = 50 + "px";
-    elm2.setAttribute("data-x", (100).toString());
-    elm2.setAttribute("data-delay", (3000).toString());    
+    elm2.setAttribute("data-delay", (3000).toString());  
 
     class CommemtTimeLine{
         /**
@@ -139,8 +123,10 @@
             const area_width = area.clientWidth;
             let elms = document.querySelectorAll(selector);
             elms.forEach((elm)=>{
-                elm.style.opacity = 0;
+                // elm.style.opacity = 0;
                 elm.style.left = area_width + "px";
+                const rowindex = parseInt(elm.getAttribute('data-rowindex'));
+                elm.style.top = (rowindex * 50) + "px";
             });
 
             this.flow_timeline = anime.timeline({
@@ -252,28 +238,21 @@
     ctl.createFlow();
     ctl.createFix();
 
-    let play2 = ()=>{
-        //self.comment_anime.play();
-        //TLflow.play();
+    let play = ()=>{
         ctl.play();
     };
 
     let pause = ()=>{
-        //self.comment_anime.pause();
-        //TLflow.pause();
         ctl.pause();
     };
 
     let seek = ()=>{
         const target = document.getElementById("seek");
         const time_ms = parseInt(target.value);
-
-        //self.comment_anime.seek(time_ms);
-        //TLflow.seek(time_ms);
         ctl.seek(time_ms);
     };
 
-    let rr = ()=>{
+    let reset = ()=>{
         ctl.createFlow();
         ctl.createFix();
     }
@@ -283,7 +262,7 @@
     window.addEventListener('resize', () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            rr();
+            reset();
         }, timeout);       
     });
 </script>

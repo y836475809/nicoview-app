@@ -17,9 +17,13 @@ class comment_elm {
     createElm(text){
         let elm = document.createElement("div");
         elm.innerHTML = text;
-        elm.style.opacity = "0";
+        // elm.style.opacity = "0";
+        elm.style.whiteSpace = "nowrap";
+        elm.style.position = "absolute";
+        // elm.style.display = "inline";
         // elm.className = "comment";
-        document.getElementById(this.parent_id).appendChild(elm);
+        elm.classList.add("comment");
+        
         return elm;    
     }
 
@@ -28,15 +32,16 @@ class comment_elm {
      * @param {string} text 
      * @param {number} no 
      * @param {number} delay
-     * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number}} 
+     * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number, lane_index:number}} 
      */
     createFlowElm(text, no, delay) {
         let elm = this.createElm(text);
-        elm.classList.add("comment", "flow");
-        elm.style.position = "absolute";
+        elm.classList.add("flow");
         elm.setAttribute("data-delay", delay.toString());
 
+        document.getElementById(this.parent_id).appendChild(elm);
         const rect = elm.getBoundingClientRect();
+        
         const elm_width = rect.width;
         const len = this.width + elm_width;
         const speed = len / this.duration;
@@ -46,23 +51,18 @@ class comment_elm {
             no: no, 
             vpos: delay, 
             width: elm_width, 
-            speed: speed
+            speed: speed,
+            lane_index: -1
         };
     }
 
-    setFlowParam(elm, param)
-    {
-        const left = this.width;
-        const len = this.width + param.width;
-        
-        elm.style.position = "absolute";
-        elm.style.left = left + "px";
-        elm.style.width = param.width + "px";
-        elm.setAttribute("data-no", param.no.toString());
-        elm.setAttribute("data-x", (-len).toString());
-        elm.setAttribute("data-delay", param.delay.toString());
+    createFixElm(text, delay){
+        let elm = this.createElm(text);
+        elm.classList.add("fix");
+        elm.setAttribute("data-delay", delay);
+    
+        return { elm: elm, row_index: -1 };
     }
-
 
     /**
      * 
@@ -118,29 +118,7 @@ let create_comment_elm = (parent_id, text, width, duration) => {
     // document.getElementById("container").appendChild(ele);
 }
 
-let create_fix_comment = (parent_id, text, width, duration) => {
-    let ele = document.createElement("div")
-    ele.innerHTML = text
-    ele.className = "fix_comment"
-    // ele.setAttribute("data-x", -left)
-    // ele.setAttribute("data-duration", 5000)
-    // ele.style.left = left + "px"
-    // ele.style.top = top + "px"
 
-    document.getElementById(parent_id).appendChild(ele);
-    let rect = ele.getBoundingClientRect()
-    let left = width
-    let len = width + rect.width
-    let sp = len / duration
-
-    ele.style.left = left + "px"
-    // ele.style.top = top + "px"
-    ele.setAttribute("data-x", -len)
-    ele.setAttribute("data-duration", duration)
-
-    return { ele: ele, sp: sp }
-    // document.getElementById("container").appendChild(ele);
-}
 
 // let set_comment_param = (c_param, top, width, duration) => {
 //     // document.getElementById(id).appendChild(ele);

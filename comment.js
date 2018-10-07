@@ -17,7 +17,7 @@ class comment_elm {
     createElm(text){
         let elm = document.createElement("div");
         elm.innerHTML = text;
-        // elm.style.opacity = "0";
+        elm.style.opacity = "0";
         elm.style.whiteSpace = "nowrap";
         elm.style.position = "absolute";
         // elm.style.display = "inline";
@@ -34,9 +34,9 @@ class comment_elm {
      * @param {number} delay
      * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number, lane_index:number}} 
      */
-    createFlowElm(text, no, delay) {
+    createFlowElm(text, no, delay, class_name) {
         let elm = this.createElm(text);
-        elm.classList.add("flow");
+        elm.classList.add(class_name);
         elm.setAttribute("data-delay", delay.toString());
 
         document.getElementById(this.parent_id).appendChild(elm);

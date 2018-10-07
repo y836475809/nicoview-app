@@ -19,23 +19,21 @@
             border: 1px solid #000000;
         }
         .comment{
-            /* float:left; */
             color: #000000;
             border: 1px solid #FF6600;
-            /* display:inline; */
-            /* white-space: nowrap */
         }
         .fix{
             float:left;
-            /* color: #000000; */
-            /* border: 1px solid #FF6600; */
         }
+
+        #play{
+            width:50px;
+        }        
     </style>
 </head>
 
 <body>
-    <button type=button onclick="play();">start</button>
-    <button type=button onclick="pause();">pause</button>
+    <button id="play", type=button data-func="play" onclick="play();">start</button>
     <input type="number" id="seek" /><button type=button onclick="seek();">seek</button>
     <div id="area"></div>
 </body>
@@ -56,7 +54,7 @@
     const parent_id = "area";
     let area = document.querySelector("#area");
     const width = area.clientWidth;
-    const duration = 5000;
+    const duration = 3000;
     
     let cm_elm = new comment_elm(parent_id, width, duration);
     let flow_params = [];
@@ -126,7 +124,7 @@
                 // elm.style.opacity = 0;
                 elm.style.left = area_width + "px";
                 const rowindex = parseInt(elm.getAttribute('data-rowindex'));
-                elm.style.top = (rowindex * 50) + "px";
+                elm.style.top = (rowindex * 30) + "px";
             });
 
             this.flow_timeline = anime.timeline({
@@ -206,8 +204,20 @@
         play(){
             if(!this._hasTimeline()) return;
             
-            this.flow_timeline.play();
-            this.fix_timeline.play();
+            let btn = document.querySelector('#play');
+            if(btn.getAttribute('data-func')=="play"){
+                this.flow_timeline.play();
+                this.fix_timeline.play();
+
+                btn.textContent = "pause";
+                btn.setAttribute('data-func', "pause");
+            }else{
+                this.flow_timeline.pause();
+                this.fix_timeline.pause();
+
+                btn.textContent = "play";
+                btn.setAttribute('data-func', "play");
+            }
         }
 
         pause(){
@@ -233,17 +243,13 @@
     };
 
     let ctl = new CommemtTimeLine("#area", 
-        {selector: ".flow", duration: 5000}, 
-        {selector: ".fix", duration: 3000});
+        {selector: ".flow", duration: duration}, 
+        {selector: ".fix", duration: duration});
     ctl.createFlow();
     ctl.createFix();
 
     let play = ()=>{
         ctl.play();
-    };
-
-    let pause = ()=>{
-        ctl.pause();
     };
 
     let seek = ()=>{

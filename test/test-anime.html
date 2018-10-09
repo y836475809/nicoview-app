@@ -46,13 +46,14 @@
     var nico_comment = require("../nico_comment");
     var util = require("./test_comments");
 
-    // let commnets = util.randomComments(2000, 2*1000);
-    let commnets = util.sampleComments();
+    let commnets = util.randomComments(10, 1*1000);
+    // let commnets = util.sampleComments();
     commnets.sort((a, b) => {
         if (a.vpos < b.vpos) return -1;
         if (a.vpos > b.vpos) return 1;
         return 0;
     });
+    console.log("last commnt time ms=", commnets[commnets.length-1].vpos*10);
 
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
@@ -116,10 +117,24 @@
                 elm.style.top = (rowindex * 30) + "px";
             });
 
+            this.flow_timeline_b = anime.timeline({
+                targets: selector,
+                delay: (el, i) => {
+                    return el.getAttribute('data-delay')-this.mind;
+                }, 
+                easing: 'linear',
+                duration: 1,
+                loop: false,
+                autoplay: false           
+            });
+            this.flow_timeline_b.add({
+                opacity: [0,1],        
+            });
+
             this.flow_timeline = anime.timeline({
                 targets: selector,
                 translateX: (el, i) => {
-                    return -(area_width + el.getBoundingClientRect().width);
+                    return  -(area_width + el.getBoundingClientRect().width);
                 },
                 delay: (el, i) => {
                     return el.getAttribute('data-delay')-this.mind;
@@ -129,17 +144,16 @@
                 loop: false,
                 autoplay: false
             });
-
             this.flow_timeline
             .add({
-                translateX: 0,
                 translateY: 0,
-                opacity: 1,
-                duration: 1
-            })
-            .add({
-                translateY: 0,
-                opacity: 1
+                complete:(anime)=>{
+                    console.log("complete2 = ", anime);
+                    let elms = document.querySelectorAll(selector);
+                    elms.forEach((elm)=>{
+                        elm.style.opacity = 0;
+                    });
+                }
             });
         }
 
@@ -148,6 +162,9 @@
             const duration = this.fix_params.duration;
 
             if(this.fix_timeline != null){
+                this.flow_timeline_b.pause();
+                this.flow_timeline_b.reset();
+
                 this.fix_timeline.pause();
                 this.fix_timeline.reset();
                 anime.remove(selector);
@@ -193,6 +210,7 @@
         play(){
             if(!this._hasTimeline()) return;
 
+            this.flow_timeline_b.play();
             this.flow_timeline.play();
             this.is_play = true;
             //this.fix_timeline.play();
@@ -201,6 +219,7 @@
         pause(){
             if(!this._hasTimeline()) return;
 
+            this.flow_timeline_b.pause();
             this.flow_timeline.pause();
             this.is_play = false;
             //this.fix_timeline.pause();
@@ -211,6 +230,7 @@
             
             const seek_time = time_ms-this.mind;
             if(seek_time>=0){
+                this.flow_timeline_b.seek(seek_time);
                 this.flow_timeline.seek(seek_time);
             }
             // this.is_play = false;
@@ -234,7 +254,8 @@
         let area = document.querySelector("#area");
         const width = area.clientWidth;
         const duration = 3000;
-        const step = 4;
+        // const step = 2;
+        const step = 50;
 
         let cm_elm = new comment_elm(parent_id, width, duration);
         let flow_params = [];
@@ -342,6 +363,9 @@
     };
 
     let reset = ()=>{
+        cutimer = 0;
+        document.getElementById("timer").textContent = cutimer;
+
         ctl_list.forEach((ctl) => {
             ctl.createFlow();
         });

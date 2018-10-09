@@ -44,64 +44,15 @@
     var anime = require('animejs');
     var comment_elm = require("../comment");
     var nico_comment = require("../nico_comment");
+    var util = require("./test_comments");
 
-    let getRnum = (min, max)=>{
-        return Math.floor(Math.random() * (max-min+1) + min);
-    };
-    let getRstring = (min, max)=>{
-        const s = "abcdefghijklmnopqrstuvwxyz0123456789()!?^あいうえおかきくけこさしすせそー";
-        
-        let cm = "";
-        const cm_len = getRnum(min, max);
-        for (let index = 0; index < cm_len; index++) {
-            cm += s[getRnum(0, s.length-1)];
-        }
-
-        return cm;
-    };
-    let mk_cm = (cm_num, interval_ms)=>{
-        let cms = [];
-        cms.push({ no: 1, vpos: 0, text: getRstring(1, 30) });
-
-        for (let index = 1; index < cm_num; index++) {
-            const text = getRstring(1, 30);
-            // const vpos = getRnum(0, time_ms/10);
-            const interval = getRnum(200/10, interval_ms/10);
-            const vpos = cms[cms.length-1].vpos + interval;
-            cms.push({ no: index+1, vpos: vpos, text: text });
-        }
-
-        cms.sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
-
-        return cms;
-    };
-
-    // let commnets = mk_cm(2000, 2*1000);
-    // let commnets2 = mk_cm(1000, 2*1000);
-
-    // let commnets = [
-    //     { no: 1, vpos: 0, text: "AAAAA AAAAAAAAAA" },
-    //     { no: 2, vpos: 250, text: "AAAAA" },
-    //     { no: 3, vpos: 300, text: "AAAAAAAAAAAAAAA "},
-    //     { no: 4, vpos: 450, text: "0" }
-    // ];
-
-    let commnets = [
-        { no: 1, vpos: 0,    text: "あああああああああAAAああああ" },
-        { no: 2, vpos: 143,  text: "いいいいいい" },
-        { no: 3, vpos: 241,  text: "うううううううううううううう"},
-        { no: 4, vpos: 274,  text: "ええええええええええ"},
-        { no: 5, vpos: 362,  text: "おおおおおおおおおおおお" },
-        { no: 6, vpos: 399,  text: "かかかかかかかかかかかかかかか" },
-        { no: 7, vpos: 432,  text: "ききき" },
-        { no: 8, vpos: 635,  text: "bbbbくくくくくくくくくくくくくくくく"},
-        { no: 9, vpos: 712,  text: "けけけけけけ" },
-        { no: 10, vpos: 743, text: "ここここここここここここここここここここここここここここここ" },
-    ];
+    // let commnets = util.randomComments(2000, 2*1000);
+    let commnets = util.sampleComments();
+    commnets.sort((a, b) => {
+        if (a.vpos < b.vpos) return -1;
+        if (a.vpos > b.vpos) return 1;
+        return 0;
+    });
 
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
@@ -140,7 +91,7 @@
             const elms = document.querySelectorAll(selector);
             this.mind = Math.min.apply(null, 
                 Array.from(elms).map(elm => elm.getAttribute('data-delay')));
-            console.log("mind=", this.mind);
+            // console.log("mind=", this.mind);
         }
 
         createFlow(){

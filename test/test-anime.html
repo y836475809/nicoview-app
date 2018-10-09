@@ -46,7 +46,7 @@
     var nico_comment = require("../nico_comment");
     var util = require("./test_comments");
 
-    let commnets = util.randomComments(10, 1*1000);
+    let commnets = util.randomComments(1000, 1.5*1000);
     // let commnets = util.sampleComments();
     commnets.sort((a, b) => {
         if (a.vpos < b.vpos) return -1;
@@ -100,6 +100,8 @@
             const duration = this.flow_params.duration;
 
             if(this.flow_timeline != null){
+                this.flow_timeline_b.pause();
+                this.flow_timeline_b.reset();
                 this.flow_timeline.pause();
                 this.flow_timeline.reset();
                 anime.remove(selector);
@@ -162,9 +164,6 @@
             const duration = this.fix_params.duration;
 
             if(this.fix_timeline != null){
-                this.flow_timeline_b.pause();
-                this.flow_timeline_b.reset();
-
                 this.fix_timeline.pause();
                 this.fix_timeline.reset();
                 anime.remove(selector);
@@ -255,7 +254,7 @@
         const width = area.clientWidth;
         const duration = 3000;
         // const step = 2;
-        const step = 50;
+        const step = 200;
 
         let cm_elm = new comment_elm(parent_id, width, duration);
         let flow_params = [];
@@ -333,8 +332,8 @@
             cutimer_id = setInterval(()=>{
                 const target = document.getElementById("timer");
                 target.textContent = cutimer;
-                cutimer+=100;
-            }, 100);;
+                cutimer+=200;
+            }, 200);;
 
             btn.textContent = "pause";
             btn.setAttribute('data-func', "pause");

@@ -257,9 +257,12 @@
 
         seek(time_ms){
             if(!this._hasTimeline()) return;
-
-            this.flow_timeline.seek(time_ms-this.mind);
-            this.is_play = false;
+            
+            const seek_time = time_ms-this.mind;
+            if(seek_time>=0){
+                this.flow_timeline.seek(seek_time);
+            }
+            // this.is_play = false;
             //this.fix_timeline.seek(time_ms);
         }
 

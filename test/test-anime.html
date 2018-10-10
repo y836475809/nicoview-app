@@ -46,7 +46,7 @@
     var nico_comment = require("../nico_comment");
     var util = require("./test_comments");
 
-    let commnets = util.randomComments(1000, 1.5*1000);
+    let commnets = util.randomComments(5000, 1.5*1000);
     // let commnets = util.sampleComments();
     commnets.sort((a, b) => {
         if (a.vpos < b.vpos) return -1;
@@ -100,8 +100,6 @@
             const duration = this.flow_params.duration;
 
             if(this.flow_timeline != null){
-                this.flow_timeline_b.pause();
-                this.flow_timeline_b.reset();
                 this.flow_timeline.pause();
                 this.flow_timeline.reset();
                 anime.remove(selector);
@@ -119,43 +117,34 @@
                 elm.style.top = (rowindex * 30) + "px";
             });
 
-            this.flow_timeline_b = anime.timeline({
-                targets: selector,
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay')-this.mind;
-                }, 
-                easing: 'linear',
-                duration: 1,
-                loop: false,
-                autoplay: false           
-            });
-            this.flow_timeline_b.add({
-                opacity: [0,1],        
-            });
-
             this.flow_timeline = anime.timeline({
                 targets: selector,
-                translateX: (el, i) => {
-                    return  -(area_width + el.getBoundingClientRect().width);
-                },
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay')-this.mind;
-                },
-                easing: 'linear',
-                duration: duration,
+                // targets: elms,
+                easing: 'linear',        
                 loop: false,
                 autoplay: false
             });
             this.flow_timeline
             .add({
-                translateY: 0,
-                complete:(anime)=>{
-                    console.log("complete2 = ", anime);
-                    let elms = document.querySelectorAll(selector);
-                    elms.forEach((elm)=>{
-                        elm.style.opacity = 0;
-                    });
-                }
+                delay: (el, i) => {
+                    return el.getAttribute('data-delay')-this.mind;
+                },
+                opacity: [0,1],  
+                duration: 1,      
+            })        
+            .add({
+                delay: (el, i) => {
+                    return el.getAttribute('data-delay')-this.mind;
+                },
+                translateX: (el, i) => {
+                    return  -(area_width + el.getBoundingClientRect().width);
+                },
+                duration: duration,
+                offset:1
+            })
+            .add({
+                opacity: 0,  
+                duration: 1,
             });
         }
 
@@ -209,7 +198,6 @@
         play(){
             if(!this._hasTimeline()) return;
 
-            this.flow_timeline_b.play();
             this.flow_timeline.play();
             this.is_play = true;
             //this.fix_timeline.play();
@@ -218,7 +206,6 @@
         pause(){
             if(!this._hasTimeline()) return;
 
-            this.flow_timeline_b.pause();
             this.flow_timeline.pause();
             this.is_play = false;
             //this.fix_timeline.pause();
@@ -229,7 +216,6 @@
             
             const seek_time = time_ms-this.mind;
             if(seek_time>=0){
-                this.flow_timeline_b.seek(seek_time);
                 this.flow_timeline.seek(seek_time);
             }
             // this.is_play = false;
@@ -255,29 +241,36 @@
         const duration = 3000;
         // const step = 2;
         const step = 200;
-
+        console.log("commnets1=", performance.now());
         let cm_elm = new comment_elm(parent_id, width, duration);
+        console.log("commnets2=", performance.now());
         let flow_params = [];
         let cnt=0;
+        //
+        let pp = document.getElementById(parent_id);
+        let fragment = document.createDocumentFragment();
         commnets.forEach((cm) => {
             const no = cm.no;
             const text = cm.text;
             const delay = cm.vpos*10;
             const q = Math.floor(cnt/step);
             cnt++;
-            flow_params.push(cm_elm.createFlowElm(text, no, delay, `flow${q}`));
+            flow_params.push(cm_elm.createFlowElm(text, no, delay, `flow${q}`, fragment));
         });
+        pp.appendChild(fragment);
 
+        console.log("commnets3=", performance.now());
         const num = 12;
         let cm = new nico_comment(num);
         cm.width = width;
         cm.comments = flow_params;
+        console.log("commnets4=", performance.now());
         cm.calc_comment();
-
+        console.log("commnets5=", performance.now());
         cm.comments.forEach((cm, index) => {
             cm.elm.setAttribute("data-rowindex", (cm.lane_index).toString());
         });  
-        
+        console.log("commnets6=", performance.now());
         let clt_list = [];
         const q = Math.floor(commnets.length/step);
         const r = commnets.length%step;
@@ -289,11 +282,11 @@
             let ctl = new CommemtTimeLine("#area", 
             {selector: `.flow${index}`, duration: duration}, 
             {selector: ".fix", duration: duration});
-            ctl.createFlow();
+            ctl.createFlow(); //
             //ctl.createFix();
             clt_list.push(ctl);
         }
-     
+        console.log("commnets7=", performance.now());
         return clt_list;
     };   
 

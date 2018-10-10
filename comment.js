@@ -34,12 +34,13 @@ class comment_elm {
      * @param {number} delay
      * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number, lane_index:number}} 
      */
-    createFlowElm(text, no, delay, class_name) {
+    createFlowElm(text, no, delay, class_name, pp) {
         let elm = this.createElm(text);
         elm.classList.add(class_name);
         elm.setAttribute("data-delay", delay.toString());
 
-        document.getElementById(this.parent_id).appendChild(elm);
+        //document.getElementById(this.parent_id).appendChild(elm);
+        pp.appendChild(elm);
         const rect = elm.getBoundingClientRect();
         
         const elm_width = rect.width;

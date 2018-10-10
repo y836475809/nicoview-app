@@ -20,7 +20,7 @@
         }
         .comment{
             color: #000000;
-            border: 1px solid #FF6600;
+            border: 1px solid #FF6600;           
         }
         .fix{
             float:left;
@@ -46,8 +46,8 @@
     var nico_comment = require("../nico_comment");
     var util = require("./test_comments");
 
-    let commnets = util.randomComments(5000, 1.5*1000);
-    // let commnets = util.sampleComments();
+    // let commnets = util.randomComments(5000, 1.5*1000);
+    let commnets = util.sampleComments();
     commnets.sort((a, b) => {
         if (a.vpos < b.vpos) return -1;
         if (a.vpos > b.vpos) return 1;
@@ -86,6 +86,7 @@
             this.flow_timeline = null;
             this.fix_timeline = null;
             this.is_play = false;
+            this.p=[];
         }
         
         getMinDelay(selector){
@@ -96,9 +97,16 @@
         }
 
         createFlow(){
+            console.log("createFlow=", this.flow_params.selector);
             const selector = this.flow_params.selector;
             const duration = this.flow_params.duration;
 
+            //if(this.flow_timeline == null){
+                this.p.forEach((elm) => {
+                    elm.style.display= "block"; 
+                });
+            //d}
+                
             if(this.flow_timeline != null){
                 this.flow_timeline.pause();
                 this.flow_timeline.reset();
@@ -140,12 +148,22 @@
                     return  -(area_width + el.getBoundingClientRect().width);
                 },
                 duration: duration,
-                offset:1
+                offset:1,
+                complete:()=>{
+                    this.p.forEach((elm) => {
+                        elm.style.display= "none"; 
+                    });
+                }
             })
-            .add({
-                opacity: 0,  
-                duration: 1,
-            });
+            // .add({
+            //     opacity: 0,  
+            //     duration: 1,
+            //     complete:()=>{
+            //         this.p.forEach((elm) => {
+            //             elm.style.display= "none"; 
+            //         });
+            //     }
+            // });
         }
 
         createFix(){
@@ -196,8 +214,12 @@
         }
 
         play(){
-            if(!this._hasTimeline()) return;
-
+            // if(!this._hasTimeline()) return;
+            if(this.flow_timeline==null){
+                console.log("createFlow1=", performance.now());
+                this.createFlow();
+                console.log("createFlow2=", performance.now());
+            }
             this.flow_timeline.play();
             this.is_play = true;
             //this.fix_timeline.play();
@@ -215,10 +237,20 @@
             if(!this._hasTimeline()) return;
             
             const seek_time = time_ms-this.mind;
-            if(seek_time>=0){
-                this.flow_timeline.seek(seek_time);
+            console.log("createFlow seek_time=", seek_time);
+            // if(seek_time>=0){
+            if(seek_time<=0){
+                this.p.forEach((elm) => {
+                    elm.style.display= "block"; 
+                });
+                this.flow_timeline.pause();
+                this.flow_timeline.reset();
+                // this.flow_timeline.seek(0);
             }
-            // this.is_play = false;
+            else{
+                //TODO:
+            }
+            this.is_play = false;
             //this.fix_timeline.seek(time_ms);
         }
 
@@ -239,8 +271,8 @@
         let area = document.querySelector("#area");
         const width = area.clientWidth;
         const duration = 3000;
-        // const step = 2;
-        const step = 200;
+        const step = 2;
+        // const step = 100;
         console.log("commnets1=", performance.now());
         let cm_elm = new comment_elm(parent_id, width, duration);
         console.log("commnets2=", performance.now());
@@ -249,13 +281,32 @@
         //
         let pp = document.getElementById(parent_id);
         let fragment = document.createDocumentFragment();
+        let ppp = [];
+        let p=[];
+        let ppp_cp = [];
+        let p_cp=[];
         commnets.forEach((cm) => {
             const no = cm.no;
             const text = cm.text;
             const delay = cm.vpos*10;
             const q = Math.floor(cnt/step);
             cnt++;
-            flow_params.push(cm_elm.createFlowElm(text, no, delay, `flow${q}`, fragment));
+            let tmp = cm_elm.createFlowElm(text, no, delay, `flow${q}`, fragment);
+            flow_params.push(tmp);
+            // flow_params.push(cm_elm.createFlowElm(text, no, delay, `flow${q}`, fragment));
+           if(cnt%step==0){
+                p.push(tmp.elm);
+                p_cp.push(cm.vpos);
+
+                ppp.push(p);
+                p=[];
+
+                ppp_cp.push(p_cp);
+                p_cp=[];
+            }else{
+                p.push(tmp.elm);
+                p_cp.push(cm.vpos);
+            }
         });
         pp.appendChild(fragment);
 
@@ -267,8 +318,9 @@
         console.log("commnets4=", performance.now());
         cm.calc_comment();
         console.log("commnets5=", performance.now());
-        cm.comments.forEach((cm, index) => {
+        cm.comments.forEach((cm, index) => {     
             cm.elm.setAttribute("data-rowindex", (cm.lane_index).toString());
+            cm.elm.style.display= "none"; 
         });  
         console.log("commnets6=", performance.now());
         let clt_list = [];
@@ -282,7 +334,10 @@
             let ctl = new CommemtTimeLine("#area", 
             {selector: `.flow${index}`, duration: duration}, 
             {selector: ".fix", duration: duration});
-            ctl.createFlow(); //
+            // ctl.createFlow(ppp[index]); //
+            ctl.p=ppp[index]; //
+            ctl.mind = Math.min.apply(null, ppp_cp[index])*10;
+            console.log("ctl.mind=", ctl.mind);
             //ctl.createFix();
             clt_list.push(ctl);
         }
@@ -304,6 +359,7 @@
     let test = ()=>{
         ctl_list.forEach((ctl) => {
             if(!ctl.is_play && ctl.mind<=getCurrentTime()){
+                console.log("test play=", ctl.is_play, "ctl.mind=", ctl.mind, "cu time=", getCurrentTime());
                 ctl.play();
             }
         });        
@@ -346,8 +402,8 @@
     let seek = ()=>{
         const target = document.getElementById("seek");
         const time_ms = parseInt(target.value);
-
         document.getElementById("timer").textContent = time_ms;
+        cutimer = time_ms;
 
         ctl_list.forEach((ctl) => {
             ctl.seek(time_ms);

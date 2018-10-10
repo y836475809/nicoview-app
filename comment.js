@@ -38,12 +38,20 @@ class comment_elm {
         let elm = this.createElm(text);
         elm.classList.add(class_name);
         elm.setAttribute("data-delay", delay.toString());
-
-        //document.getElementById(this.parent_id).appendChild(elm);
+  
         pp.appendChild(elm);
-        const rect = elm.getBoundingClientRect();
-        
-        const elm_width = rect.width;
+        //document.getElementById(this.parent_id).appendChild(elm);
+        // const rect = elm.getBoundingClientRect();
+        // const elm_width = rect.width;
+
+        let half_num = 0;
+        const half = text.match(/[\w\d !"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^`{|}~]/gi);
+        if(half){
+            half_num = half.length;
+        }
+        const tb_num = text.length - half_num;
+        const elm_width = half_num + 2*tb_num;
+
         const len = this.width + elm_width;
         const speed = len / this.duration;
 

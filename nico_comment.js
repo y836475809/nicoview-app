@@ -1,5 +1,5 @@
 
-class nico_comment {
+class NicoComment {
     constructor(lane_num) {
         this.lanes = []
         for (let i = 0; i < lane_num; i++) {
@@ -69,4 +69,4 @@ class nico_comment {
     }
 }
 
-module.exports = nico_comment
+module.exports = NicoComment;

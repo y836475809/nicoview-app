@@ -30,20 +30,24 @@ class comment_elm {
     /**
      * 
      * @param {string} text 
+     * @param {number} delay
+     * @returns {HTMLElement}} 
+     */
+    createElm2(text, delay) {
+        let elm = this.createElm(text);
+        // elm.classList.add(class_name);
+        elm.setAttribute("data-delay", delay.toString());
+        return elm;
+    }
+
+    /**
+     * 
+     * @param {string} text 
      * @param {number} no 
      * @param {number} delay
-     * @returns {{elm: HTMLElement, no:number, vpos:number, width:number, speed:number, lane_index:number}} 
+     * @returns {{no:number, vpos:number, width:number, speed:number, lane_index:number}} 
      */
-    createFlowElm(text, no, delay, class_name, pp) {
-        let elm = this.createElm(text);
-        elm.classList.add(class_name);
-        elm.setAttribute("data-delay", delay.toString());
-  
-        pp.appendChild(elm);
-        //document.getElementById(this.parent_id).appendChild(elm);
-        // const rect = elm.getBoundingClientRect();
-        // const elm_width = rect.width;
-
+    createFlowParam(text, no, delay) {
         let half_num = 0;
         const half = text.match(/[\w\d !"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^`{|}~]/gi);
         if(half){
@@ -56,7 +60,6 @@ class comment_elm {
         const speed = len / this.duration;
 
         return {
-            elm: elm,
             no: no, 
             vpos: delay, 
             width: elm_width, 

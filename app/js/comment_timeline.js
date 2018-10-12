@@ -1,4 +1,5 @@
 
+var NicoComment = require("../../nico_comment");
 
 class TimeLine {
     /**
@@ -193,28 +194,32 @@ class TimeLine {
 };
 
 class CommentTimeLines {
-    constructor(interval_ms, get_time_func) {
-        this.timelines = [];
+    constructor(parent_id, div_num, row_num, interval_ms, get_time_func) {
         this.parent_id = parent_id;
+
+        this.div_num = div_num;
+        this.row_num = row_num;
+
+        this.timelines = [];
         this.interval_ms = interval_ms;
-        this.play_timer = null;
         this.get_time_func = get_time_func;
+        this.play_timer = null;
     }
 
     /**
      * 
      * @param {Array} commnets 
      */
-    make_tl(parent_id, duration, step, row_num, commnets) {
+    create(duration, commnets) {
         // const parent_id = "area";
-        let parent_elm = document.getElementById(parent_id);
+        let parent_elm = document.getElementById(this.parent_id);
         const width = parent_elm.clientWidth;
         // const duration = 3000;
         // const step = 2;
         // const step = 200;
 
         console.log("commnets1=", performance.now());
-        let cm_elm = new comment_elm(parent_id, width, duration);
+        let cm_elm = new comment_elm(this.parent_id, width, duration);
         console.log("commnets2=", performance.now());
 
         let flow_params = [];
@@ -228,7 +233,7 @@ class CommentTimeLines {
 
         console.log("commnets3=", performance.now());
         // const num = 12;
-        let nico_comment = new NicoComment(row_num);
+        let nico_comment = new NicoComment(this.row_num);
         nico_comment.width = width;
         nico_comment.comments = flow_params;
         console.log("commnets4=", performance.now());
@@ -248,11 +253,12 @@ class CommentTimeLines {
         });
         parent_elm.appendChild(fragment);
 
-        let qcnt = Math.floor(commnets.length / step) + (commnets.length % step == 0 ? 0 : 1);
+        let qcnt = Math.floor(commnets.length / this.div_num) 
+                    + (commnets.length % this.div_num == 0 ? 0 : 1);
         const seqnums = Array.from(new Array(commnets.length)).map((v, i) => i);
         let div_seq = [];
         for (let index = 0; index < qcnt; index++) {
-            div_seq.push(seqnums.splice(0, step));
+            div_seq.push(seqnums.splice(0, this.div_num));
         }
 
         this.timelines = [];
@@ -266,7 +272,7 @@ class CommentTimeLines {
                 elms.push(elm);
             });
 
-            let timeline = new CommentTimeLine(parent_id,
+            let timeline = new TimeLine(this.parent_id,
                 { selector: `.flow${i}`, duration: duration },
                 { selector: ".fix", duration: duration });
             timeline.elms = elms;
@@ -283,13 +289,13 @@ class CommentTimeLines {
         this.timelines.forEach((tl) => {
             if (!tl.is_play && tl.mind <= this.get_time_func()) {
                 console.log("test play=", tl.is_play, 
-                    "ctl.mind=", tl.mind, "cu time=", getCurrentTime());
+                    "ctl.mind=", tl.mind, "cu time=", this.get_time_func());
                 tl.play();
             }
         });
         if (this.play_timer) {
             this.play_timer = setTimeout(() => {
-                test();
+                this.test();
             }, this.interval_ms);
         }
     }
@@ -297,7 +303,7 @@ class CommentTimeLines {
     play() {
         if (this.play_timer == null) {
             this.play_timer = setTimeout(() => {
-                test();
+                this.test();
             }, this.interval_ms);
         }
     }
@@ -314,4 +320,12 @@ class CommentTimeLines {
             tl.seek(time_ms);
         });
     }
+
+    reset(){
+        this.timelines.forEach((tl) => {
+            tl.createFlow();
+        });
+    }
 };
+
+module.exports = CommentTimeLines;

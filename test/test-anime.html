@@ -43,8 +43,9 @@
     // @ts-check
     var anime = require('animejs');
     var comment_elm = require("../comment");
-    var NicoComment = require("../nico_comment");
+    // var NicoComment = require("../nico_comment");
     var util = require("./test_comments");
+    var CommentTimeLines = require("../app/js/comment_timeline");
 
     // let commnets = util.randomComments(5000, 1.5*1000);
     let commnets = util.sampleComments();
@@ -73,55 +74,71 @@
     elm2.style.top = 50 + "px";
     elm2.setAttribute("data-delay", (3000).toString());  
 
-    let ctl_list = make_tl(commnets);
-    console.log("ctl_list.length=", ctl_list.length)
+    const parent_id = "area";
+    const div_num = 2;
+    const row_num = 12;
+    const interval_ms = 100;
+    const duration = 3000;
 
     let cutimer = 0;
-    let cutimer_id;
-
-    let getCurrentTime = ()=>{
+    const get_time_func = ()=>{
         return cutimer;
     };
-    const inv = 100;
-    let int_timer=null;
-    let test = ()=>{
-        ctl_list.forEach((ctl) => {
-            if(!ctl.is_play && ctl.mind<=getCurrentTime()){
-                console.log("test play=", ctl.is_play, "ctl.mind=", ctl.mind, "cu time=", getCurrentTime());
-                ctl.play();
-            }
-        });        
-		if (int_timer) {
-			int_timer = setTimeout( ()=> { 
-                test(); 
-            }, inv);
-		}       
-    };
+    let ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
+
+    ctls.create(duration, commnets);
+    // let ctl_list = make_tl(commnets);
+    console.log("ctl_list.length=", ctls.timelines.length)
+
+    let cutimer_id;
+
+    // let getCurrentTime = ()=>{
+    //     return cutimer;
+    // };
+    // const inv = 100;
+    // let int_timer=null;
+    // let test = ()=>{
+    //     ctl_list.forEach((ctl) => {
+    //         if(!ctl.is_play && ctl.mind<=getCurrentTime()){
+    //             console.log("test play=", ctl.is_play, "ctl.mind=", ctl.mind, "cu time=", getCurrentTime());
+    //             ctl.play();
+    //         }
+    //     });        
+	// 	if (int_timer) {
+	// 		int_timer = setTimeout( ()=> { 
+    //             test(); 
+    //         }, inv);
+	// 	}       
+    // };
     
     let play = ()=>{   
         let btn = document.querySelector('#play');
         if(btn.getAttribute('data-func')=="play"){
-            if(int_timer==null){
-                int_timer = setTimeout( ()=> { 
-                    test(); 
-                }, inv);
-            }
+            // if(int_timer==null){
+            //     int_timer = setTimeout( ()=> { 
+            //         test(); 
+            //     }, inv);
+            // }
+            ctls.play();
+
             cutimer_id = setInterval(()=>{
                 const target = document.getElementById("timer");
                 target.textContent = cutimer;
-                cutimer+=200;
-            }, 200);;
+                cutimer+=100;
+            }, 100);;
 
             btn.textContent = "pause";
             btn.setAttribute('data-func', "pause");
         }else{
-            clearInterval(cutimer_id);
-            clearTimeout(int_timer);
-            int_timer = null;
-            ctl_list.forEach((ctl) => {
-                ctl.pause();
-            });
+            
+            // clearTimeout(int_timer);
+            // int_timer = null;
+            // ctl_list.forEach((ctl) => {
+            //     ctl.pause();
+            // });
+            ctls.pause();
 
+            clearInterval(cutimer_id);
             btn.textContent = "play";
             btn.setAttribute('data-func', "play");
         }
@@ -133,18 +150,20 @@
         document.getElementById("timer").textContent = time_ms;
         cutimer = time_ms;
 
-        ctl_list.forEach((ctl) => {
-            ctl.seek(time_ms);
-        });
+        // ctl_list.forEach((ctl) => {
+        //     ctl.seek(time_ms);
+        // });
+        ctls.seek(time_ms);
     };
 
     let reset = ()=>{
         cutimer = 0;
         document.getElementById("timer").textContent = cutimer;
 
-        ctl_list.forEach((ctl) => {
-            ctl.createFlow();
-        });
+        // ctl_list.forEach((ctl) => {
+        //     ctl.createFlow();
+        // });
+        ctls.reset();
     }
 
     let timer;

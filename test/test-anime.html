@@ -46,16 +46,7 @@
     // var NicoComment = require("../nico_comment");
     var util = require("./test_comments");
     var CommentTimeLines = require("../app/js/comment_timeline");
-
-    // let commnets = util.randomComments(5000, 1.5*1000);
-    let commnets = util.sampleComments();
-    commnets.sort((a, b) => {
-        if (a.vpos < b.vpos) return -1;
-        if (a.vpos > b.vpos) return 1;
-        return 0;
-    });
-    console.log("last commnt time ms=", commnets[commnets.length-1].vpos*10);
-
+  
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
     elm.innerHTML = "fix textsssss";
@@ -74,6 +65,16 @@
     elm2.style.top = 50 + "px";
     elm2.setAttribute("data-delay", (3000).toString());  
 
+    // let commnets = util.randomComments(5000, 1.5*1000);
+    let commnets = util.sampleComments();
+    commnets.sort((a, b) => {
+        if (a.vpos < b.vpos) return -1;
+        if (a.vpos > b.vpos) return 1;
+        return 0;
+    });
+    console.log("last commnt time ms=", commnets[commnets.length-1].vpos*10);
+
+
     const parent_id = "area";
     const div_num = 2;
     const row_num = 12;
@@ -87,38 +88,13 @@
     let ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
 
     ctls.create(duration, commnets);
-    // let ctl_list = make_tl(commnets);
     console.log("ctl_list.length=", ctls.timelines.length)
 
     let cutimer_id;
-
-    // let getCurrentTime = ()=>{
-    //     return cutimer;
-    // };
-    // const inv = 100;
-    // let int_timer=null;
-    // let test = ()=>{
-    //     ctl_list.forEach((ctl) => {
-    //         if(!ctl.is_play && ctl.mind<=getCurrentTime()){
-    //             console.log("test play=", ctl.is_play, "ctl.mind=", ctl.mind, "cu time=", getCurrentTime());
-    //             ctl.play();
-    //         }
-    //     });        
-	// 	if (int_timer) {
-	// 		int_timer = setTimeout( ()=> { 
-    //             test(); 
-    //         }, inv);
-	// 	}       
-    // };
     
     let play = ()=>{   
         let btn = document.querySelector('#play');
         if(btn.getAttribute('data-func')=="play"){
-            // if(int_timer==null){
-            //     int_timer = setTimeout( ()=> { 
-            //         test(); 
-            //     }, inv);
-            // }
             ctls.play();
 
             cutimer_id = setInterval(()=>{
@@ -130,12 +106,6 @@
             btn.textContent = "pause";
             btn.setAttribute('data-func', "pause");
         }else{
-            
-            // clearTimeout(int_timer);
-            // int_timer = null;
-            // ctl_list.forEach((ctl) => {
-            //     ctl.pause();
-            // });
             ctls.pause();
 
             clearInterval(cutimer_id);
@@ -149,20 +119,12 @@
         const time_ms = parseInt(target.value);
         document.getElementById("timer").textContent = time_ms;
         cutimer = time_ms;
-
-        // ctl_list.forEach((ctl) => {
-        //     ctl.seek(time_ms);
-        // });
         ctls.seek(time_ms);
     };
 
     let reset = ()=>{
         cutimer = 0;
         document.getElementById("timer").textContent = cutimer;
-
-        // ctl_list.forEach((ctl) => {
-        //     ctl.createFlow();
-        // });
         ctls.reset();
     }
 

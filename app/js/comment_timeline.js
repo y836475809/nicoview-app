@@ -140,6 +140,22 @@ class TimeLine {
             });
     }
 
+    delete(){
+        let area = document.getElementById(this.parent_selector);
+        this.elms.forEach((elm) => {
+            area.removeChild(elm);
+        });
+        this.elms = [];       
+
+        if (this.flow_timeline == null) {
+            return;
+        }
+
+        anime.remove(this.flow_params.selector);
+
+        this.flow_timeline = null;
+    }
+
     play() {
         // if(!this._hasTimeline()) return;
         if (this.flow_timeline == null) {
@@ -167,7 +183,7 @@ class TimeLine {
         console.log("createFlow seek_time=", seek_time);
         // if(seek_time>=0){
         if (seek_time <= 0) {
-            this.p.forEach((elm) => {
+            this.elms.forEach((elm) => {
                 elm.style.display = "block";
             });
             this.flow_timeline.pause();
@@ -302,6 +318,11 @@ class CommentTimeLines {
 
     play() {
         if (this.play_timer == null) {
+            this.timelines.forEach((tl) => {
+                if (!tl.is_play && tl.mind <= this.get_time_func()) {
+                    tl.play();
+                }
+            })
             this.play_timer = setTimeout(() => {
                 this.test();
             }, this.interval_ms);
@@ -322,9 +343,12 @@ class CommentTimeLines {
     }
 
     reset(){
+        this.pause();
+
         this.timelines.forEach((tl) => {
-            tl.createFlow();
+            tl.delete();
         });
+        this.timelines = [];
     }
 };
 

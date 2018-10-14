@@ -13,8 +13,8 @@
         #area{
             position: absolute;
             left: 100px;
-            top: 50px;
-            height: 80%;
+            top: 150px;
+            height: 70%;
             width: 60%;
             border: 1px solid #000000;
         }
@@ -26,16 +26,35 @@
             float:left;
         }
 
-        #play{
+        .test-btn{
             width:50px;
-        }        
+        }
+        .test-intput{
+            width:100px;
+        }      
     </style>
 </head>
 
 <body>
     <div id="timer">0</div>
-    <button id="play", type=button data-func="play" onclick="play();">start</button>
-    <input type="number" id="seek" /><button type=button onclick="seek();">seek</button>
+    <div>
+        <label>sample: div num
+            <input type="number" id="sample-div-num" class="test-intput" value="2"/></label>
+        <button class="test-btn" type=button onclick="loadSample();">load</button>
+    </div>
+    <div>
+        <label>random: div num
+            <input type="number" id="random-div-num" class="test-intput" value="200"/></label>
+        <label>num
+            <input type="number" id="random-num" class="test-intput"  value="2000"/></label>
+        <button class="test-btn" type=button onclick="loadRandom();">load</button>
+    </div>
+    <hr>
+    <div>
+        <button id="play" class="test-btn" type=button data-func="play" onclick="play();">start</button>
+        <input type="number" id="seek" class="test-intput" />
+        <button type=button onclick="seek();">seek</button>
+    </div>
     <div id="area"></div>
 </body>
 
@@ -43,7 +62,6 @@
     // @ts-check
     var anime = require('animejs');
     var comment_elm = require("../comment");
-    // var NicoComment = require("../nico_comment");
     var util = require("./test_comments");
     var CommentTimeLines = require("../app/js/comment_timeline");
   
@@ -65,32 +83,57 @@
     elm2.style.top = 50 + "px";
     elm2.setAttribute("data-delay", (3000).toString());  
 
-    // let commnets = util.randomComments(5000, 1.5*1000);
-    let commnets = util.sampleComments();
-    commnets.sort((a, b) => {
-        if (a.vpos < b.vpos) return -1;
-        if (a.vpos > b.vpos) return 1;
-        return 0;
-    });
-    console.log("last commnt time ms=", commnets[commnets.length-1].vpos*10);
-
-
-    const parent_id = "area";
-    const div_num = 2;
-    const row_num = 12;
-    const interval_ms = 100;
-    const duration = 3000;
-
+    let ctls = null;
     let cutimer = 0;
+
     const get_time_func = ()=>{
         return cutimer;
     };
-    let ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
-
-    ctls.create(duration, commnets);
-    console.log("ctl_list.length=", ctls.timelines.length)
 
     let cutimer_id;
+
+    let loadSample = ()=>{
+        reset();
+
+        let commnets = util.sampleComments();
+        commnets.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        const div_num = parseInt(document.getElementById("sample-div-num").value);
+        createTimeLines(commnets, div_num);
+    }
+
+    let loadRandom = ()=>{
+        reset();
+
+        const num = parseInt(document.getElementById("random-num").value);
+        let commnets = util.randomComments(num, 1.5*1000);
+        commnets.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        const div_num = parseInt(document.getElementById("random-div-num").value);
+        createTimeLines(commnets, div_num);
+    }
+
+    let createTimeLines = (commnets, div_num)=>{
+        const parent_id = "area";
+        const row_num = 12;
+        const interval_ms = 100;
+        const duration = 3000;
+
+        ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
+        ctls.create(duration, commnets);
+        console.log("ctl_list.length=", ctls.timelines.length);
+
+        // console.log(".comment=", document.querySelectorAll(".comment"));
+        console.log(".comment.length=", document.querySelectorAll(".comment").length);
+    }
     
     let play = ()=>{   
         let btn = document.querySelector('#play');
@@ -125,7 +168,9 @@
     let reset = ()=>{
         cutimer = 0;
         document.getElementById("timer").textContent = cutimer;
-        ctls.reset();
+        if(ctls!=null){
+            ctls.reset();
+        }
     }
 
     let timer;

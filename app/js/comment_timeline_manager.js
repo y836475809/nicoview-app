@@ -1,6 +1,6 @@
 
 var NicoComment = require("../../nico_comment");
-var { FlowCommnetTimeLine, FixedCommnetTimeLine } = require("./comment_timeline");
+var { FlowCommentTimeLine, FixedCommentTimeLine } = require("./comment_timeline");
 // class TimeLine {
 //     /**
 //      * @param {string} parent_selector
@@ -287,7 +287,7 @@ class CommentTimeLineManager {
                 elms.push(elm);
             });
 
-            let timeline = new FlowCommnetTimeLine(
+            let timeline = new FlowCommentTimeLine(
                 this.parent_id,
                 { selector: `.flow${i}`, duration: duration });
             timeline.elms = elms;

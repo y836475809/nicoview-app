@@ -110,7 +110,7 @@ class TimeLine {
     }
 };
 
-class FlowCommnetTimeLine extends TimeLine {
+class FlowCommentTimeLine extends TimeLine {
     constructor(parent_selector, params) {
         super(parent_selector, params);
     }
@@ -181,7 +181,7 @@ class FlowCommnetTimeLine extends TimeLine {
     }
 };
 
-class FixedCommnetTimeLine extends TimeLine {
+class FixedCommentTimeLine extends TimeLine {
     constructor(parent_selector, params) {
         super(parent_selector, params);
     }
@@ -236,6 +236,6 @@ class FixedCommnetTimeLine extends TimeLine {
 };
 
 module.exports = {
-    FlowCommnetTimeLine: FlowCommnetTimeLine,
-    FixedCommnetTimeLine: FixedCommnetTimeLine
+    FlowCommentTimeLine: FlowCommentTimeLine,
+    FixedCommentTimeLine: FixedCommentTimeLine
 };

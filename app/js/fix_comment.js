@@ -6,7 +6,7 @@ class FixComment{
         this.row_num = row_num;
         this.rows = [];
         for (let i = 0; i < row_num; i++) {
-            this.rows.push({ no: -1, vpos: 0 });
+            this.rows.push([]);
         }
     }
 
@@ -23,7 +23,7 @@ class FixComment{
             }else{
                 cm.row_index = this.getMin();
             }
-            this.rows[cm.row_index] = {no:cm.no, vpos:cm.vpos};
+            this.rows[cm.row_index].push({no:cm.no, vpos:cm.vpos});
         });
     }
 
@@ -64,9 +64,11 @@ class FixComment{
     fill(ary, cur_vpos) {
         return ary.filter(n => 
         {
-            return (n.vpos+this.duration) <=cur_vpos;
+            return cur_vpos < (n.vpos+this.duration);
         });
     }
 
 
 };
+
+module.exports = FixComment;

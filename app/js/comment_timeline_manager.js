@@ -292,6 +292,7 @@ class CommentTimeLineManager {
                 { selector: `.flow${i}`, duration: duration });
             timeline.elms = elms;
             timeline.mind = Math.min.apply(null, vpos);
+            timeline.mind2 = Math.min.apply(null, vpos);
             timeline.last_time = Math.max.apply(null, vpos) + duration;
             console.log("ctl.mind=", timeline.mind);
 
@@ -347,9 +348,9 @@ class CommentTimeLineManager {
         this.pause();
 
         this.timelines.forEach((tl) => {
-            tl.delete();
+            tl.reset();
         });
-        this.timelines = [];
+        // this.timelines = [];
     }
 };
 

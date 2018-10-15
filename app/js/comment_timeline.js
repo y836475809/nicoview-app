@@ -16,6 +16,7 @@ class TimeLine {
     }
 
     delete() {
+        //TODO
         let area = document.getElementById(this.parent_selector);
         this.elms.forEach((elm) => {
             area.removeChild(elm);
@@ -28,6 +29,14 @@ class TimeLine {
 
         anime.remove(this.params.selector);
 
+        this.timeline = null;
+    }
+
+    reset() {
+        this.elms.forEach((elm) => {
+            elm.style.display = "none";
+        });
+        anime.remove(this.params.selector);
         this.timeline = null;
     }
 
@@ -65,18 +74,23 @@ class TimeLine {
         // if(seek_time>=0){
         if (this.mind <= time_ms && time_ms < this.last_time) {
             if (this.timeline == null) {
-                this.create();
+                //this.create();
             } else {
                 // this.elms.forEach((elm) => {
                 //     elm.style.display = "block";
                 // });
             }
+            this.create();
             this.timeline.seek(seek_time);
         } else if(this.mind > time_ms){
             console.log("createFlow seek delete = ", this.params.selector);
-            // this.delete();
+            this.reset();
+            // anime.remove(this.params.selector);
+            //this.timeline = null;
+            //TODO:
             // this.timeline = null;
-            // this.mind = this.mind - time_ms;
+            // this.mind2 = this.mind + time_ms;
+            // this.timeline.seek(seek_time);
             // if (this.timeline != null) {
             //     this.timeline.seek(seek_time);
             // }
@@ -117,8 +131,10 @@ class FlowCommnetTimeLine extends TimeLine {
         const area_width = area.clientWidth;
 
         this.elms.forEach((elm) => {
+           
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
+            console.log("create elms elm.style.left=", elm.style.left);
             const rowindex = parseInt(elm.getAttribute('data-rowindex'));
             elm.style.top = (rowindex * 30) + "px";
         });
@@ -133,14 +149,14 @@ class FlowCommnetTimeLine extends TimeLine {
         this.timeline
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind;
+                    return el.getAttribute('data-delay') - this.mind2;
                 },
                 opacity: [0, 1],
                 duration: 1,
             })
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind;
+                    return el.getAttribute('data-delay') - this.mind2;
                 },
                 translateX: (el, i) => {
                     return -(area_width + el.getBoundingClientRect().width);

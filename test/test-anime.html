@@ -63,7 +63,7 @@
     var anime = require('animejs');
     var comment_elm = require("../comment");
     var util = require("./test_comments");
-    var CommentTimeLines = require("../app/js/comment_timeline");
+    var CommentTimeLineManager = require("../app/js/comment_timeline_manager");
   
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
@@ -127,7 +127,7 @@
         const interval_ms = 100;
         const duration = 3000;
 
-        ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
+        ctls = new CommentTimeLineManager(parent_id, div_num, row_num, interval_ms, get_time_func);
         ctls.create(duration, commnets);
         console.log("ctl_list.length=", ctls.timelines.length);
 

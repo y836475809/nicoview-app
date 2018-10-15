@@ -183,13 +183,18 @@ class TimeLine {
         console.log("createFlow seek_time=", seek_time);
         // if(seek_time>=0){
         if (this.mind <= seek_time && seek_time < this.last_time) {
-            this.elms.forEach((elm) => {
-                elm.style.display = "block";
-            });
             if (this.flow_timeline == null) {
                 this.createFlow();
+            }else{
+                this.elms.forEach((elm) => {
+                    elm.style.display = "block";
+                });
             }
             this.flow_timeline.seek(seek_time);
+        }else{
+            if (this.flow_timeline != null) {
+                this.flow_timeline.seek(seek_time);
+            }
         }
         this.is_play = false;
         //this.fix_timeline.seek(time_ms);
@@ -326,6 +331,7 @@ class CommentTimeLines {
 
     pause() {
         clearTimeout(this.play_timer);
+        this.play_timer = null;
         this.timelines.forEach((tl) => {
             tl.pause();
         });

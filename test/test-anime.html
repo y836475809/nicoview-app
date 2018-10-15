@@ -13,29 +13,48 @@
         #area{
             position: absolute;
             left: 100px;
-            top: 50px;
-            height: 80%;
+            top: 150px;
+            height: 70%;
             width: 60%;
             border: 1px solid #000000;
         }
         .comment{
             color: #000000;
-            border: 1px solid #FF6600;
+            border: 1px solid #FF6600;           
         }
         .fix{
             float:left;
         }
 
-        #play{
+        .test-btn{
             width:50px;
-        }        
+        }
+        .test-intput{
+            width:100px;
+        }      
     </style>
 </head>
 
 <body>
     <div id="timer">0</div>
-    <button id="play", type=button data-func="play" onclick="play();">start</button>
-    <input type="number" id="seek" /><button type=button onclick="seek();">seek</button>
+    <div>
+        <label>sample: div num
+            <input type="number" id="sample-div-num" class="test-intput" value="2"/></label>
+        <button class="test-btn" type=button onclick="loadSample();">load</button>
+    </div>
+    <div>
+        <label>random: div num
+            <input type="number" id="random-div-num" class="test-intput" value="200"/></label>
+        <label>num
+            <input type="number" id="random-num" class="test-intput"  value="2000"/></label>
+        <button class="test-btn" type=button onclick="loadRandom();">load</button>
+    </div>
+    <hr>
+    <div>
+        <button id="play" class="test-btn" type=button data-func="play" onclick="play();">start</button>
+        <input type="number" id="seek" class="test-intput" />
+        <button type=button onclick="seek();">seek</button>
+    </div>
     <div id="area"></div>
 </body>
 
@@ -43,18 +62,9 @@
     // @ts-check
     var anime = require('animejs');
     var comment_elm = require("../comment");
-    var nico_comment = require("../nico_comment");
     var util = require("./test_comments");
-
-    let commnets = util.randomComments(5000, 1.5*1000);
-    // let commnets = util.sampleComments();
-    commnets.sort((a, b) => {
-        if (a.vpos < b.vpos) return -1;
-        if (a.vpos > b.vpos) return 1;
-        return 0;
-    });
-    console.log("last commnt time ms=", commnets[commnets.length-1].vpos*10);
-
+    var CommentTimeLines = require("../app/js/comment_timeline");
+  
     let areabyid = document.getElementById("area");
     let elm = document.createElement("div");
     elm.innerHTML = "fix textsssss";
@@ -73,271 +83,75 @@
     elm2.style.top = 50 + "px";
     elm2.setAttribute("data-delay", (3000).toString());  
 
-    class CommemtTimeLine{
-        /**
-         * @param {string} parent_selector
-         * @param {{selector: string, duration: number}} flow_params
-         * @param {{selector: string, duration: number}} fix_params
-         */
-        constructor(parent_selector, flow_params, fix_params) {
-            this.parent_selector = parent_selector;
-            this.flow_params = flow_params;
-            this.fix_params = fix_params;
-            this.flow_timeline = null;
-            this.fix_timeline = null;
-            this.is_play = false;
-        }
-        
-        getMinDelay(selector){
-            const elms = document.querySelectorAll(selector);
-            this.mind = Math.min.apply(null, 
-                Array.from(elms).map(elm => elm.getAttribute('data-delay')));
-            // console.log("mind=", this.mind);
-        }
-
-        createFlow(){
-            const selector = this.flow_params.selector;
-            const duration = this.flow_params.duration;
-
-            if(this.flow_timeline != null){
-                this.flow_timeline.pause();
-                this.flow_timeline.reset();
-                anime.remove(selector);
-            }
-
-            this.getMinDelay(selector);
-
-            const area = document.querySelector(this.parent_selector);
-            const area_width = area.clientWidth;
-            let elms = document.querySelectorAll(selector);
-            elms.forEach((elm)=>{
-                elm.style.opacity = 0;
-                elm.style.left = area_width + "px";
-                const rowindex = parseInt(elm.getAttribute('data-rowindex'));
-                elm.style.top = (rowindex * 30) + "px";
-            });
-
-            this.flow_timeline = anime.timeline({
-                targets: selector,
-                // targets: elms,
-                easing: 'linear',        
-                loop: false,
-                autoplay: false
-            });
-            this.flow_timeline
-            .add({
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay')-this.mind;
-                },
-                opacity: [0,1],  
-                duration: 1,      
-            })        
-            .add({
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay')-this.mind;
-                },
-                translateX: (el, i) => {
-                    return  -(area_width + el.getBoundingClientRect().width);
-                },
-                duration: duration,
-                offset:1
-            })
-            .add({
-                opacity: 0,  
-                duration: 1,
-            });
-        }
-
-        createFix(){
-            const selector = this.fix_params.selector;
-            const duration = this.fix_params.duration;
-
-            if(this.fix_timeline != null){
-                this.fix_timeline.pause();
-                this.fix_timeline.reset();
-                anime.remove(selector);
-            }
-
-            const area = document.querySelector(this.parent_selector);
-            const area_width = area.clientWidth;
-           
-            let elms = document.querySelectorAll(selector);
-            elms.forEach((elm)=>{
-                elm.style.opacity = 0;
-                const elm_rect = elm.getBoundingClientRect();
-                elm.style.left = (area_width/2 - elm_rect.width/2) + "px";
-            });
-
-            this.fix_timeline = anime.timeline({
-                targets: selector,
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay');
-                },
-                // easing: 'linear',
-                // duration: duration,
-                loop: false,
-                autoplay: false
-            });
-
-            this.fix_timeline
-            .add({
-                opacity: 1,
-                duration: 1
-            })
-            .add({
-                // opacity: 1,
-                duration: duration
-            })
-            .add({
-                opacity: 0,
-                duration: 1,
-            }); 
-  
-        }
-
-        play(){
-            if(!this._hasTimeline()) return;
-
-            this.flow_timeline.play();
-            this.is_play = true;
-            //this.fix_timeline.play();
-        }
-
-        pause(){
-            if(!this._hasTimeline()) return;
-
-            this.flow_timeline.pause();
-            this.is_play = false;
-            //this.fix_timeline.pause();
-        }
-
-        seek(time_ms){
-            if(!this._hasTimeline()) return;
-            
-            const seek_time = time_ms-this.mind;
-            if(seek_time>=0){
-                this.flow_timeline.seek(seek_time);
-            }
-            // this.is_play = false;
-            //this.fix_timeline.seek(time_ms);
-        }
-
-        _hasTimeline(){
-            if(this.flow_timeline == null) return false;
-            //if(this.fix_timeline == null) return false;
-            
-            return true;
-        }
-    };
-
-    /**
-     * 
-     * @param {Array} commnets 
-     */
-    let make_tl = (commnets)=>{
-        const parent_id = "area";
-        let area = document.querySelector("#area");
-        const width = area.clientWidth;
-        const duration = 3000;
-        // const step = 2;
-        const step = 200;
-        console.log("commnets1=", performance.now());
-        let cm_elm = new comment_elm(parent_id, width, duration);
-        console.log("commnets2=", performance.now());
-        let flow_params = [];
-        let cnt=0;
-        //
-        let pp = document.getElementById(parent_id);
-        let fragment = document.createDocumentFragment();
-        commnets.forEach((cm) => {
-            const no = cm.no;
-            const text = cm.text;
-            const delay = cm.vpos*10;
-            const q = Math.floor(cnt/step);
-            cnt++;
-            flow_params.push(cm_elm.createFlowElm(text, no, delay, `flow${q}`, fragment));
-        });
-        pp.appendChild(fragment);
-
-        console.log("commnets3=", performance.now());
-        const num = 12;
-        let cm = new nico_comment(num);
-        cm.width = width;
-        cm.comments = flow_params;
-        console.log("commnets4=", performance.now());
-        cm.calc_comment();
-        console.log("commnets5=", performance.now());
-        cm.comments.forEach((cm, index) => {
-            cm.elm.setAttribute("data-rowindex", (cm.lane_index).toString());
-        });  
-        console.log("commnets6=", performance.now());
-        let clt_list = [];
-        const q = Math.floor(commnets.length/step);
-        const r = commnets.length%step;
-        let nn = q;
-        if(r>0){
-            nn+=1;
-        }
-        for (let index = 0; index < nn; index++) {
-            let ctl = new CommemtTimeLine("#area", 
-            {selector: `.flow${index}`, duration: duration}, 
-            {selector: ".fix", duration: duration});
-            ctl.createFlow(); //
-            //ctl.createFix();
-            clt_list.push(ctl);
-        }
-        console.log("commnets7=", performance.now());
-        return clt_list;
-    };   
-
-    let ctl_list = make_tl(commnets);
-    console.log("ctl_list.length=", ctl_list.length)
-
+    let ctls = null;
     let cutimer = 0;
-    let cutimer_id;
 
-    let getCurrentTime = ()=>{
+    const get_time_func = ()=>{
         return cutimer;
     };
-    const inv = 100;
-    let int_timer=null;
-    let test = ()=>{
-        ctl_list.forEach((ctl) => {
-            if(!ctl.is_play && ctl.mind<=getCurrentTime()){
-                ctl.play();
-            }
-        });        
-		if (int_timer) {
-			int_timer = setTimeout( ()=> { 
-                test(); 
-            }, inv);
-		}       
-    };
+
+    let cutimer_id;
+
+    let loadSample = ()=>{
+        reset();
+
+        let commnets = util.sampleComments();
+        commnets.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        const div_num = parseInt(document.getElementById("sample-div-num").value);
+        createTimeLines(commnets, div_num);
+    }
+
+    let loadRandom = ()=>{
+        reset();
+
+        const num = parseInt(document.getElementById("random-num").value);
+        let commnets = util.randomComments(num, 1.5*1000);
+        commnets.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        const div_num = parseInt(document.getElementById("random-div-num").value);
+        createTimeLines(commnets, div_num);
+    }
+
+    let createTimeLines = (commnets, div_num)=>{
+        const parent_id = "area";
+        const row_num = 12;
+        const interval_ms = 100;
+        const duration = 3000;
+
+        ctls = new CommentTimeLines(parent_id, div_num, row_num, interval_ms, get_time_func);
+        ctls.create(duration, commnets);
+        console.log("ctl_list.length=", ctls.timelines.length);
+
+        // console.log(".comment=", document.querySelectorAll(".comment"));
+        console.log(".comment.length=", document.querySelectorAll(".comment").length);
+    }
     
     let play = ()=>{   
         let btn = document.querySelector('#play');
         if(btn.getAttribute('data-func')=="play"){
-            if(int_timer==null){
-                int_timer = setTimeout( ()=> { 
-                    test(); 
-                }, inv);
-            }
+            ctls.play();
+
             cutimer_id = setInterval(()=>{
                 const target = document.getElementById("timer");
                 target.textContent = cutimer;
-                cutimer+=200;
-            }, 200);;
+                cutimer+=100;
+            }, 100);;
 
             btn.textContent = "pause";
             btn.setAttribute('data-func', "pause");
         }else{
-            clearInterval(cutimer_id);
-            clearTimeout(int_timer);
-            int_timer = null;
-            ctl_list.forEach((ctl) => {
-                ctl.pause();
-            });
+            ctls.pause();
 
+            clearInterval(cutimer_id);
             btn.textContent = "play";
             btn.setAttribute('data-func', "play");
         }
@@ -346,21 +160,17 @@
     let seek = ()=>{
         const target = document.getElementById("seek");
         const time_ms = parseInt(target.value);
-
         document.getElementById("timer").textContent = time_ms;
-
-        ctl_list.forEach((ctl) => {
-            ctl.seek(time_ms);
-        });
+        cutimer = time_ms;
+        ctls.seek(time_ms);
     };
 
     let reset = ()=>{
         cutimer = 0;
         document.getElementById("timer").textContent = cutimer;
-
-        ctl_list.forEach((ctl) => {
-            ctl.createFlow();
-        });
+        if(ctls!=null){
+            ctls.reset();
+        }
     }
 
     let timer;

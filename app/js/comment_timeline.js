@@ -9,6 +9,7 @@ class TimeLine {
         this.params = params;
         this.timeline = null;
         this.is_play = false;
+        this.is_cpmpleted = false;
         this.elms = [];
     }
 
@@ -48,10 +49,11 @@ class TimeLine {
             console.log("create2=", performance.now());
         }
         else{
-            // this.elms.forEach((elm) => {
-            //     elm.style.display = "block";
-            //     elm.style.opacity = 0;
-            // });
+            if(!this.is_cpmpleted){
+                this.elms.forEach((elm) => {
+                    elm.style.display = "block";
+                });
+            }
         }
         this.timeline.play();
         this.is_play = true;
@@ -70,30 +72,31 @@ class TimeLine {
         // if(!this._hasTimeline()) return;
 
         const seek_time = time_ms - this.mind;
-        console.log("createFlow seek_time=", seek_time);
+        
         // if(seek_time>=0){
         if (this.mind <= time_ms && time_ms < this.last_time) {
+            console.log("createFlow seek_time1=", this.params.selector);
             if (this.timeline == null) {
-                //this.create();
+                this.create();
             } else {
-                // this.elms.forEach((elm) => {
-                //     elm.style.display = "block";
-                // });
+                this.elms.forEach((elm) => {
+                    elm.style.display = "block";
+                });
             }
-            this.create();
+            this.timeline.reset();
             this.timeline.seek(seek_time);
+
+            this.is_cpmpleted = false;
         } else if(this.mind > time_ms){
-            console.log("createFlow seek delete = ", this.params.selector);
-            this.reset();
-            // anime.remove(this.params.selector);
-            //this.timeline = null;
-            //TODO:
-            // this.timeline = null;
-            // this.mind2 = this.mind + time_ms;
-            // this.timeline.seek(seek_time);
-            // if (this.timeline != null) {
-            //     this.timeline.seek(seek_time);
-            // }
+            console.log("createFlow seek_time2=", this.params.selector);
+            if (this.timeline != null) {
+                this.timeline.reset();
+                this.timeline.seek(seek_time);
+            }
+            this.is_cpmpleted = false;
+        }else{
+            console.log("createFlow seek_time3=", this.params.selector);
+            this.is_cpmpleted = true;
         }
         this.is_play = false;
         //this.fix_timeline.seek(time_ms);
@@ -130,8 +133,8 @@ class FlowCommnetTimeLine extends TimeLine {
         const area = document.getElementById(this.parent_selector);
         const area_width = area.clientWidth;
 
-        this.elms.forEach((elm) => {
-           
+        this.elms.forEach((elm) => {      
+
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
             console.log("create elms elm.style.left=", elm.style.left);
@@ -140,6 +143,10 @@ class FlowCommnetTimeLine extends TimeLine {
         });
 
         this.timeline = anime.timeline({
+            begin :()=>{
+                this.is_cpmpleted = false;
+                console.log("timeline begin", selector);
+            },
             targets: selector,
             easing: 'linear',
             loop: false,
@@ -168,6 +175,7 @@ class FlowCommnetTimeLine extends TimeLine {
                     this.elms.forEach((elm) => {
                         elm.style.display = "none";
                     });
+                    this.is_cpmpleted = true;
                 }
             })
     }

@@ -304,7 +304,7 @@ class CommentTimeLineManager {
 
     test() {
         this.timelines.forEach((tl) => {
-            if (!tl.is_play && tl.mind <= this.get_time_func()) {
+            if (!tl.is_play && !tl.is_cpmpleted && tl.mind <= this.get_time_func()) {
                 console.log("test play=", tl.is_play, 
                     "ctl.mind=", tl.mind, "cu time=", this.get_time_func());
                 tl.play();
@@ -320,7 +320,7 @@ class CommentTimeLineManager {
     play() {
         if (this.play_timer == null) {
             this.timelines.forEach((tl) => {
-                if (!tl.is_play && tl.mind <= this.get_time_func()) {
+                if (!tl.is_play && !tl.is_cpmpleted && tl.mind <= this.get_time_func()) {
                     tl.play();
                 }
             })

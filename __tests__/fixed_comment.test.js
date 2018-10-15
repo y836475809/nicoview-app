@@ -1,4 +1,4 @@
-var FixComment = require("../app/js/fix_comment");
+var FixComment = require("../app/js/fixed_comment");
 
 test("calc fix fill", ()=> {
     let comments = [

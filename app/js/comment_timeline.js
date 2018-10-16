@@ -187,13 +187,9 @@ class FixedCommentTimeLine extends TimeLine {
         super(parent_selector, params);
     }
 
-    createFix() {
+    create() {
         const selector = this.params.selector;
         const duration = this.params.duration;
-
-        this.elms.forEach((elm) => {
-            elm.style.display = "block";
-        });
 
         if (this.timeline != null) {
             this.timeline.pause();
@@ -204,7 +200,7 @@ class FixedCommentTimeLine extends TimeLine {
         const area = document.getElementById(this.parent_selector);
         const area_width = area.clientWidth;
 
-        this.elms.forEach((elm) => {
+        this.elmsforEach((elm)=>{
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
             const rowindex = parseInt(elm.getAttribute('data-rowindex'));
@@ -212,6 +208,9 @@ class FixedCommentTimeLine extends TimeLine {
         });
 
         this.timeline = anime.timeline({
+            begin :()=>{
+                this.is_cpmpleted = false;
+            },
             targets: selector,
             delay: (el, i) => {
                 return el.getAttribute('data-delay');
@@ -232,6 +231,12 @@ class FixedCommentTimeLine extends TimeLine {
             .add({
                 opacity: 0,
                 duration: 1,
+                complete: (anim) => {
+                    anim.animatables.forEach((obj) => {
+                        obj.target.style.display = "none";
+                    });
+                    this.is_cpmpleted = true;
+                }
             });
     }
 };

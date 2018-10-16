@@ -68,12 +68,12 @@ class comment_elm {
         };
     }
 
-    createFixElm(text, delay){
-        let elm = this.createElm(text);
-        elm.classList.add("fix");
-        elm.setAttribute("data-delay", delay);
-    
-        return { elm: elm, row_index: -1 };
+    createFixedParam(no, delay){    
+        return { 
+            no: no, 
+            vpos: delay, 
+            row_index: -1 
+        };
     }
 
     /**

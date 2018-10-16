@@ -1,0 +1,51 @@
+{
+    // IntelliSense を使用して利用可能な属性を学べます。
+    // 既存の属性の説明をホバーして表示します。
+    // 詳細情報は次を確認してください: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Electron: Main",
+            "protocol": "inspector",
+            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
+            "runtimeArgs": [
+                "--remote-debugging-port=9223",
+                "${workspaceRoot}/test/test-anime.html"
+            ],
+            "windows": {
+                "runtimeExecutable": "D:/dev/rep/_bin/electron/electron.exe"
+            }
+        },
+        {
+            "name": "Electron: Renderer",
+            "type": "chrome",
+            "request": "attach",
+            "port": 9223,
+            "webRoot": "${workspaceRoot}",
+            "timeout": 30000
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Debug Jest Tests",
+            "program": "${workspaceRoot}/node_modules/.bin/jest",
+            "protocol": "inspector",
+            "args": [ "--runInBand" ],
+            "windows": {
+                "runtimeExecutable": "C:/node/node.exe",
+                "program": "${workspaceRoot}/node_modules/jest/bin/jest.js"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Electron: All",
+            "configurations": [
+                "Electron: Main",
+                "Electron: Renderer"
+            ]
+        }
+    ]
+}

@@ -10,19 +10,25 @@ class TimeLine {
         this.timeline = null;
         this.is_play = false;
         this.is_cpmpleted = false;
-        this.elms = [];
     }
 
     create() {
     }
 
+    elmsforEach(func){
+        const parent = document.getElementById(this.parent_selector);
+        let elms = parent.querySelectorAll(this.params.selector);
+        elms.forEach((elm, index) => {
+            func(elm, index);
+        });        
+    }
+
     delete() {
         //TODO
         let area = document.getElementById(this.parent_selector);
-        this.elms.forEach((elm) => {
+        this.elmsforEach((elm)=>{
             area.removeChild(elm);
         });
-        this.elms = [];
 
         if (this.timeline == null) {
             return;
@@ -34,23 +40,25 @@ class TimeLine {
     }
 
     reset() {
-        this.elms.forEach((elm) => {
+        this.elmsforEach((elm)=>{
             elm.style.display = "none";
         });
-        anime.remove(this.params.selector);
-        this.timeline = null;
+        this.create();
     }
 
     play() {
         // if(!this._hasTimeline()) return;
         if (this.timeline == null) {
             console.log("create1=", performance.now());
+            this.elmsforEach((elm)=>{
+                elm.style.display = "block";
+            });
             this.create();
             console.log("create2=", performance.now());
         }
         else{
             if(!this.is_cpmpleted){
-                this.elms.forEach((elm) => {
+                this.elmsforEach((elm)=>{
                     elm.style.display = "block";
                 });
             }
@@ -79,7 +87,7 @@ class TimeLine {
             if (this.timeline == null) {
                 this.create();
             } else {
-                this.elms.forEach((elm) => {
+                this.elmsforEach((elm)=>{
                     elm.style.display = "block";
                 });
             }
@@ -120,10 +128,6 @@ class FlowCommentTimeLine extends TimeLine {
         const selector = this.params.selector;
         const duration = this.params.duration;
 
-        this.elms.forEach((elm) => {
-            elm.style.display = "block";
-        });
-
         if (this.timeline != null) {
             this.timeline.pause();
             this.timeline.reset();
@@ -132,14 +136,11 @@ class FlowCommentTimeLine extends TimeLine {
 
         const area = document.getElementById(this.parent_selector);
         const area_width = area.clientWidth;
-
-        this.elms.forEach((elm) => {      
-
+        this.elmsforEach((elm)=>{
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
-            console.log("create elms elm.style.left=", elm.style.left);
             const rowindex = parseInt(elm.getAttribute('data-rowindex'));
-            elm.style.top = (rowindex * 30) + "px";
+            elm.style.top = (rowindex * 30) + "px"; 
         });
 
         this.timeline = anime.timeline({
@@ -156,24 +157,24 @@ class FlowCommentTimeLine extends TimeLine {
         this.timeline
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind2;
+                    return el.getAttribute('data-delay') - this.mind;
                 },
                 opacity: [0, 1],
                 duration: 1,
             })
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind2;
+                    return el.getAttribute('data-delay') - this.mind;
                 },
                 translateX: (el, i) => {
-                    return -(area_width + el.getBoundingClientRect().width);
+                    return -(area_width + parseInt(el.getAttribute('data-width')));
                 },
                 duration: duration,
                 offset: 1,
-                complete: () => {
+                complete: (anim) => {
                     console.log("complete=", selector);
-                    this.elms.forEach((elm) => {
-                        elm.style.display = "none";
+                    anim.animatables.forEach((obj) => {
+                        obj.target.style.display = "none";
                     });
                     this.is_cpmpleted = true;
                 }

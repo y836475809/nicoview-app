@@ -262,11 +262,18 @@ class CommentTimeLineManager {
             let elm = cm_elm.createElm2(commnets[index].text, cm.vpos);
             fragment.appendChild(elm);
             elm.setAttribute("data-rowindex", (cm.lane_index).toString());
-            elm.style.display = "none";
             all_elms.push(elm);
             all_vpos.push(cm.vpos);
         });
         parent_elm.appendChild(fragment);
+
+        let elms = parent_elm.querySelectorAll(".comment");
+        elms.forEach((elm) => {
+            // const elm_width = elm.getBoundingClientRect().width;
+            const elm_width = elm.offsetWidth;
+            elm.setAttribute("data-width", elm_width.toString());
+            // elm.style.display = "none";     
+        });
 
         let qcnt = Math.floor(commnets.length / this.div_num) 
                     + (commnets.length % this.div_num == 0 ? 0 : 1);
@@ -279,20 +286,16 @@ class CommentTimeLineManager {
         this.timelines = [];
         div_seq.forEach((list, i) => {
             let vpos = [];
-            let elms = [];
             list.forEach(index => {
                 vpos.push(all_vpos[index]);
                 let elm = all_elms[index];
                 elm.classList.add(`flow${i}`);
-                elms.push(elm);
             });
 
             let timeline = new FlowCommentTimeLine(
                 this.parent_id,
                 { selector: `.flow${i}`, duration: duration });
-            timeline.elms = elms;
             timeline.mind = Math.min.apply(null, vpos);
-            timeline.mind2 = Math.min.apply(null, vpos);
             timeline.last_time = Math.max.apply(null, vpos) + duration;
             console.log("ctl.mind=", timeline.mind);
 

@@ -178,7 +178,8 @@
     window.addEventListener('resize', () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            reset();
+            ctls.reset();
+            ctls.seek(cutimer);
         }, timeout);
     });
 </script>

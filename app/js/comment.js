@@ -1,13 +1,13 @@
 // @ts-check
 
-class Commnet {
+class CommentParam {
     constructor(duration) {
         /**
          * @type {{no:number, vpos:number, text:String, type:String, view_h_div_num:number, font_scale:number}[]}
          */
-        this.flow_comments = [];
-        this.fixed_top_comments = [];
-        this.fixed_bottom_comments = [];
+        this.flow_params = [];
+        this.fixed_top_params = [];
+        this.fixed_bottom_params = [];
         this.duration = duration;
     }
 
@@ -15,10 +15,10 @@ class Commnet {
     * 
     * @param {{no:number, vpos:number, text:String, mail:String}[]} comments 
     */
-    createCommnets(comments) {
-        this.flow_comments = [];
-        this.fixed_top_comments = [];
-        this.fixed_bottom_comments = [];
+    createEachParams(comments) {
+        this.flow_params = [];
+        this.fixed_top_params = [];
+        this.fixed_bottom_params = [];
 
         const size_map = new Map([["big", 15],["middle", 20], ["small", 25]]);
         const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
@@ -44,19 +44,19 @@ class Commnet {
             if(m_type!=null){
                 p.type = m_type[0];
                 if(p.type=="ue"){
-                    this.fixed_top_comments.push(p);
+                    this.fixed_top_params.push(p);
                 }else if(p.type=="shita"){
-                    this.fixed_bottom_comments.push(p);
+                    this.fixed_bottom_params.push(p);
                 }
             }else{
-                this.flow_comments.push(p);
+                this.flow_params.push(p);
             }
         });
     }
 
-    getFlowCommentParams() {
+    getFlowParams() {
         const view_width = 800;
-        this.flow_comments.forEach(comment=>{
+        this.flow_params.forEach(comment=>{
             const text = comment.text;
             const scale = comment.font_scale;
 
@@ -81,11 +81,11 @@ class Commnet {
         });
     }
 
-    getFixedTopCommentParams() {
-        return this.fixed_top_comments;
+    getFixedTopParams() {
+        return this.fixed_top_params;
     }
 
-    getFixedBottomCommentParams() {
-        return this.fixed_bottom_comments;
+    getFixedBottomParams() {
+        return this.fixed_bottom_params;
     }
 };

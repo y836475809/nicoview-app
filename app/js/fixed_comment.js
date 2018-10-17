@@ -1,8 +1,7 @@
 // @ts-check
 
-class FixComment{
-    constructor(row_num, duration){
-        this.duration = duration;
+class FixedComment{
+    constructor(row_num){
         this.row_num = row_num;
         this.rows = [];
         for (let i = 0; i < row_num; i++) {
@@ -14,7 +13,9 @@ class FixComment{
      * 
      * @param {Array} comments 
      */
-    calc(comments){
+    calc(comments, duration){
+        this.duration = duration;
+        
         comments.forEach((cm)=>{
             this.update(cm.vpos);
             const index = this.getEmptyIndex();
@@ -71,4 +72,4 @@ class FixComment{
 
 };
 
-module.exports = FixComment;
+module.exports = FixedComment;

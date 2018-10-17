@@ -1,212 +1,9 @@
+// @ts-check
 
 var NicoComment = require("../../nico_comment");
+var FlowComment = require("./flow_comment");
+var FixedComment = require("./fixed_comment");
 var { FlowCommentTimeLine, FixedCommentTimeLine } = require("./comment_timeline");
-// class TimeLine {
-//     /**
-//      * @param {string} parent_selector
-//      * @param {{selector: string, duration: number}} flow_params
-//      * @param {{selector: string, duration: number}} fix_params
-//      */
-//     constructor(parent_selector, flow_params, fix_params) {
-//         this.parent_selector = parent_selector;
-//         this.flow_params = flow_params;
-//         this.fix_params = fix_params;
-//         this.flow_timeline = null;
-//         this.fix_timeline = null;
-//         this.is_play = false;
-//         this.elms = [];
-//     }
-
-//     // getMinDelay(selector){
-//     //     const elms = document.querySelectorAll(selector);
-//     //     this.mind = Math.min.apply(null, 
-//     //         Array.from(elms).map(elm => elm.getAttribute('data-delay')));
-//     //     // console.log("mind=", this.mind);
-//     // }
-
-//     createFlow() {
-//         console.log("createFlow=", this.flow_params.selector);
-//         const selector = this.flow_params.selector;
-//         const duration = this.flow_params.duration;
-
-//         //if(this.flow_timeline == null){
-//         this.elms.forEach((elm) => {
-//             elm.style.display = "block";
-//         });
-//         //d}
-
-//         if (this.flow_timeline != null) {
-//             this.flow_timeline.pause();
-//             this.flow_timeline.reset();
-//             anime.remove(selector);
-//         }
-
-//         // this.getMinDelay(selector);
-
-//         const area = document.getElementById(this.parent_selector);
-//         const area_width = area.clientWidth;
-//         // let elms = document.querySelectorAll(selector);
-//         this.elms.forEach((elm) => {
-//             elm.style.opacity = 0;
-//             elm.style.left = area_width + "px";
-//             const rowindex = parseInt(elm.getAttribute('data-rowindex'));
-//             elm.style.top = (rowindex * 30) + "px";
-//         });
-
-//         this.flow_timeline = anime.timeline({
-//             targets: selector,
-//             // targets: elms,
-//             easing: 'linear',
-//             loop: false,
-//             autoplay: false
-//         });
-//         this.flow_timeline
-//             .add({
-//                 delay: (el, i) => {
-//                     return el.getAttribute('data-delay') - this.mind;
-//                 },
-//                 opacity: [0, 1],
-//                 duration: 1,
-//             })
-//             .add({
-//                 delay: (el, i) => {
-//                     return el.getAttribute('data-delay') - this.mind;
-//                 },
-//                 translateX: (el, i) => {
-//                     return -(area_width + el.getBoundingClientRect().width);
-//                 },
-//                 duration: duration,
-//                 offset: 1,
-//                 complete: () => {
-//                     this.elms.forEach((elm) => {
-//                         elm.style.display = "none";
-//                     });
-//                 }
-//             })
-//         // .add({
-//         //     opacity: 0,  
-//         //     duration: 1,
-//         //     complete:()=>{
-//         //         this.p.forEach((elm) => {
-//         //             elm.style.display= "none"; 
-//         //         });
-//         //     }
-//         // });
-//     }
-
-//     createFix() {
-//         const selector = this.fix_params.selector;
-//         const duration = this.fix_params.duration;
-
-//         if (this.fix_timeline != null) {
-//             this.fix_timeline.pause();
-//             this.fix_timeline.reset();
-//             anime.remove(selector);
-//         }
-
-//         const area = document.querySelector(this.parent_selector);
-//         const area_width = area.clientWidth;
-
-//         let elms = document.querySelectorAll(selector);
-//         elms.forEach((elm) => {
-//             elm.style.opacity = 0;
-//             const elm_rect = elm.getBoundingClientRect();
-//             elm.style.left = (area_width / 2 - elm_rect.width / 2) + "px";
-//         });
-
-//         this.fix_timeline = anime.timeline({
-//             targets: selector,
-//             delay: (el, i) => {
-//                 return el.getAttribute('data-delay');
-//             },
-//             // easing: 'linear',
-//             // duration: duration,
-//             loop: false,
-//             autoplay: false
-//         });
-
-//         this.fix_timeline
-//             .add({
-//                 opacity: 1,
-//                 duration: 1
-//             })
-//             .add({
-//                 // opacity: 1,
-//                 duration: duration
-//             })
-//             .add({
-//                 opacity: 0,
-//                 duration: 1,
-//             });
-//     }
-
-//     delete(){
-//         let area = document.getElementById(this.parent_selector);
-//         this.elms.forEach((elm) => {
-//             area.removeChild(elm);
-//         });
-//         this.elms = [];       
-
-//         if (this.flow_timeline == null) {
-//             return;
-//         }
-
-//         anime.remove(this.flow_params.selector);
-
-//         this.flow_timeline = null;
-//     }
-
-//     play() {
-//         // if(!this._hasTimeline()) return;
-//         if (this.flow_timeline == null) {
-//             console.log("createFlow1=", performance.now());
-//             this.createFlow();
-//             console.log("createFlow2=", performance.now());
-//         }
-//         this.flow_timeline.play();
-//         this.is_play = true;
-//         //this.fix_timeline.play();
-//     }
-
-//     pause() {
-//         if (!this._hasTimeline()) return;
-
-//         this.flow_timeline.pause();
-//         this.is_play = false;
-//         //this.fix_timeline.pause();
-//     }
-
-//     seek(time_ms) {
-//         // if(!this._hasTimeline()) return;
-
-//         const seek_time = time_ms - this.mind;
-//         console.log("createFlow seek_time=", seek_time);
-//         // if(seek_time>=0){
-//         if (this.mind <= seek_time && seek_time < this.last_time) {
-//             if (this.flow_timeline == null) {
-//                 this.createFlow();
-//             }else{
-//                 this.elms.forEach((elm) => {
-//                     elm.style.display = "block";
-//                 });
-//             }
-//             this.flow_timeline.seek(seek_time);
-//         }else{
-//             if (this.flow_timeline != null) {
-//                 this.flow_timeline.seek(seek_time);
-//             }
-//         }
-//         this.is_play = false;
-//         //this.fix_timeline.seek(time_ms);
-//     }
-
-//     _hasTimeline() {
-//         if (this.flow_timeline == null) return false;
-//         //if(this.fix_timeline == null) return false;
-
-//         return true;
-//     }
-// };
 
 class CommentTimeLineManager {
     constructor(parent_id, div_num, row_num, interval_ms, get_time_func) {
@@ -221,59 +18,131 @@ class CommentTimeLineManager {
         this.play_timer = null;
     }
 
-    /**
-     * 
-     * @param {Array} commnets 
-     */
-    create(duration, commnets) {
-        // const parent_id = "area";
+    create(commnets, duration) {
         let parent_elm = document.getElementById(this.parent_id);
-        const width = parent_elm.clientWidth;
-        // const duration = 3000;
-        // const step = 2;
-        // const step = 200;
+        const view_width = parent_elm.clientWidth;
 
-        console.log("commnets1=", performance.now());
-        let cm_elm = new comment_elm(this.parent_id, width, duration);
-        console.log("commnets2=", performance.now());
+        let [ flow_commnets, 
+            fixed_top_commnets,
+            fixed_bottom_commnets ] = this.getEachComments(commnets);
 
-        let flow_params = [];
-        commnets.forEach((cm) => {
-            const no = cm.no;
-            const text = cm.text;
-            const delay = cm.vpos * 10;
-            let tmp = cm_elm.createFlowParam(text, no, delay);
-            flow_params.push(tmp);
-        });
-
-        console.log("commnets3=", performance.now());
-        // const num = 12;
-        let nico_comment = new NicoComment(this.row_num);
-        nico_comment.width = width;
-        nico_comment.comments = flow_params;
-        console.log("commnets4=", performance.now());
-        nico_comment.calc_comment();
-        console.log("commnets5=", performance.now());
+        let flow_cmt = new FlowComment(this.row_num, view_width, duration);
+        const flow_no_row_map = flow_cmt.getNoRowIndexMap(flow_commnets);
+        
+        let flixed_cmt = new FixedComment(this.row_num, duration);
+        const fixed_top_no_row_map = flixed_cmt.getNoRowIndexMap(fixed_top_commnets);
+        const fixed_bottom_no_row_map = flixed_cmt.getNoRowIndexMap(fixed_bottom_commnets);
 
         let fragment = document.createDocumentFragment();
-        let all_elms = [];
-        let all_vpos = [];
-        nico_comment.comments.forEach((cm, index) => {
-            let elm = cm_elm.createElm2(commnets[index].text, cm.vpos);
+
+        flow_commnets.forEach((cmt) => {
+            let elm = this.createCommentElm(fixed_bottom_commnets);
+            elm.classList.add("flow");
+            elm.setAttribute("data-rowindex", flow_no_row_map.get(cmt.no).toString());
+
             fragment.appendChild(elm);
-            elm.setAttribute("data-rowindex", (cm.lane_index).toString());
-            all_elms.push(elm);
-            all_vpos.push(cm.vpos);
+        });
+        fixed_top_commnets.forEach((cmt) => {
+            let elm = this.createCommentElm(fixed_bottom_commnets);
+            elm.classList.add("fixed");
+            elm.setAttribute("data-rowindex", fixed_top_no_row_map.get(cmt.no).toString());
+            // elm.setAttribute("data-type", cmt.type);
+
+            fragment.appendChild(elm);
+        });
+        fixed_bottom_commnets.forEach((cmt) => {
+            let elm = this.createCommentElm(fixed_bottom_commnets);
+            elm.classList.add("fixed");
+            elm.setAttribute("data-rowindex", fixed_bottom_no_row_map.get(cmt.no).toString()); 
+            // elm.setAttribute("data-type", cmt.type);
+            fragment.appendChild(elm);
         });
         parent_elm.appendChild(fragment);
 
         let elms = parent_elm.querySelectorAll(".comment");
         elms.forEach((elm) => {
-            // const elm_width = elm.getBoundingClientRect().width;
-            const elm_width = elm.offsetWidth;
-            elm.setAttribute("data-width", elm_width.toString());
-            // elm.style.display = "none";     
+            // const width = elm.offsetWidth;
+            const width = elm.getBoundingClientRect().width;
+            elm.setAttribute("data-width", width.toString());
         });
+
+        this.createTimeLine(flow_commnets, "flow", duration, this.createFlowTimeLine);
+
+        this.createTimeLine(
+            fixed_top_commnets.concat(fixed_bottom_commnets), 
+            "fixed", duration, this.createFixedTimeLine);
+    }
+
+    getEachComments(comments) {
+        let flow_commnets = [];
+        let fixed_top_commnets = [];
+        let fixed_bottom_commnets = [];
+
+        // const size_map = new Map([["big", 15],["middle", 20], ["small", 25]]);
+        // const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
+        comments.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        comments.forEach(comment=>{
+            const m_type = comment.mail.match(/ue|shita/gi);
+            const m_size = comment.mail.match(/big|small/gi);
+            let p = {
+                no:comment.no, 
+                vpos:comment.vpos*10, 
+                text:comment.text, 
+                type:"naka", 
+                font_size:"middle"
+            };
+
+            if(m_size!=null){
+                p.font_size = m_size[0];
+            }
+
+            if(m_type!=null){
+                p.type = m_type[0];
+                if(p.type=="ue"){
+                    fixed_top_commnets.push(p);
+                }else if(p.type=="shita"){
+                    fixed_bottom_commnets.push(p);
+                }
+            }else{
+                flow_commnets.push(p);
+            }
+        }); 
+        
+        return [flow_commnets, fixed_top_commnets, fixed_bottom_commnets];
+    }
+
+    createCommentElm(commnet, view_height){
+        let elm = document.createElement("div");
+        elm.innerHTML = commnet.text;
+        elm.style.opacity = "0";
+        elm.style.whiteSpace = "nowrap";
+        elm.style.position = "absolute";
+        elm.classList.add("comment");
+
+        elm.setAttribute("data-delay", commnet.vpos.toString());
+        elm.setAttribute("data-type", commnet.type);
+        // elm.setAttribute("data-font_size", commnet.font_size);
+        const font_size = commnet.font_size;  
+        if(commnet.font_size=="big"){
+            elm.style.fontSize =  Math.floor(view_height/15) + "px";
+        }else if(commnet.font_size=="small"){
+            elm.style.fontSize =  Math.floor(view_height/25) + "px";
+        }else{
+            elm.style.fontSize = Math.floor(view_height/20) + "px";
+        }
+
+        return elm;    
+    }
+
+    createTimeLine(commnets, class_name, duration, create_timeline_func){
+        if(commnets.length===0){
+            return;
+        }
 
         let qcnt = Math.floor(commnets.length / this.div_num) 
                     + (commnets.length % this.div_num == 0 ? 0 : 1);
@@ -283,33 +152,133 @@ class CommentTimeLineManager {
             div_seq.push(seqnums.splice(0, this.div_num));
         }
 
+        let parent_elm = document.getElementById(this.parent_id);
+        let elms = parent_elm.querySelectorAll(class_name);
+
         this.timelines = [];
         div_seq.forEach((list, i) => {
-            let vpos = [];
+            let vposes = [];
             list.forEach(index => {
-                vpos.push(all_vpos[index]);
-                let elm = all_elms[index];
-                elm.classList.add(`flow${i}`);
+                vposes.push(commnets[index].vpos);
+                let elm = elms[index];
+                elm.classList.add(`group${i}`);
             });
 
-            let timeline = new FlowCommentTimeLine(
-                this.parent_id,
-                { selector: `.flow${i}`, duration: duration });
-            timeline.mind = Math.min.apply(null, vpos);
-            timeline.last_time = Math.max.apply(null, vpos) + duration;
-            console.log("ctl.mind=", timeline.mind);
+            // let timeline = new FlowCommentTimeLine(
+            //     this.parent_id,
+            //     { selector: `${class_name}.group${i}`, duration: duration });
+            let timeline = create_timeline_func(`${class_name}.group${i}`, duration);
+            timeline.start_time = Math.min.apply(null, vposes);
+            timeline.last_time = Math.max.apply(null, vposes) + duration;
+
+            console.log("ctl.start_time=", timeline.start_time);
 
             this.timelines.push(timeline);
-        });
+        });       
+    }
 
-        console.log("commnets6=", performance.now());
-    };
+    createFlowTimeLine(selector, duration){
+        return new FlowCommentTimeLine(
+            this.parent_id,
+            { 
+                selector: selector, 
+                duration: duration 
+            });     
+    }
+    createFixedTimeLine(selector, duration){
+        return new FixedCommentTimeLine(
+            this.parent_id,
+            { 
+                selector: selector, 
+                duration: duration 
+            });     
+    }
+
+    // create(duration, commnets) {
+    //     // const parent_id = "area";
+    //     let parent_elm = document.getElementById(this.parent_id);
+    //     const width = parent_elm.clientWidth;
+    //     // const duration = 3000;
+    //     // const step = 2;
+    //     // const step = 200;
+
+    //     console.log("commnets1=", performance.now());
+    //     let cm_elm = new comment_elm(this.parent_id, width, duration);
+    //     console.log("commnets2=", performance.now());
+
+    //     let flow_params = [];
+    //     commnets.forEach((cm) => {
+    //         const no = cm.no;
+    //         const text = cm.text;
+    //         const delay = cm.vpos * 10;
+    //         let tmp = cm_elm.createFlowParam(text, no, delay);
+    //         flow_params.push(tmp);
+    //     });
+
+    //     console.log("commnets3=", performance.now());
+    //     // const num = 12;
+    //     let nico_comment = new NicoComment(this.row_num);
+    //     nico_comment.width = width;
+    //     nico_comment.comments = flow_params;
+    //     console.log("commnets4=", performance.now());
+    //     nico_comment.calc_comment();
+    //     console.log("commnets5=", performance.now());
+
+    //     let fragment = document.createDocumentFragment();
+    //     let all_elms = [];
+    //     let all_vpos = [];
+    //     nico_comment.comments.forEach((cm, index) => {
+    //         let elm = cm_elm.createElm2(commnets[index].text, cm.vpos);
+    //         fragment.appendChild(elm);
+    //         elm.setAttribute("data-rowindex", (cm.lane_index).toString());
+    //         all_elms.push(elm);
+    //         all_vpos.push(cm.vpos);
+    //     });
+    //     parent_elm.appendChild(fragment);
+
+    //     let elms = parent_elm.querySelectorAll(".comment");
+    //     elms.forEach((elm) => {
+    //         // const elm_width = elm.getBoundingClientRect().width;
+    //         const elm_width = elm.offsetWidth;
+    //         elm.setAttribute("data-width", elm_width.toString());
+    //         // elm.style.display = "none";     
+    //     });
+
+    //     let qcnt = Math.floor(commnets.length / this.div_num) 
+    //                 + (commnets.length % this.div_num == 0 ? 0 : 1);
+    //     const seqnums = Array.from(new Array(commnets.length)).map((v, i) => i);
+    //     let div_seq = [];
+    //     for (let index = 0; index < qcnt; index++) {
+    //         div_seq.push(seqnums.splice(0, this.div_num));
+    //     }
+
+    //     this.timelines = [];
+    //     div_seq.forEach((list, i) => {
+    //         let vpos = [];
+    //         list.forEach(index => {
+    //             vpos.push(all_vpos[index]);
+    //             let elm = all_elms[index];
+    //             elm.classList.add(`flow${i}`);
+    //         });
+
+    //         let timeline = new FlowCommentTimeLine(
+    //             this.parent_id,
+    //             { selector: `.flow${i}`, duration: duration });
+    //         timeline.mind = Math.min.apply(null, vpos);
+    //         timeline.last_time = Math.max.apply(null, vpos) + duration;
+    //         console.log("ctl.mind=", timeline.mind);
+
+    //         this.timelines.push(timeline);
+    //     });
+
+    //     console.log("commnets6=", performance.now());
+    // };
 
     test() {
         this.timelines.forEach((tl) => {
-            if (!tl.is_play && !tl.is_cpmpleted && tl.mind <= this.get_time_func()) {
+            if (!tl.is_play && !tl.is_cpmpleted && tl.start_time <= this.get_time_func()) {
                 console.log("test play=", tl.is_play, 
-                    "ctl.mind=", tl.mind, "cu time=", this.get_time_func());
+                    "ctl.start_time=", tl.start_time, "cu time=", this.get_time_func());
                 tl.play();
             }
         });
@@ -323,7 +292,7 @@ class CommentTimeLineManager {
     play() {
         if (this.play_timer == null) {
             this.timelines.forEach((tl) => {
-                if (!tl.is_play && !tl.is_cpmpleted && tl.mind <= this.get_time_func()) {
+                if (!tl.is_play && !tl.is_cpmpleted && tl.start_time <= this.get_time_func()) {
                     tl.play();
                 }
             })

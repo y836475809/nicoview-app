@@ -1,3 +1,6 @@
+// @ts-check
+
+var anime = require('animejs');
 
 class TimeLine {
     /**
@@ -10,6 +13,8 @@ class TimeLine {
         this.timeline = null;
         this.is_play = false;
         this.is_cpmpleted = false;
+        this.start_time = 0;
+        this.last_time = 0;
     }
 
     create() {
@@ -21,6 +26,21 @@ class TimeLine {
         elms.forEach((elm, index) => {
             func(elm, index);
         });        
+    }
+
+    // getFontSize(elm, view_height){
+    //     const font_size = elm.getAttribute('data-font_size');
+    //     if(font_size=="big"){
+    //         return Math.floor(view_height/15);
+    //     }else if(font_size=="small"){
+    //         return Math.floor(view_height/25);
+    //     }else{
+    //         return Math.floor(view_height/20);
+    //     }
+    // }
+
+    getRowHeight(view_height){
+        return Math.floor(view_height/12);
     }
 
     delete() {
@@ -79,10 +99,10 @@ class TimeLine {
     seek(time_ms) {
         // if(!this._hasTimeline()) return;
 
-        const seek_time = time_ms - this.mind;
+        const seek_time = time_ms - this.start_time;
         
         // if(seek_time>=0){
-        if (this.mind <= time_ms && time_ms < this.last_time) {
+        if (this.start_time <= time_ms && time_ms < this.last_time) {
             console.log("createFlow seek_time1=", this.params.selector);
             if (this.timeline == null) {
                 this.create();
@@ -95,7 +115,7 @@ class TimeLine {
             this.timeline.seek(seek_time);
 
             this.is_cpmpleted = false;
-        } else if(this.mind > time_ms){
+        } else if(this.start_time > time_ms){
             console.log("createFlow seek_time2=", this.params.selector);
             if (this.timeline != null) {
                 this.timeline.reset();
@@ -136,11 +156,12 @@ class FlowCommentTimeLine extends TimeLine {
 
         const area = document.getElementById(this.parent_selector);
         const area_width = area.clientWidth;
+        const row_h = this.getRowHeight(area.clientHeight);
         this.elmsforEach((elm)=>{
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
             const rowindex = parseInt(elm.getAttribute('data-rowindex'));
-            elm.style.top = (rowindex * 30) + "px"; 
+            elm.style.top = (rowindex * row_h) + "px"; 
         });
 
         this.timeline = anime.timeline({
@@ -157,14 +178,14 @@ class FlowCommentTimeLine extends TimeLine {
         this.timeline
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind;
+                    return el.getAttribute('data-delay') - this.start_time;
                 },
                 opacity: [0, 1],
                 duration: 1,
             })
             .add({
                 delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.mind;
+                    return el.getAttribute('data-delay') - this.start_time;
                 },
                 translateX: (el, i) => {
                     return -(area_width + parseInt(el.getAttribute('data-width')));

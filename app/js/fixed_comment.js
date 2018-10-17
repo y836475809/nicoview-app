@@ -1,31 +1,41 @@
 // @ts-check
 
 class FixedComment{
-    constructor(row_num){
+    constructor(row_num, duration){
         this.row_num = row_num;
-        this.rows = [];
-        for (let i = 0; i < row_num; i++) {
-            this.rows.push([]);
-        }
+        this.duration = duration;
     }
 
     /**
      * 
      * @param {Array} comments 
      */
-    calc(comments, duration){
-        this.duration = duration;
+    getNoRowIndexMap(comments){
+        let no_row_map = new Map();
+
+        this.rows = [];
+        for (let i = 0; i < this.row_num; i++) {
+            this.rows.push([]);
+        }
         
-        comments.forEach((cm)=>{
-            this.update(cm.vpos);
+        comments.forEach((comment)=>{
+            this.update(comment.vpos);
             const index = this.getEmptyIndex();
+            let row_index = 0;
             if(index>=0){
-                cm.row_index = index;
+                // comment.row_index = index;
+                row_index = index;
+                // no_row_map.set(comment.no, index);
             }else{
-                cm.row_index = this.getMin();
+                // comment.row_index = this.getMin();
+                row_index = this.getMin();
+                // no_row_map.set(comment.no, this.getMin());
             }
-            this.rows[cm.row_index].push({no:cm.no, vpos:cm.vpos});
+            no_row_map.set(comment.no, row_index);
+            this.rows[row_index].push({no:comment.no, vpos:comment.vpos});
         });
+
+        return no_row_map;
     }
 
     update(cur_vpos) {

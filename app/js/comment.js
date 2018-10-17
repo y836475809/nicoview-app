@@ -3,7 +3,7 @@
 class CommentParam {
     constructor(duration) {
         /**
-         * @type {{no:number, vpos:number, text:String, type:String, view_h_div_num:number, font_scale:number}[]}
+         * @type {{no:number, vpos:number, text:String, type:String, font_size:String}[]}
          */
         this.flow_params = [];
         this.fixed_top_params = [];
@@ -20,8 +20,8 @@ class CommentParam {
         this.fixed_top_params = [];
         this.fixed_bottom_params = [];
 
-        const size_map = new Map([["big", 15],["middle", 20], ["small", 25]]);
-        const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
+        // const size_map = new Map([["big", 15],["middle", 20], ["small", 25]]);
+        // const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
 
         let results = [];
         comments.forEach(comment=>{
@@ -31,14 +31,12 @@ class CommentParam {
                 no:comment.no, 
                 vpos:comment.vpos*10, 
                 text:comment.text, 
-                type:"naka", 
-                view_h_div_num:20,
-                font_scale:1
+                type:"naka",
+                font_size:"middle"
             };
 
             if(m_size!=null){
-                p.view_h_div_num = size_map.get(m_size[0]);
-                p.font_scale = scale_map.get(m_size[0]);
+                p.font_size = m_size[0];
             }
 
             if(m_type!=null){
@@ -56,9 +54,11 @@ class CommentParam {
 
     getFlowParams() {
         const view_width = 800;
+        const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
+
         this.flow_params.forEach(comment=>{
             const text = comment.text;
-            const scale = comment.font_scale;
+            const scale = scale_map.get(comment.font_size);
 
             let half_num = 0;
             const half = text.match(/[\w\d !"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^`{|}~]/gi);

@@ -1,52 +1,50 @@
 // @ts-check
 
 class FlowComment {
-    constructor(row_num) {
-        this.view_width = 800;
+    constructor(row_num, view_width, duration=3000) {
         this.row_num = row_num;
-        this.rows = [];
-        for (let i = 0; i < row_num; i++) {
-            this.rows.push({ no: -1, nokori: 0 });
-        }
+        this.view_width = view_width;
+        this.duration = duration;
     }
 
-    setRowIndex(comments, duration) {
-        let params = this._getParams(comments, duration);
-        const row_map = this._getRowIndexMap(params);
-
-        comments.forEach((comment, index) => {
-            comment[index].row_index = row_map.get(index);
-        });
+    getNoRowIndexMap(comments) {
+        let params = this._getParams(comments, this.duration);
+        return this._getNoRowIndexMap(params);
     }
 
-    _getRowIndexMap(params) {
-        let row_map = new Map();
+    _getNoRowIndexMap(params) {
+        let no_row_map = new Map();
 
         this.params = params;
         this.rows = [];
         for (let i = 0; i < this.row_num; i++) {
             this.rows.push({ no: -1, nokori: 0 });
         }
-        this.no_index_map = new Map()
+
+        this.no_index_map = new Map();
         this.params.forEach((p, index) => {
             this.no_index_map.set(p.no, index);
         });
 
         this.params.forEach((param, index) => {
-            this._update_lane(param.vpos)
-            row_map.set(index, this._get_index_of_priority_lane());
+            this._update_lane(param.vpos);
+            const row_index = this._get_index_of_priority_lane();
+            no_row_map.set(param.no, row_index);
 
-            this.rows[index].no = param.no;
-            this.rows[index].nokori = this.view_width + param.width;
+            this.rows[row_index].no = param.no;
+            this.rows[row_index].nokori = this.view_width + param.width;
         });
 
-        return row_map;
+        return no_row_map;
     }
 
     _getParams(comments, duration) {
+        const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
+
         return comments.map((comment) => {
             const text = comment.text;
-            const scale = comment.font_scale;
+            // const scale = comment.font_scale;
+            const scale = scale_map.get(comment.font_size);
 
             let half_num = 0;
             const half = text.match(/[\w\d !"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^`{|}~]/gi);
@@ -63,8 +61,7 @@ class FlowComment {
                 no: comment.no,
                 vpos: comment.vpos,
                 width: text_width,
-                speed: speed,
-                row_index: -1
+                speed: speed
             };
         });
     }

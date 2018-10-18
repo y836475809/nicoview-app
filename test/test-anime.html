@@ -61,28 +61,9 @@
 <script>
     // @ts-check
     var anime = require('animejs');
-    var comment_elm = require("../comment");
     var util = require("./test_comments");
     var CommentTimeLineManager = require("../app/js/comment_timeline_manager");
   
-    let areabyid = document.getElementById("area");
-    let elm = document.createElement("div");
-    elm.innerHTML = "fix textsssss";
-    elm.classList.add("comment", "fix");
-    elm.style.opacity = 0;
-    areabyid.appendChild(elm);
-    elm.style.position = "absolute";
-    elm.setAttribute("data-delay", (1000).toString());
-
-    let elm2= document.createElement("div");
-    elm2.innerHTML = "fix text2";
-    elm2.classList.add("comment", "fix");
-    elm2.style.opacity = 0;
-    areabyid.appendChild(elm2);
-    elm2.style.position = "absolute";
-    elm2.style.top = 50 + "px";
-    elm2.setAttribute("data-delay", (3000).toString());  
-
     let ctls = null;
     let cutimer = 0;
 
@@ -128,7 +109,7 @@
         const duration = 3000;
 
         ctls = new CommentTimeLineManager(parent_id, div_num, row_num, interval_ms, get_time_func);
-        ctls.create(duration, commnets);
+        ctls.create(commnets, duration);
         console.log("ctl_list.length=", ctls.timelines.length);
 
         // console.log(".comment=", document.querySelectorAll(".comment"));

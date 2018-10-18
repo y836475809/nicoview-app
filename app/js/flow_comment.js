@@ -47,7 +47,7 @@ class FlowComment {
             const scale = scale_map.get(comment.font_size);
 
             let half_num = 0;
-            const half = text.match(/[\w\d !"#$%&'()\*\+\-\.,\/:;<=>?@\[\\\]^`{|}~]/gi);
+            const half = text.match(/[\w\d !"#$%&'()*+\-.,/:;<=>?@[\\\]^`{|}~]/g);
             if (half) {
                 half_num = half.length;
             }

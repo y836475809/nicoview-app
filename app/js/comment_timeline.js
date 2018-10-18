@@ -115,15 +115,18 @@ class TimeLine {
             this.timeline.seek(seek_time);
 
             this.is_cpmpleted = false;
-        } else if(this.start_time > time_ms){
+        } else if(time_ms < this.start_time){
             console.log("createFlow seek_time2=", this.params.selector);
             if (this.timeline != null) {
                 this.timeline.reset();
                 this.timeline.seek(seek_time);
             }
             this.is_cpmpleted = false;
-        }else{
+        }else if(this.last_time <= time_ms){
             console.log("createFlow seek_time3=", this.params.selector);
+            if(this.timeline!=null){
+                this.timeline.seek(seek_time);
+            }
             this.is_cpmpleted = true;
         }
         this.is_play = false;

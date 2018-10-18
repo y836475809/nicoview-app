@@ -1,4 +1,4 @@
-var SQLiteDB = require("../app/js/sqlite_db");
+const SQLiteDB = require("../app/js/sqlite_db");
 
 const db_file_path = `${__dirname}/data/sample.db`;
 

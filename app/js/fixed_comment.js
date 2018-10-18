@@ -23,13 +23,9 @@ class FixedComment{
             const index = this.getEmptyIndex();
             let row_index = 0;
             if(index>=0){
-                // comment.row_index = index;
                 row_index = index;
-                // no_row_map.set(comment.no, index);
             }else{
-                // comment.row_index = this.getMin();
                 row_index = this.getMin();
-                // no_row_map.set(comment.no, this.getMin());
             }
             no_row_map.set(comment.no, row_index);
             this.rows[row_index].push({no:comment.no, vpos:comment.vpos});
@@ -78,8 +74,6 @@ class FixedComment{
             return cur_vpos < (n.vpos+this.duration);
         });
     }
-
-
-};
+}
 
 module.exports = FixedComment;

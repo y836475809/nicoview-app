@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require("fs");
 const reader = require("../app/js/reader")
 
 const dir = `${__dirname}/data`;

@@ -1,13 +1,6 @@
-var FixedComment = require("../app/js/fixed_comment");
+const FixedComment = require("../app/js/fixed_comment");
 
 test("calc fix fill", () => {
-    let comments = [
-        { no: 1, vpos: 0 },
-        { no: 2, vpos: 5 },
-        { no: 3, vpos: 10 },
-        { no: 4, vpos: 15 }
-    ];
-
     const num = 3;
     const duration = 100;
     let fixed_cmt = new FixedComment(num, duration);

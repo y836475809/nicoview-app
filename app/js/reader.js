@@ -1,5 +1,5 @@
 
-const cheerio = require('cheerio');
+const cheerio = require("cheerio");
 
 /**
  * 
@@ -10,13 +10,13 @@ function comment(xml) {
     let commnets = [];
     $("chat").each(function (i, el) {
         const item = $(el);
-        if(!item.attr('deleted')){
+        if(!item.attr("deleted")){
             const text = item.text();
-            const no = parseInt(item.attr('no'));
-            const vpos = parseInt(item.attr('vpos'));
-            const date = parseInt(item.attr('date'));
-            const user_id = item.attr('user_id');
-            const mail = item.attr('mail');
+            const no = parseInt(item.attr("no"));
+            const vpos = parseInt(item.attr("vpos"));
+            const date = parseInt(item.attr("date"));
+            const user_id = item.attr("user_id");
+            const mail = item.attr("mail");
             commnets.push({
                 no: no,
                 vpos: vpos,
@@ -29,7 +29,7 @@ function comment(xml) {
     });
 
     return commnets;
-};
+}
 
 /**
  * 
@@ -58,11 +58,11 @@ function thumb_info(xml) {
     const embeddable = parseInt($("embeddable").text());
     const no_live_play = parseInt($("no_live_play").text());
 
-    let tags = []
+    let tags = [];
     $("tag").each(function (i, el) {
         const item = $(el);
         const text = item.text();
-        const lock = item.attr('lock');
+        const lock = item.attr("lock");
         tags.push({ tag: text, lock: lock !== undefined ? lock : "" });
     });
 
@@ -93,7 +93,7 @@ function thumb_info(xml) {
         user_nickname: user_nickname,
         user_icon_url: user_icon_url
     };
-};
+}
 
 module.exports.comment = comment;
 module.exports.thumb_info = thumb_info;

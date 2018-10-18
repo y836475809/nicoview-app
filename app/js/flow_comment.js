@@ -26,7 +26,7 @@ class FlowComment {
             this.no_index_map.set(p.no, index);
         });
 
-        this.params.forEach((param, index) => {
+        this.params.forEach((param) => {
             this._update_lane(param.vpos);
             const row_index = this._get_index_of_priority_lane();
             no_row_map.set(param.no, row_index);
@@ -93,10 +93,10 @@ class FlowComment {
                 return i;
             }
         }
-        let rems = this.rows.map(function (o) { return o.nokori });
+        let rems = this.rows.map(function (o) { return o.nokori; });
         let index = rems.indexOf(Math.min.apply(null, rems));
         return index;
     }
-};
+}
 
 module.exports = FlowComment;

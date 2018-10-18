@@ -1,6 +1,6 @@
 // @ts-check
 
-var anime = require('animejs');
+const anime = require("animejs");
 
 class TimeLine {
     /**
@@ -139,7 +139,7 @@ class TimeLine {
 
         return true;
     }
-};
+}
 
 class FlowCommentTimeLine extends TimeLine {
     constructor(parent_selector, params) {
@@ -163,7 +163,7 @@ class FlowCommentTimeLine extends TimeLine {
         this.elmsforEach((elm)=>{
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
-            const rowindex = parseInt(elm.getAttribute('data-rowindex'));
+            const rowindex = parseInt(elm.getAttribute("data-rowindex"));
             elm.style.top = (rowindex * row_h) + "px"; 
         });
 
@@ -173,25 +173,25 @@ class FlowCommentTimeLine extends TimeLine {
                 console.log("timeline begin", selector);
             },
             targets: selector,
-            easing: 'linear',
+            easing: "linear",
             loop: false,
             autoplay: false
         });
 
         this.timeline
             .add({
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.start_time;
+                delay: (el) => {
+                    return el.getAttribute("data-delay") - this.start_time;
                 },
                 opacity: [0, 1],
                 duration: 1,
             })
             .add({
-                delay: (el, i) => {
-                    return el.getAttribute('data-delay') - this.start_time;
+                delay: (el) => {
+                    return el.getAttribute("data-delay") - this.start_time;
                 },
-                translateX: (el, i) => {
-                    return -(area_width + parseInt(el.getAttribute('data-width')));
+                translateX: (el) => {
+                    return -(area_width + parseInt(el.getAttribute("data-width")));
                 },
                 duration: duration,
                 offset: 1,
@@ -202,9 +202,9 @@ class FlowCommentTimeLine extends TimeLine {
                     });
                     this.is_cpmpleted = true;
                 }
-            })
+            });
     }
-};
+}
 
 class FixedCommentTimeLine extends TimeLine {
     constructor(parent_selector, params) {
@@ -227,7 +227,7 @@ class FixedCommentTimeLine extends TimeLine {
         this.elmsforEach((elm)=>{
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
-            const rowindex = parseInt(elm.getAttribute('data-rowindex'));
+            const rowindex = parseInt(elm.getAttribute("data-rowindex"));
             elm.style.top = (rowindex * 30) + "px";
         });
 
@@ -236,8 +236,8 @@ class FixedCommentTimeLine extends TimeLine {
                 this.is_cpmpleted = false;
             },
             targets: selector,
-            delay: (el, i) => {
-                return el.getAttribute('data-delay');
+            delay: (el) => {
+                return el.getAttribute("data-delay");
             },
             loop: false,
             autoplay: false
@@ -263,7 +263,7 @@ class FixedCommentTimeLine extends TimeLine {
                 }
             });
     }
-};
+}
 
 module.exports = {
     FlowCommentTimeLine: FlowCommentTimeLine,

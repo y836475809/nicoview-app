@@ -48,3 +48,18 @@ module.exports.sampleComments = function(){
         { no: 10, vpos: 743, text: "ここここここここここここここここここここここここここここここ", mail:"" },
     ];
 };
+
+module.exports.fixedSampleComments = function(){
+    return  [
+        { no: 1, vpos: 0,    text: "あああああああああAAAああああ" , mail:"ue" },
+        { no: 2, vpos: 100,  text: "いいいいいい" , mail:"big ue" },
+        { no: 3, vpos: 200,  text: "うううううううううううううう", mail:"ue" },
+        { no: 4, vpos: 400,  text: "ええええええええええ", mail:"ue" },
+        { no: 5, vpos: 500,  text: "おおおおおおおおおおおお", mail:"ue" },
+        { no: 6, vpos: 600,  text: "かかかかかかかかかかかかかかか" , mail:"ue" },
+        { no: 7, vpos: 800,  text: "ききき", mail:"ue" },
+        { no: 8, vpos: 900,  text: "bbbbくくくくくくくくくくくくくくくく", mail:"ue" },
+        { no: 9, vpos: 1000,  text: "けけけけけけ", mail:"ue" },
+        { no: 10, vpos: 1100, text: "ここここここここここここ", mail:"ue" },
+    ];
+};

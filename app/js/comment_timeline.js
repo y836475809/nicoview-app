@@ -100,7 +100,7 @@ class TimeLine {
         // if(!this._hasTimeline()) return;
 
         const seek_time = time_ms - this.start_time;
-        
+
         // if(seek_time>=0){
         if (this.start_time <= time_ms && time_ms < this.last_time) {
             console.log("createFlow seek_time1=", this.params.selector);
@@ -164,7 +164,7 @@ class FlowCommentTimeLine extends TimeLine {
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
             const rowindex = parseInt(elm.getAttribute("data-rowindex"));
-            elm.style.top = (rowindex * row_h) + "px"; 
+            elm.style.top = (rowindex * row_h) + "px";
         });
 
         this.timeline = anime.timeline({
@@ -223,45 +223,34 @@ class FixedCommentTimeLine extends TimeLine {
 
         const area = document.getElementById(this.parent_selector);
         const area_width = area.clientWidth;
-
-        this.elmsforEach((elm)=>{
+        const row_h = this.getRowHeight(area.clientHeight);
+        this.elmsforEach((elm) => {
             elm.style.opacity = 0;
             elm.style.left = area_width + "px";
             const rowindex = parseInt(elm.getAttribute("data-rowindex"));
-            elm.style.top = (rowindex * 30) + "px";
+            elm.style.top = (rowindex * row_h) + "px";
         });
 
-        this.timeline = anime.timeline({
+        anime.easings["fixedCommentEasing"] = function(t) {
+            if(t>0.01 && t<0.999){
+                return 1;
+            }
+            return 0;
+        };
+        this.timeline = anime({
             begin :()=>{
                 this.is_cpmpleted = false;
             },
             targets: selector,
             delay: (el) => {
-                return el.getAttribute("data-delay");
+                return parseInt(el.getAttribute("data-delay")) - this.start_time;
             },
+            easing: "fixedCommentEasing",
+            opacity: [1],
+            duration:duration,
             loop: false,
             autoplay: false
-        });
-
-        this.timeline
-            .add({
-                opacity: 1,
-                duration: 1
-            })
-            .add({
-                // opacity: 1,
-                duration: duration
-            })
-            .add({
-                opacity: 0,
-                duration: 1,
-                complete: (anim) => {
-                    anim.animatables.forEach((obj) => {
-                        obj.target.style.display = "none";
-                    });
-                    this.is_cpmpleted = true;
-                }
-            });
+        }); 
     }
 }
 

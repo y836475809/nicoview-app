@@ -49,6 +49,11 @@
             <input type="number" id="random-num" class="test-intput"  value="2000"/></label>
         <button class="test-btn" type=button onclick="loadRandom();">load</button>
     </div>
+    <div>
+        <label>fixed sample: div num
+            <input type="number" id="fixed-sample-div-num" class="test-intput" value="20"/></label>
+        <button class="test-btn" type=button onclick="loadFixedSample();">load</button>
+    </div>
     <hr>
     <div>
         <button id="play" class="test-btn" type=button data-func="play" onclick="play();">start</button>
@@ -84,6 +89,20 @@
         });
 
         const div_num = parseInt(document.getElementById("sample-div-num").value);
+        createTimeLines(commnets, div_num);
+    }
+
+    let loadFixedSample = ()=>{
+        reset();
+
+        let commnets = util.fixedSampleComments();
+        commnets.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        const div_num = parseInt(document.getElementById("fixed-sample-div-num").value);
         createTimeLines(commnets, div_num);
     }
 

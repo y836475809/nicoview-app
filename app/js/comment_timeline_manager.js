@@ -39,7 +39,7 @@ class CommentTimeLineManager {
         console.log("commnets4=", performance.now());
 
         let fragment = document.createDocumentFragment();
-
+        
         flow_commnets.forEach((cmt) => {
             let elm = this.createCommentElm(cmt);
             elm.classList.add("flow");
@@ -103,13 +103,24 @@ class CommentTimeLineManager {
         const view_height = parent_elm.clientHeight;
 
         console.log("sizeSetting1=", performance.now());
-        let clone = parent_elm.cloneNode(true);
+        //let clone = parent_elm.cloneNode(true);
 
         console.log("sizeSetting2=", performance.now());
     
-        let elements = clone.querySelectorAll(".comment");
-        for (let index = 0, len = elements.length; index < len; index++) {
-            let elm = elements[index];
+        // let elements = clone.querySelectorAll(".comment");
+        // for (let index = 0, len = elements.length; index < len; index++) {
+        //     let elm = elements[index];
+        //     const font_size = elm.getAttribute("data-fontsize");
+        //     if(font_size=="big"){
+        //         elm.style.fontSize =  Math.floor(view_height/15) + "px";
+        //     }else if(font_size=="small"){
+        //         elm.style.fontSize =  Math.floor(view_height/25) + "px";
+        //     }else{
+        //         elm.style.fontSize = Math.floor(view_height/20) + "px";
+        //     }       
+        // }
+        let elms = parent_elm.querySelectorAll(".comment");
+        elms.forEach((elm) => {
             const font_size = elm.getAttribute("data-fontsize");
             if(font_size=="big"){
                 elm.style.fontSize =  Math.floor(view_height/15) + "px";
@@ -117,19 +128,20 @@ class CommentTimeLineManager {
                 elm.style.fontSize =  Math.floor(view_height/25) + "px";
             }else{
                 elm.style.fontSize = Math.floor(view_height/20) + "px";
-            }       
-        }
+            }    
+        });
+
         console.log("sizeSetting3=", performance.now());
     
-        parent_elm.parentNode.replaceChild(clone, parent_elm);
+        //parent_elm.parentNode.replaceChild(clone, parent_elm);
         
         console.log("sizeSetting4=", performance.now());
 
-        parent_elm = document.getElementById(this.parent_id);
+        //parent_elm = document.getElementById(this.parent_id);
 
         console.log("sizeSetting5=", performance.now());
 
-        let elms = parent_elm.querySelectorAll(".comment");
+        //let elms = parent_elm.querySelectorAll(".comment");
 
         console.log("sizeSetting6=", performance.now());
 

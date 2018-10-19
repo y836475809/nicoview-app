@@ -6,3 +6,5 @@ https://voyager-jp.com/blog/jquery/pagination-js/
 https://gist.github.com/assertnotnull/c3b383f05a0fdc85ddf5
 
 http://www.yujakudo.com/blogs/develop/node-jselectron/test-of-webview/
+
+http://nicowiki.com/elsecom.html

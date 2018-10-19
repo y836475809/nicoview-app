@@ -79,7 +79,7 @@
     let cutimer_id;
 
     let loadSample = ()=>{
-        reset();
+        init();
 
         let commnets = util.sampleComments();
         commnets.sort((a, b) => {
@@ -93,7 +93,7 @@
     }
 
     let loadFixedSample = ()=>{
-        reset();
+        init();
 
         let commnets = util.fixedSampleComments();
         commnets.sort((a, b) => {
@@ -107,7 +107,7 @@
     }
 
     let loadRandom = ()=>{
-        reset();
+        init();
 
         const num = parseInt(document.getElementById("random-num").value);
         let commnets = util.randomComments(num, 1.5*1000);
@@ -170,6 +170,14 @@
         document.getElementById("timer").textContent = cutimer;
         if(ctls!=null){
             ctls.reset();
+        }
+    }
+
+    let init = ()=>{
+        cutimer = 0;
+        document.getElementById("timer").textContent = cutimer;
+        if(ctls!=null){
+            ctls.delete();
         }
     }
 

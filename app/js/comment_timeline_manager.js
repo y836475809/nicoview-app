@@ -90,11 +90,15 @@ class CommentTimeLineManager {
     }
 
     delete() {
+        this.pause();
+
         let view = document.getElementById(this.parent_id);
         let elms = view.querySelectorAll(".comment");
         elms.forEach((elm) => {
             view.removeChild(elm);
         });
+        
+        this.timelines = [];
     }
 
     sizeSetting(){

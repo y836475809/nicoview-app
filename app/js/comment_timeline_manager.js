@@ -183,10 +183,13 @@ class CommentTimeLineManager {
 
     createCommentElm(commnet){
         let elm = document.createElement("div");
-        elm.innerHTML = commnet.text;
-        elm.style.opacity = "0";
-        elm.style.whiteSpace = "nowrap";
-        elm.style.position = "absolute";
+        elm.innerText = commnet.text;
+
+        let sly = elm.style;
+        sly.opacity = "0";
+        sly.whiteSpace = "nowrap";
+        sly.position = "absolute";
+
         elm.classList.add("comment");
 
         elm.setAttribute("data-delay", commnet.vpos.toString());

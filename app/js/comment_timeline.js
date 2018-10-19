@@ -226,7 +226,7 @@ class FixedCommentTimeLine extends TimeLine {
         const row_h = this.getRowHeight(area.clientHeight);
         this.elmsforEach((elm) => {
             elm.style.opacity = 0;
-            elm.style.left = area_width + "px";
+            elm.style.left = (area_width / 2 - parseInt(elm.getAttribute("data-width")) / 2) + "px";
             const rowindex = parseInt(elm.getAttribute("data-rowindex"));
             elm.style.top = (rowindex * row_h) + "px";
         });

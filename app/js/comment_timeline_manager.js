@@ -99,10 +99,24 @@ class CommentTimeLineManager {
 
     sizeSetting(){
         console.log("sizeSetting0=", performance.now());
+
         let parent_elm = document.getElementById(this.parent_id);
+        let elms = parent_elm.querySelectorAll(".comment");
+
+        console.log("sizeSetting1=", performance.now());
+
+        let fragment = document.createDocumentFragment();
+        elms.forEach((elm) => {
+            parent_elm.removeChild(elm);
+            fragment.appendChild(elm);
+        });
+        
+        console.log("sizeSetting2=", performance.now());
+        
         const view_height = parent_elm.clientHeight;
 
-        let elms = parent_elm.querySelectorAll(".comment");
+        console.log("sizeSetting3=", performance.now());
+
         elms.forEach((elm) => {
             const font_size = elm.getAttribute("data-fontsize");
             if(font_size=="big"){
@@ -111,16 +125,19 @@ class CommentTimeLineManager {
                 elm.style.fontSize =  Math.floor(view_height/25) + "px";
             }else{
                 elm.style.fontSize = Math.floor(view_height/20) + "px";
-            }    
+            } 
         });
+        console.log("sizeSetting4=", performance.now());
+        
+        parent_elm.appendChild(fragment);
 
-        console.log("sizeSetting6=", performance.now());
+        console.log("sizeSetting5=", performance.now());
 
         elms.forEach((elm) => {
             const width = elm.getBoundingClientRect().width;
             elm.setAttribute("data-width", width.toString());
         });
-        console.log("sizeSetting7=", performance.now());
+        console.log("sizeSetting6=", performance.now());
     }
 
     getEachComments(comments) {

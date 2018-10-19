@@ -102,23 +102,6 @@ class CommentTimeLineManager {
         let parent_elm = document.getElementById(this.parent_id);
         const view_height = parent_elm.clientHeight;
 
-        console.log("sizeSetting1=", performance.now());
-        //let clone = parent_elm.cloneNode(true);
-
-        console.log("sizeSetting2=", performance.now());
-    
-        // let elements = clone.querySelectorAll(".comment");
-        // for (let index = 0, len = elements.length; index < len; index++) {
-        //     let elm = elements[index];
-        //     const font_size = elm.getAttribute("data-fontsize");
-        //     if(font_size=="big"){
-        //         elm.style.fontSize =  Math.floor(view_height/15) + "px";
-        //     }else if(font_size=="small"){
-        //         elm.style.fontSize =  Math.floor(view_height/25) + "px";
-        //     }else{
-        //         elm.style.fontSize = Math.floor(view_height/20) + "px";
-        //     }       
-        // }
         let elms = parent_elm.querySelectorAll(".comment");
         elms.forEach((elm) => {
             const font_size = elm.getAttribute("data-fontsize");
@@ -131,18 +114,6 @@ class CommentTimeLineManager {
             }    
         });
 
-        console.log("sizeSetting3=", performance.now());
-    
-        //parent_elm.parentNode.replaceChild(clone, parent_elm);
-        
-        console.log("sizeSetting4=", performance.now());
-
-        //parent_elm = document.getElementById(this.parent_id);
-
-        console.log("sizeSetting5=", performance.now());
-
-        //let elms = parent_elm.querySelectorAll(".comment");
-
         console.log("sizeSetting6=", performance.now());
 
         elms.forEach((elm) => {
@@ -150,44 +121,6 @@ class CommentTimeLineManager {
             elm.setAttribute("data-width", width.toString());
         });
         console.log("sizeSetting7=", performance.now());
-
-        // function sampleResolve() {
-        //     return new Promise(resolve => {
-        //         for (let index = 0, len = elements.length/2; index < len; index++) {
-        //             let elm = elements[index];
-        //             const width = elm.getBoundingClientRect().width;
-        //             elm.setAttribute("data-width", width.toString());
-        //         }
-        //         resolve(1);
-        //         // setTimeout(() => {
-        //         //     resolve(value);
-        //         // }, 2000);
-        //     })
-        // }
-        
-        // function sampleResolve2() {
-        //     return new Promise(resolve => {
-        //         for (let index = elements.length/2, len = elements.length; index < len; index++) {
-        //             let elm = elements[index];
-        //             const width = elm.getBoundingClientRect().width;
-        //             elm.setAttribute("data-width", width.toString());
-        //         }
-        //         resolve(2);
-        //         // setTimeout(() => {
-        //         //     resolve(value * 2);
-        //         // }, 1000);
-        //     })
-        // }
-        // async function sample() {
-        //     const [a] = await Promise.all([sampleResolve()]);
-        //     const c = await sampleResolve2();
-        
-        //     return [a, c];
-        // }
-        // sample().then(([a, c]) => {
-        //     console.log(a, c); // => 5 10 20
-        // });
-        // console.log("sizeSetting8=", performance.now());
     }
 
     getEachComments(comments) {

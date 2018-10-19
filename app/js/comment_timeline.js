@@ -28,17 +28,6 @@ class TimeLine {
         });        
     }
 
-    // getFontSize(elm, view_height){
-    //     const font_size = elm.getAttribute('data-font_size');
-    //     if(font_size=="big"){
-    //         return Math.floor(view_height/15);
-    //     }else if(font_size=="small"){
-    //         return Math.floor(view_height/25);
-    //     }else{
-    //         return Math.floor(view_height/20);
-    //     }
-    // }
-
     getRowHeight(view_height){
         return view_height/this.params.row_num;
     }
@@ -67,7 +56,6 @@ class TimeLine {
     }
 
     play() {
-        // if(!this._hasTimeline()) return;
         if (this.timeline == null) {
             console.log("create1=", performance.now());
             this.elmsforEach((elm)=>{
@@ -85,7 +73,6 @@ class TimeLine {
         }
         this.timeline.play();
         this.is_play = true;
-        //this.fix_timeline.play();
     }
 
     pause() {
@@ -93,15 +80,11 @@ class TimeLine {
 
         this.timeline.pause();
         this.is_play = false;
-        //this.fix_timeline.pause();
     }
 
     seek(time_ms) {
-        // if(!this._hasTimeline()) return;
-
         const seek_time = time_ms - this.start_time;
 
-        // if(seek_time>=0){
         if (this.start_time <= time_ms && time_ms < this.last_time) {
             console.log("createFlow seek_time1=", this.params.selector);
             if (this.timeline == null) {
@@ -130,12 +113,10 @@ class TimeLine {
             this.is_cpmpleted = true;
         }
         this.is_play = false;
-        //this.fix_timeline.seek(time_ms);
     }
 
     _hasTimeline() {
         if (this.timeline == null) return false;
-        //if(this.fix_timeline == null) return false;
 
         return true;
     }

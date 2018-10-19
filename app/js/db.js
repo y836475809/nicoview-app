@@ -1,6 +1,6 @@
 
-const fs = require('fs');
-const reader = require('./reader');
+const fs = require("fs");
+const reader = require("./reader");
 
 class DB {
     constructor() {

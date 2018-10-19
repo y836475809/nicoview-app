@@ -26,79 +26,105 @@
     <script>
         const remote = require('electron').remote;
         const base_dir = remote.getGlobal('sharedObj').base_dir;
-        var $ = jQuery = require("jquery");
-        var anime = require('animejs');
+        // var $ = jQuery = require("jquery");
+        // var anime = require('animejs');
 
-        let comment_anime = null;
-        let my = [];
+        // let comment_anime = null;
+        // let my = [];
+        let ctls = null;
         // var create_comment_elm = require('../../comment')
-        let comment_elm = require(`${base_dir}/comment`);
-        let nico_comment = require(`${base_dir}/nico_comment`);
+        // let comment_elm = require(`${base_dir}/comment`);
+        // let nico_comment = require(`${base_dir}/nico_comment`);
+        const CommentTimeLineManager = require(`${base_dir}/app/js/comment_timeline_manager`);
+        
+        let get_time_func = ()=>{
+            return this.refs.palyermain.currentTime*1000;
+        };
+        let createTimeLines = (commnets, div_num)=>{
+            const parent_id = "player-video-screen";
+            const row_num = 12;
+            const interval_ms = 100;
+            const duration = 3000;
+
+            ctls = new CommentTimeLineManager(
+                parent_id, 
+                div_num, 
+                row_num, 
+                interval_ms, 
+                get_time_func);
+            ctls.create(commnets, duration);
+            console.log("ctl_list.length=", ctls.timelines.length);
+            console.log(".comment.length=", document.querySelectorAll(".comment").length);
+        }
 
         obs.on("receivedData", (data) => {
-            if (comment_anime !== null) {
-                anime.remove('.comment');
-                $('.comment').remove();
-            };
+            // if (comment_anime !== null) {
+            //     anime.remove('.comment');
+            //     $('.comment').remove();
+            // };
 
             console.log('data=', data);
 
             let video = this.refs.palyermain;
             video.src = data.src;
             video.type = data.type;
+            
+         
+            const div_num = 200;
+            createTimeLines(data.commnets, div_num);
+
             video.load();
+            // let nc_elms = [];
+            // let nc_params = [];
+            // const parent_id = "player-video-screen";
+            // // const parent_id = "player-video-content";
+            // // const width = getContentSize().width;
+            // const width = window.innerWidth;
+            // const duration = 5000;
+            // let commnets = data.commnets;
+            // let cm_elm = new comment_elm(parent_id, width, duration);
+            // commnets.forEach((cm) => {
+            //     const no = cm.no;
+            //     const text = cm.text;
+            //     const delay = cm.vpos*10;
+            //     ret = cm_elm.cretae_flow(no, text, delay);
+            //     nc_elms.push(ret.ele);
+            //     nc_params.push(ret.params);
 
-            let nc_elms = [];
-            let nc_params = [];
-            const parent_id = "player-video-screen";
-            // const parent_id = "player-video-content";
-            // const width = getContentSize().width;
-            const width = window.innerWidth;
-            const duration = 5000;
-            let commnets = data.commnets;
-            let cm_elm = new comment_elm(parent_id, width, duration);
-            commnets.forEach((cm) => {
-                const no = cm.no;
-                const text = cm.text;
-                const delay = cm.vpos*10;
-                ret = cm_elm.cretae_flow(no, text, delay);
-                nc_elms.push(ret.ele);
-                nc_params.push(ret.params);
+            // });
 
-            });
+            // const num = 12;
+            // // const c_top = this.refs.palyercontainer.offsetTop
+            // let cm = new nico_comment(num);
+            // cm.width = width;
+            // cm.comments = nc_params;
+            // cm.calc_comment();
 
-            const num = 12;
-            // const c_top = this.refs.palyercontainer.offsetTop
-            let cm = new nico_comment(num);
-            cm.width = width;
-            cm.comments = nc_params;
-            cm.calc_comment();
-
-            let lanes_map;
-            let calc_cms = cm.comments;
-            calc_cms.forEach((cm, index) => {
-                // lanes_map[cm.no] = cm.lane_index
-                let em = nc_elms[index];
-                em.style.position = "absolute";
-                em.style.top = (cm.lane_index * 50) + "px";
-            });
+            // let lanes_map;
+            // let calc_cms = cm.comments;
+            // calc_cms.forEach((cm, index) => {
+            //     // lanes_map[cm.no] = cm.lane_index
+            //     let em = nc_elms[index];
+            //     em.style.position = "absolute";
+            //     em.style.top = (cm.lane_index * 50) + "px";
+            // });
 
 
-            comment_anime = anime({
-                targets: '.comment',
-                translateX: function (el) {
-                    return el.getAttribute('data-x');
-                },
-                duration: function (target) {
-                    return duration;
-                },
-                delay: function (target, index) {
-                    return target.getAttribute('data-delay');
-                },
-                easing: 'linear',
-                loop: false,
-                autoplay: false
-            });
+            // comment_anime = anime({
+            //     targets: '.comment',
+            //     translateX: function (el) {
+            //         return el.getAttribute('data-x');
+            //     },
+            //     duration: function (target) {
+            //         return duration;
+            //     },
+            //     delay: function (target, index) {
+            //         return target.getAttribute('data-delay');
+            //     },
+            //     easing: 'linear',
+            //     loop: false,
+            //     autoplay: false
+            // });
         });
 
         invert = () => {
@@ -111,7 +137,7 @@
         };
 
         add = () => {
-            comment_anime.play();
+            //comment_anime.play();
 
             // const parent_id = "container"
             // const top = 50
@@ -148,6 +174,7 @@
             // comment_anime.play()
         };
 
+        
         this.on('mount', function () {
             console.log('mount');
 
@@ -165,11 +192,13 @@
             });
             this.refs.palyermain.addEventListener('play', () => {
                 console.log('addEventListener playによるイベント発火');
-                comment_anime.play();
+                // comment_anime.play();
+                ctls.play();
             });
             this.refs.palyermain.addEventListener('pause', () => {
                 console.log('addEventListener pauseによるイベント発火');
-                comment_anime.pause();
+                // comment_anime.pause();
+                ctls.pause();
             });
 
             this.refs.palyermain.addEventListener('timeupdate', () => {
@@ -188,13 +217,22 @@
             this.refs.palyermain.addEventListener('playing', function(){
                 console.log('addEventListener playingによるイベント発火');
             });
+            
             obs.on("play", () => {
                 console.log("player.tag play");
+                // let video = this.refs.palyermain;
+                // video.play();
                 this.refs.palyermain.play();
+                // let video = document.getElementById('player');
+                // video.play();
             });
             obs.on("pause", () => {
                 console.log("player.tag pause");
+                // let video = this.refs.palyermain;
+                // video.pause();
                 this.refs.palyermain.pause();
+                // let video = document.getElementById('player');
+                // video.pause();
             });
 
             obs.on("on_seeked", (current) => {
@@ -203,17 +241,21 @@
                 
                 if(this.refs.palyermain.paused){
                     this.refs.palyermain.currentTime = current;
-                    comment_anime.seek(current * 1000);
+                    // comment_anime.seek(current * 1000);
+                    ctls.seek(current * 1000);
                 }else{
                     console.log('player paused');
                     this.refs.palyermain.pause();
-                    comment_anime.pause();
+                    // comment_anime.pause();
+                    ctls.pause();
 
                     this.refs.palyermain.currentTime = current;
-                    comment_anime.seek(current * 1000);
+                    // comment_anime.seek(current * 1000);
+                    ctls.seek(current * 1000);
 
                     this.refs.palyermain.play();
-                    comment_anime.play();
+                    // comment_anime.play();
+                    ctls.play();
                 }    
             });
 

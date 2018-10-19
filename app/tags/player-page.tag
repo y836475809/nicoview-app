@@ -61,9 +61,9 @@
             //window.resizeTo(new_width, new_height);
         });
         
-        riot.mount('player-tags');
-        riot.mount('player-video');
-        riot.mount('player-controls');
+        // riot.mount('player-tags');
+        // riot.mount('player-video');
+        // riot.mount('player-controls');
     </script>  
       
 </player-page>

@@ -61,5 +61,8 @@ module.exports.fixedSampleComments = function(){
         { no: 8, vpos: 900,  text: "bbbbくくくくくくくくくくくくくくくく", mail:"ue" },
         { no: 9, vpos: 1000,  text: "けけけけけけ", mail:"ue" },
         { no: 10, vpos: 1100, text: "ここここここここここここ", mail:"ue" },
+        { no: 11, vpos: 50,    text: "#Aああああ#" , mail:"shita" },
+        { no: 12, vpos: 400,    text: "#いいいいいい#" , mail:"shita" },
+        { no: 13, vpos: 450,    text: "#ううう#" , mail:"shita" },
     ];
 };

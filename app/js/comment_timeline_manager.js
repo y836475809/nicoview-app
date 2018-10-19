@@ -270,7 +270,7 @@ class CommentTimeLineManager {
                 elm.classList.add(`group${i}`);
             });
 
-            let timeline = create_timeline_func(this.parent_id, `${selector}.group${i}`, duration);
+            let timeline = create_timeline_func(this.parent_id, `${selector}.group${i}`, duration, this.row_num);
             timeline.start_time = Math.min.apply(null, vposes);
             timeline.last_time = Math.max.apply(null, vposes) + duration;
 
@@ -280,20 +280,22 @@ class CommentTimeLineManager {
         });       
     }
 
-    createFlowTimeLine(parent_id, selector, duration){
+    createFlowTimeLine(parent_id, selector, duration, row_num){
         return new FlowCommentTimeLine(
             parent_id,
             { 
                 selector: selector, 
-                duration: duration 
+                duration: duration,
+                row_num: row_num
             });     
     }
-    createFixedTimeLine(parent_id, selector, duration){
+    createFixedTimeLine(parent_id, selector, duration, row_num){
         return new FixedCommentTimeLine(
             parent_id,
             { 
                 selector: selector, 
-                duration: duration 
+                duration: duration,
+                row_num: row_num
             });     
     }
 

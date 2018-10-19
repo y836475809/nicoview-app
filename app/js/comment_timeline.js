@@ -5,7 +5,7 @@ const anime = require("animejs");
 class TimeLine {
     /**
      * @param {string} parent_selector
-     * @param {{selector: string, duration: number}} params
+     * @param {{selector: string, duration: number, row_num: number}} params
      */
     constructor(parent_selector, params) {
         this.parent_selector = parent_selector;
@@ -40,7 +40,7 @@ class TimeLine {
     // }
 
     getRowHeight(view_height){
-        return Math.floor(view_height/12);
+        return view_height/this.params.row_num;
     }
 
     delete() {
@@ -214,6 +214,7 @@ class FixedCommentTimeLine extends TimeLine {
     create() {
         const selector = this.params.selector;
         const duration = this.params.duration;
+        const row_num = this.params.row_num;
 
         if (this.timeline != null) {
             this.timeline.pause();
@@ -228,11 +229,16 @@ class FixedCommentTimeLine extends TimeLine {
             elm.style.opacity = 0;
             elm.style.left = (area_width / 2 - parseInt(elm.getAttribute("data-width")) / 2) + "px";
             const rowindex = parseInt(elm.getAttribute("data-rowindex"));
-            elm.style.top = (rowindex * row_h) + "px";
+            const data_type = elm.getAttribute("data-type");
+            if(data_type=="ue"){
+                elm.style.top = (rowindex * row_h) + "px";
+            }else if(data_type=="shita"){
+                elm.style.top = ((row_num - rowindex - 1) * row_h) + "px";
+            }
         });
 
         anime.easings["fixedCommentEasing"] = function(t) {
-            if(t>0.01 && t<0.999){
+            if(t>0.0 && t<1.0){
                 return 1;
             }
             return 0;
@@ -243,7 +249,14 @@ class FixedCommentTimeLine extends TimeLine {
             },
             targets: selector,
             delay: (el) => {
-                return parseInt(el.getAttribute("data-delay")) - this.start_time;
+                return parseFloat(el.getAttribute("data-delay")) - this.start_time;
+            },
+            complete: (anim) => {
+                console.log("complete=", selector);
+                anim.animatables.forEach((obj) => {
+                    obj.target.style.display = "none";
+                });
+                this.is_cpmpleted = true;
             },
             easing: "fixedCommentEasing",
             opacity: [1],

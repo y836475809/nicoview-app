@@ -151,6 +151,8 @@ class CommentTimeLineManager {
             }else{
                 elm.style.fontSize = Math.floor(view_height/20) + "px";
             } 
+            elm.style.opacity = 0;
+            elm.style.display = "block";           
         });
         console.log("sizeSetting4=", performance.now());
         
@@ -163,6 +165,10 @@ class CommentTimeLineManager {
             elm.setAttribute("data-width", width.toString());
         });
         console.log("sizeSetting6=", performance.now());
+        elms.forEach((elm) => {
+            elm.style.display = "none";
+        });
+        console.log("sizeSetting7=", performance.now());
     }
 
     getEachComments(comments) {

@@ -25,7 +25,7 @@ class TimeLine {
         let elms = parent.querySelectorAll(this.params.selector);
         elms.forEach((elm, index) => {
             func(elm, index);
-        });        
+        });
     }
 
     getRowHeight(view_height){
@@ -49,9 +49,6 @@ class TimeLine {
     }
 
     reset() {
-        this.elmsforEach((elm)=>{
-            elm.style.display = "none";
-        });
         this.create();
     }
 
@@ -244,7 +241,7 @@ class FixedCommentTimeLine extends TimeLine {
             duration:duration,
             loop: false,
             autoplay: false
-        }); 
+        });
     }
 }
 

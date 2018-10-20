@@ -30,7 +30,11 @@
 
 <script>
     /* globals riot */
-    const obs = riot.observable();
+    const remote = require("electron").remote;
+    var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
+    var base_dir = shared_obj.base_dir; // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
+
     riot.mount("main-page");
 
     const timeout = 200;

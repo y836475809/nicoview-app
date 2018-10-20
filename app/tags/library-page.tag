@@ -14,16 +14,12 @@
 <context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
+    /* globals base_dir obs opts */
     this.items = [
         { title: 'First item' , itemkey: "First"},
         { title: 'Second item', itemkey: "Second"},
         { title: 'Third item', itemkey: "Third"}
     ];
-    const remote = require('electron').remote;
-    const ipc = require('electron').ipcRenderer;
-
-    const shared_obj = remote.getGlobal('sharedObj');
-    const base_dir = shared_obj.base_dir;
 
     const DB = require(`${base_dir}/app/js/db`).DB;
     const serializer = require(`${base_dir}/app/js/serializer`);

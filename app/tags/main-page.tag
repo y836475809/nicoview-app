@@ -34,11 +34,7 @@
     </div>
 
     <script>
-        /* globals obs */
-        const remote = require("electron").remote;
-        const shared_obj = remote.getGlobal("sharedObj");
-        const base_dir = shared_obj.base_dir;
-        
+        /* globals obs shared_obj base_dir */        
         const config = shared_obj.config;
 
         let riot = require("riot");

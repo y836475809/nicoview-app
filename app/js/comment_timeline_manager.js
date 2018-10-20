@@ -1,4 +1,3 @@
-// @ts-check
 
 const FlowComment = require("./flow_comment");
 const FixedComment = require("./fixed_comment");

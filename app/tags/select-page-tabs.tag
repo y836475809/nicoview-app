@@ -13,7 +13,7 @@
         }
         .tabs::after {
             display: table;
-            content: '';
+            content: "";
             clear: both;
         }
         .tabs > li {
@@ -34,7 +34,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            content: '';
+            content: "";
             border-top: 3px solid #fd6d4f;
             box-shadow: 0 0 8px rgba(234, 64, 26, .6);
         }

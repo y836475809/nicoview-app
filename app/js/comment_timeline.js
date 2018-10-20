@@ -1,4 +1,3 @@
-// @ts-check
 
 const anime = require("animejs");
 

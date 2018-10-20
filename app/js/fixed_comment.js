@@ -1,4 +1,3 @@
-// @ts-check
 
 class FixedComment{
     constructor(row_num, duration){

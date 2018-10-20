@@ -34,13 +34,14 @@
     </div>
 
     <script>
-        const remote = require('electron').remote;
-        const shared_obj = remote.getGlobal('sharedObj');
+        /* globals obs */
+        const remote = require("electron").remote;
+        const shared_obj = remote.getGlobal("sharedObj");
         const base_dir = shared_obj.base_dir;
         
         const config = shared_obj.config;
 
-        let riot = require('riot');
+        let riot = require("riot");
         // let obs = riot.observable();
 
         require(`${base_dir}/app/tags/select-page-tabs.tag`);
@@ -60,10 +61,10 @@
             page3.style.display = list[2];  
         };
 
-        this.on('mount', function () {
-            riot.mount('select-page-tabs', {tabs:['Tab 1','Tab 2','Tab 3']});
-            riot.mount('#page1 library-page', { "config": config });
-            riot.mount('#page2 search-page');             
+        this.on("mount", function () {
+            riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
+            riot.mount("#page1 library-page", { "config": config });
+            riot.mount("#page2 search-page");             
             select_page(this.index);
         });
 
@@ -72,7 +73,7 @@
             select_page(index);
         });
         
-        obs.on('resizeEndEvent', function (size) {
+        obs.on("resizeEndEvent", function (size) {
             obs.trigger("pageResizedEvent", {
                 w: size.w, 
                 h: size.h - 200 

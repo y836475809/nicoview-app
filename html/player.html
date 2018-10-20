@@ -23,28 +23,28 @@
 <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
 <!--<script src="app/app.js"></script>-->
 <script>
-    const remote = require('electron').remote
-    const base_dir = remote.getGlobal('sharedObj').base_dir
-    var ipc = require('electron').ipcRenderer
-    var riot = require('riot')
+    const remote = require("electron").remote;
+    const base_dir = remote.getGlobal("sharedObj").base_dir;
+    const ipc = require("electron").ipcRenderer;
+    const riot = require("riot");
 
-    var obs = riot.observable();
+    const obs = riot.observable();
 
-    require(`${base_dir}/app/tags/player-page.tag`)
-    riot.mount('player-page');
+    require(`${base_dir}/app/tags/player-page.tag`);
+    riot.mount("player-page");
     
-    const timeout = 200
-    let timer
-    window.addEventListener('resize', () => {
+    const timeout = 200;
+    let timer;
+    window.addEventListener("resize", () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             obs.trigger("resizeEndEvent", { w: window.innerWidth, h: window.innerHeight });
         }, timeout);
-    })
+    });
 
-    ipc.on('request-send-video-data', (event, arg) => {
-        obs.trigger("receivedData", arg)
-    })
+    ipc.on("request-send-video-data", (event, arg) => {
+        obs.trigger("receivedData", arg);
+    });
 
 </script>
 

@@ -1,4 +1,3 @@
-// @ts-check
 
 class FlowComment {
     constructor(row_num, view_width, duration=3000) {

@@ -44,8 +44,9 @@
     </div>
 
     <script>
-        const base_dir = remote.getGlobal('sharedObj').base_dir;
-        let riot = require('riot');
+        /* globals riot obs remote */
+        const base_dir = remote.getGlobal("sharedObj").base_dir;
+        let riot = require("riot");
 
         require(`${base_dir}/app/tags/player-tags.tag`);
         require(`${base_dir}/app/tags/player-video.tag`);

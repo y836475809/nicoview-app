@@ -96,20 +96,20 @@
             this.update();
         };
 
-        this.on('mount', () => {
+        this.on("mount", () => {
             this.duration = 0;
             updateSeek(0);
             this.update();
         });
 
-        obs.on('seek_reload', (duration) => {
+        obs.on("seek_reload", (duration) => {
             this.duration = duration;
             updateSeek(0);
 
             this.update();
         });
 
-        obs.on('seek_update', (current) => {
+        obs.on("seek_update", (current) => {
             updateSeek(current);
         });
     </script>

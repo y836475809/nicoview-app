@@ -26,6 +26,7 @@
 <table ref="dt" class="display stripe hover" style="width:100%"></table>
 
 <script>
+    /* globals opts obs $ */
     const params = opts.params.dt;
 
     let getDataTableElm = ()=>{
@@ -48,7 +49,7 @@
     this.ress = (size)=> {
         const h = size.h;
         let scroll_body = this.root.querySelector("div.dataTables_scrollBody");
-        $(scroll_body).css('height', h);
+        $(scroll_body).css("height", h);
 
         let table = getDataTable();
         table.columns.adjust();
@@ -61,22 +62,22 @@
 
     this.showContextMenu = (e)=>{};
 
-    var selselect = function(){
+    let selselect = function(){
         let selindex=0;
 
         return function(elm){
             let table = getDataTable(); 
-            var data = table.row(elm).data();
+            // const data = table.row(elm).data();
             let new_index = table.row(elm).index();
             console.log("mousedown ", table.row(elm).index()); 
-            if ( $(elm).hasClass('selected') ) {
+            if ( $(elm).hasClass("selected") ) {
                 if(selindex!==new_index)
                 {
-                    $(elm).removeClass('selected');
+                    $(elm).removeClass("selected");
                 }     
             }else {
-                table.$('tr.selected').removeClass('selected');
-                $(elm).addClass('selected');
+                table.$("tr.selected").removeClass("selected");
+                $(elm).addClass("selected");
             } 
             selindex=new_index;        
         };
@@ -84,14 +85,14 @@
 
     this.getSelectedDatas = ()=>{
         const table = getDataTable(); 
-        const elms = table.$('tr.selected').toArray();
-        var datas = elms.map((elm)=>{
+        const elms = table.$("tr.selected").toArray();
+        let datas = elms.map((elm)=>{
             return table.row(elm).data();
         });
         return datas;
     };
 
-    this.on('mount', function () {  
+    this.on("mount", function () {  
         let table = getDataTableElm();
         table.DataTable({
             dom: params.dom,
@@ -107,14 +108,14 @@
             stateSave: params.stateSave,
             lengthMenu: params.lengthMenu,
             displayLength: params.displayLength,
-        })
+        });
 
-        table.on('page.dt', function(){
+        table.on("page.dt", function(){
             $("div.dataTables_scrollBody").scrollTop(0);
-         });
+        });
 
         let table_body = this.root.querySelector("table tbody");
-        $(table_body).on('mousedown', 'tr', function(e){
+        $(table_body).on("mousedown", "tr", function(e){
             selselect(this);
             //return false;
         });
@@ -124,7 +125,7 @@
             return false;
         });
 
-        $(table_body).on('dblclick', 'tr', function (){
+        $(table_body).on("dblclick", "tr", function (){
             let table = getDataTable(); 
             const data = table.row(this).data();
             params.dblclickRow(data);

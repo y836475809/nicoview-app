@@ -35,17 +35,18 @@
     <player-seek ref="seek" class="seek"></player-seek>
 
     <script>
-        require('./player-seek.tag');
-        riot.mount('player-seek');
+        /* globals riot obs */
+        require("./player-seek.tag");
+        riot.mount("player-seek");
 
         let setBtnState = (state)=>{
-            let btn = this.root.querySelector('div.play');
-            btn.setAttribute('data-state', state);
+            let btn = this.root.querySelector("div.play");
+            btn.setAttribute("data-state", state);
         };
         
         let getBtnState = ()=>{
-            let btn = this.root.querySelector('div.play');
-            return btn.getAttribute('data-state');
+            let btn = this.root.querySelector("div.play");
+            return btn.getAttribute("data-state");
         };
 
         let isPause = ()=>{
@@ -65,7 +66,7 @@
             }
         };
 
-        this.on('mount', ()=> {
+        this.on("mount", ()=> {
             setBtnState("stop");
 
             obs.on("resizeEndEvent", (video_size) => { 

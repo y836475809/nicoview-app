@@ -15,12 +15,12 @@
 
 <script>
     this.items = [
-        { title: 'First item' , itemkey: "First"},
-        { title: 'Second item', itemkey: "Second"}
+        { title: "First item" , itemkey: "First"},
+        { title: "Second item", itemkey: "Second"}
     ];
 
-    const remote = require('electron').remote;
-    const shared_obj = remote.getGlobal('sharedObj');
+    const remote = require("electron").remote;
+    const shared_obj = remote.getGlobal("sharedObj");
     const base_dir = shared_obj.base_dir;
 
     require(`${base_dir}/app/tags/base-datatable.tag`);
@@ -34,18 +34,18 @@
     this.params = {};
     this.params.dt = {
         columns: [
-            { title: 'image' },
-            { title: 'id' },
-            { title: 'name' },
-            { title: 'office' },
-            { title: 'position' }
+            { title: "image" },
+            { title: "id" },
+            { title: "name" },
+            { title: "office" },
+            { title: "position" }
         ],
         columnDefs: [{
             targets: 0,
             orderable: false,
             data: "image",
             render: function (data, type, row, meta) {
-                return `<img src='${data}'>`
+                return `<img src="${data}">`
             },
         },
         { targets: 1, data: "id" },
@@ -56,8 +56,8 @@
             handleWidth: 10,
             exclude: [0]
         },
-        dom: 'Zfrtip',
-        scrollY:'400px',
+        dom: "Zfrtip",
+        scrollY:"400px",
         scrollCollapse:false,
         autoWidth: true,
         deferRender: true,
@@ -68,7 +68,7 @@
         }          
     };
 
-    this.on('mount', function () {
+    this.on("mount", function () {
         let contextmenu = this.refs.ctm;
 
         this.refs.dt.showContextMenu=(e)=>{
@@ -83,7 +83,7 @@
         };    
     });
 
-    obs.on('pageResizedEvent', (size)=>{
+    obs.on("pageResizedEvent", (size)=>{
         if(this.refs!==undefined){
             this.refs.dt.ress(size);
         }

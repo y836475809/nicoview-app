@@ -29,28 +29,29 @@
     </div>
 
     <script>
+        /* globals $ */
         let self = this;
         this.show = (e)=>{
-            let menu = this.root.querySelector('div.conmenu');
-            menu.style.left = e.pageX + 'px';
-            menu.style.top = e.pageY + 'px';
-            menu.classList.add('on');              
+            let menu = this.root.querySelector("div.conmenu");
+            menu.style.left = e.pageX + "px";
+            menu.style.top = e.pageY + "px";
+            menu.classList.add("on");              
         };
 
         this.callback = (e)=>{};
 
-        this.on('mount', function () {
-            let menu = this.root.querySelector('div.conmenu');
+        this.on("mount", function () {
+            let menu = this.root.querySelector("div.conmenu");
 
-            let elms = this.root.querySelectorAll('div.conmenu .conmenu-item');
+            let elms = this.root.querySelectorAll("div.conmenu .conmenu-item");
             elms.forEach((elem)=>{
                 elem.addEventListener("click", function(e){
                     const target = e.target;
-                    const key = target.getAttribute('data-itemkey');
+                    const key = target.getAttribute("data-itemkey");
                     self.callback({key:key});
 
-                    if(menu.classList.contains('on')){
-                        menu.classList.remove('on');
+                    if(menu.classList.contains("on")){
+                        menu.classList.remove("on");
                     }
                     return false;                
                 });
@@ -58,9 +59,9 @@
 
             $("html").mousedown(()=>{
                 // console.log("html click");
-                const elms = this.root.querySelectorAll('div.conmenu .conmenu-item:hover');
-                if(elms.length===0 && menu.classList.contains('on')){
-                    menu.classList.remove('on');
+                const elms = this.root.querySelectorAll("div.conmenu .conmenu-item:hover");
+                if(elms.length===0 && menu.classList.contains("on")){
+                    menu.classList.remove("on");
                 }       
             });         
         });

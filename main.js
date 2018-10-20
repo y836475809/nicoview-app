@@ -68,7 +68,7 @@ app.on("activate", () => {
 
 let creatPlayerWindow = (data) => {
     if (player_win === null) {
-        const player_path = `file://${__dirname}/html/player.html`
+        const player_path = `file://${__dirname}/html/player.html`;
         player_win = new BrowserWindow({ width: 800, height: 600 });
         player_win.loadURL(player_path);
 

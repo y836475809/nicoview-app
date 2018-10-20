@@ -64,10 +64,9 @@
 </body>
 
 <script>
-    // @ts-check
-    var anime = require('animejs');
-    var util = require("./test_comments");
-    var CommentTimeLineManager = require("../app/js/comment_timeline_manager");
+    // const anime = require("animejs");
+    const util = require("./test_comments");
+    const CommentTimeLineManager = require("../app/js/comment_timeline_manager");
   
     let ctls = null;
     let cutimer = 0;
@@ -90,7 +89,7 @@
 
         const div_num = parseInt(document.getElementById("sample-div-num").value);
         createTimeLines(commnets, div_num);
-    }
+    };
 
     let loadFixedSample = ()=>{
         init();
@@ -104,7 +103,7 @@
 
         const div_num = parseInt(document.getElementById("fixed-sample-div-num").value);
         createTimeLines(commnets, div_num);
-    }
+    };
 
     let loadRandom = ()=>{
         init();
@@ -119,7 +118,7 @@
 
         const div_num = parseInt(document.getElementById("random-div-num").value);
         createTimeLines(commnets, div_num);
-    }
+    };
 
     let createTimeLines = (commnets, div_num)=>{
         const parent_id = "area";
@@ -133,27 +132,27 @@
 
         // console.log(".comment=", document.querySelectorAll(".comment"));
         console.log(".comment.length=", document.querySelectorAll(".comment").length);
-    }
+    };
     
     let play = ()=>{   
-        let btn = document.querySelector('#play');
-        if(btn.getAttribute('data-func')=="play"){
+        let btn = document.querySelector("#play");
+        if(btn.getAttribute("data-func")=="play"){
             ctls.play();
 
             cutimer_id = setInterval(()=>{
                 const target = document.getElementById("timer");
                 target.textContent = cutimer;
                 cutimer+=100;
-            }, 100);;
+            }, 100);
 
             btn.textContent = "pause";
-            btn.setAttribute('data-func', "pause");
+            btn.setAttribute("data-func", "pause");
         }else{
             ctls.pause();
 
             clearInterval(cutimer_id);
             btn.textContent = "play";
-            btn.setAttribute('data-func', "play");
+            btn.setAttribute("data-func", "play");
         }
     };
 
@@ -171,7 +170,7 @@
         if(ctls!=null){
             ctls.reset();
         }
-    }
+    };
 
     let init = ()=>{
         cutimer = 0;
@@ -179,11 +178,11 @@
         if(ctls!=null){
             ctls.delete();
         }
-    }
+    };
 
     let timer;
     const timeout = 200;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             ctls.reset();

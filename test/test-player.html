@@ -19,17 +19,17 @@
 </body>
 
 <script>
-    const fs = require('fs');
-    const remote = require('electron').remote;
-    const shared_obj = remote.getGlobal('sharedObj');
+    const fs = require("fs");
+    const remote = require("electron").remote;
+    const shared_obj = remote.getGlobal("sharedObj");
     const base_dir = shared_obj.base_dir;
-    const video_src = shared_obj.config.video_src;
-    var riot = require('riot');
-    var obs = riot.observable();
+    // const video_src = shared_obj.config.video_src;
+    const riot = require("riot");
+    const obs = riot.observable();
     require(`${base_dir}/app/tags/player-page.tag`);
     const reader = require("../app/js/reader");
 
-    riot.mount('player-page');
+    riot.mount("player-page");
 
     let start = () => {
         // let commnets = []
@@ -51,13 +51,13 @@
 
     const timeout = 200;
     let timer;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             obs.trigger("resizeEndEvent", {
-                    w: window.innerWidth, 
-                    h: window.innerHeight 
-                 });
+                w: window.innerWidth, 
+                h: window.innerHeight 
+            });
         }, timeout);
     });
 

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <script>
-        window.jQuery = window.$ = require('jquery');
+        window.jQuery = window.$ = require("jquery");
     </script>
     <!-- <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.min.js"></script> -->
     <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
@@ -29,18 +29,19 @@
 </body>
 
 <script>
-    var obs = riot.observable();
-    riot.mount('main-page');
+    /* globals riot */
+    const obs = riot.observable();
+    riot.mount("main-page");
 
     const timeout = 200;
     let timer;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
             obs.trigger("resizeEndEvent", {
-                    w: window.innerWidth, 
-                    h: window.innerHeight 
-                 });
+                w: window.innerWidth, 
+                h: window.innerHeight 
+            });
         }, timeout);
     });
 

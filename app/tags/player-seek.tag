@@ -60,9 +60,10 @@
     <div class="duration">{this.fmt_duration}</div>
 
     <script>
+        /* globals obs */
         const time_format = require("../../app/js/time_format");
 
-        mousedown(e){
+        this.mousedown = (e) => {
             if(this.duration===0){
                 return;
             }

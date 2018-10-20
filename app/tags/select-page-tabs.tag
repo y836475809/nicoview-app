@@ -47,8 +47,9 @@
     <ul class="tabs">
         <li each="{tab, i in tabs}" class="{is-active: parent.index === i}" onclick="{parent.changeTab}">{tab}</li>
     </ul>    
-    <script>    
-        var self = this;
+    <script>   
+        /* globals obs opts */ 
+        let self = this;
     
         // タブのタイトルを配列で管理
         self.tabs = opts.tabs;
@@ -57,9 +58,10 @@
         self.index = 0;
     
         // タブをクリックでindexを切り替え
-        changeTab(event) {
+        this.changeTab = (event) => {
+        // changeTab(event) {
             self.index = event.item.i;
             obs.trigger("selindex", self.index);
-        }
+        };
     </script>
 </select-page-tabs>

@@ -63,8 +63,10 @@
             video.src = data.src;
             video.type = data.type;
          
-            const div_num = 200;
-            createTimeLines(data.commnets, div_num);
+            if(data.commnets.length>0){
+                const div_num = 200;
+                createTimeLines(data.commnets, div_num);
+            }
 
             video.load();
         });

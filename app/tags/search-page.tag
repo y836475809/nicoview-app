@@ -14,21 +14,17 @@
 <context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
+    /* globals base_dir obs */
     this.items = [
         { title: "First item" , itemkey: "First"},
         { title: "Second item", itemkey: "Second"}
     ];
 
-    const remote = require("electron").remote;
-    const shared_obj = remote.getGlobal("sharedObj");
-    const base_dir = shared_obj.base_dir;
-
     require(`${base_dir}/app/tags/base-datatable.tag`);
     require(`${base_dir}/app/tags/context-menu.tag`);
 
-    serach(){
+    this.serach = () => {
         console.log("serach");
-
     };
 
     this.params = {};
@@ -45,7 +41,7 @@
             orderable: false,
             data: "image",
             render: function (data, type, row, meta) {
-                return `<img src="${data}">`
+                return `<img src="${data}">`;
             },
         },
         { targets: 1, data: "id" },
@@ -68,7 +64,7 @@
         }          
     };
 
-    this.on("mount", function () {
+    this.on("mount", () => {
         let contextmenu = this.refs.ctm;
 
         this.refs.dt.showContextMenu=(e)=>{

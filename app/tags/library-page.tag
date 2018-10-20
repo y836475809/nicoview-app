@@ -16,11 +16,12 @@
 <script>
     /* globals base_dir obs opts */
     this.items = [
-        { title: 'First item' , itemkey: "First"},
-        { title: 'Second item', itemkey: "Second"},
-        { title: 'Third item', itemkey: "Third"}
+        { title: "First item" , itemkey: "First"},
+        { title: "Second item", itemkey: "Second"},
+        { title: "Third item", itemkey: "Third"}
     ];
 
+    const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
     const serializer = require(`${base_dir}/app/js/serializer`);
     const time_format = require(`${base_dir}/app/js/time_format`);
@@ -32,7 +33,7 @@
 
     const config = opts.config;
 
-    read(){
+    this.read = ()=>{
         const data_path = config.library_path;
         const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
         const video = serializer.load(`${data_path}/db/video.json`);
@@ -54,16 +55,16 @@
         this.refs.dt.setData(datas);
     };
 
-    this.params = {}
+    this.params = {};
     this.params.dt = {
         columns : [
-            { title: 'image' },
-            { title: 'id' },
-            { title: 'name' },
-            { title: 'creation_date' },
-            { title: 'pub_date' },
-            { title: 'play_count' },
-            { title: 'time' }
+            { title: "image" },
+            { title: "id" },
+            { title: "name" },
+            { title: "creation_date" },
+            { title: "pub_date" },
+            { title: "play_count" },
+            { title: "time" }
         ],
         columnDefs: [
             {
@@ -71,7 +72,7 @@
                 orderable: false,
                 data: "image",
                 render: function (data, type, row, meta) {
-                    return `<img src='${data}' width="130" height="100">`
+                    return `<img src="${data}" width="130" height="100">`
                 },
             },
             { targets: 1, data: "id" },
@@ -97,8 +98,8 @@
             handleWidth: 10,
             exclude: [0],
         },
-        dom: 'Zlfrtip',  
-        scrollY:'400px',
+        dom: "Zlfrtip",  
+        scrollY:"400px",
         scrollCollapse:false,
         autoWidth: true,
         paging: false,
@@ -114,12 +115,12 @@
                 type: video_type,
                 commnets: []
             };       
-            ipc.send('request-show-player', play_data);
+            ipc.send("request-show-player", play_data);
         }
     };
 
 
-    this.on('mount', function () {
+    this.on("mount", function () {
         let contextmenu = this.refs.ctm;
 
         this.refs.dt.showContextMenu=(e)=>{
@@ -134,7 +135,7 @@
         };        
     });
 
-    obs.on('pageResizedEvent', (size)=> {
+    obs.on("pageResizedEvent", (size)=> {
         if(this.refs!==undefined){
             this.refs.dt.ress(size);
         }

@@ -26,9 +26,9 @@
     const remote = require("electron").remote;
     const base_dir = remote.getGlobal("sharedObj").base_dir;
     const ipc = require("electron").ipcRenderer;
-    const riot = require("riot");
 
-    const obs = riot.observable();
+    var riot = require("riot"); // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
 
     require(`${base_dir}/app/tags/player-page.tag`);
     riot.mount("player-page");

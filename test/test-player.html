@@ -22,10 +22,11 @@
     const fs = require("fs");
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
-    const base_dir = shared_obj.base_dir;
+    var base_dir = shared_obj.base_dir;  // eslint-disable-line
     // const video_src = shared_obj.config.video_src;
-    const riot = require("riot");
-    const obs = riot.observable();
+    var riot = require("riot");  // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
+
     require(`${base_dir}/app/tags/player-page.tag`);
     const reader = require("../app/js/reader");
 

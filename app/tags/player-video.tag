@@ -24,9 +24,7 @@
     </div>
 
     <script>
-        /* globals obs */
-        const remote = require("electron").remote;
-        const base_dir = remote.getGlobal("sharedObj").base_dir;
+        /* globals base_dir obs */
         // var $ = jQuery = require("jquery");
         // var anime = require("animejs");
 
@@ -56,7 +54,7 @@
             ctls.create(commnets, duration);
             console.log("ctl_list.length=", ctls.timelines.length);
             console.log(".comment.length=", document.querySelectorAll(".comment").length);
-        }
+        };
 
         obs.on("receivedData", (data) => {
             console.log("data=", data);

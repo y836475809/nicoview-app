@@ -87,6 +87,10 @@ class CommentTimeLineManager {
             ".fixed", duration, this.createFixedTimeLine);
 
         console.log("commnets10=", performance.now());
+
+        this.setdisplayNone();
+
+        console.log("commnets11=", performance.now());
     }
 
     delete() {
@@ -99,6 +103,23 @@ class CommentTimeLineManager {
         });
         
         this.timelines = [];
+    }
+
+    setdisplayNone(){
+        let parent_elm = document.getElementById(this.parent_id);
+        let elms = parent_elm.querySelectorAll(".comment");
+
+        let fragment = document.createDocumentFragment();
+        elms.forEach((elm) => {
+            parent_elm.removeChild(elm);
+            fragment.appendChild(elm);
+        });
+
+        elms.forEach((elm) => {
+            elm.style.display = "none";
+        });
+        
+        parent_elm.appendChild(fragment);  
     }
 
     sizeSetting(){

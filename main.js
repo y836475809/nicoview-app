@@ -9,6 +9,8 @@ const { ipcMain } = electron;
 const fs = require("fs");
 const req_path = require("path");
 
+app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
+
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;

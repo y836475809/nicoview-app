@@ -63,6 +63,7 @@
             video.src = data.src;
             video.type = data.type;
          
+            ctls = null;
             if(data.commnets.length>0){
                 const div_num = 200;
                 createTimeLines(data.commnets, div_num);
@@ -70,7 +71,7 @@
 
             video.load();
         });
-        
+
         this.on("mount", function () {
             console.log("mount");
 
@@ -89,12 +90,16 @@
             this.refs.palyermain.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
                 // comment_anime.play();
-                ctls.play();
+                if(ctls!=null){
+                    ctls.play();
+                }
             });
             this.refs.palyermain.addEventListener("pause", () => {
                 console.log("addEventListener pauseによるイベント発火");
                 // comment_anime.pause();
-                ctls.pause();
+                if(ctls!=null){
+                    ctls.pause();
+                }
             });
 
             this.refs.palyermain.addEventListener("timeupdate", () => {
@@ -126,17 +131,25 @@
             obs.on("on_seeked", (current) => {           
                 if(this.refs.palyermain.paused){
                     this.refs.palyermain.currentTime = current;
-                    ctls.seek(current * 1000);
+                    if(ctls!=null){
+                        ctls.seek(current * 1000);
+                    }
                 }else{
                     console.log("player paused");
                     this.refs.palyermain.pause();
-                    ctls.pause();
+                    if(ctls!=null){
+                        ctls.pause();
+                    }
 
                     this.refs.palyermain.currentTime = current;
-                    ctls.seek(current * 1000);
+                    if(ctls!=null){
+                        ctls.seek(current * 1000);
+                    }
 
                     this.refs.palyermain.play();
-                    ctls.play();
+                    if(ctls!=null){
+                        ctls.play();
+                    }
                 }    
             });
 

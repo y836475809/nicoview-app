@@ -153,6 +153,10 @@
                 }    
             });
 
+            obs.on("on_change_volume", (volume) => {
+                this.refs.palyermain.volume = volume ;
+            });
+
             obs.on("resizeEndEvent", function (wsize) {
                 // ff()
             });

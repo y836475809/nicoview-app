@@ -4,7 +4,7 @@
             display:grid;
             width: 100%;
             height: 80px;
-            grid-template-columns: 50px 1fr 10px;
+            grid-template-columns: 50px 1fr 100px;
             background-color: #cccccc;
             padding: 5px;
         }
@@ -28,16 +28,22 @@
         }
         .seek{
             grid-column: 2 / 3;
-        }       
+        }
+        .volume{
+            grid-column: 3 / 4;
+        }    
     </style>
 
     <div class="play" onclick={play}></div>
     <player-seek ref="seek" class="seek"></player-seek>
+    <player-volume class="volume"></player-volume>
 
     <script>
         /* globals riot obs */
         require("./player-seek.tag");
+        require("./player-volume.tag");
         riot.mount("player-seek");
+        riot.mount("player-volume");
 
         let setBtnState = (state)=>{
             let btn = this.root.querySelector("div.play");

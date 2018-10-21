@@ -26,6 +26,7 @@
             "error",
             "always"
         ],
-        "no-var":"error"
+        "no-var":"error",
+        "no-console":"warn"
     }
 }

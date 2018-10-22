@@ -30,8 +30,12 @@
     </div>
 
     <script>
-        /* globals opts obs */
-        const default_volume = opts.volume;
+        /* globals obs */
+        let default_volume = localStorage["player.volume"];
+        if(!default_volume){
+            default_volume = 0.5;
+        }
+
         this.picker_mousedown = (e) => {
             let picker = this.root.querySelector("div.picker");
             const left = parseInt(picker.style.left) -5 + e.layerX;

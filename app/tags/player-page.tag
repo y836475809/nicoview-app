@@ -40,14 +40,11 @@
         </div>
     </div>
     <div id="player-controls-content">
-        <player-controls player_config={this.player_config}></player-controls>
+        <player-controls></player-controls>
     </div>
 
     <script>
-        /* globals base_dir shared_obj obs */
-        const config = shared_obj.config;
-        this.player_config = config.player_config;
-
+        /* globals base_dir obs */
         require(`${base_dir}/app/tags/player-tags.tag`);
         require(`${base_dir}/app/tags/player-video.tag`);
         require(`${base_dir}/app/tags/player-controls.tag`);

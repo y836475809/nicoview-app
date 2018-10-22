@@ -36,13 +36,10 @@
 
     <div class="play" onclick={play}></div>
     <player-seek ref="seek" class="seek"></player-seek>
-    <player-volume class="volume" volume={this.player_volume}></player-volume>
+    <player-volume class="volume"></player-volume>
 
     <script>
-        /* globals opts riot obs */
-        const player_config = opts.player_config;
-        this.player_volume = player_config.volume;
-
+        /* globals riot obs */
         require("./player-seek.tag");
         require("./player-volume.tag");
         riot.mount("player-seek");

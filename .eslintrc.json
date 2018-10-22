@@ -9,6 +9,9 @@
     "parserOptions": {
         "ecmaVersion": 2016
     },
+    "plugins": [
+        "html"
+    ],
     "rules": {
         "indent": [
             "error",

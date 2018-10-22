@@ -37,6 +37,10 @@
 
     riot.mount("main-page");
 
+    obs.on("on_error", (error)=> {
+        console.error(error);
+    });
+
     const timeout = 200;
     let timer;
     window.addEventListener("resize", () => {

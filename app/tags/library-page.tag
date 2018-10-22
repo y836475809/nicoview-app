@@ -14,7 +14,7 @@
 <context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
-    /* globals base_dir obs opts */
+    /* globals base_dir obs */
     this.items = [
         { title: "First item" , itemkey: "First"},
         { title: "Second item", itemkey: "Second"},
@@ -31,28 +31,34 @@
 
     let db = new DB();
 
-    const config = opts.config;
-
     this.read = ()=>{
-        const data_path = config.library_path;
-        const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
-        const video = serializer.load(`${data_path}/db/video.json`);
-        db.setData(dirpath, video);
+        let data_path = localStorage.getItem("library.path");
+        if(!data_path){ 
+            return;
+        }
 
-        let datas = new Array();
-        video.forEach((value, key) => {
-            datas.push({
-                image: db.getThumbPath(key),
-                id: key,
-                name: value["video_name"],
-                creation_date: value["creation_date"],
-                pub_date: value["pub_date"],
-                play_count: value["play_count"],
-                time: value["time"]}
-            );
-        });
+        try {
+            const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
+            const video = serializer.load(`${data_path}/db/video.json`);
+            db.setData(dirpath, video);
 
-        this.refs.dt.setData(datas);
+            let datas = new Array();
+            video.forEach((value, key) => {
+                datas.push({
+                    image: db.getThumbPath(key),
+                    id: key,
+                    name: value["video_name"],
+                    creation_date: value["creation_date"],
+                    pub_date: value["pub_date"],
+                    play_count: value["play_count"],
+                    time: value["time"]}
+                );
+            });
+
+            this.refs.dt.setData(datas);
+        } catch (error) {
+            obs.trigger("on_error", error);  
+        }
     };
 
     this.params = {};
@@ -72,7 +78,7 @@
                 orderable: false,
                 data: "image",
                 render: function (data, type, row, meta) {
-                    return `<img src="${data}" width="130" height="100">`
+                    return `<img src="${data}" width="130" height="100">`;
                 },
             },
             { targets: 1, data: "id" },

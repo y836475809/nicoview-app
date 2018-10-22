@@ -34,9 +34,7 @@
     </div>
 
     <script>
-        /* globals obs shared_obj base_dir */        
-        const config = shared_obj.config;
-
+        /* globals obs base_dir */
         let riot = require("riot");
         // let obs = riot.observable();
 
@@ -59,7 +57,7 @@
 
         this.on("mount", function () {
             riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
-            riot.mount("#page1 library-page", { "config": config });
+            riot.mount("#page1 library-page");
             riot.mount("#page2 search-page");             
             select_page(this.index);
         });

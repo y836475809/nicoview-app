@@ -6,22 +6,16 @@ const { BrowserWindow } = electron;
 
 const { ipcMain } = electron;
 
-const fs = require("fs");
-const req_path = require("path");
-
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
 let player_win = null;
-let config_json = {};
 
 function createWindow() {
-    config_json = getConfig();
     global.sharedObj = {
-        base_dir: __dirname,
-        config: config_json
+        base_dir: __dirname
     };
 
     let html = "html/index.html";
@@ -94,16 +88,3 @@ ipcMain.on("request-show-player", (event, arg) => {
     creatPlayerWindow(arg);
     player_win.show();
 });
-
-let setConfig = (key, value)=>{
-    const cp = app.getPath("userData");
-    const path = req_path.join(cp, "test_config.json"); 
-    config_json[key] = value;
-    fs.writeFileSync(path, JSON.stringify(config_json, null, 2));
-};
-
-let getConfig = ()=>{
-    const cp = app.getPath("userData");
-    const path = req_path.join(cp, "test_config.json"); 
-    return JSON.parse(fs.readFileSync(path, {encoding: "utf8"}));
-};

@@ -37,8 +37,7 @@
             picker.style.left = left + "px";
 
             let slider = this.root.querySelector("div.slider");
-            const per = left / slider.clientWidth;
-            const volume = per * this.duration;
+            const volume = left / slider.clientWidth;
 
             obs.trigger("on_change_volume", volume);
         };

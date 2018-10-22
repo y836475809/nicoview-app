@@ -31,38 +31,34 @@
 
     <script>
         /* globals obs */
-        let default_volume = localStorage["player.volume"];
+        let default_volume = localStorage.getItem("player.volume");
         if(!default_volume){
             default_volume = 0.5;
         }
 
         this.picker_mousedown = (e) => {
             let picker = this.root.querySelector("div.picker");
-            const left = parseInt(picker.style.left) -5 + e.layerX;
-            picker.style.left = left + "px";
-            let slider = this.root.querySelector("div.slider");
-            const volume = left / slider.clientWidth;
-
-            obs.trigger("on_change_volume", volume);
+            const left = parseInt(picker.style.left) + e.layerX;
+            updateVolume(left);
 
             e.stopPropagation();
         };
 
         this.slider_mousedown = (e) => {
-            let picker = this.root.querySelector("div.picker");
             const left = e.layerX;
-            picker.style.left = (left - 5) + "px";
-            let slider = this.root.querySelector("div.slider");
-            const volume = left / slider.clientWidth;
-
-            obs.trigger("on_change_volume", volume);  
+            updateVolume(left);
         };
 
-        obs.on("on_load_volume", (volume) => {
+        const updateVolume = (pos) => {
             let picker = this.root.querySelector("div.picker");
-            let slider = this.root.querySelector("div.slider");      
-            picker.style.left = volume * slider.clientWidth + "px";
-        });
+            picker.style.left = (pos - 5) + "px";
+
+            let slider = this.root.querySelector("div.slider");
+            const volume = pos / slider.clientWidth;
+
+            localStorage.setItem("player.volume", volume);
+            obs.trigger("on_change_volume", volume);  
+        };
 
         this.on("mount", ()=> {
             let picker = this.root.querySelector("div.picker");

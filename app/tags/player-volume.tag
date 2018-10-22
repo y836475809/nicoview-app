@@ -9,7 +9,7 @@
             background-color: #797b80;
             position: relative;
             top: 10px;
-            left: 15px;
+            left: 0px;
             width: 70px;
             height: 10px;
         }
@@ -30,7 +30,9 @@
     </div>
 
     <script>
-        /* globals obs */
+        /* globals opts obs */
+        const default_volume = opts.volume;
+
         this.mousedown = (e) => {
             let picker = this.root.querySelector("div.picker");
             const left = e.layerX;
@@ -50,6 +52,10 @@
 
         this.on("mount", ()=> {
             console.log("mount v");
+            let picker = this.root.querySelector("div.picker");
+            let slider = this.root.querySelector("div.slider");      
+            picker.style.left = default_volume * slider.clientWidth + "px";  
+            obs.trigger("on_change_volume", default_volume); 
         });
     </script>
 </player-volume>

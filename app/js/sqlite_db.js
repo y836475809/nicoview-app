@@ -34,7 +34,7 @@ class SQLiteDB {
         const values = res[0].values;
         values.forEach((value) => {
             const id = value[0];
-            const dirpath = decodeURI(value[1]);
+            const dirpath = decodeURIComponent(value[1]);
             this.dirpath_map.set(id, dirpath);
         });
     }
@@ -82,13 +82,13 @@ class SQLiteDB {
             const modification_date = value[6];
             const creation_date = value[7];
             const thumb_url = value[8];
-            const play_cont = value[9];
+            const play_count = value[9];
             const time = value[10];
             const last_play_date = value[11];
             const yet_reading = value[12];
             const pub_date = value[13];
 
-            const video_filename = path.basename(decodeURI(uri));
+            const video_filename = path.basename(decodeURIComponent(uri));
             const video_type = `video/${path.extname(uri).slice(1)}`;
 
             const tags = this.tag_map.get(id);
@@ -103,7 +103,7 @@ class SQLiteDB {
                     modification_date: modification_date,
                     creation_date: creation_date,
                     // thumb_url: thumb_url,
-                    play_cont: play_cont,
+                    play_count: play_count,
                     time: time,
                     last_play_date: last_play_date,
                     yet_reading: yet_reading,

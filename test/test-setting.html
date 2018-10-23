@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tets setting</title>
+    <script src="../node_modules/riot/riot+compiler.min.js"></script>
+</head>
+
+<body>
+    <setting-page></setting-page>
+</body>
+
+<script>
+    var riot = require("riot");  // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
+    
+    require("../app/tags/setting-page.tag");
+    riot.mount("setting-page");
+
+    obs.on("on_load_library", () => {
+        console.log("on_load_library");
+    });
+</script>
+
+</html>

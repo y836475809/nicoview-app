@@ -108,7 +108,9 @@
         scrollY:"400px",
         scrollCollapse:false,
         autoWidth: true,
-        paging: false,
+        paging: true,
+        displayLength:100,
+        lengthMenu: [ 100, 200, 300, 400, 500 ],
         deferRender: true,
         stateSave: true,
         dblclickRow: function(data){

@@ -14,13 +14,16 @@
 <script>
     var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-    
-    require("../app/tags/setting-page.tag");
-    riot.mount("setting-page");
+    try {
+        require("../app/tags/setting-page.tag");
+        riot.mount("setting-page");
 
-    obs.on("on_load_library", () => {
-        console.log("on_load_library");
-    });
+        obs.on("on_load_library", () => {
+            console.log("on_load_library");
+        });
+    } catch (error) {
+        console.log("error=", error);
+    }
 </script>
 
 </html>

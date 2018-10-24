@@ -50,17 +50,12 @@
             }
             const db_file_path = file_paths[0];
             const dist_dir = path.join(library_path, "db");
-            try {
-                fs.mkdir(dist_dir, (error) => {
-                    if(error.code!="EEXIST"){
-                        throw new Error(error);
-                    }
-                });                
-            } catch (error) {
-                obs.trigger("on_error", error);
-                return;
-            }
-
+            fs.mkdir(dist_dir, (error) => {
+                if(error.code!="EEXIST"){
+                    throw new Error(error);
+                }
+            });
+            
             const dir_file_path = path.join(dist_dir, "dirpath.json");
             const dir_video_path = path.join(dist_dir, "video.json");
             let db = new SQLiteDB();

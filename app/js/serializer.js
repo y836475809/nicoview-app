@@ -15,9 +15,12 @@ let load = function (file_path) {
  * @param {string} file_path 
  * @param {Map} obj 
  */
-let save = function (file_path, obj) {
+let save = function (file_path, obj, callback) {
     const data = JSON.stringify([...obj], null, "  ");
-    fs.writeFileSync(file_path, data, "utf-8");
+    if(!callback){
+        callback = (err)=>{};
+    }
+    fs.writeFile(file_path, data, "utf-8", callback);
 };
 
 exports.load = load;

@@ -8,10 +8,21 @@ class SQLiteDB {
      * 
      * @param {string} db_file_path 
      */
-    init(db_file_path) {
-        const sqlite_db = fs.readFileSync(db_file_path);
-        const uint_8array = new Uint8Array(sqlite_db);
-        this.db = new sql.Database(uint_8array);
+    init(db_file_path, errorCallback) {
+        fs.readFile(db_file_path, (err, data)=>{
+            if(err){
+                if(errorCallback){
+                    errorCallback(err);
+                }
+            }
+            else{
+                const uint_8array = new Uint8Array(data);
+                this.db = new sql.Database(uint_8array);
+                if(errorCallback){
+                    errorCallback(null);
+                }
+            }
+        });
     }
     get_dirpath() {
         return this.dirpath_map;

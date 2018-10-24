@@ -18,6 +18,11 @@
 
         let library_path = null;
 
+        this.on("mount", () => {
+            library_path = localStorage.getItem("library.path");
+            document.getElementById("library-path").setAttribute("value", library_path);
+        });
+
         this.read = ()=>{
             const dir_paths = dialog.showOpenDialog(null, {
                 properties: ["openDirectory"],
@@ -28,6 +33,8 @@
                 return;
             }
             library_path = dir_paths[0];
+            localStorage.setItem("library.path", library_path);
+
             document.getElementById("library-path").setAttribute("value", library_path);
         };
 
@@ -48,8 +55,16 @@
             if(!file_paths){
                 return;
             }
+            const dist_dirs = dialog.showOpenDialog(null, {
+                properties: ["openDirectory"],
+                title: "Select",
+                defaultPath: "."
+            });
+            if(!dist_dirs){
+                return;
+            }
             const db_file_path = file_paths[0];
-            const dist_dir = path.join(library_path, "db");
+            const dist_dir = dist_dirs[0];
             fs.mkdir(dist_dir, (error) => {
                 if(error.code!="EEXIST"){
                     throw new Error(error);
@@ -63,6 +78,13 @@
             db.read();
             serializer.save(dir_file_path, db.get_dirpath());
             serializer.save(dir_video_path, db.get_video());
+            
+            dialog.showMessageBox(null,{
+                type: "info",
+                buttons: ["OK"],
+                message: "finish"
+            });
+
         };
     </script>
 </setting-page>

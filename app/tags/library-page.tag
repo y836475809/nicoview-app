@@ -23,7 +23,7 @@
 
     const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
-    const serializer = require(`${base_dir}/app/js/serializer`);
+    // const serializer = require(`${base_dir}/app/js/serializer`);
     const time_format = require(`${base_dir}/app/js/time_format`);
 
     require(`${base_dir}/app/tags/base-datatable.tag`);
@@ -38,9 +38,11 @@
         }
 
         try {
-            const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
-            const video = serializer.load(`${data_path}/db/video.json`);
-            db.setData(dirpath, video);
+            // const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
+            // const video = serializer.load(`${data_path}/db/video.json`);
+            // db.setData(dirpath, video);
+            db.load(`${data_path}/library.json`);
+            const video = db.video_info;
 
             let datas = new Array();
             video.forEach((value, key) => {

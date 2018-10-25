@@ -1,6 +1,7 @@
 
 const fs = require("fs");
 const reader = require("./reader");
+const serializer = require("./serializer");
 
 class DB {
     constructor() {
@@ -15,6 +16,18 @@ class DB {
     setData(dir_path, video_info) {
         this.dir_path = dir_path;
         this.video_info = video_info;
+    }
+
+    load(file_path){
+        const datas = serializer.load(file_path);
+        if (!datas.has("dirpath")) {
+            throw Error("not find id=dirpath");
+        }
+        if (!datas.has("video")) {
+            throw Error("not find id=video");
+        }
+        this.dir_path = new Map(datas.get("dirpath"));
+        this.video_info = new Map(datas.get("video"));
     }
 
     /**

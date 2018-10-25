@@ -110,7 +110,7 @@
             }
 
             let db = new SQLiteDB();
-            function asyncFunc1() {
+            function asyncRead() {
                 // return new Promise(resolve => setTimeout(resolve, 5000));
                 return new Promise((resolve, reject) => {
                     db.init(db_file_path, (error)=>{
@@ -123,32 +123,20 @@
                     });
                 });
             }
-            function asyncFunc2() {
+            function asyncSave() {
                 return new Promise((resolve, reject) => {
                     if(!dist_path){
                         reject({
                             message:"dist_path is empty"
                         });
                     }
-                    const dist_file_path = path.join(dist_path, "dirpath.json");
-                    serializer.save(dist_file_path, db.get_dirpath(), (error)=>{
-                        if(error){
-                            reject(error);
-                        }else{
-                            resolve();
-                        }
-                    });
-                });
-            }
-            function asyncFunc3() {
-                return new Promise((resolve, reject) => {
-                    if(!dist_path){
-                        reject({
-                            message:"dist_path is empty"
-                        });
-                    }
-                    const dist_video_path = path.join(dist_path, "video.json");
-                    serializer.save(dist_video_path, db.get_video(), (error)=>{
+                    const file_path = path.join(dist_path, "library.json");
+                    const data = new Map([
+                        [ "dirpath", [...db.get_dirpath()] ],
+                        [ "video", [...db.get_video()] ]
+                    ]);
+
+                    serializer.save(file_path, data, (error)=>{
                         if(error){
                             reject(error);
                         }else{
@@ -161,9 +149,8 @@
             async function convertPromise() {
                 obs.trigger("on_load_indicator", "Now Loading...");
 
-                await asyncFunc1();
-                await asyncFunc2();
-                await asyncFunc3();
+                await asyncRead();
+                await asyncSave();
             }
             convertPromise().then(() => {
                 dialog.showMessageBox(remote.getCurrentWindow(),{

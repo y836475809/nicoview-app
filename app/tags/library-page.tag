@@ -11,23 +11,16 @@
     <input type="button" value="show" onclick={read}>  
     <base-datatable ref="dt" params={this.params}></base-datatable>
 </div>
-<context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
     /* globals base_dir obs */
-    this.items = [
-        { title: "First item" , itemkey: "First"},
-        { title: "Second item", itemkey: "Second"},
-        { title: "Third item", itemkey: "Third"}
-    ];
-
+    const {remote} = require("electron");
+    const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
-    // const serializer = require(`${base_dir}/app/js/serializer`);
     const time_format = require(`${base_dir}/app/js/time_format`);
-
-    require(`${base_dir}/app/tags/base-datatable.tag`);
-    require(`${base_dir}/app/tags/context-menu.tag`);
+    
+    require(`${base_dir}/app/tags/base-datatable.tag`);  
 
     let db = new DB();
 
@@ -129,20 +122,22 @@
         }
     };
 
+    let self = this;
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: "Play", click() {
+            const datas = self.refs.dt.getSelectedDatas();
+            console.log("lib context menu data=", datas);
+        }
+    }));
+    menu.append(new MenuItem({ type: "separator" }));
+    menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
     this.on("mount", function () {
-        let contextmenu = this.refs.ctm;
-
         this.refs.dt.showContextMenu=(e)=>{
-            contextmenu.show(e);
-        };
-
-        contextmenu.callback = (e)=>{
-            const key = e.key;
-            const datas = this.refs.dt.getSelectedDatas();
-            console.log("lib conmenu key=", key);
-            console.log("lib conmenu data=", datas);
-        };        
+            e.preventDefault();
+            menu.popup({window: remote.getCurrentWindow()});
+        };       
     });
 
     obs.on("pageResizedEvent", (size)=> {

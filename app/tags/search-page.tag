@@ -11,17 +11,13 @@
     <input type="button" value="search" onclick={serach}>
     <base-datatable ref="dt" params={this.params}></base-datatable>
 </div>
-<context-menu ref="ctm" items={this.items}></context-menu>
 
 <script>
     /* globals base_dir obs */
-    this.items = [
-        { title: "First item" , itemkey: "First"},
-        { title: "Second item", itemkey: "Second"}
-    ];
-
+    const {remote} = require("electron");
+    const {Menu, MenuItem} = remote;
+    
     require(`${base_dir}/app/tags/base-datatable.tag`);
-    require(`${base_dir}/app/tags/context-menu.tag`);
 
     this.serach = () => {
         console.log("serach");
@@ -64,19 +60,22 @@
         }          
     };
 
+    let self = this;
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: "Play", click() {
+            const datas = self.refs.dt.getSelectedDatas();
+            console.log("search context menu data=", datas);
+        }
+    }));
+    menu.append(new MenuItem({ type: "separator" }));
+    menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
+    
     this.on("mount", () => {
-        let contextmenu = this.refs.ctm;
-
         this.refs.dt.showContextMenu=(e)=>{
-            contextmenu.show(e);
+            e.preventDefault();
+            menu.popup({window: remote.getCurrentWindow()});
         };
-
-        contextmenu.callback = (e)=>{
-            const key = e.key;
-            const datas = this.refs.dt.getSelectedDatas();
-            console.log("#conmenu key=", key);
-            console.log("#conmenu data=", datas);
-        };    
     });
 
     obs.on("pageResizedEvent", (size)=>{

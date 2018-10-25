@@ -95,22 +95,6 @@
             document.getElementById("library-path").setAttribute("value", library_path);
         };
 
-        this.onclickDBPath = () =>{
-            const path = selectFileDialog("Sqlite db", ["db"]);
-            if(!path){
-                return;
-            }
-            document.getElementById("db-path").setAttribute("value", path);
-        };
-
-        this.onclickDistPath = () =>{
-            const path = selectFolderDialog();
-            if(!path){
-                return;
-            }
-            document.getElementById("dist-path").setAttribute("value", path);
-        };
-
         this.onclickRefreshLibrary = ()=>{
             obs.trigger("on_load_library");
         };
@@ -176,7 +160,7 @@
 
             async function convertPromise() {
                 obs.trigger("on_load_indicator", "Now Loading...");
-                
+
                 await asyncFunc1();
                 await asyncFunc2();
                 await asyncFunc3();

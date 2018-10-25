@@ -31,19 +31,18 @@
     </div>
 
     <script>
-        /* globals obs */
         this.isloading = false;
-        
-        obs.on("on_load_indicator", (message) => {
+
+        this.showLoading = (message) => {
             this.isloading = true;
             this.message = message;
             this.update();
-        });
+        };
 
-        obs.on("on_unload_indicator", () => {
+        this.hideLoading = () => {
             this.isloading = false;
             this.update();
-        });
+        };
     </script>
 
 </indicator>

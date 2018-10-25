@@ -35,7 +35,7 @@
     <div class="group">
         <input type="button" value="Convert" onclick={onclickConvertDB}>
     </div>
-    <indicator></indicator>
+    <indicator ref="indicator"></indicator>
 
     <script>
         /* globals riot obs */
@@ -47,7 +47,8 @@
 
         require("./indicator.tag");
         riot.mount("indicator");
-
+        
+        let self = this;
         this.library = "library";
 
         let library_path = null;
@@ -147,8 +148,7 @@
             }
 
             async function convertPromise() {
-                obs.trigger("on_load_indicator", "Now Loading...");
-
+                self.refs.indicator.showLoading("Now Loading...");
                 await asyncRead();
                 await asyncSave();
             }
@@ -165,7 +165,7 @@
                     message: err.message
                 });
             }).then(() => {
-                obs.trigger("on_unload_indicator");
+                self.refs.indicator.hideLoading();
             });
         };
     </script>

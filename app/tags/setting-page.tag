@@ -33,22 +33,14 @@
         <label>library</label><input type="button" value="refresh" onclick={onclickRefreshLibrary}>
     </div>
     <div class="group">
-        <div class="param">
-            <label>db</label><input id="db-path" type="text" readonly>
-            <input type="button" value="Select" onclick={onclickDBPath}>
-        </div>
-        <div class="param">
-            <label>dist</label><input id="dist-path" type="text" readonly>
-            <input type="button" value="Select" onclick={onclickDistPath}>
-        </div>
-        
-        <input type="button" value="import" onclick={onclickConvertDB}>
+        <input type="button" value="Convert" onclick={onclickConvertDB}>
     </div>
     <script>
         /* globals obs */
         const path = require("path");
         const SQLiteDB = require("../js/sqlite_db");
         const serializer = require("../js/serializer");
+        const { remote } = require("electron");
         const { dialog } = require("electron").remote;
 
         this.library = "library";
@@ -61,7 +53,7 @@
         });
 
         const selectFileDialog = (name, extensions)=>{
-            const paths = dialog.showOpenDialog(null, {
+            const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
                 properties: ["openFile"],
                 title: "Select",
                 defaultPath: ".",
@@ -77,7 +69,7 @@
         };
 
         const selectFolderDialog = ()=>{
-            const paths = dialog.showOpenDialog(null, {
+            const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
                 properties: ["openDirectory"],
                 title: "Select",
                 defaultPath: "."
@@ -119,8 +111,14 @@
         };
 
         this.onclickConvertDB = ()=>{
-            const db_file_path = document.getElementById("db-path").value;
-            const dist_path = document.getElementById("dist-path").value;
+            const db_file_path = selectFileDialog("Sqlite db", ["db"]);
+            if(!db_file_path){
+                return;
+            }
+            const dist_path = selectFolderDialog();
+            if(!dist_path){
+                return;
+            }
 
             let db = new SQLiteDB();
             function asyncFunc1() {
@@ -176,13 +174,13 @@
                 await asyncFunc3();
             }
             convertPromise().then(() => {
-                dialog.showMessageBox(null,{
+                dialog.showMessageBox(remote.getCurrentWindow(),{
                     type: "info",
                     buttons: ["OK"],
                     message: "Conversion complete"
                 });
             }).catch((err) => {
-                dialog.showMessageBox(null,{
+                dialog.showMessageBox(remote.getCurrentWindow(),{
                     type: "error",
                     buttons: ["OK"],
                     message: err.message

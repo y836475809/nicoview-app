@@ -35,13 +35,18 @@
     <div class="group">
         <input type="button" value="Convert" onclick={onclickConvertDB}>
     </div>
+    <indicator></indicator>
+
     <script>
-        /* globals obs */
+        /* globals riot obs */
         const path = require("path");
         const SQLiteDB = require("../js/sqlite_db");
         const serializer = require("../js/serializer");
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
+
+        require("./indicator.tag");
+        riot.mount("indicator");
 
         this.library = "library";
 
@@ -122,6 +127,7 @@
 
             let db = new SQLiteDB();
             function asyncFunc1() {
+                // return new Promise(resolve => setTimeout(resolve, 5000));
                 return new Promise((resolve, reject) => {
                     db.init(db_file_path, (error)=>{
                         if(error){
@@ -169,6 +175,8 @@
             }
 
             async function convertPromise() {
+                obs.trigger("on_load_indicator", "Now Loading...");
+                
                 await asyncFunc1();
                 await asyncFunc2();
                 await asyncFunc3();
@@ -185,6 +193,8 @@
                     buttons: ["OK"],
                     message: err.message
                 });
+            }).then(() => {
+                obs.trigger("on_unload_indicator");
             });
         };
     </script>

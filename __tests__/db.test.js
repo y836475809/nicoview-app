@@ -21,6 +21,6 @@ test("db file path", function () {
         });
 
     db.setData(dirpath_map, video_map);
-    expect(db.getThumbInfoPath("sm1")).toEqual("file:///C:/data/サンプル/サンプル1 - [sm1][ThumbInfo].xml");
-    expect(db.getThumbInfoPath("sm2")).toEqual("file:///C:/data/サンプル2 - [sm2][ThumbInfo].xml");
+    expect(db.getThumbInfoPath("sm1")).toEqual("C:/data/サンプル/サンプル1 - [sm1][ThumbInfo].xml");
+    expect(db.getThumbInfoPath("sm2")).toEqual("C:/data/サンプル2 - [sm2][ThumbInfo].xml");
 });

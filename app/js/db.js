@@ -16,6 +16,7 @@ class DB {
     setData(dir_path, video_info) {
         this.dir_path = dir_path;
         this.video_info = video_info;
+        this.normalizePath();
     }
 
     load(file_path){
@@ -28,6 +29,14 @@ class DB {
         }
         this.dir_path = new Map(datas.get("dirpath"));
         this.video_info = new Map(datas.get("video"));
+        this.normalizePath();
+    }
+
+    normalizePath(){
+        this.dir_path.forEach((value, key) => {
+            const path = value.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
+            this.dir_path.set(key, path);
+        });
     }
 
     /**

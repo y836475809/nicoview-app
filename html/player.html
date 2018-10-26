@@ -43,7 +43,10 @@
     });
 
     ipc.on("request-send-video-data", (event, arg) => {
-        obs.trigger("receivedData", arg);
+        const video_data = arg.video_data;
+        const tag_data = arg.tag_data;
+        obs.trigger("receivedData", video_data);
+        obs.trigger("on_load_player_tags", tag_data);
     });
 
 </script>

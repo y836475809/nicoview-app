@@ -121,6 +121,14 @@ class DB {
         return video_info.video_type;
     }
 
+    getVideoTags(id){
+        if (!this.video_info.has(id)) {
+            throw Error(`not find video_info, id=${id}`);
+        }
+        const video_info = this.getVideoInfo(id);
+        return video_info.tags;
+    }
+
     /**
      * 
      * @param {string} dirpath_id 

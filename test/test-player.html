@@ -43,7 +43,20 @@
             type: "video/mp4",
             commnets: commnets
         };
-        obs.trigger("receivedData", data);  
+        const tag_data = {
+            video_tags: [
+                "タグ1", "タグ2", "タグ3",
+                "タグ1", "タグ2", "タグ3",
+                "タグ1", "タグ2", "タグ33333333333333333",
+                "タグ1", "タグ2", "タグ33333333333333333",
+                "タグ1", "タグ2", "タグ33333333333333333",
+                "タグ1", "タグ2", "タグ33333333333333333",
+                "タグ1", "タグ2", "タグ33333333333333333",
+                "タグ1", "タグ2", "タグ33333333333333333"]
+        };
+
+        obs.trigger("receivedData", data); 
+        obs.trigger("on_load_player_tags", tag_data); 
     };
     obs.on("loadplaydata", () => {
         start();

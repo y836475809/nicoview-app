@@ -15,6 +15,7 @@
 </head>
 
 <body>
+    <button type="button" onclick="onclickLoad();">load</button>
     <player-page></player-page>
 </body>
 
@@ -31,7 +32,7 @@
 
     riot.mount("player-page");
 
-    let start = () => {
+    const onclickLoad = () => {
         // let commnets = []
         const comment_path = `${base_dir}/test/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
@@ -55,12 +56,10 @@
                 "タグ1", "タグ2", "タグ33333333333333333"]
         };
 
+        obs.trigger("on_set_player_state", "play"); 
         obs.trigger("receivedData", data); 
-        obs.trigger("on_load_player_tags", tag_data); 
+        obs.trigger("on_load_player_tags", tag_data);        
     };
-    obs.on("loadplaydata", () => {
-        start();
-    });
 
     const timeout = 200;
     let timer;

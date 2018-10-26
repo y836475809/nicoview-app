@@ -71,9 +71,20 @@
                 setBtnState("play");
             }
         };
+        
+        obs.on("on_set_player_state", (state)=> {
+            if(state=="play"){
+                setBtnState("pause");
+                return;
+            }
+            if(state=="pause"){
+                setBtnState("play");
+                return;
+            }
+        });
 
         this.on("mount", ()=> {
-            setBtnState("stop");
+            setBtnState("pause");
 
             obs.on("resizeEndEvent", (video_size) => { 
                 this.refs.seek.redraw();

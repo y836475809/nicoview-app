@@ -1,7 +1,7 @@
 <player-volume>
     <style scoped>
         :scope {
-            width: 100px;
+            width: 100%;
             height: 30px;
             margin: 0;
         }
@@ -10,8 +10,11 @@
             position: relative;
             top: 10px;
             left: 0px;
-            width: 70px;
+            width: calc(100% - 25px);
             height: 10px;
+            margin-left: 10px;
+            margin-right: 10px;
+            border-radius:5px;
         }
         .picker {
             position: relative;

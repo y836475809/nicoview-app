@@ -1,9 +1,13 @@
 <player-tags>
     <style scoped>
          :scope {
-            width: calc(100% - 4px);
-            height: 50px;
-            border: 2px solid black;
+            --border-width: 1px;
+            --margin-value: 4px;
+            --total-margin: calc((var(--border-width) + var(--margin-value)) * 2);
+            width: calc(100% - var(--total-margin));
+            height: calc(100% - var(--total-margin));
+            border: var(--border-width) solid black;
+            margin: var(--margin-value);
             display:block;
             overflow: auto;
         }
@@ -17,7 +21,7 @@
             cursor: pointer;
         }
     </style>
-
+    
     <button type="button" class="tag-button" 
         each={item, i in video_tags} data-index={i} onclick={onclickTag}>
         {item}

@@ -5,7 +5,9 @@
             margin: 0;
             width: 100%;
             height: 100%;  
-            grid-template-rows: 100px 1fr 100px;
+            --tags-height: 100px;
+            --controls-height: 100px;
+            grid-template-rows: var(--tags-height) 1fr var(--controls-height);
             grid-template-columns: 1fr 1fr;  
         }
         #player-tags-content{
@@ -26,7 +28,7 @@
         #player-video {
             object-fit: contain;
             object-position: center center;
-            height: calc(100vh - 200px);
+            height: calc(100vh - var(--tags-height) - var(--controls-height));
             width: 100%;        
         }
     </style>

@@ -17,6 +17,7 @@
             background-color: #797b80;
             position: relative;
             height: 10px;
+            border-radius:5px;
         }
         .current {
             grid-row: 2 / 3;

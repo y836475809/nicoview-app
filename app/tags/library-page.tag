@@ -8,7 +8,6 @@
     </style>
 
 <div class="table-base">
-    <input type="button" value="show" onclick={read}>  
     <base-datatable ref="dt" params={this.params}></base-datatable>
 </div>
 
@@ -19,15 +18,12 @@
     const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
     const time_format = require(`${base_dir}/app/js/time_format`);
-    const pref = require("../js/preference");
     
     require(`${base_dir}/app/tags/base-datatable.tag`);  
 
     let db = new DB();
 
-    this.read = ()=>{
-        // let data_path = localStorage.getItem("library.path");
-        const data_file_path = pref.getLibraryFilePath();
+    this.loadData = (data_file_path)=>{
         if(!data_file_path){ 
             return;
         }
@@ -148,9 +144,22 @@
         };       
     });
 
+    obs.on("load_data", (data_file_path)=> {
+        this.loadData(data_file_path);
+    });
+
     obs.on("pageResizedEvent", (size)=> {
         if(this.refs!==undefined){
-            this.refs.dt.ress(size);
+            const dt_root = this.refs.dt.root;
+            const dt_elm1 = dt_root.querySelector("div.dataTables_length");
+            const dt_elm2 = dt_root.querySelector("div.dataTables_paginate");
+            const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
+            const margin = 10;
+            const exclude_h = dt_elm1.offsetHeight + dt_elm2.offsetHeight + dt_elm3.offsetHeight + margin;
+            this.refs.dt.ress({
+                w: size.w,
+                h: size.h - exclude_h,
+            });
         }
     });
 </script>

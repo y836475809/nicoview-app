@@ -1,14 +1,15 @@
 <main-page>
     <style scoped>
         :scope {
+            --select-tab-height: 80px;
             display:grid;
-            grid-template-rows: 80px 1fr;
+            grid-template-rows: var(--select-tab-height) 1fr;
             grid-template-columns: 1fr 1fr;
             width: 100%;
             height: 100%;
             margin: 0;
         }
-        select-page-tabs{
+        #main-select-page-tabs{
             grid-row: 1 / 2;
             grid-column: 1 / 3;
         }
@@ -21,8 +22,9 @@
             grid-column: 1 / 3;
         }       
     </style>
-
-    <select-page-tabs></select-page-tabs>
+    <div id="main-select-page-tabs">
+        <select-page-tabs></select-page-tabs>
+    </div>
     <div id="page1">
         <library-page></library-page>
     </div>
@@ -41,6 +43,8 @@
         require(`${base_dir}/app/tags/select-page-tabs.tag`);
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
+
+        const tab_height = parseInt(getComputedStyle(this.root).getPropertyValue("--select-tab-height"));
 
         this.index = 0;
         let select_page = (index)=>{
@@ -73,8 +77,8 @@
             clearTimeout(timer);
             timer = setTimeout(() => {
                 obs.trigger("pageResizedEvent", {
-                    w: window.innerWidth, 
-                    h: window.innerHeight - 200 
+                    w: this.root.offsetWidth, 
+                    h: this.root.offsetHeight - tab_height
                 });
             }, timeout);
         });

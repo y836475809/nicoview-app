@@ -21,21 +21,37 @@
             width: 100%;
             margin: 0;
         }
+        .test-button{
+            height: 25px;
+        }
+        .test-main-page{
+            height: calc(100% - 25px);
+        }
     </style>
 </head>
 
 <body>
-    <main-page></main-page>
+    <div class="test-button">
+        <input type="button" value="load" onclick="onclickLoadData();">  
+    </div>
+    <main-page class="test-main-page"></main-page>
 </body>
 
 <script>
     /* globals riot */
     const remote = require("electron").remote;
+    const pref = require("../app/js/preference");
+
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
     riot.mount("main-page");
+
+    const onclickLoadData = ()=>{
+        const data_path = pref.getLibraryFilePath();
+        obs.trigger("load_data", data_path);
+    };
 
     obs.on("on_error", (error)=> {
         console.error(error);

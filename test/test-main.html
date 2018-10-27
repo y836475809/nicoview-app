@@ -40,7 +40,7 @@
 <script>
     /* globals riot */
     const remote = require("electron").remote;
-    const pref = require("../app/js/preference");
+    const { dialog } = require("electron").remote;
 
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var base_dir = shared_obj.base_dir; // eslint-disable-line
@@ -49,7 +49,19 @@
     riot.mount("main-page");
 
     const onclickLoadData = ()=>{
-        const data_path = pref.getLibraryFilePath();
+        const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
+            properties: ["openFile"],
+            title: "Select",
+            defaultPath: ".",
+            filters: [
+                {name: "Sqlite db", extensions: "db"}, 
+                {name: "All", extensions: ["*"]},
+            ]
+        });
+        if(!paths){
+            return;
+        }
+        const data_path = paths[0];
         obs.trigger("load_data", data_path);
     };
 

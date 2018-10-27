@@ -66,12 +66,17 @@
             this.index = index;      
             select_page(index);
         });
-        
-        obs.on("resizeEndEvent", function (size) {
-            obs.trigger("pageResizedEvent", {
-                w: size.w, 
-                h: size.h - 200 
-            });  
+
+        const timeout = 200;
+        let timer;
+        window.addEventListener("resize", () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                obs.trigger("pageResizedEvent", {
+                    w: window.innerWidth, 
+                    h: window.innerHeight - 200 
+                });
+            }, timeout);
         });
     </script>
 </main-page>

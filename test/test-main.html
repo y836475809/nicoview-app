@@ -40,19 +40,6 @@
     obs.on("on_error", (error)=> {
         console.error(error);
     });
-
-    const timeout = 200;
-    let timer;
-    window.addEventListener("resize", () => {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            obs.trigger("resizeEndEvent", {
-                w: window.innerWidth, 
-                h: window.innerHeight 
-            });
-        }, timeout);
-    });
-
 </script>
 
 </html>

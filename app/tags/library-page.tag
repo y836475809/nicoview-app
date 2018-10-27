@@ -19,14 +19,16 @@
     const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
     const time_format = require(`${base_dir}/app/js/time_format`);
+    const pref = require("../js/preference");
     
     require(`${base_dir}/app/tags/base-datatable.tag`);  
 
     let db = new DB();
 
     this.read = ()=>{
-        let data_path = localStorage.getItem("library.path");
-        if(!data_path){ 
+        // let data_path = localStorage.getItem("library.path");
+        const data_file_path = pref.getLibraryFilePath();
+        if(!data_file_path){ 
             return;
         }
 
@@ -34,7 +36,7 @@
             // const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
             // const video = serializer.load(`${data_path}/db/video.json`);
             // db.setData(dirpath, video);
-            db.load(`${data_path}/library.json`);
+            db.load(data_file_path);
             const video = db.video_info;
 
             let datas = new Array();

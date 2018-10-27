@@ -1,7 +1,8 @@
 <setting-page>
     <style scoped>
         :scope {
-            font-size: 16px;
+            font-size: 12px;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
         }
         button, input, select, textarea {
             font-family : inherit;
@@ -15,47 +16,52 @@
             display: block;
             padding: 5px;
             margin: 10px;
-            border-radius: 2px;
-            background-color:lightgray;
         }
-        label {
-            margin-right: 10px;
-            width:100px;
-            float: left;
+        #library-path{
+            width: 300px;
         }
     </style>
 
     <div class="group">
-        <label>{this.library}</label><input id="library-path" type="text" readonly>
-        <input type="button" value="Select" onclick={onclicklibraryPath}>
+        <label class="param">Library path</label>
+        <input id="library-path" type="text" readonly>
+        <input type="button" value="Select" onclick={onclickSelectLibrarayPath}>
     </div>
     <div class="group">
-        <label>library</label><input type="button" value="refresh" onclick={onclickRefreshLibrary}>
+        <label class="param">Refresh library</label>
+        <input type="button" value="Refresh" onclick={onclickRefreshLibrary}>
     </div>
     <div class="group">
-        <input type="button" value="Convert" onclick={onclickConvertDB}>
+        <label class="param">Import db</label>
+        <input type="button" value="Import" onclick={onclickImport}>
     </div>
     <indicator ref="indicator"></indicator>
 
     <script>
         /* globals riot obs */
-        const path = require("path");
+        const fs = require("fs");
         const SQLiteDB = require("../js/sqlite_db");
         const serializer = require("../js/serializer");
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
+        const pref = require("../js/preference");
 
         require("./indicator.tag");
         riot.mount("indicator");
         
         let self = this;
-        this.library = "library";
 
-        let library_path = null;
+        const setLibraryPathAtt = (value) => {
+            document.getElementById("library-path").setAttribute("value", value);
+        };
 
         this.on("mount", () => {
-            library_path = localStorage.getItem("library.path");
-            document.getElementById("library-path").setAttribute("value", library_path);
+            const path = pref.getLibraryPath();
+            if(!path){
+                setLibraryPathAtt("");
+            }else{
+                setLibraryPathAtt(path);
+            } 
         });
 
         const selectFileDialog = (name, extensions)=>{
@@ -86,35 +92,44 @@
             return null;
         };
 
-        this.onclicklibraryPath = ()=>{
+        this.onclickSelectLibrarayPath = ()=>{
             const path = selectFolderDialog();
             if(!path){
                 return;
             }
-            library_path = path;
-            localStorage.setItem("library.path", library_path);
-            document.getElementById("library-path").setAttribute("value", library_path);
+
+            pref.setLibraryPath(path);
+            setLibraryPathAtt(path);
         };
 
         this.onclickRefreshLibrary = ()=>{
             obs.trigger("on_load_library");
         };
 
-        this.onclickConvertDB = ()=>{
+        this.onclickImport = ()=>{
             const db_file_path = selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
             }
-            const dist_path = selectFolderDialog();
-            if(!dist_path){
-                return;
-            }
 
             let db = new SQLiteDB();
-            function asyncRead() {
+            
+            function asyncMkDir(data_path) {
+                return new Promise((resolve, reject) => {
+                    fs.mkdir(data_path, (error)=>{
+                        if(error && error.code != "EEXIST"){
+                            reject(error);
+                        }else{
+                            resolve();
+                        }
+                    });
+                });
+            }
+
+            function asyncRead(file_path) {
                 // return new Promise(resolve => setTimeout(resolve, 5000));
                 return new Promise((resolve, reject) => {
-                    db.init(db_file_path, (error)=>{
+                    db.init(file_path, (error)=>{
                         if(error){
                             reject(error);
                         }else{
@@ -126,12 +141,7 @@
             }
             function asyncSave() {
                 return new Promise((resolve, reject) => {
-                    if(!dist_path){
-                        reject({
-                            message:"dist_path is empty"
-                        });
-                    }
-                    const file_path = path.join(dist_path, "library.json");
+                    const file_path = pref.getLibraryFilePath();
                     const data = new Map([
                         [ "dirpath", [...db.get_dirpath()] ],
                         [ "video", [...db.get_video()] ]
@@ -149,9 +159,17 @@
 
             async function convertPromise() {
                 self.refs.indicator.showLoading("Now Loading...");
-                await asyncRead();
+
+                const data_path = pref.getDataPath();
+                if(!data_path){
+                    throw { message:"Library path is empty" };
+                }
+
+                await asyncMkDir(data_path);
+                await asyncRead(db_file_path);
                 await asyncSave();
             }
+
             convertPromise().then(() => {
                 dialog.showMessageBox(remote.getCurrentWindow(),{
                     type: "info",

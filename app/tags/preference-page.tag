@@ -1,4 +1,4 @@
-<setting-page>
+<preference-page>
     <style scoped>
         :scope {
             font-size: 12px;
@@ -187,4 +187,4 @@
             });
         };
     </script>
-</setting-page>
+</preference-page>

@@ -20,11 +20,16 @@
             outline:none;
             cursor: pointer;
         }
+        .tag-lock {
+            display: inline;
+            color: red;
+            margin-left: 5px;
+        }
     </style>
     
     <button type="button" class="tag-button" 
         each={item, i in video_tags} data-index={i} onclick={onclickTag}>
-        {item}
+        {item.text}<div class="tag-lock" if={item.lock} data-index={i}>[lock]</div>
     </button>
 
     <script>
@@ -35,8 +40,8 @@
             console.log("index=", index, " value=", this.video_tags[index]);
         };
 
-        obs.on("on_load_player_tags", (tag_data) => {
-            this.video_tags = tag_data.video_tags;
+        obs.on("on_load_player_tags", (video_tags) => {
+            this.video_tags = video_tags;
             this.update();
         });
     </script>

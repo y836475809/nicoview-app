@@ -44,21 +44,20 @@
             type: "video/mp4",
             commnets: commnets
         };
-        const tag_data = {
-            video_tags: [
-                "タグ1", "タグ2", "タグ3",
-                "タグ1", "タグ2", "タグ3",
-                "タグ1", "タグ2", "タグ33333333333333333",
-                "タグ1", "タグ2", "タグ33333333333333333",
-                "タグ1", "タグ2", "タグ33333333333333333",
-                "タグ1", "タグ2", "タグ33333333333333333",
-                "タグ1", "タグ2", "タグ33333333333333333",
-                "タグ1", "タグ2", "タグ33333333333333333"]
-        };
+        const video_tags = [
+            { text: "タグ1", lock: true },
+            { text: "タグ2", lock: true },
+            { text: "タグ3", lock: true },
+            { text: "タグ1", lock: false },
+            { text: "タグ2", lock: false },
+            { text: "タグ33333333333333333", lock: true },
+            { text: "タグ33333333333333333", lock: false },
+            { text: "タグ33333333333333333", lock: false }
+        ];
 
         obs.trigger("on_set_player_state", "play"); 
         obs.trigger("receivedData", data); 
-        obs.trigger("on_load_player_tags", tag_data);        
+        obs.trigger("on_load_player_tags", video_tags);        
     };
 
     const timeout = 200;

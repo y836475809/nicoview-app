@@ -50,9 +50,9 @@ test("read thumb info", function () {
     expect(obj.embeddable).toBe(1);
     expect(obj.no_live_play).toBe(0);
     expect(obj.tags).toEqual([
-        {tag:"タグ1", lock:"1"},
-        {tag:"タグ2", lock:""},
-        {tag:"タグ3", lock:""}
+        {text:"タグ1", lock:true},
+        {text:"タグ2", lock:false},
+        {text:"タグ3", lock:false}
     ]);
     expect(obj.user_id).toEqual("00000");
     expect(obj.user_nickname).toEqual("ニックネーム");

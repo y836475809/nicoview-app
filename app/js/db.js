@@ -98,7 +98,8 @@ class DB {
      * @param {string} id 
      */
     findThumbInfo(id) {
-        const xml = fs.readFileSync("./sample/sample[ThumbInfo].xml", "utf-8");
+        const path = this.getThumbInfoPath(id);
+        const xml = fs.readFileSync(path, "utf-8");
         return reader.thumb_info(xml);
     }
 

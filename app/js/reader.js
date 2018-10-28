@@ -63,7 +63,7 @@ function thumb_info(xml) {
         const item = $(el);
         const text = item.text();
         const lock = item.attr("lock");
-        tags.push({ tag: text, lock: lock !== undefined ? lock : "" });
+        tags.push({ text: text, lock: lock == "1" ? true : false });
     });
 
     const user_id = $("user_id").text();

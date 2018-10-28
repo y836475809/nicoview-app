@@ -111,16 +111,15 @@
             const video_file_path = db.getVideoPath(data.id);
             const video_type = db.getVideoType(data.id);
             const commnets = db.findComments(data.id);
-            const video_tags = db.getVideoTags(data.id);
+            const thumb_info = db.findThumbInfo(data.id);
+            // const video_tags = db.getVideoTags(data.id);
             const send_data = {
                 video_data: {
                     src: video_file_path,
                     type: video_type,
                     commnets: []
                 },
-                tag_data: {
-                    video_tags: video_tags
-                },
+                thumb_info: thumb_info
             };       
             ipc.send("request-show-player", send_data);
         }

@@ -8,8 +8,8 @@
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
-            /* height: 100vh; */
             margin: 0;
+            /* overflow-y: hidden; */
         }
         #info{
             grid-row: 1 / 2;
@@ -19,15 +19,15 @@
         #description{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            background-color: darkgray;
+            background-color: rgb(167, 133, 133);
         } 
         #comment-list{
-            /* height: calc(100vh - var(--tags-height) - var(--controls-height)); */
-            /* width: 100%; */
-            /* height: calc(100% - 200px); */
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
-            background-color: darkgray;
+            background-color: rgb(139, 39, 39);
+        }
+        div.base-datatabl{
+            height: 100%;
         }
     </style>
     
@@ -81,11 +81,12 @@
                 handleWidth: 10,
                 exclude: [0],
             },
-            dom: "Zlfrtip",  
+            // dom: "Zlfrtip",  
+            dom: "Zlrtp",
             scrollY:"100px",
             scrollCollapse:false,
             autoWidth: false,
-            paging: true,
+            paging: false,
             displayLength:100,
             lengthMenu: [ 100, 200, 300, 400, 500 ],
             deferRender: true,
@@ -111,16 +112,11 @@
         });
         obs.on("pageResizedEvent", (size)=> {
             if(this.refs!==undefined){
-                console.log("comment-list pageResizedEvent size:", size); 
-                const dt_root = this.refs.dt.root;
-                const dt_elm1 = dt_root.querySelector("div.dataTables_length");
-                const dt_elm2 = dt_root.querySelector("div.dataTables_paginate");
-                const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
                 const margin = 10;
-                const exclude_h = dt_elm1.offsetHeight + dt_elm2.offsetHeight + dt_elm3.offsetHeight + margin;
+                const exclude_h = 200 + margin;
                 this.refs.dt.ress({
                     w: size.w,
-                    h: size.h - exclude_h - 200 -25,
+                    h: size.h - exclude_h
                 });
             }
         });

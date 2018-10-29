@@ -1,18 +1,33 @@
 <player-viewinfo-page>
     <style scoped>
-        :scope { 
+        :scope {
             display: flex;
             flex-direction: row;
+            height: 100%;
         }
+    
+        .split {
+            box-sizing: border-box;
+            /* overflow-y: auto; */
+            /* overflow-x: hidden; */
+        }
+    
         .gutter.gutter-horizontal {
-            cursor: ew-resize;
+            cursor: col-resize;
+        }
+    
+        .split.split-horizontal,
+        .gutter.gutter-horizontal {
+            margin: 0;
+            height: 100%;
+            float: left;
         }
     </style>
     
-    <div id="player-frame" class="split">
+    <div id="player-frame" class="split split-horizontal">
         <player-page></player-page>
     </div>
-    <div id="viewinfo-frame" class="split">
+    <div id="viewinfo-frame" class="split split-horizontal">
         <viewinfo-page></viewinfo-page>
     </div>
 
@@ -31,8 +46,9 @@
 
         this.on("mount", () => {
             sp = Split(["#player-frame", "#viewinfo-frame"], {
-                sizes: [50, 50],
-                minSize: [100, 100]
+                // sizes: [50, 50],
+                // minSize: [100, 100],
+                gutterSize: 8,
             });
         });   
         

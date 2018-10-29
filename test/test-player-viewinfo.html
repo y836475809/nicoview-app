@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Test player viewinfo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="../node_modules/riot/riot+compiler.min.js"></script>
+</head>
+
+<body>
+    <button type="button" onclick="onclickLoad();">load</button>
+    <player-viewinfo-page></player-viewinfo-page>
+</body>
+
+<script>
+    const remote = require("electron").remote;
+    const shared_obj = remote.getGlobal("sharedObj");
+    var base_dir = shared_obj.base_dir;  // eslint-disable-line
+    var riot = require("riot");  // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
+
+    require(`${base_dir}/app/tags/player-viewinfo-page`);
+    riot.mount("player-viewinfo-page");
+
+    const onclickLoad = () => {
+        obs.trigger("on_set_split_sizes", [75, 25]); 
+    };
+</script>
+
+</html>

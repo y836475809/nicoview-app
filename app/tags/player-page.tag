@@ -1,13 +1,6 @@
 <player-page>
     <style scoped>
-        :scope { 
-            display: flex;
-            flex-direction: row;
-        }
-        .gutter.gutter-horizontal {
-            cursor: ew-resize;
-        }
-        #player-frame {
+        :scope {
             display: grid;
             margin: 0;
             width: 100%;
@@ -38,33 +31,22 @@
             height: calc(100vh - var(--tags-height) - var(--controls-height));
             width: 100%;        
         }
-        #viewinfo-frame { 
-            width: 100%;
-            height: 100%;
-        }
     </style>
 
-    <div id="player-frame" class="split">
-        <div id="player-tags-content">
-            <player-tags></player-tags>
-        </div>
-        <div id="player-video-content">
-            <div id="player-video">
-                <player-video></player-video>
-            </div>
-        </div>
-        <div id="player-controls-content">
-            <player-controls></player-controls>
+    <div id="player-tags-content">
+        <player-tags></player-tags>
+    </div>
+    <div id="player-video-content">
+        <div id="player-video">
+            <player-video></player-video>
         </div>
     </div>
-    <div id="viewinfo-frame" class="split">
-        test
+    <div id="player-controls-content">
+        <player-controls></player-controls>
     </div>
 
     <script>
         /* globals base_dir obs */
-        const Split = require("split.js");
-
         require(`${base_dir}/app/tags/player-tags.tag`);
         require(`${base_dir}/app/tags/player-video.tag`);
         require(`${base_dir}/app/tags/player-controls.tag`);
@@ -79,12 +61,6 @@
             //window.resizeTo(new_width, new_height);
         });
 
-        this.on("mount", () => {
-            Split(["#player-frame", "#viewinfo-frame"], {
-                sizes: [50, 50],
-                minSize: [100, 100]
-            });
-        });
         // riot.mount('player-tags');
         // riot.mount('player-video');
         // riot.mount('player-controls');

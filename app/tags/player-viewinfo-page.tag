@@ -34,6 +34,18 @@
                 sizes: [50, 50],
                 minSize: [100, 100]
             });
-        });    
+        });   
+        
+        const timeout = 200;
+        let timer;
+        window.addEventListener("resize", () => {
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                obs.trigger("pageResizedEvent", {
+                    w: this.root.offsetWidth, 
+                    h: this.root.offsetHeight
+                });
+            }, timeout);
+        });
     </script>
 </player-viewinfo-page>

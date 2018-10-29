@@ -4,12 +4,36 @@
     <meta charset="utf-8" />
     <title>Test player viewinfo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+            window.jQuery = window.$ = require("jquery");
+    </script>
+    <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+    <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
+
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
+    
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+        }
+        .test-button{
+            height: 25px;
+        }
+        .test-player-viewinfo-page{
+            height: calc(100% - 25px);
+        }
+    </style>
+
 </head>
 
 <body>
-    <button type="button" onclick="onclickLoad();">load</button>
-    <player-viewinfo-page></player-viewinfo-page>
+    <div class="test-button">
+        <button type="button" onclick="onclickLoad();">load</button>
+    </div>
+    <player-viewinfo-page class="test-player-viewinfo-page"></player-viewinfo-page>
 </body>
 
 <script>

@@ -113,6 +113,10 @@
             this.refs.dt.setData(viewinfo.commnets);
         });
 
+        obs.on("on_scroll", (index)=> {
+            this.refs.dt.scrollto(index);
+        });
+
         // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";
         this.on("mount", () => {
             this.refs.description.innerHTML = "<a href=# class=\"dlink\">test</a>";

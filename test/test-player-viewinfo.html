@@ -33,6 +33,7 @@
     <div class="test-button">
         <button type="button" onclick="onclickLoad();">load</button>
         <button type="button" onclick="onclickLoad2();">load comment</button>
+        <button type="button" onclick="onclickLoad3();">scroll</button>
     </div>
     <player-viewinfo-page class="test-player-viewinfo-page"></player-viewinfo-page>
 </body>
@@ -53,7 +54,7 @@
     };
     const onclickLoad2 = () => {
         let commnets = [];
-        const nn = 10000;
+        const nn = 100;
         for (let index = 0; index < nn; index++) {
             commnets.push({
                 no: index + 1,
@@ -67,6 +68,9 @@
         obs.trigger("on_change_viweinfo",{
             commnets: commnets
         }); 
+    };
+    const onclickLoad3 = () => {
+        obs.trigger("on_scroll", 50);
     };
 </script>
 

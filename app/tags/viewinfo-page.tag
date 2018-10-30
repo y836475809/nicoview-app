@@ -26,8 +26,20 @@
             grid-column: 1 / 3; 
             background-color: rgb(139, 39, 39);
         }
-        div.base-datatabl{
-            height: 100%;
+        table tbody tr td:nth-of-type(2) {
+            max-width: 200px;
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        table tbody tr td:nth-of-type(1),
+        table tbody tr td:nth-of-type(3),
+        table tbody tr td:nth-of-type(4),
+        table tbody tr td:nth-of-type(5),
+        table tbody tr td:nth-of-type(6) {
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     </style>
     
@@ -79,14 +91,15 @@
             ], 
             colResize : {
                 handleWidth: 10,
-                exclude: [0],
+                // exclude: [0],
             },
-            // dom: "Zlfrtip",  
-            dom: "Zlrtp",
-            scrollY:"100px",
+            // dom: "Zlfrtip",
+            dom: "Zrt",
+            scrollX: true,
             scrollCollapse:false,
+            scroller: true,
             autoWidth: false,
-            paging: false,
+            paging: true,
             displayLength:100,
             lengthMenu: [ 100, 200, 300, 400, 500 ],
             deferRender: true,
@@ -97,7 +110,7 @@
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
-
+            this.refs.dt.setData(viewinfo.commnets);
         });
 
         // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";

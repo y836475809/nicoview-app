@@ -32,11 +32,13 @@
 <body>
     <div class="test-button">
         <button type="button" onclick="onclickLoad();">load</button>
+        <button type="button" onclick="onclickLoad2();">load comment</button>
     </div>
     <player-viewinfo-page class="test-player-viewinfo-page"></player-viewinfo-page>
 </body>
 
 <script>
+    require("datatables.net-scroller")( window, window.$ ); 
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var base_dir = shared_obj.base_dir;  // eslint-disable-line
@@ -48,6 +50,23 @@
 
     const onclickLoad = () => {
         obs.trigger("on_set_split_sizes", [75, 25]); 
+    };
+    const onclickLoad2 = () => {
+        let commnets = [];
+        const nn = 10000;
+        for (let index = 0; index < nn; index++) {
+            commnets.push({
+                no: index + 1,
+                vpos: 10 + index,
+                date: 1332592373506 + index*100,
+                user_id: "AAA",
+                mail: "ue",
+                text: "------------------text1------------------------"
+            });
+        }
+        obs.trigger("on_change_viweinfo",{
+            commnets: commnets
+        }); 
     };
 </script>
 

@@ -2,11 +2,12 @@
     <style scoped>
         :scope{
             display:grid;
-            width: 100%;
-            height: 100%;
             grid-template-columns: 50px 1fr 100px;
+            --margin-value: 5px;
+            margin : var(--margin-value);
+            width: calc(100% - var(--margin-value) * 2);
+            height: calc(100% - var(--margin-value) * 2);
             background-color: #cccccc;
-            padding: 5px;
         }
         .play{
             grid-column: 1 / 2;

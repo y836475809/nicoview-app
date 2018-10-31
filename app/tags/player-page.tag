@@ -26,9 +26,10 @@
             background-color: aqua;
         }  
         #player-video {
+            overflow: hidden; 
             object-fit: contain;
             object-position: center center;
-            height: calc(100vh - var(--tags-height) - var(--controls-height));
+            /* height: calc(100vh - var(--tags-height) - var(--controls-height)); */
             width: 100%;        
         }
     </style>
@@ -51,6 +52,15 @@
         require(`${base_dir}/app/tags/player-video.tag`);
         require(`${base_dir}/app/tags/player-controls.tag`);
         
+        let tags_height = 0;
+        let controls_height = 0;
+
+        const adjustPlayerVideoSize = () => {
+            const ch = this.root.clientHeight;
+            const h = ch - (tags_height + controls_height);
+            document.getElementById("player-video").style.height = h + "px";
+        };
+
         obs.on("resizePlayer", (video_size) => {    
             const dh =  window.outerHeight - this.root.offsetHeight;
             const new_height = video_size.height + 200 + dh;
@@ -61,6 +71,17 @@
             //window.resizeTo(new_width, new_height);
         });
 
+        this.on("mount", () => {
+            const css_style = getComputedStyle(this.root);
+            tags_height = parseInt(css_style.getPropertyValue("--tags-height"));
+            controls_height = parseInt(css_style.getPropertyValue("--controls-height"));
+
+            adjustPlayerVideoSize();
+        });
+
+        obs.on("on_resize_window", (window_size) => { 
+            adjustPlayerVideoSize();       
+        });
         // riot.mount('player-tags');
         // riot.mount('player-video');
         // riot.mount('player-controls');

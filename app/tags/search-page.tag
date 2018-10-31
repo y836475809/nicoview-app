@@ -23,6 +23,7 @@
         console.log("serach");
     };
 
+
     this.params = {};
     this.params.dt = {
         columns: [
@@ -49,7 +50,7 @@
             exclude: [0]
         },
         dom: "Zfrtip",
-        scrollY:"400px",
+        scrollY:"100px",
         scrollCollapse:false,
         autoWidth: true,
         deferRender: true,
@@ -71,6 +72,7 @@
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
     
+    this.kk = () => {console.log("ch=");};
     this.on("mount", () => {
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();

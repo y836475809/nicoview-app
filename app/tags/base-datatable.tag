@@ -111,7 +111,7 @@
             colResize: params.colResize,
             //scrollY:'50vh',
             scrollX: params.scrollX == undefined ? false : params.scrollX,
-            scrollY: ($(window).height() - 200),
+            scrollY: params.scrollY,
             scrollCollapse: params.scrollCollapse,
             scroller: params.scroller == undefined ? false : params.scroller,
             autoWidth: params.autoWidth,

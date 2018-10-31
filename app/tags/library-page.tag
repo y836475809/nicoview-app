@@ -7,7 +7,7 @@
         } 
     </style>
 
-<div class="table-base">
+<div ref="base" class="table-base">
     <base-datatable ref="dt" params={this.params}></base-datatable>
 </div>
 
@@ -98,7 +98,7 @@
             exclude: [0],
         },
         dom: "Zlfrtip",  
-        scrollY:"400px",
+        scrollY: "100px" ,
         scrollCollapse:false,
         autoWidth: true,
         paging: true,
@@ -136,6 +136,7 @@
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
+    this.ch = 0;
     this.on("mount", function () {
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();
@@ -144,6 +145,18 @@
     });
 
     obs.on("load_data", (data_file_path)=> {
+        const dt_root = this.refs.dt.root;
+        const dt_elm1 = dt_root.querySelector("div.dataTables_length");
+        const dt_elm2 = dt_root.querySelector("div.dataTables_paginate");
+        const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
+        const margin = 10;
+        const exclude_h = dt_elm1.offsetHeight + dt_elm2.offsetHeight + dt_elm3.offsetHeight + margin;
+        let ch = this.refs.base.clientHeight;
+        this.refs.dt.ress({
+            w: null,
+            h: ch - exclude_h,
+        });  
+        
         this.loadData(data_file_path);
     });
 

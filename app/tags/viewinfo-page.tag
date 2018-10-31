@@ -9,7 +9,7 @@
             width: 100%;
             height: 100%;
             margin: 0;
-            /* overflow-y: hidden; */
+            overflow-y: hidden;
         }
         #info{
             grid-row: 1 / 2;
@@ -45,7 +45,7 @@
     
     <div id="info">test1</div>
     <div ref="description" id="description">test2</div>
-    <div id="comment-list">
+    <div ref="base" id="comment-list">
         <base-datatable ref="dt" params={this.params}></base-datatable>
     </div>
 
@@ -96,6 +96,7 @@
             // dom: "Zlfrtip",
             dom: "Zrt",
             scrollX: true,
+            scrollY: "100px",
             scrollCollapse:false,
             scroller: true,
             autoWidth: false,
@@ -110,6 +111,16 @@
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
+            const dt_root = this.refs.dt.root;
+            const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
+            const margin = 10;
+            const exclude_h = dt_elm.offsetHeight + margin;
+            const h = this.refs.base.clientHeight - exclude_h;
+            this.refs.dt.ress({
+                w: null,
+                h: h,
+            }); 
+
             this.refs.dt.setData(viewinfo.commnets);
         });
 
@@ -118,8 +129,7 @@
         });
 
         // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";
-        this.on("mount", () => {
-            this.refs.description.innerHTML = "<a href=# class=\"dlink\">test</a>";
+        this.on("mount", () => {      
             // this.description = "<a href=\"http://www.newcredge.com/\">test</a>";
             // let elm = document.getElementById("description");
             // elm.innerHTML = "<a href=# onclick={pp}>test</a>";
@@ -129,11 +139,17 @@
         });
         obs.on("pageResizedEvent", (size)=> {
             if(this.refs!==undefined){
+                // const ch = this.root.clientHeight;
+                // const margin = 10;
+                // const exclude_h = 200 + margin + 40;
+                const dt_root = this.refs.dt.root;
+                const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
                 const margin = 10;
-                const exclude_h = 200 + margin;
+                const exclude_h = dt_elm.offsetHeight + margin;
+                const h = this.refs.base.clientHeight - exclude_h;
                 this.refs.dt.ress({
                     w: size.w,
-                    h: size.h - exclude_h
+                    h: h
                 });
             }
         });

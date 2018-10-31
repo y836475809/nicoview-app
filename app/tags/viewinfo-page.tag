@@ -96,9 +96,11 @@
             // dom: "Zlfrtip",
             dom: "Zrt",
             scrollX: true,
-            scrollY: "100px",
+            scrollY: true,
             scrollCollapse:false,
-            scroller: true,
+            scroller: {
+                displayBuffer: 20
+            },
             autoWidth: false,
             paging: true,
             displayLength:100,
@@ -119,7 +121,7 @@
             this.refs.dt.ress({
                 w: null,
                 h: h,
-            }); 
+            });
 
             this.refs.dt.setData(viewinfo.commnets);
         });

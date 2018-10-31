@@ -55,12 +55,13 @@
         table.columns.adjust();
     };
 
+    // this.row_h = null;
+    const row_h = params.scroller.row_height;
     this.scrollto = (index) => {
         let table = getDataTable();
         if(!table.data().count()){
             return;
         }
-        const row_h = table.row(0).node().offsetHeight;
         const scroll_body = this.root.querySelector("div.dataTables_scrollBody");
         const sc_h = scroll_body.offsetHeight;
         table.row( index -sc_h/row_h + 1).scrollTo();

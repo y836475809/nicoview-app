@@ -25,10 +25,10 @@
     </style>
     
     <div id="player-frame" class="split split-horizontal">
-        <player-page></player-page>
+        <player-page ref="player_frame"></player-page>
     </div>
     <div id="viewinfo-frame" class="split split-horizontal">
-        <viewinfo-page></viewinfo-page>
+        <viewinfo-page ref="viewinfo_frame"></viewinfo-page>
     </div>
 
     <script>
@@ -39,6 +39,27 @@
         require("./viewinfo-page.tag");
 
         let sp;
+        this.video_size = null;
+
+        this.getVideoSize = () => {
+            return this.video_size;
+        };
+        this.getFrameSize = () => {
+            return {
+                player:{
+                    width: this.refs.player_frame.root.offsetWidth, 
+                    height: this.refs.player_frame.root.offsetHeight
+                },
+                viewinfo:{
+                    width: this.refs.viewinfo_frame.root.offsetWidth, 
+                    height: this.refs.viewinfo_frame.root.offsetHeight                   
+                }
+            };
+        };
+
+        obs.on("resizePlayer", (video_size) => { 
+            this.video_size = video_size;
+        });
 
         obs.on("on_set_split_sizes", (sizes) => {
             sp.setSizes(sizes);

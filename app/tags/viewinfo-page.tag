@@ -70,7 +70,7 @@
         const time_format = require("../js/time_format");
         require("./base-datatable.tag");
 
-        this.thumbnail_url = "\"\"";
+        this.thumbnail_url = "";
         this.title =  "";
         this.first_retrieve =  "";
         this.view_counter = 0;

@@ -11,6 +11,7 @@
     <div class="test-button">
         <button type="button" onclick={onclickLoad}>load</button>
         <button type="button" onclick={onclickScale1}>x1</button>
+        <button type="button" onclick={onclickScale15}>x1.5</button>
         <button type="button" onclick={onclickLoad2}>load comment</button>
         <button type="button" onclick={onclickLoad3}>scroll</button>
     </div>
@@ -36,7 +37,6 @@
 
             obs.trigger("on_set_player_state", "play"); 
             obs.trigger("receivedData", data); 
-            // obs.trigger("on_set_split_sizes", [75, 25]); 
         };
         this.onclickLoad2 = () => {
             let commnets = [];
@@ -86,26 +86,10 @@
         };
         // let self = this;
         this.onclickScale1 = () => {
-            const video_size = this.refs.pv_page.getVideoSize();
-            console.log("onclickScale1 video_size " , video_size);
-
-            console.log("onclickScale1 pv_page.root.offsetHeight " , this.refs.pv_page.root.offsetHeight);
-            console.log("onclickScale1 pv_page.root.offsetWidth " , this.refs.pv_page.root.offsetWidth);
-            
-            const player_frame_size = this.refs.pv_page.getFrameSize().player;
-            console.log("onclickScale1 player_frame_size " , player_frame_size);
-            
-            // const dh =  window.outerHeight - this.refs.pv_page.root.offsetHeight;
-            const dh =  window.outerHeight - player_frame_size.height;
-            const new_height = video_size.height + dh + 200;
-
-            // const dw = video_size.width - window.innerWidth;
-            // const dw = video_size.width - this.refs.pv_page.root.offsetWidth;
-            const dw = video_size.width - player_frame_size.width;
-            const new_width = window.outerWidth + dw;
-            console.log("onclickScale1 new_height " , new_height);
-            console.log("onclickScale1 new_width " , new_width);
-            window.resizeTo(new_width, new_height);
-        };            
+            this.refs.pv_page.setkk(1);
+        }; 
+        this.onclickScale15 = () => {
+            this.refs.pv_page.setkk(1.5);
+        };           
     </script>
 </test-player-viewinfo>

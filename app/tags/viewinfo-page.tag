@@ -26,6 +26,11 @@
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
             background-color: rgb(139, 39, 39);
+            border: 2px solid #111;
+        }
+        #tddd{
+            width: 100%;
+            height: 100%;            
         }
         table.dataTable tbody td {
             padding: 0px;
@@ -69,6 +74,9 @@
         /* globals obs */
         const time_format = require("../js/time_format");
         require("./base-datatable.tag");
+
+        let info_height = 0;
+        let description_height = 0;
 
         this.thumbnail_url = "";
         this.title =  "";
@@ -168,7 +176,11 @@
         });
 
         // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";
-        this.on("mount", () => {      
+        this.on("mount", () => {     
+            const css_style = getComputedStyle(this.root);
+            info_height = parseInt(css_style.getPropertyValue("--info-height"));
+            description_height = parseInt(css_style.getPropertyValue("--description-height"));
+ 
             // this.description = "<a href=\"http://www.newcredge.com/\">test</a>";
             // let elm = document.getElementById("description");
             // elm.innerHTML = "<a href=# onclick={pp}>test</a>";
@@ -178,14 +190,11 @@
         });
         obs.on("pageResizedEvent", (size)=> {
             if(this.refs!==undefined){
-                // const ch = this.root.clientHeight;
-                // const margin = 10;
-                // const exclude_h = 200 + margin + 40;
                 const dt_root = this.refs.dt.root;
                 const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
                 const margin = 10;
-                const exclude_h = dt_elm.offsetHeight + margin;
-                const h = this.refs.base.clientHeight - exclude_h;
+                const exclude_h = info_height + description_height + dt_elm.offsetHeight + margin;
+                const h = this.root.clientHeight - exclude_h;
                 this.refs.dt.ress({
                     w: size.w,
                     h: h

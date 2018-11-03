@@ -54,6 +54,7 @@
         
         let tags_height = 0;
         let controls_height = 0;
+        this.video_size = null;
 
         const adjustPlayerVideoSize = () => {
             const ch = this.root.clientHeight;
@@ -61,14 +62,20 @@
             document.getElementById("player-video").style.height = h + "px";
         };
 
-        obs.on("resizePlayer", (video_size) => {    
-            const dh =  window.outerHeight - this.root.offsetHeight;
-            const new_height = video_size.height + 200 + dh;
+        obs.on("resize_video_size", (scale, callback) => {
+            if(!this.video_size){
+                return;
+            }
 
-            const dw = video_size.width - window.innerWidth;
-            const new_width = window.outerWidth + dw;
+            const new_size = {
+                width: this.video_size.width * scale,
+                height: this.video_size.height * scale + tags_height + controls_height
+            };
+            callback(new_size);
+        });
 
-            //window.resizeTo(new_width, new_height);
+        obs.on("resizePlayer", (video_size) => { 
+            this.video_size = video_size;
         });
 
         this.on("mount", () => {

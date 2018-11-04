@@ -11,12 +11,22 @@
             margin: 0;
             overflow-y: hidden;
             --row-height: 25px;
-        }
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 12px;
+        }    
         #info{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
             background-color: darkgray;
+            display: flex;
         } 
+        #info .right{
+            margin-left: 5px;
+            white-space: nowrap;
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
         #description{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
@@ -25,24 +35,22 @@
         #comment-list{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
-            background-color: rgb(139, 39, 39);
-            border: 2px solid #111;
+            background-color: #cccccc;
+            /* border: 2px solid #111; */
         }
-        #tddd{
-            width: 100%;
-            height: 100%;            
+        table.dataTable thead th{
+            white-space: nowrap;
         }
         table.dataTable tbody td {
             padding: 0px;
             margin: 0px;
-            /* font-size: 5px; */   
             height: var(--row-height);
         }
         table tbody tr td:nth-of-type(2) {
-            max-width: 200px;
+            /* max-width: 200px; */
             overflow: hidden; 
             text-overflow: ellipsis;
-            white-space: nowrap;
+            white-space: nowrap; 
         }
         table tbody tr td:nth-of-type(1),
         table tbody tr td:nth-of-type(3),
@@ -52,27 +60,33 @@
             overflow: hidden; 
             text-overflow: ellipsis;
             white-space: nowrap;
+            text-align: center;
         }
     </style>
     
     <div id="info">
-        <img src={this.thumbnail_url} alt="test" width="100" height="70">
-        <div>{this.title}</div>
-        <div>first_retrieve {this.first_retrieve}</div>
-        <div>view_counter {this.view_counter}</div>
-        <div>comment_num {this.comment_num}</div>
-        <div>mylist_counter {this.mylist_counter}</div>
+        <div>
+            <img src={this.thumbnail_url} alt="test" width="100" height="70">
+        </div>
+        <div class="right">
+            <div>{this.title}</div>
+            <div>{this.message.POSTED} {this.first_retrieve}</div>
+            <div>{this.message.VIEW} {this.view_counter}</div>
+            <div>{this.message.COMMENT} {this.comment_num}</div>
+            <div>{this.message.MYLIST} {this.mylist_counter}</div>
+        </div>
     </div>
     <div ref="description" id="description">
         {this.description}
     </div>
     <div ref="base" id="comment-list">
-        <base-datatable id="tddd" ref="dt" params={this.params}></base-datatable>
+        <base-datatable ref="dt" params={this.params}></base-datatable>
     </div>
 
     <script>
         /* globals obs */
         const time_format = require("../js/time_format");
+        this.message = require("../js/message");
         require("./base-datatable.tag");
 
         let info_height = 0;
@@ -95,12 +109,12 @@
         this.params = {};
         this.params.dt = {
             columns : [
-                { title: "time" },
-                { title: "comment" },
-                { title: "user_id" },
-                { title: "pub_date" },
-                { title: "no" },
-                { title: "option" }
+                { title: this.message.TIME },
+                { title: this.message.COMMENT },
+                { title: this.message.USER_ID },
+                { title: this.message.POSTED },
+                { title: this.message.NO },
+                { title: this.message.OPTION }
             ],
             columnDefs: [
                 {
@@ -126,6 +140,7 @@
             colResize : {
                 handleWidth: 10,
                 // exclude: [0],
+                tableWidthFixed: false
             },
             // dom: "Zlfrtip",
             dom: "Zrt",
@@ -160,7 +175,7 @@
 
             this.thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
-            this.first_retrieve = viewinfo.thumb_info.first_retrieve;
+            this.first_retrieve = time_format.format(viewinfo.thumb_info.first_retrieve);
             this.view_counter = viewinfo.thumb_info.view_counter;
             this.comment_num = viewinfo.thumb_info.comment_num;
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;

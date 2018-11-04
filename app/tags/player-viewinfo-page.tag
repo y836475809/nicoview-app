@@ -3,6 +3,7 @@
         :scope {
             display: flex;
             height: 100%;
+            --right-width: 300px;
         }
     
         .gutter {
@@ -12,12 +13,12 @@
     
         .split.left{
             margin: 0;
-            width: calc(100% - 200px);
+            width: calc(100% - var(--right-width));
         }
 
         .split.right{
             margin: 0;
-            width: calc(200px);
+            width: var(--right-width);
             height: 100%;
         }
     </style>

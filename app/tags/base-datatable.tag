@@ -5,7 +5,6 @@
                table.dataTable tbody tr td:first-child {  
             border-left: 1px solid #e3e7e8;
         }
-
         :scope table.dataTable thead tr th {  
             border-top: 1px solid #e3e7e8;
             border-right: 1px solid #e3e7e8;
@@ -14,16 +13,16 @@
         :scope table.dataTable tbody td {
             border-right: 1px solid #e3e7e8;
         }
-        .dataTables_scrollBody{
-            overflow-y: scroll !important;
-        }
         table.dataTable thead th, table.dataTable thead td {
             padding: 4px 4px;
             border-bottom: 1px solid #111;
         }
+        .dataTables_scrollBody{
+            overflow-y: scroll !important;
+        }
     </style>
 
-<table ref="dt" class="display stripe hover" style="width:100%"></table>
+<table ref="dt" class="stripe hover" style="width:100%"></table>
 
 <script>
     /* globals opts obs $ */

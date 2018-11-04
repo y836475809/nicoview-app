@@ -38,16 +38,13 @@
             background-color: #cccccc;
             /* border: 2px solid #111; */
         }
-        table.dataTable thead th{
-            white-space: nowrap;
-        }
         table.dataTable tbody td {
             padding: 0px;
             margin: 0px;
             height: var(--row-height);
         }
         table tbody tr td:nth-of-type(2) {
-            /* max-width: 200px; */
+            max-width: 200px;
             overflow: hidden; 
             text-overflow: ellipsis;
             white-space: nowrap; 
@@ -62,6 +59,23 @@
             white-space: nowrap;
             text-align: center;
         }
+        table.dataTable thead tr th:first-child, 
+        table.dataTable tbody tr td:first-child {  
+            border-left: 1px solid gray;
+        }
+        table.dataTable thead tr th {  
+            border-top: 1px solid gray;
+            border-right: 1px solid gray;
+            border-bottom: 1px solid gray;
+        }
+        table.dataTable tbody td {
+            border-right: 1px solid gray;
+        }
+        table.dataTable thead th, 
+        table.dataTable thead td {
+            padding: 4px 4px;
+            border-bottom: 1px solid gray;
+        }   
     </style>
     
     <div id="info">
@@ -80,7 +94,7 @@
         {this.description}
     </div>
     <div ref="base" id="comment-list">
-        <base-datatable ref="dt" params={this.params}></base-datatable>
+        <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>
 
     <script>
@@ -117,6 +131,7 @@
                 { title: this.message.OPTION }
             ],
             columnDefs: [
+                { className: "dt-head-nowrap", targets: "_all" },
                 {
                     targets: 0,
                     orderable: false,
@@ -125,7 +140,7 @@
                         return time_format.toPlayTime(data*10);
                     },
                 },
-                { targets: 1, data: "text" },
+                { targets: 1, data: "text"},
                 { targets: 2, data: "user_id" },
                 { 
                     targets: 3, 
@@ -143,7 +158,7 @@
                 tableWidthFixed: false
             },
             // dom: "Zlfrtip",
-            dom: "Zrt",
+            dom: "rt",
             scrollX: true,
             scrollY: true,
             scrollCollapse:false,

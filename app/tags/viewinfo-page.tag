@@ -78,7 +78,7 @@
     
     <div id="info">
         <div>
-            <img src={this.thumbnail_url} alt="test" width="100" height="70">
+            <img src={this.thumbnail_url} alt="test">
         </div>
         <div class="right">
             <div>{this.title}</div>
@@ -131,6 +131,7 @@
             columnDefs: [
                 { width:100, targets: [0,2,3,4,5] },
                 { width:200, targets: [1] },
+                { orderable: false, targets: "_all" },
                 {
                     targets: 0,
                     orderable: false,

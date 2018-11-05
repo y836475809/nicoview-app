@@ -38,26 +38,24 @@
             background-color: #cccccc;
             /* border: 2px solid #111; */
         }
+        table{
+            table-layout: fixed;
+        }
+        table.dataTable thead tr th{
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;         
+        }
         table.dataTable tbody td {
             padding: 0px;
             margin: 0px;
             height: var(--row-height);
-        }
-        table tbody tr td:nth-of-type(2) {
-            max-width: 200px;
             overflow: hidden; 
             text-overflow: ellipsis;
             white-space: nowrap; 
-        }
-        table tbody tr td:nth-of-type(1),
-        table tbody tr td:nth-of-type(3),
-        table tbody tr td:nth-of-type(4),
-        table tbody tr td:nth-of-type(5),
-        table tbody tr td:nth-of-type(6) {
-            overflow: hidden; 
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;
+            padding-left: 4px;
+            padding-right: 4px;
         }
         table.dataTable thead tr th:first-child, 
         table.dataTable tbody tr td:first-child {  
@@ -131,7 +129,8 @@
                 { title: this.message.OPTION }
             ],
             columnDefs: [
-                { className: "dt-head-nowrap", targets: "_all" },
+                { width:100, targets: [0,2,3,4,5] },
+                { width:200, targets: [1] },
                 {
                     targets: 0,
                     orderable: false,
@@ -139,15 +138,17 @@
                     render: function (data, type, row, meta) {
                         return time_format.toPlayTime(data*10);
                     },
+                    width:200
                 },
                 { targets: 1, data: "text"},
-                { targets: 2, data: "user_id" },
+                { targets: 2, data: "user_id"},
                 { 
                     targets: 3, 
                     data: "date" ,
                     render: function (data, type, row, meta) {
                         return time_format.format(data);
                     },
+ 
                 },
                 { targets: 4, data: "no" },
                 { targets: 5, data:  "mail" }
@@ -158,7 +159,7 @@
                 tableWidthFixed: false
             },
             // dom: "Zlfrtip",
-            dom: "rt",
+            dom: "Zrt",
             scrollX: true,
             scrollY: true,
             scrollCollapse:false,

@@ -62,6 +62,19 @@
             document.getElementById("player-video").style.height = h + "px";
         };
 
+        this.getVideoScale = () => {
+            if(!this.video_size){
+                return -1;
+            }
+            const elm = document.getElementById("player-video");
+            const scale_w = parseFloat(elm.style.width) / this.video_size.width;
+            const scale_h = parseFloat(elm.style.height) / this.video_size.height;
+            if(Math.abs(scale_w-scale_h)<1){
+                return scale_w;
+            }
+            return -1;
+        };
+
         obs.on("resize_video_size", (scale, callback) => {
             if(!this.video_size){
                 return;

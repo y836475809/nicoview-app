@@ -24,9 +24,27 @@ function getLibraryFilePath(){
     return path.join(file_path, "library.json");
 }
 
+function InfoViewWidth(width){
+    if(width){
+        localStorage.setItem("infoview-width", width);
+    }else{
+        return localStorage.getItem("infoview-width");
+    }
+}
+
+function VideoScale(scale){
+    if(scale){
+        localStorage.setItem("video-scale", scale);
+    }else{
+        return localStorage.getItem("video-scale");
+    }
+}
+
 module.exports = {
     getLibraryPath: getLibraryPath,
     setLibraryPath: setLibraryPath,
     getDataPath: getDataPath,
-    getLibraryFilePath: getLibraryFilePath
+    getLibraryFilePath: getLibraryFilePath,
+    InfoViewWidth: InfoViewWidth,
+    VideoScale: VideoScale
 };

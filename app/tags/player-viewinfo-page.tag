@@ -33,6 +33,7 @@
 
     <script>
         /* globals obs */
+        const pref = require("../js/preference");
         require("./player-page.tag");
         require("./viewinfo-page.tag");
 
@@ -72,6 +73,18 @@
 
         this.on("mount", () => {
         });   
+
+        obs.on("resizePlayer", (video_size) => { 
+
+        });
+
+        window.onbeforeunload = (e) => {
+            const video_scale = this.refs.player_frame.getVideoScale();
+            pref.VideoScale(video_scale);
+
+            const ve = document.getElementById("viewinfo-frame");  
+            pref.InfoViewWidth(parseInt(ve.style.width));
+        };
         
         const timeout = 200;
         let timer;

@@ -64,11 +64,11 @@
 
         this.getVideoScale = () => {
             if(!this.video_size){
-                return -1;
+                return null;
             }
             const elm = document.getElementById("player-video");
-            const scale_w = parseFloat(elm.style.width) / this.video_size.width;
-            const scale_h = parseFloat(elm.style.height) / this.video_size.height;
+            const scale_w = elm.offsetWidth / this.video_size.width;
+            const scale_h = elm.offsetHeight / this.video_size.height;
             if(Math.abs(scale_w-scale_h)<1){
                 return scale_w;
             }
@@ -87,8 +87,9 @@
             callback(new_size);
         });
 
-        obs.on("resizePlayer", (video_size) => { 
+        obs.on("load_meta_data", (video_size) => { 
             this.video_size = video_size;
+            obs.trigger("load_video");
         });
 
         this.on("mount", () => {

@@ -57,7 +57,7 @@
             gutter = false;
         };
 
-        this.setkk = (scale) => {  
+        this.resizeVideo = (scale) => {  
             obs.trigger("resize_video_size", scale, (new_size) => {
                 let pf_elm = document.getElementById("player-frame");
 
@@ -72,18 +72,31 @@
         };
 
         this.on("mount", () => {
+            const vw = pref.InfoViewWidth();
+            if(vw){
+                let pe = document.getElementById("player-frame");
+                let ve = document.getElementById("viewinfo-frame");
+                pe.style.width = `calc(100% - ${vw}px)`;
+                ve.style.width = vw + "px";
+            }
         });   
 
-        obs.on("resizePlayer", (video_size) => { 
-
+        obs.on("load_video", () => { 
+            const video_scale = pref.VideoScale();
+            if(!video_scale || video_scale<0){
+                return;
+            }       
+            this.resizeVideo(video_scale);
         });
 
         window.onbeforeunload = (e) => {
             const video_scale = this.refs.player_frame.getVideoScale();
-            pref.VideoScale(video_scale);
+            if(video_scale){
+                pref.VideoScale(video_scale);
+            }
 
             const ve = document.getElementById("viewinfo-frame");  
-            pref.InfoViewWidth(parseInt(ve.style.width));
+            pref.InfoViewWidth(parseInt(ve.offsetWidth));
         };
         
         const timeout = 200;

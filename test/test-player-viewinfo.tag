@@ -86,10 +86,10 @@
         };
         // let self = this;
         this.onclickScale1 = () => {
-            this.refs.pv_page.setkk(1);
+            this.refs.pv_page.resizeVideo(1);
         }; 
         this.onclickScale15 = () => {
-            this.refs.pv_page.setkk(1.5);
+            this.refs.pv_page.resizeVideo(1.5);
         };           
     </script>
 </test-player-viewinfo>

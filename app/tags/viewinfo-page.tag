@@ -73,7 +73,11 @@
         table.dataTable thead td {
             padding: 4px 4px;
             border-bottom: 1px solid gray;
-        }   
+        }  
+        #sync-comment-check{
+            height: 25px;
+            vertical-align:middle;
+        }
     </style>
     
     <div id="info">
@@ -92,6 +96,7 @@
         {this.description}
     </div>
     <div ref="base" id="comment-list">
+        <input id="sync-comment-check" type="checkbox" onclick={this.SyncCommentCheck} /><label for="sync-comment-check">sync</label>
         <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>
 
@@ -117,6 +122,11 @@
 
         const pp = (e) =>{
             console.log("pp = ", e);
+        };
+
+        this.SyncCommentCheck = (e) => {
+            const chk = e.target.checked;
+            console.log(chk);
         };
 
         const row_height = 25;
@@ -185,8 +195,12 @@
         obs.on("on_change_viweinfo", (viewinfo)=> {
             const dt_root = this.refs.dt.root;
             const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
+            const ch_elm = document.getElementById("sync-comment-check");
             const margin = 10;
-            const exclude_h = dt_elm.offsetHeight + margin;
+            const exclude_h = 
+                dt_elm.offsetHeight 
+                + ch_elm.offsetHeight 
+                + margin;
             const h = this.refs.base.clientHeight - exclude_h;
             this.refs.dt.ress({
                 w: null,
@@ -259,8 +273,13 @@
             if(this.refs!==undefined){
                 const dt_root = this.refs.dt.root;
                 const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
+                const ch_elm = document.getElementById("sync-comment-check");
                 const margin = 10;
-                const exclude_h = info_height + description_height + dt_elm.offsetHeight + margin;
+                const exclude_h = info_height 
+                        + description_height 
+                        + dt_elm.offsetHeight 
+                        + ch_elm.offsetHeight 
+                        + margin;
                 const h = this.root.clientHeight - exclude_h;
                 this.refs.dt.ress({
                     w: size.w,

@@ -28,7 +28,8 @@
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
-        <viewinfo-page ref="viewinfo_frame"></viewinfo-page>
+        <viewinfo-page ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
+        </viewinfo-page>
     </div>
 
     <script>
@@ -37,6 +38,7 @@
         require("./player-page.tag");
         require("./viewinfo-page.tag");
 
+        this.sync_comment_checked = pref.SyncComment();
         let gutter = false;
 
         this.mousemove = (e) => {
@@ -97,6 +99,8 @@
 
             const ve = document.getElementById("viewinfo-frame");  
             pref.InfoViewWidth(parseInt(ve.offsetWidth));
+
+            pref.SyncComment(this.refs.viewinfo_frame.getSyncCommentChecked());
         };
         
         const timeout = 200;

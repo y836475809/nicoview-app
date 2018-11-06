@@ -40,11 +40,24 @@ function VideoScale(scale){
     }
 }
 
+function SyncComment(value){
+    if(value){
+        localStorage.setItem("sync-comment-check", value);
+    }else{
+        const checked = localStorage.getItem("sync-comment-check");
+        if(!checked){
+            return false;
+        }
+        return checked;
+    }
+}
+
 module.exports = {
     getLibraryPath: getLibraryPath,
     setLibraryPath: setLibraryPath,
     getDataPath: getDataPath,
     getLibraryFilePath: getLibraryFilePath,
     InfoViewWidth: InfoViewWidth,
-    VideoScale: VideoScale
+    VideoScale: VideoScale,
+    SyncComment: SyncComment
 };

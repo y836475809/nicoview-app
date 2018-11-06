@@ -96,7 +96,7 @@
         {this.description}
     </div>
     <div ref="base" id="comment-list">
-        <input id="sync-comment-check" type="checkbox" onclick={this.SyncCommentCheck} /><label for="sync-comment-check">sync</label>
+        <input id="sync-comment-check" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label for="sync-comment-check">sync</label>
         <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>
 
@@ -117,16 +117,21 @@
         this.mylist_counter = 0;
         this.description = "";
 
+        let play_time_ms = 0;
         let current_comment_index = 0;
         let commnet_list = [];
+        let sync_comment_checked = this.opts.sync_comment_checked;
 
         const pp = (e) =>{
             console.log("pp = ", e);
         };
 
-        this.SyncCommentCheck = (e) => {
-            const chk = e.target.checked;
-            console.log(chk);
+        this.onclickSyncCommentCheck = (e) => {
+            sync_comment_checked = e.target.checked;
+        };
+
+        this.getSyncCommentChecked = () => {
+            return sync_comment_checked;
         };
 
         const row_height = 25;
@@ -215,6 +220,7 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.description = viewinfo.thumb_info.description;
 
+            play_time_ms = 0;
             current_comment_index = 0;
             commnet_list = viewinfo.commnets;
             this.refs.dt.setData(viewinfo.commnets);
@@ -227,18 +233,24 @@
         });
 
         obs.on("seek_update", (current_sec)=> {
+            if(!sync_comment_checked){
+                return;
+            }
             if(commnet_list.length==0){
                 return;
             }
+
             const current_ms = current_sec * 1000;
-            const cur_commnet = commnet_list[current_comment_index];
             const len = commnet_list.length;
-            if(cur_commnet.vpos*10<current_ms){        
+            const is_foward = play_time_ms <= current_ms;
+            play_time_ms = current_ms;
+
+            if(is_foward){
                 for (let index = current_comment_index; index < len; index++) {
                     const commnet = commnet_list[index];
                     if(commnet.vpos*10 >= current_ms){
                         current_comment_index = index;
-                        this.refs.dt.scrollto(index);
+                        this.refs.dt.scrollto(current_comment_index);
                         return;
                     }
                 }
@@ -246,13 +258,13 @@
             }else{
                 for (let index = current_comment_index; index >= 0; index--) {
                     const commnet = commnet_list[index];
-                    if(commnet.vpos*10 < current_ms){
+                    if(commnet.vpos*10 <= current_ms){
                         current_comment_index = index;
-                        this.refs.dt.scrollto(index);
+                        this.refs.dt.scrollto(current_comment_index);
                         return;
                     }
                 } 
-                this.refs.dt.scrollto(0);            
+                this.refs.dt.scrollto(0);
             }
         });
 
@@ -267,7 +279,10 @@
             // elm.innerHTML = "<a href=# onclick={pp}>test</a>";
             this.root.querySelectorAll(".dlink").forEach((link) => {
                 link.addEventListener("click", pp);
-            });       
+            });
+            
+            let ch_elm = document.getElementById("sync-comment-check");
+            ch_elm.checked = sync_comment_checked;
         });
         obs.on("pageResizedEvent", (size)=> {
             if(this.refs!==undefined){

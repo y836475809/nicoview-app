@@ -112,6 +112,9 @@
         this.mylist_counter = 0;
         this.description = "";
 
+        let current_comment_index = 0;
+        let commnet_list = [];
+
         const pp = (e) =>{
             console.log("pp = ", e);
         };
@@ -137,7 +140,7 @@
                     orderable: false,
                     data: "vpos",
                     render: function (data, type, row, meta) {
-                        return time_format.toPlayTime(data*10);
+                        return time_format.toPlayTime(data*10/1000);
                     },
                     width:200
                 },
@@ -198,6 +201,8 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.description = viewinfo.thumb_info.description;
 
+            current_comment_index = 0;
+            commnet_list = viewinfo.commnets;
             this.refs.dt.setData(viewinfo.commnets);
 
             this.update();
@@ -205,6 +210,36 @@
 
         obs.on("on_scroll", (index)=> {
             this.refs.dt.scrollto(index);
+        });
+
+        obs.on("seek_update", (current_sec)=> {
+            if(commnet_list.length==0){
+                return;
+            }
+            const current_ms = current_sec * 1000;
+            const cur_commnet = commnet_list[current_comment_index];
+            const len = commnet_list.length;
+            if(cur_commnet.vpos*10<current_ms){        
+                for (let index = current_comment_index; index < len; index++) {
+                    const commnet = commnet_list[index];
+                    if(commnet.vpos*10 >= current_ms){
+                        current_comment_index = index;
+                        this.refs.dt.scrollto(index);
+                        return;
+                    }
+                }
+                this.refs.dt.scrollto(len-1);
+            }else{
+                for (let index = current_comment_index; index >= 0; index--) {
+                    const commnet = commnet_list[index];
+                    if(commnet.vpos*10 < current_ms){
+                        current_comment_index = index;
+                        this.refs.dt.scrollto(index);
+                        return;
+                    }
+                } 
+                this.refs.dt.scrollto(0);            
+            }
         });
 
         // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";

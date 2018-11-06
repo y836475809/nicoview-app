@@ -44,7 +44,7 @@
             for (let index = 0; index < nn; index++) {
                 commnets.push({
                     no: index + 1,
-                    vpos: 10 + index,
+                    vpos: 50 * index,
                     date: 1332592373506 + index*100,
                     user_id: "AAA",
                     mail: "ue",

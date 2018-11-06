@@ -63,7 +63,7 @@
         }
         const scroll_body = this.root.querySelector("div.dataTables_scrollBody");
         const sc_h = scroll_body.offsetHeight;
-        table.row( index -sc_h/row_h + 1).scrollTo();
+        table.row( index -sc_h/row_h + 1).scrollTo(false);
     };
     // this.adjust_columns = ()=>{
     //     let table = getDataTable();

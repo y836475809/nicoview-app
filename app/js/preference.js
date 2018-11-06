@@ -1,5 +1,25 @@
 const path = require("path");
 
+function PrimitivelocalStorage(key, value){
+    if(value){
+        localStorage.setItem(key, value);
+    }else{
+        return localStorage.getItem(key);
+    }
+}
+
+function BooleanlocalStorage(key, value){
+    if(value != undefined){
+        localStorage.setItem(key, value);
+    }else{
+        const checked = localStorage.getItem(key);
+        if(checked == null){
+            return false;
+        }
+        return checked.toLowerCase() == "true";
+    }
+}
+
 function getLibraryPath(){
     return localStorage.getItem("library-path");
 }
@@ -24,32 +44,16 @@ function getLibraryFilePath(){
     return path.join(file_path, "library.json");
 }
 
-function InfoViewWidth(width){
-    if(width){
-        localStorage.setItem("infoview-width", width);
-    }else{
-        return localStorage.getItem("infoview-width");
-    }
+function InfoViewWidth(value){
+    return PrimitivelocalStorage("infoview-width", value);
 }
 
-function VideoScale(scale){
-    if(scale){
-        localStorage.setItem("video-scale", scale);
-    }else{
-        return localStorage.getItem("video-scale");
-    }
+function VideoScale(value){
+    return PrimitivelocalStorage("video-scale", value);
 }
 
 function SyncComment(value){
-    if(value){
-        localStorage.setItem("sync-comment-check", value);
-    }else{
-        const checked = localStorage.getItem("sync-comment-check");
-        if(!checked){
-            return false;
-        }
-        return checked;
-    }
+    return BooleanlocalStorage("sync-comment-check", value);
 }
 
 module.exports = {

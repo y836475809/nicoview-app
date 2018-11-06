@@ -74,7 +74,8 @@
             padding: 4px 4px;
             border-bottom: 1px solid gray;
         }  
-        #sync-comment-check{
+
+        .viewinfo-checkbox{
             height: 25px;
             vertical-align:middle;
         }
@@ -96,7 +97,7 @@
         {this.description}
     </div>
     <div ref="base" id="comment-list">
-        <input id="sync-comment-check" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label for="sync-comment-check">sync</label>
+        <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
         <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>
 
@@ -105,6 +106,8 @@
         const time_format = require("../js/time_format");
         this.message = require("../js/message");
         require("./base-datatable.tag");
+
+        const row_height = 25;
 
         let info_height = 0;
         let description_height = 0;
@@ -134,7 +137,28 @@
             return sync_comment_checked;
         };
 
-        const row_height = 25;
+        const resizeCommnetList = () => {
+            if(this.refs==undefined){
+                return;
+            }
+
+            const dt_elm = this.refs.dt.root.querySelector("div.dataTables_scrollHead");
+            const ch_elm = this.root.querySelector(".viewinfo-checkbox");
+            const margin = 10;
+            const exclude_h = info_height + description_height 
+                    + dt_elm.offsetHeight + ch_elm.offsetHeight 
+                    + margin;
+            const h = this.root.clientHeight - exclude_h;
+            this.refs.dt.ress({
+                w: null,
+                h: h
+            });
+        };
+
+        const updateSyncCommentCheckBox = () => {
+            let ch_elm = this.root.querySelector(".viewinfo-checkbox");
+            ch_elm.checked = sync_comment_checked;
+        };
 
         this.params = {};
         this.params.dt = {
@@ -174,10 +198,8 @@
             ], 
             colResize : {
                 handleWidth: 10,
-                // exclude: [0],
                 tableWidthFixed: false
             },
-            // dom: "Zlfrtip",
             dom: "Zrt",
             scrollX: true,
             scrollY: true,
@@ -198,19 +220,7 @@
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
-            const dt_root = this.refs.dt.root;
-            const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
-            const ch_elm = document.getElementById("sync-comment-check");
-            const margin = 10;
-            const exclude_h = 
-                dt_elm.offsetHeight 
-                + ch_elm.offsetHeight 
-                + margin;
-            const h = this.refs.base.clientHeight - exclude_h;
-            this.refs.dt.ress({
-                w: null,
-                h: h,
-            });
+            resizeCommnetList();
 
             this.thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
@@ -223,6 +233,7 @@
             play_time_ms = 0;
             current_comment_index = 0;
             commnet_list = viewinfo.commnets;
+
             this.refs.dt.setData(viewinfo.commnets);
 
             this.update();
@@ -268,39 +279,16 @@
             }
         });
 
-        // this.description.innerHTML = "<a href=# onclick={pp}>test</a>";
         this.on("mount", () => {     
             const css_style = getComputedStyle(this.root);
             info_height = parseInt(css_style.getPropertyValue("--info-height"));
             description_height = parseInt(css_style.getPropertyValue("--description-height"));
- 
-            // this.description = "<a href=\"http://www.newcredge.com/\">test</a>";
-            // let elm = document.getElementById("description");
-            // elm.innerHTML = "<a href=# onclick={pp}>test</a>";
-            this.root.querySelectorAll(".dlink").forEach((link) => {
-                link.addEventListener("click", pp);
-            });
             
-            let ch_elm = document.getElementById("sync-comment-check");
-            ch_elm.checked = sync_comment_checked;
+            updateSyncCommentCheckBox();
         });
+        
         obs.on("pageResizedEvent", (size)=> {
-            if(this.refs!==undefined){
-                const dt_root = this.refs.dt.root;
-                const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
-                const ch_elm = document.getElementById("sync-comment-check");
-                const margin = 10;
-                const exclude_h = info_height 
-                        + description_height 
-                        + dt_elm.offsetHeight 
-                        + ch_elm.offsetHeight 
-                        + margin;
-                const h = this.root.clientHeight - exclude_h;
-                this.refs.dt.ress({
-                    w: size.w,
-                    h: h
-                });
-            }
+            resizeCommnetList();
         });
     </script>
 </viewinfo-page>

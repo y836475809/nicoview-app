@@ -69,7 +69,7 @@
             const elm = document.getElementById("player-video");
             const scale_w = elm.offsetWidth / this.video_size.width;
             const scale_h = elm.offsetHeight / this.video_size.height;
-            if(Math.abs(scale_w-scale_h)<1){
+            if(Math.abs(scale_w-scale_h)<1e-3){
                 return scale_w;
             }
             return -1;

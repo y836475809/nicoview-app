@@ -55,8 +55,11 @@
     };
 
     // this.row_h = null;
-    const row_h = params.scroller.row_height;
+    const row_h = params.row_height;
     this.scrollto = (index) => {
+        if(!row_h){
+            return;
+        }
         let table = getDataTable();
         if(!table.data().count()){
             return;

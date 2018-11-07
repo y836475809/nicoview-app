@@ -208,9 +208,9 @@
             scrollY: true,
             scrollCollapse:false,
             scroller: {
-                displayBuffer: 20,
-                row_height: row_height
+                displayBuffer: 20
             },
+            row_height: row_height,
             autoWidth: false,
             paging: true,
             displayLength:100,

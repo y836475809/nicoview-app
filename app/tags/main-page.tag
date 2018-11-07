@@ -37,6 +37,7 @@
 
     <script>
         /* globals obs base_dir */
+        require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
         // let obs = riot.observable();
 

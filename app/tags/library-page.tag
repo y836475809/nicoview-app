@@ -1,10 +1,47 @@
 <library-page id="library-page">
     <style scoped>
         :scope .table-base {
-            background-color: #cccccc;
+            background-color: whitesmoke;
             width: 100%;
             height: 100%;
+            overflow-y: hidden;
         } 
+
+        /* table.dataTable{
+            table-layout: fixed;
+        }      */
+        table.dataTable thead tr th{
+            overflow: hidden; 
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            text-align: center;         
+        }
+        table.dataTable tbody td {
+            padding: 0px;
+            margin: 0px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }     
+        table.dataTable thead tr th:first-child, 
+        table.dataTable tbody tr td:first-child {  
+            border-left: 1px solid gray;
+        }
+        table.dataTable thead tr th {  
+            border-top: 1px solid gray;
+            border-right: 1px solid gray;
+            border-bottom: 1px solid gray;
+        }
+        table.dataTable tbody td {
+            border-right: 1px solid gray;
+        }
+        table.dataTable thead th, 
+        table.dataTable thead td {
+            padding: 4px 4px;
+            border-bottom: 1px solid gray;
+        }  
+        table.dataTable tbody tr:hover {
+            background-color: rgb(211, 218, 228) !important;
+        }
     </style>
 
 <div ref="base" class="table-base">
@@ -66,9 +103,11 @@
             { title: "time" }
         ],
         columnDefs: [
+            { width:100, targets: [1,2,3,4,5,6] },
             {
                 targets: 0,
                 orderable: false,
+                width: 130,
                 data: "image",
                 render: function (data, type, row, meta) {
                     return `<img src="${data}" width="130" height="100">`;
@@ -91,16 +130,27 @@
                 },
             },
             { targets: 5, data: "play_count" },
-            { targets: 6, data: "time" }
+            { 
+                targets: 6, 
+                data: "time",
+                render: function (data, type, row, meta) {
+                    return time_format.toPlayTime(data);
+                },
+            }
         ], 
         colResize : {
             handleWidth: 10,
             exclude: [0],
+            // tableWidthFixed: false
         },
-        dom: "Zlfrtip",  
+        dom: "Zfrti",  
+        scrollX: true,
         scrollY: "100px" ,
         scrollCollapse:false,
-        autoWidth: true,
+        scroller: {
+            displayBuffer: 50
+        },
+        autoWidth: false,
         paging: true,
         displayLength:100,
         lengthMenu: [ 100, 200, 300, 400, 500 ],
@@ -136,7 +186,6 @@
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
-    this.ch = 0;
     this.on("mount", function () {
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();
@@ -144,35 +193,32 @@
         };       
     });
 
-    obs.on("load_data", (data_file_path)=> {
+    const resizeDataTable = () => {
+        if(this.refs == undefined){
+            return;
+        }
         const dt_root = this.refs.dt.root;
-        const dt_elm1 = dt_root.querySelector("div.dataTables_length");
-        const dt_elm2 = dt_root.querySelector("div.dataTables_paginate");
+        const dt_elm1 = dt_root.querySelector("div.dataTables_filter");
         const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
         const margin = 10;
-        const exclude_h = dt_elm1.offsetHeight + dt_elm2.offsetHeight + dt_elm3.offsetHeight + margin;
+        const exclude_h = dt_elm1.offsetHeight 
+            + dt_elm3.offsetHeight 
+            + margin;
         let ch = this.refs.base.clientHeight;
         this.refs.dt.ress({
             w: null,
             h: ch - exclude_h,
         });  
+    };
+
+    obs.on("load_data", (data_file_path)=> {
+        resizeDataTable();
         
         this.loadData(data_file_path);
     });
 
     obs.on("pageResizedEvent", (size)=> {
-        if(this.refs!==undefined){
-            const dt_root = this.refs.dt.root;
-            const dt_elm1 = dt_root.querySelector("div.dataTables_length");
-            const dt_elm2 = dt_root.querySelector("div.dataTables_paginate");
-            const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
-            const margin = 10;
-            const exclude_h = dt_elm1.offsetHeight + dt_elm2.offsetHeight + dt_elm3.offsetHeight + margin;
-            this.refs.dt.ress({
-                w: size.w,
-                h: size.h - exclude_h,
-            });
-        }
+        resizeDataTable();
     });
 </script>
 </library-page>

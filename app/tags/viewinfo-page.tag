@@ -47,9 +47,15 @@
             grid-column: 1 / 3; 
             background-color:whitesmoke;
         }
+        
+        .viewinfo-checkbox{
+            height: 25px;
+            vertical-align:middle;
+        }
+
         table{
             table-layout: fixed;
-        }
+        }      
         table.dataTable thead tr th{
             overflow: hidden; 
             text-overflow: ellipsis;
@@ -83,10 +89,8 @@
             padding: 4px 4px;
             border-bottom: 1px solid gray;
         }  
-
-        .viewinfo-checkbox{
-            height: 25px;
-            vertical-align:middle;
+        table.dataTable tbody tr:hover {
+            background-color: rgb(211, 218, 228) !important;
         }
     </style>
     

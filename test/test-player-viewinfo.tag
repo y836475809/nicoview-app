@@ -13,7 +13,6 @@
         <button type="button" onclick={onclickScale1}>x1</button>
         <button type="button" onclick={onclickScale15}>x1.5</button>
         <button type="button" onclick={onclickLoad2}>load comment</button>
-        <button type="button" onclick={onclickLoad3}>scroll</button>
     </div>
     <player-viewinfo-page ref="pv_page" class="test-player-viewinfo-page"></player-viewinfo-page>
     
@@ -81,10 +80,6 @@
                 commnets: commnets
             }); 
         };
-        this.onclickLoad3 = () => {
-            obs.trigger("on_scroll", 50);
-        };
-        // let self = this;
         this.onclickScale1 = () => {
             this.refs.pv_page.resizeVideo(1);
         }; 

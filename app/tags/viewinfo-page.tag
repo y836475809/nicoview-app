@@ -231,10 +231,6 @@
             this.update();
         });
 
-        obs.on("on_scroll", (index)=> {
-            this.refs.dt.scrollto(index);
-        });
-
         obs.on("seek_update", (current_sec)=> {
             if(!sync_comment_checked){
                 return;

@@ -2,6 +2,7 @@
     <style scoped>
         :scope {
             display: grid;
+            --panel-padding: 4px;
             --video-panel-height: 100px;
             --description-panel-height: 100px;
             grid-template-rows: var(--video-panel-height) var(--description-panel-height) 1fr;
@@ -13,13 +14,21 @@
             --row-height: 25px;
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size: 12px;
+            box-sizing: border-box;
         }    
+        .viewinfo-panel{
+            padding: var(--panel-padding);
+        }
         .viewinfo-video-panel{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
-            background-color: darkgray;
-            display: flex;
+            background-color:whitesmoke;
+            display: flex; 
         } 
+        .viewinfo-thumbnail{
+            width: calc(130px - var(--panel-padding) * 2);
+            height: calc(var(--video-panel-height) - var(--panel-padding) * 2);
+        }
         .viewinfo-video-panel-info{
             margin-left: 5px;
             white-space: nowrap;
@@ -30,13 +39,13 @@
         .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            background-color: rgb(167, 133, 133);
+            border: 1px solid gray;
+            margin: 1px;
         } 
         .viewinfo-comments-panel{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
-            background-color: #cccccc;
-            /* border: 2px solid #111; */
+            background-color:whitesmoke;
         }
         table{
             table-layout: fixed;
@@ -81,22 +90,22 @@
         }
     </style>
     
-    <div class="viewinfo-video-panel">
+    <div class="viewinfo-panel viewinfo-video-panel">
         <div>
-            <img src={this.thumbnail_url} alt="thumbnail" width="130px" height="100px">
+            <img src={this.thumbnail_url} alt="thumbnail" class="viewinfo-thumbnail">
         </div>
         <div class="viewinfo-video-panel-info">
             <div>{this.title}</div>
-            <div>{this.message.POSTED} {this.first_retrieve}</div>
-            <div>{this.message.VIEW} {this.view_counter}</div>
-            <div>{this.message.COMMENT} {this.comment_num}</div>
-            <div>{this.message.MYLIST} {this.mylist_counter}</div>
+            <div>{this.message.POSTED} : {this.first_retrieve}</div>
+            <div>{this.message.VIEW} : {this.view_counter}</div>
+            <div>{this.message.COMMENT} : {this.comment_num}</div>
+            <div>{this.message.MYLIST} : {this.mylist_counter}</div>
         </div>
     </div>
-    <div class="viewinfo-description-panel">
+    <div class="viewinfo-panel viewinfo-description-panel">
         {this.description}
     </div>
-    <div class="viewinfo-comments-panel">
+    <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
         <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>

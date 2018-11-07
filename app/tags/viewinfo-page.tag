@@ -104,6 +104,7 @@
     <script>
         /* globals obs */
         const time_format = require("../js/time_format");
+        const SyncCommentScroll = require("../js/sync_comment_scroll");
         this.message = require("../js/message");
         require("./base-datatable.tag");
 
@@ -117,9 +118,7 @@
         this.mylist_counter = 0;
         this.description = "";
 
-        let play_time_ms = 0;
-        let current_comment_index = 0;
-        let commnet_list = [];
+        let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
 
         this.onclickSyncCommentCheck = (e) => {
@@ -225,9 +224,7 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.description = viewinfo.thumb_info.description;
 
-            play_time_ms = 0;
-            current_comment_index = 0;
-            commnet_list = viewinfo.commnets;
+            sync_comment_scroll.setComments(viewinfo.commnets);
 
             this.refs.dt.setData(viewinfo.commnets);
 
@@ -242,36 +239,9 @@
             if(!sync_comment_checked){
                 return;
             }
-            if(commnet_list.length==0){
-                return;
-            }
 
-            const current_ms = current_sec * 1000;
-            const len = commnet_list.length;
-            const is_foward = play_time_ms <= current_ms;
-            play_time_ms = current_ms;
-
-            if(is_foward){
-                for (let index = current_comment_index; index < len; index++) {
-                    const commnet = commnet_list[index];
-                    if(commnet.vpos*10 >= current_ms){
-                        current_comment_index = index;
-                        this.refs.dt.scrollto(current_comment_index);
-                        return;
-                    }
-                }
-                this.refs.dt.scrollto(len-1);
-            }else{
-                for (let index = current_comment_index; index >= 0; index--) {
-                    const commnet = commnet_list[index];
-                    if(commnet.vpos*10 <= current_ms){
-                        current_comment_index = index;
-                        this.refs.dt.scrollto(current_comment_index);
-                        return;
-                    }
-                } 
-                this.refs.dt.scrollto(0);
-            }
+            const comment_index =  sync_comment_scroll.getCommnetIndex(current_sec);
+            this.refs.dt.scrollto(comment_index);
         });
 
         this.on("mount", () => {                 

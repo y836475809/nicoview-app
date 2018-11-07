@@ -1,10 +1,10 @@
 <player-page>
     <style scoped>
-        :scope { 
+        :scope {
             display: grid;
             margin: 0;
             width: 100%;
-            height: 100%;  
+            height: 100%;
             --tags-height: 100px;
             --controls-height: 100px;
             grid-template-rows: var(--tags-height) 1fr var(--controls-height);
@@ -26,9 +26,10 @@
             background-color: aqua;
         }  
         #player-video {
+            overflow: hidden; 
             object-fit: contain;
             object-position: center center;
-            height: calc(100vh - var(--tags-height) - var(--controls-height));
+            /* height: calc(100vh - var(--tags-height) - var(--controls-height)); */
             width: 100%;        
         }
     </style>
@@ -51,16 +52,57 @@
         require(`${base_dir}/app/tags/player-video.tag`);
         require(`${base_dir}/app/tags/player-controls.tag`);
         
-        obs.on("resizePlayer", (video_size) => {    
-            const dh =  window.outerHeight - this.root.offsetHeight;
-            const new_height = video_size.height + 200 + dh;
+        let tags_height = 0;
+        let controls_height = 0;
+        this.video_size = null;
 
-            const dw = video_size.width - window.innerWidth;
-            const new_width = window.outerWidth + dw;
+        const adjustPlayerVideoSize = () => {
+            const ch = this.root.clientHeight;
+            const h = ch - (tags_height + controls_height);
+            document.getElementById("player-video").style.height = h + "px";
+        };
 
-            //window.resizeTo(new_width, new_height);
+        this.getVideoScale = () => {
+            if(!this.video_size){
+                return null;
+            }
+            const elm = document.getElementById("player-video");
+            const scale_w = elm.offsetWidth / this.video_size.width;
+            const scale_h = elm.offsetHeight / this.video_size.height;
+            if(Math.abs(scale_w-scale_h)<1e-3){
+                return scale_w;
+            }
+            return -1;
+        };
+
+        obs.on("resize_video_size", (scale, callback) => {
+            if(!this.video_size){
+                return;
+            }
+
+            const new_size = {
+                width: this.video_size.width * scale,
+                height: this.video_size.height * scale + tags_height + controls_height
+            };
+            callback(new_size);
         });
-        
+
+        obs.on("load_meta_data", (video_size) => { 
+            this.video_size = video_size;
+            obs.trigger("load_video");
+        });
+
+        this.on("mount", () => {
+            const css_style = getComputedStyle(this.root);
+            tags_height = parseInt(css_style.getPropertyValue("--tags-height"));
+            controls_height = parseInt(css_style.getPropertyValue("--controls-height"));
+
+            adjustPlayerVideoSize();
+        });
+
+        obs.on("on_resize_window", (window_size) => { 
+            adjustPlayerVideoSize();       
+        });
         // riot.mount('player-tags');
         // riot.mount('player-video');
         // riot.mount('player-controls');

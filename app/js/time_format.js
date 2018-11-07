@@ -1,6 +1,10 @@
-
-function format(time_ms) {
-    const d = new Date(time_ms);
+    
+/**
+ * ms or str
+ * @param {number | string} time 
+ */
+function format(time) {
+    const d = new Date(time);
     const year = d.getFullYear();
     const month = d.getMonth() + 1;
     const day = d.getDate();
@@ -26,5 +30,7 @@ function toPlayTime(time_sec){
     return `${s_hour}:${s_min}:${s_sec}`;
 }
 
-exports.format = format;
-exports.toPlayTime = toPlayTime;
+module.exports = {
+    format: format,
+    toPlayTime: toPlayTime
+};

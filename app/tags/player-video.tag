@@ -81,7 +81,7 @@
                     width: event.target.videoWidth,
                     height: event.target.videoHeight
                 };
-                obs.trigger("resizePlayer", video_size);
+                obs.trigger("load_meta_data", video_size);
                 obs.trigger("seek_reload", this.refs.player_video.duration);
             });
 

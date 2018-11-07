@@ -5,7 +5,6 @@
                table.dataTable tbody tr td:first-child {  
             border-left: 1px solid #e3e7e8;
         }
-
         :scope table.dataTable thead tr th {  
             border-top: 1px solid #e3e7e8;
             border-right: 1px solid #e3e7e8;
@@ -14,16 +13,16 @@
         :scope table.dataTable tbody td {
             border-right: 1px solid #e3e7e8;
         }
-        .dataTables_scrollBody{
-            overflow-y: scroll !important;
-        }
         table.dataTable thead th, table.dataTable thead td {
             padding: 4px 4px;
             border-bottom: 1px solid #111;
         }
+        .dataTables_scrollBody{
+            overflow-y: scroll !important;
+        }
     </style>
 
-<table ref="dt" class="display stripe hover" style="width:100%"></table>
+<table ref="dt" class="stripe hover" style="width:100%"></table>
 
 <script>
     /* globals opts obs $ */
@@ -55,6 +54,17 @@
         table.columns.adjust();
     };
 
+    // this.row_h = null;
+    const row_h = params.scroller.row_height;
+    this.scrollto = (index) => {
+        let table = getDataTable();
+        if(!table.data().count()){
+            return;
+        }
+        const scroll_body = this.root.querySelector("div.dataTables_scrollBody");
+        const sc_h = scroll_body.offsetHeight;
+        table.row( index -sc_h/row_h + 1).scrollTo(false);
+    };
     // this.adjust_columns = ()=>{
     //     let table = getDataTable();
     //     table.columns.adjust(); 
@@ -100,8 +110,10 @@
             columnDefs: params.columnDefs,
             colResize: params.colResize,
             //scrollY:'50vh',
-            scrollY: ($(window).height() - 200),
+            scrollX: params.scrollX == undefined ? false : params.scrollX,
+            scrollY: params.scrollY,
             scrollCollapse: params.scrollCollapse,
+            scroller: params.scroller == undefined ? false : params.scroller,
             autoWidth: params.autoWidth,
             paging: params.paging,
             deferRender: params.deferRender,

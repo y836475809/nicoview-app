@@ -9,14 +9,19 @@
             height: 100%;
             width: 100%;
             margin: 0;
-            overflow: hidden;
+        }
+        #test-player-load-btn{
+            height: 25px;
+        }
+        #test-player-page{
+            height: calc(100% - 25px);
         }
     </style>
 </head>
 
 <body>
-    <button type="button" onclick="onclickLoad();">load</button>
-    <player-page></player-page>
+    <button id="test-player-load-btn"type="button" onclick="onclickLoad();">load</button>
+    <player-page id="test-player-page"></player-page>
 </body>
 
 <script>
@@ -63,12 +68,15 @@
     const timeout = 200;
     let timer;
     window.addEventListener("resize", () => {
+        const window_size = {
+            w: window.innerWidth, 
+            h: window.innerHeight 
+        };
+        obs.trigger("on_resize_window", window_size);
+
         clearTimeout(timer);
         timer = setTimeout(() => {
-            obs.trigger("resizeEndEvent", {
-                w: window.innerWidth, 
-                h: window.innerHeight 
-            });
+            obs.trigger("resizeEndEvent", window_size);
         }, timeout);
     });
 

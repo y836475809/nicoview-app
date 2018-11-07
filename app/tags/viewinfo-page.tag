@@ -2,9 +2,9 @@
     <style scoped>
         :scope {
             display: grid;
-            --info-height: 100px;
-            --description-height: 100px;
-            grid-template-rows: var(--info-height) var(--description-height) 1fr;
+            --video-panel-height: 100px;
+            --description-panel-height: 100px;
+            grid-template-rows: var(--video-panel-height) var(--description-panel-height) 1fr;
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
@@ -14,25 +14,25 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size: 12px;
         }    
-        #info{
+        .viewinfo-video-panel{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
             background-color: darkgray;
             display: flex;
         } 
-        #info .right{
+        .viewinfo-video-panel-info{
             margin-left: 5px;
             white-space: nowrap;
             overflow-x: hidden;
             width: 100%;
         }
         
-        #description{
+        .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
             background-color: rgb(167, 133, 133);
         } 
-        #comment-list{
+        .viewinfo-comments-panel{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
             background-color: #cccccc;
@@ -81,11 +81,11 @@
         }
     </style>
     
-    <div id="info">
+    <div class="viewinfo-video-panel">
         <div>
-            <img src={this.thumbnail_url} alt="test">
+            <img src={this.thumbnail_url} alt="thumbnail" width="130px" height="100px">
         </div>
-        <div class="right">
+        <div class="viewinfo-video-panel-info">
             <div>{this.title}</div>
             <div>{this.message.POSTED} {this.first_retrieve}</div>
             <div>{this.message.VIEW} {this.view_counter}</div>
@@ -93,10 +93,10 @@
             <div>{this.message.MYLIST} {this.mylist_counter}</div>
         </div>
     </div>
-    <div ref="description" id="description">
+    <div class="viewinfo-description-panel">
         {this.description}
     </div>
-    <div ref="base" id="comment-list">
+    <div class="viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
         <base-datatable ref="dt" params={this.params} ></base-datatable>
     </div>
@@ -108,9 +108,6 @@
         require("./base-datatable.tag");
 
         const row_height = 25;
-
-        let info_height = 0;
-        let description_height = 0;
 
         this.thumbnail_url = "";
         this.title =  "";
@@ -124,10 +121,6 @@
         let current_comment_index = 0;
         let commnet_list = [];
         let sync_comment_checked = this.opts.sync_comment_checked;
-
-        const pp = (e) =>{
-            console.log("pp = ", e);
-        };
 
         this.onclickSyncCommentCheck = (e) => {
             sync_comment_checked = e.target.checked;
@@ -143,9 +136,11 @@
             }
 
             const dt_elm = this.refs.dt.root.querySelector("div.dataTables_scrollHead");
+            const vp_elm = this.root.querySelector(".viewinfo-video-panel");
+            const dp_elm = this.root.querySelector(".viewinfo-description-panel");            
             const ch_elm = this.root.querySelector(".viewinfo-checkbox");
             const margin = 10;
-            const exclude_h = info_height + description_height 
+            const exclude_h = vp_elm.offsetHeight + dp_elm.offsetHeight
                     + dt_elm.offsetHeight + ch_elm.offsetHeight 
                     + margin;
             const h = this.root.clientHeight - exclude_h;
@@ -279,11 +274,7 @@
             }
         });
 
-        this.on("mount", () => {     
-            const css_style = getComputedStyle(this.root);
-            info_height = parseInt(css_style.getPropertyValue("--info-height"));
-            description_height = parseInt(css_style.getPropertyValue("--description-height"));
-            
+        this.on("mount", () => {                 
             updateSyncCommentCheckBox();
         });
         

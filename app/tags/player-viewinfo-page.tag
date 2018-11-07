@@ -59,7 +59,7 @@
             gutter = false;
         };
 
-        this.resizeVideo = (scale) => {  
+        const resizeVideo = (scale) => {  
             obs.trigger("resize_video_size", scale, (new_size) => {
                 let pf_elm = document.getElementById("player-frame");
 
@@ -88,7 +88,11 @@
             if(!video_scale || video_scale<0){
                 return;
             }       
-            this.resizeVideo(video_scale);
+            resizeVideo(video_scale);
+        });
+
+        obs.on("on_set_video_size_scale", (scale) => { 
+            resizeVideo(scale);
         });
 
         window.onbeforeunload = (e) => {

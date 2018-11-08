@@ -27,3 +27,10 @@ table.dataTable tbody tr:hover {
 .dataTables_scrollBody{
   overflow-y: scroll !important;
 }
+
+table.dataTable tr.odd { 
+  background-color: rgb(228, 236, 247) !important;
+}
+table.dataTable tr.even { 
+  background-color: white !important;
+}

@@ -1,16 +1,16 @@
 <main-page>
     <style scoped>
         :scope {
-            --select-tab-height: 80px;
+            --main-group-buttons-height: 30px;
             display:grid;
-            grid-template-rows: var(--select-tab-height) 1fr;
+            grid-template-rows: var(--main-group-buttons-height) 1fr;
             grid-template-columns: 1fr 1fr;
             width: 100%;
             height: 100%;
             margin: 0;
             overflow-y: hidden;
         }
-        #main-select-page-tabs{
+        .main-group-buttons{
             grid-row: 1 / 2;
             grid-column: 1 / 3;
         }
@@ -26,39 +26,42 @@
             grid-row: 2 / 3;
             grid-column: 1 / 3;
         }        */
-        input[type=radio] {
+        .main-group-buttons input[type=radio] {
             display: none; 
         }
-        input[type=radio]:checked + .button {
-            background: #31A9EE;
-            color: #ffffff;
+        .main-group-buttons input[type=radio]:checked + .button {
+            background: lightgray;
+            color: black;
         }
-        .button {
+        .main-group-buttons .button {
             display: inline-block;
-            margin: 5px;
+            margin-right: -2px; 
             padding: 5px;
-            border: 2px solid #006DD9;
+            border: 1px solid gray;
             text-align: center;
             box-sizing: border-box;
-            border-radius: 5px;
+            border-radius: 2px;
+            height: var(--main-group-buttons-height);
         }
-        .button:hover
+        .main-group-buttons .button:hover
         {
-            color: #888;
+            box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset,
+              2px 0 2px -2px rgba(0, 0, 0, .2) inset,
+              -2px 0 5px -2px rgba(0, 0, 0, .2) inset; 
         }
     </style>
-    <div id="main-select-page-tabs">
+    <div class="main-group-buttons">
         <!-- <select-page-tabs></select-page-tabs> -->
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.cl.bind(this,0)}> 
+            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
             <span class="button">page1</span>
         </label>
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.cl.bind(this,1)}> 
+            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
             <span class="button">page2</span> 
         </label>
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.cl.bind(this,2)}> 
+            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
             <span class="button">page3</span> 
         </label>
     </div>
@@ -77,14 +80,14 @@
         require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
-        require(`${base_dir}/app/tags/select-page-tabs.tag`);
+        // require(`${base_dir}/app/tags/select-page-tabs.tag`);
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
         // riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
         // riot.mount("library-page");
         // riot.mount("search-page");
 
-        const tab_height = parseInt(getComputedStyle(this.root).getPropertyValue("--select-tab-height"));
+        const main_group_buttons_height = parseInt(getComputedStyle(this.root).getPropertyValue("--main-group-buttons-height"));
 
         this.index = 0;
         let select_page = (index)=>{
@@ -106,7 +109,7 @@
                 });
         };
 
-        this.cl = (index, e) => {
+        this.onclickPageSelect = (index, e) => {
             select_page(index);
         };
 
@@ -117,10 +120,6 @@
             select_page(this.index);
         });
 
-        obs.on("selindex", (index) => { 
-            select_page(index);
-        });
-
         const timeout = 200;
         let timer;
         window.addEventListener("resize", () => {
@@ -128,7 +127,7 @@
             timer = setTimeout(() => {
                 obs.trigger("pageResizedEvent", {
                     w: this.root.offsetWidth, 
-                    h: this.root.offsetHeight - tab_height
+                    h: this.root.offsetHeight - main_group_buttons_height
                 });
             }, timeout);
         });

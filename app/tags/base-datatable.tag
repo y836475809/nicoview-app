@@ -1,42 +1,8 @@
 
 <base-datatable>
     <style scoped>
-        /* table.dataTable tbody td {
-            padding: 0px;
-            margin: 0px;
-            padding-left: 4px;
-            padding-right: 4px;
-        }
-        table{
-            table-layout: fixed;
-        }     
-        table.dataTable thead tr th {
-            overflow: hidden; 
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;         
-        }
-        table.dataTable thead tr th:first-child, 
-        table.dataTable tbody tr td:first-child {  
-            border-left: 1px solid gray;
-        }
-        table.dataTable thead tr th {  
-            border-top: 1px solid gray;
-            border-right: 1px solid gray;
-            border-bottom: 1px solid rgb(236, 12, 12);
-        }
-        table.dataTable tbody td {
-            border-right: 1px solid gray;
-        }
-        table.dataTable thead th, 
-        table.dataTable thead td {
-            padding: 4px 4px;
-            border-bottom: 1px solid gray;
-        }  */
-        .dataTables_scrollBody{
-            overflow-y: scroll !important;
-        }
-    </style>
+
+</style>
 
 <table ref="dt" class="stripe hover" style="width:100%"></table>
 

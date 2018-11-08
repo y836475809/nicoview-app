@@ -11,6 +11,7 @@
     <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
     <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
     <!-- <link rel="stylesheet" type="text/css" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css"> -->
+    <link rel="stylesheet" type="text/css" href="../css/mydatatables.css">
 
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <script type="riot/tag" src="../app/tags/main-page.tag"></script>
@@ -25,7 +26,7 @@
             height: 25px;
         }
         .test-main-page{
-            height: calc(100% - 25px);
+            height: calc(100% - 30px);
         }
     </style>
 </head>
@@ -34,14 +35,16 @@
     <div class="test-button">
         <input type="button" value="load" onclick="onclickLoadData();">  
     </div>
-    <main-page class="test-main-page"></main-page>
+    <div class="test-main-page">
+        <main-page></main-page>
+    </div>
 </body>
 
 <script>
     /* globals riot */
     const remote = require("electron").remote;
     const { dialog } = require("electron").remote;
-
+    
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line

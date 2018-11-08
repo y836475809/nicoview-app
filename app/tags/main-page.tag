@@ -8,6 +8,7 @@
             width: 100%;
             height: 100%;
             margin: 0;
+            overflow-y: hidden;
         }
         #main-select-page-tabs{
             grid-row: 1 / 2;
@@ -20,7 +21,11 @@
         #page2 {
             grid-row: 2 / 3;
             grid-column: 1 / 3;
-        }       
+        }   
+        /* #page3 {
+            grid-row: 2 / 3;
+            grid-column: 1 / 3;
+        }        */
     </style>
     <div id="main-select-page-tabs">
         <select-page-tabs></select-page-tabs>
@@ -39,11 +44,13 @@
         /* globals obs base_dir */
         require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
-        // let obs = riot.observable();
 
         require(`${base_dir}/app/tags/select-page-tabs.tag`);
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
+        // riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
+        // riot.mount("library-page");
+        // riot.mount("search-page");
 
         const tab_height = parseInt(getComputedStyle(this.root).getPropertyValue("--select-tab-height"));
 
@@ -62,8 +69,8 @@
 
         this.on("mount", function () {
             riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
-            riot.mount("#page1 library-page");
-            riot.mount("#page2 search-page");             
+            riot.mount("library-page");
+            riot.mount("search-page");             
             select_page(this.index);
         });
 

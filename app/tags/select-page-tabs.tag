@@ -1,5 +1,5 @@
 <select-page-tabs>
-    <style>
+    <style scoped>
         :scope {
             margin: 0 auto;
             width: 100%;

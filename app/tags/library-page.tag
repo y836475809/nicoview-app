@@ -1,20 +1,15 @@
-<library-page id="library-page">
+<library-page>
     <style scoped>
-        :scope .table-base {
+        :scope {
+            --datatable-border-color: gray;
+            /* width: 100%; */
+            /* height: 100%; */
+        }
+        .table-base {
             background-color: whitesmoke;
             width: 100%;
             height: 100%;
             overflow-y: hidden;
-        } 
-
-        /* table.dataTable{
-            table-layout: fixed;
-        }      */
-        table.dataTable thead tr th{
-            overflow: hidden; 
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;         
         }
         table.dataTable tbody td {
             padding: 0px;
@@ -22,31 +17,11 @@
             padding-left: 4px;
             padding-right: 4px;
         }     
-        table.dataTable thead tr th:first-child, 
-        table.dataTable tbody tr td:first-child {  
-            border-left: 1px solid gray;
-        }
-        table.dataTable thead tr th {  
-            border-top: 1px solid gray;
-            border-right: 1px solid gray;
-            border-bottom: 1px solid gray;
-        }
-        table.dataTable tbody td {
-            border-right: 1px solid gray;
-        }
-        table.dataTable thead th, 
-        table.dataTable thead td {
-            padding: 4px 4px;
-            border-bottom: 1px solid gray;
-        }  
-        table.dataTable tbody tr:hover {
-            background-color: rgb(211, 218, 228) !important;
-        }
     </style>
 
-<div ref="base" class="table-base">
-    <base-datatable ref="dt" params={this.params}></base-datatable>
-</div>
+    <div ref="base" class="table-base">
+        <base-datatable ref="dt" params={this.params}></base-datatable>
+    </div>
 
 <script>
     /* globals base_dir obs */
@@ -186,14 +161,14 @@
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
-    this.on("mount", function () {
+    this.on("mount", () => {
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();
             menu.popup({window: remote.getCurrentWindow()});
         };       
     });
 
-    const resizeDataTable = () => {
+    const resizeDataTable = (size) => {
         if(this.refs == undefined){
             return;
         }
@@ -205,6 +180,9 @@
             + dt_elm3.offsetHeight 
             + margin;
         let ch = this.refs.base.clientHeight;
+        if(size){
+            ch = size.h;
+        }
         this.refs.dt.ress({
             w: null,
             h: ch - exclude_h,
@@ -218,7 +196,7 @@
     });
 
     obs.on("pageResizedEvent", (size)=> {
-        resizeDataTable();
+        resizeDataTable(size);
     });
 </script>
 </library-page>

@@ -15,6 +15,7 @@
             font-family: Verdana, Geneva, Tahoma, sans-serif;
             font-size: 12px;
             box-sizing: border-box;
+            --datatable-border-color: gray;
         }    
         .viewinfo-panel{
             padding: var(--panel-padding);
@@ -56,12 +57,6 @@
         table{
             table-layout: fixed;
         }      
-        table.dataTable thead tr th{
-            overflow: hidden; 
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            text-align: center;         
-        }
         table.dataTable tbody td {
             padding: 0px;
             margin: 0px;
@@ -71,26 +66,6 @@
             white-space: nowrap; 
             padding-left: 4px;
             padding-right: 4px;
-        }
-        table.dataTable thead tr th:first-child, 
-        table.dataTable tbody tr td:first-child {  
-            border-left: 1px solid gray;
-        }
-        table.dataTable thead tr th {  
-            border-top: 1px solid gray;
-            border-right: 1px solid gray;
-            border-bottom: 1px solid gray;
-        }
-        table.dataTable tbody td {
-            border-right: 1px solid gray;
-        }
-        table.dataTable thead th, 
-        table.dataTable thead td {
-            padding: 4px 4px;
-            border-bottom: 1px solid gray;
-        }  
-        table.dataTable tbody tr:hover {
-            background-color: rgb(211, 218, 228) !important;
         }
     </style>
     

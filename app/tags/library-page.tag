@@ -21,6 +21,7 @@
 
     <div ref="base" class="table-base">
         <base-datatable ref="dt" params={this.params}></base-datatable>
+        <div class="library-item-info">num of items {this.num_items}</div>
     </div>
 
 <script>
@@ -32,6 +33,8 @@
     const time_format = require(`${base_dir}/app/js/time_format`);
     
     require(`${base_dir}/app/tags/base-datatable.tag`);  
+
+    this.num_items = 0;
 
     let db = new DB();
 
@@ -61,6 +64,7 @@
             });
 
             this.refs.dt.setData(datas);
+            this.num_items = datas.length;
         } catch (error) {
             obs.trigger("on_error", error);  
         }
@@ -118,7 +122,7 @@
             exclude: [0],
             // tableWidthFixed: false
         },
-        dom: "Zfrti",  
+        dom: "Zfrt",  
         scrollX: true,
         scrollY: "100px" ,
         scrollCollapse:false,

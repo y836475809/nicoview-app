@@ -171,7 +171,7 @@
                     targets: 3, 
                     data: "date" ,
                     render: function (data, type, row, meta) {
-                        return time_format.format(data);
+                        return time_format.toDate(data);
                     },
  
                 },
@@ -206,7 +206,7 @@
 
             this.thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
-            this.first_retrieve = time_format.format(viewinfo.thumb_info.first_retrieve);
+            this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);
             this.view_counter = viewinfo.thumb_info.view_counter;
             this.comment_num = viewinfo.thumb_info.comment_num;
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;

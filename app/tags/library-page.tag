@@ -94,14 +94,14 @@
                 targets: 3, 
                 data: "creation_date" ,
                 render: function (data, type, row, meta) {
-                    return time_format.format(data);
+                    return time_format.toDate(data);
                 },
             },
             { 
                 targets: 4, 
                 data: "pub_date",
                 render: function (data, type, row, meta) {
-                    return time_format.format(data);
+                    return time_format.toDate(data);
                 },
             },
             { targets: 5, data: "play_count" },

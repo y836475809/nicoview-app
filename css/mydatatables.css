@@ -21,16 +21,15 @@ table.dataTable thead td {
   padding: 4px 4px;
   border-bottom: 1px solid var(--datatable-border-color);
 } 
-table.dataTable tbody tr:hover {
+table.dataTable tbody tr:hover:not(.selected) {
   background-color: rgb(211, 218, 228) !important;
+}
+table.dataTable tr.odd:not(.selected) { 
+  background-color: rgb(228, 236, 247) !important;
+}
+table.dataTable tr.even:not(.selected) { 
+  background-color: white !important;
 }
 .dataTables_scrollBody{
   overflow-y: scroll !important;
-}
-
-table.dataTable tr.odd { 
-  background-color: rgb(228, 236, 247) !important;
-}
-table.dataTable tr.even { 
-  background-color: white !important;
 }

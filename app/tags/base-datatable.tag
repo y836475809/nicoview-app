@@ -64,7 +64,7 @@
             let table = getDataTable(); 
             // const data = table.row(elm).data();
             let new_index = table.row(elm).index();
-            console.log("mousedown ", table.row(elm).index()); 
+            // console.log("mousedown ", table.row(elm).index()); 
             if ( $(elm).hasClass("selected") ) {
                 if(selindex!==new_index)
                 {

@@ -17,11 +17,14 @@
             padding-left: 4px;
             padding-right: 4px;
         }     
+        .library-item-info{
+            height: 25px;
+        }
     </style>
 
     <div ref="base" class="table-base">
-        <base-datatable ref="dt" params={this.params}></base-datatable>
         <div class="library-item-info">num of items {this.num_items}</div>
+        <base-datatable ref="dt" params={this.params}></base-datatable>
     </div>
 
 <script>
@@ -65,6 +68,7 @@
 
             this.refs.dt.setData(datas);
             this.num_items = datas.length;
+            this.update();
         } catch (error) {
             obs.trigger("on_error", error);  
         }
@@ -179,9 +183,11 @@
         const dt_root = this.refs.dt.root;
         const dt_elm1 = dt_root.querySelector("div.dataTables_filter");
         const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
+        const info_elm = this.root.querySelector(".library-item-info");
         const margin = 10;
         const exclude_h = dt_elm1.offsetHeight 
             + dt_elm3.offsetHeight 
+            + info_elm.offsetHeight 
             + margin;
         let ch = this.refs.base.clientHeight;
         if(size){

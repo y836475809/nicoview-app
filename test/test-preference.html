@@ -5,6 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tets preference</title>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
+    <style type="text/css">
+        html,body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,6 +28,10 @@
         obs.on("on_load_library", () => {
             console.log("on_load_library");
         });
+
+        //this.on("mount", () => {
+            obs.trigger("on_change_show_pref_page", true);  
+        //});
     } catch (error) {
         console.log("error=", error);
     }

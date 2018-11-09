@@ -2,7 +2,29 @@
     <style scoped>
         :scope {
             font-size: 12px;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;            
+        }
+        .pref-container{
+            position: absolute;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            background-color:black;
+            opacity: 0.7;
+        }
+        .pref-page{
+            --pref-container-margin: 25px;
+            position: absolute;
+            top: var(--pref-container-margin);
+            left: var(--pref-container-margin);
+            width: calc(100vw - var(--pref-container-margin) * 2);
+            height: calc(100vh - var(--pref-container-margin) * 2);
+            display: block;
+            background-color:whitesmoke;
+            border: 1px solid grey;
+        }
+        .display-none{
+            display: none;
         }
         button, input, select, textarea {
             font-family : inherit;
@@ -20,8 +42,17 @@
         #library-path{
             width: 300px;
         }
+        .pref-close-btn{
+            position: absolute;
+            width: 25px;
+            height: 25px;
+            top: 5px;
+            left: calc(100% - 30px);            
+        }
     </style>
 
+    <div class={ this.isloading === true ? "pref-container" : "display-none" }>
+            <div class="pref-page">
     <div class="group">
         <label class="param">Library path</label>
         <input id="library-path" type="text" readonly>
@@ -35,6 +66,9 @@
         <label class="param">Import db</label>
         <input type="button" value="Import" onclick={onclickImport}>
     </div>
+    <button class="pref-close-btn" type="button" onclick={onclickClose}>x</button>
+    </div>
+</div>
     <indicator ref="indicator"></indicator>
 
     <script>
@@ -49,6 +83,7 @@
         require("./indicator.tag");
         riot.mount("indicator");
         
+        this.isloading = false;
         let self = this;
 
         const setLibraryPathAtt = (value) => {
@@ -63,6 +98,16 @@
                 setLibraryPathAtt(path);
             } 
         });
+
+        obs.on("on_change_show_pref_page", (is_show)=> {
+            this.isloading = is_show;
+            this.update();
+        });
+
+        this.onclickClose = () => {
+            this.isloading = false;
+            this.update();            
+        };
 
         const selectFileDialog = (name, extensions)=>{
             const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {

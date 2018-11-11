@@ -57,9 +57,39 @@
             type: "video/mp4",
             commnets: commnets
         };
-
+        const viweinfo = {
+            thumb_info: {
+                video_id: "sm100000",
+                title: "test sm100000",
+                description: "動画",
+                thumbnail_url: `${base_dir}/test/data/sample.jpeg`, //130x100
+                first_retrieve: "2017-07-07T18:30:00+09:00",
+                length: "10:00",
+                movie_type: "mp4",
+                size_high: 1000000,
+                size_low: 2000000,
+                view_counter: 1000,
+                comment_num: 2000,
+                mylist_counter: 100,
+                last_res_body: "test",
+                watch_url: "http://www.nicovideo.jp/watch/sm100000",
+                thumb_type: "video",
+                embeddable: 1,
+                no_live_play: 0,
+                tags: [            
+                    { text: "タグ1", lock: true },
+                    { text: "タグ2", lock: true }
+                ],
+                user_id: "1234567",
+                user_nickname: "abcdefg",
+                user_icon_url: `${base_dir}/test/data/user_icon.jpg` //50x50
+            },
+            commnets: commnets
+        };
+        
         obs.trigger("on_set_player_state", "play"); 
         obs.trigger("receivedData", data); 
+        obs.trigger("on_change_viweinfo", viweinfo);
     };
     const onclickLoad2 = () => {
         let commnets = [];

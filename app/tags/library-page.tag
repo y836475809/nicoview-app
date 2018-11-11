@@ -123,7 +123,7 @@
         ], 
         colResize : {
             handleWidth: 10,
-            exclude: [0],
+            // exclude: [0],
             // tableWidthFixed: false
         },
         dom: "Zfrt",  

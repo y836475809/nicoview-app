@@ -179,7 +179,7 @@
             scrollY: true,
             scrollCollapse:false,
             scroller: {
-                displayBuffer: 20
+                displayBuffer: 50
             },
             row_height: row_height,
             autoWidth: false,

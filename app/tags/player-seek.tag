@@ -23,7 +23,6 @@
             grid-row: 2 / 3;
             grid-column: 2 / 3;
             text-align: center;
-            font-size: 12px;
             line-height: 10px;
             margin-left: 10px;
         }
@@ -31,7 +30,6 @@
             grid-row: 2 / 3;
             grid-column: 3 / 4;
             text-align: center;
-            font-size: 12px;
             line-height: 10px;
         }  
         .duration {

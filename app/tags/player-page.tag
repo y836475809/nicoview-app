@@ -9,21 +9,20 @@
             --controls-height: 100px;
             grid-template-rows: var(--tags-height) 1fr var(--controls-height);
             grid-template-columns: 1fr 1fr;  
+            background-color: var(--control-color);
         }
         #player-tags-content{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
-            background-color: darkgray;
         }  
         #player-video-content{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            background-color: blueviolet;
+            background-color: black;
         }  
         #player-controls-content{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
-            background-color: aqua;
         }  
         #player-video {
             overflow: hidden; 

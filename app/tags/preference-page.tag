@@ -1,9 +1,5 @@
 <preference-page>
     <style scoped>
-        :scope {
-            font-size: 12px;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;            
-        }
         .pref-container{
             position: absolute;
             width: 100vw;
@@ -20,8 +16,8 @@
             width: calc(100vw - var(--pref-container-margin) * 2);
             height: calc(100vh - var(--pref-container-margin) * 2);
             display: block;
-            background-color:whitesmoke;
-            border: 1px solid grey;
+            background-color: var(--control-color);
+            border: 1px solid var(--control-border-color);
         }
         .display-none{
             display: none;

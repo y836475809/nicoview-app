@@ -9,13 +9,8 @@
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
-            margin: 0;
             overflow-y: hidden;
             --row-height: 25px;
-            font-family: Verdana, Geneva, Tahoma, sans-serif;
-            font-size: 12px;
-            box-sizing: border-box;
-            --datatable-border-color: gray;
         }    
         .viewinfo-panel{
             padding: var(--panel-padding);
@@ -23,7 +18,6 @@
         .viewinfo-video-panel{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
-            background-color:whitesmoke;
             display: flex; 
         } 
         .viewinfo-thumbnail{
@@ -34,19 +28,17 @@
             margin-left: 5px;
             white-space: nowrap;
             overflow-x: hidden;
-            width: 100%;
         }
         
         .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            border: 1px solid gray;
-            margin: 1px;
+            border: 1px solid var(--control-border-color);
         } 
         .viewinfo-comments-panel{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
-            background-color:whitesmoke;
+            background-color: var(--control-color);
         }
         
         .viewinfo-checkbox{

@@ -7,13 +7,13 @@
             margin : var(--margin-value);
             width: calc(100% - var(--margin-value) * 2);
             height: calc(100% - var(--margin-value) * 2);
-            background-color: #cccccc;
+            background-color: var(--control-color);
         }
         .play{
             grid-column: 1 / 2;
             width: 30px;
 			height: 30px;
-            border: 1px solid #a8a8a8;
+            border: 1px solid var(--control-border-color);
             background-image: url(../images/play.png);
             background-size: contain;
         }

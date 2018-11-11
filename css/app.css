@@ -1,0 +1,55 @@
+
+* {
+    box-sizing: border-box; 
+}
+
+:root {
+    --control-color:whitesmoke;
+    --control-border-color:gray;
+    --datatable-border-color: gray;
+}
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height:100%;
+    font-family: Verdana, Geneva, Tahoma, sans-serif; 
+    font-size: 12px;
+}
+
+table.dataTable thead tr th {
+    overflow: hidden; 
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;         
+}
+  table.dataTable thead tr th:first-child, 
+  table.dataTable tbody tr td:first-child {  
+    border-left: 1px solid var(--datatable-border-color);
+}
+  table.dataTable thead tr th {  
+    border-top: 1px solid var(--datatable-border-color);
+    border-right: 1px solid var(--datatable-border-color);
+    border-bottom: 1px solid var(--datatable-border-color);
+}
+  table.dataTable tbody td {
+    border-right: 1px solid var(--datatable-border-color);
+}
+  table.dataTable thead th, 
+  table.dataTable thead td {
+    padding: 4px 4px;
+    border-bottom: 1px solid var(--datatable-border-color);
+} 
+  table.dataTable tbody tr:hover:not(.selected) {
+    background-color: rgb(211, 218, 228) !important;
+}
+  table.dataTable tr.odd:not(.selected) { 
+    background-color: rgb(228, 236, 247) !important;
+}
+  table.dataTable tr.even:not(.selected) { 
+    background-color: white !important;
+}
+  .dataTables_scrollBody{
+    overflow-y: scroll !important;
+}

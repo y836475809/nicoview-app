@@ -6,7 +6,7 @@
             --total-margin: calc((var(--border-width) + var(--margin-value)) * 2);
             width: calc(100% - var(--total-margin));
             height: calc(100% - var(--total-margin));
-            border: var(--border-width) solid black;
+            border: var(--border-width) solid var(--control-border-color);
             margin: var(--margin-value);
             display:block;
             overflow: auto;

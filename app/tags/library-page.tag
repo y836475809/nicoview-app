@@ -6,7 +6,7 @@
             /* height: 100%; */
         }
         .table-base {
-            background-color: whitesmoke;
+            background-color: var(--control-color);
             width: 100%;
             height: 100%;
             overflow-y: hidden;

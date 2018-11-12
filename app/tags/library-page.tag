@@ -219,7 +219,7 @@
         this.loadData(data_file_path);
     });
 
-    obs.on("pageResizedEvent", (size)=> {
+    obs.on("resizeEndEvent", (size)=> {
         resizeDataTable(size);
     });
 </script>

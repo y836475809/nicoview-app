@@ -164,7 +164,7 @@
                 }
             });
 
-            obs.on("resizeEndEvent", function (wsize) {
+            obs.on("resizeEndEvent", (wsize) => {
                 if(ctls!=null){
                     ctls.reset();
                     const current = this.refs.player_video.currentTime;

@@ -80,7 +80,7 @@
         };
     });
 
-    obs.on("pageResizedEvent", (size)=>{
+    obs.on("resizeEndEvent", (size)=>{
         if(this.refs!==undefined){
             this.refs.dt.ress(size);
         }

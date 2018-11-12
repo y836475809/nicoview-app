@@ -125,7 +125,7 @@
         window.addEventListener("resize", () => {
             clearTimeout(timer);
             timer = setTimeout(() => {
-                obs.trigger("pageResizedEvent", {
+                obs.trigger("resizeEndEvent", {
                     w: this.root.offsetWidth, 
                     h: this.root.offsetHeight - main_group_buttons_height
                 });

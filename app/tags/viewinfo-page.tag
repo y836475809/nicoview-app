@@ -224,7 +224,7 @@
             updateSyncCommentCheckBox();
         });
         
-        obs.on("pageResizedEvent", (size)=> {
+        obs.on("resizeEndEvent", (size)=> {
             resizeCommnetList();
         });
     </script>

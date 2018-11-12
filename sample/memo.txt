@@ -16,3 +16,5 @@ eslint-plugin-html
         "javascriptreact",
         "html"  
     ]
+
+https://saeedalipoor.github.io/icono/

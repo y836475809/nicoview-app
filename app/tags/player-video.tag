@@ -158,8 +158,18 @@
                 this.refs.player_video.volume = volume ;
             });
 
+            obs.on("on_resize_begin", function () {
+                if(ctls!=null){
+                    ctls.pause();
+                }
+            });
+
             obs.on("resizeEndEvent", function (wsize) {
-                // ff()
+                if(ctls!=null){
+                    ctls.reset();
+                    const current = this.refs.player_video.currentTime;
+                    ctls.seek(current * 1000);
+                }
             });
         });
     </script>

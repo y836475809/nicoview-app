@@ -4,13 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Hello World!</title>
+    <script>
+        window.jQuery = window.$ = require("jquery");
+    </script>
+\    <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
+    <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
     <link rel="stylesheet" type="text/css" href="../css/app.css">
     <style type="text/css">
     </style>
 </head>
 
 <body>
-    <player-page></player-page>
+    <player-viewinfo-page></player-viewinfo-page>
 </body>
 <!--<script src="lib/jquery-3.2.1.min.js"></script>-->
 <!--<script src="app/app.js"></script>-->
@@ -18,27 +23,38 @@
     const remote = require("electron").remote;
     const base_dir = remote.getGlobal("sharedObj").base_dir;
     const ipc = require("electron").ipcRenderer;
+    require("datatables.net-scroller")( window, window.$ ); 
+    require("datatables.net"); 
 
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
-    require(`${base_dir}/app/tags/player-page.tag`);
-    riot.mount("player-page");
+    require(`${base_dir}/app/tags/player-viewinfo-page`);
+    riot.mount("player-viewinfo-page");
     
     const timeout = 200;
     let timer;
     window.addEventListener("resize", () => {
+        const window_size = {
+            w: window.innerWidth, 
+            h: window.innerHeight 
+        };
+        obs.trigger("on_resize_window", window_size);
+
         clearTimeout(timer);
         timer = setTimeout(() => {
-            obs.trigger("resizeEndEvent", { w: window.innerWidth, h: window.innerHeight });
+            obs.trigger("pageResizedEvent", window_size);
         }, timeout);
     });
 
     ipc.on("request-send-video-data", (event, arg) => {
+        console.log("request-send-video-data", arg);
         const video_data = arg.video_data;
-        const thumb_info = arg.thumb_info;
+        const viweinfo = arg.viweinfo;
+        obs.trigger("on_set_player_state", "play"); 
         obs.trigger("receivedData", video_data);
-        obs.trigger("on_load_player_tags", thumb_info.tags);
+        obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);
+        obs.trigger("on_change_viweinfo", viweinfo);
     });
 
 </script>

@@ -106,20 +106,5 @@
 
             pref.SyncComment(this.refs.viewinfo_frame.getSyncCommentChecked());
         };
-        
-        const timeout = 200;
-        let timer;
-        window.addEventListener("resize", () => {
-            const window_size = {
-                w: window.innerWidth, 
-                h: window.innerHeight 
-            };
-            obs.trigger("on_resize_window", window_size);
-
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                obs.trigger("pageResizedEvent", window_size);
-            }, timeout);
-        });
     </script>
 </player-viewinfo-page>

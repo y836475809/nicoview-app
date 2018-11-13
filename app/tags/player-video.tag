@@ -57,6 +57,31 @@
             console.log(".comment.length=", document.querySelectorAll(".comment").length);
         };
 
+        const moveSeek = (current) => {
+            if(this.refs.player_video.paused){
+                this.refs.player_video.currentTime = current;
+                if(ctls!=null){
+                    ctls.seek(current * 1000);
+                }
+            }else{
+                console.log("player paused");
+                this.refs.player_video.pause();
+                if(ctls!=null){
+                    ctls.pause();
+                }
+
+                this.refs.player_video.currentTime = current;
+                if(ctls!=null){
+                    ctls.seek(current * 1000);
+                }
+
+                this.refs.player_video.play();
+                if(ctls!=null){
+                    ctls.play();
+                }
+            } 
+        };
+
         obs.on("receivedData", (data) => {
             console.log("data=", data);
 
@@ -129,29 +154,8 @@
                 this.refs.player_video.pause();
             });
 
-            obs.on("on_seeked", (current) => {           
-                if(this.refs.player_video.paused){
-                    this.refs.player_video.currentTime = current;
-                    if(ctls!=null){
-                        ctls.seek(current * 1000);
-                    }
-                }else{
-                    console.log("player paused");
-                    this.refs.player_video.pause();
-                    if(ctls!=null){
-                        ctls.pause();
-                    }
-
-                    this.refs.player_video.currentTime = current;
-                    if(ctls!=null){
-                        ctls.seek(current * 1000);
-                    }
-
-                    this.refs.player_video.play();
-                    if(ctls!=null){
-                        ctls.play();
-                    }
-                }    
+            obs.on("on_seeked", (current) => {  
+                moveSeek(current);   
             });
 
             obs.on("on_change_volume", (volume) => {
@@ -167,8 +171,9 @@
             obs.on("resizeEndEvent", (wsize) => {
                 if(ctls!=null){
                     ctls.reset();
+                    
                     const current = this.refs.player_video.currentTime;
-                    ctls.seek(current * 1000);
+                    moveSeek(current);
                 }
             });
         });

@@ -66,6 +66,7 @@ let creatPlayerWindow = (data) => {
     if (player_win === null) {
         const player_path = `file://${__dirname}/html/player.html`;
         player_win = new BrowserWindow({ width: 800, height: 600 });
+        player_win.setMenu(null);
         player_win.loadURL(player_path);
 
         player_win.on("close", (e) => {

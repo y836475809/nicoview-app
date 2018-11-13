@@ -19,13 +19,15 @@
         }
     </style>
 
-    <div id="player-video-screen">
+    <div id="player-video-screen" onmousedown={mousedown}>
         <video ref="player_video" id="player" autoplay preload="metadata" controls>
         </video>
     </div>
 
     <script>
         /* globals base_dir obs */
+        const {remote} = require("electron");
+        const {Menu, MenuItem} = remote;
         // var $ = jQuery = require("jquery");
         // var anime = require("animejs");
 
@@ -81,6 +83,41 @@
                 }
             } 
         };
+        
+        const menu = new Menu();
+        menu.append(new MenuItem({ 
+            label: "view", submenu: [
+                {label: "x1.0", click() {
+                    obs.trigger("on_set_video_size_scale", 1.0);
+                }},
+                {label: "x1.5", click() {
+                    obs.trigger("on_set_video_size_scale", 1.5);
+                }}               
+            ]}));
+        menu.append(new MenuItem({ type: "separator" }));
+        menu.append(new MenuItem({ 
+            label: "tool", submenu: [
+                {label: "Toggle Dev Tools", role: "toggledevtools"},              
+            ]}));
+
+        this.mousedown = (e) => {
+            if(e.which===3){
+                menu.popup({window: remote.getCurrentWindow()});
+            }
+        };
+        window.addEventListener("keyup", (e) => {
+            const video = this.refs.player_video;
+            if(video.ended || video.readyState != 4){
+                return;
+            }
+            if(e.key==" "){
+                if(video.paused){
+                    video.play();
+                }else{
+                    video.pause();
+                }
+            }
+        }, true);
 
         obs.on("receivedData", (data) => {
             console.log("data=", data);

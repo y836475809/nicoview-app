@@ -41,9 +41,11 @@
 
         this.sync_comment_checked = pref.SyncComment();
         let gutter = false;
+        let gutter_move = false;
 
         this.mousemove = (e) => {
-            if(gutter){     
+            if(gutter){   
+                gutter_move = true;  
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
                 const mw = this.root.offsetWidth - e.clientX;
@@ -57,7 +59,11 @@
             }
         };
         this.mouseup = (e) => {
+            if(gutter_move){
+                obs.trigger("reset_comment_timelime");
+            }
             gutter = false;
+            gutter_move = false;
         };
 
         const resizeVideo = (scale) => {  

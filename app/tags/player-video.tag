@@ -171,7 +171,14 @@
             obs.on("resizeEndEvent", (wsize) => {
                 if(ctls!=null){
                     ctls.reset();
-                    
+                    const current = this.refs.player_video.currentTime;
+                    moveSeek(current);
+                }
+            });
+            obs.on("reset_comment_timelime", () => {
+                if(ctls!=null){
+                    ctls.pause();
+                    ctls.reset();
                     const current = this.refs.player_video.currentTime;
                     moveSeek(current);
                 }

@@ -21,10 +21,12 @@
             display: flex; 
         } 
         .viewinfo-thumbnail{
+            user-select: none;
             width: calc(130px - var(--panel-padding) * 2);
             height: calc(var(--video-panel-height) - var(--panel-padding) * 2);
         }
         .viewinfo-video-panel-info{
+            user-select: none;
             margin-left: 5px;
             white-space: nowrap;
             overflow-x: hidden;

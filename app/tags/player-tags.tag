@@ -2,7 +2,7 @@
     <style scoped>
          :scope {
             --border-width: 1px;
-            --margin-value: 4px;
+            --margin-value: 2px;
             --total-margin: calc((var(--border-width) + var(--margin-value)) * 2);
             width: calc(100% - var(--total-margin));
             height: calc(100% - var(--total-margin));
@@ -12,10 +12,9 @@
             overflow: auto;
         }
         .tag-button {
-            /* padding: 10px 30px; */
-            margin: 5px 5px;
-            color: white;
-            background-color: royalblue;
+            margin: 2px 2px;
+            color: blue;
+            background-color: transparent;
             border-style: none;
             outline:none;
             cursor: pointer;

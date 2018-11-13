@@ -8,7 +8,8 @@
     
         .gutter {
             cursor: col-resize;
-            width: 8px;
+            width: 4px;
+            border-left: 1px solid var(--control-border-color);
         }
     
         .split.left{

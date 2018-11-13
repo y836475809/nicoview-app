@@ -3,7 +3,7 @@
         :scope {
             display:grid;
             grid-template-rows: 1fr 1fr 1fr;
-            grid-template-columns: 1fr 70px 10px 60px;
+            grid-template-columns: 1fr 50px 10px 40px;
             width: 100%;
             height: 30px;
             margin: 0;

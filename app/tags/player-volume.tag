@@ -18,7 +18,7 @@
         }
         .picker {
             position: relative;
-			top: -1px;
+			top: 0px;
             left: 0px;
 			width: 10px;
 			height: 10px;

@@ -1,10 +1,10 @@
-<library-page onmousemove={mousemove} onmouseup={mouseup}>
+<library-page>
     <style scoped>
         :scope {
             --datatable-border-color: gray;
             /* width: 100%; */
             /* height: 100%; */
-            --right-width: 300px;
+            --right-width: 200px;
             display: flex;
             height: 100%;
         }
@@ -23,22 +23,18 @@
         .library-item-info{
             height: 25px;
         }
-
+ 
         .gutter {    
-            cursor: col-resize;
             width: 4px;
             border-left: 1px solid var(--control-border-color);
-        }   
+        } 
         .split.left{
-            margin: 0;
             width: var(--right-width);
         }
-
         .split.right{
-            margin: 0;   
             width: calc(100% - var(--right-width));
-            height: 100%;
         }
+
         ul.sideMenu {
             padding: 0;
             position: relative;
@@ -62,22 +58,17 @@
         }
     </style>
 
-    <div id="sidebar-frame" class="split left">
+    <div class="split left">
         <ul class="sideMenu" onmouseup={sidebar_mouseup}>
             <li>Search
                 <ul>
                     <li class="search-item" each="{ task, key in tasks }" onmousedown={search_item_mouseup} onclick={onclickItem}>{ key }: { task.body }</li>
-                    <!-- <li><a href="/cat1/">パソコン関係</a></li>
-                    <li><a href="/cat2/">家電製品関係</a></li>
-                    <li><a href="/cat3/">雑貨/キッチン用品関係</a></li>
-                    <li><a href="/cat4/">食事・お取り寄せ関係</a></li>
-                    <li><a href="/cat5/">その他諸々</a></li> -->
                 </ul>
             </li>
         </ul>
     </div>
-    <div class="gutter" onmousedown={mousedown}></div>
-    <div id="librarylist-frame" class="split right">
+    <div class="gutter"></div>
+    <div class="split right">
         <div ref="base" class="table-base">
             <div class="library-item-info">num of items {this.num_items}</div>
             <base-datatable ref="dt" params={this.params}></base-datatable>
@@ -122,32 +113,6 @@
         if(e.which===3){
             menu2.popup({window: remote.getCurrentWindow()});
         }
-    };
-
-
-    let gutter = false;
-    let gutter_move = false;
-
-    this.mousemove = (e) => {
-        if(gutter){   
-            gutter_move = true;  
-            let pe = document.getElementById("sidebar-frame");
-            let ve = document.getElementById("librarylist-frame");
-            pe.style.width = e.clientX + "px";
-            ve.style.width = `calc(100% - ${e.clientX}px)`;
-        }
-    };
-    this.mousedown = (e) => {
-        if(e.which===1){
-            gutter = true;     
-        }
-    };
-    this.mouseup = (e) => {
-        if(gutter_move){
-            resizeDataTable();
-        }
-        gutter = false;
-        gutter_move = false; 
     };
 
     this.num_items = 0;

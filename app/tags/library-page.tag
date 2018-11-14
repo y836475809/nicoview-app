@@ -35,7 +35,7 @@
             width: calc(100% - var(--right-width));
         }
 
-        ul.sideMenu {
+        /* ul.sideMenu {
             padding: 0;
             position: relative;
         }
@@ -49,23 +49,45 @@
             cursor: default;
         }
         .sideMenu > li > ul {
+            left: 10px;
             list-style-type: none!important;
             cursor: pointer;
         }
         .sideMenu > li > ul li.select{
             background: lightgrey;
             opacity: 0.7;
+        } */
+        
+
+        .sideMenu {
+            position: relative;
+            color: #2d8fdd;
+            background: #f1f8ff;
+            margin-bottom: 3px;
+            line-height: 1.5;
+            padding: 0.5em;
+            /* list-style-type: none!important;
+            cursor: default; */
+        }
+        .search-item {
+            position: relative;
+            left: 10px;
+            width: calc(100% - 10px);
+            /* list-style-type: none!important; */
+            cursor: pointer;
+        }
+        .search-item.select{
+            background: lightgrey;
+            opacity: 0.7;
         }
     </style>
 
     <div class="split left">
-        <ul class="sideMenu" onmouseup={sidebar_mouseup}>
-            <li>Search
-                <ul>
-                    <li class="search-item" each="{ task, key in tasks }" onmousedown={search_item_mouseup} onclick={onclickItem}>{ key }: { task.body }</li>
-                </ul>
-            </li>
-        </ul>
+        <div class="sideMenu" onmouseup={sidebar_mouseup}>Search
+            <div id="items">
+                <div class="search-item" each="{ task, key in tasks }" onmouseup={search_item_mouseup} onclick={onclickItem}>{ key }: { task.body }</div>
+            </div>
+        </div>
     </div>
     <div class="gutter"></div>
     <div class="split right">
@@ -82,6 +104,7 @@
     const ipc = require("electron").ipcRenderer;
     const DB = require(`${base_dir}/app/js/db`).DB;
     const time_format = require(`${base_dir}/app/js/time_format`);
+    const Sortable = require("sortablejs");
     
     require(`${base_dir}/app/tags/base-datatable.tag`);  
 
@@ -97,6 +120,9 @@
         "sm5": {"body": "sm5"},
     };
     this.search_item_mouseup = (e) => {
+        if(e.which!==1){
+            return;
+        }
         console.log("index=", e);
         
         let elms = this.root.querySelectorAll(".search-item.select");
@@ -110,6 +136,7 @@
         
     };
     this.sidebar_mouseup = (e) => {
+        // console.log("sidebar_mouseup=", e);
         if(e.which===3){
             menu2.popup({window: remote.getCurrentWindow()});
         }
@@ -262,6 +289,9 @@
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
     this.on("mount", () => {
+        let el = document.getElementById("items");
+        let sortable = Sortable.create(el);
+
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();
             menu.popup({window: remote.getCurrentWindow()});

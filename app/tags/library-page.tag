@@ -1,9 +1,12 @@
-<library-page>
+<library-page onmousemove={mousemove} onmouseup={mouseup}>
     <style scoped>
         :scope {
             --datatable-border-color: gray;
             /* width: 100%; */
             /* height: 100%; */
+            --right-width: 300px;
+            display: flex;
+            height: 100%;
         }
         .table-base {
             background-color: var(--control-color);
@@ -20,11 +23,65 @@
         .library-item-info{
             height: 25px;
         }
+
+        .gutter {    
+            cursor: col-resize;
+            width: 4px;
+            border-left: 1px solid var(--control-border-color);
+        }   
+        .split.left{
+            margin: 0;
+            width: var(--right-width);
+        }
+
+        .split.right{
+            margin: 0;   
+            width: calc(100% - var(--right-width));
+            height: 100%;
+        }
+        ul.sideMenu {
+            padding: 0;
+            position: relative;
+        }
+        .sideMenu > li {
+            color: #2d8fdd;
+            background: #f1f8ff;
+            margin-bottom: 3px;
+            line-height: 1.5;
+            padding: 0.5em;
+            list-style-type: none!important;
+            cursor: default;
+        }
+        .sideMenu > li > ul {
+            list-style-type: none!important;
+            cursor: pointer;
+        }
+        .sideMenu > li > ul li.select{
+            background: lightgrey;
+            opacity: 0.7;
+        }
     </style>
 
-    <div ref="base" class="table-base">
-        <div class="library-item-info">num of items {this.num_items}</div>
-        <base-datatable ref="dt" params={this.params}></base-datatable>
+    <div id="sidebar-frame" class="split left">
+        <ul class="sideMenu" onmouseup={sidebar_mouseup}>
+            <li>Search
+                <ul>
+                    <li class="search-item" each="{ task, key in tasks }" onmousedown={search_item_mouseup} onclick={onclickItem}>{ key }: { task.body }</li>
+                    <!-- <li><a href="/cat1/">パソコン関係</a></li>
+                    <li><a href="/cat2/">家電製品関係</a></li>
+                    <li><a href="/cat3/">雑貨/キッチン用品関係</a></li>
+                    <li><a href="/cat4/">食事・お取り寄せ関係</a></li>
+                    <li><a href="/cat5/">その他諸々</a></li> -->
+                </ul>
+            </li>
+        </ul>
+    </div>
+    <div class="gutter" onmousedown={mousedown}></div>
+    <div id="librarylist-frame" class="split right">
+        <div ref="base" class="table-base">
+            <div class="library-item-info">num of items {this.num_items}</div>
+            <base-datatable ref="dt" params={this.params}></base-datatable>
+        </div>
     </div>
 
 <script>
@@ -36,6 +93,62 @@
     const time_format = require(`${base_dir}/app/js/time_format`);
     
     require(`${base_dir}/app/tags/base-datatable.tag`);  
+
+    const menu2 = new Menu();
+    menu2.append(new MenuItem({
+        label: "Play", click() {
+            console.log("lib context menu data=");
+        }
+    }));
+    this.tasks = {
+        "all": {"body": ""},
+        "sm1": {"body": "sm1"},
+        "sm5": {"body": "sm5"},
+    };
+    this.search_item_mouseup = (e) => {
+        console.log("index=", e);
+        
+        let elms = this.root.querySelectorAll(".search-item.select");
+        elms.forEach((elm) => {
+            elm.classList.toggle("select");  
+        });
+        e.target.classList.toggle("select"); 
+        
+        const param = e.item.task.body;
+        search_dt(param);
+        
+    };
+    this.sidebar_mouseup = (e) => {
+        if(e.which===3){
+            menu2.popup({window: remote.getCurrentWindow()});
+        }
+    };
+
+
+    let gutter = false;
+    let gutter_move = false;
+
+    this.mousemove = (e) => {
+        if(gutter){   
+            gutter_move = true;  
+            let pe = document.getElementById("sidebar-frame");
+            let ve = document.getElementById("librarylist-frame");
+            pe.style.width = e.clientX + "px";
+            ve.style.width = `calc(100% - ${e.clientX}px)`;
+        }
+    };
+    this.mousedown = (e) => {
+        if(e.which===1){
+            gutter = true;     
+        }
+    };
+    this.mouseup = (e) => {
+        if(gutter_move){
+            resizeDataTable();
+        }
+        gutter = false;
+        gutter_move = false; 
+    };
 
     this.num_items = 0;
 
@@ -221,6 +334,38 @@
 
     obs.on("resizeEndEvent", (size)=> {
         resizeDataTable(size);
+    });
+
+    let pre_s_param = "";
+    let sc_map = new Map();
+    const search_dt = (param) => {
+        const dt_root = this.refs.dt.root;
+        let s = dt_root.querySelector("div.dataTables_scrollBody");
+        const scroll_top = s.scrollTop;
+        sc_map.set(pre_s_param, scroll_top);
+
+        this.refs.dt.search(param);
+        if(sc_map.has(param)){
+            // s.scrollTop(sc_map.get(param));
+            this.refs.dt.scrollto2(sc_map.get(param));
+        }
+
+        pre_s_param = param;
+    };
+    obs.on("library_dt_search", (param)=> {
+        search_dt(param);
+        // const dt_root = this.refs.dt.root;
+        // let s = dt_root.querySelector("div.dataTables_scrollBody");
+        // const scroll_top = s.scrollTop;
+        // sc_map.set(pre_s_param, scroll_top);
+
+        // this.refs.dt.search(param);
+        // if(sc_map.has(param)){
+        //     // s.scrollTop(sc_map.get(param));
+        //     this.refs.dt.scrollto2(sc_map.get(param));
+        // }
+
+        // pre_s_param = param;
     });
 </script>
 </library-page>

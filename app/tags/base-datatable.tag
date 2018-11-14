@@ -45,6 +45,21 @@
         const sc_h = scroll_body.offsetHeight;
         table.row( index -sc_h/row_h + 1).scrollTo(false);
     };
+
+    this.scrollto2 = (pos) => {
+        let table = getDataTable();
+        if(!table.data().count()){
+            return;
+        }
+        // table.row(index).scrollTo(false);
+        $("div.dataTables_scrollBody").scrollTop(pos);
+    };
+
+    this.search = (param) => {
+        let table = getDataTable();
+        table.search( param ).draw();
+    };
+
     // this.adjust_columns = ()=>{
     //     let table = getDataTable();
     //     table.columns.adjust(); 

@@ -19,6 +19,7 @@
 
     <style type="text/css">
         .test-button{
+            display: inline;
             height: 25px;
         }
         .test-main-page{
@@ -30,6 +31,12 @@
 <body>
     <div class="test-button">
         <input type="button" value="load" onclick="onclickLoadData();">  
+    </div>
+    <div class="test-button">
+        <input type="button" value="all" onclick="onserachAll();">  
+    </div>
+    <div class="test-button">
+        <input type="button" value="sm5" onclick="onserach();">  
     </div>
     <div class="test-main-page">
         <main-page></main-page>
@@ -63,6 +70,15 @@
         const data_path = paths[0];
         obs.trigger("load_data", data_path);
     };
+
+    const onserachAll = ()=>{
+        obs.trigger("library_dt_search", "");
+    };
+
+    const onserach = ()=>{
+        obs.trigger("library_dt_search", "sm5");
+    };
+
 
     obs.on("on_error", (error)=> {
         console.error(error);

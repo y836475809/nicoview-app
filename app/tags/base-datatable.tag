@@ -17,11 +17,6 @@
         return getDataTableElm().DataTable();
     };
 
-    obs.on("receivedData", (datas) => {
-        let table = getDataTable();
-        table.clear().rows.add(datas).draw();
-    });
-
     this.setData = (datas)=> {
         let table = getDataTable();
         table.clear().rows.add(datas).draw();      

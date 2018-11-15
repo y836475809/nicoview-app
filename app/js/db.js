@@ -20,7 +20,7 @@ class DB {
     }
 
     load(file_path){
-        const datas = serializer.load(file_path);
+        const datas = new Map(serializer.load(file_path));
         if (!datas.has("dirpath")) {
             throw Error("not find id=dirpath");
         }

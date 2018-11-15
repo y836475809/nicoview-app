@@ -7,7 +7,7 @@ const fs = require("fs");
  */
 let load = function (file_path) {
     const data = fs.readFileSync(file_path, "utf-8");
-    return new Map(JSON.parse(data));
+    return JSON.parse(data);
 };
 
 /**

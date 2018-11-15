@@ -35,57 +35,59 @@
             width: calc(100% - var(--right-width));
         }
 
-        /* ul.sideMenu {
-            padding: 0;
-            position: relative;
-        }
-        .sideMenu > li {
-            color: #2d8fdd;
-            background: #f1f8ff;
-            margin-bottom: 3px;
-            line-height: 1.5;
-            padding: 0.5em;
-            list-style-type: none!important;
-            cursor: default;
-        }
-        .sideMenu > li > ul {
-            left: 10px;
-            list-style-type: none!important;
-            cursor: pointer;
-        }
-        .sideMenu > li > ul li.select{
-            background: lightgrey;
-            opacity: 0.7;
-        } */
-        
-
-        .sideMenu {
-            position: relative;
-            color: #2d8fdd;
-            background: #f1f8ff;
-            margin-bottom: 3px;
-            line-height: 1.5;
-            padding: 0.5em;
-            /* list-style-type: none!important;
-            cursor: default; */
+        .sideMenu > h2 {
+            font-size: 1.5em;
+            background-color: #2d8fdd;
+            color: white;
+            text-align: center;
+            height: 45px;
+            line-height: 45px;
+            margin: 0;
+            user-select: none;
         }
         .search-item {
-            position: relative;
-            left: 10px;
-            width: calc(100% - 10px);
-            /* list-style-type: none!important; */
+            border-bottom: 1px solid gray;
+            padding-left: 10px;
+            background-color: white;
+            line-height: 30px;
+            user-select: none;
             cursor: pointer;
+            display: flex;
+        }
+        .search-item > div {
+            margin: 0;
+            width: 100%;
+            /* background-color: blue; */
+        }
+        .search-item:first-child {
+            border-top: 1px solid gray;
+           }
+        .search-item:hover {
+            background-color: #eee;
         }
         .search-item.select{
             background: lightgrey;
             opacity: 0.7;
         }
+        div.search-item-del {
+            margin: 0;
+            margin-left: auto;
+            width: 30px;
+            color: gray;
+            transform: scale(0.5) rotate(45deg);
+        }
     </style>
 
     <div class="split left">
-        <div class="sideMenu" onmouseup={sidebar_mouseup}>Search
-            <div id="items">
-                <div class="search-item" each="{ task, key in tasks }" onmouseup={search_item_mouseup} onclick={onclickItem}>{ key }: { task.body }</div>
+        <div class="sideMenu" onmouseup={sidebar_mouseup}>
+            <h2>Search</h2>
+            <div class="search items">
+                <div class="search-item" onclick={onclickClearSearch}>Clear</div>
+                <div class="search-item" each="{ task, i in tasks }" data-id={i}>
+                    <div onmouseup={search_item_mouseup} onclick={onclickItem}>{ task.label }</div>
+                    <!-- <div class="search-item-del" data-id={i} onclick={onclickDelItem}><span class="icono-cross"></span></div> -->
+                    <div class="search-item-del icono-cross" data-id={i} onclick={onclickDelItem}></div>
+                </div>
             </div>
         </div>
     </div>
@@ -93,6 +95,8 @@
     <div class="split right">
         <div ref="base" class="table-base">
             <div class="library-item-info">num of items {this.num_items}</div>
+            <input type="search" class="library-search-input" onkeydown={onkeydownSearchInput} />
+            <button onclick={onclickAdd}>test</button>
             <base-datatable ref="dt" params={this.params}></base-datatable>
         </div>
     </div>
@@ -105,21 +109,34 @@
     const DB = require(`${base_dir}/app/js/db`).DB;
     const time_format = require(`${base_dir}/app/js/time_format`);
     const Sortable = require("sortablejs");
-    
+    const path = require("path");
+    const pref = require("../js/preference");
+    const serializer = require("../js/serializer");
     require(`${base_dir}/app/tags/base-datatable.tag`);  
 
-    const menu2 = new Menu();
-    menu2.append(new MenuItem({
-        label: "Play", click() {
-            console.log("lib context menu data=");
-        }
-    }));
-    this.tasks = {
-        "all": {"body": ""},
-        "sm1": {"body": "sm1"},
-        "sm5": {"body": "sm5"},
-    };
+    // const menu2 = new Menu();
+    // menu2.append(new MenuItem({
+    //     label: "Play", click() {
+    //         console.log("lib context menu data=");
+    //     }
+    // }));
+
+    let sortable = null;
+
+    // this.tasks = [
+    //     { label: "all", param: "" },
+    //     { label: "sm1", param: "sm1" },
+    //     { label: "sm5", param: "sm5" },
+    // ];
+    const seach_path = path.join(pref.getDataPath(), "seach.json");
+    try {
+        this.tasks = serializer.load(seach_path);
+    } catch (error) {
+        this.tasks = [];
+    }
+
     this.search_item_mouseup = (e) => {
+        console.log("search_item_mouseup=", e);
         if(e.which!==1){
             return;
         }
@@ -131,15 +148,65 @@
         });
         e.target.classList.toggle("select"); 
         
-        const param = e.item.task.body;
+        const param = e.item.task.param;
         search_dt(param);
         
     };
-    this.sidebar_mouseup = (e) => {
-        // console.log("sidebar_mouseup=", e);
-        if(e.which===3){
-            menu2.popup({window: remote.getCurrentWindow()});
+    // this.sidebar_mouseup = (e) => {
+    //     if(e.which===3){
+    //         menu2.popup({window: remote.getCurrentWindow()});
+    //     }
+    // };
+    this.onkeydownSearchInput = (e) => {
+        if(e.keyCode===13){
+            const param = e.target.value;
+            search_dt(param);
         }
+    };
+    this.onclickAdd = () => {
+        const search_elm = this.root.querySelector(".library-search-input");
+        const param = search_elm.value;
+        if(!param){
+            return;
+        }
+        this.tasks.push({ label: param, param: param });
+        const tmp = this.tasks.slice();
+        this.tasks = [];
+        this.update();
+        this.tasks = tmp.slice();
+        this.update();
+
+        serializer.save(seach_path, this.tasks, (error)=>{
+            if(error){
+                console.log(error);
+            }
+        });
+    };
+    this.onclickDelItem = (e) => {
+        
+        const del_index = parseInt(e.target.getAttribute("data-id"));
+        console.log("onclickDelItem=", e);
+        console.log("onclickDelItem del_index=", del_index);
+        let tmp = [];
+        this.tasks.forEach((task, i) => {
+            if(i!==del_index){
+                tmp.push(task);
+            }    
+        });
+        
+        this.tasks = [];
+        this.update();
+        this.tasks = tmp.slice();
+        this.update();
+        
+        serializer.save(seach_path, this.tasks, (error)=>{
+            if(error){
+                console.log(error);
+            }
+        });
+    };
+    this.onclickClearSearch = () =>{
+        search_dt("");
     };
 
     this.num_items = 0;
@@ -240,7 +307,7 @@
             // exclude: [0],
             // tableWidthFixed: false
         },
-        dom: "Zfrt",  
+        dom: "Zfrt",    
         scrollX: true,
         scrollY: "100px" ,
         scrollCollapse:false,
@@ -289,8 +356,30 @@
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
     this.on("mount", () => {
-        let el = document.getElementById("items");
-        let sortable = Sortable.create(el);
+        // const el = document.getElementById("items");
+        const el = this.root.querySelector(".search.items");
+        sortable = Sortable.create(el, {
+            onSort: (evt) => {
+                const  order = sortable.toArray();
+                console.log("onSort sortable array=", order);
+
+                let sorted_items = [];
+                order.forEach(i => {
+                    sorted_items.push(this.tasks[i]);
+                });
+                this.tasks = [];
+                this.update();
+
+                this.tasks = sorted_items.slice();
+                this.update();
+
+                serializer.save(seach_path, this.tasks, (error)=>{
+                    if(error){
+                        console.log(error);
+                    }
+                });
+            }
+        });
 
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();

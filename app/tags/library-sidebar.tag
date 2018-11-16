@@ -137,10 +137,11 @@
         };
 
         this.onclickClearSearch = (e) =>{
-            if(!e.target.classList.contains("select")){
-                e.target.classList.add("select");
+            let elm = this.root.querySelector("#fixed-search-item-lable.search-item-lable");
+            if(elm){
+                elm.classList.add("select");
             }
-            
+
             this.search_items.forEach((item, i) => {
                 item.selected = false;
             });
@@ -156,6 +157,10 @@
         
         obs.on("on_add_search_item", (item)=> {
             addSearchItem(item);
+        });
+
+        obs.on("on_clear_search", ()=> {
+            this.onclickClearSearch();
         });
 
         this.on("mount", () => {

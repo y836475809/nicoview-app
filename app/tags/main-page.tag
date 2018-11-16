@@ -77,6 +77,7 @@
 
     <script>
         /* globals obs base_dir */
+        const pref = require(`${base_dir}/app/js/preference`);
         require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
@@ -118,6 +119,10 @@
             riot.mount("library-page");
             riot.mount("search-page");        
             select_page(this.index);
+
+            const lib_file_path = pref.getLibraryFilePath();
+            obs.trigger("on_clear_search");
+            obs.trigger("load_data", lib_file_path);
         });
 
         const timeout = 200;

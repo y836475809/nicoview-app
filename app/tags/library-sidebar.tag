@@ -38,12 +38,26 @@
             /* opacity: 0.7; */
         }
         div.search-item-del {
+            position: relative;
             margin: 0;
             margin-left: auto;
-            width: 30px;
+            width: 20px;
+            height: 20px;
+            top: 5px;
+        }
+        div.search-item-del:hover {
+            border-radius: 50% 50% 50% 50%;
+            background-color: darkgray;
+        }
+        div.search-item-del > span {
+            top: -7px;
+            left: -7px;
             color: gray;
             transform: scale(0.5) rotate(45deg);
-        }        
+        }
+        div.search-item-del > span:hover {
+            color: white;
+        }
     </style>
 
     <div class="library-sidebar">
@@ -54,7 +68,7 @@
         <div class="search items">
             <div class="search-item" each="{ search, i in search_items }" data-id={i} >
                 <div class="{ search.selected ? 'search-item-lable select' : 'search-item-lable' }" onmouseup={onmouseupSearchItem}>{ search.label }</div>
-                <div class="search-item-del icono-cross" data-id={i} onclick={onclickDeleteSearchItem}></div>
+                <div class="search-item-del"><span class="icono-cross" data-id={i} onclick={onclickDeleteSearchItem}></span></div>
             </div>
         </div>
     </div>

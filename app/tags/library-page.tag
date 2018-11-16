@@ -176,6 +176,7 @@
             {
                 targets: 0,
                 orderable: false,
+                searchable: false,
                 width: 130,
                 data: "image",
                 render: function (data, type, row, meta) {
@@ -186,6 +187,7 @@
             { targets: 2, data: "name" },
             { 
                 targets: 3, 
+                searchable: false,
                 data: "creation_date" ,
                 render: function (data, type, row, meta) {
                     return time_format.toDate(data);
@@ -193,14 +195,16 @@
             },
             { 
                 targets: 4, 
+                searchable: false,
                 data: "pub_date",
                 render: function (data, type, row, meta) {
                     return time_format.toDate(data);
                 },
             },
-            { targets: 5, data: "play_count" },
+            { targets: 5, searchable: false, data: "play_count" },
             { 
                 targets: 6, 
+                searchable: false,
                 data: "time",
                 render: function (data, type, row, meta) {
                     return time_format.toPlayTime(data);

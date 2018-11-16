@@ -5,6 +5,8 @@
             /* width: 100%; */
             /* height: 100%; */
             --right-width: 200px;
+            --search-input-width: 200px;
+            --search-button-size: 25px;
             display: flex;
             height: 100%;
         }
@@ -20,9 +22,6 @@
             padding-left: 4px;
             padding-right: 4px;
         }     
-        .library-item-info{
-            height: 25px;
-        }
  
         .gutter {    
             width: 4px;
@@ -34,6 +33,40 @@
         .split.right{
             width: calc(100% - var(--right-width));
         }
+
+        .library-info{
+            display: flex;
+        }
+        .library-item-info{
+            height: 25px;
+            line-height: 25px;
+            vertical-align: middle;
+            user-select: none;
+        }
+        .library-search{
+            display: flex;
+            width: calc(var(--search-input-width) + var(--search-button-size) + 6px);
+            margin: 0;
+            margin-left: auto;
+            margin-right: 15px;
+            margin-bottom: 4px;     
+        }
+        .library-search > button{ 
+            margin: auto;
+            width: var(--search-button-size);
+            height: var(--search-button-size);
+        }
+        .library-search-input{
+            width: var(--search-input-width);
+            height: var(--search-button-size);
+        }
+        .library-search > button > span {
+            margin: 0;
+            top: -5px;
+            left: -10px;
+            color: black;
+            transform: scale(0.5);
+        }
     </style>
 
     <div class="split left">
@@ -42,9 +75,13 @@
     <div class="gutter"></div>
     <div class="split right">
         <div ref="base" class="table-base">
-            <div class="library-item-info">num of items {this.num_items}</div>
-            <input type="search" class="library-search-input" onkeydown={onkeydownSearchInput} />
-            <button onclick={onclickAdd}>test</button>
+            <div class="library-info">
+                <div class="library-item-info">num of items {this.num_items}</div>
+                <div class="library-search">
+                    <input type="search" class="library-search-input" onkeydown={onkeydownSearchInput} />
+                    <button title="test" onclick={onclickAdd}><span class="icono-plus"></span></button>
+                </div>
+            </div>
             <base-datatable ref="dt" params={this.params}></base-datatable>
         </div>
     </div>
@@ -182,7 +219,7 @@
             // exclude: [0],
             // tableWidthFixed: false
         },
-        dom: "Zfrt",    
+        dom: "Zrt",    
         scrollX: true,
         scrollY: "100px" ,
         scrollCollapse:false,
@@ -242,13 +279,12 @@
             return;
         }
         const dt_root = this.refs.dt.root;
-        const dt_elm1 = dt_root.querySelector("div.dataTables_filter");
-        const dt_elm3 = dt_root.querySelector("div.dataTables_scrollHead");
-        const info_elm = this.root.querySelector(".library-item-info");
-        const margin = 10;
-        const exclude_h = dt_elm1.offsetHeight 
-            + dt_elm3.offsetHeight 
+        const info_elm = this.root.querySelector(".library-info");
+        const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
+        const margin = 4;
+        const exclude_h = 
             + info_elm.offsetHeight 
+            + dt_elm.offsetHeight 
             + margin;
         let ch = this.refs.base.clientHeight;
         if(size){

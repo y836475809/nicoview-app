@@ -9,6 +9,7 @@
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
+            overflow-x: hidden;
             overflow-y: hidden;
             --row-height: 25px;
         }    

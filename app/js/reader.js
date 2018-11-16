@@ -22,7 +22,7 @@ function comment(xml) {
                 vpos: vpos,
                 date: date,
                 user_id: user_id,
-                mail: mail,
+                mail: mail ? mail : "184",
                 text: text
             });
         }

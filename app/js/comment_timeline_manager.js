@@ -182,8 +182,6 @@ class CommentTimeLineManager {
         });
 
         comments.forEach(comment=>{
-            const m_type = comment.mail.match(/ue|shita/gi);
-            const m_size = comment.mail.match(/big|small/gi);
             let p = {
                 no:comment.no, 
                 vpos:comment.vpos*10, 
@@ -191,6 +189,9 @@ class CommentTimeLineManager {
                 type:"naka", 
                 font_size:"middle"
             };
+
+            const m_type = comment.mail ? comment.mail.match(/ue|shita/gi) : null;
+            const m_size = comment.mail ? comment.mail.match(/big|small/gi) : null;
 
             if(m_size!=null){
                 p.font_size = m_size[0];

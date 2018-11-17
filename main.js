@@ -12,6 +12,7 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
 let player_win = null;
+let is_debug_mode = false;
 
 function createWindow() {
     global.sharedObj = {
@@ -21,6 +22,7 @@ function createWindow() {
     let html = "html/index.html";
     if (process.argv.length > 2) {
         html = process.argv[2];
+        is_debug_mode = true;
     }
 
     // ブラウザウィンドウの作成
@@ -29,8 +31,10 @@ function createWindow() {
     // アプリケーションのindex.htmlの読み込み
     win.loadURL(`file://${__dirname}/${html}`);
 
-    // DevToolsを開く
-    win.webContents.openDevTools();
+    if(is_debug_mode){
+        // DevToolsを開く
+        win.webContents.openDevTools();
+    }
 
     // ウィンドウが閉じられた時に発行される
     win.on("closed", () => {
@@ -66,7 +70,12 @@ let creatPlayerWindow = (data) => {
     if (player_win === null) {
         const player_path = `file://${__dirname}/html/player.html`;
         player_win = new BrowserWindow({ width: 800, height: 600 });
-        player_win.setMenu(null);
+        if(!is_debug_mode){
+            player_win.setMenu(null);
+        }
+        if(is_debug_mode){
+            player_win.webContents.openDevTools();
+        }
         player_win.loadURL(player_path);
 
         player_win.on("close", (e) => {

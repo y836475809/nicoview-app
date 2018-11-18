@@ -30,7 +30,7 @@
         const {Menu, MenuItem} = remote;
         // var $ = jQuery = require("jquery");
         // var anime = require("animejs");
-
+        let video_playing = false;
         // let comment_anime = null;
         // let my = [];
         let ctls = null;
@@ -66,21 +66,21 @@
                     ctls.seek(current * 1000);
                 }
             }else{
-                console.log("player paused");
                 this.refs.player_video.pause();
                 if(ctls!=null){
                     ctls.pause();
                 }
 
                 this.refs.player_video.currentTime = current;
-                if(ctls!=null){
-                    ctls.seek(current * 1000);
-                }
+                // if(ctls!=null){
+                //     ctls.seek(current * 1000);
+                // }
 
                 this.refs.player_video.play();
-                if(ctls!=null){
-                    ctls.play();
-                }
+                video_playing = true;
+                // if(ctls!=null){
+                //     ctls.play();
+                // }
             } 
         };
         
@@ -178,8 +178,18 @@
             this.refs.player_video.addEventListener("canplay", function(){
                 console.log("addEventListener canplayによるイベント発火");
             }); 
-            this.refs.player_video.addEventListener("playing", function(){
+            this.refs.player_video.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
+                if(video_playing==true){
+                    if(ctls!=null){
+                        const current = this.refs.player_video.currentTime;
+                        console.log("addEventListener playingによるイベント発火 current= ", current);
+                        //ctls.pause();
+                        ctls.seek(current * 1000);
+                        ctls.play();
+                    }
+                    video_playing = false;
+                }
             });
             
             obs.on("play", () => {
@@ -192,15 +202,18 @@
             });
 
             obs.on("on_seeked", (current) => {  
-                moveSeek(current);   
+                video_playing = false;
+                moveSeek(current); 
             });
 
             obs.on("on_change_volume", (volume) => {
                 this.refs.player_video.volume = volume ;
             });
-
-            obs.on("on_resize_begin", function () {
+           
+            obs.on("on_resize_begin", () => {
                 if(ctls!=null){
+                    video_playing = !this.refs.player_video.paused;
+                    video_playing = false;
                     ctls.pause();
                 }
             });

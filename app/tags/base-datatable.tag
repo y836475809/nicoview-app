@@ -31,7 +31,7 @@
         table.columns.adjust();
     };
 
-    // this.row_h = null;
+    // TODO: move viweinfopage
     const row_h = params.row_height;
     this.scrollto = (index) => {
         if(!row_h){
@@ -46,6 +46,7 @@
         table.row( index -sc_h/row_h + 1).scrollTo(false);
     };
 
+    // TODO: rename scrollpos
     this.scrollto2 = (pos) => {
         let table = getDataTable();
         if(!table.data().count()){

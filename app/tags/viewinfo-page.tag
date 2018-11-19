@@ -33,6 +33,7 @@
             overflow-x: hidden;
         }
         
+        /* TODO: add scrolly auto */
         .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 

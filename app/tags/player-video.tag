@@ -93,6 +93,7 @@
                 menu.popup({window: remote.getCurrentWindow()});
             }
         };
+        // TODO : move player-controls
         window.addEventListener("keyup", (e) => {
             const video = this.refs.player_video;
             if(video.ended || video.readyState != 4){

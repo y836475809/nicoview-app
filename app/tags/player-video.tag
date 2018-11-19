@@ -113,6 +113,9 @@
             video.src = data.src;
             video.type = data.type;
          
+            if(ctls){
+                ctls.delete();
+            }
             ctls = null;
             if(data.commnets.length>0){
                 const div_num = 200;

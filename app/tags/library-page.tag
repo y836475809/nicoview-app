@@ -225,7 +225,7 @@
         },
         dom: "Zrt",    
         scrollX: true,
-        scrollY: "100px" ,
+        scrollY: true,
         scrollCollapse:false,
         scroller: {
             displayBuffer: 50

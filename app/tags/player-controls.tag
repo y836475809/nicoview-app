@@ -116,5 +116,11 @@
                 this.refs.seek.redraw();
             });
         });
+
+        window.addEventListener("keyup", (e) => {
+            if(e.key==" "){
+                this.play();
+            }
+        }, true);   
     </script>
 </player-controls>

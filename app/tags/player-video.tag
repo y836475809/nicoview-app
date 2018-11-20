@@ -86,20 +86,20 @@
                 menu.popup({window: remote.getCurrentWindow()});
             }
         };
-        // TODO : move player-controls
-        window.addEventListener("keyup", (e) => {
-            const video = this.refs.player_video;
-            if(video.ended || video.readyState != 4){
-                return;
-            }
-            if(e.key==" "){
-                if(video.paused){
-                    video.play();
-                }else{
-                    video.pause();
-                }
-            }
-        }, true);
+        // // TODO : move player-controls
+        // window.addEventListener("keyup", (e) => {
+        //     const video = this.refs.player_video;
+        //     if(video.ended || video.readyState != 4){
+        //         return;
+        //     }
+        //     if(e.key==" "){
+        //         if(video.paused){
+        //             video.play();
+        //         }else{
+        //             video.pause();
+        //         }
+        //     }
+        // }, true);
 
         obs.on("receivedData", (data) => {
             console.log("data=", data);

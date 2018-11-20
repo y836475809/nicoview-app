@@ -22,6 +22,7 @@
         table.clear().rows.add(datas).draw();      
     };
 
+    // TODO: rename
     this.ress = (size)=> {
         const h = size.h;
         let scroll_body = this.root.querySelector("div.dataTables_scrollBody");
@@ -52,7 +53,6 @@
         if(!table.data().count()){
             return;
         }
-        // table.row(index).scrollTo(false);
         $("div.dataTables_scrollBody").scrollTop(pos);
     };
 
@@ -61,11 +61,6 @@
         table.search( param ).draw();
     };
 
-    // this.adjust_columns = ()=>{
-    //     let table = getDataTable();
-    //     table.columns.adjust(); 
-    // };
-
     this.showContextMenu = (e)=>{};
 
     let selselect = function(){
@@ -73,9 +68,7 @@
 
         return function(elm){
             let table = getDataTable(); 
-            // const data = table.row(elm).data();
-            let new_index = table.row(elm).index();
-            // console.log("mousedown ", table.row(elm).index()); 
+            const new_index = table.row(elm).index();
             if ( $(elm).hasClass("selected") ) {
                 if(selindex!==new_index)
                 {
@@ -105,7 +98,6 @@
             columns: params.columns,
             columnDefs: params.columnDefs,
             colResize: params.colResize,
-            //scrollY:'50vh',
             scrollX: params.scrollX == undefined ? false : params.scrollX,
             scrollY: params.scrollY,
             scrollCollapse: params.scrollCollapse,
@@ -125,7 +117,6 @@
         let table_body = this.root.querySelector("table tbody");
         $(table_body).on("mousedown", "tr", function(e){
             selselect(this);
-            //return false;
         });
 
         $(table_body).contextmenu((e)=>{

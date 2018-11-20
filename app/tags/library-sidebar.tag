@@ -34,8 +34,6 @@
         }
         .search-item-lable.select{
             color: red;
-            /* background-color: cadetblue; */
-            /* opacity: 0.7; */
         }
         div.search-item-del {
             position: relative;

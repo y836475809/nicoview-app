@@ -29,14 +29,7 @@
         /* globals base_dir obs */
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        // var $ = jQuery = require("jquery");
-        // var anime = require("animejs");
-        // let comment_anime = null;
-        // let my = [];
         let ctls = null;
-        // var create_comment_elm = require("../../comment")
-        // let comment_elm = require(`${base_dir}/comment`);
-        // let nico_comment = require(`${base_dir}/nico_comment`);
         const CommentTimeLineManager = require(`${base_dir}/app/js/comment_timeline_manager`);
         
         let get_time_func = ()=>{
@@ -144,14 +137,12 @@
             });
             this.refs.player_video.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
-                // comment_anime.play();
                 if(ctls!=null){
                     ctls.play();
                 }
             });
             this.refs.player_video.addEventListener("pause", () => {
                 console.log("addEventListener pauseによるイベント発火");
-                // comment_anime.pause();
                 if(ctls!=null){
                     ctls.pause();
                 }

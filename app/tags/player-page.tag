@@ -28,7 +28,6 @@
             overflow: hidden; 
             object-fit: contain;
             object-position: center center;
-            /* height: calc(100vh - var(--tags-height) - var(--controls-height)); */
             width: 100%;        
         }
     </style>
@@ -102,9 +101,6 @@
         obs.on("on_resize_window", (window_size) => { 
             adjustPlayerVideoSize();       
         });
-        // riot.mount('player-tags');
-        // riot.mount('player-video');
-        // riot.mount('player-controls');
     </script>  
       
 </player-page>

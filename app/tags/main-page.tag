@@ -22,10 +22,7 @@
             grid-row: 2 / 3;
             grid-column: 1 / 3;
         }   
-        /* #page3 {
-            grid-row: 2 / 3;
-            grid-column: 1 / 3;
-        }        */
+
         .main-group-buttons input[type=radio] {
             display: none; 
         }
@@ -51,7 +48,6 @@
         }
     </style>
     <div class="main-group-buttons">
-        <!-- <select-page-tabs></select-page-tabs> -->
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
             <span class="button">page1</span>
@@ -81,12 +77,8 @@
         require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
-        // require(`${base_dir}/app/tags/select-page-tabs.tag`);
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
-        // riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
-        // riot.mount("library-page");
-        // riot.mount("search-page");
 
         const main_group_buttons_height = parseInt(getComputedStyle(this.root).getPropertyValue("--main-group-buttons-height"));
 
@@ -115,7 +107,6 @@
         };
 
         this.on("mount", function () {
-            // riot.mount("select-page-tabs", {tabs:["Tab 1","Tab 2","Tab 3"]});
             riot.mount("library-page");
             riot.mount("search-page");        
             select_page(this.index);

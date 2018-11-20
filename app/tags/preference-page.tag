@@ -168,7 +168,6 @@
             }
 
             function asyncRead(file_path) {
-                // return new Promise(resolve => setTimeout(resolve, 5000));
                 return new Promise((resolve, reject) => {
                     db.init(file_path, (error)=>{
                         if(error){

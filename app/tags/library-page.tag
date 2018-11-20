@@ -294,7 +294,7 @@
         if(size){
             ch = size.h;
         }
-        this.refs.dt.ress({
+        this.refs.dt.setScrollSize({
             w: null,
             h: ch - exclude_h,
         });  
@@ -313,15 +313,13 @@
     let pre_s_param = "";
     let sc_map = new Map();
     const search_dt = (param) => {
-        const dt_root = this.refs.dt.root;
-        let s = dt_root.querySelector("div.dataTables_scrollBody");
-        const scroll_top = s.scrollTop;
+        const scroll_top = this.refs.dt.getScrollTop();
         sc_map.set(pre_s_param, scroll_top);
 
         this.refs.dt.search(param);
         if(sc_map.has(param)){
             // s.scrollTop(sc_map.get(param));
-            this.refs.dt.scrollto2(sc_map.get(param));
+            this.refs.dt.setScrollTop(sc_map.get(param));
         }
 
         pre_s_param = param;

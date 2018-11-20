@@ -22,8 +22,7 @@
         table.clear().rows.add(datas).draw();      
     };
 
-    // TODO: rename
-    this.ress = (size)=> {
+    this.setScrollSize = (size)=> {
         const h = size.h;
         let scroll_body = this.root.querySelector("div.dataTables_scrollBody");
         $(scroll_body).css("height", h);
@@ -32,28 +31,29 @@
         table.columns.adjust();
     };
 
-    // TODO: move viweinfopage
-    const row_h = params.row_height;
-    this.scrollto = (index) => {
-        if(!row_h){
-            return;
-        }
+    this.setScrollToIndex = (index) => {
         let table = getDataTable();
         if(!table.data().count()){
             return;
         }
-        const scroll_body = this.root.querySelector("div.dataTables_scrollBody");
-        const sc_h = scroll_body.offsetHeight;
-        table.row( index -sc_h/row_h + 1).scrollTo(false);
+
+        table.row(index).scrollTo(false);
     };
 
-    // TODO: rename scrollpos
-    this.scrollto2 = (pos) => {
+    this.setScrollTop = (pos) => {
         let table = getDataTable();
         if(!table.data().count()){
             return;
         }
         $("div.dataTables_scrollBody").scrollTop(pos);
+    };
+
+    this.getScrollTop = () => {
+        return this.root.querySelector("div.dataTables_scrollBody").scrollTop;
+    };
+
+    this.getScrollHeight = () => {
+        return this.root.querySelector("div.dataTables_scrollBody").offsetHeight;
     };
 
     this.search = (param) => {

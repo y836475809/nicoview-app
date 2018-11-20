@@ -127,7 +127,7 @@
                     + dt_elm.offsetHeight + ch_elm.offsetHeight 
                     + margin;
             const h = this.root.clientHeight - exclude_h;
-            this.refs.dt.ress({
+            this.refs.dt.setScrollSize({
                 w: null,
                 h: h
             });
@@ -185,7 +185,6 @@
             scroller: {
                 displayBuffer: 50
             },
-            row_height: row_height,
             autoWidth: false,
             paging: true,
             displayLength:100,
@@ -220,8 +219,10 @@
                 return;
             }
 
-            const comment_index =  sync_comment_scroll.getCommnetIndex(current_sec);
-            this.refs.dt.scrollto(comment_index);
+            const comment_index =  sync_comment_scroll.getCommnetIndex(current_sec);    
+            const sc_h = this.refs.dt.getScrollHeight();
+            const index = comment_index - sc_h / row_height + 1;
+            this.refs.dt.setScrollToIndex(index);
         });
 
         this.on("mount", () => {                 

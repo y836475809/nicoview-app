@@ -29,9 +29,13 @@
         /* globals base_dir obs */
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        let ctls = null;
+        const pref = require("../js/preference");
+
         const CommentTimeLineManager = require(`${base_dir}/app/js/comment_timeline_manager`);
         
+        let ctls = null;
+        let video_size = null;
+
         let get_time_func = ()=>{
             return this.refs.player_video.currentTime*1000;
         };
@@ -68,12 +72,15 @@
         const menu = new Menu();
         menu.append(new MenuItem({ 
             label: "view", submenu: [
-                {label: "x1.0", click() {
-                    obs.trigger("on_set_video_size_scale", 1.0);
+                {label: "640x360", click() {
+                    obs.trigger("on_set_screen_size", false, {width: 640 ,height: 360});
                 }},
-                {label: "x1.5", click() {
-                    obs.trigger("on_set_video_size_scale", 1.5);
-                }}               
+                {label: "854x480", click() {
+                    obs.trigger("on_set_screen_size", false, {width: 854 ,height: 480});
+                }},
+                {label: "orignal", type: "checkbox", checked: pref.ScreenSizeOrignal(), click(e) {
+                    obs.trigger("on_set_screen_size", e.checked, video_size);
+                }}                        
             ]}));
         menu.append(new MenuItem({ type: "separator" }));
         menu.append(new MenuItem({ 
@@ -124,7 +131,7 @@
             console.log("mount");
 
             this.refs.player_video.addEventListener("loadedmetadata", (event) => {
-                const video_size = {
+                video_size = {
                     width: event.target.videoWidth,
                     height: event.target.videoHeight
                 };

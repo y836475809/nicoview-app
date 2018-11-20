@@ -66,18 +66,18 @@
             gutter_move = false;
         };
 
-        const resizeVideo = (scale) => {  
-            obs.trigger("resize_video_size", scale, (new_size) => {
-                let pf_elm = document.getElementById("player-frame");
+        const resizeVideo = (size) => { 
+            const h = this.refs.player_frame.getTagsPanelHeight() 
+                    + this.refs.player_frame.getControlPanelHeight();
+            const pf_elm = document.getElementById("player-frame");
 
-                const dh = new_size.height - pf_elm.offsetHeight;
-                const new_height = window.outerHeight + dh;
+            const dh = size.height + h - pf_elm.offsetHeight;
+            const new_height = window.outerHeight + dh;
 
-                const dw = new_size.width - pf_elm.offsetWidth;
-                const new_width = window.outerWidth + dw;
+            const dw = size.width - pf_elm.offsetWidth;
+            const new_width = window.outerWidth + dw;
 
-                window.resizeTo(new_width, new_height);
-            });
+            window.resizeTo(new_width, new_height);
         };
 
         this.on("mount", () => {
@@ -89,17 +89,29 @@
                 ve.style.width = vw + "px";
             }
         });   
-
-        obs.on("load_video", () => { 
-            const video_scale = pref.VideoScale();
-            if(!video_scale || video_scale<0){
-                return;
-            }       
-            resizeVideo(video_scale);
+  
+        obs.on("load_meta_data", (video_size) => { 
+            const is_org_size = pref.ScreenSizeOrignal();
+            const size = pref.ScreenSize();
+            if(is_org_size){  
+                resizeVideo(video_size);
+            }else{
+                resizeVideo(size);
+            }
         });
 
-        obs.on("on_set_video_size_scale", (scale) => { 
-            resizeVideo(scale);
+        obs.on("on_set_screen_size", (is_org_size, size) => { 
+            pref.ScreenSizeOrignal(is_org_size);
+            resizeVideo(size);
+        });
+
+        obs.on("resizeEndEvent", (window_size) => {
+            const h = this.refs.player_frame.getTagsPanelHeight() 
+                    + this.refs.player_frame.getControlPanelHeight();
+            const pf_elm = document.getElementById("player-frame");
+            const width = pf_elm.offsetWidth - h;
+            const height = pf_elm.offsetHeight;
+            pref.ScreenSize({width: width, height: height});
         });
 
         let resize_begin = false;

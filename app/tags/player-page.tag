@@ -60,35 +60,16 @@
             document.getElementById("player-video").style.height = h + "px";
         };
 
-        this.getVideoScale = () => {
-            if(!this.video_size){
-                return null;
-            }
-            const elm = document.getElementById("player-video");
-            const scale_w = elm.offsetWidth / this.video_size.width;
-            const scale_h = elm.offsetHeight / this.video_size.height;
-            if(Math.abs(scale_w-scale_h)<1e-3){
-                return scale_w;
-            }
-            return -1;
+        this.getTagsPanelHeight = () => {
+            const css_style = getComputedStyle(this.root);
+            return parseInt(css_style.getPropertyValue("--tags-height"));
         };
 
-        obs.on("resize_video_size", (scale, callback) => {
-            if(!this.video_size){
-                return;
-            }
+        this.getControlPanelHeight = () => {
+            const css_style = getComputedStyle(this.root);
+            return parseInt(css_style.getPropertyValue("--controls-height"));
+        };
 
-            const new_size = {
-                width: this.video_size.width * scale,
-                height: this.video_size.height * scale + tags_height + controls_height
-            };
-            callback(new_size);
-        });
-
-        obs.on("load_meta_data", (video_size) => { 
-            this.video_size = video_size;
-            obs.trigger("load_video");
-        });
 
         this.on("mount", () => {
             const css_style = getComputedStyle(this.root);

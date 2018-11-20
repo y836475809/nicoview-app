@@ -48,8 +48,20 @@ function InfoViewWidth(value){
     return PrimitivelocalStorage("infoview-width", value);
 }
 
-function VideoScale(value){
-    return PrimitivelocalStorage("video-scale", value);
+function ScreenSize(size){
+    if(size){
+        PrimitivelocalStorage("screen-width", size.width);
+        PrimitivelocalStorage("screen-height", size.height);
+    }else{
+        return {
+            width: PrimitivelocalStorage("screen-width"),
+            height: PrimitivelocalStorage("screen-height")
+        };
+    }
+}
+
+function ScreenSizeOrignal(value){
+    return BooleanlocalStorage("screen-size-orignal", value);
 }
 
 function SyncComment(value){
@@ -62,6 +74,7 @@ module.exports = {
     getDataPath: getDataPath,
     getLibraryFilePath: getLibraryFilePath,
     InfoViewWidth: InfoViewWidth,
-    VideoScale: VideoScale,
+    ScreenSize: ScreenSize,
+    ScreenSizeOrignal: ScreenSizeOrignal,
     SyncComment: SyncComment
 };

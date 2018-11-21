@@ -31,7 +31,7 @@
             margin: 5px;
         }
         .group{
-            display: block;
+            /* display: flex; */
             padding: 5px;
             margin: 10px;
         }
@@ -44,6 +44,10 @@
             height: 25px;
             top: 5px;
             left: calc(100% - 30px);            
+        }
+        .pref-checkbox{
+            height: 25px;
+            vertical-align:middle;
         }
     </style>
 
@@ -61,6 +65,10 @@
     <div class="group">
         <label class="param">Import db</label>
         <input type="button" value="Import" onclick={onclickImport}>
+    </div>
+    <div class="group">
+        <input class="pref-checkbox play-org-size" type="checkbox" onclick={onclickPlayOrgSizeCheck} />
+        <label>play with original size of video</label>
     </div>
     <button class="pref-close-btn" type="button" onclick={onclickClose}>x</button>
     </div>
@@ -93,6 +101,9 @@
             }else{
                 setLibraryPathAtt(path);
             } 
+
+            let play_org_size_ch = this.root.querySelector(".pref-checkbox.play-org-size");
+            play_org_size_ch.checked = pref.ScreenSizeOrignal();
         });
 
         obs.on("on_change_show_pref_page", (is_show)=> {
@@ -103,6 +114,10 @@
         this.onclickClose = () => {
             this.isloading = false;
             this.update();            
+        };
+
+        this.onclickPlayOrgSizeCheck = (e) => {
+            pref.ScreenSizeOrignal(e.target.checked);
         };
 
         const selectFileDialog = (name, extensions)=>{

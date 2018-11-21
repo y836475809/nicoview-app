@@ -70,15 +70,61 @@
     <div id="page3">
         test
     </div>
+    <preference-page></preference-page>
 
     <script>
         /* globals obs base_dir */
+        const {remote} = require("electron");
+        const { dialog } = require("electron").remote;
+        const {Menu} = remote;
         const pref = require(`${base_dir}/app/js/preference`);
         require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
+        require(`${base_dir}/app/tags/preference-page.tag`);
+
+        let template = [{
+            label: "File",
+            submenu: [
+                {
+                    label: "Load",
+                    click: () => {
+                        const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
+                            properties: ["openFile"],
+                            title: "Select",
+                            defaultPath: ".",
+                            filters: [
+                                {name: "library db", extensions: "json"}, 
+                                {name: "All", extensions: ["*"]},
+                            ]
+                        });
+                        if(!paths){
+                            return;
+                        }
+                        const data_path = paths[0];
+                        obs.trigger("load_data", data_path);
+                    }
+                },
+                {
+                    label: "Preference",
+                    click: () => {
+                        obs.trigger("on_change_show_pref_page", true);  
+                    }
+                }
+            ]
+        },
+        {
+            label: "Tools",
+            submenu: [
+                { role: "reload" },
+                { role: "forcereload" },
+                { role: "toggledevtools" },
+            ]
+        }];
+        const menu = Menu.buildFromTemplate(template);
+        remote.getCurrentWindow().setMenu(menu);
 
         const main_group_buttons_height = parseInt(getComputedStyle(this.root).getPropertyValue("--main-group-buttons-height"));
 
@@ -108,7 +154,9 @@
 
         this.on("mount", function () {
             riot.mount("library-page");
-            riot.mount("search-page");        
+            riot.mount("search-page");   
+            riot.mount("preference-page");
+
             select_page(this.index);
 
             const lib_file_path = pref.getLibraryFilePath();

@@ -23,6 +23,7 @@
 
     <script>
         /* globals riot */
+        require("datatables.net-scroller")( window, window.$ );
         const remote = require("electron").remote;
         var shared_obj = remote.getGlobal("sharedObj"); // eslint-disable-line
         var base_dir = shared_obj.base_dir; // eslint-disable-line

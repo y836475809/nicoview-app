@@ -1,12 +1,15 @@
 <preference-page>
     <style scoped>
+        :scope {
+            position: absolute;
+        }
         .pref-container{
             position: absolute;
             width: 100vw;
             height: 100vh;
             margin: 0;
             background-color:black;
-            opacity: 0.7;
+            opacity: 0.95;
         }
         .pref-page{
             --pref-container-margin: 25px;

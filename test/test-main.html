@@ -18,35 +18,16 @@
     <script type="riot/tag" src="../app/tags/main-page.tag"></script>
 
     <style type="text/css">
-        .test-button{
-            display: inline;
-            height: 25px;
-        }
-        .test-main-page{
-            height: calc(100% - 30px);
-        }
     </style>
 </head>
 
 <body>
-    <div class="test-button">
-        <input type="button" value="load" onclick="onclickLoadData();">  
-    </div>
-    <div class="test-button">
-        <input type="button" value="all" onclick="onserachAll();">  
-    </div>
-    <div class="test-button">
-        <input type="button" value="sm5" onclick="onserach();">  
-    </div>
-    <div class="test-main-page">
-        <main-page></main-page>
-    </div>
+    <main-page></main-page>
 </body>
 
 <script>
     /* globals riot */
     const remote = require("electron").remote;
-    const { dialog } = require("electron").remote;
     require("datatables.net-scroller")( window, window.$ );
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
@@ -54,32 +35,6 @@
     var obs = riot.observable(); // eslint-disable-line
 
     riot.mount("main-page");
-
-    const onclickLoadData = ()=>{
-        const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-            properties: ["openFile"],
-            title: "Select",
-            defaultPath: ".",
-            filters: [
-                {name: "Sqlite db", extensions: "db"}, 
-                {name: "All", extensions: ["*"]},
-            ]
-        });
-        if(!paths){
-            return;
-        }
-        const data_path = paths[0];
-        obs.trigger("load_data", data_path);
-    };
-
-    const onserachAll = ()=>{
-        obs.trigger("library_dt_search", "");
-    };
-
-    const onserach = ()=>{
-        obs.trigger("library_dt_search", "sm5");
-    };
-
 
     obs.on("on_error", (error)=> {
         console.error(error);

@@ -223,6 +223,8 @@
             // exclude: [0],
             // tableWidthFixed: false
         },
+
+        //TODO: remove scroller, change to paging
         dom: "Zrt",    
         scrollX: true,
         scrollY: true,

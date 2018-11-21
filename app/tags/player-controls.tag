@@ -51,6 +51,7 @@
         const STATE_STOP = "stop";
 
         let current_state = STATE_STOP;
+        let enable = false;
 
         const isPlay = () => {
             return current_state == STATE_PLAY;
@@ -88,6 +89,10 @@
         };
 
         this.play = () => {
+            if(!enable){
+                return;
+            }
+
             if(isStop()){
                 obs.trigger("loadplaydata");
                 current_state = STATE_PLAY;
@@ -100,14 +105,20 @@
             }
             setPlayBtnClass();
         };
+
+        obs.on("loaded_data", ()=> {
+            enable = true;
+            setPlayBtnEnable(true);
+        });
         
         obs.on("on_set_player_state", (state)=> {
             current_state = state;
             setPlayBtnClass();
-            setPlayBtnEnable(true);
+            // setPlayBtnEnable(true);
         });
 
         this.on("mount", ()=> {
+            enable = false;
             current_state = STATE_PAUSE;
             setPlayBtnClass();
             setPlayBtnEnable(false);

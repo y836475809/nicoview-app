@@ -114,6 +114,7 @@
 
             this.refs.player_video.addEventListener("loadeddata", (event) => {
                 console.log("loadeddata event=", event);
+                obs.trigger("loaded_data");
             });
             this.refs.player_video.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");

@@ -35,10 +35,13 @@
 
     <script>
         /* globals obs */
+        const {remote} = require("electron");
+        const {Menu, MenuItem} = remote;
         const pref = require("../js/preference");
         require("./player-page.tag");
         require("./viewinfo-page.tag");
 
+        let org_video_size = null;
         this.sync_comment_checked = pref.SyncComment();
         let gutter = false;
         let gutter_move = false;
@@ -80,6 +83,43 @@
             window.resizeTo(new_width, new_height);
         };
 
+        let template = [{
+            label: "View",
+            submenu: [
+                {
+                    label: "x1",
+                    click: () => {
+                        resizeVideo(pref.getDefaultScreenSize());
+                    }
+                },
+                {
+                    label: "x1.5",
+                    click: () => {
+                        const size = pref.getDefaultScreenSize();
+                        resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
+                    }
+                },
+                {
+                    label: "orgnal size",
+                    click: () => {
+                        if(org_video_size){
+                            resizeVideo(org_video_size);
+                        }
+                    }
+                },
+            ]
+        },
+        {
+            label: "Tools",
+            submenu: [
+                { role: "reload" },
+                { role: "forcereload" },
+                { role: "toggledevtools" },
+            ]
+        }];
+        const menu = Menu.buildFromTemplate(template);
+        Menu.setApplicationMenu(menu);
+
         this.on("mount", () => {
             const vw = pref.InfoViewWidth();
             if(vw){
@@ -88,30 +128,17 @@
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
+            const size = pref.ScreenSize();
+            resizeVideo(size);
         });   
   
-        obs.on("load_meta_data", (video_size) => { 
+        obs.on("load_meta_data", (video_size) => {
+            org_video_size =  video_size;
+
             const is_org_size = pref.ScreenSizeOrignal();
-            const size = pref.ScreenSize();
             if(is_org_size){  
-                resizeVideo(video_size);
-            }else{
-                resizeVideo(size);
+                resizeVideo(org_video_size);
             }
-        });
-
-        obs.on("on_set_screen_size", (is_org_size, size) => { 
-            pref.ScreenSizeOrignal(is_org_size);
-            resizeVideo(size);
-        });
-
-        obs.on("resizeEndEvent", (window_size) => {
-            const h = this.refs.player_frame.getTagsPanelHeight() 
-                    + this.refs.player_frame.getControlPanelHeight();
-            const pf_elm = document.getElementById("player-frame");
-            const width = pf_elm.offsetWidth - h;
-            const height = pf_elm.offsetHeight;
-            pref.ScreenSize({width: width, height: height});
         });
 
         let resize_begin = false;
@@ -136,10 +163,12 @@
         });
 
         window.onbeforeunload = (e) => {
-            const video_scale = this.refs.player_frame.getVideoScale();
-            if(video_scale){
-                pref.VideoScale(video_scale);
-            }
+            const h = this.refs.player_frame.getTagsPanelHeight() 
+                    + this.refs.player_frame.getControlPanelHeight();
+            const pf_elm = document.getElementById("player-frame");
+            const width = pf_elm.offsetWidth;
+            const height = pf_elm.offsetHeight - h;
+            pref.ScreenSize({width: width, height: height});
 
             const ve = document.getElementById("viewinfo-frame");  
             pref.InfoViewWidth(parseInt(ve.offsetWidth));

@@ -28,8 +28,6 @@
 <body>
     <div class="test-button">
         <button type="button" onclick="onclickLoad();">load</button>
-        <button type="button" onclick="onclickScale1();">x1</button>
-        <button type="button" onclick="onclickScale15();">x1.5</button>
         <button type="button" onclick="onclickLoad2();">load comment</button>
     </div>    
     <player-viewinfo-page class="test-player-viewinfo-page"></player-viewinfo-page>
@@ -136,12 +134,6 @@
             },
             commnets: commnets
         }); 
-    };
-    const onclickScale1 = () => {
-        obs.trigger("on_set_video_size_scale", 1); 
-    }; 
-    const onclickScale15 = () => {
-        obs.trigger("on_set_video_size_scale", 1.5); 
     };
 </script>
 

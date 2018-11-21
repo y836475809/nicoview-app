@@ -48,15 +48,25 @@ function InfoViewWidth(value){
     return PrimitivelocalStorage("infoview-width", value);
 }
 
+function getDefaultScreenSize(){
+    return {width: 854 ,height: 480};
+}
+
 function ScreenSize(size){
     if(size){
         PrimitivelocalStorage("screen-width", size.width);
         PrimitivelocalStorage("screen-height", size.height);
     }else{
-        return {
-            width: PrimitivelocalStorage("screen-width"),
-            height: PrimitivelocalStorage("screen-height")
-        };
+        const width = PrimitivelocalStorage("screen-width");
+        const height = PrimitivelocalStorage("screen-height");
+        if(!width || !height){
+            return getDefaultScreenSize();
+        }else{
+            return {
+                width: parseInt(width), 
+                height: parseInt(height)
+            };
+        }
     }
 }
 
@@ -74,6 +84,7 @@ module.exports = {
     getDataPath: getDataPath,
     getLibraryFilePath: getLibraryFilePath,
     InfoViewWidth: InfoViewWidth,
+    getDefaultScreenSize: getDefaultScreenSize,
     ScreenSize: ScreenSize,
     ScreenSizeOrignal: ScreenSizeOrignal,
     SyncComment: SyncComment

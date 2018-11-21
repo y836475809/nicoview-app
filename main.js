@@ -70,9 +70,6 @@ let creatPlayerWindow = (data) => {
     if (player_win === null) {
         const player_path = `file://${__dirname}/html/player.html`;
         player_win = new BrowserWindow({ width: 800, height: 600 });
-        if(!is_debug_mode){
-            player_win.setMenu(null);
-        }
         if(is_debug_mode){
             player_win.webContents.openDevTools();
         }

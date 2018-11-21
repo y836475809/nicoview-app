@@ -27,10 +27,6 @@
 
     <script>
         /* globals base_dir obs */
-        const {remote} = require("electron");
-        const {Menu, MenuItem} = remote;
-        const pref = require("../js/preference");
-
         const CommentTimeLineManager = require(`${base_dir}/app/js/comment_timeline_manager`);
         
         let ctls = null;
@@ -69,30 +65,7 @@
             } 
         };
         
-        const menu = new Menu();
-        menu.append(new MenuItem({ 
-            label: "view", submenu: [
-                {label: "640x360", click() {
-                    obs.trigger("on_set_screen_size", false, {width: 640 ,height: 360});
-                }},
-                {label: "854x480", click() {
-                    obs.trigger("on_set_screen_size", false, {width: 854 ,height: 480});
-                }},
-                {label: "orignal", type: "checkbox", checked: pref.ScreenSizeOrignal(), click(e) {
-                    obs.trigger("on_set_screen_size", e.checked, video_size);
-                }}                        
-            ]}));
-        menu.append(new MenuItem({ type: "separator" }));
-        menu.append(new MenuItem({ 
-            label: "tool", submenu: [
-                {label: "Toggle Dev Tools", role: "toggledevtools"},              
-            ]}));
-
-        this.mousedown = (e) => {
-            if(e.which===3){
-                menu.popup({window: remote.getCurrentWindow()});
-            }
-        };
+        
         // // TODO : move player-controls
         // window.addEventListener("keyup", (e) => {
         //     const video = this.refs.player_video;

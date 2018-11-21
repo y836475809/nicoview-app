@@ -118,7 +118,7 @@
             ]
         }];
         const menu = Menu.buildFromTemplate(template);
-        Menu.setApplicationMenu(menu);
+        remote.getCurrentWindow().setMenu(menu);
 
         this.on("mount", () => {
             const vw = pref.InfoViewWidth();

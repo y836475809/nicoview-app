@@ -138,6 +138,7 @@
             const video = db.video_info;
 
             let datas = new Array();
+            for(let i=0; i< 2000; i++){
             video.forEach((value, key) => {
                 datas.push({
                     image: db.getThumbPath(key),
@@ -150,6 +151,7 @@
                     // tags: value["tags"]
                 );
             });
+            }
 
             this.refs.dt.setData(datas);
             this.num_items = datas.length;

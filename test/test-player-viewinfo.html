@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="../node_modules/icono/dist/icono.min.css">
     <link rel="stylesheet" type="text/css" href="../css/app.css">
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
-    
+    <script type="text/javascript" src="../lib/Scroller-1.4.4/js/dataTables.scroller.js"></script>
     <style type="text/css">
         .test-button{
             height: 25px;
@@ -42,7 +42,7 @@
     var obs = riot.observable(); // eslint-disable-line
     
     const reader = require("../app/js/reader");
-    require("datatables.net-scroller")( window, window.$ ); 
+    // require("datatables.net-scroller")( window, window.$ ); 
 
     require(`${base_dir}/app/tags/player-viewinfo-page`);
     riot.mount("player-viewinfo-page");
@@ -94,7 +94,7 @@
     };
     const onclickLoad2 = () => {
         let commnets = [];
-        const nn = 100;
+        const nn = 5000;
         for (let index = 0; index < nn; index++) {
             commnets.push({
                 no: index + 1,

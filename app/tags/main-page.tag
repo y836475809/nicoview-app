@@ -78,7 +78,7 @@
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const pref = require(`${base_dir}/app/js/preference`);
-        require("datatables.net-scroller")( window, window.$ ); 
+        // require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
         require(`${base_dir}/app/tags/library-page.tag`);

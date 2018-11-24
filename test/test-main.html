@@ -13,7 +13,6 @@
     <!-- <link rel="stylesheet" type="text/css" href="../node_modules/jquery-contextmenu/dist/jquery.contextMenu.min.css"> -->
     <link rel="stylesheet" type="text/css" href="../node_modules/icono/dist/icono.min.css">
     <link rel="stylesheet" type="text/css" href="../css/app.css">
-    <script type="text/javascript" src="../lib/Scroller-1.4.4/js/dataTables.scroller.js"></script>
 
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <script type="riot/tag" src="../app/tags/main-page.tag"></script>
@@ -29,7 +28,7 @@
 <script>
     /* globals riot */
     const remote = require("electron").remote;
-    // require("datatables.net-scroller")( window, window.$ );
+    require("datatables.net-scroller")( window, window.$ );
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var base_dir = shared_obj.base_dir; // eslint-disable-line

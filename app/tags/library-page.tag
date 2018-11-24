@@ -138,7 +138,6 @@
             const video = db.video_info;
 
             let datas = new Array();
-            for(let i=0; i< 2000; i++){
             video.forEach((value, key) => {
                 datas.push({
                     image: db.getThumbPath(key),
@@ -151,7 +150,6 @@
                     // tags: value["tags"]
                 );
             });
-            }
 
             this.refs.dt.setData(datas);
             this.num_items = datas.length;
@@ -232,12 +230,12 @@
         scrollY: true,
         scrollCollapse:false,
         scroller: {
-            displayBuffer: 50
+            displayBuffer: 10
         },
         autoWidth: false,
-        paging: true,
-        displayLength:100,
-        lengthMenu: [ 100, 200, 300, 400, 500 ],
+        // paging: true,
+        // displayLength:100,
+        // lengthMenu: [ 100, 200, 300, 400, 500 ],
         deferRender: true,
         stateSave: true,
         dblclickRow: function(data){

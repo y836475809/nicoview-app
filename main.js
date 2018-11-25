@@ -82,11 +82,17 @@ let creatPlayerWindow = (data) => {
         player_win.webContents.on("did-finish-load", () => {
             if (data !== null) {
                 player_win.webContents.send("request-send-video-data", data);
+
+                const title = data.viweinfo.thumb_info.title;
+                player_win.setTitle(title);
             }
         });
     }else{
         if (data !== null) {
             player_win.webContents.send("request-send-video-data", data);
+
+            const title = data.viweinfo.thumb_info.title;
+            player_win.setTitle(title);
         }      
     }
 };

@@ -97,6 +97,9 @@
     require(`${base_dir}/app/tags/base-datatable.tag`);  
     require(`${base_dir}/app/tags/library-sidebar.tag`);  
 
+    const row_hight = 100;
+    const row_img_width = 130;
+
     // const menu2 = new Menu();
     // menu2.append(new MenuItem({
     //     label: "Play", click() {
@@ -146,9 +149,9 @@
                     creation_date: value["creation_date"],
                     pub_date: value["pub_date"],
                     play_count: value["play_count"],
-                    time: value["time"]}
-                    // tags: value["tags"]
-                );
+                    time: value["time"],
+                    tags: value["tags"]?value["tags"].join(" "):""
+                });
             });
 
             this.refs.dt.setData(datas);
@@ -169,7 +172,6 @@
             { title: "pub_date" },
             { title: "play_count" },
             { title: "time" },
-            // { title: "tags" },
         ],
         columnDefs: [
             { width:100, targets: [1,2,3,4,5,6] },
@@ -177,10 +179,10 @@
                 targets: 0,
                 orderable: false,
                 searchable: false,
-                width: 130,
+                width: row_img_width,
                 data: "image",
                 render: function (data, type, row, meta) {
-                    return `<img src="${data}" width="130" height="100">`;
+                    return `<img src="${data}" width="${row_img_width}" height="${row_hight}">`;
                 },
             },
             { targets: 1, data: "id" },
@@ -210,13 +212,11 @@
                     return time_format.toPlayTime(data);
                 },
             },
-            // { 
-            //     targets: 7, 
-            //     data: "tags",
-            //     render: function (data, type, row, meta) {
-            //         return `<div style="height:100px;overflow: hidden;overflow-y: auto;">${data}</div>`;
-            //     },
-            // }
+            { 
+                targets: 7, 
+                data: "tags",
+                visible: false
+            }
         ], 
         colResize : {
             handleWidth: 10,
@@ -224,7 +224,6 @@
             // tableWidthFixed: false
         },
 
-        //TODO: remove scroller, change to paging
         dom: "Zrt",    
         scrollX: true,
         scrollY: true,

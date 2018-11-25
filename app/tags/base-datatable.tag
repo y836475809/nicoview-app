@@ -4,7 +4,7 @@
 
 </style>
 
-<table ref="dt" class="stripe hover" style="width:100%"></table>
+<table ref="dt" class="stripe" style="width:100%"></table>
 
 <script>
     /* globals opts obs $ */

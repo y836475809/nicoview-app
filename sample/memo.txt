@@ -20,3 +20,7 @@ eslint-plugin-html
 https://saeedalipoor.github.io/icono/
 
 https://qiita.com/shinkuFencer/items/b15488de72b32621acf9
+
+
+https://github.com/Seo-4d696b75/NicoAPILibrary/wiki/API
+https://www.npmjs.com/package/niconico

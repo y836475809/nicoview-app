@@ -87,7 +87,7 @@
             stateSave: true,
             dblclickRow: function(data){
                 // console.log("lib dblclickRow data:", data); 
-                const id = data.id;
+                const video_id = data.id;
                 // const video_file_path = db.getVideoPath(data.id);
                 // const video_type = db.getVideoType(data.id);
                 // const commnets = db.findComments(data.id);
@@ -106,8 +106,12 @@
                 //         commnets: commnets
                 //     }
                 // };       
-                // ipc.send("request-show-player", send_data);
+                ipc.send("request-player", video_id);
             }
         };
+
+        this.on("mount", () => {
+
+        });
     </script>
 </play-history>

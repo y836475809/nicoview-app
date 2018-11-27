@@ -232,4 +232,4 @@ class DB {
     }
 }
 
-module.exports.DB = DB;
+module.exports = DB;

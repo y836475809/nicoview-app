@@ -91,7 +91,7 @@
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
-    const DB = require(`${base_dir}/app/js/db`).DB;
+    const DB = require(`${base_dir}/app/js/db`);
     const time_format = require(`${base_dir}/app/js/time_format`);
 
     require(`${base_dir}/app/tags/base-datatable.tag`);  

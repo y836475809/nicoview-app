@@ -1,7 +1,7 @@
 const DB = require("../app/js/db");
 
 test("db file path", function () {
-    let db = new DB.DB();
+    let db = new DB();
     const dirpath_map = new Map()
         .set(1, "file:///C:/data/サンプル")
         .set(2, "file:///C:/data");

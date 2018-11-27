@@ -28,13 +28,17 @@
 <script>
     /* globals riot */
     const remote = require("electron").remote;
+    const ipc = require("electron").ipcRenderer;
     require("datatables.net-scroller")( window, window.$ );
+    const pref = require("../app/js/preference");
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
     riot.mount("main-page");
+
+    ipc.send("request-main-load-library", pref.getLibraryFilePath());
 
     obs.on("on_error", (error)=> {
         console.error(error);

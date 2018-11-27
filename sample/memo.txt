@@ -24,3 +24,9 @@ https://qiita.com/shinkuFencer/items/b15488de72b32621acf9
 
 https://github.com/Seo-4d696b75/NicoAPILibrary/wiki/API
 https://www.npmjs.com/package/niconico
+
+
+https://tsuwatch.hatenablog.com/entry/2017/04/15/151426
+https://github.com/tsuwatch/kaizoku
+https://www.npmjs.com/package/niconico
+https://programmer-jobs.blogspot.com/2016/06/electron-session-get-set.html

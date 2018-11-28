@@ -16,8 +16,6 @@ const DB = require("./app/js/db");
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
-let player_win2 = null;
-let db = new DB();
 
 function createWindow() {
     global.sharedObj = {
@@ -107,51 +105,12 @@ ipcMain.on("request-show-player", (event, arg) => {
     player_win.show();
 });
 
-let creatPlayerWindow2 = (video_id) => {
-    const video_file_path = db.getVideoPath(video_id);
-    const video_type = db.getVideoType(video_id);
-    const commnets = db.findComments(video_id);
-    let thumb_info = db.findThumbInfo(video_id);
-    thumb_info.thumbnail_url = db.getThumbPath(video_id);
-
-    const send_data = {
-        video_data: {
-            src: video_file_path,
-            type: video_type,
-            commnets: commnets
-        },
-        viweinfo: {
-            thumb_info:thumb_info,
-            commnets: commnets
-        }
-    }; 
-
-    if (player_win2 === null) {
-        const player_path = `file://${__dirname}/html/player.html`;
-        player_win2 = new BrowserWindow({ width: 800, height: 600 });
-        if(is_debug_mode){
-            player_win2.webContents.openDevTools();
-        }
-        player_win2.loadURL(player_path);
-
-        player_win2.on("close", (e) => {
-            player_win2 = null;
-        });
-
-        player_win2.webContents.on("did-finish-load", () => { 
-            player_win2.webContents.send("request-video-data", send_data);
-        });
-    }else{
-        player_win2.webContents.send("request-video-data", send_data);
-    }
+const is_local = (url) => {
+    return !/^(http)/.test(url);
 };
 
-ipcMain.on("request-player", (event, video_id) => {
-    creatPlayerWindow2(video_id);
-    player_win2.show();
-});
-
-
-ipcMain.on("request-main-load-library", (event, library_path) => {
-    db.load(library_path);
+ipcMain.on("request-play", (event, video_id, url) => {
+    if(is_local(url)){
+        win.webContents.send("request-library-play-video", video_id);
+    }
 });

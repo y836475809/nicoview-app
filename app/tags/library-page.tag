@@ -162,6 +162,27 @@
         }
     };
 
+    const getLibraryData = (video_id) => {
+        const video_file_path = db.getVideoPath(video_id);
+        const video_type = db.getVideoType(video_id);
+        const commnets = db.findComments(video_id);
+        let thumb_info = db.findThumbInfo(video_id);
+        const thumb_url = db.getThumbPath(video_id);
+        thumb_info.thumbnail_url = thumb_url;
+
+        return {
+            video_data: {
+                src: video_file_path,
+                type: video_type,
+                commnets: commnets
+            },
+            viweinfo: {
+                thumb_info:thumb_info,
+                commnets: commnets
+            }
+        };
+    };
+
     this.params = {};
     this.params.dt = {
         columns : [
@@ -237,27 +258,9 @@
         // lengthMenu: [ 100, 200, 300, 400, 500 ],
         deferRender: true,
         stateSave: true,
-        dblclickRow: function(data){
-            console.log("lib dblclickRow data:", data); 
-            const video_file_path = db.getVideoPath(data.id);
-            const video_type = db.getVideoType(data.id);
-            const commnets = db.findComments(data.id);
-            let thumb_info = db.findThumbInfo(data.id);
-            thumb_info.thumbnail_url = data.image;
-
-            // const video_tags = db.getVideoTags(data.id);
-            const send_data = {
-                video_data: {
-                    src: video_file_path,
-                    type: video_type,
-                    commnets: commnets
-                },
-                viweinfo: {
-                    thumb_info:thumb_info,
-                    commnets: commnets
-                }
-            };       
-            ipc.send("request-show-player", send_data);
+        dblclickRow: function(data){ 
+            const library_data = getLibraryData(data.id);   
+            ipc.send("request-show-player", library_data);
         }
     };
 
@@ -339,6 +342,10 @@
         // }
 
         // pre_s_param = param;
+    });
+    ipc.on("request-library-play-video", (event, video_id) => {     
+        const library_data = getLibraryData(video_id);
+        ipc.send("request-show-player", library_data);
     });
 </script>
 </library-page>

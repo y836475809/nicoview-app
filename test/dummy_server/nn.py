@@ -4,10 +4,27 @@ from bottle import run, template, get, post, request, response
 import sys, codecs
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
-@get("/wh")
-def method_wh():
-    response.set_cookie("nicohistory", "sm123%5678")
+
+@get("/watch/<smid>")
+def method_watch(smid):
+    response.set_cookie("nicohistory", "%s%%5678" % smid)
     response.set_cookie("nicosid", "1234.5678")
+    return template(smid)
+
+
+@post("/sessions?_format=json")
+def method_dmc():
+    nicohistory = request.get_cookie("nicohistory", "")
+    nicosid = request.get_cookie("nicosid", "")
+    sesstion = request.session
+    return {
+        "data": {
+            "session": {
+                "content_uri": "http://pa90.dmc.nico:2812/vod/ht2_nicovideo/nicovideo-aa"
+            }
+        }
+    }
+
 
 @post("/login")
 def method_login():

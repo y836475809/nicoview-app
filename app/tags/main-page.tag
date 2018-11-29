@@ -21,6 +21,10 @@
         #page2 {
             grid-row: 2 / 3;
             grid-column: 1 / 3;
+        }  
+        #page3 {
+            grid-row: 2 / 3;
+            grid-column: 1 / 3;
         }   
 
         .main-group-buttons input[type=radio] {
@@ -68,7 +72,7 @@
         <search-page></search-page>
     </div>
     <div id="page3">
-        test
+        <play-history></play-history>
     </div>
     <preference-page></preference-page>
 
@@ -83,6 +87,7 @@
 
         require(`${base_dir}/app/tags/library-page.tag`);
         require(`${base_dir}/app/tags/search-page.tag`);
+        require(`${base_dir}/app/tags/play-history.tag`);
         require(`${base_dir}/app/tags/preference-page.tag`);
 
         let template = [{
@@ -136,11 +141,11 @@
             let page2 = document.getElementById("page2");
             let page3 = document.getElementById("page3");
 
-            let list = ["none", "none", "none"];
-            list[index] = "block";
-            page1.style.display = list[0];
-            page2.style.display = list[1];
-            page3.style.display = list[2];  
+            let list = [0, 0, 0];
+            list[index] = 1;
+            page1.style.zIndex = list[0];
+            page2.style.zIndex = list[1];
+            page3.style.zIndex = list[2];  
 
             Array.from(this.root.querySelectorAll("[name=\"page_select\"]"), 
                 (elm, index) => {
@@ -155,14 +160,22 @@
         this.on("mount", function () {
             riot.mount("library-page");
             riot.mount("search-page");   
+            riot.mount("play-history");
             riot.mount("preference-page");
 
             select_page(this.index);
 
             const lib_file_path = pref.getLibraryFilePath();
+            const history_file_path = pref.getHistoryPath();
             obs.trigger("on_clear_search");
             obs.trigger("load_data", lib_file_path);
+            obs.trigger("load_history", history_file_path);
         });
+
+        window.onbeforeunload = (e) => {
+            const history_file_path = pref.getHistoryPath();
+            obs.trigger("save_history", history_file_path);
+        };
 
         const timeout = 200;
         let timer;

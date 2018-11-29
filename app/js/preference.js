@@ -44,6 +44,14 @@ function getLibraryFilePath(){
     return path.join(file_path, "library.json");
 }
 
+function getHistoryPath(){
+    const file_path = getDataPath();
+    if(!file_path){
+        return null;
+    }
+    return path.join(file_path, "history.json");
+}
+
 function InfoViewWidth(value){
     return PrimitivelocalStorage("infoview-width", value);
 }
@@ -83,6 +91,7 @@ module.exports = {
     setLibraryPath: setLibraryPath,
     getDataPath: getDataPath,
     getLibraryFilePath: getLibraryFilePath,
+    getHistoryPath: getHistoryPath,
     InfoViewWidth: InfoViewWidth,
     getDefaultScreenSize: getDefaultScreenSize,
     ScreenSize: ScreenSize,

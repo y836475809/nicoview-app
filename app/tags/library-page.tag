@@ -183,6 +183,12 @@
         };
     };
 
+    const UpdateHistory = (id, url, thumb_info) =>{
+        const image = thumb_info.thumbnail_url;
+        const name = thumb_info.title;
+        obs.trigger("set_history", image, id, name, url);
+    };
+
     this.params = {};
     this.params.dt = {
         columns : [
@@ -259,7 +265,8 @@
         deferRender: true,
         stateSave: true,
         dblclickRow: function(data){ 
-            const library_data = getLibraryData(data.id);   
+            const library_data = getLibraryData(data.id);
+            UpdateHistory(data.id, library_data.video_data.src, library_data.viweinfo.thumb_info);
             ipc.send("request-show-player", library_data);
         }
     };

@@ -4,9 +4,23 @@
             width: 100%;
             height: 100%;
         }
+        .table-base {
+            background-color: var(--control-color);
+            width: 100%;
+            height: 100%;
+            overflow-y: hidden;
+        }
+        table.dataTable tbody td {
+            padding: 0px;
+            margin: 0px;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
     </style>
     
-    <base-datatable ref="dt" params={this.params}></base-datatable>
+    <div ref="base" class="table-base">
+        <base-datatable ref="dt" params={this.params}></base-datatable>
+    </div>
 
     <script>
         /* globals base_dir obs */
@@ -22,6 +36,8 @@
         let history_items = [];
 
         const loadHistory = (file_path) => {
+            resizeDataTable();
+            
             try {
                 history_items = serializer.load(file_path);
                 history_items.sort((a, b) => {
@@ -29,6 +45,7 @@
                 });
                 this.refs.dt.setData(history_items);      
             } catch (error) {
+                console.error(error);
                 // obs.trigger("on_error", error);  
             }
         };
@@ -70,9 +87,45 @@
             loadHistory(file_path);
         });
 
+        obs.on("save_history", (file_path) => {
+            if(!file_path){
+                return;
+            }
+
+            serializer.save(file_path, history_items, (error)=>{
+                if(error){
+                    console.error(error);
+                }
+            });
+        });
+
         obs.on("set_history", (image, id, name, url)=> {
             setHistory(image, id, name, url);
         });      
+
+        const resizeDataTable = (size) => {
+            if(this.refs == undefined){
+                return;
+            }
+            const dt_root = this.refs.dt.root;
+            const dt_elm = dt_root.querySelector("div.dataTables_scrollHead");
+            const margin = 4;
+            const exclude_h = 
+                + dt_elm.offsetHeight 
+                + margin;
+            let ch = this.refs.base.clientHeight;
+            if(size){
+                ch = size.h;
+            }
+            this.refs.dt.setScrollSize({
+                w: null,
+                h: ch - exclude_h,
+            });  
+        };
+
+        obs.on("resizeEndEvent", (size)=> {
+            resizeDataTable(size);
+        });
 
         this.params = {};
         this.params.dt = {
@@ -138,7 +191,6 @@
         };
 
         this.on("mount", () => {
-
         });
     </script>
 </play-history>

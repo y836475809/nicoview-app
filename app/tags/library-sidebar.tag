@@ -1,5 +1,10 @@
 <library-sidebar>
     <style scoped>
+        .library-sidebar {
+            width: 100%;
+            height: 100%;
+            background-color: var(--control-color);
+        }
        .library-sidebar > h2 {
             font-size: 1.5em;
             background-color: #2d8fdd;

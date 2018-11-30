@@ -30,8 +30,8 @@
         const serializer = require(`${base_dir}/app/js/serializer`);
 
         const history_max_size = 100;
-        const row_img_width = 130;
-        const row_hight = 100;
+        const row_img_width = 130/2;
+        const row_hight = 100/2;
 
         let history_items = [];
 
@@ -141,7 +141,6 @@
                 { width:100, targets: [1,2,3,4] },
                 {
                     targets: 0,
-                    orderable: false,
                     searchable: false,
                     width: row_img_width,
                     data: "image",
@@ -174,18 +173,21 @@
             },
 
             dom: "Zrt",    
+            ordering: false,
             scrollX: true,
             scrollY: true,
             scrollCollapse:false,
             scroller: {
                 displayBuffer: 10
             },
+            paging: true,
             autoWidth: false,
             deferRender: true,
             stateSave: true,
             dblclickRow: function(data){
                 const video_id = data.id;
                 const url = data.url;    
+                setHistory(data.image, video_id, data.name, url);
                 ipc.send("request-play", video_id, url);
             }
         };

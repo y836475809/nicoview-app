@@ -93,21 +93,9 @@
 
     this.on("mount", function () {  
         let table = getDataTableElm();
+        $.extend($.fn.dataTable.defaults, params);
         table.DataTable({
-            dom: params.dom,
-            columns: params.columns,
-            columnDefs: params.columnDefs,
-            colResize: params.colResize,
-            scrollX: params.scrollX == undefined ? false : params.scrollX,
-            scrollY: params.scrollY,
-            scrollCollapse: params.scrollCollapse,
-            scroller: params.scroller == undefined ? false : params.scroller,
-            autoWidth: params.autoWidth,
-            paging: params.paging,
-            deferRender: params.deferRender,
-            stateSave: params.stateSave,
-            lengthMenu: params.lengthMenu,
-            displayLength: params.displayLength,
+            scroller: params.scroller == undefined ? false : params.scroller
         });
 
         table.on("page.dt", function(){

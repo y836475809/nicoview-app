@@ -26,6 +26,7 @@
         .gutter {    
             width: 4px;
             border-left: 1px solid var(--control-border-color);
+            background-color: var(--control-color);
         } 
         .split.left{
             width: var(--right-width);
@@ -259,7 +260,7 @@
             displayBuffer: 10
         },
         autoWidth: false,
-        // paging: true,
+        paging: true,
         // displayLength:100,
         // lengthMenu: [ 100, 200, 300, 400, 500 ],
         deferRender: true,

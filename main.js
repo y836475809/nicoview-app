@@ -9,6 +9,7 @@ const { ipcMain } = electron;
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const DB = require("./app/js/db");
+const Preference = require("./app/js/preference");
 // const pref = require("./app/js/preference");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -16,6 +17,7 @@ const DB = require("./app/js/db");
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
+const pref = new Preference();
 
 function createWindow() {
     global.sharedObj = {
@@ -113,4 +115,15 @@ ipcMain.on("request-play", (event, video_id, url) => {
     if(is_local(url)){
         win.webContents.send("request-library-play-video", video_id);
     }
+});
+
+ipcMain.on("getPreferences", (event, arg) => {
+    const key = arg;
+    event.returnValue = pref.getValue(key);
+});
+
+ipcMain.on("setPreferences", (event, arg) => {
+    const key = arg.key;
+    const value = arg.value;
+    pref.update(key, value);
 });

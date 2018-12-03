@@ -38,7 +38,7 @@
             padding: 5px;
             margin: 10px;
         }
-        #library-path{
+        #library-dir{
             width: 300px;
         }
         .pref-close-btn{
@@ -57,8 +57,8 @@
     <div class={ this.isloading === true ? "pref-container" : "display-none" }>
             <div class="pref-page">
     <div class="group">
-        <label class="param">Library path</label>
-        <input id="library-path" type="text" readonly>
+        <label class="param">Library dir</label>
+        <input id="library-dir" type="text" readonly>
         <input type="button" value="Select" onclick={onclickSelectLibrarayPath}>
     </div>
     <div class="group">
@@ -83,9 +83,8 @@
         const fs = require("fs");
         const SQLiteDB = require("../js/sqlite_db");
         const serializer = require("../js/serializer");
-        const { remote } = require("electron");
+        const { ipc, remote } = require("electron");
         const { dialog } = require("electron").remote;
-        const pref = require("../js/preference");
 
         require("./indicator.tag");
         riot.mount("indicator");
@@ -93,20 +92,20 @@
         this.isloading = false;
         let self = this;
 
-        const setLibraryPathAtt = (value) => {
-            document.getElementById("library-path").setAttribute("value", value);
+        const setLibraryDirAtt = (value) => {
+            document.getElementById("library-dir").setAttribute("value", value);
         };
 
         this.on("mount", () => {
-            const path = pref.getLibraryPath();
+            const path = ipc.sendSync("getPreferences","library_dir");
             if(!path){
-                setLibraryPathAtt("");
+                setLibraryDirAtt("");
             }else{
-                setLibraryPathAtt(path);
+                setLibraryDirAtt(path);
             } 
 
             let play_org_size_ch = this.root.querySelector(".pref-checkbox.play-org-size");
-            play_org_size_ch.checked = pref.ScreenSizeOrignal();
+            play_org_size_ch.checked = ipc.sendSync("getPreferences", "play_org_size");
         });
 
         obs.on("on_change_show_pref_page", (is_show)=> {
@@ -120,7 +119,7 @@
         };
 
         this.onclickPlayOrgSizeCheck = (e) => {
-            pref.ScreenSizeOrignal(e.target.checked);
+            ipc.sendSync("setPreferences", { key:"play_org_size", value: e.target.checked});
         };
 
         const selectFileDialog = (name, extensions)=>{
@@ -156,9 +155,9 @@
             if(!path){
                 return;
             }
+            setLibraryDirAtt(path);
 
-            pref.setLibraryPath(path);
-            setLibraryPathAtt(path);
+            ipc.sendSync("setPreferences", { key:"library_dir", value: path});
         };
 
         this.onclickRefreshLibrary = ()=>{
@@ -199,7 +198,7 @@
             }
             function asyncSave() {
                 return new Promise((resolve, reject) => {
-                    const file_path = pref.getLibraryFilePath();
+                    const file_path = ipc.sendSync("getPreferences", "library_file");
                     const data = new Map([
                         [ "dirpath", [...db.get_dirpath()] ],
                         [ "video", [...db.get_video()] ]
@@ -218,7 +217,7 @@
             async function convertPromise() {
                 self.refs.indicator.showLoading("Now Loading...");
 
-                const data_path = pref.getDataPath();
+                const data_path = ipc.sendSync("getPreferences", "data_dir");
                 if(!data_path){
                     throw { message:"Library path is empty" };
                 }

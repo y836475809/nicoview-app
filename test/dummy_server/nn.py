@@ -1,51 +1,77 @@
 # coding=utf-8
 
-from bottle import run, template, get, post, request, response
+from bottle import run, template, get, post, request, response, Bottle, abort, HTTPResponse
+from beaker.middleware import SessionMiddleware
 import sys, codecs
+
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
+session_opts = {
+    'session.type': 'memory',
+    'session.cookie_expires': 300,
+    'session.auto': True
+}
 
-@get("/watch/<smid>")
-def method_watch(smid):
-    response.set_cookie("nicohistory", "%s%%5678" % smid)
+app = SessionMiddleware(Bottle(), session_opts)
+
+
+def sesstion_ok():
+    nicohistory = request.get_cookie("nicohistory", "")
+    nicosid = request.get_cookie("nicosid", "")
+    sesstion = request.session
+    return sesstion["nicohistory"] == nicohistory and sesstion["nicosid"] == nicosid
+
+
+@get("/watch/<videoid>")
+def method_watch(videoid):
+    response.set_cookie("nicohistory", "%s%%1234" % videoid)
     response.set_cookie("nicosid", "1234.5678")
-    return template(smid)
+    sesstion = request.environ.get('beaker.session')
+    sesstion["nicohistory"] = "%s%%5678" % videoid
+    sesstion["nicosid"] = "1234.5678"
+    return template(videoid)
+
+
+@get("/smile")
+def method_smile():
+    if not sesstion_ok():
+        abort(403)
+
+    p = request.query.m
+    id = p.split(",")[0]
+    nicohistory = request.get_cookie("nicohistory", "")
+    if nicohistory.count(id):
+        return template('<b>ok</b>!')
+    else:
+        abort(403)
 
 
 @post("/sessions?_format=json")
 def method_dmc():
-    nicohistory = request.get_cookie("nicohistory", "")
-    nicosid = request.get_cookie("nicosid", "")
-    sesstion = request.session
-    return {
-        "data": {
-            "session": {
-                "content_uri": "http://pa90.dmc.nico:2812/vod/ht2_nicovideo/nicovideo-aa"
+    contentType = request.get_header('Content-Type')
+    if contentType == "application/json":
+        json = request.json
+        if "session" not in json:
+            abort(403)
+
+        if not sesstion_ok():
+            abort(403)
+
+        body = {
+            "data": {
+                "session": {
+                    "content_uri": "http://pa90.dmc.nico:2812/vod/ht2_nicovideo/nicovideo-aa"
+                }
             }
         }
-    }
-
-
-@post("/login")
-def method_login():
-    mail = request.forms.mail_tel
-    password = request.forms.password
-    if check_login(mail, password):
-        response.set_cookie("user_session", "user_session_1234_56789")
-        response.set_cookie("user_session_secure", "abcdefg")
-        return template('<b>ok</b>!')
+        r = HTTPResponse(status=200, body=body)
+        r.set_header("Content-Type", "application/json")
+        return r
     else:
-        return template('<b>fault</b>!')
-
-
-def check_login(username, password):
-    if username == "a" and password == "1":
-        return True
-    else:
-        return False
+        abort(403)
 
 
 if __name__ == "__main__":
     port = 8084
     host = "http://localhost:%d" % port
-    run(host='localhost', port=port, debug=True)
+    run(app=app, host='localhost', port=port, debug=True)

@@ -83,7 +83,7 @@
         const fs = require("fs");
         const SQLiteDB = require("../js/sqlite_db");
         const serializer = require("../js/serializer");
-        const { ipc, remote } = require("electron");
+        const { ipcRenderer, remote } = require("electron");
         const { dialog } = require("electron").remote;
 
         require("./indicator.tag");
@@ -97,7 +97,7 @@
         };
 
         this.on("mount", () => {
-            const path = ipc.sendSync("getPreferences","library_dir");
+            const path = ipcRenderer.sendSync("getPreferences","library_dir");
             if(!path){
                 setLibraryDirAtt("");
             }else{
@@ -105,7 +105,7 @@
             } 
 
             let play_org_size_ch = this.root.querySelector(".pref-checkbox.play-org-size");
-            play_org_size_ch.checked = ipc.sendSync("getPreferences", "play_org_size");
+            play_org_size_ch.checked = ipcRenderer.sendSync("getPreferences", "play_org_size");
         });
 
         obs.on("on_change_show_pref_page", (is_show)=> {
@@ -119,7 +119,7 @@
         };
 
         this.onclickPlayOrgSizeCheck = (e) => {
-            ipc.sendSync("setPreferences", { key:"play_org_size", value: e.target.checked});
+            ipcRenderer.send("setPreferences", { key:"play_org_size", value: e.target.checked});
         };
 
         const selectFileDialog = (name, extensions)=>{
@@ -157,7 +157,7 @@
             }
             setLibraryDirAtt(path);
 
-            ipc.sendSync("setPreferences", { key:"library_dir", value: path});
+            ipcRenderer.send("setPreferences", { key:"library_dir", value: path});
         };
 
         this.onclickRefreshLibrary = ()=>{
@@ -198,7 +198,7 @@
             }
             function asyncSave() {
                 return new Promise((resolve, reject) => {
-                    const file_path = ipc.sendSync("getPreferences", "library_file");
+                    const file_path = ipcRenderer.sendSync("getPreferences", "library_file");
                     const data = new Map([
                         [ "dirpath", [...db.get_dirpath()] ],
                         [ "video", [...db.get_video()] ]
@@ -217,7 +217,7 @@
             async function convertPromise() {
                 self.refs.indicator.showLoading("Now Loading...");
 
-                const data_path = ipc.sendSync("getPreferences", "data_dir");
+                const data_path = ipcRenderer.sendSync("getPreferences", "data_dir");
                 if(!data_path){
                     throw { message:"Library path is empty" };
                 }

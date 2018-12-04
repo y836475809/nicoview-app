@@ -16,7 +16,8 @@ let load = function (file_path) {
  * @param {Map} obj 
  */
 let save = function (file_path, obj, callback) {
-    const data = JSON.stringify([...obj], null, "  ");
+    const value = Array.isArray(obj) ? [...obj] : obj;
+    const data = JSON.stringify(value, null, "  ");
     if(!callback){
         callback = (err)=>{};
     }

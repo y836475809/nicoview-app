@@ -45,6 +45,11 @@ class Preference {
     }
     update(key, value){
         this.pref[key] = value;
+
+        this.pref.data_dir = path.join(this.pref.library_dir, "data");
+        this.pref.library_file = path.join(this.pref.library_dir, "library.json");
+        this.pref.history_file = path.join(this.pref.data_dir, "history.json");
+        this.pref.search_file = path.join(this.pref.data_dir, "search.json");
     }
 
     set libraryDir(value){
@@ -180,15 +185,15 @@ function SyncComment(value){
 }
 
 module.exports = Preference;
-module.exports = {
-    getLibraryPath: getLibraryPath,
-    setLibraryPath: setLibraryPath,
-    getDataPath: getDataPath,
-    getLibraryFilePath: getLibraryFilePath,
-    getHistoryPath: getHistoryPath,
-    InfoViewWidth: InfoViewWidth,
-    getDefaultScreenSize: getDefaultScreenSize,
-    ScreenSize: ScreenSize,
-    ScreenSizeOrignal: ScreenSizeOrignal,
-    SyncComment: SyncComment
-};
+// module.exports = {
+//     getLibraryPath: getLibraryPath,
+//     setLibraryPath: setLibraryPath,
+//     getDataPath: getDataPath,
+//     getLibraryFilePath: getLibraryFilePath,
+//     getHistoryPath: getHistoryPath,
+//     InfoViewWidth: InfoViewWidth,
+//     getDefaultScreenSize: getDefaultScreenSize,
+//     ScreenSize: ScreenSize,
+//     ScreenSizeOrignal: ScreenSizeOrignal,
+//     SyncComment: SyncComment
+// };

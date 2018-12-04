@@ -10,7 +10,6 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const DB = require("./app/js/db");
 const Preference = require("./app/js/preference");
-// const pref = require("./app/js/preference");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -54,7 +53,10 @@ function createWindow() {
 
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
-app.on("ready", createWindow);
+app.on("ready", ()=>{
+    pref.load();
+    createWindow();
+});
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。
 app.on("window-all-closed", () => {
@@ -126,4 +128,5 @@ ipcMain.on("setPreferences", (event, arg) => {
     const key = arg.key;
     const value = arg.value;
     pref.update(key, value);
+    pref.save();
 });

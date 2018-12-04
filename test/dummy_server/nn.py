@@ -12,7 +12,8 @@ session_opts = {
     'session.auto': True
 }
 
-app = SessionMiddleware(Bottle(), session_opts)
+app = Bottle()
+apps = SessionMiddleware(app, session_opts)
 
 
 def sesstion_ok():
@@ -22,7 +23,7 @@ def sesstion_ok():
     return sesstion["nicohistory"] == nicohistory and sesstion["nicosid"] == nicosid
 
 
-@get("/watch/<videoid>")
+@app.get("/watch/<videoid>")
 def method_watch(videoid):
     response.set_cookie("nicohistory", "%s%%1234" % videoid)
     response.set_cookie("nicosid", "1234.5678")
@@ -32,7 +33,7 @@ def method_watch(videoid):
     return template(videoid)
 
 
-@get("/smile")
+@app.get("/smile")
 def method_smile():
     if not sesstion_ok():
         abort(403)
@@ -46,7 +47,7 @@ def method_smile():
         abort(403)
 
 
-@post("/sessions?_format=json")
+@app.post("/sessions?_format=json")
 def method_dmc():
     contentType = request.get_header('Content-Type')
     if contentType == "application/json":
@@ -74,4 +75,4 @@ def method_dmc():
 if __name__ == "__main__":
     port = 8084
     host = "http://localhost:%d" % port
-    run(app=app, host='localhost', port=port, debug=True)
+    run(app=apps, host='localhost', port=port, debug=True)

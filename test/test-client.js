@@ -1,8 +1,9 @@
 const { get, post, head } = require("request-promise");
+const request = require("request");
 const fs = require("fs");
 const { JSDOM } = require("jsdom");
 
-let cookieJar;
+let cookieJar = request.jar();
 // function asyncTest(url) {
 //     return new Promise(async (resolve, reject) => {
 //         const body = await get(url, {
@@ -13,10 +14,58 @@ let cookieJar;
 //     });
 // }
 
+class NicoNico{
+    constructor(url, watch_url){
+        this.cookieJar = request.jar();
+        this.url = url | "http://www.nicovideo.jp/";
+        this.watch_url = watch_url | "http://www.nicovideo.jp/watch/";
+    }
+
+    watch(video_id){
+        return async ()=>{
+            const url = `${this.watch_url}${video_id}`;
+            const body = await get(url, {
+                jar: this.cookieJar,
+            });
+            const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+            this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
+        }; 
+    }
+
+    isDmc(){
+        return this.api_data.video.dmcInfo!=null;
+    }
+
+    getSmileUrl(){
+        return this.api_data.video.smileInfo.url;
+    }
+
+    getSession(){
+        const cookies = this.cookieJar.getCookies(this.url);
+        const nicohistory = cookies.find((item)=>{
+            return item.key == "nicohistory";
+        });
+        const nicosid = cookies.find((item)=>{
+            return item.key == "nicosid";
+        });
+        if(!nicohistory || !nicosid){
+            throw new Error("not find session");
+        }
+        return {
+            url: this.url, 
+            nicohistory: nicohistory.value, 
+            nicosid: nicosid.value
+        };
+    }
+}
+
 async function asyncTest(url) {
     const body = await get(url, {
         jar: cookieJar,
     });
+    const ck = cookieJar.getCookies(url)[0];
+    console.log("key=",ck.key);
+    console.log("value=",ck.value);
     return body;
 }
 

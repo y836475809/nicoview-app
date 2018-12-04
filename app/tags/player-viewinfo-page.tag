@@ -35,14 +35,13 @@
 
     <script>
         /* globals obs */
-        const {remote} = require("electron");
+        const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        const pref = require("../js/preference");
         require("./player-page.tag");
         require("./viewinfo-page.tag");
 
         let org_video_size = null;
-        this.sync_comment_checked = pref.SyncComment();
+        this.sync_comment_checked = ipcRenderer.sendSync("getPreferences", "sync_comment");
         let gutter = false;
         let gutter_move = false;
 
@@ -89,13 +88,13 @@
                 {
                     label: "x1",
                     click: () => {
-                        resizeVideo(pref.getDefaultScreenSize());
+                        resizeVideo(ipcRenderer.sendSync("getPreferences", "player_default_size"));
                     }
                 },
                 {
                     label: "x1.5",
                     click: () => {
-                        const size = pref.getDefaultScreenSize();
+                        const size = ipcRenderer.sendSync("getPreferences", "player_default_size");
                         resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
                     }
                 },
@@ -121,21 +120,21 @@
         remote.getCurrentWindow().setMenu(menu);
 
         this.on("mount", () => {
-            const vw = pref.InfoViewWidth();
+            const vw = ipcRenderer.sendSync("getPreferences", "info_view_width");
             if(vw){
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
-            const size = pref.ScreenSize();
+            const size = ipcRenderer.sendSync("getPreferences", "player_size");
             resizeVideo(size);
         });   
   
         obs.on("load_meta_data", (video_size) => {
             org_video_size =  video_size;
 
-            const is_org_size = pref.ScreenSizeOrignal();
+            const is_org_size = ipcRenderer.sendSync("getPreferences", "play_org_size");
             if(is_org_size){  
                 resizeVideo(org_video_size);
             }
@@ -168,12 +167,21 @@
             const pf_elm = document.getElementById("player-frame");
             const width = pf_elm.offsetWidth;
             const height = pf_elm.offsetHeight - h;
-            pref.ScreenSize({width: width, height: height});
+            ipcRenderer.send("setPreferences", {
+                key:"player_size", 
+                value: {width: width, height: height}
+            });
 
             const ve = document.getElementById("viewinfo-frame");  
-            pref.InfoViewWidth(parseInt(ve.offsetWidth));
+            ipcRenderer.send("setPreferences", { 
+                key:"info_view_width", 
+                value: parseInt(ve.offsetWidth)
+            });
 
-            pref.SyncComment(this.refs.viewinfo_frame.getSyncCommentChecked());
+            ipcRenderer.send("setPreferences", { 
+                key:"sync_comment", 
+                value: this.refs.viewinfo_frame.getSyncCommentChecked()
+            });
         };
     </script>
 </player-viewinfo-page>

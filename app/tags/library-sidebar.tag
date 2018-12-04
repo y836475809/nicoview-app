@@ -78,15 +78,12 @@
 
     <script>
         /* globals obs */
-        const path = require("path");
+        const { ipcRenderer } = require("electron");
         const Sortable = require("sortablejs");
-        const pref = require("../js/preference");
         const serializer = require("../js/serializer");
-
-        const seach_pref_path = path.join(pref.getDataPath(), "seach.json");
-        
+        const seach_file_path = ipcRenderer.sendSync("getPreferences","search_file");
         try {
-            this.search_items = serializer.load(seach_pref_path);
+            this.search_items = serializer.load(seach_file_path);
             this.search_items.forEach((item) => {
                 item.selected = false;
             });
@@ -103,7 +100,7 @@
         };
 
         const savePref = () => {
-            serializer.save(seach_pref_path, this.search_items, (error)=>{
+            serializer.save(seach_file_path, this.search_items, (error)=>{
                 if(error){
                     console.log(error);
                 }

@@ -92,7 +92,6 @@
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
-    const DB = require(`${base_dir}/app/js/db`);
     const time_format = require(`${base_dir}/app/js/time_format`);
 
     require(`${base_dir}/app/tags/base-datatable.tag`);  
@@ -127,61 +126,12 @@
 
     this.num_items = 0;
 
-    let db = new DB();
+    const loadLibraryItems = (items)=>{
+        resizeDataTable();
 
-    this.loadData = (data_file_path)=>{
-        if(!data_file_path){ 
-            return;
-        }
-
-        try {
-            // const dirpath = serializer.load(`${data_path}/db/dirpath.json`);
-            // const video = serializer.load(`${data_path}/db/video.json`);
-            // db.setData(dirpath, video);
-            db.load(data_file_path);
-            const video = db.video_info;
-
-            let datas = new Array();
-            video.forEach((value, key) => {
-                datas.push({
-                    image: db.getThumbPath(key),
-                    id: key,
-                    name: value["video_name"],
-                    creation_date: value["creation_date"],
-                    pub_date: value["pub_date"],
-                    play_count: value["play_count"],
-                    time: value["time"],
-                    tags: value["tags"]?value["tags"].join(" "):""
-                });
-            });
-
-            this.refs.dt.setData(datas);
-            this.num_items = datas.length;
-            this.update();
-        } catch (error) {
-            obs.trigger("on_error", error);  
-        }
-    };
-
-    const getLibraryData = (video_id) => {
-        const video_file_path = db.getVideoPath(video_id);
-        const video_type = db.getVideoType(video_id);
-        const commnets = db.findComments(video_id);
-        let thumb_info = db.findThumbInfo(video_id);
-        const thumb_url = db.getThumbPath(video_id);
-        thumb_info.thumbnail_url = thumb_url;
-
-        return {
-            video_data: {
-                src: video_file_path,
-                type: video_type,
-                commnets: commnets
-            },
-            viweinfo: {
-                thumb_info:thumb_info,
-                commnets: commnets
-            }
-        };
+        this.refs.dt.setData(items);
+        this.num_items = items.length;
+        this.update();
     };
 
     const UpdateHistory = (id, url, thumb_info) =>{
@@ -266,7 +216,7 @@
         deferRender: true,
         stateSave: true,
         dblclickRow: function(data){ 
-            const library_data = getLibraryData(data.id);
+            const library_data = ipc.sendSync("get-library-data", data.id);
             UpdateHistory(data.id, library_data.video_data.src, library_data.viweinfo.thumb_info);
             ipc.send("request-show-player", library_data);
         }
@@ -276,8 +226,8 @@
     const menu = new Menu();
     menu.append(new MenuItem({
         label: "Play", click() {
-            const datas = self.refs.dt.getSelectedDatas();
-            console.log("lib context menu data=", datas);
+            const items = self.refs.dt.getSelectedDatas();
+            console.log("lib context menu data=", items);
         }
     }));
     menu.append(new MenuItem({ type: "separator" }));
@@ -287,8 +237,13 @@
         this.refs.dt.showContextMenu=(e)=>{
             e.preventDefault();
             menu.popup({window: remote.getCurrentWindow()});
-        };       
+        };     
+        
+        ipc.send("get-library-items");
     });
+    ipc.on("get-library-items-reply", (event, library_items) => {     
+        loadLibraryItems(library_items);
+    });    
 
     const resizeDataTable = (size) => {
         if(this.refs == undefined){
@@ -311,12 +266,6 @@
             h: ch - exclude_h,
         });  
     };
-
-    obs.on("load_data", (data_file_path)=> {
-        resizeDataTable();
-        
-        this.loadData(data_file_path);
-    });
 
     obs.on("resizeEndEvent", (size)=> {
         resizeDataTable(size);
@@ -350,10 +299,6 @@
         // }
 
         // pre_s_param = param;
-    });
-    ipc.on("request-library-play-video", (event, video_id) => {     
-        const library_data = getLibraryData(video_id);
-        ipc.send("request-show-player", library_data);
     });
 </script>
 </library-page>

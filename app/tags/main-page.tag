@@ -79,9 +79,9 @@
     <script>
         /* globals obs base_dir */
         const {remote} = require("electron");
+        const ipc = require("electron").ipcRenderer;
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
-        const pref = require(`${base_dir}/app/js/preference`);
         // require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
@@ -109,7 +109,7 @@
                             return;
                         }
                         const data_path = paths[0];
-                        obs.trigger("load_data", data_path);
+                        ipc.send("get-library-items-from-file", data_path);
                     }
                 },
                 {
@@ -165,16 +165,10 @@
 
             select_page(this.index);
 
-            const lib_file_path = pref.getLibraryFilePath();
-            const history_file_path = pref.getHistoryPath();
             obs.trigger("on_clear_search");
-            obs.trigger("load_data", lib_file_path);
-            obs.trigger("load_history", history_file_path);
         });
 
         window.onbeforeunload = (e) => {
-            const history_file_path = pref.getHistoryPath();
-            obs.trigger("save_history", history_file_path);
         };
 
         const timeout = 200;

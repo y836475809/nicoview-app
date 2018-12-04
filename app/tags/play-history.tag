@@ -27,81 +27,15 @@
         const ipc = require("electron").ipcRenderer;
         require(`${base_dir}/app/tags/base-datatable.tag`);
         const time_format = require(`${base_dir}/app/js/time_format`);
-        const serializer = require(`${base_dir}/app/js/serializer`);
 
-        const history_max_size = 100;
+        // const history_max_size = 100;
         const row_img_width = 130/2;
         const row_hight = 100/2;
 
-        let history_items = [];
-
-        const loadHistory = (file_path) => {
+        const loadHistoryItems = (history_items) => {
             resizeDataTable();
-            
-            try {
-                history_items = serializer.load(file_path);
-                history_items.sort((a, b) => {
-                    return a.play_date < b.play_date;
-                });
-                this.refs.dt.setData(history_items);      
-            } catch (error) {
-                console.error(error);
-                // obs.trigger("on_error", error);  
-            }
+            this.refs.dt.setData(history_items); 
         };
-
-        const addHistory = (image, id, name, url) => {
-            if(history_items.length >= history_max_size){
-                history_items.pop();
-            }
-            history_items.unshift({
-                image: image,
-                id: id,
-                name: name,
-                play_date: Date.now(), 
-                play_time: 0,
-                url: url                
-            });
-            this.refs.dt.setData(history_items);
-        };
-
-        const setHistory = (image, id, name, url) => {
-            const index = history_items.findIndex(item => item.id === id);
-            if(index === -1){
-                addHistory(image, id, name, url);
-            }else{
-                let item = history_items[index];
-                item.play_date = Date.now();
-                if(url != item.url){
-                    item.image = image;
-                    item.url = url;
-                }
-                history_items.sort((a, b) => {
-                    return a.play_date < b.play_date;
-                });
-                this.refs.dt.setData(history_items);
-            }
-        };
-
-        obs.on("load_history", (file_path)=> {
-            loadHistory(file_path);
-        });
-
-        obs.on("save_history", (file_path) => {
-            if(!file_path){
-                return;
-            }
-
-            serializer.save(file_path, history_items, (error)=>{
-                if(error){
-                    console.error(error);
-                }
-            });
-        });
-
-        obs.on("set_history", (image, id, name, url)=> {
-            setHistory(image, id, name, url);
-        });      
 
         const resizeDataTable = (size) => {
             if(this.refs == undefined){
@@ -187,12 +121,25 @@
             dblclickRow: function(data){
                 const video_id = data.id;
                 const url = data.url;    
-                setHistory(data.image, video_id, data.name, url);
-                ipc.send("request-play", video_id, url);
+                ipc.send("add-history-items", {
+                    image: data.image, 
+                    id: video_id, 
+                    name: data.name, 
+                    url: url
+                });
+                if(!/^(http)/.test(url)){
+                    const library_data = ipc.sendSync("get-library-data", data.id);
+                    ipc.send("request-show-player", library_data);
+                }
             }
         };
 
         this.on("mount", () => {
+            ipc.send("get-history-items");
+        });
+
+        ipc.on("get-history-items-reply", (event, history_items) => {     
+            loadHistoryItems(history_items);
         });
     </script>
 </play-history>

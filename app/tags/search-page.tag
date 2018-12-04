@@ -65,8 +65,8 @@
     const menu = new Menu();
     menu.append(new MenuItem({
         label: "Play", click() {
-            const datas = self.refs.dt.getSelectedDatas();
-            console.log("search context menu data=", datas);
+            const items = self.refs.dt.getSelectedDatas();
+            console.log("search context menu data=", items);
         }
     }));
     menu.append(new MenuItem({ type: "separator" }));

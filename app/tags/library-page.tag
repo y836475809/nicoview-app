@@ -134,11 +134,6 @@
         this.update();
     };
 
-    const UpdateHistory = (id, url, thumb_info) =>{
-        const image = thumb_info.thumbnail_url;
-        const name = thumb_info.title;
-        obs.trigger("set_history", image, id, name, url);
-    };
 
     this.params = {};
     this.params.dt = {
@@ -215,9 +210,16 @@
         // lengthMenu: [ 100, 200, 300, 400, 500 ],
         deferRender: true,
         stateSave: true,
-        dblclickRow: function(data){ 
-            const library_data = ipc.sendSync("get-library-data", data.id);
-            UpdateHistory(data.id, library_data.video_data.src, library_data.viweinfo.thumb_info);
+        dblclickRow: function(data){    
+            const video_id = data.id;
+            const library_data = ipc.sendSync("get-library-data", video_id);
+            const thumb_info = library_data.viweinfo.thumb_info;   
+            ipc.send("add-history-items", {
+                image: thumb_info.thumbnail_url, 
+                id: video_id, 
+                name: thumb_info.title, 
+                url: library_data.video_data.src
+            });
             ipc.send("request-show-player", library_data);
         }
     };

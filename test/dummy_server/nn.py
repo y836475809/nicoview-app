@@ -16,32 +16,31 @@ app = Bottle()
 apps = SessionMiddleware(app, session_opts)
 
 
-def sesstion_ok():
+def session_ok():
     nicohistory = request.get_cookie("nicohistory", "")
     nicosid = request.get_cookie("nicosid", "")
-    sesstion = request.session
-    return sesstion["nicohistory"] == nicohistory and sesstion["nicosid"] == nicosid
+    session = request.session
+    return session["nicohistory"] == nicohistory and session["nicosid"] == nicosid
 
 
 @app.get("/watch/<videoid>")
 def method_watch(videoid):
     response.set_cookie("nicohistory", "%s%%1234" % videoid)
     response.set_cookie("nicosid", "1234.5678")
-    sesstion = request.environ.get('beaker.session')
-    sesstion["nicohistory"] = "%s%%5678" % videoid
-    sesstion["nicosid"] = "1234.5678"
+    session = request.environ.get('beaker.session')
+    session["nicohistory"] = "%s%%5678" % videoid
+    session["nicosid"] = "1234.5678"
     return template(videoid)
 
 
 @app.get("/smile")
 def method_smile():
-    if not sesstion_ok():
+    if not session_ok():
         abort(403)
 
-    p = request.query.m
-    id = p.split(",")[0]
+    video_id = request.query.m.split(",")[0]
     nicohistory = request.get_cookie("nicohistory", "")
-    if nicohistory.count(id):
+    if nicohistory.count(video_id):
         return template('<b>ok</b>!')
     else:
         abort(403)
@@ -49,13 +48,10 @@ def method_smile():
 
 @app.post("/sessions?_format=json")
 def method_dmc():
-    contentType = request.get_header('Content-Type')
-    if contentType == "application/json":
+    content_type = request.get_header('Content-Type')
+    if content_type == "application/json":
         json = request.json
         if "session" not in json:
-            abort(403)
-
-        if not sesstion_ok():
             abort(403)
 
         body = {
@@ -68,6 +64,15 @@ def method_dmc():
         r = HTTPResponse(status=200, body=body)
         r.set_header("Content-Type", "application/json")
         return r
+    else:
+        abort(403)
+
+
+@app.post("/sessions/<sessionid>?_format=json&_method=PUT")
+def method_hb(sessionid):
+    content_type = request.get_header('Content-Type')
+    if content_type == "application/json":
+        print("sessionid=%s" % sessionid)
     else:
         abort(403)
 

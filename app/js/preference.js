@@ -55,50 +55,5 @@ class Preference {
         this.pref.history_file = path.join(system_data_dir, "history.json");
         this.pref.search_file = path.join(system_data_dir, "search.json");
     }
-
-    // set libraryDir(value){
-    //     this.pref.library_dir = value;
-    //     this.pref.library_file = path.join(this.pref.library_dir, "library.json");
-    // }
-
-    // get libraryFile(){
-    //     return this.pref.library_file;
-    // }
-
-    // get historyFile(){
-    //     return this.pref.history_file;
-    // }
-
-    // get searchFile(){
-    //     return this.pref.search_file;
-    // }    
-
-    // get infoViewWidth(){
-    //     return this.pref.info_view_width;
-    // }
-    // set infoViewWidth(value){
-    //     this.pref.info_view_width = value;
-    // }
-
-    // get syncComment(){
-    //     return this.pref.sync_comment;
-    // }
-    // set syncComment(value){
-    //     this.pref.sync_comment = value;
-    // }
-
-    // get playerSize(){
-    //     return this.pref.player_size;
-    // }
-    // set playerSize(value){
-    //     this.pref.player_size = value;
-    // }
-
-    // get playOrgSize(){
-    //     return this.pref.play_org_size;
-    // }
-    // set playOrgSize(value){
-    //     this.pref.play_org_size = value;
-    // }
 }
 module.exports = Preference;

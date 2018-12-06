@@ -1,4 +1,4 @@
-const serializer = require("./app/js/serializer");
+const serializer = require("./serializer");
 
 class HistoryStore{
     constructor(file_path, history_max){

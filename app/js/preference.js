@@ -24,6 +24,7 @@ class Preference {
                 search_file: path.join(system_data_dir, "search.json"),
                 info_view_width: 200,
                 sync_comment: false,
+                player_volume: 0.5,
                 player_default_size: {width: 854 ,height: 480},
                 player_size: {width: 854 ,height: 480},
                 play_org_size: false

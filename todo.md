@@ -6,8 +6,8 @@
 - [x] プレーヤーのタイトルに動画名を入れる
 - [ ] 長いコメントは速すぎる場合があるのでdurationを長くする
 - [ ] イベントの文字列を定数にする
-- [ ] preference保存でobjectをjsonにして保存する
-- [ ] preferenceの関数整理
+- [x] preference保存でobjectをjsonにして保存する
+- [x] preferenceの関数整理
 - [ ] windowのサイズ、位置のsave,load
 - [ ] ライブラリの検索結果のアイテム数表示
 - [ ] ライブラリページのスクロール位置の記録(bookmark?)

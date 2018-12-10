@@ -1,8 +1,16 @@
 # coding=utf-8
 
-from bottle import run, template, get, post, request, response, Bottle, abort, HTTPResponse
+from bottle import run, template, get, post, request, response, Bottle, abort, HTTPResponse, static_file
 from beaker.middleware import SessionMiddleware
 import sys, codecs
+from datetime import datetime
+from logging import getLogger, StreamHandler, DEBUG
+logger = getLogger(__name__)
+handler = StreamHandler()
+handler.setLevel(DEBUG)
+logger.setLevel(DEBUG)
+logger.addHandler(handler)
+logger.propagate = False
 
 sys.stdout = codecs.getwriter("utf-8")(sys.stdout)
 
@@ -14,6 +22,9 @@ session_opts = {
 
 app = Bottle()
 apps = SessionMiddleware(app, session_opts)
+
+port = 8084
+host = "http://localhost:%d" % port
 
 
 def session_ok():
@@ -41,13 +52,16 @@ def method_smile():
     video_id = request.query.m.split(",")[0]
     nicohistory = request.get_cookie("nicohistory", "")
     if nicohistory.count(video_id):
-        return template('<b>ok</b>!')
+        return static_file("test.mp4", root="./data/video")
     else:
         abort(403)
 
 
-@app.post("/sessions?_format=json")
+@app.post("/sessions")
 def method_dmc():
+    if request.query._format != "json":
+        abort(403)
+
     content_type = request.get_header('Content-Type')
     if content_type == "application/json":
         json = request.json
@@ -55,29 +69,43 @@ def method_dmc():
             abort(403)
 
         body = {
+            "meta": {
+                "status": 201,
+                "message": "created"
+            },
             "data": {
                 "session": {
-                    "content_uri": "http://pa90.dmc.nico:2812/vod/ht2_nicovideo/nicovideo-aa"
+                    "id": "4649242834315c372b54",
+                    "content_uri": "%s/data/video/test.mp4" % (host)
                 }
             }
         }
-        r = HTTPResponse(status=200, body=body)
+        r = HTTPResponse(status=201, body=body)
         r.set_header("Content-Type", "application/json")
         return r
     else:
         abort(403)
 
 
-@app.post("/sessions/<sessionid>?_format=json&_method=PUT")
+@app.route('/sessions/<sessionid>', method=['OPTIONS', 'POST'])
 def method_hb(sessionid):
+    if request.query._format != "json":
+        abort(403)
+
     content_type = request.get_header('Content-Type')
-    if content_type == "application/json":
-        print("sessionid=%s" % sessionid)
+    if request.method == "POST" and content_type == "application/json":
+        abort(403)
+        logger.debug(request.json)
+        if "session" in request.json:
+            logger.debug("%s %s sessionid=%s" % (request.method, datetime.now().strftime("%Y/%m/%d %H:%M:%S"), sessionid))
+        else:
+            abort(403)
+    elif request.method == "OPTIONS":
+        # abort(403)
+        logger.debug("%s %s sessionid=%s" % (request.method, datetime.now().strftime("%Y/%m/%d %H:%M:%S"), sessionid))
     else:
         abort(403)
 
 
 if __name__ == "__main__":
-    port = 8084
-    host = "http://localhost:%d" % port
     run(app=apps, host='localhost', port=port, debug=True)

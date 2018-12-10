@@ -1,19 +1,10 @@
-const { get, post, head } = require("request-promise");
+// const { get, post, head } = require("request-promise");
+const rp = require("request-promise");
+const errors = require("request-promise/errors");
 // const rp = require("request-promise");
 const request = require("request");
-const fs = require("fs");
+// const fs = require("fs");
 const { JSDOM } = require("jsdom");
-
-let cookieJar = request.jar();
-// function asyncTest(url) {
-//     return new Promise(async (resolve, reject) => {
-//         const body = await get(url, {
-//             jar: cookieJar,
-//         });
-//         // console.log(body);
-//         resolve(body);
-//     });
-// }
 
 class NicoNico{
     constructor(nico_url){
@@ -21,18 +12,38 @@ class NicoNico{
         this.nico_url = nico_url | "http://www.nicovideo.jp";
         this.watch_url = `${nico_url}/watch`;
         this.heart_beat_rate = 0.9;
+        this.req = null;
+    }
+
+    cancel(){
+        if(this.req){
+            this.req.abort();
+        }
     }
 
     watch(video_id){
-        return async ()=>{
-            const url = `${this.watch_url}/${video_id}`;
-            const body = await get(url, {
+        return new Promise(async (resolve, reject) => {
+            this.dmcInfo = null;
+
+            const options = {
+                uri: `${this.watch_url}/${video_id}`,
+                method: "GET",    
                 jar: this.cookieJar,
-            });
-            const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-            this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
-            this.dmcInfo = this.api_data.video.dmcInfo;
-        }; 
+                timeout: 10 * 1000
+            };
+            try {
+                this.req = rp(options);
+                await this.req.then((body) => {
+                    const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+                    this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
+                    this.dmcInfo = this.api_data.video.dmcInfo;    
+                }); 
+                // console.log(this.dmcInfo.session_api.urls[0].url);
+                resolve(this.api_data);            
+            } catch (error) {
+                reject(error);
+            }
+        });
     }
 
     getSession(){
@@ -53,39 +64,47 @@ class NicoNico{
         };
     }
 
+    get SmileUrl(){
+        return this.api_data.video.smileInfo.url;
+    }
+
     isDmc(){
         return this.dmcInfo!=null;
     }
 
-    getSmileUrl(){
-        return this.api_data.video.smileInfo.url;
-    }
-
-    getDmcSession(){
+    get DmcSession(){
+        if(!this.isDmc()){
+            return null;
+        }
+        const session_api = this.dmcInfo.session_api;
         return {
             session: {
-                recipe_id: this.dmcInfo.recipe_id,
-                content_id: this.dmcInfo.content_id,
+                recipe_id: session_api.recipe_id,
+                content_id: session_api.content_id,
                 content_type: "movie",
                 content_src_id_sets: [{
                     content_src_ids: [{
                         src_id_to_mux: {
-                            video_src_ids: this.dmcInfo.videos, audio_src_ids: this.dmcInfo.audios
+                            video_src_ids: session_api.videos, 
+                            audio_src_ids: session_api.audios
                         }
                     }]
                 }],
                 timing_constraint: "unlimited",
-                keep_method: { heartbeat: { lifetime: this.dmcInfo.heartbeat_lifetime } },
+                keep_method: { 
+                    heartbeat: { 
+                        lifetime: session_api.heartbeat_lifetime 
+                    } 
+                },
                 protocol: {
-                    name: this.dmcInfo.protocols[0],
+                    name: "http",
                     parameters: {
                         http_parameters: {
                             parameters: {
-                                hls_parameters: {
-                                    segment_duration: 5000,
-                                    transfer_preset: this.dmcInfo.transfer_presets[0],
-                                    use_well_known_port: this.dmcInfo.urls[0].is_well_known_port ? "yes" : "no",
-                                    use_ssl: this.dmcInfo.urls[0].is_ssl ? "yes" : "no"
+                                http_output_download_parameters: {
+                                    use_well_known_port: "yes",
+                                    use_ssl: "yes",
+                                    transfer_preset: ""
                                 }
                             }
                         }
@@ -94,96 +113,188 @@ class NicoNico{
                 content_uri: "",
                 session_operation_auth: {
                     session_operation_auth_by_signature: {
-                        token: this.dmcInfo.token, signature: this.dmcInfo.signature
+                        token: session_api.token, 
+                        signature: session_api.signature
                     }
                 },
                 content_auth: {
-                    auth_type: this.dmcInfo.auth_types.http,
-                    content_key_timeout: this.dmcInfo.content_key_timeout,
+                    auth_type: "ht2",
+                    content_key_timeout: session_api.content_key_timeout,
                     service_id: "nicovideo",
-                    service_user_id: this.dmcInfo.service_user_id
+                    service_user_id: session_api.service_user_id
                 },
-                client_info: { player_id: this.dmcInfo.player_id },
-                priority: this.dmcInfo.priority
+                client_info: { 
+                    player_id: session_api.player_id 
+                },
+                priority: session_api.priority
             } 
         };
     }
 
-    postDmcSession(){
-        return async ()=>{
-            const uri = `${this.dmcInfo.session_api.urls[0].url}/?_format=json`;
+    postDmcSession(){ 
+        return new Promise(async (resolve, reject) => {
+            if(!this.DmcSession){
+                return reject("dmc info is null");
+            }
+            
             const options = {
-                jar: this.cookieJar,
-                headers: { "content-type": "application/json" },
-                body: this.getDmcSessionRequest(),
-                json: true
-            };   
-            const dmc_session_response = await post(uri, options);
-            this.dmc_session_response = JSON.parse(dmc_session_response);
-        }; 
+                uri: `${this.dmcInfo.session_api.urls[0].url}?_format=json`,
+                method: "POST",
+                headers: { "content-type": "application/json" },   
+                // jar: this.cookieJar,
+                json: this.DmcSession
+            };
+            try {
+                this.req = rp(options);
+                await this.req.then((body) => {
+                    // console.log(body.data.session.content_uri);
+                    // this.dmc_session = JSON.parse(body); 
+                    this.dmc_session = body.data;
+                    // console.log(body.data.session.content_uri);
+                });
+                // .catch(errors.StatusCodeError, (reason)=> {
+                //     reject(errors);
+                // });
+                resolve(this.dmc_session);
+            } catch (error) {
+                reject(error);
+            } 
+        });     
     }
 
-    getDmcContentUri(){
-        return this.dmc_session_response.data.session.content_uri;
+    get DmcContentUri(){
+        return this.dmc_session.session.content_uri;
     }
 
-    heartBeat(){
-        const session = this.dmc_session_response.data.session;
-        const id = session.id;
-        const uri = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+    heartBeat(url){
+        const session = this.dmc_session;
         const options = {
-            jar: this.cookieJar,
+            uri: url,
+            method: "POST",
+            // jar: this.cookieJar,
             headers: { "content-type": "application/json" },
-            body: session,
-            json: true
-        };   
-        post(uri, options);       
+            json: session
+        };
+        // rp(options);
+        rp(options).catch((error)=>{
+            // console.log("heartBeat error: ", error);
+            throw new Error(error);
+        });
     }
 
     startHeartBeat(){
-        const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-        this.heart_beat_id = setInterval(()=>{
-            this.heartBeat();
-        }, interval_ms);
+        return new Promise(async (resolve, reject) => {
+            this.heart_beat_id = null;
+            // const session = this.dmc_session;
+            const id = this.dmc_session.session.id;
+            const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+            
+            const options = {
+                uri: url,
+                method: "OPTIONS",
+                // headers: { "content-type": "application/json" },     
+                // jar: this.cookieJar,
+            };
+            const session = this.dmc_session;
+            const options2 = {
+                uri: url,
+                method: "POST",
+                // jar: this.cookieJar,
+                headers: { "content-type": "application/json" },
+                json: session
+            };
+            try {
+                await rp(options);
+                // .catch(errors.StatusCodeError, (reason)=> {
+                //     console.log("OPTIONS errors=", errors);
+                //     reject(errors);
+                // });           
+        
+                // const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
+                const interval_ms = 2 * 1000;
+                // this.heart_beat_id = setInterval(async ()=>{
+                //     // this.heartBeat(url);
+                //     // rp(options2);
+                //     await rp(options2).catch((error)=> {
+                //         // console.log("HeartBeat error=", error);
+                //         // reject(error);
+                //         // throw new Error(error);
+                //         // throw new Error('throw from await/catch');
+                //         return Promise.reject(new Error("HeartBeat error="));
+                //     });
+                //     // throw new Error("error");
+                // }, interval_ms);  
+                
+                this.heart_beat_id = setInterval(()=>{
+                    // this.heartBeat(url);
+                    // try {
+                    //     await rp(options2);
+                    // } catch (error) {
+                    //     return Promise.reject(new Error("HeartBeat error="));
+                    // }  
+                    request(options2, (error, response, body) => {
+                        console.log("statusCode=", response.statusCode);
+                        if(response.statusCode!==200 && response.statusCode!==201){
+                            console.log("HeartBeat error");
+                            throw new Error("HeartBeat error");                           
+                        }
+                        if(error){
+                            console.log("HeartBeat error");
+                            throw new Error(error);
+                            // return Promise.reject(new Error("HeartBeat error="));
+                        }
+                    });
+                    // rp(options2).catch((error)=> {
+                    //     // console.log("HeartBeat error=", error);
+                    //     // reject(error);
+                    //     // throw new Error(error);
+                    //     // throw new Error('throw from await/catch');
+                    //     // this.stopHeartBeat(error);
+                    //     return Promise.reject(new Error("HeartBeat error="));
+                    // });
+                    // throw new Error("error");
+                }, interval_ms);          
+            } catch (error) {
+                console.log("startHeartBeat errors=", error);
+                // this.stopHeartBeat();
+                reject(error);
+            }
+        });
     }
 
-    stopHeartBeat(){
-        clearInterval(this.heart_beat_id);
-    }
-}
-
-async function asyncTest(url) {
-    const body = await get(url, {
-        jar: cookieJar,
-    });
-    const ck = cookieJar.getCookies(url)[0];
-    console.log("key=",ck.key);
-    console.log("value=",ck.value);
-    return body;
-}
-
-async function main(url) {
-    const body = await asyncTest(url);
-    const api_data = 
-        new JSDOM(body).window.document.getElementById("js-initial-watch-data").getAttribute("data-api-data");
-    const json = JSON.parse(api_data);
-    fs.writeFile("./api_data.json", JSON.stringify(json), "utf-8", (err)=>{
-        if(err){
-            console.log(err);
+    stopHeartBeat(error){
+        if(error){
+            console.log("stopHeartBeat error");
+            throw new Error(error);
         }
-    });
-    console.log("OK");
+        if(this.heart_beat_id){
+            console.log("stopHeartBeat");
+            clearInterval(this.heart_beat_id);
+        }
+    }
 }
 
-
-if(process.argv.length < 3)
-{
-    console.log("not find url");
-    return;
-}
-const url = process.argv[2];
 // const url = "http://www.nicovideo.jp/watch/sm29316071";
-main(url);
+// const url = "http://www.nicovideo.jp/watch/sm32951089";
+async function main() {
+    const niconico = new NicoNico("http://localhost:8084");
+    try{
+        await niconico.watch("sm32951089");
+        await niconico.postDmcSession();
+        niconico.startHeartBeat();
+        // setTimeout(()=>{
+        //     niconico.stopHeartBeat();
+        // }, 120*4*1000);
+        console.log("session_api.urls[0].url = ", niconico.dmcInfo.session_api.urls[0].url);
+        console.log("DmcContentUri = ", niconico.DmcContentUri);
+        // console.log("dmcInfo = ", niconico.dmcInfo);    
+    } catch (error) {
+        console.log("error: ", error);
+    }
+    console.log("watch finish");
+}
+main();
+
 
 //video.isOfficial=true で公式
 //get xml comment

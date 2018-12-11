@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .cn{
+            display:block;
+        }
+        #video{
+            width: 500px;
+            height: 300px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cn">
+        <input id="video-id" type="text">
+        <button onclick="onclickLoad();">load</button>
+        <button onclick="onclickLoadDmc();">Dmc</button>
+        <button onclick="onclickLoadSmile();">Smile</button>
+        <button onclick="onclickStopHB();">stop hb</button>
+    </div>
+    <video id="video" autoplay preload="metadata" controls></video> 
+</body>
+
+<script>
+    const { ipcRenderer } = require("electron");
+    const NicoNico = require("./test-client");
+    const video = document.getElementById("video");
+    const niconico = new NicoNico();
+
+    video.addEventListener("progress", (e) => {
+        console.log("progressによるイベント発火");
+        console.log(e.total + ", " + e.loaded + ", "  + e.lengthComputable );
+    }); 
+    video.addEventListener("waiting", () => {
+        console.log("waitingによるイベント発火");
+    }); 
+    video.addEventListener("canplay", () => {
+        console.log("canplayによるイベント発火");
+    }); 
+    video.addEventListener("playing", () => {
+        console.log("playingによるイベント発火");
+    });    
+
+    async function main(video_id) {
+        console.log("start watch: ", video_id);
+        await niconico.watch(video_id);
+        if(niconico.isDmc){
+            console.log("start postDmcSession: ", video_id);
+            await niconico.postDmcSession();
+            const session = niconico.getSession();
+            const ret = ipcRenderer.sendSync("set-session-to-main", session);
+            if(ret!="ok"){
+                console.log("set-session-to-main error: ", video_id);
+                return;
+            }
+            console.log("set dmc url: ", video_id);
+            const url = niconico.DmcContentUri;
+            video.src = url;
+            video.type = "mp4";
+
+            console.log("start HeartBeat: ", video_id);
+            niconico.startHeartBeat((error) => {
+                niconico.stopHeartBeat();
+                console.log("HeartBeat error: ", error);
+            });
+        }else{
+            console.log("smile: ", video_id);
+            const session = niconico.getSession();
+            const ret = ipcRenderer.sendSync("set-session-to-main", session);
+            if(ret!="ok"){
+                console.log("set-session-to-main error: ", video_id);
+                return;
+            }
+            console.log("set smile url: ", video_id);
+            const url = niconico.SmileUrl;
+            video.src = url;
+            video.type = "mp4";
+        }
+    }
+
+    const onclickLoad = ()=>{ 
+        const video_id = document.getElementById("video-id").value;
+        if(video_id==""){
+            return;
+        }
+        main(video_id);
+    };
+
+    const onclickStopHB = ()=>{
+        niconico.stopHeartBeat();
+    };  
+
+    const onclickLoadDmc = ()=>{
+        main("sm32951089");
+    };  
+    const onclickLoadSmile = ()=>{
+        main("sm29316071");
+    };  
+</script>
+
+</html>

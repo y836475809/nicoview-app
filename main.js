@@ -101,3 +101,15 @@ ipcMain.on("request-show-player", (event, arg) => {
     creatPlayerWindow(arg);
     player_win.show();
 });
+
+ipcMain.on("set-session-to-main", (event, arg) => {
+    const session = arg;
+    win.webContents.session.cookies.set(session, (error) => {
+        if (error) {
+            console.log(error);
+            event.returnValue = "error";
+        }else{
+            event.returnValue = "ok";
+        }
+    });
+});

@@ -260,8 +260,10 @@ async function main() {
     console.log("watch finish");
 }
 
-main();
+// main();
 
+
+module.exports = NicoNico;
 
 //video.isOfficial=true で公式
 //get xml comment

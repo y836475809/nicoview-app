@@ -1,7 +1,4 @@
-// const { get, post, head } = require("request-promise");
 const rp = require("request-promise");
-const errors = require("request-promise/errors");
-// const rp = require("request-promise");
 const request = require("request");
 // const fs = require("fs");
 const { JSDOM } = require("jsdom");
@@ -182,7 +179,7 @@ class NicoNico{
         });
     }
 
-    startHeartBeat(){
+    startHeartBeat(on_error_heartbeat){
         return new Promise(async (resolve, reject) => {
             this.heart_beat_id = null;
             // const session = this.dmc_session;
@@ -205,68 +202,36 @@ class NicoNico{
             };
             try {
                 await rp(options);
-                // .catch(errors.StatusCodeError, (reason)=> {
-                //     console.log("OPTIONS errors=", errors);
-                //     reject(errors);
-                // });           
-        
-                // const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-                const interval_ms = 2 * 1000;
-                // this.heart_beat_id = setInterval(async ()=>{
-                //     // this.heartBeat(url);
-                //     // rp(options2);
-                //     await rp(options2).catch((error)=> {
-                //         // console.log("HeartBeat error=", error);
-                //         // reject(error);
-                //         // throw new Error(error);
-                //         // throw new Error('throw from await/catch');
-                //         return Promise.reject(new Error("HeartBeat error="));
-                //     });
-                //     // throw new Error("error");
-                // }, interval_ms);  
-                
+
+                const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
+                // const interval_ms = 2 * 1000;                
                 this.heart_beat_id = setInterval(()=>{
-                    // this.heartBeat(url);
-                    // try {
-                    //     await rp(options2);
-                    // } catch (error) {
-                    //     return Promise.reject(new Error("HeartBeat error="));
-                    // }  
-                    request(options2, (error, response, body) => {
-                        console.log("statusCode=", response.statusCode);
-                        if(response.statusCode!==200 && response.statusCode!==201){
-                            console.log("HeartBeat error");
-                            throw new Error("HeartBeat error");                           
-                        }
-                        if(error){
-                            console.log("HeartBeat error");
-                            throw new Error(error);
-                            // return Promise.reject(new Error("HeartBeat error="));
-                        }
+                    rp(options2).catch((error)=>{
+                        on_error_heartbeat(error);
                     });
-                    // rp(options2).catch((error)=> {
-                    //     // console.log("HeartBeat error=", error);
-                    //     // reject(error);
-                    //     // throw new Error(error);
-                    //     // throw new Error('throw from await/catch');
-                    //     // this.stopHeartBeat(error);
-                    //     return Promise.reject(new Error("HeartBeat error="));
+                    // request(options2, (error, response, body) => {
+                    //     console.log("statusCode=", response.statusCode);
+                    //     if(response.statusCode===200 || response.statusCode===201){
+                    //         console.log("HeartBeat");
+                    //     }else{
+                    //         //response.statusCode!==200 && response.statusCode!==201){
+                    //         console.log("HeartBeat error");
+                    //         on_error_heartbeat(new Error(response.statusCode));
+                    //     }
+                    //     if(error){
+                    //         console.log("HeartBeat error");
+                    //         on_error_heartbeat(error);
+                    //     }
                     // });
-                    // throw new Error("error");
                 }, interval_ms);          
             } catch (error) {
                 console.log("startHeartBeat errors=", error);
-                // this.stopHeartBeat();
                 reject(error);
             }
         });
     }
 
-    stopHeartBeat(error){
-        if(error){
-            console.log("stopHeartBeat error");
-            throw new Error(error);
-        }
+    stopHeartBeat(){
         if(this.heart_beat_id){
             console.log("stopHeartBeat");
             clearInterval(this.heart_beat_id);
@@ -281,10 +246,11 @@ async function main() {
     try{
         await niconico.watch("sm32951089");
         await niconico.postDmcSession();
-        niconico.startHeartBeat();
-        // setTimeout(()=>{
-        //     niconico.stopHeartBeat();
-        // }, 120*4*1000);
+        niconico.startHeartBeat((error) => {
+            niconico.stopHeartBeat();
+            console.log("HeartBeat error: ", error);
+        });
+
         console.log("session_api.urls[0].url = ", niconico.dmcInfo.session_api.urls[0].url);
         console.log("DmcContentUri = ", niconico.DmcContentUri);
         // console.log("dmcInfo = ", niconico.dmcInfo);    
@@ -293,6 +259,7 @@ async function main() {
     }
     console.log("watch finish");
 }
+
 main();
 
 

@@ -1,10 +1,13 @@
 const electron = require("electron");
+const session = electron.session;
 // アプリケーションを操作するモジュール
 const { app } = electron;
 // ネイティブブラウザウィンドウを作成するモジュール
 const { BrowserWindow } = electron;
 
 const { ipcMain } = electron;
+const fs = require("fs");
+const path = require("path");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -102,14 +105,50 @@ ipcMain.on("request-show-player", (event, arg) => {
     player_win.show();
 });
 
+app.on("login", function(event, webContents, request, authInfo, callback) {
+    event.preventDefault();
+
+    try {
+        const f = path.join(app.getPath("userData"), "p.json");
+        const p = JSON.parse(fs.readFileSync(f));
+        callback(p.name, p.pass);      
+    } catch (error) {
+        callback(null, null);
+    }
+
+});
+
 ipcMain.on("set-session-to-main", (event, arg) => {
-    const session = arg;
-    win.webContents.session.cookies.set(session, (error) => {
+    const sessions = arg;
+    session.defaultSession.cookies.set(sessions[0], (error) => {
         if (error) {
-            console.log(error);
+            console.error(error);
             event.returnValue = "error";
         }else{
-            event.returnValue = "ok";
+            session.defaultSession.cookies.set(sessions[1], (error) => {
+                if (error) {
+                    console.error(error);
+                    event.returnValue = "error";
+                }else{
+                    event.returnValue = "ok";
+                }         
+            });
         }
     });
+    // win.webContents.session.cookies.set(sessions[0], (error) => {
+    //     if (error) {
+    //         console.log(error);
+    //         event.returnValue = "error";
+    //     }else{
+    //         // event.returnValue = "ok";
+    //         win.webContents.session.cookies.set(sessions[1], (error) => {
+    //             if (error) {
+    //                 console.log(error);
+    //                 event.returnValue = "error";
+    //             }else{
+    //                 event.returnValue = "ok";
+    //             }
+    //         });
+    //     }
+    // });
 });

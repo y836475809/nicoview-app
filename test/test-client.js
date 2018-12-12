@@ -6,8 +6,8 @@ const { JSDOM } = require("jsdom");
 class NicoNico{
     constructor(nico_url){
         this.cookieJar = request.jar();
-        this.nico_url = nico_url | "http://www.nicovideo.jp";
-        this.watch_url = `${nico_url}/watch`;
+        this.nico_url = nico_url !== undefined ?  nico_url : "http://www.nicovideo.jp";
+        this.watch_url = `${this.nico_url}/watch`;
         this.heart_beat_rate = 0.9;
         this.req = null;
     }
@@ -54,11 +54,24 @@ class NicoNico{
         if(!nicohistory || !nicosid){
             throw new Error("not find session");
         }
-        return {
-            url: this.nico_url, 
-            nicohistory: nicohistory.value, 
-            nicosid: nicosid.value
-        };
+
+        return [
+            {
+                url: this.nico_url,
+                name: nicohistory.key,
+                value: nicohistory.value,
+                domain: nicohistory.domain,
+                path: nicohistory.path,
+                secure: nicohistory.secure
+            }, {
+                url: this.nico_url,
+                name: nicosid.key,
+                value: nicosid.value,
+                domain: nicosid.domain,
+                path: nicosid.path,
+                secure: nicosid.secure
+            }
+        ];
     }
 
     get SmileUrl(){

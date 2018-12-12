@@ -35,7 +35,7 @@
 
     video.addEventListener("progress", (e) => {
         console.log("progressによるイベント発火");
-        console.log(e.total + ", " + e.loaded + ", "  + e.lengthComputable );
+        // console.log(e.total + ", " + e.loaded + ", "  + e.lengthComputable );
     }); 
     video.addEventListener("waiting", () => {
         console.log("waitingによるイベント発火");
@@ -50,7 +50,7 @@
     async function main(video_id) {
         console.log("start watch: ", video_id);
         await niconico.watch(video_id);
-        if(niconico.isDmc){
+        if(niconico.isDmc()){
             console.log("start postDmcSession: ", video_id);
             await niconico.postDmcSession();
             const session = niconico.getSession();
@@ -62,7 +62,7 @@
             console.log("set dmc url: ", video_id);
             const url = niconico.DmcContentUri;
             video.src = url;
-            video.type = "mp4";
+            video.type = "video/mp4";
 
             console.log("start HeartBeat: ", video_id);
             niconico.startHeartBeat((error) => {
@@ -77,10 +77,12 @@
                 console.log("set-session-to-main error: ", video_id);
                 return;
             }
-            console.log("set smile url: ", video_id);
+            
             const url = niconico.SmileUrl;
+            console.log("set smile url: ", url);
             video.src = url;
-            video.type = "mp4";
+            video.type = "video/mp4";
+            video.load();
         }
     }
 

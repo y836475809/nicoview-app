@@ -43,35 +43,23 @@ class NicoNico{
         });
     }
 
-    getSession(){
+    getNicoHistory(){
         const cookies = this.cookieJar.getCookies(this.nico_url);
         const nicohistory = cookies.find((item)=>{
             return item.key == "nicohistory";
         });
-        const nicosid = cookies.find((item)=>{
-            return item.key == "nicosid";
-        });
-        if(!nicohistory || !nicosid){
+        if(!nicohistory){
             throw new Error("not find session");
         }
 
-        return [
-            {
-                url: this.nico_url,
-                name: nicohistory.key,
-                value: nicohistory.value,
-                domain: nicohistory.domain,
-                path: nicohistory.path,
-                secure: nicohistory.secure
-            }, {
-                url: this.nico_url,
-                name: nicosid.key,
-                value: nicosid.value,
-                domain: nicosid.domain,
-                path: nicosid.path,
-                secure: nicosid.secure
-            }
-        ];
+        return {
+            url: this.nico_url,
+            name: nicohistory.key,
+            value: nicohistory.value,
+            domain: nicohistory.domain,
+            path: nicohistory.path,
+            secure: nicohistory.secure
+        };
     }
 
     get SmileUrl(){
@@ -217,25 +205,13 @@ class NicoNico{
                 await rp(options);
 
                 const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-                // const interval_ms = 2 * 1000;                
+                // const interval_ms = 2 * 1000;
+                console.log("HeartBeat interval_ms=", interval_ms);                
                 this.heart_beat_id = setInterval(()=>{
                     rp(options2).catch((error)=>{
                         on_error_heartbeat(error);
                     });
-                    // request(options2, (error, response, body) => {
-                    //     console.log("statusCode=", response.statusCode);
-                    //     if(response.statusCode===200 || response.statusCode===201){
-                    //         console.log("HeartBeat");
-                    //     }else{
-                    //         //response.statusCode!==200 && response.statusCode!==201){
-                    //         console.log("HeartBeat error");
-                    //         on_error_heartbeat(new Error(response.statusCode));
-                    //     }
-                    //     if(error){
-                    //         console.log("HeartBeat error");
-                    //         on_error_heartbeat(error);
-                    //     }
-                    // });
+                    console.log("HeartBeat ", new Date());
                 }, interval_ms);          
             } catch (error) {
                 console.log("startHeartBeat errors=", error);

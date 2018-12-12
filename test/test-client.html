@@ -53,10 +53,10 @@
         if(niconico.isDmc()){
             console.log("start postDmcSession: ", video_id);
             await niconico.postDmcSession();
-            const session = niconico.getSession();
-            const ret = ipcRenderer.sendSync("set-session-to-main", session);
+            const nicohistory = niconico.getNicoHistory();
+            const ret = ipcRenderer.sendSync("set-nicohistory", nicohistory);
             if(ret!="ok"){
-                console.log("set-session-to-main error: ", video_id);
+                console.log("set-nicohistory error: ", video_id);
                 return;
             }
             console.log("set dmc url: ", video_id);
@@ -69,12 +69,13 @@
                 niconico.stopHeartBeat();
                 console.log("HeartBeat error: ", error);
             });
+            video.load();
         }else{
             console.log("smile: ", video_id);
-            const session = niconico.getSession();
-            const ret = ipcRenderer.sendSync("set-session-to-main", session);
+            const nicohistory = niconico.getNicoHistory();
+            const ret = ipcRenderer.sendSync("set-nicohistory", nicohistory);
             if(ret!="ok"){
-                console.log("set-session-to-main error: ", video_id);
+                console.log("set-nicohistory error: ", video_id);
                 return;
             }
             

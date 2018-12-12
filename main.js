@@ -118,21 +118,14 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
 
 });
 
-ipcMain.on("set-session-to-main", (event, arg) => {
-    const sessions = arg;
-    session.defaultSession.cookies.set(sessions[0], (error) => {
+ipcMain.on("set-nicohistory", (event, arg) => {
+    const nicohistory = arg;
+    session.defaultSession.cookies.set(nicohistory, (error) => {
         if (error) {
             console.error(error);
             event.returnValue = "error";
         }else{
-            session.defaultSession.cookies.set(sessions[1], (error) => {
-                if (error) {
-                    console.error(error);
-                    event.returnValue = "error";
-                }else{
-                    event.returnValue = "ok";
-                }         
-            });
+            event.returnValue = "ok";
         }
     });
     // win.webContents.session.cookies.set(sessions[0], (error) => {

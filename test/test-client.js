@@ -229,20 +229,18 @@ class NicoNico {
 }
 
 class NicoCommnet {
-    constructor(session, api_data) {
-        this.session = session;
+    constructor(api_data) {
         this.api_data = api_data;
     }
 
     getCommnet() {
         return new Promise(async (resolve, reject) => {
-            const url = this.api_data.thread.serverUrl;
-            const json = this.makePostJson();
+            const url = "http://nmsg.nicovideo.jp/api.json/";
+            const json = this.makeJson();
             const options = {
                 uri: url,
                 method: "POST",
                 headers: { "content-type": "application/json" },
-                // jar: this.session,
                 json: json
             };
             try {
@@ -418,7 +416,10 @@ async function main() {
 
 
 module.exports = NicoNico;
-
+module.exports = {
+    NicoNico: NicoNico,
+    NicoCommnet: NicoCommnet
+};
 //video.isOfficial=true で公式
 //get xml comment
 //url = video.thread.serverUrl

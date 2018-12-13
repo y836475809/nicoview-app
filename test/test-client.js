@@ -228,6 +228,171 @@ class NicoNico {
     }
 }
 
+class NicoCommnet {
+    constructor(session, api_data) {
+        this.session = session;
+        this.api_data = api_data;
+    }
+
+    getCommnet() {
+        return new Promise(async (resolve, reject) => {
+            const url = this.api_data.thread.serverUrl;
+            const json = this.makePostJson();
+            const options = {
+                uri: url,
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                // jar: this.session,
+                json: json
+            };
+            try {
+                const comment_data = await rp(options);
+                resolve(comment_data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    hasOwnerComment() {
+        const comment_composite = this.api_data.commentComposite;
+        return comment_composite.threads[0].isActive;
+    }
+
+    _getContentLen(duration) {
+        return Math.ceil(duration / 60);
+    }
+
+    makeJson() {
+        if (this.hasOwnerComment()) {
+            return this.makeJsonOwner();
+        } else {
+            return this.makeJsonNoOwner();
+        }
+    }
+
+    makeJsonNoOwner() {
+        //no owner
+        const comment_composite = this.api_data.commentComposite;
+        const thread = comment_composite.threads[1].id;
+        const fork = comment_composite.threads[1].fork;
+        const content_len = this._getContentLen(this.api_data.video.duration);
+        return [
+            {
+                ping: { content: "rs:0" }
+            },
+            {
+                ping: { content: "ps:0" }
+            },
+            {
+                thread: {
+                    thread: thread,
+                    version: "20090904",
+                    fork: fork,
+                    language: 0,
+                    user_id: "",
+                    with_global: 1,
+                    scores: 1,
+                    nicoru: 0
+                }
+            },
+            {
+                ping: { content: "pf:0" }
+            },
+            {
+                ping: { content: "ps:1" }
+            },
+            {
+                thread_leaves: {
+                    thread: thread,
+                    language: 0,
+                    user_id: "",
+                    content: `0-${content_len}:100,1000`,
+                    scores: 1,
+                    nicoru: 0
+                }
+            },
+            {
+                ping: { content: "pf:1" }
+            },
+            {
+                ping: { content: "rf:0" }
+            }
+        ];
+    }
+
+    makeJsonOwner() {
+        //owner
+        const comment_composite = this.api_data.commentComposite;
+        const thread0 = comment_composite.threads[0].id;
+        const fork0 = comment_composite.threads[0].fork;
+        const thread1 = comment_composite.threads[1].id;
+        const fork1 = comment_composite.threads[1].fork;
+        const content_len = this._getContentLen(this.api_data.video.duration);
+        return [
+            {
+                ping: { content: "rs:0" }
+            },
+            {
+                ping: { content: "ps:0" }
+            },
+            {
+                thread: {
+                    thread: thread0,
+                    version: "20061206",
+                    fork: fork0,
+                    language: 0,
+                    user_id: "",
+                    res_from: -1000,
+                    with_global: 1,
+                    scores: 1,
+                    nicoru: 0
+                }
+            },
+            {
+                ping: { content: "pf:0" }
+            },
+            {
+                ping: { content: "ps:1" }
+            },
+            {
+                thread: {
+                    thread: thread1,
+                    version: "20090904",
+                    fork: fork1,
+                    language: 0,
+                    user_id: "",
+                    with_global: 1,
+                    scores: 1,
+                    nicoru: 0
+                }
+            },
+            {
+                ping: { content: "pf:1" }
+            },
+            {
+                ping: { content: "ps:2" }
+            },
+            {
+                thread_leaves: {
+                    thread: thread0,
+                    language: 0,
+                    user_id: "",
+                    content: `0-${content_len}:100,1000`,
+                    scores: 1,
+                    nicoru: 0
+                }
+            },
+            {
+                ping: { content: "pf:2" }
+            },
+            {
+                ping: { content: "rf:0" }
+            }
+        ];
+    }
+}
+
 // const url = "http://www.nicovideo.jp/watch/sm29316071";
 // const url = "http://www.nicovideo.jp/watch/sm32951089";
 async function main() {

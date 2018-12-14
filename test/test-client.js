@@ -229,18 +229,43 @@ class NicoNico {
 }
 
 class NicoCommnet {
-    constructor(api_data) {
+    constructor(cookie_jar, api_data) {
+        this.cookie_jar = cookie_jar;
         this.api_data = api_data;
+        this.r_no = 0;
+        this.p_no = 0;
+    }
+
+    isSuccess(response){
+        return response[2].thread.resultcode===0;
     }
 
     getCommnet() {
+        const josn = this.hasOwnerComment() ? 
+            this.makeJsonOwner(this.r_no, this.p_no):this.makeJsonNoOwner(this.r_no, this.p_no); 
+        this.r_no += 1;
+        this.p_no += josn.length;
+
+        return this._post(josn);
+    }
+
+    getCommnetDiff(res_from) {
+        const josn = this.makeJsonDiff(this.r_no, this.p_no, res_from);
+        this.r_no += 1;
+        this.p_no += josn.length;
+
+        return this._post(josn);
+    }
+
+    _post(post_data){
         return new Promise(async (resolve, reject) => {
             const url = "http://nmsg.nicovideo.jp/api.json/";
-            const json = this.makeJson();
+            const json = post_data;
             const options = {
                 uri: url,
                 method: "POST",
                 headers: { "content-type": "application/json" },
+                jar: this.cookie_jar,
                 json: json
             };
             try {
@@ -261,65 +286,53 @@ class NicoCommnet {
         return Math.ceil(duration / 60);
     }
 
-    makeJson() {
-        if (this.hasOwnerComment()) {
-            return this.makeJsonOwner();
-        } else {
-            return this.makeJsonNoOwner();
-        }
+    _getPing(name, value){
+        return { ping: { content: `${name}:${value}` } };
     }
 
-    makeJsonNoOwner() {
+    _addCommand(cmds, p_no, cmd_obj){
+        cmds.push(this._getPing("ps", p_no));
+        cmds.push(cmd_obj);
+        cmds.push(this._getPing("pf", p_no));
+    }
+
+    makeJsonNoOwner(r_no, p_no) {
         //no owner
         const comment_composite = this.api_data.commentComposite;
         const thread = comment_composite.threads[1].id;
         const fork = comment_composite.threads[1].fork;
         const content_len = this._getContentLen(this.api_data.video.duration);
-        return [
-            {
-                ping: { content: "rs:0" }
-            },
-            {
-                ping: { content: "ps:0" }
-            },
-            {
-                thread: {
-                    thread: thread,
-                    version: "20090904",
-                    fork: fork,
-                    language: 0,
-                    user_id: "",
-                    with_global: 1,
-                    scores: 1,
-                    nicoru: 0
-                }
-            },
-            {
-                ping: { content: "pf:0" }
-            },
-            {
-                ping: { content: "ps:1" }
-            },
-            {
-                thread_leaves: {
-                    thread: thread,
-                    language: 0,
-                    user_id: "",
-                    content: `0-${content_len}:100,1000`,
-                    scores: 1,
-                    nicoru: 0
-                }
-            },
-            {
-                ping: { content: "pf:1" }
-            },
-            {
-                ping: { content: "rf:0" }
+
+        let cmds = [];
+        cmds.push(this._getPing("rs", r_no));
+        this._addCommand(cmds, p_no, {
+            thread: {
+                thread: thread,
+                version: "20090904",
+                fork: fork,
+                language: 0,
+                user_id: "",
+                with_global: 1,
+                scores: 1,
+                nicoru: 0
             }
-        ];
+        });
+        this._addCommand(cmds, p_no++, {
+            thread_leaves: {
+                thread: thread,
+                language: 0,
+                user_id: "",
+                content: `0-${content_len}:100,1000`,
+                scores: 1,
+                nicoru: 0
+            }
+        });
+        cmds.push(this._getPing("rf", r_no));
+        
+        return cmds;
     }
 
-    makeJsonOwner() {
+    makeJsonOwner(r_no, p_no) {
         //owner
         const comment_composite = this.api_data.commentComposite;
         const thread0 = comment_composite.threads[0].id;
@@ -327,68 +340,138 @@ class NicoCommnet {
         const thread1 = comment_composite.threads[1].id;
         const fork1 = comment_composite.threads[1].fork;
         const content_len = this._getContentLen(this.api_data.video.duration);
-        return [
-            {
-                ping: { content: "rs:0" }
-            },
-            {
-                ping: { content: "ps:0" }
-            },
-            {
-                thread: {
-                    thread: thread0,
-                    version: "20061206",
-                    fork: fork0,
-                    language: 0,
-                    user_id: "",
-                    res_from: -1000,
-                    with_global: 1,
-                    scores: 1,
-                    nicoru: 0
-                }
-            },
-            {
-                ping: { content: "pf:0" }
-            },
-            {
-                ping: { content: "ps:1" }
-            },
-            {
-                thread: {
-                    thread: thread1,
-                    version: "20090904",
-                    fork: fork1,
-                    language: 0,
-                    user_id: "",
-                    with_global: 1,
-                    scores: 1,
-                    nicoru: 0
-                }
-            },
-            {
-                ping: { content: "pf:1" }
-            },
-            {
-                ping: { content: "ps:2" }
-            },
-            {
-                thread_leaves: {
-                    thread: thread0,
-                    language: 0,
-                    user_id: "",
-                    content: `0-${content_len}:100,1000`,
-                    scores: 1,
-                    nicoru: 0
-                }
-            },
-            {
-                ping: { content: "pf:2" }
-            },
-            {
-                ping: { content: "rf:0" }
+
+        let cmds = [];
+        cmds.push(this._getPing("rs", r_no));
+        this._addCommand(cmds, p_no, {
+            thread: {
+                thread: thread0,
+                version: "20061206",
+                fork: fork0,
+                language: 0,
+                user_id: "",
+                res_from: -1000,
+                with_global: 1,
+                scores: 1,
+                nicoru: 0
             }
-        ];
+        });
+        this._addCommand(cmds, p_no++, {
+            thread: {
+                thread: thread1,
+                version: "20090904",
+                fork: fork1,
+                language: 0,
+                user_id: "",
+                with_global: 1,
+                scores: 1,
+                nicoru: 0
+            }
+        });   
+        this._addCommand(cmds, p_no++, {
+            thread_leaves: {
+                thread: thread0,
+                language: 0,
+                user_id: "",
+                content: `0-${content_len}:100,1000`,
+                scores: 1,
+                nicoru: 0
+            }
+        });         
+        cmds.push(this._getPing("rf", r_no));
+        return cmds;
     }
+
+    makeJsonDiff(r_no, p_no, res_from) {
+        const comment_composite = this.api_data.commentComposite;
+        const thread1 = comment_composite.threads[1].id;
+        let cmds = [];
+        cmds.push(this._getPing("rs", r_no));
+        this._addCommand(cmds, p_no, {
+            thread: {
+                thread: thread1,
+                version: "20061206",
+                fork: 0,
+                language: 0,
+                user_id: "",
+                res_from: res_from,
+                with_global: 1,
+                scores: 0,
+                nicoru: 0
+            }
+        });  
+        cmds.push(this._getPing("rf", r_no));
+
+        return cmds;
+    }
+}
+
+/**
+ * 
+ * @param {Array} json 
+ */
+function ConvertJsonToComment(json){
+    return json.filter((elm, index) => {
+        return "chat" in json[index];
+    }).map((elm) =>{
+        return {
+            no: elm.no,
+            vpos: elm.vpos,
+            date: elm.date,
+            user_id: elm.user_id,
+            mail: elm.mail ? elm.mail : "184",
+            text: elm.content
+        };
+    });
+}
+
+function getVideoType(smile_url){
+    //"https://smile-cls30.sl.nicovideo.jp/smile?v=XXXXXXX.XXXXX" => flv
+    //"https://smile-cls30.sl.nicovideo.jp/smile?m=XXXXXXX.XXXXX" => mp4
+    if(/.*\/smile\?v=.*/.test(smile_url)){
+        return "flv";
+    }
+    if(/.*\/smile\?m=.*/.test(smile_url)){
+        return "mp4";
+    }
+
+    throw new Error("not flv or mp4");
+}
+
+function ConvertApiDataToThumbInfo(api_data){
+    const video = api_data.video;
+    const thread = api_data.thread;
+    const video_type = getVideoType(video.smileInfo.url);
+    const owner = api_data.owner;
+    const tags = api_data.tags.map((elm) => {
+        return { 
+            text: elm.name, 
+            lock: elm.isLocked
+        };
+    });
+    return {
+        video_id: video.id,
+        title: video.title,
+        description: video.description,
+        thumbnail_url: video.largeThumbnailURL,
+        // first_retrieve: first_retrieve,
+        length: video.duration,
+        movie_type: video_type,
+        // size_high: size_high,
+        // size_low: size_low,
+        view_counter: video.viewCount,
+        comment_num: thread.commentCount,
+        mylist_counter: video.mylistCount,
+        // last_res_body: last_res_body,
+        // watch_url: watch_url,
+        // thumb_type: thumb_type,
+        // embeddable: embeddable,
+        // no_live_play: no_live_play,
+        tags: tags,
+        user_id: owner.id,
+        user_nickname: owner.nickname,
+        user_icon_url: owner.iconURL
+    };    
 }
 
 // const url = "http://www.nicovideo.jp/watch/sm29316071";

@@ -74,7 +74,7 @@
             console.log("smile: ", video_id);
             const nicohistory = niconico.getNicoHistory();
 
-            const nc = new NicoCommnet(niconico.api_data);
+            const nc = new NicoCommnet(niconico.cookieJar, niconico.api_data);
             const comment_data = await nc.getCommnet();
             console.log("comment_data: ", comment_data);
             

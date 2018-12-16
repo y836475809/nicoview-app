@@ -2,6 +2,7 @@
 
 from bottle import run, template, get, post, request, response, Bottle, abort, HTTPResponse, static_file
 from beaker.middleware import SessionMiddleware
+import json
 import sys, codecs
 from datetime import datetime
 from logging import getLogger, StreamHandler, DEBUG
@@ -105,6 +106,22 @@ def method_hb(sessionid):
         logger.debug("%s %s sessionid=%s" % (request.method, datetime.now().strftime("%Y/%m/%d %H:%M:%S"), sessionid))
     else:
         abort(403)
+
+
+@app.post("/api.json/")
+def method_comment():
+    content_type = request.get_header('Content-Type')
+    if content_type != "application/json":
+        abort(403)
+
+    req_json = request.json
+    if "ping" not in req_json[0] or "ping" not in req_json[1] or "thread" not in req_json[2]:
+        abort(403)
+
+    comment_json = []
+    with open("./data/comment.json") as f:
+        comment_json = json.load(f)
+    return comment_json
 
 
 if __name__ == "__main__":

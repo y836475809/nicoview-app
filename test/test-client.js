@@ -10,15 +10,19 @@ class NicoNico {
         this.watch_url = `${this.nico_url}/watch`;
         this.heart_beat_rate = 0.9;
         this.req = null;
+        this.is_canceled = false;
     }
 
     cancel() {
         if (this.req) {
-            this.req.abort();
+            this.req.cancel();
+            this.is_canceled = true;
         }
     }
 
     watch(video_id) {
+        this.is_canceled = false;
+
         return new Promise(async (resolve, reject) => {
             this.dmcInfo = null;
 
@@ -28,18 +32,21 @@ class NicoNico {
                 jar: this.cookieJar,
                 timeout: 10 * 1000
             };
-            try {
-                this.req = rp(options);
-                await this.req.then((body) => {
-                    const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                    this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
-                    this.dmcInfo = this.api_data.video.dmcInfo;
-                });
-                // console.log(this.dmcInfo.session_api.urls[0].url);
+            //try {
+            this.req = rp(options);
+            this.req.then((body) => {
+                const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+                this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
+                this.dmcInfo = this.api_data.video.dmcInfo;
                 resolve(this.api_data);
-            } catch (error) {
+            }).catch((error)=>{
                 reject(error);
-            }
+            });
+            // console.log(this.dmcInfo.session_api.urls[0].url);
+            //resolve(this.api_data);
+            // } catch (error) {
+            //     reject(error);
+            // }
         });
     }
 
@@ -130,6 +137,7 @@ class NicoNico {
     }
 
     postDmcSession() {
+        this.is_canceled = false;
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
                 return reject("dmc info is null");
@@ -140,23 +148,27 @@ class NicoNico {
                 method: "POST",
                 headers: { "content-type": "application/json" },
                 // jar: this.cookieJar,
-                json: this.DmcSession
+                json: this.DmcSession,
+                timeout: 10 * 1000
             };
-            try {
-                this.req = rp(options);
-                await this.req.then((body) => {
-                    // console.log(body.data.session.content_uri);
-                    // this.dmc_session = JSON.parse(body); 
-                    this.dmc_session = body.data;
-                    // console.log(body.data.session.content_uri);
-                });
-                // .catch(errors.StatusCodeError, (reason)=> {
-                //     reject(errors);
-                // });
+            //try {
+            this.req = rp(options);
+            this.req.then((body) => {
+                // console.log(body.data.session.content_uri);
+                // this.dmc_session = JSON.parse(body); 
+                this.dmc_session = body.data;
+                // console.log(body.data.session.content_uri);
                 resolve(this.dmc_session);
-            } catch (error) {
+            }).catch((error)=>{
                 reject(error);
-            }
+            });
+            // .catch(errors.StatusCodeError, (reason)=> {
+            //     reject(errors);
+            // });
+            //     resolve(this.dmc_session);
+            // } catch (error) {
+            //     reject(error);
+            // }
         });
     }
 
@@ -171,7 +183,8 @@ class NicoNico {
             method: "POST",
             // jar: this.cookieJar,
             headers: { "content-type": "application/json" },
-            json: session
+            json: session,
+            timeout: 10 * 1000
         };
         // rp(options);
         rp(options).catch((error) => {
@@ -190,6 +203,7 @@ class NicoNico {
             const options = {
                 uri: url,
                 method: "OPTIONS",
+                timeout: 10 * 1000
                 // headers: { "content-type": "application/json" },     
                 // jar: this.cookieJar,
             };
@@ -199,7 +213,8 @@ class NicoNico {
                 method: "POST",
                 // jar: this.cookieJar,
                 headers: { "content-type": "application/json" },
-                json: session
+                json: session,
+                timeout: 10 * 1000
             };
             try {
                 await rp(options);
@@ -207,6 +222,7 @@ class NicoNico {
                 const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
                 // const interval_ms = 2 * 1000;
                 console.log("HeartBeat interval_ms=", interval_ms);
+                this.stopHeartBeat();
                 this.heart_beat_id = setInterval(() => {
                     rp(options2).catch((error) => {
                         on_error_heartbeat(error);
@@ -229,11 +245,32 @@ class NicoNico {
 }
 
 class NicoCommnet {
-    constructor(cookie_jar, api_data) {
-        this.cookie_jar = cookie_jar;
-        this.api_data = api_data;
+    // constructor(cookie_jar, api_data) {
+    //     this.cookie_jar = cookie_jar;
+    //     this.api_data = api_data;
+    //     this.r_no = 0;
+    //     this.p_no = 0;
+    //     this.req = null;
+    // }
+    constructor() {
+        this.cookie_jar = null;
+        this.api_data = null;
         this.r_no = 0;
         this.p_no = 0;
+        this.req = null;
+        this.is_canceled = false;
+    }
+
+    setParams(cookie_jar, api_data){
+        this.cookie_jar = cookie_jar;
+        this.api_data = .api_data;
+    }
+
+    cancel() {
+        if (this.req) {
+            this.req.cancel();
+            this.is_canceled = true;
+        }
     }
 
     isSuccess(response){
@@ -258,6 +295,8 @@ class NicoCommnet {
     }
 
     _post(post_data){
+        this.is_canceled = false;
+
         return new Promise(async (resolve, reject) => {
             const url = "http://nmsg.nicovideo.jp/api.json/";
             const json = post_data;
@@ -266,14 +305,21 @@ class NicoCommnet {
                 method: "POST",
                 headers: { "content-type": "application/json" },
                 jar: this.cookie_jar,
-                json: json
+                json: json,
+                timeout: 10 * 1000
             };
-            try {
-                const comment_data = await rp(options);
+            // try {
+            //     const comment_data = await rp(options);
+            //     resolve(comment_data);
+            // } catch (error) {
+            //     reject(error);
+            // }
+            this.req = rp(options);
+            this.req.then((comment_data) => {
                 resolve(comment_data);
-            } catch (error) {
+            }).catch((error)=>{
                 reject(error);
-            }
+            });
         });
     }
 

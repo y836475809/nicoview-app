@@ -263,7 +263,7 @@ class NicoCommnet {
 
     setParams(cookie_jar, api_data){
         this.cookie_jar = cookie_jar;
-        this.api_data = .api_data;
+        this.api_data = api_data;
     }
 
     cancel() {

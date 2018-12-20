@@ -4,13 +4,16 @@ const request = require("request");
 const { JSDOM } = require("jsdom");
 
 class NicoNico {
-    constructor(nico_url) {
+    constructor(nico_url, proxy) {
         this.cookieJar = request.jar();
         this.nico_url = nico_url !== undefined ? nico_url : "http://www.nicovideo.jp";
         this.watch_url = `${this.nico_url}/watch`;
         this.heart_beat_rate = 0.9;
         this.req = null;
         this.is_canceled = false;
+
+        const option = proxy !== undefined ? { proxy: proxy } : {};
+        this.def_rp = request.defaults(option);
     }
 
     cancel() {
@@ -33,11 +36,15 @@ class NicoNico {
                 timeout: 10 * 1000
             };
             //try {
-            this.req = rp(options);
+            this.req = this.def_rp(options);
             this.req.then((body) => {
-                const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
-                this.dmcInfo = this.api_data.video.dmcInfo;
+                try {
+                    const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+                    this.api_data = JSON.parse(data_elm.getAttribute("data-api-data"));
+                    this.dmcInfo = this.api_data.video.dmcInfo;                
+                } catch (error) {
+                    reject(error);
+                }
                 resolve(this.api_data);
             }).catch((error)=>{
                 reject(error);

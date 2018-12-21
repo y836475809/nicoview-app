@@ -20,6 +20,10 @@ describe("http", () => {
 
         app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
+
+            res.cookie("nicohistory", `${video_id}%123456789`, { domain: ".nicovideo.jp", path: "/" });
+            res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/" });
+
             const file = fs.readFileSync(`${__dirname}/data/${video_id}.html`, "utf-8");
             res.writeHead(200, { "Content-Type": "text/html" });
             res.write(file);
@@ -48,6 +52,34 @@ describe("http", () => {
         console.log("afterAll");
         server.close();
         proxyServer.close();
+    });
+
+    test("http req cookie", async () => {
+        // jest.setTimeout(20000);
+        // nock.cleanAll();
+        // nock.disableNetConnect();
+        // nock.enableNetConnect("localhost");
+        // nock(`http://localhost:${port}`)
+        //     .get("/watch/sm19961784")
+        //     .delay(1000)
+        //     .reply(200, "ok");
+        // // .reply(200, (uri, requestBody) => {
+        // //     console.log(requestBody);
+        // //     return requestBody;
+        // // });
+        // // .replyWithFile(200, `${__dirname}/data/sm19961784.html`, { "Content-Type": "html/text" });
+
+        expect.assertions(1);
+
+        const niconico = new NicoNico(undefined, `http://localhost:${proxy_port}`);
+        const ret = await niconico.watch("sm19961784");
+        expect(niconico.getNicoHistory()).toEqual({
+            name: "nicohistory",
+            value: "sm19961784%123456789",
+            domain: ".nicovideo.jp",
+            path: "/",
+            secure: false
+        });
     });
 
     test("http req cancel", (done) => {

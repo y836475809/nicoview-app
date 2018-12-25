@@ -21,7 +21,7 @@ describe("http", () => {
         app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
 
-            res.cookie("nicohistory", `${video_id}%123456789`, { domain: ".nicovideo.jp", path: "/" });
+            res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/" });
             res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/" });
 
             const file = fs.readFileSync(`${__dirname}/data/${video_id}.html`, "utf-8");
@@ -75,8 +75,8 @@ describe("http", () => {
         const ret = await niconico.watch("sm19961784");
         expect(niconico.getNicoHistory()).toEqual({
             name: "nicohistory",
-            value: "sm19961784%123456789",
-            domain: ".nicovideo.jp",
+            value: "sm19961784%3A123456789",
+            domain: "nicovideo.jp",
             path: "/",
             secure: false
         });

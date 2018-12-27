@@ -12,6 +12,7 @@
   "author": "",
   "license": "MIT",
   "devDependencies": {
+    "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
     "http-proxy": "^1.17.0",
     "jest": "^23.6.0",

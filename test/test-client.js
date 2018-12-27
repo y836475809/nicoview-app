@@ -159,7 +159,8 @@ class NicoNico {
                 timeout: 10 * 1000
             };
             //try {
-            this.req = rp(options);
+            // this.req = rp(options);
+            this.req = this.def_rp(options);
             this.req.then((body) => {
                 // console.log(body.data.session.content_uri);
                 // this.dmc_session = JSON.parse(body); 
@@ -183,22 +184,22 @@ class NicoNico {
         return this.dmc_session.session.content_uri;
     }
 
-    heartBeat(url) {
-        const session = this.dmc_session;
-        const options = {
-            uri: url,
-            method: "POST",
-            // jar: this.cookieJar,
-            headers: { "content-type": "application/json" },
-            json: session,
-            timeout: 10 * 1000
-        };
-        // rp(options);
-        rp(options).catch((error) => {
-            // console.log("heartBeat error: ", error);
-            throw new Error(error);
-        });
-    }
+    // heartBeat(url) {
+    //     const session = this.dmc_session;
+    //     const options = {
+    //         uri: url,
+    //         method: "POST",
+    //         // jar: this.cookieJar,
+    //         headers: { "content-type": "application/json" },
+    //         json: session,
+    //         timeout: 10 * 1000
+    //     };
+    //     // rp(options);
+    //     rp(options).catch((error) => {
+    //         // console.log("heartBeat error: ", error);
+    //         throw new Error(error);
+    //     });
+    // }
 
     startHeartBeat(on_error_heartbeat) {
         return new Promise(async (resolve, reject) => {
@@ -222,17 +223,25 @@ class NicoNico {
                 headers: { "content-type": "application/json" },
                 json: session,
                 timeout: 10 * 1000
-            };
+            };   
             try {
-                await rp(options);
+                // await rp(options);
+                const req = this.def_rp(options);
+                await req.post(options);
 
                 const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
                 // const interval_ms = 2 * 1000;
                 console.log("HeartBeat interval_ms=", interval_ms);
                 this.stopHeartBeat();
+                const req_hb = this.def_rp(options);
                 this.heart_beat_id = setInterval(() => {
-                    rp(options2).catch((error) => {
-                        on_error_heartbeat(error);
+                    // rp(options2).catch((error) => {
+                    //     on_error_heartbeat(error);
+                    // });
+                    req_hb.post(options2, (error, response, body) => {
+                        if(error){
+                            on_error_heartbeat(error);
+                        }
                     });
                     console.log("HeartBeat ", new Date());
                 }, interval_ms);

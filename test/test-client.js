@@ -67,7 +67,7 @@ class NicoNico {
         }
 
         return {
-            // url: this.nico_url,
+            url: this.nico_url,
             name: nicohistory.key,
             value: nicohistory.value,
             domain: nicohistory.domain,

@@ -1,19 +1,16 @@
 const rp = require("request-promise");
-const request = require("request");
-// const fs = require("fs");
 const { JSDOM } = require("jsdom");
 
 class NicoNico {
     constructor(nico_url, proxy) {
-        this.cookieJar = request.jar();
+        this.cookieJar = rp.jar();
         this.nico_url = nico_url !== undefined ? nico_url : "http://www.nicovideo.jp";
         this.watch_url = `${this.nico_url}/watch`;
         this.heart_beat_rate = 0.9;
         this.req = null;
         this.is_canceled = false;
 
-        const option = proxy !== undefined ? { proxy: proxy } : {};
-        this.def_rp = request.defaults(option);
+        this.proxy = proxy;
     }
 
     cancel() {
@@ -33,10 +30,10 @@ class NicoNico {
                 uri: `${this.watch_url}/${video_id}`,
                 method: "GET",
                 jar: this.cookieJar,
-                timeout: 10 * 1000
-            };
-            //try {
-            this.req = this.def_rp(options);
+                timeout: 10 * 1000,
+                proxy: this.proxy
+            }; 
+            this.req = rp(options);  
             this.req.then((body) => {
                 try {
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
@@ -49,11 +46,6 @@ class NicoNico {
             }).catch((error)=>{
                 reject(error);
             });
-            // console.log(this.dmcInfo.session_api.urls[0].url);
-            //resolve(this.api_data);
-            // } catch (error) {
-            //     reject(error);
-            // }
         });
     }
 
@@ -65,7 +57,7 @@ class NicoNico {
         if (!nicohistory) {
             throw new Error("not find session");
         }
-
+        // nicohistory.expires
         return {
             url: this.nico_url,
             name: nicohistory.key,
@@ -156,27 +148,16 @@ class NicoNico {
                 headers: { "content-type": "application/json" },
                 // jar: this.cookieJar,
                 json: this.DmcSession,
-                timeout: 10 * 1000
+                timeout: 10 * 1000,
+                proxy: this.proxy
             };
-            //try {
-            // this.req = rp(options);
-            this.req = this.def_rp(options);
+            this.req = rp(options);  
             this.req.then((body) => {
-                // console.log(body.data.session.content_uri);
-                // this.dmc_session = JSON.parse(body); 
                 this.dmc_session = body.data;
-                // console.log(body.data.session.content_uri);
                 resolve(this.dmc_session);
             }).catch((error)=>{
                 reject(error);
             });
-            // .catch(errors.StatusCodeError, (reason)=> {
-            //     reject(errors);
-            // });
-            //     resolve(this.dmc_session);
-            // } catch (error) {
-            //     reject(error);
-            // }
         });
     }
 
@@ -184,34 +165,17 @@ class NicoNico {
         return this.dmc_session.session.content_uri;
     }
 
-    // heartBeat(url) {
-    //     const session = this.dmc_session;
-    //     const options = {
-    //         uri: url,
-    //         method: "POST",
-    //         // jar: this.cookieJar,
-    //         headers: { "content-type": "application/json" },
-    //         json: session,
-    //         timeout: 10 * 1000
-    //     };
-    //     // rp(options);
-    //     rp(options).catch((error) => {
-    //         // console.log("heartBeat error: ", error);
-    //         throw new Error(error);
-    //     });
-    // }
-
     startHeartBeat(on_error_heartbeat) {
         return new Promise(async (resolve, reject) => {
             this.heart_beat_id = null;
-            // const session = this.dmc_session;
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
             const options = {
                 uri: url,
                 method: "OPTIONS",
-                timeout: 10 * 1000
+                timeout: 10 * 1000,
+                proxy: this.proxy
                 // headers: { "content-type": "application/json" },     
                 // jar: this.cookieJar,
             };
@@ -222,26 +186,18 @@ class NicoNico {
                 // jar: this.cookieJar,
                 headers: { "content-type": "application/json" },
                 json: session,
-                timeout: 10 * 1000
+                timeout: 10 * 1000,
+                proxy: this.proxy
             };   
             try {
-                // await rp(options);
-                const req = this.def_rp(options);
-                await req.post(options);
+                await rp(options);
 
                 const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-                // const interval_ms = 2 * 1000;
-                console.log("HeartBeat interval_ms=", interval_ms);
                 this.stopHeartBeat();
-                const req_hb = this.def_rp(options);
                 this.heart_beat_id = setInterval(() => {
-                    // rp(options2).catch((error) => {
-                    //     on_error_heartbeat(error);
-                    // });
-                    req_hb.post(options2, (error, response, body) => {
-                        if(error){
-                            on_error_heartbeat(error);
-                        }
+                    rp(options2).catch((error) => {
+                        console.log("startHeartBeat errors=", error);
+                        on_error_heartbeat(error);
                     });
                     console.log("HeartBeat ", new Date());
                 }, interval_ms);

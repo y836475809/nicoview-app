@@ -9,6 +9,9 @@ class MockNicoServer {
         this.app = express();
         this.app.use(cookieParser());
         this.app.use(express.json());
+
+        this.dmc_hb_options_count = 0;
+        this.dmc_hb_post_count = 0;
     
         this.server_port = 8084;
         this.proxy_port = 3000;
@@ -57,6 +60,24 @@ class MockNicoServer {
         this.proxyServer.close();
     }
 
+    clearCount(){
+        console.log("clearCount");
+        this.dmc_hb_options_count = 0;
+        this.dmc_hb_post_count = 0;
+    }
+
+    _hasCookie(req){
+        const cookies = req.cookies;
+        if (cookies === undefined) {
+            return false;
+        }
+        if (cookies.nicohistory === undefined) {
+            return false;
+        }
+
+        return true;
+    }
+
     setupRouting(){
         this.app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
@@ -70,16 +91,10 @@ class MockNicoServer {
             res.end();
         });
         this.app.get("/smile", (req, res) => {
-            const cookie = req.cookies;
-            if (cookie === undefined) {
+            if(!this._hasCookie(req)){
                 res.status(403).send("403");
                 return;
             }
-            if (cookie.nicohistory === undefined) {
-                res.status(403).send("403");
-                return;
-            }
-
             res.status(200).send("smile");
         });   
         this.app.post("/api/sessions", (req, res) => {
@@ -126,6 +141,7 @@ class MockNicoServer {
                 res.status(403).send("403");
                 return;
             }
+            this.dmc_hb_options_count++;
             res.status(200).send("ok");
         });
         this.app.post("/api/sessions/:id", (req, res) => {
@@ -139,8 +155,9 @@ class MockNicoServer {
                 }); 
                 return;
             }
-            const json = res.json();
+            const json = req.body;
             if(json.session){
+                this.dmc_hb_post_count++;
                 res.status(200).json({
                     meta: {
                         status: 200,

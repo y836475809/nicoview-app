@@ -1,4 +1,3 @@
-const nock = require("nock");
 const request = require("request");
 const { NicoNico, NicoCommnet } = require("../test/test-client");
 const { MockNicoServer, httpsTohttp } = require("./nico_mock");
@@ -7,7 +6,6 @@ const test_data_video_id = "sm12345678";
 
 describe("http", () => {
     const mock_server = new MockNicoServer();
-    const mock_server_url = mock_server.serverUrl;
     const proxy_url = mock_server.proxyUrl;
 
     beforeAll(() => {
@@ -21,10 +19,11 @@ describe("http", () => {
         mock_server.stop();
     });
 
-    test("http req cookie", async () => {
+    test("nico cookie", async () => {
         const niconico = new NicoNico(undefined, proxy_url);
         const api_data = await niconico.watch(test_data_video_id);
         expect(niconico.getNicoHistory()).toEqual({
+            url: "http://www.nicovideo.jp",
             name: "nicohistory",
             value: `${test_data_video_id}%3A123456789`,
             domain: "nicovideo.jp",
@@ -37,7 +36,7 @@ describe("http", () => {
         expect(niconico.dmcInfo.session_api).not.toBeNull();
     });
 
-    test("http req smile", async (done) => {
+    test("nico smile error", async (done) => {
         expect.assertions(2);
 
         const niconico = new NicoNico(undefined, proxy_url);
@@ -52,16 +51,15 @@ describe("http", () => {
             proxy:proxy_url
         };
         request(options1, (err, response, body) => {
-            if(err){
-                done();
-            }else{
+            if(!err && response.statusCode==403){
                 expect(response.statusCode).toBe(403);
                 expect(body).toBe("403");
                 done();
             }
         });
     });
-    test("http req smile2", async (done) => {
+    
+    test("nico smile", async (done) => {
         expect.assertions(2);
 
         const niconico = new NicoNico(undefined, proxy_url);
@@ -88,7 +86,7 @@ describe("http", () => {
         });
     });
 
-    test("http session", async () => {
+    test("nico dmc session", async () => {
         expect.hasAssertions();
 
         const niconico = new NicoNico(undefined, proxy_url);
@@ -99,29 +97,52 @@ describe("http", () => {
         expect(dmc_session.session).not.toBeNull();
     });
 
-    test("http req cancel", (done) => {
+    test("nico dmc heart beat", async (done) => {
         // jest.setTimeout(20000);
-        nock.cleanAll();
-        nock.disableNetConnect();
-        nock.enableNetConnect("localhost");
-        nock(mock_server_url)
-            .get(`/watch/${test_data_video_id}`)
-            .delay(1000)
-            .reply(200, "ok");
-        // // .reply(200, (uri, requestBody) => {
-        // //     console.log(requestBody);
-        // //     return requestBody;
-        // // });
-        // // .replyWithFile(200, `${__dirname}/data/sm19961784.html`, { "Content-Type": "html/text" });
-
-        expect.assertions(1);
+        expect.assertions(3);
+        mock_server.clearCount();
 
         const niconico = new NicoNico(undefined, proxy_url);
-        return niconico.watch(test_data_video_id).then(b=>{
+        await niconico.watch(test_data_video_id); 
+        niconico.dmcInfo.session_api.urls[0].url = 
+            httpsTohttp(niconico.dmcInfo.session_api.urls[0].url);
+        const dmc_session = await niconico.postDmcSession();
+        expect(dmc_session.session).not.toBeNull();
+
+        niconico.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+        niconico.startHeartBeat((error)=>{});
+
+        setTimeout(()=>{
+            expect(mock_server.dmc_hb_options_count).toBe(1);
+            expect(mock_server.dmc_hb_post_count).toBe(3);
+            niconico.stopHeartBeat();
             done();
-        }).catch((error)=>{
-            expect(error.name).toBe("TypeError");
+        }, 3000);
+    });
+
+    test("nico stop dmc heart beat", async (done) => {
+        jest.setTimeout(20000);
+        expect.assertions(3);
+        mock_server.clearCount();
+
+        const niconico = new NicoNico(undefined, proxy_url);
+        await niconico.watch(test_data_video_id); 
+        niconico.dmcInfo.session_api.urls[0].url = 
+            httpsTohttp(niconico.dmcInfo.session_api.urls[0].url);
+        const dmc_session = await niconico.postDmcSession();
+        expect(dmc_session.session).not.toBeNull();
+
+        niconico.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+        niconico.startHeartBeat((error)=>{});
+        setTimeout(()=>{
+            niconico.stopHeartBeat();
+        }, 500);
+
+        setTimeout(()=>{
+            expect(mock_server.dmc_hb_options_count).toBe(1);
+            expect(mock_server.dmc_hb_post_count).toBe(0);
+            niconico.stopHeartBeat();
             done();
-        });
+        }, 3000);
     });
 });

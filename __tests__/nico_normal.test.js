@@ -1,8 +1,9 @@
 const request = require("request");
-const { NicoNico, NicoCommnet } = require("../test/test-client");
+const { NicoWatch, NicoVideo,  NicoCommnet,
+    getNicoCookie } = require("../app/js/niconico");
 const { MockNicoServer, httpsTohttp } = require("./nico_mock");
 
-const test_data_video_id = "sm12345678";
+const test_video_id = "sm12345678";
 
 describe("http", () => {
     const mock_server = new MockNicoServer();
@@ -19,13 +20,13 @@ describe("http", () => {
         mock_server.stop();
     });
 
-    test("nico cookie", async () => {
-        const niconico = new NicoNico(undefined, proxy_url);
-        const api_data = await niconico.watch(test_data_video_id);
-        expect(niconico.getNicoHistory()).toEqual({
+    test("nico cookie api_data", async () => {
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        expect(getNicoCookie(cookie_jar)).toEqual({
             url: "http://www.nicovideo.jp",
             name: "nicohistory",
-            value: `${test_data_video_id}%3A123456789`,
+            value: `${test_video_id}%3A123456789`,
             domain: "nicovideo.jp",
             path: "/",
             secure: false
@@ -33,19 +34,20 @@ describe("http", () => {
 
         expect(api_data.video).not.toBeNull();
         expect(api_data.commentComposite.threads).not.toBeNull();
-        expect(niconico.dmcInfo.session_api).not.toBeNull();
+        expect(api_data.video.dmcInfo.session_api).not.toBeNull();
     });
 
     test("nico smile error", async (done) => {
         expect.assertions(2);
 
-        const niconico = new NicoNico(undefined, proxy_url);
-        const api_data = await niconico.watch(test_data_video_id); 
-        const smile_url = api_data.video.smileInfo.url;
-        const url = httpsTohttp(smile_url);
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_video = new NicoVideo(cookie_jar, api_data, proxy_url);
+        const smile_url = nico_video.SmileUrl;
 
         const options1 = {
-            url: url,
+            url: smile_url,
             method: "GET",
             timeout: 20 * 1000,
             proxy:proxy_url
@@ -62,18 +64,18 @@ describe("http", () => {
     test("nico smile", async (done) => {
         expect.assertions(2);
 
-        const niconico = new NicoNico(undefined, proxy_url);
-        const api_data = await niconico.watch(test_data_video_id); 
-        const cookieJar = niconico.cookieJar;
-        const smile_url = api_data.video.smileInfo.url;
-        const url = httpsTohttp(smile_url);
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_video = new NicoVideo(cookie_jar, api_data, proxy_url);
+        const smile_url = nico_video.SmileUrl;
 
         const options2 = {
-            url: url,
+            url: smile_url,
             method: "GET",
             timeout: 20 * 1000,
             proxy: proxy_url,
-            jar: cookieJar
+            jar: cookie_jar
         };
         request(options2, (err, response, body) => {
             if(err){
@@ -89,59 +91,57 @@ describe("http", () => {
     test("nico dmc session", async () => {
         expect.hasAssertions();
 
-        const niconico = new NicoNico(undefined, proxy_url);
-        const api_data = await niconico.watch(test_data_video_id); 
-        niconico.dmcInfo.session_api.urls[0].url = 
-            httpsTohttp(niconico.dmcInfo.session_api.urls[0].url);
-        const dmc_session = await niconico.postDmcSession();
-        expect(dmc_session.session).not.toBeNull();
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_video = new NicoVideo(cookie_jar, api_data, proxy_url);
+        await nico_video.postDmcSession();
+
+        expect(nico_video.dmc_session.session).not.toBeNull();
     });
 
     test("nico dmc heart beat", async (done) => {
-        // jest.setTimeout(20000);
-        expect.assertions(3);
+        expect.assertions(2);
         mock_server.clearCount();
 
-        const niconico = new NicoNico(undefined, proxy_url);
-        await niconico.watch(test_data_video_id); 
-        niconico.dmcInfo.session_api.urls[0].url = 
-            httpsTohttp(niconico.dmcInfo.session_api.urls[0].url);
-        const dmc_session = await niconico.postDmcSession();
-        expect(dmc_session.session).not.toBeNull();
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_video = new NicoVideo(cookie_jar, api_data, proxy_url);
+        await nico_video.postDmcSession();
 
-        niconico.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
-        niconico.startHeartBeat((error)=>{});
+        nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+        nico_video.startHeartBeat((error)=>{});
 
         setTimeout(()=>{
             expect(mock_server.dmc_hb_options_count).toBe(1);
             expect(mock_server.dmc_hb_post_count).toBe(3);
-            niconico.stopHeartBeat();
+            nico_video.stopHeartBeat();
             done();
         }, 3000);
     });
 
     test("nico stop dmc heart beat", async (done) => {
         jest.setTimeout(20000);
-        expect.assertions(3);
+        expect.assertions(2);
         mock_server.clearCount();
 
-        const niconico = new NicoNico(undefined, proxy_url);
-        await niconico.watch(test_data_video_id); 
-        niconico.dmcInfo.session_api.urls[0].url = 
-            httpsTohttp(niconico.dmcInfo.session_api.urls[0].url);
-        const dmc_session = await niconico.postDmcSession();
-        expect(dmc_session.session).not.toBeNull();
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_video = new NicoVideo(cookie_jar, api_data, proxy_url);
+        await nico_video.postDmcSession();
 
-        niconico.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
-        niconico.startHeartBeat((error)=>{});
+        nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+        nico_video.startHeartBeat((error)=>{});
         setTimeout(()=>{
-            niconico.stopHeartBeat();
+            nico_video.stopHeartBeat();
         }, 500);
 
         setTimeout(()=>{
             expect(mock_server.dmc_hb_options_count).toBe(1);
             expect(mock_server.dmc_hb_post_count).toBe(0);
-            niconico.stopHeartBeat();
+            nico_video.stopHeartBeat();
             done();
         }, 3000);
     });

@@ -181,10 +181,12 @@ class MockNicoServer {
  * 
  * @param {string} url 
  */
-const httpsTohttp = (url) => {
-    return url.replace("https", "http");
+const httpsTohttp = (api_data) => {
+    const smile_url = api_data.video.smileInfo.url;
+    const dmc_url = api_data.video.dmcInfo.session_api.urls[0].url;
+    api_data.video.smileInfo.url = smile_url.replace("https", "http");
+    api_data.video.dmcInfo.session_api.urls[0].url = dmc_url.replace("https", "http");
 };
-
 
 module.exports = {
     MockNicoServer: MockNicoServer,

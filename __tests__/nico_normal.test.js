@@ -1,6 +1,6 @@
 const request = require("request");
 const { NicoWatch, NicoVideo,  NicoCommnet,
-    getNicoCookie } = require("../app/js/niconico");
+    getCookies } = require("../app/js/niconico");
 const { MockNicoServer, httpsTohttp } = require("./nico_mock");
 
 const test_video_id = "sm12345678";
@@ -23,14 +23,24 @@ describe("http", () => {
     test("nico cookie api_data", async () => {
         const nico_watch = new NicoWatch(proxy_url);
         const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
-        expect(getNicoCookie(cookie_jar)).toEqual({
-            url: "http://www.nicovideo.jp",
-            name: "nicohistory",
-            value: `${test_video_id}%3A123456789`,
-            domain: "nicovideo.jp",
-            path: "/",
-            secure: false
-        });
+        expect(getCookies(cookie_jar)).toEqual([
+            {
+                url: "http://www.nicovideo.jp",
+                name: "nicohistory",
+                value: `${test_video_id}%3A123456789`,
+                domain: "nicovideo.jp",
+                path: "/",
+                secure: false
+            },
+            {
+                url: "http://www.nicovideo.jp",
+                name: "nicosid",
+                value: "123456.789",
+                domain: "nicovideo.jp",
+                path: "/",
+                secure: false
+            }
+        ]);
 
         expect(api_data.video).not.toBeNull();
         expect(api_data.commentComposite.threads).not.toBeNull();

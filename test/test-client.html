@@ -60,7 +60,7 @@
             console.log("start postDmcSession: ", video_id);
             await niconico.postDmcSession();
             const nicohistory = niconico.getNicoHistory();
-            const ret = ipcRenderer.sendSync("set-nicohistory", nicohistory);
+            const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
             if(ret!="ok"){
                 console.log("set-nicohistory error: ", video_id);
                 return;
@@ -87,7 +87,7 @@
             const comment_data = await nc.getCommnet();
             console.log("comment_data: ", comment_data);
             
-            const ret = ipcRenderer.sendSync("set-nicohistory", nicohistory);
+            const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
             if(ret!="ok"){
                 console.log("set-nicohistory error: ", video_id);
                 return;

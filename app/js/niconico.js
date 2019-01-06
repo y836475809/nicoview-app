@@ -214,9 +214,10 @@ class NicoVideo {
 }
 
 class NicoCommnet {
-    constructor(cookie_jar, api_data) {
+    constructor(cookie_jar, api_data, proxy) {
         this.cookie_jar = cookie_jar;
         this.api_data = api_data;
+        this.proxy = proxy;
         this.r_no = 0;
         this.p_no = 0;
         this.req = null;
@@ -268,6 +269,7 @@ class NicoCommnet {
                 headers: { "content-type": "application/json" },
                 jar: this.cookie_jar,
                 json: json,
+                proxy: this.proxy,
                 timeout: 10 * 1000
             };
             this.req = rp(options);
@@ -408,23 +410,27 @@ class NicoCommnet {
     }
 }
 
-function getNicoCookie(cookie_jar) {
+function getCookies(cookie_jar) {
     const cookies = cookie_jar.getCookies(nicovideo_url);
-    const nicohistory = cookies.find((item) => {
-        return item.key == "nicohistory";
+    const keys = ["nicohistory", "nicosid"];
+    const nico_cookies = keys.map(key=>{
+        const cookie = cookies.find((item) => {
+            return item.key == key;
+        });
+        if (!cookie) {
+            throw new Error(`not find ${key}`);
+        }
+        // cookie.expires
+        return {
+            url: nicovideo_url,
+            name: cookie.key,
+            value: cookie.value,
+            domain: cookie.domain,
+            path: cookie.path,
+            secure: cookie.secure
+        };        
     });
-    if (!nicohistory) {
-        throw new Error("not find nicohistory");
-    }
-    // nicohistory.expires
-    return {
-        url: nicovideo_url,
-        name: nicohistory.key,
-        value: nicohistory.value,
-        domain: nicohistory.domain,
-        path: nicohistory.path,
-        secure: nicohistory.secure
-    };
+    return nico_cookies;
 }
 
 /**
@@ -491,5 +497,5 @@ module.exports = {
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoCommnet: NicoCommnet,
-    getNicoCookie: getNicoCookie
+    getCookies: getCookies
 };

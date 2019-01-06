@@ -118,30 +118,23 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
 
 });
 
-ipcMain.on("set-nicohistory", (event, arg) => {
-    const nicohistory = arg;
-    session.defaultSession.cookies.set(nicohistory, (error) => {
-        if (error) {
-            console.error(error);
-            event.returnValue = "error";
-        }else{
-            event.returnValue = "ok";
-        }
+ipcMain.on("set-nicohistory", async (event, arg) => {
+    const cookies = arg;
+    const ps = cookies.map(cookie=>{
+        return new Promise((resolve, reject) => {
+            session.defaultSession.cookies.set(cookie, (error) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            });
+        });
     });
-    // win.webContents.session.cookies.set(sessions[0], (error) => {
-    //     if (error) {
-    //         console.log(error);
-    //         event.returnValue = "error";
-    //     }else{
-    //         // event.returnValue = "ok";
-    //         win.webContents.session.cookies.set(sessions[1], (error) => {
-    //             if (error) {
-    //                 console.log(error);
-    //                 event.returnValue = "error";
-    //             }else{
-    //                 event.returnValue = "ok";
-    //             }
-    //         });
-    //     }
-    // });
+    try {
+        await Promise.all(ps);
+        event.returnValue = "ok";
+    } catch (error) {
+        event.returnValue = "error";
+    }
 });

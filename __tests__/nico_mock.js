@@ -3,6 +3,8 @@ const cookieParser = require("cookie-parser");
 const httpProxy = require("http-proxy");
 const http = require("http");
 const fs = require("fs");
+const res_no_owner_comment_json = require("./data/res_no_owner_comment.json");
+const res_owner_comment_json = require("./data/res_owner_comment.json");
 
 class MockNicoServer {
     constructor(){
@@ -29,6 +31,9 @@ class MockNicoServer {
                     host: "localhost", port: this.server_port
                 },
                 "api.dmc.nico": {
+                    host: "localhost", port: this.server_port
+                },
+                "nmsg.nicovideo.jp" : {
                     host: "localhost", port: this.server_port
                 }
             };
@@ -173,6 +178,49 @@ class MockNicoServer {
                     message: 403
                 }
             }); 
+        });
+        this.app.post("/api.json", (req, res) => {
+            /**
+             *  @type {Array}
+             */
+            const req_json = req.body;
+            if(req_json.length===8){
+                //no owner
+                if(req_json[0].ping.content
+                 && req_json[1].ping.content
+                 && req_json[2].thread.version == "20090904"
+                 && req_json[3].ping.content
+                 && req_json[4].ping.content
+                 && req_json[5].thread_leaves
+                 && req_json[6].ping.content
+                 && req_json[7].ping.content){
+                    res.status(200).json(res_no_owner_comment_json); 
+                    return;
+                }
+            }
+            if(req_json.length===11){
+                //owner
+                if(req_json[0].ping.content
+                 && req_json[1].ping.content
+                 && req_json[2].thread.version == "20061206"
+                 && req_json[3].ping.content
+                 && req_json[4].ping.content
+                 && req_json[5].thread.version == "20090904"
+                 && req_json[6].ping.content
+                 && req_json[7].ping.content
+                 && req_json[8].thread_leaves
+                 && req_json[9].ping.content
+                 && req_json[10].ping.content){
+                    res.status(200).json(res_owner_comment_json); 
+                    return;
+                }
+            }
+            res.status(200).json({
+                meta: {
+                    status: 403,
+                    message: 403
+                }
+            });           
         });
     }
 }

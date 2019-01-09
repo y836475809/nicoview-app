@@ -224,11 +224,6 @@ class NicoCommnet {
         this.is_canceled = false;
     }
 
-    // setParams(cookie_jar, api_data){
-    //     this.cookie_jar = cookie_jar;
-    //     this.api_data = api_data;
-    // }
-
     cancel() {
         if (this.req) {
             this.req.cancel();
@@ -241,20 +236,28 @@ class NicoCommnet {
     }
 
     getCommnet() {
-        const josn = this.hasOwnerComment() ? 
-            this.makeJsonOwner(this.r_no, this.p_no):this.makeJsonNoOwner(this.r_no, this.p_no); 
-        this.r_no += 1;
-        this.p_no += josn.length;
-
+        const josn = this._get_commnet_json();
         return this._post(josn);
     }
 
     getCommnetDiff(res_from) {
+        const josn = this._get_commnet_diff_json(res_from);
+        return this._post(josn);
+    }
+
+    _get_commnet_json(){
+        const josn = this.hasOwnerComment() ? 
+            this.makeJsonOwner(this.r_no, this.p_no):this.makeJsonNoOwner(this.r_no, this.p_no); 
+        this.r_no += 1;
+        this.p_no += josn.length;
+        return josn;       
+    }
+
+    _get_commnet_diff_json(res_from){
         const josn = this.makeJsonDiff(this.r_no, this.p_no, res_from);
         this.r_no += 1;
         this.p_no += josn.length;
-
-        return this._post(josn);
+        return josn;       
     }
 
     _post(post_data){
@@ -321,7 +324,7 @@ class NicoCommnet {
                 nicoru: 0
             }
         });
-        this._addCommand(cmds, p_no++, {
+        this._addCommand(cmds, ++p_no, {
             thread_leaves: {
                 thread: thread,
                 language: 0,
@@ -360,7 +363,7 @@ class NicoCommnet {
                 nicoru: 0
             }
         });
-        this._addCommand(cmds, p_no++, {
+        this._addCommand(cmds, ++p_no, {
             thread: {
                 thread: thread1,
                 version: "20090904",
@@ -372,7 +375,7 @@ class NicoCommnet {
                 nicoru: 0
             }
         });   
-        this._addCommand(cmds, p_no++, {
+        this._addCommand(cmds, ++p_no, {
             thread_leaves: {
                 thread: thread0,
                 language: 0,

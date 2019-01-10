@@ -126,7 +126,7 @@ class MockNicoServer {
                 && json.session.session_operation_auth
                 && json.session.content_auth
                 && json.session.client_info
-                && json.session.priority){
+                && json.session.priority !== undefined){
                     
                 res.status(200).json({
                     meta: {

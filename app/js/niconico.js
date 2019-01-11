@@ -14,7 +14,7 @@ class NicoWatch {
 
     cancel() {
         if (this.req) {
-            this.req.cancel();
+            this.req.abort();
             this.is_canceled = true;
         }
     }

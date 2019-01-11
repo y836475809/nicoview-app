@@ -18,6 +18,9 @@ class MockNicoServer {
         this.server_port = 8084;
         this.proxy_port = 3000;
         this.proxy = new httpProxy.createProxyServer();
+        this.proxy.on("error", (err, req, res) => {
+            res.end();
+        });
 
         this.proxyServer = http.createServer((req, res) => {
             const mapping = {
@@ -86,11 +89,18 @@ class MockNicoServer {
     setupRouting(){
         this.app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
+            const fpath = `${__dirname}/data/${video_id}.html`;
+            try {
+                fs.statSync(fpath);
+            } catch (error) {
+                res.status(404).send(`not find ${video_id}`);
+                return;               
+            }
 
             res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/" });
             res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/" });
 
-            const file = fs.readFileSync(`${__dirname}/data/${video_id}.html`, "utf-8");
+            const file = fs.readFileSync(fpath, "utf-8");
             res.writeHead(200, { "Content-Type": "text/html" });
             res.write(file);
             res.end();

@@ -1,0 +1,376 @@
+{
+    "video": {
+        "id": "sm12345678",  
+        "title": "test",
+        "originalTitle": "test org",
+        "description": "test<br />text1<br /><br />next→<a href=\"https://www.nicovideo.jp/watch/sm123456\" class=\"watch\">sm123456</a><br /><br />mylist1　　<a href=\"https://www.nicovideo.jp/mylist/123456\" target=\"_blank\" rel=\"noopener\">mylist/35526961</a>",
+        "originalDescription": "test<br />text1<br /><br />next→sm123456<br /><br />mylist1　　mylist/123456",
+        "thumbnailURL": "https://tn.smilevideo.jp/smile?i=12345678",
+        "largeThumbnailURL": "https://tn.smilevideo.jp/smile?i=12345678.L",
+        "postedDateTime": "2018/01/01 01:00:00",
+        "originalPostedDateTime": null,
+        "width": null,
+        "height": null,
+        "duration": 100,
+        "viewCount": 200,
+        "mylistCount": 300,
+        "translation": false,
+        "translator": null,
+        "movieType": "mp4",
+        "badges": null,
+        "mainCommunityId": null,
+        "dmcInfo": {
+            "time": 1543320000,
+            "time_ms": 154332770000,
+            "video": {
+                "video_id": "sm12345678",
+                "length_seconds": 1509,
+                "deleted": 0
+            },
+            "thread": {
+                "server_url": "https://nmsg.nicovideo.jp/api/",
+                "sub_server_url": "https://nmsg.nicovideo.jp/api/",
+                "thread_id": 1234567890,        
+                "nicos_thread_id": null,
+                "optional_thread_id": null,
+                "thread_key_required": false,
+                "channel_ng_words": [],
+                "owner_ng_words": [],
+                "maintenances_ng": false,
+                "postkey_available": true,
+                "ng_revision": 1
+            },
+            "user": {
+                "user_id": 1234567,
+                "is_premium": false,
+                "nickname": "aaaaa"
+            },
+            "import_version": 0,
+            "error": null,
+            "tracking_id": "aaa",
+            "session_api": {
+                "recipe_id": "nicovideo-sm12345678",
+                "player_id": "nicovideo-1-aaaaa_123456",
+                "videos": [
+                    "archive_h264_600kbps_360p",
+                    "archive_h264_300kbps_360p"
+                ],
+                "audios": [
+                    "archive_aac_64kbps"
+                ],
+                "movies": [],
+                "protocols": [
+                    "http",
+                    "hls"
+                ],
+                "auth_types": {
+                    "http": "ht2",
+                    "hls": "ht2"
+                },
+                "service_user_id": "1234567",
+                "token": "",
+                "signature": "",
+                "content_id": "out1",
+                "heartbeat_lifetime": 120000,
+                "content_key_timeout": 600000,
+                "priority": 0.4,
+                "transfer_presets": [],
+                "urls": [
+                    {
+                        "url": "https://api.dmc.nico/api/sessions",
+                        "is_well_known_port": true,
+                        "is_ssl": true
+                    }
+                ]
+            },
+            "storyboard_session_api": null,
+            "quality": {
+                "videos": [
+                    {
+                        "id": "archive_h264_1600kbps_480p",
+                        "available": false,
+                        "bitrate": 1600000,
+                        "resolution": {
+                            "width": 854,
+                            "height": 480
+                        },
+                        "label": "480p | 1.6M"
+                    },
+                    {
+                        "id": "archive_h264_600kbps_360p",
+                        "available": true,
+                        "bitrate": 600000,
+                        "resolution": {
+                            "width": 640,
+                            "height": 360
+                        },
+                        "label": "360p | 0.6M"
+                    },
+                    {
+                        "id": "archive_h264_300kbps_360p",
+                        "available": true,
+                        "bitrate": 300000,
+                        "resolution": {
+                            "width": 640,
+                            "height": 360
+                        },
+                        "label": "360p | 0.3M"
+                    }
+                ],
+                "audios": [
+                    {
+                        "id": "archive_aac_128kbps",
+                        "available": false,
+                        "bitrate": 128000,
+                        "sampling_rate": 0
+                    },
+                    {
+                        "id": "archive_aac_64kbps",
+                        "available": true,
+                        "bitrate": 64000,
+                        "sampling_rate": 0
+                    }
+                ]
+            }
+        },
+        "backCommentType": null,
+        "channelId": null,
+        "isCommentExpired": false,
+        "isWide": "1",
+        "isOfficialAnime": null,
+        "isNoBanner": null,
+        "isDeleted": false,
+        "isTranslated": false,
+        "isR18": false,
+        "isAdult": false,
+        "isNicowari": null,
+        "isPublic": true,
+        "isPublishedNicoscript": null,
+        "isNoNGS": null,
+        "isCommunityMemberOnly": "",
+        "isCommonsTreeExists": true,
+        "isNoIchiba": false,
+        "isOfficial": false,
+        "isMonetized": false,
+        "smileInfo": {
+            "url": "https://smile-cls20.sl.nicovideo.jp/smile?m=12345678.67759low",
+            "isSlowLine": false,
+            "currentQualityId": "auto",
+            "qualityIds": [
+                "auto",
+                "low"
+            ]
+        }
+    },
+    "player": {
+        "playerInfoXMLUpdateTIme": 1532318603,
+        "isContinuous": false
+    },
+    "thread": {
+        "commentCount": 1000,
+        "hasOwnerThread": null,
+        "mymemoryLanguage": null,
+        "serverUrl": "https://nmsg.nicovideo.jp/api/",
+        "subServerUrl": "https://nmsg.nicovideo.jp/api/",
+        "ids": {
+            "default": "1234567890",
+            "nicos": null,
+            "community": null
+        }
+    },
+    "commentComposite": {
+        "threads": [
+            {
+                "id": 1234567890,           
+                "fork": 1,
+                "isActive": false,
+                "postkeyStatus": 0,
+                "isDefaultPostTarget": false,
+                "isThreadkeyRequired": false,
+                "isLeafRequired": false,
+                "label": "owner",
+                "isOwnerThread": true,
+                "hasNicoscript": true
+            },
+            {
+                "id": 1234567890,
+                "fork": 0,
+                "isActive": true,
+                "postkeyStatus": 0,
+                "isDefaultPostTarget": true,
+                "isThreadkeyRequired": false,
+                "isLeafRequired": true,
+                "label": "default",
+                "isOwnerThread": false,
+                "hasNicoscript": false
+            }
+        ],
+        "layers": [
+            {
+                "index": 0,
+                "isTranslucent": false,
+                "threadIds": [
+                    {
+                        "id": 1234567890,
+                        "fork": 1
+                    }
+                ]
+            },
+            {
+                "index": 1,
+                "isTranslucent": false,
+                "threadIds": [
+                    {
+                        "id": 1234567890,
+                        "fork": 0
+                    }
+                ]
+            }
+        ]
+    },
+    "tags": [
+        {
+            "id": "1",
+            "name": "tag1",
+            "isCategory": true,
+            "isCategoryCandidate": true,
+            "isDictionaryExists": true,
+            "isLocked": true
+        },
+        {
+            "id": "2",
+            "name": "tag2",
+            "isCategory": false,
+            "isCategoryCandidate": false,
+            "isDictionaryExists": true,
+            "isLocked": true
+        },
+        {
+            "id": "3",
+            "name": "tag3",
+            "isCategory": false,
+            "isCategoryCandidate": false,
+            "isDictionaryExists": true,
+            "isLocked": false
+        }
+    ],
+    "playlist": {
+        "watchId": "sm12345678",
+        "referer": "https://www.nicovideo.jp/mylist/123456",
+        "parameter": null,
+        "recipe": "aaaa"
+    },
+    "owner": {
+        "id": "123345677",
+        "nickname": "aaaaさん",
+        "iconURL": "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/123345677/.jpg?1313765172",
+        "nicoliveInfo": null,
+        "channelInfo": null,
+        "isUserVideoPublic": true,
+        "isUserMyVideoPublic": true,
+        "isUserOpenListPublic": true
+    },
+    "viewer": {
+        "id": 1234,
+        "nickname": "bbbbb さん",
+        "prefecture": 1,
+        "sex": 0,
+        "age": 2,
+        "isPremium": false,
+        "isPostLocked": false,
+        "isHtrzm": false,
+        "isTwitterConnection": false,
+        "nicosid": "123456789.12345678"
+    },
+    "community": null,
+    "mainCommunity": null,
+    "channel": null,
+    "ad": {
+        "vastMetaData": null
+    },
+    "lead": {
+        "tagRelatedMarquee": {
+            "id": "1",
+            "url": "http://rd.nicovideo.jp/cc/video_tag_marquee/1",
+            "title": "lead text"
+        },
+        "videoEndBannerIn": null,
+        "videoEndOverlay": null
+    },
+    "maintenance": null,
+    "context": {
+        "playFrom": null,
+        "initialPlaybackPosition": null,
+        "initialPlaybackType": null,
+        "playLength": null,
+        "returnId": null,
+        "returnTo": null,
+        "returnMsg": null,
+        "watchId": "sm12345678",
+        "isNoMovie": null,
+        "isNoRelatedVideo": null,
+        "isDownloadCompleteWait": null,
+        "isNoNicotic": null,
+        "isNeedPayment": false,
+        "isAdultRatingNG": false,
+        "isPlayable": null,
+        "isTranslatable": false,
+        "isTagUneditable": false,
+        "isVideoOwner": false,
+        "isThreadOwner": false,
+        "isOwnerThreadEditable": null,
+        "useChecklistCache": null,
+        "isDisabledMarquee": null,
+        "isDictionaryDisplayable": true,
+        "isDefaultCommentInvisible": false,
+        "accessFrom": null,
+        "csrfToken": "aaaa",
+        "translationVersionJsonUpdateTime": 1509423100,
+        "userkey": "aaaa-bbb",
+        "watchAuthKey": "",
+        "watchTrackId": "",
+        "watchPageServerTime": 1543327746120,
+        "isAuthenticationRequired": false,
+        "isPeakTime": true,
+        "ngRevision": 1,
+        "categoryName": "category1",
+        "categoryKey": "category",
+        "categoryGroupName": "category name",
+        "categoryGroupKey": "g_culture",
+        "yesterdayRank": 1,
+        "highestRank": 2,
+        "isMyMemory": false,
+        "ownerNGList": [
+            {
+                "source": "",
+                "destination": ""
+            }
+        ],
+        "linkedChannelVideos": null,
+        "isAllowEmbedPlayer": true
+    },
+    "liveTopics": {
+        "items": [
+            {
+                "id": "lv1234",
+                "title": "title1",
+                "thumbnailURL": "https://secure-dcdn.cdn.nimg.jp/comch/community-icon/64x64/co1234.jpg?1533130660",
+                "point": 10,
+                "isHigh": true,
+                "elapsedTimeM": 10,
+                "communityId": "co1234",
+                "communityName": "communityName1"
+            },
+            {
+                "id": "lv5678",
+                "title": "title12",
+                "thumbnailURL": "https://secure-dcdn.cdn.nimg.jp/comch/community-icon/64x64/co5678.jpg?1536097596",
+                "point": 20,
+                "isHigh": true,
+                "elapsedTimeM": 20,
+                "communityId": "co5678",
+                "communityName": "communityName2"
+            }
+        ]
+    }
+}

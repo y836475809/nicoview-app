@@ -1,6 +1,5 @@
 const nock = require("nock");
-const { NicoWatch, NicoVideo,  NicoCommnet,
-    getCookies } = require("../app/js/niconico");
+const { NicoWatch, NicoVideo,  NicoCommnet, getCookies } = require("../app/js/niconico");
 const { MockNicoServer, httpsTohttp } = require("./nico_mock");
 
 const test_video_id = "sm12345678";
@@ -83,36 +82,23 @@ describe("nico watch", () => {
         }
     });
 
-    test("watch cancel", (done) => {
-        // jest.setTimeout(20000);
-        
+    test("watch cancel", (done) => { 
         nock.cleanAll();
         nock.disableNetConnect();
         nock.enableNetConnect("localhost");
 
         nock(server_url)
             .get(`/watch/${test_video_id}`)
-            .delay(5000)
-            .replyWithFile(200, 
-                `${__dirname}/data/sm12345678.html`, 
-                { "Content-Type": "html/text" });
-
-        expect.hasAssertions();
+            .delay(30000)
+            .reply(200, "ok");
         
         const nico_watch = new NicoWatch(proxy_url);
-        nico_watch.watch(test_video_id).then(b=>{
-            console.log("done: ", b);
-            done();
-        }).catch((error)=>{
-            // console.log("error");
-            console.log("error name:", error.name);
-            console.log("error message:", error.message);
-            expect(error.name).toBe("TypeError");
-            done();
-        });
+        nico_watch.watch(test_video_id).then(b=>{});
+
         setTimeout(()=>{
             nico_watch.cancel();
-        }, 2000);
+            done();
+        }, 1000);
         
 
     });

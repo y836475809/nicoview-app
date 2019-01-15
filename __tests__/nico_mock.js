@@ -6,6 +6,30 @@ const fs = require("fs");
 const res_no_owner_comment_json = require("./data/res_no_owner_comment.json");
 const res_owner_comment_json = require("./data/res_owner_comment.json");
 
+const getMockWatchHtml = (video_id) => {
+    function escapeHtml(str){
+        str = str.replace(/&/g, "&amp;");
+        str = str.replace(/>/g, "&gt;");
+        str = str.replace(/</g, "&lt;");
+        str = str.replace(/"/g, "&quot;");
+        str = str.replace(/'/g, "&#x27;");
+        str = str.replace(/`/g, "&#x60;");
+        str = str.replace(/\//g, "\\/");
+        return str;
+    }
+    
+    const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
+    const j = fs.readFileSync(fpath, "utf-8");
+    const data_api_data = escapeHtml(j);
+    // const html = escape("hh");
+    return `<!DOCTYPE html>
+    <html lang="ja">
+        <body>
+        <div id="js-initial-watch-data" data-api-data="${data_api_data}"
+        </body>
+    </html>`;
+};
+
 class MockNicoServer {
     constructor(){
         this.app = express();
@@ -82,6 +106,9 @@ class MockNicoServer {
         if (cookies.nicohistory === undefined) {
             return false;
         }
+        if (cookies.nicosid === undefined) {
+            return false;
+        }
 
         return true;
     }
@@ -89,7 +116,7 @@ class MockNicoServer {
     setupRouting(){
         this.app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
-            const fpath = `${__dirname}/data/${video_id}.html`;
+            const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
             try {
                 fs.statSync(fpath);
             } catch (error) {
@@ -99,11 +126,8 @@ class MockNicoServer {
 
             res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/" });
             res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/" });
-
-            const file = fs.readFileSync(fpath, "utf-8");
-            res.writeHead(200, { "Content-Type": "text/html" });
-            res.write(file);
-            res.end();
+            
+            res.status(200).send(getMockWatchHtml(video_id));
         });
         this.app.get("/smile", (req, res) => {
             if(!this._hasCookie(req)){
@@ -257,5 +281,6 @@ const httpsTohttp = (api_data) => {
 
 module.exports = {
     MockNicoServer: MockNicoServer,
-    httpsTohttp: httpsTohttp
+    httpsTohttp: httpsTohttp,
+    getMockWatchHtml: getMockWatchHtml
 };

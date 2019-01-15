@@ -1,6 +1,6 @@
 const nock = require("nock");
 const { NicoWatch, NicoVideo,  NicoCommnet, getCookies } = require("../app/js/niconico");
-const { MockNicoServer, httpsTohttp } = require("./nico_mock");
+const { MockNicoServer, httpsTohttp, getMockWatchHtml } = require("./nico_mock");
 
 const test_video_id = "sm12345678";
 
@@ -67,9 +67,7 @@ describe("nico watch", () => {
         nock(server_url)
             .get(`/watch/${test_video_id}`)
             .delay(11000)
-            .replyWithFile(200, 
-                `${__dirname}/data/sm12345678.html`, 
-                { "Content-Type": "html/text" });
+            .reply(200, getMockWatchHtml(test_video_id));
 
         expect.hasAssertions();
 

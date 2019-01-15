@@ -194,6 +194,11 @@ class MockNicoServer {
              *  @type {Array}
              */
             const req_json = req.body;
+            if(req_json.length===0){
+                res.status(404).send("404 - \"Not Found\r\n\""); 
+                return;  
+            }
+
             if(req_json.length===8){
                 //no owner
                 if(req_json[0].ping.content
@@ -208,6 +213,7 @@ class MockNicoServer {
                     return;
                 }
             }
+
             if(req_json.length===11){
                 //owner
                 if(req_json[0].ping.content
@@ -225,12 +231,15 @@ class MockNicoServer {
                     return;
                 }
             }
-            res.status(200).json({
-                meta: {
-                    status: 403,
-                    message: 403
+
+            res.status(200).json([
+                {
+                    "ping": { "content": "rs:0" }
+                },
+                {
+                    "ping": { "content": "rf:0" }
                 }
-            });           
+            ]); 
         });
     }
 }

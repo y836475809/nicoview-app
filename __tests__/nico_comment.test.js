@@ -122,7 +122,7 @@ describe("nico comment", () => {
         expect(res_commnets[6].chat).not.toBeNull();
     });
 
-    test("get comment illegal param", async () => {
+    test("get comment empty param", async () => {
         expect.hasAssertions();
 
         const nico_watch = new NicoWatch(proxy_url);
@@ -131,16 +131,39 @@ describe("nico comment", () => {
         const nico_comment = new NicoCommnet(cookie_jar, api_data, proxy_url);
 
         try {
-            await nico_comment._post({});
+            await nico_comment._post([]);
         } catch (error) {
-            expect(error.statusCode).toBe(403);
+            expect(error.statusCode).toBe(404);
         }
     });
 
+    test("get comment illegal param", async () => {
+        expect.hasAssertions();
+
+        const nico_watch = new NicoWatch(proxy_url);
+        const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+        httpsTohttp(api_data);
+        const nico_comment = new NicoCommnet(cookie_jar, api_data, proxy_url);
+
+        let cmds = [];
+        cmds.push(nico_comment._getPing("rs", 0));
+        cmds.push(nico_comment._getPing("rf", 0));
+        const res_commnets = await nico_comment._post(cmds);
+        const chats = res_commnets.filter((elm, index) => { 
+            return "chat" in res_commnets[index]; 
+        });
+        expect(chats.length).toBe(0);
+    });
+
     test("get comment timeout", async () => {
+        jest.setTimeout(20000);
         expect.hasAssertions();
         nock(server_url)
-            .post(`/watch/${test_video_id}`)
+            .get(`/watch/${test_video_id}`)
+            .replyWithFile(200, 
+                `${__dirname}/data/sm12345678.html`, 
+                { "Content-Type": "html/text" })
+            .post("/api.json/")
             .delay(11000)
             .reply(200, res_comment_json);
 
@@ -159,7 +182,11 @@ describe("nico comment", () => {
 
     test("get comment cancel", async (done) => {
         nock(server_url)
-            .post(`/watch/${test_video_id}`)
+            .get(`/watch/${test_video_id}`)
+            .replyWithFile(200, 
+                `${__dirname}/data/sm12345678.html`, 
+                { "Content-Type": "html/text" })
+            .post("/api.json/")
             .delay(3000)
             .reply(200, res_comment_json);
 
@@ -167,7 +194,6 @@ describe("nico comment", () => {
         const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
         httpsTohttp(api_data);
         const nico_comment = new NicoCommnet(cookie_jar, api_data, proxy_url);
-
         nico_comment.getCommnet().then(b=>{});
 
         setTimeout(()=>{

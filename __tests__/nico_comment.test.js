@@ -13,7 +13,8 @@ describe("nico comment", () => {
     const proxy_url = mock_server.proxyUrl;
 
     const mock_cookie_jar = rp.jar();
-    mock_cookie_jar.setCookie(`nicohistory=${test_video_id}%3A123456789; nicosid=123456.789`);
+    mock_cookie_jar.setCookie(`nicohistory=${test_video_id}%3A123456789; Domain=nicovideo.jp`, "http://nicovideo.jp");
+    mock_cookie_jar.setCookie("nicosid=123456.789; Domain=nicovideo.jp", "http://nicovideo.jp");
 
     beforeAll(() => {
         console.log("beforeAll");

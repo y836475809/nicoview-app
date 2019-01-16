@@ -62,6 +62,7 @@ class NicoVideo {
     cancel() {
         if (this.req) {
             this.req.cancel();
+            this.stopHeartBeat();
             this.is_canceled = true;
         }
     }
@@ -468,7 +469,7 @@ function getVideoType(smile_url){
     throw new Error("not flv or mp4");
 }
 
-function ConvertApiDataToThumbInfo(api_data){
+function getThumbInfo(api_data){
     const video = api_data.video;
     const thread = api_data.thread;
     const video_type = getVideoType(video.smileInfo.url);
@@ -500,5 +501,6 @@ module.exports = {
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoCommnet: NicoCommnet,
-    getCookies: getCookies
+    getCookies: getCookies,
+    getThumbInfo: getThumbInfo
 };

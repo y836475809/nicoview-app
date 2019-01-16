@@ -7,7 +7,11 @@ const test_video_id = "sm12345678";
 describe("nico watch", () => {
     const mock_server = new MockNicoServer();
     const server_url = mock_server.serverUrl;
-    const proxy_url = mock_server.proxyUrl;
+    // const proxy_url = mock_server.proxyUrl;
+    const proxy_url = {
+        host: "localhost",
+        port : 3000
+    };
 
     beforeAll(() => {
         console.log("beforeAll");
@@ -53,7 +57,7 @@ describe("nico watch", () => {
         try {
             await nico_watch.watch("ms00000000");
         } catch (error) {
-            expect(error.statusCode).toBe(404);
+            expect(error.status).toBe(404);
         }
     });
 
@@ -81,6 +85,8 @@ describe("nico watch", () => {
     });
 
     test("watch cancel", (done) => { 
+        expect.assertions(1);
+
         nock.cleanAll();
         nock.disableNetConnect();
         nock.enableNetConnect("localhost");
@@ -91,11 +97,14 @@ describe("nico watch", () => {
             .reply(200, "ok");
         
         const nico_watch = new NicoWatch(proxy_url);
-        nico_watch.watch(test_video_id).then(b=>{});
+        nico_watch.watch(test_video_id, (msg)=>{
+            expect(msg).toBe("watch cancel");
+            done();
+        }).then(b=>{});
 
         setTimeout(()=>{
             nico_watch.cancel();
-            done();
+            // done();
         }, 1000);
         
 

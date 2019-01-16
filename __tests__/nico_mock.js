@@ -65,9 +65,10 @@ class MockNicoServer {
                 }
             };
 
-            let parser = document.createElement("a");
-            parser.href = req.url;
-            const target = mapping[parser.hostname];
+            // let parser = document.createElement("a");
+            // parser.href = req.url;
+            // const target = mapping[parser.hostname];
+            const target = { host: "localhost", port: this.server_port };
             this.proxy.web(req, res, { target: target });
         });
         this.proxyServer.listen(this.proxy_port);
@@ -124,8 +125,8 @@ class MockNicoServer {
                 return;               
             }
 
-            res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/" });
-            res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/" });
+            res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/", secure: false});
+            res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/", secure: false });
             
             res.status(200).send(getMockWatchHtml(video_id));
         });

@@ -1,5 +1,9 @@
 const rp = require("request-promise");
 const { JSDOM } = require("jsdom");
+const axios = require("axios");
+const tough = require("tough-cookie");
+const axiosCookieJarSupport = require("axios-cookiejar-support").default;
+axiosCookieJarSupport(axios);
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -10,40 +14,79 @@ class NicoWatch {
         this.req = null;
         this.is_canceled = false;
         this.proxy = proxy;
+        this.cancel_token = axios.CancelToken;
+        this.source = null;
     }
 
     cancel() {
-        if (this.req) {
-            this.req.cancel();
+        if (this.source) {
+            this.source.cancel("watch cancel");
             this.is_canceled = true;
         }
     }
 
-    watch(video_id) {
+    watch(video_id, on_cancel) {
         this.is_canceled = false;
 
         return new Promise(async (resolve, reject) => {
-            let cookie_jar = rp.jar();
-            const options = {
-                uri: `${this.watch_url}/${video_id}`,
-                method: "GET",
+            this.source = this.cancel_token.source();
+            let cookie_jar = new tough.CookieJar();
+            axios.get(`${this.watch_url}/${video_id}`, {
                 jar: cookie_jar,
+                withCredentials: true,
                 timeout: 10 * 1000,
-                proxy: this.proxy
-            }; 
-            this.req = rp(options);  
-            this.req.then((body) => {
-                let api_data = null;
+                proxy: {
+                    host: this.proxy.host,
+                    port: this.proxy.port
+                },
+                cancelToken: this.source.token
+            }).then((response) => {
+                const body = response.data;
                 try {
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                    api_data = JSON.parse(data_elm.getAttribute("data-api-data"));               
+                    const api_data = JSON.parse(data_elm.getAttribute("data-api-data")); 
+                    resolve({ cookie_jar, api_data });    
                 } catch (error) {
                     reject(error);
-                }
-                resolve({ cookie_jar, api_data });
+                } 
             }).catch((error)=>{
-                reject(error);
+                if(axios.isCancel(error)){
+                    if(on_cancel!=undefined){
+                        on_cancel(error.message);
+                    }
+                    resolve(error.message);
+                }else{
+                    if (error.response) {
+                        console.log("1####### error=", error.message);
+                        reject(error.response);
+                    }else{
+                        console.log("####### error=", error.message);
+                        reject(error);
+                    }
+                }
             });
+
+            // let cookie_jar = rp.jar();
+            // const options = {
+            //     uri: `${this.watch_url}/${video_id}`,
+            //     method: "GET",
+            //     jar: cookie_jar,
+            //     timeout: 10 * 1000,
+            //     proxy: this.proxy
+            // }; 
+            // this.req = rp(options);  
+            // this.req.then((body) => {
+            //     let api_data = null;
+            //     try {
+            //         const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+            //         api_data = JSON.parse(data_elm.getAttribute("data-api-data"));               
+            //     } catch (error) {
+            //         reject(error);
+            //     }
+            //     resolve({ cookie_jar, api_data });
+            // }).catch((error)=>{
+            //     reject(error);
+            // });
         });
     }    
 }
@@ -415,7 +458,12 @@ class NicoCommnet {
 }
 
 function getCookies(cookie_jar) {
-    const cookies = cookie_jar.getCookies(nicovideo_url);
+    // console.log("cookies cookies toJSON=", cookie_jar.toJSON());
+    const cookies = cookie_jar.toJSON().cookies;
+    // cookie_jar.getCookies("nicovideo.jp", function(err, cookies) {
+    //     console.log("cookies cookies=", cookies);
+    // });
+    // const cookies = cookie_jar.getCookies(nicovideo_url);
     const keys = ["nicohistory", "nicosid"];
     const nico_cookies = keys.map(key=>{
         const cookie = cookies.find((item) => {
@@ -431,7 +479,7 @@ function getCookies(cookie_jar) {
             value: cookie.value,
             domain: cookie.domain,
             path: cookie.path,
-            secure: cookie.secure
+            secure: cookie.secure==undefined?false:true
         };        
     });
     return nico_cookies;

@@ -21,22 +21,22 @@ class NicoWatch {
     }
 
     cancel() {
-        // if (this.source) {
-        //     this.source.cancel("watch cancel");
-        //     // this.source = null;
-        //     // this.source = this.cancel_token.source();
-        //     this.is_canceled = true;
-        // }
-        if (this.fcancel.exec) {
-            console.log("cancel ##################")
-            this.fcancel.exec("watch cancel");
+        if (this.source) {
+            this.source.cancel("watch cancel");
+            // this.source = null;
+            // this.source = this.cancel_token.source();
             this.is_canceled = true;
         }
+        // if (this.fcancel.exec) {
+        //     console.log("cancel ##################")
+        //     this.fcancel.exec("watch cancel");
+        //     this.is_canceled = true;
+        // }
     }
 
     watch(video_id, on_cancel) {
         this.is_canceled = false;
-        // this.source = this.cancel_token.source();
+        this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
             // let self = this;
             let cookie_jar = new tough.CookieJar();
@@ -48,13 +48,11 @@ class NicoWatch {
                     host: this.proxy.host,
                     port: this.proxy.port
                 },
-                // cancelToken: this.source.token
-                cancelToken: new CancelToken((c) => {
-                    console.log("CancelToken ################## =", c)
-                    // An executor function receives a cancel function as a parameter
-                    this.fcancel.exec = c;
-                    
-                })
+                cancelToken: this.source.token
+                // cancelToken: new CancelToken((c) => {
+                //     // An executor function receives a cancel function as a parameter
+                //     this.fcancel.exec = c;                    
+                // })
             }).then((response) => {
                 const body = response.data;
                 try {
@@ -66,13 +64,10 @@ class NicoWatch {
                 } 
             }).catch((error)=>{
                 if(axios.isCancel(error)){
-                    console.log("##################")
                     if(on_cancel!=undefined){
                         // resolve(error.message);
-                        on_cancel(error.message);
-                        
+                        on_cancel(error.message); 
                     }
-                    resolve(error.message);
                 }else{
                     if (error.response) {
                         reject({

@@ -4,6 +4,7 @@ const axios = require("axios");
 const tough = require("tough-cookie");
 const axiosCookieJarSupport = require("axios-cookiejar-support").default;
 axiosCookieJarSupport(axios);
+const CancelToken = axios.CancelToken;
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -16,20 +17,28 @@ class NicoWatch {
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
+        this.fcancel = { exec: null };
     }
 
     cancel() {
-        if (this.source) {
-            this.source.cancel("watch cancel");
+        // if (this.source) {
+        //     this.source.cancel("watch cancel");
+        //     // this.source = null;
+        //     // this.source = this.cancel_token.source();
+        //     this.is_canceled = true;
+        // }
+        if (this.fcancel.exec) {
+            console.log("cancel ##################")
+            this.fcancel.exec("watch cancel");
             this.is_canceled = true;
         }
     }
 
     watch(video_id, on_cancel) {
         this.is_canceled = false;
-
-        return new Promise(async (resolve, reject) => {
-            this.source = this.cancel_token.source();
+        // this.source = this.cancel_token.source();
+        return new Promise((resolve, reject) => {
+            // let self = this;
             let cookie_jar = new tough.CookieJar();
             axios.get(`${this.watch_url}/${video_id}`, {
                 jar: cookie_jar,
@@ -39,7 +48,13 @@ class NicoWatch {
                     host: this.proxy.host,
                     port: this.proxy.port
                 },
-                cancelToken: this.source.token
+                // cancelToken: this.source.token
+                cancelToken: new CancelToken((c) => {
+                    console.log("CancelToken ################## =", c)
+                    // An executor function receives a cancel function as a parameter
+                    this.fcancel.exec = c;
+                    
+                })
             }).then((response) => {
                 const body = response.data;
                 try {
@@ -47,21 +62,30 @@ class NicoWatch {
                     const api_data = JSON.parse(data_elm.getAttribute("data-api-data")); 
                     resolve({ cookie_jar, api_data });    
                 } catch (error) {
-                    reject(error);
+                    reject({error: error});
                 } 
             }).catch((error)=>{
                 if(axios.isCancel(error)){
+                    console.log("##################")
                     if(on_cancel!=undefined){
+                        // resolve(error.message);
                         on_cancel(error.message);
+                        
                     }
                     resolve(error.message);
                 }else{
                     if (error.response) {
-                        console.log("1####### error=", error.message);
-                        reject(error.response);
+                        reject({
+                            status: error.response.status,
+                            data: error.response.data
+                        });
+                    }else if(error.request){
+                        reject({
+                            code: error.code,
+                            message: error.message
+                        });
                     }else{
-                        console.log("####### error=", error.message);
-                        reject(error);
+                        reject({error: error});
                     }
                 }
             });

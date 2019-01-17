@@ -81,16 +81,24 @@ class MockNicoServer {
         return `http://localhost:${this.proxy_port}`;
     } 
 
-    start(){
-        this.server = this.app.listen(this.server_port, () => {
-            console.log("Start express");
+    async start(){        
+        await new Promise((resolve) => {
+            this.server = this.app.listen(this.server_port, () => {
+                console.log("Start express");
+                return resolve();
+            });
         });
+        this.setupRouting();
+        // this.server = this.app.listen(this.server_port, () => {
+        //     console.log('Listening :)');
+        //     //this.server.close(function() { console.log('Doh :('); });
+        // });
     }
 
-    stop(){
+    async stop(){
         console.log("Stop express");
-        this.server.close();
-        this.proxyServer.close();
+        await this.proxyServer.close();
+        await this.server.close();
     }
 
     clearCount(){
@@ -121,14 +129,14 @@ class MockNicoServer {
             try {
                 fs.statSync(fpath);
             } catch (error) {
-                res.status(404).send(`not find ${video_id}`);
+                res.status(404).send(`not find ${video_id}`).end();
                 return;               
             }
 
             res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/", secure: false});
             res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/", secure: false });
             
-            res.status(200).send(getMockWatchHtml(video_id));
+            res.status(200).send(getMockWatchHtml(video_id)).end();
         });
         this.app.get("/smile", (req, res) => {
             if(!this._hasCookie(req)){

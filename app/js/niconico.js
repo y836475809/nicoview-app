@@ -57,8 +57,13 @@ class NicoWatch {
                 const body = response.data;
                 try {
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                    const api_data = JSON.parse(data_elm.getAttribute("data-api-data")); 
-                    resolve({ cookie_jar, api_data });    
+                    const data_json = data_elm.getAttribute("data-api-data");
+                    if(!data_json){
+                        reject({error: {message:"not find data-api-data"}});
+                    }else{
+                        const api_data = JSON.parse(data_json);
+                        resolve({ cookie_jar, api_data }); 
+                    }   
                 } catch (error) {
                     reject({error: error});
                 } 

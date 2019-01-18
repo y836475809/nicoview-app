@@ -12,31 +12,75 @@ const proxy_url = {
     host: "localhost",
     port: 3000
 };
+
+let test_times = [];
+
 test.before(async t => {
-    console.log("################## test.before");
+    test_times = [];
     await mock_server.start();   
 });
 
 test.after(async t => {
     await mock_server.stop();
+
+    const black   = "\u001b[30m";
+    const red     = "\u001b[31m";
+    const green   = "\u001b[32m";
+    const yellow  = "\u001b[33m";
+    const blue    = "\u001b[34m";
+    const magenta = "\u001b[35m";
+    const cyan    = "\u001b[36m";
+    const white   = "\u001b[37m";
+    const reset   = "\u001b[0m";
+
+    test_times.forEach(value => {
+        console.log(`${value.name} ${green}(${value.time} ms)${reset}`);
+    });
 });
-var start;
-// let mm = new Map();
+
 test.beforeEach(t => {
-    start = new Date();
-    // mm.set(t.title, start);
-    console.log("################## t.title=", t.title);
-    
+    t.context.start = new Date();
+
     nock.cleanAll();
 });
 
 test.afterEach(t => {
-    var stop = new Date();
-    var ms = stop.getTime() - start.getTime();
-    console.log("################## t.title=", t.title, " ms=", ms);
+    const start = t.context.start;
+    const ms = new Date().getTime() - start.getTime();
+    test_times.push({
+        name: t.title.replace("afterEach hook for ", ""),
+        time: ms
+    });
 });
 
-test.cb('calc test', t => {
+test("watch get cookie", async (t) => {
+    const nico_watch = new NicoWatch(proxy_url);
+    const { cookie_jar, api_data } = await nico_watch.watch(test_video_id);
+    t.deepEqual(getCookies(cookie_jar),[
+        {
+            url: "http://www.nicovideo.jp",
+            name: "nicohistory",
+            value: `${test_video_id}%3A123456789`,
+            domain: "nicovideo.jp",
+            path: "/",
+            secure: false
+        },
+        {
+            url: "http://www.nicovideo.jp",
+            name: "nicosid",
+            value: "123456.789",
+            domain: "nicovideo.jp",
+            path: "/",
+            secure: false
+        }
+    ]);
+
+    t.not(api_data.video, undefined);
+    t.not(api_data.commentComposite.threads, undefined);
+    t.not(api_data.video.dmcInfo.session_api, undefined);
+});
+
+test.cb("watch cancel", t => {
     t.plan(1);
 
     nock.disableNetConnect();
@@ -44,25 +88,15 @@ test.cb('calc test', t => {
     nock(server_url)
         .get(`/watch/${test_video_id}`)
         .delay(5000)
-        // .reply(200, "ok");
         .reply(200, getMockWatchHtml(test_video_id));
 
     const nico_watch = new NicoWatch(proxy_url);
     nico_watch.watch(test_video_id, (msg) => {
-        console.log("msg ##################", msg);
         t.is(msg, "watch cancel");
-        // done(); 
         t.end();
-    }).catch((error) => {
-        console.log("error ##################", error);
-    }).then((b) => {
-        console.log("()then ##################");
-        // t.end();
     });
     setTimeout(()=>{
-        
         nico_watch.cancel();
-        // done();
     }, 1000);
    
 });
@@ -81,21 +115,84 @@ test("watch timetout", async (t) => {
         const nico_watch = new NicoWatch(proxy_url);
         await nico_watch.watch(test_video_id);
     } catch (error) {
-        console.log("timetout then ##################");
         t.is(error.code, "ECONNABORTED");
         t.regex(error.message, /timeout/);
     }
 });
 
-test("get 404", async t => {
+test("watch page not find", async t => {
     t.plan(1);
-    nock.cleanAll();
 
-    const nico_watch = new NicoWatch(proxy_url);
     try {
+        const nico_watch = new NicoWatch(proxy_url);
         await nico_watch.watch("ms00000000");
     } catch (error) {
-        console.log("################## error=", error);
         t.is(error.status, 404);
+    }
+});
+
+test("watch data-api-data json error", async (t) => {
+    t.plan(1);
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url)
+        .get(`/watch/${test_video_id}`)
+        .reply(200, 
+            `<!DOCTYPE html>
+            <html lang="ja">
+                <body>
+                <div id="js-initial-watch-data" data-api-data="dummy"
+                </body>
+            </html>`);
+    try {
+        const nico_watch = new NicoWatch(proxy_url);
+        await nico_watch.watch(test_video_id);
+    } catch (error) {
+        t.is(error.error.message, "Unexpected token d in JSON at position 0");
+    }
+});
+
+test("watch no data-api-data", async (t) => {
+    t.plan(1);
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url)
+        .get(`/watch/${test_video_id}`)
+        .reply(200, 
+            `<!DOCTYPE html>
+            <html lang="ja">
+                <body>
+                <div id="js-initial-watch-data" fault-data-api-data="{&quot;video&quot;:null}"
+                </body>
+            </html>`);
+    try {
+        const nico_watch = new NicoWatch(proxy_url);
+        await nico_watch.watch(test_video_id);
+    } catch (error) {
+        t.is(error.error.message, "not find data-api-data");
+    }
+});
+
+test("watch no js-initial-watch-data", async (t) => {
+    t.plan(1);
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url)
+        .get(`/watch/${test_video_id}`)
+        .reply(200, 
+            `<!DOCTYPE html>
+            <html lang="ja">
+                <body>
+                <div id="fault-js-initial-watch-data" data-api-data="{&quot;video&quot;:null}"
+                </body>
+            </html>`);
+    try {
+        const nico_watch = new NicoWatch(proxy_url);
+        await nico_watch.watch(test_video_id);
+    } catch (error) {
+        t.is(error.error.message, "Cannot read property 'getAttribute' of null");
     }
 });

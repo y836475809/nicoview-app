@@ -6,29 +6,46 @@ const fs = require("fs");
 const res_no_owner_comment_json = require("./data/res_no_owner_comment.json");
 const res_owner_comment_json = require("./data/res_owner_comment.json");
 
-const getMockWatchHtml = (video_id) => {
-    function escapeHtml(str){
-        str = str.replace(/&/g, "&amp;");
-        str = str.replace(/>/g, "&gt;");
-        str = str.replace(/</g, "&lt;");
-        str = str.replace(/"/g, "&quot;");
-        str = str.replace(/'/g, "&#x27;");
-        str = str.replace(/`/g, "&#x60;");
-        str = str.replace(/\//g, "\\/");
-        return str;
+class MockNicoUitl {
+    static get videoID1(){
+        return "sm12345678";
     }
-    
-    const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
-    const j = fs.readFileSync(fpath, "utf-8");
-    const data_api_data = escapeHtml(j);
-    // const html = escape("hh");
-    return `<!DOCTYPE html>
-    <html lang="ja">
-        <body>
-        <div id="js-initial-watch-data" data-api-data="${data_api_data}"
-        </body>
-    </html>`;
-};
+
+    static getWatchHtml(video_id){
+        function escapeHtml(str){
+            str = str.replace(/&/g, "&amp;");
+            str = str.replace(/>/g, "&gt;");
+            str = str.replace(/</g, "&lt;");
+            str = str.replace(/"/g, "&quot;");
+            str = str.replace(/'/g, "&#x27;");
+            str = str.replace(/`/g, "&#x60;");
+            str = str.replace(/\//g, "\\/");
+            return str;
+        }
+        
+        const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
+        const j = fs.readFileSync(fpath, "utf-8");
+        const data_api_data = escapeHtml(j);
+        // const html = escape("hh");
+        return `<!DOCTYPE html>
+        <html lang="ja">
+            <body>
+            <div id="js-initial-watch-data" data-api-data="${data_api_data}"
+            </body>
+        </html>`;
+    }
+
+    /**
+     * 
+     * @param {string} url 
+     */
+    static tohttp(api_data){
+        const smile_url = api_data.video.smileInfo.url;
+        const dmc_url = api_data.video.dmcInfo.session_api.urls[0].url;
+        api_data.video.smileInfo.url = smile_url.replace("https", "http");
+        api_data.video.dmcInfo.session_api.urls[0].url = dmc_url.replace("https", "http");
+    }
+}
 
 class MockNicoServer {
     constructor(){
@@ -77,8 +94,11 @@ class MockNicoServer {
     get serverUrl() {
         return `http://localhost:${this.server_port}`;
     } 
-    get proxyUrl() {
-        return `http://localhost:${this.proxy_port}`;
+    get proxy() {
+        return {
+            host: "localhost",
+            port: this.proxy_port
+        };
     } 
 
     async start(){        
@@ -129,14 +149,14 @@ class MockNicoServer {
             try {
                 fs.statSync(fpath);
             } catch (error) {
-                res.status(404).send(`not find ${video_id}`).end();
+                res.status(404).send(`not find ${video_id}`);
                 return;               
             }
 
             res.cookie("nicohistory", `${video_id}:123456789`, { domain: ".nicovideo.jp", path: "/", secure: false});
             res.cookie("nicosid", "123456.789", { domain: ".nicovideo.jp", path: "/", secure: false });
             
-            res.status(200).send(getMockWatchHtml(video_id)).end();
+            res.status(200).send(MockNicoUitl.getWatchHtml(video_id));
         });
         this.app.get("/smile", (req, res) => {
             if(!this._hasCookie(req)){
@@ -277,19 +297,7 @@ class MockNicoServer {
     }
 }
 
-/**
- * 
- * @param {string} url 
- */
-const httpsTohttp = (api_data) => {
-    const smile_url = api_data.video.smileInfo.url;
-    const dmc_url = api_data.video.dmcInfo.session_api.urls[0].url;
-    api_data.video.smileInfo.url = smile_url.replace("https", "http");
-    api_data.video.dmcInfo.session_api.urls[0].url = dmc_url.replace("https", "http");
-};
-
 module.exports = {
     MockNicoServer: MockNicoServer,
-    httpsTohttp: httpsTohttp,
-    getMockWatchHtml: getMockWatchHtml
+    MockNicoUitl: MockNicoUitl
 };

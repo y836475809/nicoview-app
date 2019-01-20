@@ -4,7 +4,6 @@ const axios = require("axios");
 const tough = require("tough-cookie");
 const axiosCookieJarSupport = require("axios-cookiejar-support").default;
 axiosCookieJarSupport(axios);
-const CancelToken = axios.CancelToken;
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -44,10 +43,7 @@ class NicoWatch {
                 jar: cookie_jar,
                 withCredentials: true,
                 timeout: 10 * 1000,
-                proxy: {
-                    host: this.proxy.host,
-                    port: this.proxy.port
-                },
+                proxy: this.proxy,
                 cancelToken: this.source.token
                 // cancelToken: new CancelToken((c) => {
                 //     // An executor function receives a cancel function as a parameter

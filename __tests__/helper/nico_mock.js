@@ -3,8 +3,12 @@ const cookieParser = require("cookie-parser");
 const httpProxy = require("http-proxy");
 const http = require("http");
 const fs = require("fs");
-const res_no_owner_comment_json = require("./data/res_no_owner_comment.json");
-const res_owner_comment_json = require("./data/res_owner_comment.json");
+const path = require("path");
+
+const base_dir = path.resolve(__dirname, "..");
+
+const res_no_owner_comment_json = require(`${base_dir}/data/res_no_owner_comment.json`);
+const res_owner_comment_json = require(`${base_dir}/data/res_owner_comment.json`);
 
 class MockNicoUitl {
     static get videoID1(){
@@ -23,7 +27,7 @@ class MockNicoUitl {
     }
 
     static getWatchHtml(video_id){ 
-        const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
+        const fpath = `${base_dir}/data/${video_id}_data_api_data.json`;
         const j = fs.readFileSync(fpath, "utf-8");
         const data_api_data = MockNicoUitl._escapeHtml(j);
         // const html = escape("hh");
@@ -145,7 +149,7 @@ class MockNicoServer {
     setupRouting(){
         this.app.get("/watch/:videoid", (req, res) => {
             const video_id = req.params.videoid;
-            const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
+            const fpath = `${base_dir}/data/${video_id}_data_api_data.json`;
             try {
                 fs.statSync(fpath);
             } catch (error) {

@@ -1,50 +1,32 @@
-const nock = require("nock");
-const { NicoWatch, NicoVideo, NicoCommnet, getCookies } = require("../app/js/niconico");
-const { MockNicoServer, MockNicoUitl } = require("./nico_mock");
 const test = require("ava");
+const nock = require("nock");
+const { NicoWatch, getCookies } = require("../app/js/niconico");
+const { MockNicoServer, MockNicoUitl } = require("./helper/nico_mock");
+const { ProfTime } = require("./helper/ava_prof_time");
 
 const mock_server = new MockNicoServer();
 const server_url = mock_server.serverUrl;
 const proxy = mock_server.proxy;
 
-let test_times = [];
+const prof_time = new ProfTime();
 
 test.before(async t => {
-    test_times = [];
-    await mock_server.start();   
+    await mock_server.start();
+    prof_time.clear();
 });
 
 test.after(async t => {
     await mock_server.stop();
-
-    const black   = "\u001b[30m";
-    const red     = "\u001b[31m";
-    const green   = "\u001b[32m";
-    const yellow  = "\u001b[33m";
-    const blue    = "\u001b[34m";
-    const magenta = "\u001b[35m";
-    const cyan    = "\u001b[36m";
-    const white   = "\u001b[37m";
-    const reset   = "\u001b[0m";
-
-    test_times.forEach(value => {
-        console.log(`${value.name} ${green}(${value.time} ms)${reset}`);
-    });
+    prof_time.log(t);
 });
 
 test.beforeEach(t => {
-    t.context.start = new Date();
-
+    prof_time.start(t);
     nock.cleanAll();
 });
 
 test.afterEach(t => {
-    const start = t.context.start;
-    const ms = new Date().getTime() - start.getTime();
-    test_times.push({
-        name: t.title.replace("afterEach hook for ", ""),
-        time: ms
-    });
+    prof_time.end(t);
 });
 
 test("watch get cookie", async (t) => {

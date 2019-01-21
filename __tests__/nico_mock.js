@@ -11,21 +11,21 @@ class MockNicoUitl {
         return "sm12345678";
     }
 
-    static getWatchHtml(video_id){
-        function escapeHtml(str){
-            str = str.replace(/&/g, "&amp;");
-            str = str.replace(/>/g, "&gt;");
-            str = str.replace(/</g, "&lt;");
-            str = str.replace(/"/g, "&quot;");
-            str = str.replace(/'/g, "&#x27;");
-            str = str.replace(/`/g, "&#x60;");
-            str = str.replace(/\//g, "\\/");
-            return str;
-        }
-        
+    static _escapeHtml(str){
+        str = str.replace(/&/g, "&amp;");
+        str = str.replace(/>/g, "&gt;");
+        str = str.replace(/</g, "&lt;");
+        str = str.replace(/"/g, "&quot;");
+        str = str.replace(/'/g, "&#x27;");
+        str = str.replace(/`/g, "&#x60;");
+        str = str.replace(/\//g, "\\/");
+        return str;
+    }
+
+    static getWatchHtml(video_id){ 
         const fpath = `${__dirname}/data/${video_id}_data_api_data.json`;
         const j = fs.readFileSync(fpath, "utf-8");
-        const data_api_data = escapeHtml(j);
+        const data_api_data = MockNicoUitl._escapeHtml(j);
         // const html = escape("hh");
         return `<!DOCTYPE html>
         <html lang="ja">
@@ -58,12 +58,12 @@ class MockNicoServer {
     
         this.server_port = 8084;
         this.proxy_port = 3000;
-        this.proxy = new httpProxy.createProxyServer();
-        this.proxy.on("error", (err, req, res) => {
+        this.proxy_server = new httpProxy.createProxyServer();
+        this.proxy_server.on("error", (err, req, res) => {
             res.end();
         });
 
-        this.proxyServer = http.createServer((req, res) => {
+        this.convert_server = http.createServer((req, res) => {
             const mapping = {
                 "www.nicovideo.jp": {
                     host: "localhost", port: this.server_port
@@ -86,9 +86,9 @@ class MockNicoServer {
             // parser.href = req.url;
             // const target = mapping[parser.hostname];
             const target = { host: "localhost", port: this.server_port };
-            this.proxy.web(req, res, { target: target });
+            this.proxy_server.web(req, res, { target: target });
         });
-        this.proxyServer.listen(this.proxy_port);
+        this.convert_server.listen(this.proxy_port);
     }
 
     get serverUrl() {
@@ -117,7 +117,7 @@ class MockNicoServer {
 
     async stop(){
         console.log("Stop express");
-        await this.proxyServer.close();
+        await this.convert_server.close();
         await this.server.close();
     }
 

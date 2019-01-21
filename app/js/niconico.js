@@ -8,6 +8,31 @@ axiosCookieJarSupport(axios);
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
 
+const ErrorHandling = (error)=> {
+    if(axios.isCancel(error)){
+        return {
+            cancel: true,
+            message: error.message
+        };
+    }else{
+        if (error.response) {
+            return {
+                status: error.response.status,
+                data: error.response.data
+            };
+        }else if(error.request){
+            return {
+                code: error.code,
+                message: error.message
+            };
+        }else{
+            return {
+                error: error
+            };
+        }
+    }
+}
+
 class NicoWatch {
     constructor(proxy) {  
         this.watch_url = `${nicovideo_url}/watch`;
@@ -218,22 +243,22 @@ class NicoVideo {
                 return;
             }
 
-            const options = {
-                uri: `${this.dmcInfo.session_api.urls[0].url}?_format=json`,
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                // jar: this.cookieJar,
-                json: this.DmcSession,
-                timeout: 10 * 1000,
-                proxy: this.proxy
-            };
-            this.req = rp(options);  
-            this.req.then((body) => {
-                this.dmc_session = body.data;
-                resolve();
-            }).catch((error)=>{
-                reject(error);
-            });
+            // const options = {
+            //     uri: `${this.dmcInfo.session_api.urls[0].url}?_format=json`,
+            //     method: "POST",
+            //     headers: { "content-type": "application/json" },
+            //     // jar: this.cookieJar,
+            //     json: this.DmcSession,
+            //     timeout: 10 * 1000,
+            //     proxy: this.proxy
+            // };
+            // this.req = rp(options);  
+            // this.req.then((body) => {
+            //     this.dmc_session = body.data;
+            //     resolve();
+            // }).catch((error)=>{
+            //     reject(error);
+            // });
             const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
             axios.post(url, json, {
@@ -244,27 +269,29 @@ class NicoVideo {
                 cancelToken: this.source.token,
             }).then((response) => {
                 this.dmc_session = response.data;
-                resolve();
+                resolve(this.dmc_session);
             }).catch((error)=>{
-                if(axios.isCancel(error)){
-                    if(on_cancel!=undefined){
-                        on_cancel(error.message); 
-                    }
-                }else{
-                    if (error.response) {
-                        reject({
-                            status: error.response.status,
-                            data: error.response.data
-                        });
-                    }else if(error.request){
-                        reject({
-                            code: error.code,
-                            message: error.message
-                        });
-                    }else{
-                        reject({error: error});
-                    }
-                }
+                reject(ErrorHandling(error)); 
+                // if(axios.isCancel(error)){
+                //     if(on_cancel!=undefined){
+                //         on_cancel(error.message); 
+                //     }
+                //     resolve(null);
+                // }else{
+                //     if (error.response) {
+                //         reject({
+                //             status: error.response.status,
+                //             data: error.response.data
+                //         });
+                //     }else if(error.request){
+                //         reject({
+                //             code: error.code,
+                //             message: error.message
+                //         });
+                //     }else{
+                //         reject({error: error});
+                //     }
+                // }
             });
         });
     }
@@ -273,45 +300,69 @@ class NicoVideo {
         return this.dmc_session.session.content_uri;
     }
 
-    startHeartBeat(on_error_heartbeat) {
+    // startHeartBeat(on_cancel, on_error_heartbeat) {
+    startHeartBeat(on_cancel) {
         return new Promise(async (resolve, reject) => {
             this.heart_beat_id = null;
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
-            const options = {
-                uri: url,
-                method: "OPTIONS",
-                timeout: 10 * 1000,
-                proxy: this.proxy    
-                // jar: this.cookieJar,
-            };
+            // const options = {
+            //     uri: url,
+            //     method: "OPTIONS",
+            //     timeout: 10 * 1000,
+            //     proxy: this.proxy    
+            //     // jar: this.cookieJar,
+            // };
             const session = this.dmc_session;
-            const options2 = {
-                uri: url,
-                method: "POST",      
-                headers: { "content-type": "application/json" },
-                json: session,
-                timeout: 10 * 1000,
-                // jar: this.cookieJar,
-                proxy: this.proxy
-            };   
-            try {
-                await rp(options);
+            // const options2 = {
+            //     uri: url,
+            //     method: "POST",      
+            //     headers: { "content-type": "application/json" },
+            //     json: session,
+            //     timeout: 10 * 1000,
+            //     // jar: this.cookieJar,
+            //     proxy: this.proxy
+            // };   
+            // try {
+            //     await rp(options);
 
-                const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-                this.stopHeartBeat();
-                this.heart_beat_id = setInterval(() => {
-                    rp(options2).catch((error) => {
-                        console.log("startHeartBeat errors=", error);
-                        on_error_heartbeat(error);
-                    });
-                    console.log("HeartBeat ", new Date());
-                }, interval_ms);
+            //     const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
+            //     this.stopHeartBeat();
+            //     this.heart_beat_id = setInterval(() => {
+            //         rp(options2).catch((error) => {
+            //             console.log("startHeartBeat errors=", error);
+            //             on_error_heartbeat(error);
+            //         });
+            //         console.log("HeartBeat ", new Date());
+            //     }, interval_ms);
+            // } catch (error) {
+            //     console.log("startHeartBeat errors=", error);
+            //     reject(error);
+            // }
+
+            try {
+                await axios.options(url, session, {               
+                    timeout: 10 * 1000,
+                    proxy: this.proxy   
+                });       
             } catch (error) {
-                console.log("startHeartBeat errors=", error);
-                reject(error);
+                reject(ErrorHandling(error)); 
+                return;
             }
+
+            const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
+            this.stopHeartBeat();
+            this.heart_beat_id = setInterval(() => {
+                axios.post(url, {
+                    timeout: 10 * 1000,
+                    proxy: this.proxy,
+                }).catch((error)=>{
+                    this.stopHeartBeat();
+                    reject(ErrorHandling(error)); 
+                });
+                console.log("HeartBeat ", new Date());
+            }, interval_ms);
         });
     }
 

@@ -1,5 +1,6 @@
 const express = require("express");
 const cookieParser = require("cookie-parser");
+const tough = require("tough-cookie");
 const httpProxy = require("http-proxy");
 const http = require("http");
 const fs = require("fs");
@@ -45,6 +46,19 @@ class MockNicoUitl {
         const dmc_url = api_data.video.dmcInfo.session_api.urls[0].url;
         api_data.video.smileInfo.url = smile_url.replace("https", "http");
         api_data.video.dmcInfo.session_api.urls[0].url = dmc_url.replace("https", "http");
+    }
+
+    static getCookieJar(video_id){
+        const url = `http://www.nicovideo.jp/watch/${video_id}`;
+        const options = "Domain=nicovideo.jp; Path=/";
+        const c1 = tough.Cookie.parse(`nicohistory=${video_id}%3A123456789; ${options}`);
+        const c2 = tough.Cookie.parse(`nicosid=123456.789; ${options}`);
+        
+        const cookie_jar = new tough.CookieJar();
+        cookie_jar.setCookieSync(c1, url);
+        cookie_jar.setCookieSync(c2, url);
+        
+        return cookie_jar;
     }
 }
 
@@ -248,7 +262,7 @@ class MockNicoServer {
              *  @type {Array}
              */
             const req_json = req.body;
-            if(req_json.length===0){
+            if(req_json.length===0){              
                 res.status(404).send("404 - \"Not Found\r\n\""); 
                 return;  
             }

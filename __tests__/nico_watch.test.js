@@ -77,6 +77,44 @@ test.cb("watch cancel", t => {
    
 });
 
+test("watch cancel 2", async(t) => {
+    t.plan(3);
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url)
+        .get(`/watch/${TestData.video_id}`)
+        .delay(5000)
+        .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
+
+    const nico_watch = new NicoWatch(proxy);
+
+    let cancel_count = 0;
+    setTimeout(()=>{
+        nico_watch.cancel();
+        nico_watch.cancel();
+    }, 1000);
+
+    const ret = await nico_watch.watch(TestData.video_id, (msg) => {
+        console.log("watch cancel");
+        t.is(msg, "watch cancel");
+        cancel_count++;
+    });
+    t.is(ret, null);
+    t.is(cancel_count, 1);
+
+    // setTimeout(()=>{
+    //     nico_watch.cancel();
+    // }, 1000);
+    // setTimeout(()=>{
+    //     nico_watch.cancel();
+    // }, 1100);
+    // setTimeout(()=>{
+    //     t.is(cancel_count, 1);
+    //     t.end();
+    // }, 2000);
+});
+
 test("watch timetout", async (t) => {
     t.plan(2);
 

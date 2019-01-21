@@ -16,7 +16,7 @@ class NicoWatch {
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
-        this.fcancel = { exec: null };
+        // this.fcancel = { exec: null };
     }
 
     cancel() {
@@ -50,6 +50,7 @@ class NicoWatch {
                 //     this.fcancel.exec = c;                    
                 // })
             }).then((response) => {
+                // this.source = null;
                 const body = response.data;
                 try {
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
@@ -64,11 +65,13 @@ class NicoWatch {
                     reject({error: error});
                 } 
             }).catch((error)=>{
+                // this.source = null;
                 if(axios.isCancel(error)){
                     if(on_cancel!=undefined){
-                        // resolve(error.message);
+                        // resolve(error.message);         
                         on_cancel(error.message); 
                     }
+                    resolve(null);
                 }else{
                     if (error.response) {
                         reject({
@@ -117,14 +120,22 @@ class NicoVideo {
         this.api_data = api_data;  
         this.dmcInfo = api_data.video.dmcInfo;  
         this.heart_beat_rate = 0.9;
-        this.req = null;
+        // this.req = null;
         this.is_canceled = false;
         this.proxy = proxy;
+        this.cancel_token = axios.CancelToken;
+        this.source = null;
+        this.sources = new Map();
     }
 
     cancel() {
-        if (this.req) {
-            this.req.cancel();
+        // if (this.req) {
+        //     this.req.cancel();
+        //     this.stopHeartBeat();
+        //     this.is_canceled = true;
+        // }
+        if (this.source) {
+            this.source.cancel("video cancel");
             this.stopHeartBeat();
             this.is_canceled = true;
         }
@@ -197,11 +208,14 @@ class NicoVideo {
         };
     }
 
-    postDmcSession() {
+    postDmcSession(on_cancel) {
         this.is_canceled = false;
+        this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
-                return reject("dmc info is null");
+                // return reject("dmc info is null");
+                reject({error: {message: "dmc info is null"}});
+                return;
             }
 
             const options = {
@@ -219,6 +233,38 @@ class NicoVideo {
                 resolve();
             }).catch((error)=>{
                 reject(error);
+            });
+            const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
+            const json = this.DmcSession;
+            axios.post(url, json, {
+                // jar: cookie_jar,
+                // withCredentials: true,
+                timeout: 10 * 1000,
+                proxy: this.proxy,
+                cancelToken: this.source.token,
+            }).then((response) => {
+                this.dmc_session = response.data;
+                resolve();
+            }).catch((error)=>{
+                if(axios.isCancel(error)){
+                    if(on_cancel!=undefined){
+                        on_cancel(error.message); 
+                    }
+                }else{
+                    if (error.response) {
+                        reject({
+                            status: error.response.status,
+                            data: error.response.data
+                        });
+                    }else if(error.request){
+                        reject({
+                            code: error.code,
+                            message: error.message
+                        });
+                    }else{
+                        reject({error: error});
+                    }
+                }
             });
         });
     }
@@ -285,12 +331,14 @@ class NicoCommnet {
         this.r_no = 0;
         this.p_no = 0;
         this.req = null;
+        this.cancel_token = axios.CancelToken;
+        this.source = null;
         this.is_canceled = false;
     }
 
     cancel() {
-        if (this.req) {
-            this.req.cancel();
+        if (this.source) {
+            this.source.cancel("comment cancel");
             this.is_canceled = true;
         }
     }
@@ -299,14 +347,14 @@ class NicoCommnet {
         return response[2].thread.resultcode===0;
     }
 
-    getCommnet() {
+    getCommnet(on_cancel) {
         const josn = this._get_commnet_json();
-        return this._post(josn);
+        return this._post(josn, on_cancel);
     }
 
-    getCommnetDiff(res_from) {
+    getCommnetDiff(res_from, on_cancel) {
         const josn = this._get_commnet_diff_json(res_from);
-        return this._post(josn);
+        return this._post(josn, on_cancel);
     }
 
     _get_commnet_json(){
@@ -324,26 +372,45 @@ class NicoCommnet {
         return josn;       
     }
 
-    _post(post_data){
+    _post(post_data, on_cancel){
         this.is_canceled = false;
-
+        this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             // const url = "http://nmsg.nicovideo.jp/api.json/";
             const json = post_data;
-            const options = {
-                uri: niconmsg_url,
-                method: "POST",
-                headers: { "content-type": "application/json" },
-                jar: this.cookie_jar,
-                json: json,
+            axios.post(niconmsg_url, json, {
+                // jar: cookie_jar,
+                // withCredentials: true,
+                timeout: 10 * 1000,
                 proxy: this.proxy,
-                timeout: 10 * 1000
-            };
-            this.req = rp(options);
-            this.req.then((comment_data) => {
+                cancelToken: this.source.token,
+            }).then((response) => {
+                // this.source = null;
+                const comment_data = response.data;
                 resolve(comment_data);
             }).catch((error)=>{
-                reject(error);
+                // this.source = null;
+                if(axios.isCancel(error)){
+                    // this.source = null;
+                    if(on_cancel!=undefined){
+                        on_cancel(error.message); 
+                    }
+                    resolve(null);
+                }else{
+                    if (error.response) {
+                        reject({
+                            status: error.response.status,
+                            data: error.response.data
+                        });
+                    }else if(error.request){
+                        reject({
+                            code: error.code,
+                            message: error.message
+                        });
+                    }else{
+                        reject({error: error});
+                    }
+                }
             });
         });
     }

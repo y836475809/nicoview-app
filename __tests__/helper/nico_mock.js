@@ -7,14 +7,11 @@ const path = require("path");
 
 const base_dir = path.resolve(__dirname, "..");
 
-const res_no_owner_comment_json = require(`${base_dir}/data/res_no_owner_comment.json`);
-const res_owner_comment_json = require(`${base_dir}/data/res_owner_comment.json`);
+const no_owner_comment_json = require(`${base_dir}/data/res_no_owner_comment.json`);
+const owner_comment_json = require(`${base_dir}/data/res_owner_comment.json`);
+const data_api_data_json = require(`${base_dir}/data/sm12345678_data_api_data.json`);
 
 class MockNicoUitl {
-    static get videoID1(){
-        return "sm12345678";
-    }
-
     static _escapeHtml(str){
         str = str.replace(/&/g, "&amp;");
         str = str.replace(/>/g, "&gt;");
@@ -266,7 +263,7 @@ class MockNicoServer {
                  && req_json[5].thread_leaves
                  && req_json[6].ping.content
                  && req_json[7].ping.content){
-                    res.status(200).json(res_no_owner_comment_json); 
+                    res.status(200).json(no_owner_comment_json); 
                     return;
                 }
             }
@@ -284,7 +281,7 @@ class MockNicoServer {
                  && req_json[8].thread_leaves
                  && req_json[9].ping.content
                  && req_json[10].ping.content){
-                    res.status(200).json(res_owner_comment_json); 
+                    res.status(200).json(owner_comment_json); 
                     return;
                 }
             }
@@ -303,5 +300,11 @@ class MockNicoServer {
 
 module.exports = {
     MockNicoServer: MockNicoServer,
-    MockNicoUitl: MockNicoUitl
+    MockNicoUitl: MockNicoUitl,
+    TestData : {
+        video_id : "sm12345678",
+        no_owner_comment: no_owner_comment_json,
+        owner_comment: owner_comment_json,
+        data_api_data: data_api_data_json
+    }
 };

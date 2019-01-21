@@ -1,7 +1,7 @@
 const test = require("ava");
 const nock = require("nock");
 const { NicoWatch, getCookies } = require("../app/js/niconico");
-const { MockNicoServer, MockNicoUitl } = require("./helper/nico_mock");
+const { MockNicoServer, MockNicoUitl, TestData } = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
 const mock_server = new MockNicoServer();
@@ -31,12 +31,12 @@ test.afterEach(t => {
 
 test("watch get cookie", async (t) => {
     const nico_watch = new NicoWatch(proxy);
-    const { cookie_jar, api_data } = await nico_watch.watch(MockNicoUitl.videoID1);
+    const { cookie_jar, api_data } = await nico_watch.watch(TestData.video_id);
     t.deepEqual(getCookies(cookie_jar),[
         {
             url: "http://www.nicovideo.jp",
             name: "nicohistory",
-            value: `${MockNicoUitl.videoID1}%3A123456789`,
+            value: `${TestData.video_id}%3A123456789`,
             domain: "nicovideo.jp",
             path: "/",
             secure: false
@@ -62,12 +62,12 @@ test.cb("watch cancel", t => {
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
     nock(server_url)
-        .get(`/watch/${MockNicoUitl.videoID1}`)
+        .get(`/watch/${TestData.video_id}`)
         .delay(5000)
-        .reply(200, MockNicoUitl.getWatchHtml(MockNicoUitl.videoID1));
+        .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
 
     const nico_watch = new NicoWatch(proxy);
-    nico_watch.watch(MockNicoUitl.videoID1, (msg) => {
+    nico_watch.watch(TestData.video_id, (msg) => {
         t.is(msg, "watch cancel");
         t.end();
     });
@@ -83,13 +83,13 @@ test("watch timetout", async (t) => {
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
     nock(server_url)
-        .get(`/watch/${MockNicoUitl.videoID1}`)
+        .get(`/watch/${TestData.video_id}`)
         .delay(11000)
-        .reply(200, MockNicoUitl.getWatchHtml(MockNicoUitl.videoID1));
+        .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
         
     try {
         const nico_watch = new NicoWatch(proxy);
-        await nico_watch.watch(MockNicoUitl.videoID1);
+        await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.code, "ECONNABORTED");
         t.regex(error.message, /timeout/);
@@ -113,7 +113,7 @@ test("watch data-api-data json error", async (t) => {
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
     nock(server_url)
-        .get(`/watch/${MockNicoUitl.videoID1}`)
+        .get(`/watch/${TestData.video_id}`)
         .reply(200, 
             `<!DOCTYPE html>
             <html lang="ja">
@@ -123,7 +123,7 @@ test("watch data-api-data json error", async (t) => {
             </html>`);
     try {
         const nico_watch = new NicoWatch(proxy);
-        await nico_watch.watch(MockNicoUitl.videoID1);
+        await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.error.message, "Unexpected token d in JSON at position 0");
     }
@@ -135,7 +135,7 @@ test("watch no data-api-data", async (t) => {
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
     nock(server_url)
-        .get(`/watch/${MockNicoUitl.videoID1}`)
+        .get(`/watch/${TestData.video_id}`)
         .reply(200, 
             `<!DOCTYPE html>
             <html lang="ja">
@@ -145,7 +145,7 @@ test("watch no data-api-data", async (t) => {
             </html>`);
     try {
         const nico_watch = new NicoWatch(proxy);
-        await nico_watch.watch(MockNicoUitl.videoID1);
+        await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.error.message, "not find data-api-data");
     }
@@ -157,7 +157,7 @@ test("watch no js-initial-watch-data", async (t) => {
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
     nock(server_url)
-        .get(`/watch/${MockNicoUitl.videoID1}`)
+        .get(`/watch/${TestData.video_id}`)
         .reply(200, 
             `<!DOCTYPE html>
             <html lang="ja">
@@ -167,7 +167,7 @@ test("watch no js-initial-watch-data", async (t) => {
             </html>`);
     try {
         const nico_watch = new NicoWatch(proxy);
-        await nico_watch.watch(MockNicoUitl.videoID1);
+        await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.error.message, "Cannot read property 'getAttribute' of null");
     }

@@ -176,3 +176,86 @@ test("nico stop dmc heart beat", async (t) => {
     t.is(mock_server.dmc_hb_options_count, 1);
     t.is(mock_server.dmc_hb_post_count, 0);
 });
+
+test("stop by cancel dmc heart beat", async (t) => {
+    t.plan(2);
+    mock_server.clearCount();
+
+    const nico_video = new NicoVideo(cookie_jar, data_api_data, proxy);
+    await nico_video.postDmcSession();
+    await nico_video.optionsHeartBeat();
+  
+    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video.postHeartBeat();
+
+
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    nico_video.cancel();
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    t.is(mock_server.dmc_hb_options_count, 1);
+    t.is(mock_server.dmc_hb_post_count, 2);    
+});
+
+test("cancel dmc heart beat options", async (t) => {
+    t.plan(3);
+    mock_server.clearCount();
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url)
+        .post("/api/sessions?_format=json")
+        .reply(200, {
+            meta: {status: 201, message: "created"},
+            data: { session: { id:"12345678" } }
+        })
+        .options("/api/sessions/12345678?_format=json&_method=PUT")
+        .delay(5000)
+        .reply(200, "ok");
+
+    const nico_video = new NicoVideo(cookie_jar, data_api_data, proxy);
+    await nico_video.postDmcSession();
+
+    setTimeout(()=>{
+        nico_video.cancel();
+    }, 1000);
+    try {
+        await nico_video.optionsHeartBeat();
+    } catch (error) {
+        t.truthy(error.cancel); 
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    t.is(mock_server.dmc_hb_options_count, 0);
+    t.is(mock_server.dmc_hb_post_count, 0);  
+});
+
+test("cancel dmc heart beat post", async (t) => {
+    t.plan(2);
+    mock_server.clearCount();
+
+    nock.disableNetConnect();
+    nock.enableNetConnect("localhost");
+    nock(server_url, { allowUnmocked: true })
+        .post("/api/sessions/12345678?_format=json&_method=PUT")
+        .delay(5000)
+        .reply(200, {
+            meta: {status: 200,message: "ok"},
+            data: { session: { id:"12345678" } }
+        });
+
+    const nico_video = new NicoVideo(cookie_jar, data_api_data, proxy);
+    await nico_video.postDmcSession();
+    await nico_video.optionsHeartBeat();
+    
+    nico_video.dmcInfo.session_api.heartbeat_lifetime = 2*1000;
+    nico_video.postHeartBeat();
+
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    nico_video.cancel();
+    await new Promise(resolve => setTimeout(resolve, 3000));
+
+    t.is(mock_server.dmc_hb_options_count, 1);
+    t.is(mock_server.dmc_hb_post_count, 0);    
+});

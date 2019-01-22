@@ -141,7 +141,8 @@ class NicoVideo {
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
-        this.sources = new Map();
+        this.source_hb_options = null;
+        this.source_hb_post = null;
         this.heart_beat_id = null;
     }
 
@@ -153,6 +154,18 @@ class NicoVideo {
         // }
         if (this.source) {
             this.source.cancel("video cancel");
+            this.stopHeartBeat();
+            this.is_canceled = true;
+        }
+        
+        if (this.source_hb_options) {
+            this.source_hb_options.cancel("hb_options cancel");
+            this.stopHeartBeat();
+            this.is_canceled = true;
+        }
+
+        if (this.source_hb_post) {
+            this.source_hb_post.cancel("hb_post cancel");
             this.stopHeartBeat();
             this.is_canceled = true;
         }
@@ -294,23 +307,23 @@ class NicoVideo {
     }
 
     optionsHeartBeat() {
+        this.source_hb_options = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             this.stopHeartBeat();
 
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
-            try {
-                await axios.options(url, {     
-                    withCredentials: true,   
-                    timeout: 10 * 1000,
-                    proxy: this.proxy   
-                });
+            axios.options(url, {     
+                withCredentials: true,   
+                timeout: 10 * 1000,
+                proxy: this.proxy ,
+                cancelToken: this.source_hb_options.token,  
+            }).then((response) => {
                 resolve();
-            } catch (error) {
+            }).catch((error)=>{
                 reject(ErrorHandling(error)); 
-                return;
-            }
+            });
         });
     }
     
@@ -323,10 +336,12 @@ class NicoVideo {
 
         const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;    
         this.heart_beat_id = setInterval(() => {
+            this.source_hb_post = this.cancel_token.source();
             axios.post(url, session, {
                 timeout: 10 * 1000,
                 withCredentials: true,
                 proxy: this.proxy,
+                cancelToken: this.source_hb_post.token,  
             }).catch((error)=>{
                 this.stopHeartBeat();
             });

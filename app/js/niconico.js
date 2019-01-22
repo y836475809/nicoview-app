@@ -10,28 +10,19 @@ const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
 
 const ErrorHandling = (error)=> {
     if(axios.isCancel(error)){
-        return {
-            cancel: true,
-            message: error.message
-        };
+        error.cancel = true;
+        return error;
     }else{
         if (error.response) {
-            return {
-                status: error.response.status,
-                data: error.response.data
-            };
+            error.name = "ResponseError";
+            return error;
         }else if(error.request){
-            return {
-                code: error.code,
-                message: error.message
-            };
-        }else{
-            return {
-                error: error
-            };
+            error.name = "RequestError";
+            return error;
         }
+        return error;
     }
-}
+};
 
 class NicoWatch {
     constructor(proxy) {  
@@ -151,6 +142,7 @@ class NicoVideo {
         this.cancel_token = axios.CancelToken;
         this.source = null;
         this.sources = new Map();
+        this.heart_beat_id = null;
     }
 
     cancel() {
@@ -233,13 +225,14 @@ class NicoVideo {
         };
     }
 
-    postDmcSession(on_cancel) {
+    postDmcSession() {
         this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
                 // return reject("dmc info is null");
-                reject({error: {message: "dmc info is null"}});
+                const error = new Error("dmc info is null");
+                reject(error);
                 return;
             }
 
@@ -263,12 +256,12 @@ class NicoVideo {
             const json = this.DmcSession;
             axios.post(url, json, {
                 // jar: cookie_jar,
-                // withCredentials: true,
+                withCredentials: true,
                 timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token,
             }).then((response) => {
-                this.dmc_session = response.data;
+                this.dmc_session = response.data.data;
                 resolve(this.dmc_session);
             }).catch((error)=>{
                 reject(ErrorHandling(error)); 
@@ -300,76 +293,52 @@ class NicoVideo {
         return this.dmc_session.session.content_uri;
     }
 
-    // startHeartBeat(on_cancel, on_error_heartbeat) {
-    startHeartBeat(on_cancel) {
+    optionsHeartBeat() {
         return new Promise(async (resolve, reject) => {
-            this.heart_beat_id = null;
+            this.stopHeartBeat();
+
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
-            // const options = {
-            //     uri: url,
-            //     method: "OPTIONS",
-            //     timeout: 10 * 1000,
-            //     proxy: this.proxy    
-            //     // jar: this.cookieJar,
-            // };
-            const session = this.dmc_session;
-            // const options2 = {
-            //     uri: url,
-            //     method: "POST",      
-            //     headers: { "content-type": "application/json" },
-            //     json: session,
-            //     timeout: 10 * 1000,
-            //     // jar: this.cookieJar,
-            //     proxy: this.proxy
-            // };   
-            // try {
-            //     await rp(options);
-
-            //     const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-            //     this.stopHeartBeat();
-            //     this.heart_beat_id = setInterval(() => {
-            //         rp(options2).catch((error) => {
-            //             console.log("startHeartBeat errors=", error);
-            //             on_error_heartbeat(error);
-            //         });
-            //         console.log("HeartBeat ", new Date());
-            //     }, interval_ms);
-            // } catch (error) {
-            //     console.log("startHeartBeat errors=", error);
-            //     reject(error);
-            // }
-
             try {
-                await axios.options(url, session, {               
+                await axios.options(url, {     
+                    withCredentials: true,   
                     timeout: 10 * 1000,
                     proxy: this.proxy   
-                });       
+                });
+                resolve();
             } catch (error) {
                 reject(ErrorHandling(error)); 
                 return;
             }
-
-            const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;
-            this.stopHeartBeat();
-            this.heart_beat_id = setInterval(() => {
-                axios.post(url, {
-                    timeout: 10 * 1000,
-                    proxy: this.proxy,
-                }).catch((error)=>{
-                    this.stopHeartBeat();
-                    reject(ErrorHandling(error)); 
-                });
-                console.log("HeartBeat ", new Date());
-            }, interval_ms);
         });
+    }
+    
+    postHeartBeat() {
+        this.stopHeartBeat();
+
+        const id = this.dmc_session.session.id;
+        const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        const session = this.dmc_session;
+
+        const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;    
+        this.heart_beat_id = setInterval(() => {
+            axios.post(url, session, {
+                timeout: 10 * 1000,
+                withCredentials: true,
+                proxy: this.proxy,
+            }).catch((error)=>{
+                this.stopHeartBeat();
+            });
+            console.log("HeartBeat ", new Date());
+        }, interval_ms);
     }
 
     stopHeartBeat() {
         if (this.heart_beat_id) {
             console.log("stopHeartBeat");
             clearInterval(this.heart_beat_id);
+            this.heart_beat_id = null;
         }
     }
 }
@@ -431,7 +400,7 @@ class NicoCommnet {
             const json = post_data;
             axios.post(niconmsg_url, json, {
                 // jar: cookie_jar,
-                // withCredentials: true,
+                withCredentials: true,
                 timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token,

@@ -175,7 +175,7 @@ class MockNicoServer {
         });
         this.app.get("/smile", (req, res) => {
             if(!this._hasCookie(req)){
-                res.status(403).send("403");
+                res.status(403).send("fault 403");
                 return;
             }
             res.status(200).send("smile");
@@ -186,7 +186,7 @@ class MockNicoServer {
                 res.status(403).send({
                     meta: {
                         status: 403,
-                        message: "403"
+                        message: "fault 403"
                     }
                 }); 
                 return;
@@ -211,23 +211,23 @@ class MockNicoServer {
                         status: 201,
                         message: "created"
                     },
-                    data: { session: {} }
+                    data: { session: { id:"12345678" } }
                 }); 
                 return;
             }
 
-            res.status(403).send(403); 
+            res.status(403).send("fault 403"); 
         });
-        this.app.options("/api/sessions/:id", (req, res) => {
+        this.app.options("/api/sessions/:id+", (req, res) => {
             const query = req.query._format;
             if(query!="json"){
-                res.status(403).send("403");
+                res.status(403).send("fault 403");
                 return;
             }
             this.dmc_hb_options_count++;
             res.status(200).send("ok");
         });
-        this.app.post("/api/sessions/:id", (req, res) => {
+        this.app.post("/api/sessions/:id+", (req, res) => {
             const query = req.query._format;
             if(query!="json"){
                 res.status(403).json({

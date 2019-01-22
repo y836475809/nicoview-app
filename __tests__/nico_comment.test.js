@@ -124,13 +124,14 @@ test("get comment", async (t) => {
 });
 
 test("get comment empty param", async (t) => {
-    t.plan(1);
+    t.plan(2);
 
     const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
     try {
         await nico_comment._post([]);
     } catch (error) {
-        t.is(error.status, 404);
+        t.is(error.cancel, undefined);
+        t.is(error.name, "ResponseError");
     }
 });
 
@@ -150,7 +151,7 @@ test("get comment illegal param", async (t) => {
 });
 
 test("get comment timeout", async (t) => {
-    t.plan(2);
+    t.plan(3);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -164,12 +165,13 @@ test("get comment timeout", async (t) => {
     try {
         await nico_comment.getCommnet();
     } catch (error) {
-        t.is(error.code, "ECONNABORTED");
+        t.is(error.cancel, undefined);
+        t.is(error.name, "RequestError");
         t.regex(error.message, /timeout/);
     }
 });
 
-test.cb("get comment cancel", t => {
+test("get comment cancel", async(t) => {
     t.plan(1);
     
     nock.disableNetConnect();
@@ -180,17 +182,19 @@ test.cb("get comment cancel", t => {
         .reply(200, res_comment_json);
 
     const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
-    nico_comment.getCommnet((msg) => {
-        t.is(msg, "comment cancel");
-        t.end();
-    });
     setTimeout(()=>{
         nico_comment.cancel();
     }, 1000);
+
+    try {
+        await nico_comment.getCommnet();
+    } catch (error) {
+        t.truthy(error.cancel);
+    }
 });
 
 test("get comment cancel 2", async(t) => {
-    t.plan(3);
+    t.plan(1);
     
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -201,16 +205,14 @@ test("get comment cancel 2", async(t) => {
 
     const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
     
-    let cancel_count = 0;
     setTimeout(()=>{
         nico_comment.cancel();
         nico_comment.cancel();
     }, 1000);
-
-    const ret = await nico_comment.getCommnet((msg) => {
-        t.is(msg, "comment cancel");
-        cancel_count++;
-    });
-    t.is(ret, null);
-    t.is(cancel_count, 1);
+    
+    try {
+        await nico_comment.getCommnet();
+    } catch (error) {
+        t.truthy(error.cancel);
+    }
 });

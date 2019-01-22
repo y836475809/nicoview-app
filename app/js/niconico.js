@@ -1,4 +1,3 @@
-const rp = require("request-promise");
 const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
@@ -32,28 +31,19 @@ class NicoWatch {
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
-        // this.fcancel = { exec: null };
     }
 
     cancel() {
         if (this.source) {
             this.source.cancel("watch cancel");
-            // this.source = null;
-            // this.source = this.cancel_token.source();
             this.is_canceled = true;
         }
-        // if (this.fcancel.exec) {
-        //     console.log("cancel ##################")
-        //     this.fcancel.exec("watch cancel");
-        //     this.is_canceled = true;
-        // }
     }
 
-    watch(video_id, on_cancel) {
+    watch(video_id) {
         this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
-            // let self = this;
             let cookie_jar = new tough.CookieJar();
             axios.get(`${this.watch_url}/${video_id}`, {
                 jar: cookie_jar,
@@ -61,71 +51,23 @@ class NicoWatch {
                 timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token
-                // cancelToken: new CancelToken((c) => {
-                //     // An executor function receives a cancel function as a parameter
-                //     this.fcancel.exec = c;                    
-                // })
             }).then((response) => {
-                // this.source = null;
                 const body = response.data;
                 try {
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
                     const data_json = data_elm.getAttribute("data-api-data");
                     if(!data_json){
-                        reject({error: {message:"not find data-api-data"}});
+                        reject(ErrorHandling(new Error("not find data-api-data"))); 
                     }else{
                         const api_data = JSON.parse(data_json);
                         resolve({ cookie_jar, api_data }); 
                     }   
                 } catch (error) {
-                    reject({error: error});
+                    reject(ErrorHandling(error)); 
                 } 
             }).catch((error)=>{
-                // this.source = null;
-                if(axios.isCancel(error)){
-                    if(on_cancel!=undefined){
-                        // resolve(error.message);         
-                        on_cancel(error.message); 
-                    }
-                    resolve(null);
-                }else{
-                    if (error.response) {
-                        reject({
-                            status: error.response.status,
-                            data: error.response.data
-                        });
-                    }else if(error.request){
-                        reject({
-                            code: error.code,
-                            message: error.message
-                        });
-                    }else{
-                        reject({error: error});
-                    }
-                }
+                reject(ErrorHandling(error)); 
             });
-
-            // let cookie_jar = rp.jar();
-            // const options = {
-            //     uri: `${this.watch_url}/${video_id}`,
-            //     method: "GET",
-            //     jar: cookie_jar,
-            //     timeout: 10 * 1000,
-            //     proxy: this.proxy
-            // }; 
-            // this.req = rp(options);  
-            // this.req.then((body) => {
-            //     let api_data = null;
-            //     try {
-            //         const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-            //         api_data = JSON.parse(data_elm.getAttribute("data-api-data"));               
-            //     } catch (error) {
-            //         reject(error);
-            //     }
-            //     resolve({ cookie_jar, api_data });
-            // }).catch((error)=>{
-            //     reject(error);
-            // });
         });
     }    
 }
@@ -136,7 +78,6 @@ class NicoVideo {
         this.api_data = api_data;  
         this.dmcInfo = api_data.video.dmcInfo;  
         this.heart_beat_rate = 0.9;
-        // this.req = null;
         this.is_canceled = false;
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
@@ -147,11 +88,6 @@ class NicoVideo {
     }
 
     cancel() {
-        // if (this.req) {
-        //     this.req.cancel();
-        //     this.stopHeartBeat();
-        //     this.is_canceled = true;
-        // }
         if (this.source) {
             this.source.cancel("video cancel");
             this.stopHeartBeat();
@@ -243,28 +179,11 @@ class NicoVideo {
         this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
-                // return reject("dmc info is null");
                 const error = new Error("dmc info is null");
                 reject(error);
                 return;
             }
 
-            // const options = {
-            //     uri: `${this.dmcInfo.session_api.urls[0].url}?_format=json`,
-            //     method: "POST",
-            //     headers: { "content-type": "application/json" },
-            //     // jar: this.cookieJar,
-            //     json: this.DmcSession,
-            //     timeout: 10 * 1000,
-            //     proxy: this.proxy
-            // };
-            // this.req = rp(options);  
-            // this.req.then((body) => {
-            //     this.dmc_session = body.data;
-            //     resolve();
-            // }).catch((error)=>{
-            //     reject(error);
-            // });
             const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
             axios.post(url, json, {
@@ -278,26 +197,6 @@ class NicoVideo {
                 resolve(this.dmc_session);
             }).catch((error)=>{
                 reject(ErrorHandling(error)); 
-                // if(axios.isCancel(error)){
-                //     if(on_cancel!=undefined){
-                //         on_cancel(error.message); 
-                //     }
-                //     resolve(null);
-                // }else{
-                //     if (error.response) {
-                //         reject({
-                //             status: error.response.status,
-                //             data: error.response.data
-                //         });
-                //     }else if(error.request){
-                //         reject({
-                //             code: error.code,
-                //             message: error.message
-                //         });
-                //     }else{
-                //         reject({error: error});
-                //     }
-                // }
             });
         });
     }
@@ -382,14 +281,14 @@ class NicoCommnet {
         return response[2].thread.resultcode===0;
     }
 
-    getCommnet(on_cancel) {
+    getCommnet() {
         const josn = this._get_commnet_json();
-        return this._post(josn, on_cancel);
+        return this._post(josn);
     }
 
-    getCommnetDiff(res_from, on_cancel) {
+    getCommnetDiff(res_from) {
         const josn = this._get_commnet_diff_json(res_from);
-        return this._post(josn, on_cancel);
+        return this._post(josn);
     }
 
     _get_commnet_json(){
@@ -407,7 +306,7 @@ class NicoCommnet {
         return josn;       
     }
 
-    _post(post_data, on_cancel){
+    _post(post_data){
         this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
@@ -420,32 +319,10 @@ class NicoCommnet {
                 proxy: this.proxy,
                 cancelToken: this.source.token,
             }).then((response) => {
-                // this.source = null;
                 const comment_data = response.data;
                 resolve(comment_data);
             }).catch((error)=>{
-                // this.source = null;
-                if(axios.isCancel(error)){
-                    // this.source = null;
-                    if(on_cancel!=undefined){
-                        on_cancel(error.message); 
-                    }
-                    resolve(null);
-                }else{
-                    if (error.response) {
-                        reject({
-                            status: error.response.status,
-                            data: error.response.data
-                        });
-                    }else if(error.request){
-                        reject({
-                            code: error.code,
-                            message: error.message
-                        });
-                    }else{
-                        reject({error: error});
-                    }
-                }
+                reject(ErrorHandling(error)); 
             });
         });
     }
@@ -580,12 +457,7 @@ class NicoCommnet {
 }
 
 function getCookies(cookie_jar) {
-    // console.log("cookies cookies toJSON=", cookie_jar.toJSON());
     const cookies = cookie_jar.toJSON().cookies;
-    // cookie_jar.getCookies("nicovideo.jp", function(err, cookies) {
-    //     console.log("cookies cookies=", cookies);
-    // });
-    // const cookies = cookie_jar.getCookies(nicovideo_url);
     const keys = ["nicohistory", "nicosid"];
     const nico_cookies = keys.map(key=>{
         const cookie = cookies.find((item) => {

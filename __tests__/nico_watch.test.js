@@ -56,7 +56,7 @@ test("watch get cookie", async (t) => {
     t.not(api_data.video.dmcInfo.session_api, undefined);
 });
 
-test.cb("watch cancel", t => {
+test("watch cancel", async(t) => {
     t.plan(1);
 
     nock.disableNetConnect();
@@ -67,18 +67,18 @@ test.cb("watch cancel", t => {
         .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
 
     const nico_watch = new NicoWatch(proxy);
-    nico_watch.watch(TestData.video_id, (msg) => {
-        t.is(msg, "watch cancel");
-        t.end();
-    });
     setTimeout(()=>{
         nico_watch.cancel();
     }, 1000);
-   
+    try {
+        await nico_watch.watch(TestData.video_id);
+    } catch (error) {
+        t.truthy(error.cancel);
+    }
 });
 
 test("watch cancel 2", async(t) => {
-    t.plan(3);
+    t.plan(1);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -89,34 +89,20 @@ test("watch cancel 2", async(t) => {
 
     const nico_watch = new NicoWatch(proxy);
 
-    let cancel_count = 0;
     setTimeout(()=>{
         nico_watch.cancel();
         nico_watch.cancel();
     }, 1000);
 
-    const ret = await nico_watch.watch(TestData.video_id, (msg) => {
-        console.log("watch cancel");
-        t.is(msg, "watch cancel");
-        cancel_count++;
-    });
-    t.is(ret, null);
-    t.is(cancel_count, 1);
-
-    // setTimeout(()=>{
-    //     nico_watch.cancel();
-    // }, 1000);
-    // setTimeout(()=>{
-    //     nico_watch.cancel();
-    // }, 1100);
-    // setTimeout(()=>{
-    //     t.is(cancel_count, 1);
-    //     t.end();
-    // }, 2000);
+    try {
+        await nico_watch.watch(TestData.video_id);
+    } catch (error) {
+        t.truthy(error.cancel);    
+    }
 });
 
 test("watch timetout", async (t) => {
-    t.plan(2);
+    t.plan(3);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -129,24 +115,26 @@ test("watch timetout", async (t) => {
         const nico_watch = new NicoWatch(proxy);
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
-        t.is(error.code, "ECONNABORTED");
+        t.is(error.cancel, undefined);
+        t.is(error.name, "RequestError");
         t.regex(error.message, /timeout/);
     }
 });
 
 test("watch page not find", async t => {
-    t.plan(1);
+    t.plan(2);
 
     try {
         const nico_watch = new NicoWatch(proxy);
         await nico_watch.watch("ms00000000");
     } catch (error) {
-        t.is(error.status, 404);
+        t.is(error.cancel, undefined);
+        t.is(error.name, "ResponseError");
     }
 });
 
 test("watch data-api-data json error", async (t) => {
-    t.plan(1);
+    t.plan(2);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -163,12 +151,13 @@ test("watch data-api-data json error", async (t) => {
         const nico_watch = new NicoWatch(proxy);
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
-        t.is(error.error.message, "Unexpected token d in JSON at position 0");
+        t.is(error.cancel, undefined);
+        t.is(error.message, "Unexpected token d in JSON at position 0");
     }
 });
 
 test("watch no data-api-data", async (t) => {
-    t.plan(1);
+    t.plan(2);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -185,12 +174,13 @@ test("watch no data-api-data", async (t) => {
         const nico_watch = new NicoWatch(proxy);
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
-        t.is(error.error.message, "not find data-api-data");
+        t.is(error.cancel, undefined);
+        t.is(error.message, "not find data-api-data");
     }
 });
 
 test("watch no js-initial-watch-data", async (t) => {
-    t.plan(1);
+    t.plan(2);
 
     nock.disableNetConnect();
     nock.enableNetConnect("localhost");
@@ -207,6 +197,7 @@ test("watch no js-initial-watch-data", async (t) => {
         const nico_watch = new NicoWatch(proxy);
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
-        t.is(error.error.message, "Cannot read property 'getAttribute' of null");
+        t.is(error.cancel, undefined);
+        t.is(error.message, "Cannot read property 'getAttribute' of null");
     }
 });

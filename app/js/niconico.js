@@ -2,7 +2,9 @@ const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
 const axiosCookieJarSupport = require("axios-cookiejar-support").default;
-axiosCookieJarSupport(axios);
+// axiosCookieJarSupport(axios);
+const client = axios.create({});
+axiosCookieJarSupport(client);
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -24,7 +26,7 @@ const ErrorHandling = (error)=> {
 };
 
 class NicoWatch {
-    constructor(proxy) {  
+    constructor(proxy) { 
         this.watch_url = `${nicovideo_url}/watch`;
         this.req = null;
         this.is_canceled = false;
@@ -45,7 +47,7 @@ class NicoWatch {
         this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
             let cookie_jar = new tough.CookieJar();
-            axios.get(`${this.watch_url}/${video_id}`, {
+            client.get(`${this.watch_url}/${video_id}`, {
                 jar: cookie_jar,
                 withCredentials: true,
                 timeout: 10 * 1000,
@@ -540,6 +542,7 @@ function getThumbInfo(api_data){
 }
 
 module.exports = {
+    client: client,
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoCommnet: NicoCommnet,

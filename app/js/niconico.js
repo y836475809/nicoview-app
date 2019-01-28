@@ -1,10 +1,10 @@
 const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
-const axiosCookieJarSupport = require("axios-cookiejar-support").default;
+// const axiosCookieJarSupport = require("axios-cookiejar-support").default;
 // axiosCookieJarSupport(axios);
 const client = axios.create({});
-axiosCookieJarSupport(client);
+// axiosCookieJarSupport(client);
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -46,9 +46,9 @@ class NicoWatch {
         this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
-            let cookie_jar = new tough.CookieJar();
+            // let cookie_jar = new tough.CookieJar();
             client.get(`${this.watch_url}/${video_id}`, {
-                jar: cookie_jar,
+                // jar: cookie_jar,
                 withCredentials: true,
                 timeout: 10 * 1000,
                 proxy: this.proxy,
@@ -56,13 +56,20 @@ class NicoWatch {
             }).then((response) => {
                 const body = response.data;
                 try {
+                    const cookie_headers = response.headers["Set-Cookie"];
+                    let cookies;
+                    if (cookie_headers instanceof Array){
+                        cookies = cookie_headers.map(tough.Cookie.parse);
+                    }else{
+                        cookies = [tough.Cookie.parse(cookie_headers)];
+                    }
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
                     const data_json = data_elm.getAttribute("data-api-data");
                     if(!data_json){
                         reject(ErrorHandling(new Error("not find data-api-data"))); 
                     }else{
                         const api_data = JSON.parse(data_json);
-                        resolve({ cookie_jar, api_data }); 
+                        resolve({ cookies, api_data }); 
                     }   
                 } catch (error) {
                     reject(ErrorHandling(error)); 
@@ -458,11 +465,13 @@ class NicoCommnet {
     }
 }
 
-function getCookies(cookie_jar) {
-    const cookies = cookie_jar.toJSON().cookies;
-    const keys = ["nicohistory", "nicosid"];
+function getCookies(cookies) {    
+    const cookie_jsons = cookies.map(value=>{
+        return value.toJSON();
+    });
+    const keys = ["nicohistory"];
     const nico_cookies = keys.map(key=>{
-        const cookie = cookies.find((item) => {
+        const cookie = cookie_jsons.find((item) => {
             return item.key == key;
         });
         if (!cookie) {

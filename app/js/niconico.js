@@ -1,10 +1,7 @@
 const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
-// const axiosCookieJarSupport = require("axios-cookiejar-support").default;
-// axiosCookieJarSupport(axios);
 const client = axios.create({});
-// axiosCookieJarSupport(client);
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -29,7 +26,6 @@ class NicoWatch {
     constructor(proxy) { 
         this.watch_url = `${nicovideo_url}/watch`;
         this.req = null;
-        this.is_canceled = false;
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
@@ -38,12 +34,10 @@ class NicoWatch {
     cancel() {
         if (this.source) {
             this.source.cancel("watch cancel");
-            this.is_canceled = true;
         }
     }
 
     watch(video_id) {
-        this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
             // let cookie_jar = new tough.CookieJar();
@@ -82,12 +76,10 @@ class NicoWatch {
 }
 
 class NicoVideo {
-    constructor(cookie_jar, api_data, proxy) {
-        this.cookie_jar = cookie_jar;
+    constructor(api_data, proxy) {
         this.api_data = api_data;  
         this.dmcInfo = api_data.video.dmcInfo;  
         this.heart_beat_rate = 0.9;
-        this.is_canceled = false;
         this.proxy = proxy;
         this.cancel_token = axios.CancelToken;
         this.source = null;
@@ -99,21 +91,17 @@ class NicoVideo {
     cancel() {
         if (this.source) {
             this.source.cancel("video cancel");
-            this.stopHeartBeat();
-            this.is_canceled = true;
         }
         
         if (this.source_hb_options) {
             this.source_hb_options.cancel("hb_options cancel");
-            this.stopHeartBeat();
-            this.is_canceled = true;
         }
 
         if (this.source_hb_post) {
-            this.source_hb_post.cancel("hb_post cancel");
-            this.stopHeartBeat();
-            this.is_canceled = true;
+            this.source_hb_post.cancel("hb_post cancel");     
         }
+
+        this.stopHeartBeat();
     }
 
     get SmileUrl() {
@@ -184,7 +172,6 @@ class NicoVideo {
     }
 
     postDmcSession() {
-        this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
@@ -195,7 +182,7 @@ class NicoVideo {
 
             const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
-            axios.post(url, json, {
+            client.post(url, json, {
                 // jar: cookie_jar,
                 withCredentials: true,
                 timeout: 10 * 1000,
@@ -222,7 +209,7 @@ class NicoVideo {
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
-            axios.options(url, {     
+            client.options(url, {     
                 withCredentials: true,   
                 timeout: 10 * 1000,
                 proxy: this.proxy ,
@@ -243,9 +230,9 @@ class NicoVideo {
         const session = this.dmc_session;
 
         const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;    
-        this.heart_beat_id = setInterval(() => {
-            this.source_hb_post = this.cancel_token.source();
-            axios.post(url, session, {
+        this.source_hb_post = this.cancel_token.source();
+        this.heart_beat_id = setInterval(() => {       
+            client.post(url, session, {
                 timeout: 10 * 1000,
                 withCredentials: true,
                 proxy: this.proxy,
@@ -266,9 +253,9 @@ class NicoVideo {
     }
 }
 
-class NicoCommnet {
-    constructor(cookie_jar, api_data, proxy) {
-        this.cookie_jar = cookie_jar;
+class NicoComment {
+    constructor(api_data, proxy) {
+        // this.cookie_jar = cookie_jar;
         this.api_data = api_data;
         this.proxy = proxy;
         this.r_no = 0;
@@ -276,13 +263,11 @@ class NicoCommnet {
         this.req = null;
         this.cancel_token = axios.CancelToken;
         this.source = null;
-        this.is_canceled = false;
     }
 
     cancel() {
         if (this.source) {
             this.source.cancel("comment cancel");
-            this.is_canceled = true;
         }
     }
 
@@ -290,17 +275,17 @@ class NicoCommnet {
         return response[2].thread.resultcode===0;
     }
 
-    getCommnet() {
-        const josn = this._get_commnet_json();
+    getComment() {
+        const josn = this._get_comment_json();
         return this._post(josn);
     }
 
-    getCommnetDiff(res_from) {
-        const josn = this._get_commnet_diff_json(res_from);
+    getCommentDiff(res_from) {
+        const josn = this._get_comment_diff_json(res_from);
         return this._post(josn);
     }
 
-    _get_commnet_json(){
+    _get_comment_json(){
         const josn = this.hasOwnerComment() ? 
             this.makeJsonOwner(this.r_no, this.p_no):this.makeJsonNoOwner(this.r_no, this.p_no); 
         this.r_no += 1;
@@ -308,7 +293,7 @@ class NicoCommnet {
         return josn;       
     }
 
-    _get_commnet_diff_json(res_from){
+    _get_comment_diff_json(res_from){
         const josn = this.makeJsonDiff(this.r_no, this.p_no, res_from);
         this.r_no += 1;
         this.p_no += josn.length;
@@ -316,12 +301,11 @@ class NicoCommnet {
     }
 
     _post(post_data){
-        this.is_canceled = false;
         this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
             // const url = "http://nmsg.nicovideo.jp/api.json/";
             const json = post_data;
-            axios.post(niconmsg_url, json, {
+            client.post(niconmsg_url, json, {
                 // jar: cookie_jar,
                 withCredentials: true,
                 timeout: 10 * 1000,
@@ -554,7 +538,7 @@ module.exports = {
     client: client,
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
-    NicoCommnet: NicoCommnet,
+    NicoComment: NicoComment,
     getCookies: getCookies,
     getThumbInfo: getThumbInfo
 };

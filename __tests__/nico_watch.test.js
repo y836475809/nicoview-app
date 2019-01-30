@@ -4,20 +4,14 @@ const { NicoWatch, getCookies } = require("../app/js/niconico");
 const { MockNicoUitl, TestData } = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
-// const mock_server = new MockNicoServer();
-// const server_url = mock_server.serverUrl;
-// const proxy = mock_server.proxy;
-
 const prof_time = new ProfTime();
-const example = nock("http://www.nicovideo.jp");
+const nico_mock = nock("http://www.nicovideo.jp");
 
-test.before(async t => {
-    // await mock_server.start();
+test.before(t => {
     prof_time.clear();
 });
 
-test.after(async t => {
-    // await mock_server.stop();
+test.after(t => {
     prof_time.log(t);
 
     nock.cleanAll();  
@@ -41,16 +35,13 @@ const getMock = (delay, body) =>{
     if(!body){
         body = MockNicoUitl.getWatchHtml(TestData.video_id);
     }
-    example
+    nico_mock
         .get(`/watch/${TestData.video_id}`)
         .delay(delay)
-        .reply(200, 
-            body, 
-            headers);
+        .reply(200, body, headers);
 };
 
 test("watch get cookie", async (t) => {
-
     getMock(1);
 
     const nico_watch = new NicoWatch();
@@ -74,13 +65,7 @@ test("watch get cookie", async (t) => {
 test("watch cancel", async(t) => {
     t.plan(1);
 
-    getMock(5000);
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .delay(5000)
-    //     .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
+    getMock(3000);
 
     const nico_watch = new NicoWatch();
     setTimeout(()=>{
@@ -96,13 +81,7 @@ test("watch cancel", async(t) => {
 test("watch cancel 2", async(t) => {
     t.plan(1);
 
-    getMock(5000);
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .delay(5000)
-    //     .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
+    getMock(3000);
 
     const nico_watch = new NicoWatch();
 
@@ -121,13 +100,7 @@ test("watch cancel 2", async(t) => {
 test("watch timetout", async (t) => {
     t.plan(3);
 
-    getMock(11000);
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .delay(11000)
-    //     .reply(200, MockNicoUitl.getWatchHtml(TestData.video_id));
+    getMock(6000);
         
     try {
         const nico_watch = new NicoWatch();
@@ -155,17 +128,6 @@ test("watch page not find", async t => {
 test("watch data-api-data json error", async (t) => {
     t.plan(2);
 
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .reply(200, 
-    //         `<!DOCTYPE html>
-    //         <html lang="ja">
-    //             <body>
-    //             <div id="js-initial-watch-data" data-api-data="dummy"
-    //             </body>
-    //         </html>`);
     const body =             
     `<!DOCTYPE html>
     <html lang="ja">
@@ -186,17 +148,6 @@ test("watch data-api-data json error", async (t) => {
 test("watch no data-api-data", async (t) => {
     t.plan(2);
 
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .reply(200, 
-    //         `<!DOCTYPE html>
-    //         <html lang="ja">
-    //             <body>
-    //             <div id="js-initial-watch-data" fault-data-api-data="{&quot;video&quot;:null}"
-    //             </body>
-    //         </html>`);
     const body =             
     `<!DOCTYPE html>
     <html lang="ja">
@@ -217,17 +168,6 @@ test("watch no data-api-data", async (t) => {
 test("watch no js-initial-watch-data", async (t) => {
     t.plan(2);
 
-    // nock.disableNetConnect();
-    // nock.enableNetConnect("localhost");
-    // nock(server_url)
-    //     .get(`/watch/${TestData.video_id}`)
-    //     .reply(200, 
-    //         `<!DOCTYPE html>
-    //         <html lang="ja">
-    //             <body>
-    //             <div id="fault-js-initial-watch-data" data-api-data="{&quot;video&quot;:null}"
-    //             </body>
-    //         </html>`);
     const body =             
     `<!DOCTYPE html>
     <html lang="ja">

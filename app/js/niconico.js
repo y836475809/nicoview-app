@@ -1,7 +1,9 @@
 const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
-const client = axios.create({});
+const client = axios.create({
+    timeout: 5 * 1000
+});
 
 const nicovideo_url = "http://www.nicovideo.jp";
 const niconmsg_url = "http://nmsg.nicovideo.jp/api.json/";
@@ -57,7 +59,6 @@ class NicoWatch {
             client.get(`${this.watch_url}/${video_id}`, {
                 // jar: cookie_jar,
                 withCredentials: true,
-                timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token
             }).then((response) => {
@@ -200,7 +201,6 @@ class NicoVideo {
             client.post(url, json, {
                 // jar: cookie_jar,
                 withCredentials: true,
-                timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token,
             }).then((response) => {
@@ -226,7 +226,6 @@ class NicoVideo {
 
             client.options(url, {     
                 withCredentials: true,   
-                timeout: 10 * 1000,
                 proxy: this.proxy ,
                 cancelToken: this.source_hb_options.token,  
             }).then((response) => {
@@ -237,7 +236,7 @@ class NicoVideo {
         });
     }
     
-    postHeartBeat() {
+    postHeartBeat(on_error) {
         this.stopHeartBeat();
 
         const id = this.dmc_session.session.id;
@@ -246,14 +245,16 @@ class NicoVideo {
 
         const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;    
         this.source_hb_post = this.cancel_token.source();
-        this.heart_beat_id = setInterval(() => {       
+        this.heart_beat_id = setInterval(() => {  
             client.post(url, session, {
-                timeout: 10 * 1000,
                 withCredentials: true,
                 proxy: this.proxy,
                 cancelToken: this.source_hb_post.token,  
             }).catch((error)=>{
                 this.stopHeartBeat();
+                if(on_error){
+                    on_error(ErrorHandling(error));
+                }
             });
             console.log("HeartBeat ", new Date());
         }, interval_ms);
@@ -323,7 +324,6 @@ class NicoComment {
             client.post(niconmsg_url, json, {
                 // jar: cookie_jar,
                 withCredentials: true,
-                timeout: 10 * 1000,
                 proxy: this.proxy,
                 cancelToken: this.source.token,
             }).then((response) => {
@@ -465,7 +465,6 @@ class NicoComment {
 }
 
 function getCookies(cookies) {  
-    console.log("########cookies=", cookies)  
     const cookie_jsons = cookies.map(value=>{
         return value.toJSON();
     });
@@ -551,7 +550,6 @@ function getThumbInfo(api_data){
 }
 
 module.exports = {
-    client: client,
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,

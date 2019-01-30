@@ -9,7 +9,7 @@ const no_owner_comment = TestData.no_owner_comment;
 const owner_comment = TestData.owner_comment;
 
 const prof_time = new ProfTime();
-const example = nock("http://nmsg.nicovideo.jp");
+const nico_mock = nock("http://nmsg.nicovideo.jp");
 
 test.before(t => {
     console.log("beforeAll");
@@ -33,7 +33,7 @@ test.afterEach(t => {
 });
 
 const getMock = (delay) =>{
-    example
+    nico_mock
         .post("/api.json/")
         .delay(delay)
         .reply((uri, reqbody)=>{
@@ -52,11 +52,10 @@ const getMock = (delay) =>{
                 return [200, owner_comment];
             }
 
-            return [200,
-                [
-                    { "ping": { "content": "rs:0" } },
-                    { "ping": { "content": "rf:0" } }
-                ]]; 
+            return [200, [
+                { "ping": { "content": "rs:0" } },
+                { "ping": { "content": "rf:0" } }
+            ]]; 
         });
 };
 
@@ -181,7 +180,7 @@ test("get comment illegal param", async (t) => {
 test("get comment timeout", async (t) => {
     t.plan(3);
 
-    getMock(11000);
+    getMock(6000);
 
     const nico_comment = new NicoComment(data_api_data);
     try {

@@ -22,6 +22,19 @@ const ErrorHandling = (error)=> {
     }
 };
 
+const getFromHeaders = (headers, target_key)=> {
+    let values = [];
+    for (const key in headers) {
+        if (key.toLowerCase() == target_key.toLowerCase()) {
+            values.push(headers[key]);
+        }
+    }
+    if(values.length>0){
+        return values;
+    }
+    throw new Error(`Can not get ${target_key} form headers`);
+};
+
 class NicoWatch {
     constructor(proxy) { 
         this.watch_url = `${nicovideo_url}/watch`;
@@ -50,18 +63,20 @@ class NicoWatch {
             }).then((response) => {
                 const body = response.data;
                 try {
-                    const cookie_headers = response.headers["Set-Cookie"];
-                    let cookies;
-                    if (cookie_headers instanceof Array){
-                        cookies = cookie_headers.map(tough.Cookie.parse);
-                    }else{
-                        cookies = [tough.Cookie.parse(cookie_headers)];
-                    }
+                    const cookie_headers = getFromHeaders(response.headers, "Set-Cookie");
+                    const cookies = cookie_headers.map(tough.Cookie.parse);
+                    // if (cookie_headers instanceof Array){
+                    //     cookies = cookie_headers.map(tough.Cookie.parse);
+                    // }else{
+                    //     cookies = [tough.Cookie.parse(cookie_headers)];
+                    //     console.log("########cookies=", cookies)
+                    //     console.log("########cookies ary=", cookies instanceof Array)
+                    // }
                     const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
                     const data_json = data_elm.getAttribute("data-api-data");
                     if(!data_json){
                         reject(ErrorHandling(new Error("not find data-api-data"))); 
-                    }else{
+                    }else{                     
                         const api_data = JSON.parse(data_json);
                         resolve({ cookies, api_data }); 
                     }   
@@ -449,7 +464,8 @@ class NicoComment {
     }
 }
 
-function getCookies(cookies) {    
+function getCookies(cookies) {  
+    console.log("########cookies=", cookies)  
     const cookie_jsons = cookies.map(value=>{
         return value.toJSON();
     });

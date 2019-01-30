@@ -228,19 +228,34 @@ test("cancel dmc heart beat options", async (t) => {
     mockAxios
         .onOptions(reg_dmc_hb_url)
         .reply((config) => {
-            hb_options_count++;
-            return [200, "ok"];
+            
+            return new Promise((resolve , reject) => {
+                setTimeout(()=>{
+                    console.log("###############config=",config);
+                    hb_options_count++;
+                    resolve([200, "ok"]);
+                }, 5000);
+            });
         });
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session =  { session: { id:"12345678" } };
-    nico_video.optionsHeartBeat()
-        .then((session)=>{
+    // nico_video.optionsHeartBeat()
+    //     .then((session)=>{
 
-        }).catch(error=>{
-            t.truthy(error.cancel); 
-        });
-    nico_video.cancel();
+    //     }).catch(error=>{
+    //         t.truthy(error.cancel); 
+    //     });
+    // nico_video.cancel();
+    setTimeout(()=>{
+        nico_video.cancel();
+    }, 1000);
+    try {
+        await nico_video.optionsHeartBeat();
+    } catch (error) {
+        console.log("###############error=",error);
+        t.truthy(error.cancel); 
+    }
 
     await new Promise(resolve => setTimeout(resolve, 3000));
 

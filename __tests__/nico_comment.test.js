@@ -1,43 +1,67 @@
 const test = require("ava");
 const nock = require("nock");
-const { NicoCommnet } = require("../app/js/niconico");
-const { MockNicoServer, MockNicoUitl, TestData} = require("./helper/nico_mock");
-const res_comment_json = TestData.no_owner_comment;
-const data_api_data = TestData.data_api_data;
-MockNicoUitl.tohttp(data_api_data);
+const { NicoComment } = require("../app/js/niconico");
+const { TestData} = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
-const mock_server = new MockNicoServer();
-const server_url = mock_server.serverUrl;
-const proxy = mock_server.proxy;
+const data_api_data = TestData.data_api_data;
+const no_owner_comment = TestData.no_owner_comment;
+const owner_comment = TestData.owner_comment;
+
 const prof_time = new ProfTime();
+const example = nock("http://nmsg.nicovideo.jp");
 
-const cookie_jar = MockNicoUitl.getCookieJar(TestData.video_id);
-
-test.before(async t => {
+test.before(t => {
     console.log("beforeAll");
-    await mock_server.start();
     prof_time.clear();
 });
 
-test.after(async t => {
+test.after(t => {
     console.log("afterAll");
-    await mock_server.stop();
     prof_time.log(t);
+    nock.cleanAll();  
 });
 
 test.beforeEach(t => {
     prof_time.start(t);
     nock.cleanAll();
+    nock.enableNetConnect();
 });
 
 test.afterEach(t => {
     prof_time.end(t);
 });
 
+const getMock = (delay) =>{
+    example
+        .post("/api.json/")
+        .delay(delay)
+        .reply((uri, reqbody)=>{
+            const data = JSON.parse(reqbody);         
+            if(data.length===0){              
+                return [404, "404 - \"Not Found\r\n\""];
+            }
+
+            if(data.length===8){
+                //no owner
+                return [200, no_owner_comment];
+            }
+
+            if(data.length===11){
+                //owner
+                return [200, owner_comment];
+            }
+
+            return [200,
+                [
+                    { "ping": { "content": "rs:0" } },
+                    { "ping": { "content": "rf:0" } }
+                ]]; 
+        });
+};
 
 test("request param", t => {
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    const nico_comment = new NicoComment(data_api_data);
 
     {
         const commnet_json = nico_comment.makeJsonNoOwner(0, 0);
@@ -69,10 +93,10 @@ test("request param", t => {
 });
 
 test("request param inc rs,ps no", t => {
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    const nico_comment = new NicoComment(data_api_data);
 
     {
-        const commnet_json = nico_comment._get_commnet_json();
+        const commnet_json = nico_comment._get_comment_json();
         t.is(commnet_json.length, 8);
         t.is(commnet_json[0].ping.content, "rs:0");
         t.is(commnet_json[1].ping.content, "ps:0");
@@ -84,7 +108,7 @@ test("request param inc rs,ps no", t => {
         t.is(commnet_json[7].ping.content, "rf:0");
     }
     {
-        const commnet_json = nico_comment._get_commnet_json();
+        const commnet_json = nico_comment._get_comment_json();
         t.is(commnet_json.length, 8);
         t.is(commnet_json[0].ping.content, "rs:1");
         t.is(commnet_json[1].ping.content, "ps:8");
@@ -96,7 +120,7 @@ test("request param inc rs,ps no", t => {
         t.is(commnet_json[7].ping.content, "rf:1");
     }
     {
-        const commnet_json = nico_comment._get_commnet_json();
+        const commnet_json = nico_comment._get_comment_json();
         t.is(commnet_json.length, 8);
         t.is(commnet_json[0].ping.content, "rs:2");
         t.is(commnet_json[1].ping.content, "ps:16");
@@ -110,8 +134,10 @@ test("request param inc rs,ps no", t => {
 });
 
 test("get comment", async (t) => {
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
-    const res_commnets = await nico_comment.getCommnet();
+    getMock(1);
+
+    const nico_comment = new NicoComment(data_api_data);
+    const res_commnets = await nico_comment.getComment();
 
     t.is(res_commnets.length, 7);
     t.not(res_commnets[0].ping, undefined);
@@ -126,7 +152,9 @@ test("get comment", async (t) => {
 test("get comment empty param", async (t) => {
     t.plan(2);
 
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    getMock(1);
+
+    const nico_comment = new NicoComment(data_api_data);
     try {
         await nico_comment._post([]);
     } catch (error) {
@@ -136,16 +164,16 @@ test("get comment empty param", async (t) => {
 });
 
 test("get comment illegal param", async (t) => {
-    t.plan(1);
+    getMock(1);
 
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    const nico_comment = new NicoComment(data_api_data);
 
     let cmds = [];
     cmds.push(nico_comment._getPing("rs", 0));
     cmds.push(nico_comment._getPing("rf", 0));
-    const res_commnets = await nico_comment._post(cmds);
-    const chats = res_commnets.filter((elm, index) => { 
-        return "chat" in res_commnets[index]; 
+    const res_comments = await nico_comment._post(cmds);
+    const chats = res_comments.filter((elm, index) => { 
+        return "chat" in res_comments[index]; 
     });
     t.is(chats.length, 0);
 });
@@ -153,17 +181,11 @@ test("get comment illegal param", async (t) => {
 test("get comment timeout", async (t) => {
     t.plan(3);
 
-    nock.disableNetConnect();
-    nock.enableNetConnect("localhost");
-    nock(server_url)
-        .post("/api.json/")
-        .delay(11000)
-        .reply(200, res_comment_json);
+    getMock(11000);
 
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
-
+    const nico_comment = new NicoComment(data_api_data);
     try {
-        await nico_comment.getCommnet();
+        await nico_comment.getComment();
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "RequestError");
@@ -174,20 +196,15 @@ test("get comment timeout", async (t) => {
 test("get comment cancel", async(t) => {
     t.plan(1);
     
-    nock.disableNetConnect();
-    nock.enableNetConnect("localhost");
-    nock(server_url)
-        .post("/api.json/")
-        .delay(3000)
-        .reply(200, res_comment_json);
+    getMock(3000);
 
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    const nico_comment = new NicoComment(data_api_data);
     setTimeout(()=>{
         nico_comment.cancel();
     }, 1000);
 
     try {
-        await nico_comment.getCommnet();
+        await nico_comment.getComment();
     } catch (error) {
         t.truthy(error.cancel);
     }
@@ -196,14 +213,9 @@ test("get comment cancel", async(t) => {
 test("get comment cancel 2", async(t) => {
     t.plan(1);
     
-    nock.disableNetConnect();
-    nock.enableNetConnect("localhost");
-    nock(server_url)
-        .post("/api.json/")
-        .delay(3000)
-        .reply(200, res_comment_json);
+    getMock(3000);
 
-    const nico_comment = new NicoCommnet(cookie_jar, data_api_data, proxy);
+    const nico_comment = new NicoComment(data_api_data);
     
     setTimeout(()=>{
         nico_comment.cancel();
@@ -211,7 +223,7 @@ test("get comment cancel 2", async(t) => {
     }, 1000);
     
     try {
-        await nico_comment.getCommnet();
+        await nico_comment.getComment();
     } catch (error) {
         t.truthy(error.cancel);
     }

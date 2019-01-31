@@ -1,20 +1,10 @@
 const test = require("ava");
-const nock = require("nock");
 const { NicoWatch, NicoVideo, NicoComment, getCookies, getThumbInfo } = require("../app/js/niconico");
-const { MockNicoUitl, TestData } = require("./helper/nico_mock");
+const { NicoMocks, TestData } = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
-const no_owner_comment = TestData.no_owner_comment;
-const owner_comment = TestData.owner_comment;
-
 const prof_time = new ProfTime();
-
-const nico_watch_mock = nock("http://www.nicovideo.jp");
-const nico_nmsg_mock = nock("http://nmsg.nicovideo.jp");
-const nico_session_mock = nock("https://api.dmc.nico");
-const nico_hb_mock = nock("https://api.dmc.nico");
-let hb_options_count = 0;
-let hb_post_count = 0;
+const nico_mocks = new NicoMocks();
 
 test.before(t => {
     prof_time.clear();
@@ -23,111 +13,18 @@ test.before(t => {
 test.after(t => {
     prof_time.log(t);
 
-    nock.cleanAll();
+    nico_mocks.clean();
 });
 
 test.beforeEach(t => {
     prof_time.start(t);
 
-    nock.cleanAll();
-    nock.enableNetConnect();
+    nico_mocks.clean();
 });
 
 test.afterEach(t => {
     prof_time.end(t);
 });
-
-const getWatchMock = (delay, body) =>{
-    const headers = {
-        "Set-Cookie": `nicohistory=${TestData.video_id}%3A123456789; path=/; domain=.nicovideo.jp`
-    };
-    if(!body){
-        body = MockNicoUitl.getWatchHtml(TestData.video_id);
-    }
-    nico_watch_mock
-        .get(`/watch/${TestData.video_id}`)
-        .delay(delay)
-        .reply(200, body, headers);
-};
-
-const getNmsgMock = (delay) =>{
-    nico_nmsg_mock
-        .post("/api.json/")
-        .delay(delay)
-        .reply((uri, reqbody)=>{
-            const data = JSON.parse(reqbody);         
-            if(data.length===0){              
-                return [404, "404 - \"Not Found\r\n\""];
-            }
-
-            if(data.length===8){
-                //no owner
-                return [200, no_owner_comment];
-            }
-
-            if(data.length===11){
-                //owner
-                return [200, owner_comment];
-            }
-
-            return [200, [
-                { "ping": { "content": "rs:0" } },
-                { "ping": { "content": "rf:0" } }
-            ]]; 
-        });
-};
-
-const getSessionMock = (delay) =>{
-    nico_session_mock
-        .post("/api/sessions")
-        .query({ _format: "json" })   
-        .delay(delay)
-        .reply((uri, reqbody)=>{
-            const data = JSON.parse(reqbody);         
-            if(data.session 
-                && data.session.recipe_id 
-                && data.session.content_id
-                && data.session.content_type
-                && data.session.content_src_id_sets
-                && data.session.timing_constraint
-                && data.session.keep_method
-                && data.session.protocol
-                && (data.session.content_uri === "")
-                && data.session.session_operation_auth
-                && data.session.content_auth
-                && data.session.client_info
-                && data.session.priority !== undefined){
-                return [200, {
-                    meta: { status: 201,message: "created" },
-                    data: { session: { id:"12345678" } }
-                }];                    
-            }
-
-            return [403, "fault 403"];
-        });
-};
-
-const getHBMock = (options_delay, post_delay) =>{
-    hb_options_count = 0;
-    hb_post_count = 0;
-
-    nico_hb_mock
-        .options(/\/api\/sessions\/.+/)
-        .query({ _format: "json", _method: "PUT" })
-        .delay(options_delay)
-        .reply((uri, reqbody)=>{
-            hb_options_count++;
-            return [200, "ok"];
-        })
-        .post(/\/api\/sessions\/.+/)
-        .query({ _format: "json", _method: "PUT" })
-        .delay(post_delay)
-        .times(50)
-        .reply((uri, reqbody)=>{
-            hb_post_count++;
-            return [200, "ok"];
-        });
-};
 
 class pp{
     constructor(){
@@ -230,10 +127,10 @@ class pp{
 test("play pp", async (t) => {
     t.plan(3);
 
-    getWatchMock(1);
-    getNmsgMock(1);
-    getSessionMock(1);
-    getHBMock(1, 1);
+    nico_mocks.watch();
+    nico_mocks.comment();
+    nico_mocks.dmc_session();
+    nico_mocks.dmc_hb();
 
     const myp = new pp();
     myp.play(TestData.video_id, (state)=>{
@@ -246,8 +143,8 @@ test("play pp", async (t) => {
     });
 
     await new Promise(resolve => setTimeout(resolve, 2200));
-    t.is(hb_options_count, 1);
-    t.is(hb_post_count, 2);
+    t.is(nico_mocks.hb_options_count, 1);
+    t.is(nico_mocks.hb_post_count, 2);
 });
 
 // describe("nico play", () => {

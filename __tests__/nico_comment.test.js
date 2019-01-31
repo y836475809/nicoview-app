@@ -1,63 +1,30 @@
 const test = require("ava");
-const nock = require("nock");
 const { NicoComment } = require("../app/js/niconico");
-const { TestData} = require("./helper/nico_mock");
+const { NicoMocks, TestData} = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
 const data_api_data = TestData.data_api_data;
-const no_owner_comment = TestData.no_owner_comment;
-const owner_comment = TestData.owner_comment;
 
 const prof_time = new ProfTime();
-const nico_mock = nock("http://nmsg.nicovideo.jp");
+const nico_mocks = new NicoMocks();
 
 test.before(t => {
-    console.log("beforeAll");
     prof_time.clear();
 });
 
 test.after(t => {
-    console.log("afterAll");
     prof_time.log(t);
-    nock.cleanAll();  
+    nico_mocks.clean();
 });
 
 test.beforeEach(t => {
     prof_time.start(t);
-    nock.cleanAll();
-    nock.enableNetConnect();
+    nico_mocks.clean();
 });
 
 test.afterEach(t => {
     prof_time.end(t);
 });
-
-const getMock = (delay) =>{
-    nico_mock
-        .post("/api.json/")
-        .delay(delay)
-        .reply((uri, reqbody)=>{
-            const data = JSON.parse(reqbody);         
-            if(data.length===0){              
-                return [404, "404 - \"Not Found\r\n\""];
-            }
-
-            if(data.length===8){
-                //no owner
-                return [200, no_owner_comment];
-            }
-
-            if(data.length===11){
-                //owner
-                return [200, owner_comment];
-            }
-
-            return [200, [
-                { "ping": { "content": "rs:0" } },
-                { "ping": { "content": "rf:0" } }
-            ]]; 
-        });
-};
 
 test("request param", t => {
     const nico_comment = new NicoComment(data_api_data);
@@ -133,7 +100,7 @@ test("request param inc rs,ps no", t => {
 });
 
 test("get comment", async (t) => {
-    getMock(1);
+    nico_mocks.comment();
 
     const nico_comment = new NicoComment(data_api_data);
     const res_commnets = await nico_comment.getComment();
@@ -151,7 +118,7 @@ test("get comment", async (t) => {
 test("get comment empty param", async (t) => {
     t.plan(2);
 
-    getMock(1);
+    nico_mocks.comment();
 
     const nico_comment = new NicoComment(data_api_data);
     try {
@@ -163,7 +130,7 @@ test("get comment empty param", async (t) => {
 });
 
 test("get comment illegal param", async (t) => {
-    getMock(1);
+    nico_mocks.comment();
 
     const nico_comment = new NicoComment(data_api_data);
 
@@ -180,7 +147,7 @@ test("get comment illegal param", async (t) => {
 test("get comment timeout", async (t) => {
     t.plan(3);
 
-    getMock(6000);
+    nico_mocks.comment(6000);
 
     const nico_comment = new NicoComment(data_api_data);
     try {
@@ -195,7 +162,7 @@ test("get comment timeout", async (t) => {
 test("get comment cancel", async(t) => {
     t.plan(1);
     
-    getMock(3000);
+    nico_mocks.comment(3000);
 
     const nico_comment = new NicoComment(data_api_data);
     setTimeout(()=>{
@@ -212,7 +179,7 @@ test("get comment cancel", async(t) => {
 test("get comment cancel 2", async(t) => {
     t.plan(1);
     
-    getMock(3000);
+    nico_mocks.comment(3000);
 
     const nico_comment = new NicoComment(data_api_data);
     

@@ -33,8 +33,6 @@
     // const { NicoNico, NicoCommnet } = require("./test-client");
     const video = document.getElementById("video");
     // const niconico = new NicoNico();
-    const { NicoPlay } = require("../app/js/niconico_play");
-    const nico_play = new NicoPlay();
     
     video.addEventListener("progress", (e) => {
         console.log("progressによるイベント発火");
@@ -52,34 +50,37 @@
 
     let onCancel = () =>{};
 
-    async function main(video_id) {
-        
-        onCancel = ()=>{
-            nico_play.cancel();
-        };
+    function main(video_id) {
+        ipcRenderer.send("start-nico-play", video_id);
 
-        nico_play.play(video_id, (prog)=>{
-            console.log("prog: ", prog);
-        }).then(datas=>{
-            // { nico_cookies, comments, thumb_info, video_url } = datas;
-            const nico_cookies = datas.nico_cookies;
-            const comments = datas.comments;
-            const thumb_info = datas.thumb_info;
-            const video_url = datas.dmc_video_url; 
+        ipcRenderer.on("nico-play-progress", (event, arg) => {
+            console.log("prog=", arg);
+        });
+
+        ipcRenderer.on("reply-nico-play", (event, arg) => {
+            console.log("reply arg : ", arg);
+            const nico_cookies = arg.nico_cookies;
+            const comments = arg.comments;
+            const thumb_info = arg.thumb_info;
+            const video_url = arg.dmc_video_url;
 
             const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
-
-            console.log("video url url: ", video_url);
+            if(ret!="ok"){
+                console.log("set-nicohistory error: ", video_id);
+                return;
+            }
             video.src = video_url;
             video.type = "video/mp4";
-            video.load();
-        }).catch(error=>{
-            if(error.cancel){
-                console.log("cancel");
-            }else{
-                console.log("error=", error);
-            }
+            video.load();           
         });
+
+        ipcRenderer.on("reply-nico-play-error", (event, arg) => {
+            console.log("nico-play error: ", arg);
+        });
+        
+        onCancel = ()=>{
+            ipcRenderer.send("cancel-nico-play", video_id);
+        };
 
         // console.log("start watch: ", video_id);
         // onCancel = ()=>{
@@ -140,7 +141,8 @@
     };
 
     const onclickStopHB = ()=>{
-        niconico.stopHeartBeat();
+        // niconico.stopHeartBeat();
+        ipcRenderer.send("cancel-nico-play");
     };  
 
     const onclickLoadDmc = ()=>{

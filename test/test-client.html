@@ -30,10 +30,12 @@
 
 <script>
     const { ipcRenderer } = require("electron");
-    const { NicoNico, NicoCommnet } = require("./test-client");
+    // const { NicoNico, NicoCommnet } = require("./test-client");
     const video = document.getElementById("video");
-    const niconico = new NicoNico();
-
+    // const niconico = new NicoNico();
+    const { NicoPlay } = require("../app/js/niconico_play");
+    const nico_play = new NicoPlay();
+    
     video.addEventListener("progress", (e) => {
         console.log("progressによるイベント発火");
         // console.log(e.total + ", " + e.loaded + ", "  + e.lengthComputable );
@@ -51,54 +53,82 @@
     let onCancel = () =>{};
 
     async function main(video_id) {
-        console.log("start watch: ", video_id);
+        
         onCancel = ()=>{
-            niconico.cancel();
+            nico_play.cancel();
         };
-        await niconico.watch(video_id);
-        if(niconico.isDmc()){
-            console.log("start postDmcSession: ", video_id);
-            await niconico.postDmcSession();
-            const nicohistory = niconico.getNicoHistory();
-            const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
-            if(ret!="ok"){
-                console.log("set-nicohistory error: ", video_id);
-                return;
-            }
-            console.log("set dmc url: ", video_id);
-            const url = niconico.DmcContentUri;
-            video.src = url;
-            video.type = "video/mp4";
 
-            console.log("start HeartBeat: ", video_id);
-            niconico.startHeartBeat((error) => {
-                niconico.stopHeartBeat();
-                console.log("HeartBeat error: ", error);
-            });
-            video.load();
-        }else{
-            console.log("smile: ", video_id);
-            const nicohistory = niconico.getNicoHistory();
-            const nc = new NicoCommnet();
-            nc.setParams(niconico.cookieJar, niconico.api_data);
-            onCancel = ()=>{
-                nc.cancel();
-            };
-            const comment_data = await nc.getCommnet();
-            console.log("comment_data: ", comment_data);
-            
-            const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
-            if(ret!="ok"){
-                console.log("set-nicohistory error: ", video_id);
-                return;
-            }
-            
-            const url = niconico.SmileUrl;
-            console.log("set smile url: ", url);
-            video.src = url;
+        nico_play.play(video_id, (prog)=>{
+            console.log("prog: ", prog);
+        }).then(datas=>{
+            // { nico_cookies, comments, thumb_info, video_url } = datas;
+            const nico_cookies = datas.nico_cookies;
+            const comments = datas.comments;
+            const thumb_info = datas.thumb_info;
+            const video_url = datas.dmc_video_url; 
+
+            const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+
+            console.log("video url url: ", video_url);
+            video.src = video_url;
             video.type = "video/mp4";
             video.load();
-        }
+        }).catch(error=>{
+            if(error.cancel){
+                console.log("cancel");
+            }else{
+                console.log("error=", error);
+            }
+        });
+
+        // console.log("start watch: ", video_id);
+        // onCancel = ()=>{
+        //     niconico.cancel();
+        // };
+        // await niconico.watch(video_id);
+        // if(niconico.isDmc()){
+        //     console.log("start postDmcSession: ", video_id);
+        //     await niconico.postDmcSession();
+        //     const nicohistory = niconico.getNicoHistory();
+        //     const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
+        //     if(ret!="ok"){
+        //         console.log("set-nicohistory error: ", video_id);
+        //         return;
+        //     }
+        //     console.log("set dmc url: ", video_id);
+        //     const url = niconico.DmcContentUri;
+        //     video.src = url;
+        //     video.type = "video/mp4";
+
+        //     console.log("start HeartBeat: ", video_id);
+        //     niconico.startHeartBeat((error) => {
+        //         niconico.stopHeartBeat();
+        //         console.log("HeartBeat error: ", error);
+        //     });
+        //     video.load();
+        // }else{
+        //     console.log("smile: ", video_id);
+        //     const nicohistory = niconico.getNicoHistory();
+        //     const nc = new NicoCommnet();
+        //     nc.setParams(niconico.cookieJar, niconico.api_data);
+        //     onCancel = ()=>{
+        //         nc.cancel();
+        //     };
+        //     const comment_data = await nc.getCommnet();
+        //     console.log("comment_data: ", comment_data);
+            
+        //     const ret = ipcRenderer.sendSync("set-nicohistory", [nicohistory]);
+        //     if(ret!="ok"){
+        //         console.log("set-nicohistory error: ", video_id);
+        //         return;
+        //     }
+            
+        //     const url = niconico.SmileUrl;
+        //     console.log("set smile url: ", url);
+        //     video.src = url;
+        //     video.type = "video/mp4";
+        //     video.load();
+        // }
     }
 
     const onclickLoad = ()=>{ 

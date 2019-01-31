@@ -2,7 +2,8 @@ const { JSDOM } = require("jsdom");
 const axios = require("axios");
 const tough = require("tough-cookie");
 const client = axios.create({
-    timeout: 5 * 1000
+    timeout: 5 * 1000,
+    withCredentials: true,
 });
 
 const nicovideo_url = "http://www.nicovideo.jp";
@@ -58,9 +59,20 @@ class NicoWatch {
             // let cookie_jar = new tough.CookieJar();
             client.get(`${this.watch_url}/${video_id}`, {
                 // jar: cookie_jar,
+                // origin: "*", 
                 withCredentials: true,
-                proxy: this.proxy,
-                cancelToken: this.source.token
+                // proxy: this.proxy,
+                cancelToken: this.source.token,
+                xsrfCookieName : "CSRF-TOKEN",
+
+                xsrfHeaderName : "X-CSRF-Token",
+                headers : {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0; Waterfox) Gecko/20100101 Firefox/56.2.6",
+                    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*',
+                    "Host": "www.nicovideo.jp",
+                    // "Access-Control-Allow-Origin": "*",
+                    // "crossDomain": true
+                }
             }).then((response) => {
                 const body = response.data;
                 try {

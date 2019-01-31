@@ -117,7 +117,7 @@ class pp{
                 //     on_hb_error(error);
                 // });                                
             } catch (error) {
-                console.log("############ err=1");
+                console.log("############ error=", error );
                 reject(error);
             }
         });      

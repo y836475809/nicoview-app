@@ -4,6 +4,7 @@ const tough = require("tough-cookie");
 const client = axios.create({
     timeout: 5 * 1000
 });
+const request = require("request");
 
 const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
@@ -53,6 +54,23 @@ class NicoWatch {
     }
 
     watch(video_id) {
+        // test
+        // use request for http(proxy) to https(page)
+        const pp = request({
+            method: 'GET',
+            uri: `${this.watch_url}/${video_id}`
+        },
+        function (error, res, body) {
+            if (!error && res.statusCode == 200) {
+                console.log("#######request bodt=", body)
+            } else {
+                //   reject(error);
+            }
+        }).on("abort", () => {
+            console.log("#######abort")
+        });
+        // pp.abort();
+
         this.source = this.cancel_token.source();
         return new Promise((resolve, reject) => {
             client.get(`${this.watch_url}/${video_id}`, {

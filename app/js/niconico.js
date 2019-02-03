@@ -1,136 +1,132 @@
 const { JSDOM } = require("jsdom");
-const axios = require("axios");
-const tough = require("tough-cookie");
-const client = axios.create({
-    timeout: 5 * 1000
-});
 const request = require("request");
 
 const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
 
-const ErrorHandling = (error)=> {
-    if(axios.isCancel(error)){
-        error.cancel = true;
-        return error;
-    }else{
-        if (error.response) {
-            error.name = "ResponseError";
-            return error;
-        }else if(error.request){
-            error.name = "RequestError";
-            return error;
-        }
-        return error;
-    }
-};
 
 const getFromHeaders = (headers, target_key)=> {
-    let values = [];
     for (const key in headers) {
         if (key.toLowerCase() == target_key.toLowerCase()) {
-            values.push(headers[key]);
+            const value = headers[key];
+            if (value instanceof Array){
+                return value;
+            }else{
+                return [value];
+            }
         }
-    }
-    if(values.length>0){
-        return values;
     }
     throw new Error(`Can not get ${target_key} form headers`);
 };
 
-class NicoWatch {
-    constructor(proxy) { 
-        this.watch_url = `${nicovideo_url}/watch`;
-        this.req = null;
-        this.proxy = proxy;
-        this.cancel_token = axios.CancelToken;
-        this.source = null;
+class NicoRequest {
+    constructor(){
+        this.canceled = false;
     }
 
-    cancel() {
-        if (this.source) {
-            this.source.cancel("watch cancel");
-        }
+    _cancel(){
+        this.canceled = true;
     }
 
-    watch(video_id) {
-        // test
-        // use request for http(proxy) to https(page)
-        const pp = request({
-            method: 'GET',
-            uri: `${this.watch_url}/${video_id}`
-        },
-        function (error, res, body) {
-            if (!error && res.statusCode == 200) {
-                console.log("#######request bodt=", body)
-            } else {
-                //   reject(error);
+    _validateStatus(status) {
+        return status >= 200 && status < 300;
+    }
+
+    _reuqest(options, resolve, reject, cb){
+        this.canceled = false;
+        return request(options, (error, res, body) => {
+            if(error){
+                reject(error);
+            }else if(this._validateStatus(res.statusCode)){
+                try {
+                    cb(res, body);
+                } catch (error) {
+                    reject(error); 
+                }
+            }else{
+                const message = `${res.statusCode}: ${options.uri}`;
+                reject(new Error(message)); 
             }
         }).on("abort", () => {
-            console.log("#######abort")
+            if(this.canceled){
+                console.log("#######cancel");
+                const error = new Error("cancel");
+                error.cancel = true;
+                reject(error);
+            } 
         });
-        // pp.abort();
-
-        this.source = this.cancel_token.source();
-        return new Promise((resolve, reject) => {
-            client.get(`${this.watch_url}/${video_id}`, {
-                withCredentials: true,
-                // proxy: this.proxy,
-                cancelToken: this.source.token,
-            }).then((response) => {
-                const body = response.data;
-                try {
-                    const cookie_headers = getFromHeaders(response.headers, "Set-Cookie");
-                    const cookies = cookie_headers.map(tough.Cookie.parse);
-                    // if (cookie_headers instanceof Array){
-                    //     cookies = cookie_headers.map(tough.Cookie.parse);
-                    // }else{
-                    //     cookies = [tough.Cookie.parse(cookie_headers)];
-                    //     console.log("########cookies=", cookies)
-                    //     console.log("########cookies ary=", cookies instanceof Array)
-                    // }
-                    const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                    const data_json = data_elm.getAttribute("data-api-data");
-                    if(!data_json){
-                        reject(ErrorHandling(new Error("not find data-api-data"))); 
-                    }else{                     
-                        const api_data = JSON.parse(data_json);
-                        resolve({ cookies, api_data }); 
-                    }   
-                } catch (error) {
-                    reject(ErrorHandling(error)); 
-                } 
-            }).catch((error)=>{
-                reject(ErrorHandling(error)); 
-            });
-        });
-    }    
+    }
 }
 
-class NicoVideo {
-    constructor(api_data, proxy) {
+class NicoWatch extends NicoRequest{
+    constructor() { 
+        super();
+        this.watch_url = `${nicovideo_url}/watch`;
+        this.req = null;
+    }
+
+    cancel(){   
+        if (this.req) {
+            this._cancel();
+            this.req.abort();
+        }
+    }
+
+    watch(video_id){
+        return new Promise((resolve, reject) => {
+            const uri = `${this.watch_url}/${video_id}`;
+            const options = {
+                method: "GET",
+                uri: uri, 
+                timeout: 5 * 1000
+            };
+            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
+                const cookie_jar = request.jar();
+                const cookie_headers = getFromHeaders(res.headers, "Set-Cookie");
+                cookie_headers.forEach(value=>{
+                    cookie_jar.setCookie(value, uri);
+                });
+                const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+                const data_json = data_elm.getAttribute("data-api-data");
+                if(!data_json){
+                    reject(new Error("not find data-api-data")); 
+                }else{                     
+                    const api_data = JSON.parse(data_json);
+                    resolve({ cookie_jar, api_data }); 
+                }
+            });       
+        });
+    }
+}
+
+class NicoVideo extends NicoRequest {
+    constructor(api_data, heart_beat_rate=0.9) {
+        super();
         this.api_data = api_data;  
-        this.dmcInfo = api_data.video.dmcInfo;  
-        this.heart_beat_rate = 0.9;
-        this.proxy = proxy;
-        this.cancel_token = axios.CancelToken;
-        this.source = null;
-        this.source_hb_options = null;
-        this.source_hb_post = null;
+        this.dmcInfo = api_data.video.dmcInfo;
+
+        this.heart_beat_rate = heart_beat_rate;
         this.heart_beat_id = null;
+
+        this.req_session = null;
+        this.req_hb_options = null;
+        this.req_hb_post = null;
     }
 
     cancel() {
-        if (this.source) {
-            this.source.cancel("video cancel");
+        if (this.req_session) {
+            this._cancel();
+            this.req_session.abort();
         }
         
-        if (this.source_hb_options) {
-            this.source_hb_options.cancel("hb_options cancel");
+        if (this.req_hb_options) {
+            this._cancel();
+            this.req_hb_options.abort();
         }
 
-        if (this.source_hb_post) {
-            this.source_hb_post.cancel("hb_post cancel");     
+        if (this.req_hb_post) {
+            this._cancel();
+            this.req_hb_post.abort();
         }
 
         this.stopHeartBeat();
@@ -204,7 +200,7 @@ class NicoVideo {
     }
 
     postDmcSession() {
-        this.source = this.cancel_token.source();
+        this.canceled = false;
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
                 const error = new Error("dmc info is null");
@@ -214,16 +210,17 @@ class NicoVideo {
 
             const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
-            client.post(url, json, {
-                // jar: cookie_jar,
-                withCredentials: true,
-                proxy: this.proxy,
-                cancelToken: this.source.token,
-            }).then((response) => {
-                this.dmc_session = response.data.data;
+            
+            const options = {
+                method: "POST",
+                uri: url, 
+                headers: { "content-type": "application/json" },
+                json: json,
+                timeout: 5 * 1000
+            };
+            this.req_session = this._reuqest(options, resolve, reject, (res, body)=>{
+                this.dmc_session = body.data;
                 resolve(this.dmc_session);
-            }).catch((error)=>{
-                reject(ErrorHandling(error)); 
             });
         });
     }
@@ -233,21 +230,20 @@ class NicoVideo {
     }
 
     optionsHeartBeat() {
-        this.source_hb_options = this.cancel_token.source();
+        this.canceled = false;
         return new Promise(async (resolve, reject) => {
             this.stopHeartBeat();
 
             const id = this.dmc_session.session.id;
             const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
 
-            client.options(url, {     
-                withCredentials: true,   
-                proxy: this.proxy ,
-                cancelToken: this.source_hb_options.token,  
-            }).then((response) => {
+            const options = {
+                method: "OPTIONS",
+                uri: url, 
+                timeout: 5 * 1000
+            };
+            this.req_hb_options = this._reuqest(options, resolve, reject, (res, body)=>{
                 resolve();
-            }).catch((error)=>{
-                reject(ErrorHandling(error)); 
             });
         });
     }
@@ -258,20 +254,34 @@ class NicoVideo {
         const id = this.dmc_session.session.id;
         const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
         const session = this.dmc_session;
-
-        const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;    
-        this.source_hb_post = this.cancel_token.source();
+        const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;   
+        this.canceled = false;
+        const options = {
+            method: "POST",
+            uri: url, 
+            headers: { "content-type": "application/json" },
+            json: session,
+            timeout: 5 * 1000
+        };
         this.heart_beat_id = setInterval(() => {  
-            client.post(url, session, {
-                withCredentials: true,
-                proxy: this.proxy,
-                cancelToken: this.source_hb_post.token,  
-            }).catch((error)=>{
-                this.stopHeartBeat();
-                if(on_error){
-                    on_error(ErrorHandling(error));
+            this.req_hb_post = request(options, (error, res, body) => {
+                if(error){
+                    this.stopHeartBeat();
+                    on_error(error);
+                }else if(!this._validateStatus(res.statusCode)){
+                    this.stopHeartBeat();
+                    const message = `${res.statusCode}: ${options.uri}`;
+                    on_error(new Error(message)); 
                 }
+            }).on("abort", () => {
+                this.stopHeartBeat();
+                if(this.canceled){
+                    const error = new Error("cancel");
+                    error.cancel = true;
+                    on_error(error);
+                } 
             });
+
             console.log("HeartBeat ", new Date());
         }, interval_ms);
     }
@@ -285,21 +295,20 @@ class NicoVideo {
     }
 }
 
-class NicoComment {
-    constructor(api_data, proxy) {
-        // this.cookie_jar = cookie_jar;
+class NicoComment extends NicoRequest {
+    constructor(api_data) {
+        super();
+        this.nmsg_ur = `${niconmsg_url}`;
         this.api_data = api_data;
-        this.proxy = proxy;
         this.r_no = 0;
         this.p_no = 0;
         this.req = null;
-        this.cancel_token = axios.CancelToken;
-        this.source = null;
     }
 
     cancel() {
-        if (this.source) {
-            this.source.cancel("comment cancel");
+        if (this.req) {
+            this._cancel();
+            this.req.abort();
         }
     }
 
@@ -333,20 +342,19 @@ class NicoComment {
     }
 
     _post(post_data){
-        this.source = this.cancel_token.source();
         return new Promise(async (resolve, reject) => {
-            // const url = "http://nmsg.nicovideo.jp/api.json/";
+            const uri = `${this.nmsg_ur}`;
             const json = post_data;
-            client.post(niconmsg_url, json, {
-                // jar: cookie_jar,
-                withCredentials: true,
-                proxy: this.proxy,
-                cancelToken: this.source.token,
-            }).then((response) => {
-                const comment_data = response.data;
-                resolve(comment_data);
-            }).catch((error)=>{
-                reject(ErrorHandling(error)); 
+            const options = {
+                method: "POST",
+                uri: uri, 
+                headers: { "content-type": "application/json" },
+                json: json,
+                timeout: 5 * 1000
+            };
+            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
+                const comment_data = body;
+                resolve(comment_data);    
             });
         });
     }
@@ -480,11 +488,12 @@ class NicoComment {
     }
 }
 
-function getCookies(cookies) {  
+function getCookies(cookie_jar) {  
+    const cookies = cookie_jar.getCookies(`${nicovideo_url}`);
     const cookie_jsons = cookies.map(value=>{
         return value.toJSON();
-    });
-    const keys = ["nicohistory"];
+    });  
+    const keys = ["nicohistory", "nicosid"];
     const nico_cookies = keys.map(key=>{
         const cookie = cookie_jsons.find((item) => {
             return item.key == key;
@@ -566,6 +575,10 @@ function getThumbInfo(api_data){
 }
 
 module.exports = {
+    // NicoUrls:{
+    //     video_url: nicovideo_url,
+    //     niconmsg_url: niconmsg_url
+    // },
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,

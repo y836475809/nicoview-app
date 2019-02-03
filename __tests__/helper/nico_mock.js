@@ -19,10 +19,13 @@ class NicoMocks {
     }
 
     watch(delay, body){
-        this.watch_nock = nock("http://www.nicovideo.jp");
+        this.watch_nock = nock("https://www.nicovideo.jp");
 
         const headers = {
-            "Set-Cookie": `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`
+            "Set-Cookie": [
+                `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
+                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
+            ]
         };
         if(!delay){
             delay = 1;
@@ -35,9 +38,15 @@ class NicoMocks {
             .delay(delay)
             .reply(200, body, headers);
     }
+
+    watchNotFindPage(video_id){
+        nock("https://www.nicovideo.jp")
+            .get(`/watch/${video_id}`)
+            .reply(404, "not find page");    
+    }
     
     comment(delay){
-        this.comment_nock = nock("http://nmsg.nicovideo.jp");
+        this.comment_nock = nock("https://nmsg.nicovideo.jp");
 
         if(!delay){
             delay = 1;
@@ -46,7 +55,8 @@ class NicoMocks {
             .post("/api.json/")
             .delay(delay)
             .reply((uri, reqbody)=>{
-                const data = JSON.parse(reqbody);
+                // const data = JSON.parse(reqbody);
+                const data = reqbody;
                 if(data.length===0){
                     return [404, "404 - \"Not Found\r\n\""];
                 }
@@ -68,6 +78,14 @@ class NicoMocks {
             });
     }
 
+    comment_error(code){
+        this.comment_nock = nock("https://nmsg.nicovideo.jp");
+
+        this.comment_nock
+            .post("/api.json/")
+            .reply(code, `${code}`);
+    }
+
     dmc_session(delay){
         this.dmc_session_nock = nock("https://api.dmc.nico");
         if(!delay){
@@ -78,7 +96,8 @@ class NicoMocks {
             .query({ _format: "json" })   
             .delay(delay)
             .reply((uri, reqbody)=>{
-                const data = JSON.parse(reqbody);
+                // const data = JSON.parse(reqbody);
+                const data = reqbody;
                 if(data.session 
                     && data.session.recipe_id 
                     && data.session.content_id
@@ -138,6 +157,36 @@ class NicoMocks {
                 return [200, "ok"];
             });
     } 
+
+    dmc_hb_options_error(code){
+        this.dmc_hb_nock = nock("https://api.dmc.nico");
+
+        this.hb_options_count = 0;
+        this.hb_post_count = 0;
+
+        this.dmc_hb_nock
+            .options(/\/api\/sessions\/.+/)
+            .query({ _format: "json", _method: "PUT" })
+            .reply(code, `${code}`);  
+    }
+
+    dmc_hb_post_error(code){
+        this.dmc_hb_nock = nock("https://api.dmc.nico");
+
+        this.hb_options_count = 0;
+        this.hb_post_count = 0;
+
+        this.dmc_hb_nock
+            .options(/\/api\/sessions\/.+/)
+            .query({ _format: "json", _method: "PUT" })
+            .reply((uri, reqbody)=>{
+                this.hb_options_count++;
+                return [200, "ok"];
+            })
+            .post(/\/api\/sessions\/.+/)
+            .query({ _format: "json", _method: "PUT" }) 
+            .reply(code, `${code}`);  
+    }
 }
 
 class MockNicoUitl {

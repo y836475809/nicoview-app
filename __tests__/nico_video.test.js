@@ -70,7 +70,7 @@ test("nico dmc session error", async (t) => {
         await nico_video.postDmcSession();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "ResponseError");
+        t.is(error.name, "Error");
     }    
 });
 
@@ -84,7 +84,7 @@ test("nico dmc session timeout", async (t) => {
         await nico_video.postDmcSession();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
+        t.is(error.name, "Error");
     }    
 });
 
@@ -146,7 +146,7 @@ test("nico stop dmc heart beat", async (t) => {
 });
 
 test("stop by cancel dmc heart beat", async (t) => {
-    t.plan(2);
+    t.plan(3);
     
     nico_mocks.dmc_hb();
 
@@ -155,15 +155,18 @@ test("stop by cancel dmc heart beat", async (t) => {
     await nico_video.optionsHeartBeat();
   
     nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
-    nico_video.postHeartBeat();
+    nico_video.postHeartBeat((error=>{
+        t.is(nico_mocks.hb_options_count, 1);
+        t.is(nico_mocks.hb_post_count, 2);   
+
+        t.truthy(error.cancel); 
+    }));
 
     await new Promise(resolve => setTimeout(resolve, 2000));
     nico_video.cancel();
     await new Promise(resolve => setTimeout(resolve, 3000));
-
-    t.is(nico_mocks.hb_options_count, 1);
-    t.is(nico_mocks.hb_post_count, 2);    
 });
+
 
 test("cancel dmc heart beat options", async (t) => {
     t.plan(2);
@@ -199,7 +202,7 @@ test("timeout dmc heart beat options", async (t) => {
         await nico_video.optionsHeartBeat();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
+        t.is(error.name, "Error");
         t.is(nico_mocks.hb_post_count, 0);  
     }
 });
@@ -215,9 +218,91 @@ test.cb("timeout dmc heart beat post",  (t) => {
     nico_video.dmcInfo.session_api.heartbeat_lifetime = 10*1000;
     nico_video.postHeartBeat((error)=>{
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
+        t.is(error.name, "Error");
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 1); 
         t.end();           
     });
+});
+
+test("stop by hb options error 403 dmc heart beat", async(t) => {
+    t.plan(5);
+    
+    nico_mocks.dmc_hb_options_error(403);
+
+    const nico_video = new NicoVideo(data_api_data);
+    nico_video.dmc_session = { session: { id:"12345678" } };
+    try {
+        await nico_video.optionsHeartBeat();
+    } catch (error) {
+        t.is(nico_mocks.hb_options_count, 0);
+        t.is(nico_mocks.hb_post_count, 0); 
+        
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /403:/);        
+    }
+});
+
+test("stop by hb options error 500 dmc heart beat", async(t) => {
+    t.plan(5);
+    
+    nico_mocks.dmc_hb_options_error(500);
+
+    const nico_video = new NicoVideo(data_api_data);
+    nico_video.dmc_session = { session: { id:"12345678" } };
+    try {
+        await nico_video.optionsHeartBeat();
+    } catch (error) {
+        t.is(nico_mocks.hb_options_count, 0);
+        t.is(nico_mocks.hb_post_count, 0); 
+        
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /500:/);        
+    }
+});
+
+test.cb("stop by hb post error 403 dmc heart beat", (t) => {
+    t.plan(5);
+    
+    nico_mocks.dmc_hb_post_error(403);
+
+    const nico_video = new NicoVideo(data_api_data);
+    nico_video.dmc_session = { session: { id:"12345678" } };
+    nico_video.optionsHeartBeat().then(()=>{});
+  
+    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video.postHeartBeat((error=>{
+        t.is(nico_mocks.hb_options_count, 1);
+        t.is(nico_mocks.hb_post_count, 0); 
+        
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /403:/);
+        
+        t.end();
+    }));
+});
+
+test.cb("stop by hb post error 500 dmc heart beat", (t) => {
+    t.plan(5);
+    
+    nico_mocks.dmc_hb_post_error(500);
+
+    const nico_video = new NicoVideo(data_api_data);
+    nico_video.dmc_session = { session: { id:"12345678" } };
+    nico_video.optionsHeartBeat().then(()=>{});
+  
+    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video.postHeartBeat((error=>{
+        t.is(nico_mocks.hb_options_count, 1);
+        t.is(nico_mocks.hb_post_count, 0); 
+        
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /500:/);
+        
+        t.end();
+    }));
 });

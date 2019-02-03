@@ -2,7 +2,8 @@ const { NicoWatch, NicoVideo, NicoComment,
     getCookies, getThumbInfo } = require("./niconico");
 
 class NicoPlay{
-    constructor(){
+    constructor(heart_beat_rate=0.9){
+        this.heart_beat_rate = heart_beat_rate;
     }
 
     cancel(){
@@ -20,14 +21,18 @@ class NicoPlay{
         }      
     }
 
-    play(video_id, on_progress){
+    stopHB(){
+        this.nico_video.stopHeartBeat();
+    }
+
+    play(video_id, on_progress, on_hb_error){
         this.cancel();
         return new Promise(async (resolve, reject) => {  
             try {
                 on_progress("start watch");
 
                 this.nico_watch = new NicoWatch();
-                const { cookies, api_data } = await this.nico_watch.watch(video_id); 
+                const { cookie_jar, api_data } = await this.nico_watch.watch(video_id); 
 
                 on_progress("finish watch");
                 // MockNicoUitl.tohttp(api_data);
@@ -47,7 +52,7 @@ class NicoPlay{
                 // const thumb_info = getThumbInfo(api_data);        
 
                 on_progress("start video");
-                this.nico_video = new NicoVideo(api_data);
+                this.nico_video = new NicoVideo(api_data, this.heart_beat_rate);
                 // const smile_video_url = this.nico_video.SmileUrl;
 
                 if(!this.nico_video.isDmc())
@@ -70,7 +75,7 @@ class NicoPlay{
 
                 // this.nico_video.dmcInfo.session_api.heartbeat_lifetime = 1000;
                 on_progress("start HeartBeat");
-                this.nico_video.postHeartBeat();
+                this.nico_video.postHeartBeat(on_hb_error);
                 // if(this.is_canceled){
                 //     console.log("############ cancel=3");
                 //     resolve({ state:"cancel" });
@@ -78,7 +83,7 @@ class NicoPlay{
                 // }
                 on_progress("finish video");
 
-                const nico_cookies = getCookies(cookies);
+                const nico_cookies = getCookies(cookie_jar);
                 const thumb_info = getThumbInfo(api_data); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 resolve({

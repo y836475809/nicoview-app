@@ -1,5 +1,6 @@
 const test = require("ava");
-const { NicoWatch, NicoVideo, NicoComment, getCookies, getThumbInfo } = require("../app/js/niconico");
+const { NicoPlay } = require("../app/js/niconico_play");
+
 const { NicoMocks, TestData } = require("./helper/nico_mock");
 const { ProfTime } = require("./helper/ava_prof_time");
 
@@ -26,105 +27,7 @@ test.afterEach(t => {
     prof_time.end(t);
 });
 
-class pp{
-    constructor(){
-    }
-
-    cancel(){
-        if(this.nico_watch){
-            console.log("############ cancel nico_watch");
-            this.nico_watch.cancel();
-        }
-        if(this.nico_comment){
-            console.log("############ cancel nico_comment");
-            this.nico_comment.cancel();
-        }
-        if(this.nico_video){
-            console.log("############ cancel nico_video");
-            this.nico_video.cancel();
-        }      
-    }
-
-    play(video_id, on_progress){
-        return new Promise(async (resolve, reject) => {  
-            try {
-                on_progress("start watch");
-
-                this.nico_watch = new NicoWatch();
-                const { cookies, api_data } = await this.nico_watch.watch(video_id); 
-
-                on_progress("finish watch");
-                // MockNicoUitl.tohttp(api_data);
-                // console.log("############ cookie_jar=", cookie_jar);
-                // const nico_cookies = getCookies(cookie_jar);
-
-                on_progress("start comment");
-
-                this.nico_comment = new NicoComment(api_data);
-                const res_comments = await this.nico_comment.getComment();
-                // if(this.is_canceled){
-                //     console.log("############ cancel=2");
-                //     resolve({ state:"cancel" });
-                //     return;
-                // }
-                on_progress("finish comment");
-                // const thumb_info = getThumbInfo(api_data);        
-
-                on_progress("start video");
-                this.nico_video = new NicoVideo(api_data);
-                // const smile_video_url = this.nico_video.SmileUrl;
-
-                // if(!this.nico_video.isDmc())
-                // {
-                //     on_progress("finish smile");
-                //     on_data({
-                //         nico_cookies: nico_cookies,
-                //         commnets: res_commnets,
-                //         thumb_info: thumb_info,
-                //         video_url: smile_video_url
-                //     });
-                //     resolve({ state:"done" });
-                //     return;                    
-                // }
-                
-                // on_progress("start dmc session");
-                await this.nico_video.postDmcSession();
-                await this.nico_video.optionsHeartBeat();
-
-                this.nico_video.dmcInfo.session_api.heartbeat_lifetime = 1000;
-                on_progress("start HeartBeat");
-                this.nico_video.postHeartBeat();
-                // if(this.is_canceled){
-                //     console.log("############ cancel=3");
-                //     resolve({ state:"cancel" });
-                //     return;
-                // }
-                on_progress("finish video");
-
-                const nico_cookies = getCookies(cookies);
-                const thumb_info = getThumbInfo(api_data); 
-                const dmc_video_url = this.nico_video.DmcContentUri;
-                resolve({
-                    nico_cookies: nico_cookies,
-                    comments: res_comments,
-                    thumb_info: thumb_info,
-                    video_url: dmc_video_url
-                });
-                // on_progress("start dmc hb");
-                // this.nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
-                // this.nico_video.startHeartBeat((error)=>{
-                //     this.nico_video.stopHeartBeat();
-                //     on_hb_error(error);
-                // });                                
-            } catch (error) {
-                console.log("############ error=", error );
-                reject(error);
-            }
-        });      
-    }
-}
-
-test("play pp", async (t) => {
+test("nico play", async (t) => {
     t.plan(3);
 
     nico_mocks.watch();
@@ -132,12 +35,14 @@ test("play pp", async (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 
-    const myp = new pp();
-    myp.play(TestData.video_id, (state)=>{
+    const heart_beat_rate = 1/120;
+    const noco_play = new NicoPlay(heart_beat_rate);
+    noco_play.play(TestData.video_id, (state)=>{
         console.log("############ state=", state);   
     }).then((result)=>{
-        console.log("############ result=", result);
+        // console.log("############ result=", result);
         t.not(result, undefined);
+        
     }).catch(error => {
         console.log("############ error=", error);
     });
@@ -145,6 +50,73 @@ test("play pp", async (t) => {
     await new Promise(resolve => setTimeout(resolve, 2200));
     t.is(nico_mocks.hb_options_count, 1);
     t.is(nico_mocks.hb_post_count, 2);
+
+    noco_play.stopHB();
+});
+
+test.cb("nico play cancel", (t) => {
+    t.plan(1);
+
+    nico_mocks.watch(3000);
+    // nico_mocks.comment();
+    // nico_mocks.dmc_session();
+    // nico_mocks.dmc_hb();
+
+    let state_log = "";
+    // const heart_beat_rate = 1/120;
+    const noco_play = new NicoPlay();
+
+    setTimeout(()=>{
+        noco_play.cancel();
+    },1000);
+
+    noco_play.play(TestData.video_id, (state)=>{
+        console.log("############ state=", state); 
+        state_log += state + ":";
+    }).then((result)=>{
+        console.log("############ result=", result);
+        t.not(result, undefined);
+    }).catch(error => {
+        console.log("############ error=", error);
+        t.is(state_log, "start watch:");
+        t.end();
+    });
+});
+
+test.cb("nico play cancel hb", (t) => {
+    t.plan(3);
+
+    nico_mocks.watch();
+    nico_mocks.comment();
+    nico_mocks.dmc_session();
+    nico_mocks.dmc_hb();
+
+    let state_log = "";
+    const heart_beat_rate = 1/120;
+    const noco_play = new NicoPlay(heart_beat_rate);
+
+    setTimeout(()=>{
+        noco_play.cancel();
+    },3000);
+
+    noco_play.play(TestData.video_id, (state)=>{
+        console.log("############ state=", state); 
+        state_log += state + ":";
+    }, (error)=>{
+        console.log("############ hb cancel error=", error); 
+        t.is(state_log, 
+            "start watch:finish watch:start comment:finish comment:start video:start HeartBeat:finish video:");
+
+        t.truthy(error.cancel);
+
+        t.end();
+    }).then((result)=>{
+        console.log("############ result=", result);
+        t.not(result, undefined);
+    }).catch(error => {
+        console.log("############ error=", error);
+        // t.is(state_log, "start watch:");
+    });     
 });
 
 // describe("nico play", () => {

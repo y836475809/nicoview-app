@@ -125,7 +125,7 @@ test("get comment empty param", async (t) => {
         await nico_comment._post([]);
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "ResponseError");
+        t.is(error.name, "Error");
     }
 });
 
@@ -154,8 +154,8 @@ test("get comment timeout", async (t) => {
         await nico_comment.getComment();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
-        t.regex(error.message, /timeout/);
+        t.is(error.name, "Error");
+        t.regex(error.message, /time/i);
     }
 });
 
@@ -192,5 +192,35 @@ test("get comment cancel 2", async(t) => {
         await nico_comment.getComment();
     } catch (error) {
         t.truthy(error.cancel);
+    }
+});
+
+test("get comment 403", async (t) => {
+    t.plan(3);
+
+    nico_mocks.comment_error(403);
+
+    const nico_comment = new NicoComment(data_api_data);
+    try {
+        await nico_comment.getComment();
+    } catch (error) {
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /403:/);
+    }
+});
+
+test("get comment 500", async (t) => {
+    t.plan(3);
+
+    nico_mocks.comment_error(500);
+
+    const nico_comment = new NicoComment(data_api_data);
+    try {
+        await nico_comment.getComment();
+    } catch (error) {
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /500:/);
     }
 });

@@ -30,12 +30,20 @@ test("watch get cookie", async (t) => {
     nico_mocks.watch();
 
     const nico_watch = new NicoWatch();
-    const { cookies, api_data } = await nico_watch.watch(TestData.video_id);
-    t.deepEqual(getCookies(cookies),[
+    const { cookie_jar, api_data } = await nico_watch.watch(TestData.video_id);
+    t.deepEqual(getCookies(cookie_jar, TestData.video_id),[
         {
-            url: "http://www.nicovideo.jp",
+            url: "https://www.nicovideo.jp",
             name: "nicohistory",
             value: `${TestData.video_id}%3A123456789`,
+            domain: "nicovideo.jp",
+            path: "/",
+            secure: false
+        },
+        {
+            url: "https://www.nicovideo.jp",
+            name: "nicosid",
+            value: "123456.789",
             domain: "nicovideo.jp",
             path: "/",
             secure: false
@@ -72,8 +80,10 @@ test("watch cancel 2", async(t) => {
 
     setTimeout(()=>{
         nico_watch.cancel();
-        nico_watch.cancel();
     }, 1000);
+    setTimeout(()=>{
+        nico_watch.cancel();
+    }, 2000);
 
     try {
         await nico_watch.watch(TestData.video_id);
@@ -92,22 +102,23 @@ test("watch timetout", async (t) => {
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
-        t.regex(error.message, /timeout/);
+        t.is(error.name, "Error");
+        t.regex(error.message, /time/i);
     }
 });
 
 test("watch page not find", async t => {
-    t.plan(2);
+    t.plan(3);
 
-    nico_mocks.watch();
-    
+    nico_mocks.watchNotFindPage("ms00000000");
+        
     try {
         const nico_watch = new NicoWatch();
         await nico_watch.watch("ms00000000");
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "RequestError");
+        t.is(error.name, "Error");
+        t.regex(error.message, /404:/);
     }
 });
 

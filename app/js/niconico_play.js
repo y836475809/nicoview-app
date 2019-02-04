@@ -58,6 +58,7 @@ class NicoPlay{
                 if(!this.nico_video.isDmc())
                 {
                     on_progress("finish smile");
+                    const nico_cookies = getCookies(cookie_jar);
                     const thumb_info = getThumbInfo(api_data); 
                     const video_url = this.nico_video.SmileUrl;
                     resolve({

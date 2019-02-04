@@ -274,8 +274,8 @@ class NicoVideo extends NicoRequest {
                     on_error(new Error(message)); 
                 }
             }).on("abort", () => {
-                this.stopHeartBeat();
                 if(this.canceled){
+                    this.stopHeartBeat();
                     const error = new Error("cancel");
                     error.cancel = true;
                     on_error(error);

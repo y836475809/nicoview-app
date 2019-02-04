@@ -49,7 +49,6 @@ class NicoRequest {
             }
         }).on("abort", () => {
             if(this.canceled){
-                console.log("#######cancel");
                 const error = new Error("cancel");
                 error.cancel = true;
                 reject(error);

@@ -16,20 +16,19 @@ class NicoMocks {
 
     clean(){
         nock.cleanAll();
+
+        this.hb_options_count = 0;
+        this.hb_post_count = 0;
     }
 
-    watch(delay, body){
+    watch(delay=1, body){
         this.watch_nock = nock("https://www.nicovideo.jp");
-
         const headers = {
             "Set-Cookie": [
                 `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
                 "nicosid=123456.789; path=/; domain=.nicovideo.jp"
             ]
         };
-        if(!delay){
-            delay = 1;
-        }
         if(!body){
             body = MockNicoUitl.getWatchHtml(video_id);
         }
@@ -45,12 +44,8 @@ class NicoMocks {
             .reply(404, "not find page");    
     }
     
-    comment(delay){
+    comment(delay=1){
         this.comment_nock = nock("https://nmsg.nicovideo.jp");
-
-        if(!delay){
-            delay = 1;
-        }
         this.comment_nock
             .post("/api.json/")
             .delay(delay)
@@ -79,18 +74,17 @@ class NicoMocks {
     }
 
     comment_error(code){
+        if(!code){
+            throw new Error("code is undefined");
+        }
         this.comment_nock = nock("https://nmsg.nicovideo.jp");
-
         this.comment_nock
             .post("/api.json/")
             .reply(code, `${code}`);
     }
 
-    dmc_session(delay){
+    dmc_session(delay=1){
         this.dmc_session_nock = nock("https://api.dmc.nico");
-        if(!delay){
-            delay = 1;
-        }
         this.dmc_session_nock
             .post("/api/sessions")
             .query({ _format: "json" })   
@@ -128,18 +122,8 @@ class NicoMocks {
             .reply(403, { meta: { status: 403, message: "403"} });    
     }
     
-    dmc_hb(options_delay, post_delay){
+    dmc_hb(options_delay=1, post_delay=1){
         this.dmc_hb_nock = nock("https://api.dmc.nico");
-
-        this.hb_options_count = 0;
-        this.hb_post_count = 0;
-
-        if(!options_delay){
-            options_delay = 1;
-        }
-        if(!post_delay){
-            post_delay = 1;
-        }
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
@@ -159,11 +143,11 @@ class NicoMocks {
     } 
 
     dmc_hb_options_error(code){
+        if(!code){
+            throw new Error("code is undefined");
+        }
+
         this.dmc_hb_nock = nock("https://api.dmc.nico");
-
-        this.hb_options_count = 0;
-        this.hb_post_count = 0;
-
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
@@ -171,11 +155,11 @@ class NicoMocks {
     }
 
     dmc_hb_post_error(code){
+        if(!code){
+            throw new Error("code is undefined");
+        }
+
         this.dmc_hb_nock = nock("https://api.dmc.nico");
-
-        this.hb_options_count = 0;
-        this.hb_post_count = 0;
-
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })

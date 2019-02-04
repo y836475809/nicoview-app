@@ -9,9 +9,6 @@ const { ipcMain } = electron;
 const fs = require("fs");
 const path = require("path");
 
-const { NicoPlay } = require("./app/js/niconico_play");
-const nico_play = new NicoPlay();
-
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -139,23 +136,5 @@ ipcMain.on("set-nicohistory", async (event, arg) => {
         event.returnValue = "ok";
     } catch (error) {
         event.returnValue = "error";
-    }
-});
-
-ipcMain.on("start-nico-play", (event, arg) => {
-    const video_id = arg;
-
-    nico_play.play(video_id, (prog)=>{
-        event.sender.send("nico-play-progress", prog);
-    }).then(result=>{
-        event.sender.send("reply-nico-play", result);
-    }).catch(error=>{
-        event.sender.send("reply-nico-play-error", error);
-    });
-});
-
-ipcMain.on("cancel-nico-play", (event, arg) => {
-    if(nico_play){
-        nico_play.cancel();
     }
 });

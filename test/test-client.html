@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style type="text/css">
+        .cn{
+            display:block;
+        }
+        #video{
+            width: 500px;
+            height: 300px;
+            border: 1px solid black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="cn">
+        <input id="video-id" type="text">
+        <button onclick="onclickLoad();">load</button>
+        <button onclick="onclickLoadDmc();">Dmc</button>
+        <button onclick="onclickLoadSmile();">Smile</button>
+        <button onclick="onclickStopHB();">stop hb</button>
+        <button onclick="onclickAbort();">abort</button>
+    </div>
+    <video id="video" autoplay preload="metadata" controls></video> 
+</body>
+
+<script>
+    const { ipcRenderer } = require("electron");
+    // const { NicoNico, NicoCommnet } = require("./test-client");
+    const video = document.getElementById("video");
+    // const niconico = new NicoNico();
+    const { NicoPlay } = require("../app/js/niconico_play");
+    const nico_play = new NicoPlay();
+
+    video.addEventListener("progress", (e) => {
+        console.log("progressによるイベント発火");
+        // console.log(e.total + ", " + e.loaded + ", "  + e.lengthComputable );
+    }); 
+    video.addEventListener("waiting", () => {
+        console.log("waitingによるイベント発火");
+    }); 
+    video.addEventListener("canplay", () => {
+        console.log("canplayによるイベント発火");
+    }); 
+    video.addEventListener("playing", () => {
+        console.log("playingによるイベント発火");
+    });    
+
+    let onCancel = () =>{};
+
+    function main(video_id) {
+        nico_play.play(video_id, (prog)=>{
+            console.log(prog);
+        }, (hb_error)=>{
+            console.log("hb_error=", hb_error);
+        }).then(result=>{
+            const nico_cookies = result.nico_cookies;
+            const comments = result.comments;
+            const thumb_info = result.thumb_info;
+            const video_url = result.video_url;
+            console.log("comments=", comments);
+            const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+            if(ret!="ok"){
+                console.log("set-nicohistory error: ", video_id);
+                return;
+            } else{
+                video.src = video_url;
+                video.type = "video/mp4";
+                video.load();                  
+            }          
+        }).catch(error=>{
+            console.log("error=", error);
+        });
+    }
+
+    const onclickLoad = ()=>{ 
+        const video_id = document.getElementById("video-id").value;
+        if(video_id==""){
+            return;
+        }
+        main(video_id);
+    };
+
+    const onclickStopHB = ()=>{
+        nico_play.stopHB();
+        // ipcRenderer.send("cancel-nico-play");
+    };  
+
+    const onclickLoadDmc = ()=>{
+        main("sm32951089");
+    };  
+    const onclickLoadSmile = ()=>{
+        main("sm29316071");
+    }; 
+    
+    const onclickAbort = ()=>{
+        nico_play.cancel();
+        // nc.cancel();
+        // onCancel();
+    };
+</script>
+
+</html>

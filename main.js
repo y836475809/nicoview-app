@@ -1,10 +1,13 @@
 const electron = require("electron");
+const session = electron.session;
 // アプリケーションを操作するモジュール
 const { app } = electron;
 // ネイティブブラウザウィンドウを作成するモジュール
 const { BrowserWindow } = electron;
 
 const { ipcMain } = electron;
+const fs = require("fs");
+const path = require("path");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -113,6 +116,19 @@ let creatPlayerWindow = (data) => {
     }
 };
 
+app.on("login", function(event, webContents, request, authInfo, callback) {
+    event.preventDefault();
+
+    try {
+        const f = path.join(app.getPath("userData"), "p.json");
+        const p = JSON.parse(fs.readFileSync(f));
+        callback(p.name, p.pass);      
+    } catch (error) {
+        callback(null, null);
+    }
+
+});
+
 ipcMain.on("request-show-player", (event, arg) => {
     creatPlayerWindow(arg);
     player_win.show();
@@ -153,4 +169,25 @@ ipcMain.on("get-history-items", (event, arg) => {
 ipcMain.on("add-history-items", (event, arg) => {
     history_store.add(arg);
     event.sender.send("get-history-items-reply", history_store.getItems());
+});
+
+ipcMain.on("set-nicohistory", async (event, arg) => {
+    const cookies = arg;
+    const ps = cookies.map(cookie=>{
+        return new Promise((resolve, reject) => {
+            session.defaultSession.cookies.set(cookie, (error) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    });
+    try {
+        await Promise.all(ps);
+        event.returnValue = "ok";
+    } catch (error) {
+        event.returnValue = "error";
+    }
 });

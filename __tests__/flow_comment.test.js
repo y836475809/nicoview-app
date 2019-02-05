@@ -1,7 +1,7 @@
-
+const test = require("ava");
 const FlowComment = require("../app/js/flow_comment");
 
-test("calc", () => {
+test("calc", (t) => {
     let parames = [
         { no: 1, vpos: 0, width: 20, speed: 1 },
         { no: 2, vpos: 5, width: 20, speed: 1 },
@@ -14,14 +14,14 @@ test("calc", () => {
     let flow_cmt = new FlowComment(row_num, view_width);
     const no_row_map = flow_cmt._getNoRowIndexMap(parames);
 
-    expect(no_row_map.size).toBe(4);
-    expect(no_row_map.get(1)).toBe(0);
-    expect(no_row_map.get(2)).toBe(1);
-    expect(no_row_map.get(3)).toBe(2);
-    expect(no_row_map.get(4)).toBe(0);
+    t.is(no_row_map.size, 4);
+    t.is(no_row_map.get(1), 0);
+    t.is(no_row_map.get(2), 1);
+    t.is(no_row_map.get(3), 2);
+    t.is(no_row_map.get(4), 0);
 });
 
-test("calc2", () => {
+test("calc2", (t) => {
     let parames = [
         { no: 1, vpos: 0, width: 10, speed: 1 },
         { no: 2, vpos: 1, width: 2, speed: 1 },
@@ -35,16 +35,16 @@ test("calc2", () => {
     let flow_cmt = new FlowComment(row_num, view_width);
     const no_row_map = flow_cmt._getNoRowIndexMap(parames);
 
-    expect(no_row_map.size).toBe(5);
-    expect(no_row_map.get(1)).toBe(0);
-    expect(no_row_map.get(2)).toBe(1);
-    expect(no_row_map.get(3)).toBe(2);
-    expect(no_row_map.get(4)).toBe(1);
-    expect(no_row_map.get(5)).toBe(2);
+    t.is(no_row_map.size, 5);
+    t.is(no_row_map.get(1), 0);
+    t.is(no_row_map.get(2), 1);
+    t.is(no_row_map.get(3), 2);
+    t.is(no_row_map.get(4), 1);
+    t.is(no_row_map.get(5), 2);
 });
 
 
-test("calc3", () => {
+test("calc3", (t) => {
     let parames = [
         { no: 1, vpos: 0, width: 10, speed: 1 },
         { no: 2, vpos: 1, width: 2, speed: 1 },
@@ -57,14 +57,14 @@ test("calc3", () => {
     let flow_cmt = new FlowComment(row_num, view_width);
     const no_row_map = flow_cmt._getNoRowIndexMap(parames);
 
-    expect(no_row_map.size).toBe(4);
-    expect(no_row_map.get(1)).toBe(0);
-    expect(no_row_map.get(2)).toBe(1);
-    expect(no_row_map.get(3)).toBe(2);
-    expect(no_row_map.get(4)).toBe(0);
+    t.is(no_row_map.size, 4);
+    t.is(no_row_map.get(1), 0);
+    t.is(no_row_map.get(2), 1);
+    t.is(no_row_map.get(3), 2);
+    t.is(no_row_map.get(4), 0);
 });
 
-test("calc sort by vpos", () => {
+test("calc sort by vpos", (t) => {
     let parames = [
         { no: 1, vpos: 10, width: 20, speed: 1 },
         { no: 2, vpos: 15, width: 20, speed: 1 },
@@ -81,9 +81,9 @@ test("calc sort by vpos", () => {
     let flow_cmt = new FlowComment(row_num, view_width);
     const no_row_map = flow_cmt._getNoRowIndexMap(parames);
 
-    expect(no_row_map.size).toBe(4);
-    expect(no_row_map.get(4)).toBe(0);
-    expect(no_row_map.get(3)).toBe(1);
-    expect(no_row_map.get(1)).toBe(2);
-    expect(no_row_map.get(2)).toBe(0);
+    t.is(no_row_map.size, 4);
+    t.is(no_row_map.get(4), 0);
+    t.is(no_row_map.get(3), 1);
+    t.is(no_row_map.get(1), 2);
+    t.is(no_row_map.get(2), 0);
 });

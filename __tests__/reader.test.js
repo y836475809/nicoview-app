@@ -1,12 +1,13 @@
+const test = require("ava");
 const fs = require("fs");
-const reader = require("../app/js/reader")
+const reader = require("../app/js/reader");
 
 const dir = `${__dirname}/data`;
 
-test("read comment", function () {
+test("read comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample.xml`, "utf-8");
     const obj = reader.comment(xml);
-    expect(obj).toEqual(
+    t.deepEqual(obj, 
         [
             {no:1,  vpos:400, date:0, user_id:"AAA", mail:"naka medium 184", text:"AAAテスト"},
             {no:2,  vpos:300, date:1, user_id:"BBB", mail:"184", text:"BBBあ"},
@@ -17,10 +18,10 @@ test("read comment", function () {
         ]);
 });
 
-test("read comment deleted", function () {
+test("read comment deleted", (t) => {
     const xml = fs.readFileSync(`${dir}/sample_deleted.xml`, "utf-8");
     const obj = reader.comment(xml);
-    expect(obj).toEqual(
+    t.deepEqual(obj, 
         [
             {no:1,  vpos:100, date:10, user_id:"AAA", mail:"184", text:"AAAテスト"},
             {no:3,  vpos:300, date:30, user_id:"BBB", mail:"184", text:"BBBテスト"},
@@ -28,33 +29,34 @@ test("read comment deleted", function () {
         ]);
 });
 
-test("read thumb info", function () {
+test("read thumb info", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[ThumbInfo].xml`, "utf-8");
     const obj = reader.thumb_info(xml);
 
-    expect(obj.video_id).toEqual("sm1000");
-    expect(obj.title).toEqual("sample.mp4");
-    expect(obj.description).toEqual("投稿コメントサンプル。他sm2000リストmylist/3000");
-    expect(obj.thumbnail_url).toEqual("http://tn-skr2.smilevideo.jp/smile?i=1000");
-    expect(obj.first_retrieve).toEqual("2000-01-01T01:02:03+09:00");
-    expect(obj.length).toEqual("00:45");
-    expect(obj.movie_type).toEqual("mp4");
-    expect(obj.size_high).toBe(1000);
-    expect(obj.size_low).toBe(500);
-    expect(obj.view_counter).toBe(100);
-    expect(obj.comment_num).toBe(10);
-    expect(obj.mylist_counter).toBe(5);
-    expect(obj.last_res_body).toEqual("最新コメント1 最新コメント2");
-    expect(obj.watch_url).toEqual("http://www.nicovideo.jp/watch/sm1000");
-    expect(obj.thumb_type).toEqual("video");
-    expect(obj.embeddable).toBe(1);
-    expect(obj.no_live_play).toBe(0);
-    expect(obj.tags).toEqual([
-        {text:"タグ1", lock:true},
-        {text:"タグ2", lock:false},
-        {text:"タグ3", lock:false}
-    ]);
-    expect(obj.user_id).toEqual("00000");
-    expect(obj.user_nickname).toEqual("ニックネーム");
-    expect(obj.user_icon_url).toEqual("https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg");
+    t.is(obj.video_id, "sm1000");
+    t.is(obj.title, "sample.mp4");
+    t.is(obj.description, "投稿コメントサンプル。他sm2000リストmylist/3000");
+    t.is(obj.thumbnail_url, "http://tn-skr2.smilevideo.jp/smile?i=1000");
+    t.is(obj.first_retrieve, "2000-01-01T01:02:03+09:00");
+    t.is(obj.length, "00:45");
+    t.is(obj.movie_type, "mp4");
+    t.is(obj.size_high, 1000);
+    t.is(obj.size_low, 500);
+    t.is(obj.view_counter, 100);
+    t.is(obj.comment_num, 10);
+    t.is(obj.mylist_counter, 5);
+    t.is(obj.last_res_body, "最新コメント1 最新コメント2");
+    t.is(obj.watch_url, "http://www.nicovideo.jp/watch/sm1000");
+    t.is(obj.thumb_type, "video");
+    t.is(obj.embeddable, 1);
+    t.is(obj.no_live_play, 0);
+    t.deepEqual(obj.tags,
+        [
+            {text:"タグ1", lock:true},
+            {text:"タグ2", lock:false},
+            {text:"タグ3", lock:false}
+        ]);
+    t.is(obj.user_id, "00000");
+    t.is(obj.user_nickname, "ニックネーム");
+    t.is(obj.user_icon_url, "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg");
 });

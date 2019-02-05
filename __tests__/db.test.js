@@ -1,6 +1,7 @@
+const test = require("ava");
 const DB = require("../app/js/db");
 
-test("db file path", function () {
+test("db file path", (t) => {
     let db = new DB();
     const dirpath_map = new Map()
         .set(1, "file:///C:/data/サンプル")
@@ -21,6 +22,6 @@ test("db file path", function () {
         });
 
     db.setData(dirpath_map, video_map);
-    expect(db.getThumbInfoPath("sm1")).toEqual("C:/data/サンプル/サンプル1 - [sm1][ThumbInfo].xml");
-    expect(db.getThumbInfoPath("sm2")).toEqual("C:/data/サンプル2 - [sm2][ThumbInfo].xml");
+    t.is(db.getThumbInfoPath("sm1"), "C:/data/サンプル/サンプル1 - [sm1][ThumbInfo].xml");
+    t.is(db.getThumbInfoPath("sm2"), "C:/data/サンプル2 - [sm2][ThumbInfo].xml");
 });

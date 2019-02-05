@@ -2,6 +2,7 @@
     <style scoped>
         :scope {
             position: absolute;
+            z-index: 9999; 
         }
         .pref-container{
             position: absolute;

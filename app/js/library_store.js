@@ -9,22 +9,27 @@ class LibraryStore{
     }
 
     load(){ 
-        this.db.load(this.file_path);
+        try {
+            this.db.load(this.file_path);
 
-        this.library_items = [];
-        const video = this.db.video_info;
-        video.forEach((value, key) => {
-            this.library_items.push({
-                image: this.db.getThumbPath(key),
-                id: key,
-                name: value["video_name"],
-                creation_date: value["creation_date"],
-                pub_date: value["pub_date"],
-                play_count: value["play_count"],
-                time: value["time"],
-                tags: value["tags"]?value["tags"].join(" "):""
-            });
-        });
+            this.library_items = [];
+            const video = this.db.video_info;
+            video.forEach((value, key) => {
+                this.library_items.push({
+                    image: this.db.getThumbPath(key),
+                    id: key,
+                    name: value["video_name"],
+                    creation_date: value["creation_date"],
+                    pub_date: value["pub_date"],
+                    play_count: value["play_count"],
+                    time: value["time"],
+                    tags: value["tags"]?value["tags"].join(" "):""
+                });
+            });            
+        } catch (error) {
+            console.log(error);
+            this.library_items = [];
+        }
     }
 
     getItems(){

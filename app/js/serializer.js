@@ -6,6 +6,11 @@ const fs = require("fs");
  * @param {string} file_path 
  */
 let load = function (file_path) {
+    try {
+        fs.accessSync(file_path);
+    } catch (error) {
+        throw error;
+    }
     const data = fs.readFileSync(file_path, "utf-8");
     return JSON.parse(data);
 };

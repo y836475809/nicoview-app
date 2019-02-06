@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <script>
+        window.jQuery = window.$ = require("jquery");
+    </script>
+    <script src="../node_modules/slickgrid/lib/jquery.event.drag-2.3.0.js"></script>
+    <script src="../node_modules/slickgrid/slick.core.js"></script>
+    <script src="../node_modules/slickgrid/slick.grid.js"></script>
+    <script src="../node_modules/slickgrid/slick.dataview.js"></script>
+    <script src="../node_modules/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick.grid.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/css/smoothness/jquery-ui-1.11.3.custom.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick-default-theme.css">
+
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            /* overflow: hidden; */
+        }
+
+        #cn {
+            border: 1px solid #000000;
+            width: 95%;
+            height: 95%;
+        }
+        
+        #myGrid {
+            border: 1px solid #fa0303;
+            width: 90%;
+            height: 90%;
+        }
+        .slick-cell.active {
+            border-style:initial;
+            border: 1px solid transparent;
+            border-right: 1px dotted silver;
+            border-bottom-color: silver;
+        }
+        .slick-cell.selected {
+            background-color: #6190cd6b;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cn">
+        <div id="myGrid"></div>
+    </div>
+</body>
+
+<script>
+    /* globals $ */
+    // const { Slick } = require("slickgrid");
+    const imageFormatter = ()=> {
+        return "<img class='clickableImage' src='./data/sample.jpeg' />";
+    };
+    const columns = [
+        {id: "duration", name: "Duration", field: "duration", height:100, width: 130,  formatter: imageFormatter},
+        {id: "title", name: "Title", field: "title", sortable: true},
+        {id: "%", name: "% Complete", field: "percentComplete", sortable: true},
+        {id: "start", name: "Start", field: "start", sortable: true},
+        {id: "finish", name: "Finish", field: "finish", sortable: true},
+        {id: "effort-driven", name: "Effort Driven", field: "effortDriven", sortable: true}
+    ];
+
+    const options = {
+        enableCellNavigation: true,
+        enableColumnReorder: false,
+        rowHeight: 100,
+        fullWidthRows: true,
+    };
+
+    let data = [];
+    for (let i = 0; i < 20; i++) {
+        data[i] = {
+            id : "id_" + i.toString(),
+            duration: "5 days",
+            title: "Task " + i,
+            percentComplete: Math.round(Math.random() * 100),
+            start: "01/01/2009",
+            finish: "01/05/2009",
+            effortDriven: (i % 5 == 0)
+        };
+    }
+    const dataView = new Slick.Data.DataView();
+    const grid = new Slick.Grid("#myGrid", dataView, columns, options);
+    grid.onSort.subscribe((e, args) => {
+        const comparer = (a, b) => {
+            return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
+        };
+        dataView.sort(comparer, args.sortAsc);
+        grid.invalidate();
+        grid.render();
+    });
+    dataView.onRowCountChanged.subscribe(function (e, args) {
+        grid.updateRowCount();
+        grid.render();
+    });
+
+    dataView.onRowsChanged.subscribe(function (e, args) {
+        grid.invalidateRows(args.rows);
+        grid.render();
+    });
+    grid.setSelectionModel(new Slick.RowSelectionModel());
+    grid.onClick.subscribe((e) => {
+        const cell = grid.getCellFromEvent(e);
+        console.log(cell.row);
+        grid.setSelectedRows([cell.row]);
+        e.stopPropagation();
+    });
+    grid.onDblClick.subscribe((e) => {
+        const cell = grid.getCellFromEvent(e);
+        console.log("onDblClick cell.row=", cell.row);
+        grid.setSelectedRows([cell.row]);
+        e.stopPropagation();
+    });
+    grid.onContextMenu.subscribe((e) => {
+        e.preventDefault();
+        const cell = grid.getCellFromEvent(e);
+        grid.setSelectedRows([cell.row]);
+        // $("#contextMenu")
+        //     .data("row", cell.row)
+        //     .css("top", e.pageY)
+        //     .css("left", e.pageX)
+        //     .show();
+        // $("body").one("click", function () {
+        //     $("#contextMenu").hide();
+        // });
+    });
+
+    // grid.setData(data);
+    // grid.render();
+
+    dataView.beginUpdate();
+    dataView.setItems(data);
+    dataView.endUpdate();
+    grid.render();
+
+    grid.setSortColumn("title",false); 
+    dataView.fastSort("title",false); 
+    // grid.render();
+
+    const cols = grid.getColumns();
+    console.log("cols=", cols)
+
+    const gridId = "myGrid";
+    const resizeToFitBrowserWindow = (gridId)=>{
+        const newSizes = {
+            height: $("#cn").height,
+            width: $("#cn").width
+        };
+        $("#" + gridId).height(newSizes.height);
+        $("#" + gridId).width(newSizes.width);
+        grid.resizeCanvas();  
+        console.log("cols=", cols)
+    };
+    
+    // let mm=0;
+    // setInterval(()=>{
+    //     grid.scrollRowIntoView(mm, false);
+    //     mm++;
+    // }, 1000);
+    
+
+    const timeout = 200;
+    let timer;
+    window.addEventListener("resize", () => {
+        // resizeToFitBrowserWindow(gridId);
+
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            resizeToFitBrowserWindow(gridId);
+        }, timeout);
+    });
+</script>
+
+</html>

@@ -3,14 +3,14 @@
 
 <head>
     <meta charset="UTF-8">
-    <script>
+    <!-- <script>
         window.jQuery = window.$ = require("jquery");
-    </script>
-    <script src="../node_modules/slickgrid/lib/jquery.event.drag-2.3.0.js"></script>
+    </script> -->
+    <!-- <script src="../node_modules/slickgrid/lib/jquery.event.drag-2.3.0.js"></script>
     <script src="../node_modules/slickgrid/slick.core.js"></script>
     <script src="../node_modules/slickgrid/slick.grid.js"></script>
     <script src="../node_modules/slickgrid/slick.dataview.js"></script>
-    <script src="../node_modules/slickgrid/plugins/slick.rowselectionmodel.js"></script>
+    <script src="../node_modules/slickgrid/plugins/slick.rowselectionmodel.js"></script> -->
 
     <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick.grid.css">
     <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/css/smoothness/jquery-ui-1.11.3.custom.css">
@@ -61,6 +61,13 @@
 
 <script>
     /* globals $ */
+    window.jQuery = window.$ = require("jquery");
+    require("slickgrid/lib/jquery.event.drag-2.3.0");
+    require("slickgrid/slick.core");
+    require("slickgrid/slick.grid");
+    require("slickgrid/slick.dataview");
+    require("slickgrid/plugins/slick.rowselectionmodel");
+
     const time_format = require("../app/js/time_format");
     // const { Slick } = require("slickgrid");
     const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -153,6 +160,10 @@
             dataView.setFilterArgs({searchString: param});
             dataView.refresh();
             console.log("num of item = ",dataView.getLength());
+
+            var canvasNode = grid.getCanvasNode();
+            console.log("scrollTop = ",canvasNode.offsetParent.scrollTop);
+            canvasNode.offsetParent.scrollTop = 500;
         }
     };
 

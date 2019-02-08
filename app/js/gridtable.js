@@ -5,17 +5,26 @@ require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
 
 class GridTable{
-    constructor(){
+    constructor(columns){
 
         const columns = [
-            {id: "image", name: "image", field: "image", height:100, width: 130,  formatter: imageFormatter},
-            {id: "id", name: "id", field: "id", sortable: true},
-            {id: "title", name: "Title", field: "title", sortable: true},
-            {id: "%", name: "% Complete", field: "percentComplete", sortable: true},
-            {id: "start", name: "Start", field: "start", sortable: true},
-            {id: "finish", name: "Finish", field: "finish", sortable: true},
-            {id: "effort-driven", name: "Effort Driven", field: "effortDriven", sortable: true}
+            {id: "thumb_img", name: "image", height:100, width: 130,  formatter: imageFormatter},
+            {id: "id", name: "id",sortable: true},
+            {id: "title", name: "Title", sortable: true},
+            {id: "percentComplete", name: "% Complete", sortable: true},
+            {id: "creation_date", name: "Creation date", sortable: true},
+            {id: "pub_date", name: "Pub date", sortable: true},
+            {id: "effortDriven", name: "Effort Driven", sortable: true}
         ];
+
+        this.nn = columns.map(val=>{
+            const id = val.id;
+            "thn_img".match(/(_.*)$/gi)
+            /(_img)$/i
+            return Object.assign(val, {field: val.id});
+        });
+
+        this.onContextMenu = (e, data)=>{};
 
     }
 
@@ -25,9 +34,13 @@ class GridTable{
             enableColumnReorder: false,
             fullWidthRows: true,
         };
+        if(options===undefined){
+            options = {};
+        }
+        const grid_options = Object.assign(options, default_options);
 
         this.dataView = new Slick.Data.DataView();
-        this.grid = new Slick.Grid(id, dataView, columns, options);
+        this.grid = new Slick.Grid(id, this.dataView, columns, grid_options);
         this.grid.onSort.subscribe((e, args) => {
             const comparer = (a, b) => {
                 return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
@@ -62,6 +75,9 @@ class GridTable{
             e.preventDefault();
             const cell = this.grid.getCellFromEvent(e);
             this.grid.setSelectedRows([cell.row]);
+
+            const data = dataView.getItem(cell.row);
+            this.onContextMenu(e, data);
             // $("#contextMenu")
             //     .data("row", cell.row)
             //     .css("top", e.pageY)
@@ -71,5 +87,9 @@ class GridTable{
             //     $("#contextMenu").hide();
             // });
         });       
+    }
+
+    setData(){
+
     }
 }

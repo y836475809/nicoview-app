@@ -3,6 +3,26 @@ require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
+const time_format = require("./time_format");
+
+const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
+    return `<img src='${value}' />`;
+};
+
+const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
+    return time_format.toDate(value);
+};
+
+const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
+    return time_format.toPlayTime(value);
+};
+
+
+const formatterMap = new Map([
+    ["_img", imageFormatter],
+    ["_date", dateFormatter],
+    ["_time", timeFormatter],
+]);
 
 class GridTable{
     constructor(columns){
@@ -17,15 +37,21 @@ class GridTable{
             {id: "effortDriven", name: "Effort Driven", sortable: true}
         ];
 
-        this.nn = columns.map(val=>{
+        this.nn = columns.map(val => {
             const id = val.id;
-            "thn_img".match(/(_.*)$/gi)
-            /(_img)$/i
+            const key = id.match(/(_.*)$/gi);
+            if(val.formatter === undefined && formatterMap.has(key) != null){
+                return Object.assign(val, 
+                    {
+                        field: val.id,
+                        formatter: formatterMap.get(key)
+                    });
+            }
+
             return Object.assign(val, {field: val.id});
         });
 
         this.onContextMenu = (e, data)=>{};
-
     }
 
     init(id, columns, options){

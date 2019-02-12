@@ -59,6 +59,9 @@ class GridTable {
 
         this.onContextMenu = (e, data)=>{};
         this.filter = (column_id, value, word) => { return true; };
+
+        this.on_sort_changed = (e)=>{};
+        this.on_column_width_changed = (e)=>{};
     }
 
     init(){
@@ -111,29 +114,29 @@ class GridTable {
             // });
         });  
         this.grid.onSort.subscribe((e, args) => {
-            console.log("onSort sortCol=", args.sortCol);
-            console.log("onSort sortAsc=", args.sortAsc);
+            // console.log("onSort sortCol=", args.sortCol);
+            // console.log("onSort sortAsc=", args.sortAsc);
             const column_id = args.sortCol.id;
             const column_sort_asc = args.sortAsc;
+            this.on_sort_changed({ 
+                id: this.id, 
+                column_id: column_id, 
+                column_sort_asc: column_sort_asc 
+            });
+        }); 
+        this.grid.onColumnsResized.subscribe(() => {
+            // console.log("onColumnsResized columns=", this.grid.getColumns());
             const columns = this.grid.getColumns();
-            const width = columns.map(value=>{
+            const column_width = columns.map(value=>{
                 return {
                     column_id: value.id,
                     column_width: value.width
-                }
+                };
             });
-
-            const column_state = {
-                sort: {
-                    column_id: column_id,
-                    column_sort_asc: column_sort_asc
-                },
-                width: width
-            };
-            //on_state()
-        }); 
-        this.grid.onColumnsResized.subscribe(() => {
-            console.log("onColumnsResized columns=", this.grid.getColumns());
+            this.on_column_width_changed({ 
+                id: this.id, 
+                column_width: column_width
+            });
         }); 
     }
 

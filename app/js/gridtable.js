@@ -3,7 +3,10 @@ require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
+// const $ = require("jquery");
 const time_format = require("./time_format");
+
+/* globals $ */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
     return `<img src='${value}' />`;
@@ -24,38 +27,27 @@ const formatterMap = new Map([
     ["_time", timeFormatter],
 ]);
 
-class GridTable{
-    constructor(columns){
+class GridTable {
+    constructor(id, columns, options){
+        this.id = `#${id}`;
 
-        const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130,  formatter: imageFormatter},
-            {id: "id", name: "id",sortable: true},
-            {id: "title", name: "Title", sortable: true},
-            {id: "percentComplete", name: "% Complete", sortable: true},
-            {id: "creation_date", name: "Creation date", sortable: true},
-            {id: "pub_date", name: "Pub date", sortable: true},
-            {id: "effortDriven", name: "Effort Driven", sortable: true}
-        ];
-
-        this.nn = columns.map(val => {
+        this.columns = columns.map(val => {
             const id = val.id;
             const key = id.match(/(_.*)$/gi);
-            if(val.formatter === undefined && formatterMap.has(key) != null){
+            if(val.formatter === undefined 
+                && key != null
+                && formatterMap.has(key[0])){
                 return Object.assign(val, 
                     {
                         field: val.id,
-                        formatter: formatterMap.get(key)
+                        formatter: formatterMap.get(key[0])
                     });
             }
 
             return Object.assign(val, {field: val.id});
         });
 
-        this.onContextMenu = (e, data)=>{};
-    }
-
-    init(id, columns, options){
-        let default_options =  {
+        const default_options =  {
             enableCellNavigation: true,
             enableColumnReorder: false,
             fullWidthRows: true,
@@ -63,10 +55,15 @@ class GridTable{
         if(options===undefined){
             options = {};
         }
-        const grid_options = Object.assign(options, default_options);
+        this.options = Object.assign(options, default_options);
 
+        this.onContextMenu = (e, data)=>{};
+        this.filter = (column_id, value, word) => { return true; };
+    }
+
+    init(){
         this.dataView = new Slick.Data.DataView();
-        this.grid = new Slick.Grid(id, this.dataView, columns, grid_options);
+        this.grid = new Slick.Grid(this.id, this.dataView, this.columns, this.options);
         this.grid.onSort.subscribe((e, args) => {
             const comparer = (a, b) => {
                 return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
@@ -75,12 +72,12 @@ class GridTable{
             this.grid.invalidate();
             this.grid.render();
         });
-        this.dataView.onRowCountChanged.subscribe(function (e, args) {
+        this.dataView.onRowCountChanged.subscribe((e, args) => {
             this.grid.updateRowCount();
             this.grid.render();
         });
     
-        this.dataView.onRowsChanged.subscribe(function (e, args) {
+        this.dataView.onRowsChanged.subscribe((e, args) => {
             this.grid.invalidateRows(args.rows);
             this.grid.render();
         });
@@ -102,7 +99,7 @@ class GridTable{
             const cell = this.grid.getCellFromEvent(e);
             this.grid.setSelectedRows([cell.row]);
 
-            const data = dataView.getItem(cell.row);
+            const data = this.dataView.getItem(cell.row);
             this.onContextMenu(e, data);
             // $("#contextMenu")
             //     .data("row", cell.row)
@@ -112,10 +109,87 @@ class GridTable{
             // $("body").one("click", function () {
             //     $("#contextMenu").hide();
             // });
-        });       
+        });  
+        this.grid.onSort.subscribe((e, args) => {
+            console.log("onSort sortCol=", args.sortCol);
+            console.log("onSort sortAsc=", args.sortAsc);
+            const column_id = args.sortCol.id;
+            const column_sort_asc = args.sortAsc;
+            const columns = this.grid.getColumns();
+            const width = columns.map(value=>{
+                return {
+                    column_id: value.id,
+                    column_width: value.width
+                }
+            });
+
+            const column_state = {
+                sort: {
+                    column_id: column_id,
+                    column_sort_asc: column_sort_asc
+                },
+                width: width
+            };
+            //on_state()
+        }); 
+        this.grid.onColumnsResized.subscribe(() => {
+            console.log("onColumnsResized columns=", this.grid.getColumns());
+        }); 
     }
 
-    setData(){
+    resize(new_size){
+        $(this.id).height(new_size.height);
+        $(this.id).width(new_size.width);
+        this.grid.resizeCanvas();
+    }
 
+    get scrollTop(){
+        return this.grid.getCanvasNode().offsetParent.scrollTop;
+    }
+
+    set scrollTop(value){
+        this.grid.getCanvasNode().offsetParent.scrollTop = value;
+    }
+
+    setData(data){
+        this.dataView.beginUpdate();
+        this.dataView.setItems(data);
+        this.dataView.setFilter(this._filter);
+        this.dataView.endUpdate();
+        // this.grid.render();
+    }
+
+    setFilter(filter){
+        this.filter = filter;
+        // this.dataView.setFilter(this._filter);
+    }
+
+    filterData(word){
+        this.dataView.setFilterArgs({searchString: word, filter: this.filter});
+        this.dataView.refresh();
+    }
+
+    _filter(item, args) {
+        // console.log("myFilter item=", item);
+        if(args===undefined){
+            return true;
+        }
+        if(args.searchString == ""){
+            return true;
+        }
+        for(let column_id in item){
+            const value = String(item[column_id]);
+            if(args.filter(column_id, value, args.searchString)){
+                return true;
+            }           
+            // if(this.filter(column_id, value, args.searchString)){
+            //     return true;
+            // }
+        }
+        return false;
     }
 }
+
+module.exports = {
+    GridTable: GridTable,
+};

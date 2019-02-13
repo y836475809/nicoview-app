@@ -7,12 +7,20 @@
     <script>
             window.jQuery = window.$ = require("jquery");
     </script>
-    <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
+    <!-- <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
     <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
     <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
     <link rel="stylesheet" type="text/css" href="../node_modules/icono/dist/icono.min.css">
-    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" type="text/css" href="../css/app.css"> -->
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick.grid.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/css/smoothness/jquery-ui-1.11.3.custom.css">
+    <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick-default-theme.css">
+
+    <link rel="stylesheet" type="text/css" href="../node_modules/icono/dist/icono.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/app.css">
+
     <style type="text/css">
         .test-button{
             height: 25px;
@@ -41,7 +49,7 @@
     var obs = riot.observable(); // eslint-disable-line
     
     const reader = require("../app/js/reader");
-    require("datatables.net-scroller")( window, window.$ ); 
+    // require("datatables.net-scroller")( window, window.$ ); 
 
     require(`${base_dir}/app/tags/player-viewinfo-page`);
     riot.mount("player-viewinfo-page");
@@ -98,7 +106,7 @@
             commnets.push({
                 no: index + 1,
                 vpos: 50 * index,
-                date: 1332592373506 + index*100,
+                post_date: 1332592373506 + index*100,
                 user_id: "AAA",
                 mail: "ue",
                 text: "------------------text1------------------------"

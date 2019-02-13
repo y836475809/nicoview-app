@@ -20,7 +20,7 @@ function comment(xml) {
             commnets.push({
                 no: no,
                 vpos: vpos,
-                date: date,
+                post_date: date,
                 user_id: user_id,
                 mail: mail ? mail : "184",
                 text: text

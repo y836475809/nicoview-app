@@ -50,7 +50,7 @@
             vertical-align:middle;
         }
 
-        table{
+        /* table{
             table-layout: fixed;
         }      
         table.dataTable tbody td {
@@ -62,7 +62,8 @@
             white-space: nowrap; 
             padding-left: 4px;
             padding-right: 4px;
-        }
+        } */
+
     </style>
     
     <div class="viewinfo-panel viewinfo-video-panel">
@@ -82,7 +83,10 @@
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
-        <base-datatable ref="dt" params={this.params} ></base-datatable>
+        <!-- <base-datatable ref="dt" params={this.params} ></base-datatable> -->
+        <div id="comment-grid-container">
+            <div id="comment-grid"></div>
+        </div>
     </div>
 
     <script>
@@ -90,7 +94,8 @@
         const time_format = require("../js/time_format");
         const SyncCommentScroll = require("../js/sync_comment_scroll");
         this.message = require("../js/message");
-        require("./base-datatable.tag");
+        const { GridTable } = require("../js/gridtable");
+        // require("./base-datatable.tag");
 
         const row_height = 25;
 
@@ -105,6 +110,19 @@
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
 
+        const columns = [
+            {id: "vpos", name: this.message.TIME, sortable: true},
+            {id: "text", name: this.message.COMMENT, sortable: true},
+            {id: "user_id", name: this.message.USER_ID, sortable: true},
+            {id: "post_date", name: this.message.POSTED, sortable: true},
+            {id: "no", name: this.message.NO, sortable: true},
+            {id: "mail", name: this.message.OPTION, sortable: true}
+        ];
+        const options = {
+            rowHeight: row_height,
+        };   
+        const grid_table = new GridTable("comment-grid", columns, options);
+
         this.onclickSyncCommentCheck = (e) => {
             sync_comment_checked = e.target.checked;
         };
@@ -114,23 +132,31 @@
         };
 
         const resizeCommnetList = () => {
-            if(this.refs==undefined){
-                return;
-            }
+            // if(this.refs==undefined){
+            //     return;
+            // }
 
-            const dt_elm = this.refs.dt.root.querySelector("div.dataTables_scrollHead");
-            const vp_elm = this.root.querySelector(".viewinfo-video-panel");
-            const dp_elm = this.root.querySelector(".viewinfo-description-panel");            
-            const ch_elm = this.root.querySelector(".viewinfo-checkbox");
-            const margin = 10;
-            const exclude_h = vp_elm.offsetHeight + dp_elm.offsetHeight
-                    + dt_elm.offsetHeight + ch_elm.offsetHeight 
-                    + margin;
-            const h = this.root.clientHeight - exclude_h;
-            this.refs.dt.setScrollSize({
-                w: null,
-                h: h
-            });
+            // const dt_elm = this.refs.dt.root.querySelector("div.dataTables_scrollHead");
+            // const vp_elm = this.root.querySelector(".viewinfo-video-panel");
+            // const dp_elm = this.root.querySelector(".viewinfo-description-panel");            
+            // const ch_elm = this.root.querySelector(".viewinfo-checkbox");
+            // const margin = 10;
+            // const exclude_h = vp_elm.offsetHeight + dp_elm.offsetHeight
+            //         + dt_elm.offsetHeight + ch_elm.offsetHeight 
+            //         + margin;
+            // const h = this.root.clientHeight - exclude_h;
+            // this.refs.dt.setScrollSize({
+            //     w: null,
+            //     h: h
+            // });
+            const container = this.root.querySelector("#comment-grid-container");
+            const new_height = $(window).height() - container.offsetTop - 5;
+            const new_width = container.clientWidth - 5;
+            const new_szie = {
+                height: new_height,
+                width: new_width
+            };
+            grid_table.resize(new_szie);
         };
 
         const updateSyncCommentCheckBox = () => {
@@ -138,63 +164,63 @@
             ch_elm.checked = sync_comment_checked;
         };
 
-        this.params = {};
-        this.params.dt = {
-            columns : [
-                { title: this.message.TIME },
-                { title: this.message.COMMENT },
-                { title: this.message.USER_ID },
-                { title: this.message.POSTED },
-                { title: this.message.NO },
-                { title: this.message.OPTION }
-            ],
-            columnDefs: [
-                { width:100, targets: [0,2,3,4,5] },
-                { width:200, targets: [1] },
-                { orderable: false, targets: "_all" },
-                {
-                    targets: 0,
-                    orderable: false,
-                    data: "vpos",
-                    render: function (data, type, row, meta) {
-                        return time_format.toPlayTime(data*10/1000);
-                    },
-                    width:200
-                },
-                { targets: 1, data: "text"},
-                { targets: 2, data: "user_id"},
-                { 
-                    targets: 3, 
-                    data: "date" ,
-                    render: function (data, type, row, meta) {
-                        return time_format.toDate(data);
-                    },
+        // this.params = {};
+        // this.params.dt = {
+        //     columns : [
+        //         { title: this.message.TIME },
+        //         { title: this.message.COMMENT },
+        //         { title: this.message.USER_ID },
+        //         { title: this.message.POSTED },
+        //         { title: this.message.NO },
+        //         { title: this.message.OPTION }
+        //     ],
+        //     columnDefs: [
+        //         { width:100, targets: [0,2,3,4,5] },
+        //         { width:200, targets: [1] },
+        //         { orderable: false, targets: "_all" },
+        //         {
+        //             targets: 0,
+        //             orderable: false,
+        //             data: "vpos",
+        //             render: function (data, type, row, meta) {
+        //                 return time_format.toPlayTime(data*10/1000);
+        //             },
+        //             width:200
+        //         },
+        //         { targets: 1, data: "text"},
+        //         { targets: 2, data: "user_id"},
+        //         { 
+        //             targets: 3, 
+        //             data: "date" ,
+        //             render: function (data, type, row, meta) {
+        //                 return time_format.toDate(data);
+        //             },
  
-                },
-                { targets: 4, data: "no" },
-                { targets: 5, data:  "mail" }
-            ], 
-            colResize : {
-                handleWidth: 10,
-                tableWidthFixed: false
-            },
-            dom: "Zrt",
-            scrollX: true,
-            scrollY: true,
-            scrollCollapse:false,
-            scroller: {
-                displayBuffer: 10
-            },
-            autoWidth: false,
-            // paging: true,
-            // displayLength:100,
-            // lengthMenu: [ 100, 200, 300, 400, 500 ],
-            deferRender: true,
-            stateSave: true,
-            dblclickRow: function(data){
-                console.log("comment-list dblclickRow data:", data); 
-            }
-        };
+        //         },
+        //         { targets: 4, data: "no" },
+        //         { targets: 5, data:  "mail" }
+        //     ], 
+        //     colResize : {
+        //         handleWidth: 10,
+        //         tableWidthFixed: false
+        //     },
+        //     dom: "Zrt",
+        //     scrollX: true,
+        //     scrollY: true,
+        //     scrollCollapse:false,
+        //     scroller: {
+        //         displayBuffer: 10
+        //     },
+        //     autoWidth: false,
+        //     // paging: true,
+        //     // displayLength:100,
+        //     // lengthMenu: [ 100, 200, 300, 400, 500 ],
+        //     deferRender: true,
+        //     stateSave: true,
+        //     dblclickRow: function(data){
+        //         console.log("comment-list dblclickRow data:", data); 
+        //     }
+        // };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
             resizeCommnetList();
@@ -209,9 +235,8 @@
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 
-            this.refs.dt.setData(viewinfo.commnets);
-
-            this.update();
+            grid_table.setData(viewinfo.commnets);
+            // this.update();
         });
 
         obs.on("seek_update", (current_sec)=> {
@@ -220,13 +245,19 @@
             }
 
             const comment_index =  sync_comment_scroll.getCommnetIndex(current_sec);    
-            const sc_h = this.refs.dt.getScrollHeight();
+            // const sc_h = this.refs.dt.getScrollHeight();
+            const container = this.root.querySelector("#comment-grid-container");
+            const sc_h = container.offsetHeight;
             const index = comment_index - sc_h / row_height + 1;
-            this.refs.dt.setScrollToIndex(index);
+            // this.refs.dt.setScrollToIndex(index);
+            grid_table.scrollRow(index);
         });
 
-        this.on("mount", () => {                 
+        this.on("mount", () => {  
+            grid_table.init();
+
             updateSyncCommentCheckBox();
+            resizeCommnetList();
         });
         
         obs.on("resizeEndEvent", (size)=> {

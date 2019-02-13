@@ -30,7 +30,7 @@ class HistoryStore{
                 this.history_items.pop();
             }
             this.history_items.unshift({
-                image: new_item.image,
+                thumb_img: new_item.image,
                 id: new_item.id,
                 name: new_item.name,
                 play_date: Date.now(), 
@@ -41,7 +41,7 @@ class HistoryStore{
             let item = this.history_items[index];
             item.play_date = Date.now();
             if(new_item.url != item.url){
-                item.image = new_item.image;
+                item.thumb_img = new_item.image;
                 item.url = new_item.url;
             }
             this.history_items.sort((a, b) => {

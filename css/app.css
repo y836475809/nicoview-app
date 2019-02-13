@@ -18,6 +18,16 @@ html, body {
     font-size: 12px;
 }
 
+.slick-cell.active {
+  border-style:initial;
+  border: 1px solid transparent;
+  border-right: 1px dotted silver;
+  border-bottom-color: silver;
+}
+.slick-cell.selected {
+  background-color: #6190cd6b;
+}
+
 table.dataTable thead tr th {
     overflow: hidden; 
     text-overflow: ellipsis;

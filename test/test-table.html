@@ -6,12 +6,6 @@
     <script>
         window.jQuery = window.$ = require("jquery");
     </script>
-    <!-- <script src="../node_modules/slickgrid/lib/jquery.event.drag-2.3.0.js"></script>
-    <script src="../node_modules/slickgrid/slick.core.js"></script>
-    <script src="../node_modules/slickgrid/slick.grid.js"></script>
-    <script src="../node_modules/slickgrid/slick.dataview.js"></script>
-    <script src="../node_modules/slickgrid/plugins/slick.rowselectionmodel.js"></script> -->
-
     <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick.grid.css">
     <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/css/smoothness/jquery-ui-1.11.3.custom.css">
     <link rel="stylesheet" type="text/css" href="../node_modules/slickgrid/slick-default-theme.css">
@@ -54,13 +48,15 @@
 
 <body>
     <div id="cn">
-            <input type="search" class="library-search-input" onkeydown="keyDown(event);"/>
+        <input type="search" class="library-search-input" onkeydown="keyDown(event);"/>
         <div id="myGrid"></div>
     </div>
 </body>
 
 <script>
     /* globals $ */
+    const { remote } = require("electron");
+    const { Menu, MenuItem } = remote;
     const { GridTable } = require("../app/js/gridtable");
 
     const columns = [
@@ -74,6 +70,7 @@
     ];
     const options = {
         rowHeight: 100,
+        _saveState: true,
     };
     const grid_table = new GridTable("myGrid", columns, options);
     grid_table.init();
@@ -83,13 +80,32 @@
         }   
         return false; 
     });
+    grid_table.onDblClick((e, data)=>{
+        console.log("onDblClick data=", data);
+    });
+
+    const menu = new Menu();
+    menu.append(new MenuItem({
+        label: "Play", click() {
+            const datas = grid_table.getSelectedDatas();
+            console.log("lib context menu datas=", datas);
+        }
+    }));
+    menu.append(new MenuItem({ type: "separator" }));
+    menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
+   
+    grid_table.onContextMenu((e)=>{
+        menu.popup({window: remote.getCurrentWindow()});
+    });    
     let data = [];
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 200; i++) {
+        const id = i % 20;
         data[i] = {
-            thumb_img: `./data/imgs/sm${i}.jpeg`,
-            id : "sm" + i.toString(),
+            thumb_img: `./data/imgs/sm${id}.jpeg`,
+            // id : `sm${id}`,
+            id : i,
             // duration: "5 days",
-            title: "test Task " + i,
+            title: `test Task ${id}`,
             percentComplete: Math.round(Math.random() * 100),
             // start: "01/01/2009",
             creation_date: 1307213799000+i*2000,
@@ -107,6 +123,12 @@
         }
     };
 
+    // let mm=0;
+    // setInterval(()=>{
+    //     grid_table.scrollRow(mm);
+    //     mm++;
+    // }, 1000);
+
     const timeout = 200;
     let timer;
     window.addEventListener("resize", () => {
@@ -119,184 +141,6 @@
             grid_table.resize(new_sizes);
         }, timeout);
     });
-
-    // window.jQuery = window.$ = require("jquery");
-    // require("slickgrid/lib/jquery.event.drag-2.3.0");
-    // require("slickgrid/slick.core");
-    // require("slickgrid/slick.grid");
-    // require("slickgrid/slick.dataview");
-    // require("slickgrid/plugins/slick.rowselectionmodel");
-
-    // const time_format = require("../app/js/time_format");
-    // // const { Slick } = require("slickgrid");
-    // const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
-    //     // console.log(`[${row}, ${cell}] = ${value}`);
-    //     // console.table(`${columnDef}, ${dataContext}, \n`);
-    //     // console.log(dataContext);
-    //     const id = dataContext.id;
-    //     // const src = `http://localhost:8000/${id}.jpeg`;
-    //     const src = `./data/imgs/${id}.jpeg`;
-    //     return `<img class='clickableImage' src='${src}' />`;
-    // };
-    // const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
-    //     // const start = dataContext.start;
-    //     return time_format.toDate(value);
-    // };
-    // const columns = [
-    //     {id: "image", name: "image", field: "image", height:100, width: 130,  formatter: imageFormatter},
-    //     {id: "id", name: "id", field: "id", sortable: true},
-    //     {id: "title", name: "Title", field: "title", sortable: true},
-    //     {id: "%", name: "% Complete", field: "percentComplete", sortable: true},
-    //     {id: "start", name: "Start", field: "start", sortable: true, formatter: dateFormatter},
-    //     {id: "finish", name: "Finish", field: "finish", sortable: true},
-    //     {id: "effort-driven", name: "Effort Driven", field: "effortDriven", sortable: true}
-    // ];
-
-    // const options = {
-    //     enableCellNavigation: true,
-    //     enableColumnReorder: false,
-    //     rowHeight: 100,
-    //     fullWidthRows: true,
-    // };
-
-    // let data = [];
-    // for (let i = 0; i < 20; i++) {
-    //     data[i] = {
-    //         id : "sm" + i.toString(),
-    //         // duration: "5 days",
-    //         title: "test Task " + i,
-    //         percentComplete: Math.round(Math.random() * 100),
-    //         // start: "01/01/2009",
-    //         start: 1307213799000+i*2000,
-    //         finish: "01/05/2009",
-    //         effortDriven: (i % 5 == 0),
-    //         tags:["tag1", "tag2"]
-    //     };
-    // }
-    // const dataView = new Slick.Data.DataView();
-    // const grid = new Slick.Grid("#myGrid", dataView, columns, options);
-    // grid.onSort.subscribe((e, args) => {
-    //     const comparer = (a, b) => {
-    //         return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
-    //     };
-    //     dataView.sort(comparer, args.sortAsc);
-    //     grid.invalidate();
-    //     grid.render();
-    // });
-    // dataView.onRowCountChanged.subscribe(function (e, args) {
-    //     grid.updateRowCount();
-    //     grid.render();
-    // });
-
-    // dataView.onRowsChanged.subscribe(function (e, args) {
-    //     grid.invalidateRows(args.rows);
-    //     grid.render();
-    // });
-    // grid.setSelectionModel(new Slick.RowSelectionModel());
-    // grid.onClick.subscribe((e) => {
-    //     const cell = grid.getCellFromEvent(e);
-    //     console.log(cell.row);
-    //     grid.setSelectedRows([cell.row]);
-    //     e.stopPropagation();
-    // });
-    // grid.onDblClick.subscribe((e) => {
-    //     const cell = grid.getCellFromEvent(e);
-    //     console.log("onDblClick cell.row=", cell.row);
-    //     grid.setSelectedRows([cell.row]);
-    //     e.stopPropagation();
-    // });
-    // grid.onContextMenu.subscribe((e) => {
-    //     e.preventDefault();
-    //     const cell = grid.getCellFromEvent(e);
-    //     grid.setSelectedRows([cell.row]);
-    //     console.log(dataView.getItem(cell.row));
-    //     // $("#contextMenu")
-    //     //     .data("row", cell.row)
-    //     //     .css("top", e.pageY)
-    //     //     .css("left", e.pageX)
-    //     //     .show();
-    //     // $("body").one("click", function () {
-    //     //     $("#contextMenu").hide();
-    //     // });
-    // });
-    // const keyDown = (e) => {
-    //     if(e.keyCode===13){
-    //         const param = e.target.value;
-    //         dataView.setFilterArgs({searchString: param});
-    //         dataView.refresh();
-    //         console.log("num of item = ",dataView.getLength());
-
-    //         var canvasNode = grid.getCanvasNode();
-    //         console.log("scrollTop = ",canvasNode.offsetParent.scrollTop);
-    //         canvasNode.offsetParent.scrollTop = 500;
-    //     }
-    // };
-
-    // function myFilter(item, args) {
-    //     console.log("myFilter item=", item);
-    //     for(let column_id in item){
-    //         console.log("myFilter item=", item[column_id]);
-    //     }
-    //     if(args===undefined){
-    //         return true;
-    //     }
-    //     if(args.searchString == ""){
-    //         return true;
-    //     }
-    //     for (let columnId of ["id", "title", "start", "finish", "percentComplete", "effort-driven"]){
-    //         let val = String(item[columnId]);
-    //         if (args.searchString != "" && val.indexOf(args.searchString) != -1) {
-    //             return true;
-    //         }        
-    //     } 
-    //     return false;
-    // }
-
-    // // grid.setData(data);
-    // // grid.render();
-
-    // dataView.beginUpdate();
-    // dataView.setItems(data);
-    // dataView.setFilter(myFilter);
-    // dataView.endUpdate();
-    // grid.render();
-
-    // // grid.setSortColumn("title",false); 
-    // // dataView.fastSort("title",false); 
-    // // grid.render();
-
-    // const cols = grid.getColumns();
-    // console.log("cols=", cols);
-
-    // const gridId = "myGrid";
-    // const resizeToFitBrowserWindow = (gridId)=>{
-    //     const newSizes = {
-    //         height: $("#cn").height,
-    //         width: $("#cn").width
-    //     };
-    //     $("#" + gridId).height(newSizes.height);
-    //     $("#" + gridId).width(newSizes.width);
-    //     grid.resizeCanvas();  
-    //     console.log("cols=", cols);
-    // };
-    
-    // // let mm=0;
-    // // setInterval(()=>{
-    // //     grid.scrollRowIntoView(mm, false);
-    // //     mm++;
-    // // }, 1000);
-    
-
-    // const timeout = 200;
-    // let timer;
-    // window.addEventListener("resize", () => {
-    //     // resizeToFitBrowserWindow(gridId);
-
-    //     clearTimeout(timer);
-    //     timer = setTimeout(() => {
-    //         resizeToFitBrowserWindow(gridId);
-    //     }, timeout);
-    // });
 </script>
 
 </html>

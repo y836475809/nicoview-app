@@ -3,13 +3,12 @@ require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
-// const $ = require("jquery");
 const time_format = require("./time_format");
 
 /* globals $ */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
-    return `<img src='${value}' />`;
+    return `<img src='${value}' width="130" height="100"/>`;
 };
 
 const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -51,17 +50,18 @@ class GridTable {
             enableCellNavigation: true,
             enableColumnReorder: false,
             fullWidthRows: true,
+            _stateSave: false,
         };
         if(options===undefined){
             options = {};
+            this.options = Object.assign(options, default_options);
+        }else{
+            this.options = Object.assign(default_options, options);
         }
-        this.options = Object.assign(options, default_options);
-
-        this.onContextMenu = (e, data)=>{};
+        
+        this.on_dblclick = (e, data)=>{};
+        this.on_context_menu = (e)=>{};
         this.filter = (column_id, value, word) => { return true; };
-
-        this.on_sort_changed = (e)=>{};
-        this.on_column_width_changed = (e)=>{};
     }
 
     init(){
@@ -87,57 +87,52 @@ class GridTable {
         this.grid.setSelectionModel(new Slick.RowSelectionModel());
         this.grid.onClick.subscribe((e) => {
             const cell = this.grid.getCellFromEvent(e);
-            console.log(cell.row);
             this.grid.setSelectedRows([cell.row]);
             e.stopPropagation();
         });
         this.grid.onDblClick.subscribe((e) => {
             const cell = this.grid.getCellFromEvent(e);
-            console.log("onDblClick cell.row=", cell.row);
             this.grid.setSelectedRows([cell.row]);
             e.stopPropagation();
+
+            const data = this.dataView.getItem(cell.row);
+            this.on_dblclick(e, data);
         });
         this.grid.onContextMenu.subscribe((e) => {
             e.preventDefault();
+            const selected_rows = this.grid.getSelectedRows();
             const cell = this.grid.getCellFromEvent(e);
-            this.grid.setSelectedRows([cell.row]);
-
-            const data = this.dataView.getItem(cell.row);
-            this.onContextMenu(e, data);
-            // $("#contextMenu")
-            //     .data("row", cell.row)
-            //     .css("top", e.pageY)
-            //     .css("left", e.pageX)
-            //     .show();
-            // $("body").one("click", function () {
-            //     $("#contextMenu").hide();
-            // });
+            if(selected_rows.indexOf(cell.row)===-1){
+                this.grid.setSelectedRows([cell.row]);
+            }
+            this.on_context_menu(e);
         });  
         this.grid.onSort.subscribe((e, args) => {
-            // console.log("onSort sortCol=", args.sortCol);
-            // console.log("onSort sortAsc=", args.sortAsc);
-            const column_id = args.sortCol.id;
-            const column_sort_asc = args.sortAsc;
-            this.on_sort_changed({ 
-                id: this.id, 
-                column_id: column_id, 
-                column_sort_asc: column_sort_asc 
-            });
+            if(this.options._saveState){
+                this._saveState();
+            }
         }); 
         this.grid.onColumnsResized.subscribe(() => {
-            // console.log("onColumnsResized columns=", this.grid.getColumns());
-            const columns = this.grid.getColumns();
-            const column_width = columns.map(value=>{
-                return {
-                    column_id: value.id,
-                    column_width: value.width
-                };
-            });
-            this.on_column_width_changed({ 
-                id: this.id, 
-                column_width: column_width
-            });
+            if(this.options._saveState){
+                this._saveState();
+            }
         }); 
+    }
+
+    onDblClick(on_dblclick){
+        this.on_dblclick = on_dblclick;
+    }
+
+    onContextMenu(on_context_menu){
+        this.on_context_menu = on_context_menu;
+    }
+
+    getSelectedDatas(){
+        const selected_rows = this.grid.getSelectedRows();
+        const datas = selected_rows.map(row=>{
+            return this.dataView.getItem(row);
+        });
+        return datas;
     }
 
     resize(new_size){
@@ -154,17 +149,23 @@ class GridTable {
         this.grid.getCanvasNode().offsetParent.scrollTop = value;
     }
 
+    scrollRow(row){
+        this.grid.scrollRowIntoView(row, false);
+    }
+
     setData(data){
         this.dataView.beginUpdate();
         this.dataView.setItems(data);
         this.dataView.setFilter(this._filter);
         this.dataView.endUpdate();
-        // this.grid.render();
+
+        if(this.options._saveState){
+            this._loadState();
+        }
     }
 
     setFilter(filter){
         this.filter = filter;
-        // this.dataView.setFilter(this._filter);
     }
 
     filterData(word){
@@ -173,7 +174,6 @@ class GridTable {
     }
 
     _filter(item, args) {
-        // console.log("myFilter item=", item);
         if(args===undefined){
             return true;
         }
@@ -184,12 +184,48 @@ class GridTable {
             const value = String(item[column_id]);
             if(args.filter(column_id, value, args.searchString)){
                 return true;
-            }           
-            // if(this.filter(column_id, value, args.searchString)){
-            //     return true;
-            // }
+            }
         }
         return false;
+    }
+
+    _saveState(){
+        const sort = this.grid.getSortColumns();
+        if(sort.length>0){
+            const sort_state = { 
+                id: sort[0].columnId, 
+                sort_asc: sort[0].sortAsc 
+            };
+            localStorage.setItem(`${this.id}/columns/sort`, JSON.stringify(sort_state));
+        }
+
+        const width_state = {};
+        const columns = this.grid.getColumns();
+        columns.forEach(val=>{
+            width_state[val.id] = val.width;
+        });
+        localStorage.setItem(`${this.id}/columns/width`, JSON.stringify(width_state));
+    }
+
+    _loadState(){
+        const width_value = localStorage.getItem(`${this.id}/columns/width`);
+        if(width_value){
+            const width_state = JSON.parse(width_value);
+            const columns = this.grid.getColumns();
+            columns.forEach(val=>{
+                const column_id = val.id;
+                const width = width_state[column_id];
+                val.width = width ? width : 80;
+            });
+            this.grid.setColumns(columns);
+        }
+
+        const sort_value = localStorage.getItem(`${this.id}/columns/sort`);
+        if(sort_value){
+            const sort_state = JSON.parse(sort_value);
+            this.grid.setSortColumn(sort_state.id, sort_state.sort_asc); 
+            this.dataView.fastSort(sort_state.id, sort_state.sort_asc); 
+        }
     }
 }
 

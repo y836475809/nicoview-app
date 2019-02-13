@@ -178,7 +178,9 @@
             timer = setTimeout(() => {
                 obs.trigger("resizeEndEvent", {
                     w: this.root.offsetWidth, 
-                    h: this.root.offsetHeight - main_group_buttons_height
+                    h: this.root.offsetHeight - main_group_buttons_height,
+                    width: this.root.offsetWidth, 
+                    height: this.root.offsetHeight - main_group_buttons_height                   
                 });
             }, timeout);
         });

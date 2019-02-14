@@ -27,9 +27,9 @@
         const columns = [
             {id: "thumb_img", name: "image", height:100, width: 130},
             {id: "id", name: "id",sortable: true},
-            {id: "name", name: "name", sortable: true},
-            {id: "play_date", name: "play date", sortable: true},
-            {id: "play_time", name: "time", sortable: true},
+            {id: "name", name: "名前", sortable: true},
+            {id: "play_date", name: "再生日", sortable: true},
+            {id: "play_time", name: "時間", sortable: true},
             {id: "url", name: "url", sortable: true}
         ];
         const options = {

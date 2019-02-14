@@ -57,10 +57,10 @@
         </div>
         <div class="viewinfo-video-panel-info">
             <div>{this.title}</div>
-            <div>{this.message.POSTED} : {this.first_retrieve}</div>
-            <div>{this.message.VIEW} : {this.view_counter}</div>
-            <div>{this.message.COMMENT} : {this.comment_num}</div>
-            <div>{this.message.MYLIST} : {this.mylist_counter}</div>
+            <div>投稿日 : {this.first_retrieve}</div>
+            <div>再生 : {this.view_counter}</div>
+            <div>コメント : {this.comment_num}</div>
+            <div>マイリスト : {this.mylist_counter}</div>
         </div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">
@@ -79,7 +79,6 @@
         require("slickgrid/plugins/slick.autotooltips");
         const time_format = require("../js/time_format");
         const SyncCommentScroll = require("../js/sync_comment_scroll");
-        this.message = require("../js/message");
 
         const row_height = 25;
 
@@ -99,12 +98,12 @@
         };
 
         const columns = [
-            {id: "vpos", name: this.message.TIME, sortable: true, formatter: timeFormatter},
-            {id: "text", name: this.message.COMMENT, sortable: true},
-            {id: "user_id", name: this.message.USER_ID, sortable: true},
-            {id: "post_date", name: this.message.POSTED, sortable: true},
-            {id: "no", name: this.message.NO, sortable: true},
-            {id: "mail", name: this.message.OPTION, sortable: true}
+            {id: "vpos", name: "時間", sortable: true, formatter: timeFormatter},
+            {id: "text", name: "コメント", sortable: true},
+            {id: "user_id", name: "ユーザーID", sortable: true},
+            {id: "post_date", name: "投稿日", sortable: true},
+            {id: "no", name: "番号", sortable: true},
+            {id: "mail", name: "オプション", sortable: true}
         ];
         const options = {
             rowHeight: row_height,

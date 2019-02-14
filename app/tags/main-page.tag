@@ -37,15 +37,18 @@
         .main-group-buttons .button {
             display: inline-block;
             margin-right: -2px; 
-            padding: 5px;
+            margin-left: 2px;
+            margin-top: 2px;
+            margin-bottom: 2px;
+            padding: 3px 5px 5px 5px;
             border: 1px solid gray;
             text-align: center;
             box-sizing: border-box;
             border-radius: 2px;
-            height: var(--main-group-buttons-height);
+            height: calc(var(--main-group-buttons-height) - 5px);
+            width: 80px;
         }
-        .main-group-buttons .button:hover
-        {
+        .main-group-buttons .button:hover {
             box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset,
               2px 0 2px -2px rgba(0, 0, 0, .2) inset,
               -2px 0 5px -2px rgba(0, 0, 0, .2) inset; 
@@ -54,15 +57,15 @@
     <div class="main-group-buttons">
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
-            <span class="button">page1</span>
+            <span class="button">ライブラリ</span>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
-            <span class="button">page2</span> 
+            <span class="button">検索</span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
-            <span class="button">page3</span> 
+            <span class="button">履歴</span> 
         </label>
     </div>
     <div id="page1">

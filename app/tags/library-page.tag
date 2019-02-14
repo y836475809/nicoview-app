@@ -71,7 +71,7 @@
     <div class="gutter"></div>
     <div class="split right">
         <div class="library-info">
-            <div class="library-item-info">num of items {this.num_items}</div>
+            <div class="library-item-info">項目数 {this.num_items}</div>
             <div class="library-search">
                 <input type="search" class="library-search-input" onkeydown={onkeydownSearchInput} />
                 <button title="test" onclick={onclickAdd}><span class="icono-plus"></span></button>
@@ -96,11 +96,11 @@
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},
         {id: "id", name: "id",sortable: true},
-        {id: "name", name: "name", sortable: true},
-        {id: "creation_date", name: "creation date", sortable: true},
-        {id: "pub_date", name: "pub date", sortable: true},
-        {id: "play_count", name: "play count", sortable: true},
-        {id: "play_time", name: "time", sortable: true}
+        {id: "name", name: "名前", sortable: true},
+        {id: "creation_date", name: "作成日", sortable: true},
+        {id: "pub_date", name: "投稿日", sortable: true},
+        {id: "play_count", name: "再生回数", sortable: true},
+        {id: "play_time", name: "時間", sortable: true}
     ];
     const options = {
         rowHeight: 100,

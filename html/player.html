@@ -6,10 +6,6 @@
     <script>
         window.jQuery = window.$ = require("jquery");
     </script>
-    <script type="text/javascript" src="../node_modules/datatables.net/js/jquery.dataTables.js"></script>
-    <link rel="stylesheet" type="text/css" href="../node_modules/datatables.net-dt/css/jquery.dataTables.min.css">
-    <script type="text/javascript" src="../lib/colResize/dataTables.colResize.js"></script>
-    <link rel="stylesheet" type="text/css" href="../node_modules/icono/dist/icono.min.css">
     <link rel="stylesheet" type="text/css" href="../css/app.css">
     <style type="text/css">
     </style>
@@ -18,13 +14,10 @@
 <body>
     <player-viewinfo-page></player-viewinfo-page>
 </body>
-<!--<script src="lib/jquery-3.2.1.min.js"></script>-->
-<!--<script src="app/app.js"></script>-->
 <script>
     const remote = require("electron").remote;
     const base_dir = remote.getGlobal("sharedObj").base_dir;
     const ipc = require("electron").ipcRenderer;
-    require("datatables.net-scroller")( window, window.$ ); 
 
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line

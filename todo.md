@@ -1,6 +1,6 @@
 
-- [x] ライブラリの動画のtag検索（datatableにtag情報いれる）
-- [ ] ライブラリの動画のdatatableのtagに#をつけてタグのみの検索できるようにする
+- [x] ライブラリの動画のtag検索（tag情報いれる）
+- [ ] ライブラリの動画のtagに#をつけてタグのみの検索できるようにする
 - [ ] ライブラリの選択検索条件は赤で強調しないで検索ボックスに検索条件を設定するだけにする
 - [ ] tag一覧表示、選択->検索
 - [x] プレーヤーのタイトルに動画名を入れる
@@ -34,10 +34,9 @@
 - [ ] playerでシーク上にマウスホバーで時間ポップアップ表示
 - [ ] 再生がさいごまでいった時にシークバーの位置がはみ出る
 - [ ] <script src="../node_modules/riot/riot+compiler.min.js"></script>はvar riot = require("riot"); でＯＫ？
-- [ ] this.params.dt をdtいらないのでthis.paramsにする
 - [ ] foreach->mapをなるべく使用する
-- [ ] datatablesの代わりにslickgridを使用
-- [ ] datatables削除
+- [x] datatablesの代わりにslickgridを使用
+- [x] datatables削除
 - [ ] 使用していないsplit.js削除
 - [ ] 使用していないtest\dummy_server以下のファイル削除
 - [ ] 1分間？の最大表示コメント数の実装

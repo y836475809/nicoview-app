@@ -17,7 +17,7 @@
     </div>    
 
     <script>
-        /* globals obs $ */
+        /* globals obs */
         const ipc = require("electron").ipcRenderer;
         const { GridTable } = require("../js/gridtable");
 
@@ -42,19 +42,13 @@
             grid_table.setData(history_items);
         };
 
-        const resizeDataTable = (size) => {
+        const resizeGridTable = () => {
             const container = this.root.querySelector("#history-grid-container");
-            const new_height = $(window).height() - container.offsetTop - 5;
-            const new_width = container.clientWidth - 5;
-            const new_szie = {
-                height: new_height,
-                width: new_width
-            };
-            grid_table.resize(new_szie);
+            grid_table.resizeFitContainer(container);
         };
 
         obs.on("resizeEndEvent", (size)=> {
-            resizeDataTable(size);
+            resizeGridTable();
         });
 
         this.on("mount", () => {
@@ -75,7 +69,7 @@
                 }
             });
 
-            resizeDataTable();
+            resizeGridTable();
 
             ipc.send("get-history-items");
         });

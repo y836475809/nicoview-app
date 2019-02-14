@@ -82,7 +82,6 @@
         const ipc = require("electron").ipcRenderer;
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
-        // require("datatables.net-scroller")( window, window.$ ); 
         let riot = require("riot");
 
         require(`${base_dir}/app/tags/library-page.tag`);

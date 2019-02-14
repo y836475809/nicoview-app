@@ -17,7 +17,7 @@
 </div>  
 
 <script>
-    /* globals obs $ */
+    /* globals obs */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const { GridTable } = require("../js/gridtable");
@@ -39,15 +39,9 @@
         console.log("serach");
     };
 
-    const resizeDataTable = (size) => {
+    const resizeGridTable = () => {
         const container = this.root.querySelector("#search-grid-container");
-        const new_height = $(window).height() - container.offsetTop - 5;
-        const new_width = container.clientWidth - 5;
-        const new_szie = {
-            height: new_height,
-            width: new_width
-        };
-        grid_table.resize(new_szie);
+        grid_table.resizeFitContainer(container);
     };
 
     const menu = new Menu();
@@ -66,11 +60,11 @@
         grid_table.onDblClick((e, data)=>{
         });
 
-        resizeDataTable();
+        resizeGridTable();
     });
 
     obs.on("resizeEndEvent", (size)=>{
-        resizeDataTable();
+        resizeGridTable();
     });
 </script>
 </search-page>

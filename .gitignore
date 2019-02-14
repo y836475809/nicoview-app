@@ -4,13 +4,8 @@ tmp/
 *.mp4
 /*.log
 /sample/*.json
-/test/datatables/data/*.jpg
 /test/sql/*.json
 /test/dummy_server/data/img/*.jpeg
 /data/
 test/data/
-package-lock.json
 *.lnk
-lib/colResize/examples/
-lib/colResize/bower.json
-lib/colResize/README.md

@@ -1,7 +1,6 @@
 <library-page>
     <style scoped>
         :scope {
-            --datatable-border-color: gray;
             /* width: 100%; */
             /* height: 100%; */
             --right-width: 200px;
@@ -84,7 +83,7 @@
     </div>
 
 <script>
-    /* globals base_dir obs $ */
+    /* globals base_dir obs */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
@@ -175,7 +174,7 @@
             menu.popup({window: remote.getCurrentWindow()});
         });
         
-        resizeDataTable();
+        resizeGridTable();
 
         ipc.send("get-library-items");
     });
@@ -183,19 +182,13 @@
         loadLibraryItems(library_items);
     });    
 
-    const resizeDataTable = (size) => {
+    const resizeGridTable = () => {
         const container = this.root.querySelector("#library-grid-container");
-        const new_height = $(window).height() - container.offsetTop - 5;
-        const new_width = container.clientWidth - 5;
-        const new_szie = {
-            height: new_height,
-            width: new_width
-        };
-        grid_table.resize(new_szie);
+        grid_table.resizeFitContainer(container);
     };
 
     obs.on("resizeEndEvent", (size)=> {
-        resizeDataTable(size);
+        resizeGridTable();
     });
 
     obs.on("library_dt_search", (param)=> {

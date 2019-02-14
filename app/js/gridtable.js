@@ -138,6 +138,16 @@ class GridTable {
         this.grid.resizeCanvas();
     }
 
+    resizeFitContainer(container){
+        const new_height = $(window).height() - container.offsetTop - 5;
+        const new_width = container.clientWidth - 5;
+        const new_szie = {
+            height: new_height,
+            width: new_width
+        };
+        this.resize(new_szie);
+    }
+
     get scrollTop(){
         return this.grid.getCanvasNode().offsetParent.scrollTop;
     }

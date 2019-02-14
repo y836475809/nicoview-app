@@ -36,6 +36,10 @@
 - [ ] <script src="../node_modules/riot/riot+compiler.min.js"></script>はvar riot = require("riot"); でＯＫ？
 - [ ] this.params.dt をdtいらないのでthis.paramsにする
 - [ ] foreach->mapをなるべく使用する
+- [ ] datatablesの代わりにslickgridを使用
+- [ ] datatables削除
+- [ ] 使用していないsplit.js削除
+- [ ] 使用していないtest\dummy_server以下のファイル削除
 - [ ] 1分間？の最大表示コメント数の実装
 - [ ] flvの再生
 - [ ] ニコニコ動画検索
@@ -44,6 +48,10 @@
   - [x] テストhtmlでdmc再生
   - [x] テストhtmlでコメント取得
   - [ ] テストhtmlで動画情報取得
+  - [ ] 実サーバでsmile再生
+  - [ ] 実サーバでdmc再生
+  - [ ] 実サーバからコメント取得、再生
+  - [ ] 実サーバから動画情報取得、表示  
 - [ ] ニコニコ動画保存
   - [ ] smile保存
   - [ ] dmc保存

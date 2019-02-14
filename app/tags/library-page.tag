@@ -105,7 +105,8 @@
     ];
     const options = {
         rowHeight: 100,
-        _saveState: true,
+        _saveColumnWidth: true,
+        _saveSort: true,
     };   
     const grid_table = new GridTable("library-grid", columns, options);
 

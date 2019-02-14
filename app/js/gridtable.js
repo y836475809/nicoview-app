@@ -49,8 +49,9 @@ class GridTable {
         const default_options =  {
             enableCellNavigation: true,
             enableColumnReorder: false,
-            fullWidthRows: true,
-            _stateSave: false,
+            fullWidthRows: true, 
+            _saveColumnWidth: false,
+            _saveSort: false,
         };
         if(options===undefined){
             options = {};
@@ -108,14 +109,10 @@ class GridTable {
             this.on_context_menu(e);
         });  
         this.grid.onSort.subscribe((e, args) => {
-            if(this.options._saveState){
-                this._saveState();
-            }
+            this._saveState();
         }); 
         this.grid.onColumnsResized.subscribe(() => {
-            if(this.options._saveState){
-                this._saveState();
-            }
+            this._saveState();
         }); 
     }
 
@@ -159,9 +156,7 @@ class GridTable {
         this.dataView.setFilter(this._filter);
         this.dataView.endUpdate();
 
-        if(this.options._saveState){
-            this._loadState();
-        }
+        this._loadState();
     }
 
     setFilter(filter){
@@ -190,41 +185,49 @@ class GridTable {
     }
 
     _saveState(){
-        const sort = this.grid.getSortColumns();
-        if(sort.length>0){
-            const sort_state = { 
-                id: sort[0].columnId, 
-                sort_asc: sort[0].sortAsc 
-            };
-            localStorage.setItem(`${this.id}/columns/sort`, JSON.stringify(sort_state));
+        if(this.options._saveColumnWidth){
+            const width_state = {};
+            const columns = this.grid.getColumns();
+            columns.forEach(val=>{
+                width_state[val.id] = val.width;
+            });
+            localStorage.setItem(`${this.id}/columns/width`, JSON.stringify(width_state));
         }
 
-        const width_state = {};
-        const columns = this.grid.getColumns();
-        columns.forEach(val=>{
-            width_state[val.id] = val.width;
-        });
-        localStorage.setItem(`${this.id}/columns/width`, JSON.stringify(width_state));
+        if(this.options._saveSort){
+            const sort = this.grid.getSortColumns();
+            if(sort.length>0){
+                const sort_state = { 
+                    id: sort[0].columnId, 
+                    sort_asc: sort[0].sortAsc 
+                };
+                localStorage.setItem(`${this.id}/columns/sort`, JSON.stringify(sort_state));
+            }
+        }
     }
 
     _loadState(){
-        const width_value = localStorage.getItem(`${this.id}/columns/width`);
-        if(width_value){
-            const width_state = JSON.parse(width_value);
-            const columns = this.grid.getColumns();
-            columns.forEach(val=>{
-                const column_id = val.id;
-                const width = width_state[column_id];
-                val.width = width ? width : 80;
-            });
-            this.grid.setColumns(columns);
+        if(this.options._saveColumnWidth){
+            const width_value = localStorage.getItem(`${this.id}/columns/width`);
+            if(width_value){
+                const width_state = JSON.parse(width_value);
+                const columns = this.grid.getColumns();
+                columns.forEach(val=>{
+                    const column_id = val.id;
+                    const width = width_state[column_id];
+                    val.width = width ? width : 80;
+                });
+                this.grid.setColumns(columns);
+            }
         }
 
-        const sort_value = localStorage.getItem(`${this.id}/columns/sort`);
-        if(sort_value){
-            const sort_state = JSON.parse(sort_value);
-            this.grid.setSortColumn(sort_state.id, sort_state.sort_asc); 
-            this.dataView.fastSort(sort_state.id, sort_state.sort_asc); 
+        if(this.options._saveSort){
+            const sort_value = localStorage.getItem(`${this.id}/columns/sort`);
+            if(sort_value){
+                const sort_state = JSON.parse(sort_value);
+                this.grid.setSortColumn(sort_state.id, sort_state.sort_asc); 
+                this.dataView.fastSort(sort_state.id, sort_state.sort_asc); 
+            }
         }
     }
 }

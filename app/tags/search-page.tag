@@ -31,7 +31,7 @@
     ];
     const options = {
         rowHeight: 100,
-        _saveState: false,
+        _saveColumnWidth: true,
     };   
     const grid_table = new GridTable("search-grid", columns, options);
 

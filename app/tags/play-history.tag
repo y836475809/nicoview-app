@@ -34,7 +34,7 @@
         ];
         const options = {
             rowHeight: 100,
-            _saveState: true,
+            _saveColumnWidth: true,
         }; 
         const grid_table = new GridTable("history-grid", columns, options);
 

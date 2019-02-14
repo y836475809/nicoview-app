@@ -9,12 +9,12 @@ test("read comment", (t) => {
     const obj = reader.comment(xml);
     t.deepEqual(obj, 
         [
-            {no:1,  vpos:400, date:0, user_id:"AAA", mail:"naka medium 184", text:"AAAテスト"},
-            {no:2,  vpos:300, date:1, user_id:"BBB", mail:"184", text:"BBBあ"},
-            {no:3,  vpos:1500, date:2, user_id:"CCC", mail:"184", text:"CCCテスト"},
-            {no:4,  vpos:4000, date:3, user_id:"CCC", mail:"184", text:"CCCテストテスト"},
-            {no:5,  vpos:100, date:4, user_id:"DDD", mail:"184 device:3DS", text:"DDDテスト"},
-            {no:6,  vpos:4500, date:5, user_id:"EEE", mail:"184", text:"EEEテスト"}
+            {no:1,  vpos:400, post_date:0, user_id:"AAA", mail:"naka medium 184", text:"AAAテスト"},
+            {no:2,  vpos:300, post_date:1, user_id:"BBB", mail:"184", text:"BBBあ"},
+            {no:3,  vpos:1500, post_date:2, user_id:"CCC", mail:"184", text:"CCCテスト"},
+            {no:4,  vpos:4000, post_date:3, user_id:"CCC", mail:"184", text:"CCCテストテスト"},
+            {no:5,  vpos:100, post_date:4, user_id:"DDD", mail:"184 device:3DS", text:"DDDテスト"},
+            {no:6,  vpos:4500, post_date:5, user_id:"EEE", mail:"184", text:"EEEテスト"}
         ]);
 });
 
@@ -23,9 +23,9 @@ test("read comment deleted", (t) => {
     const obj = reader.comment(xml);
     t.deepEqual(obj, 
         [
-            {no:1,  vpos:100, date:10, user_id:"AAA", mail:"184", text:"AAAテスト"},
-            {no:3,  vpos:300, date:30, user_id:"BBB", mail:"184", text:"BBBテスト"},
-            {no:4,  vpos:400, date:40, user_id:"CCC", mail:"184", text:"CCCテスト"},
+            {no:1,  vpos:100, post_date:10, user_id:"AAA", mail:"184", text:"AAAテスト"},
+            {no:3,  vpos:300, post_date:30, user_id:"BBB", mail:"184", text:"BBBテスト"},
+            {no:4,  vpos:400, post_date:40, user_id:"CCC", mail:"184", text:"CCCテスト"},
         ]);
 });
 

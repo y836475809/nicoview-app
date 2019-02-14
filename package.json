@@ -25,7 +25,6 @@
     "riot": "^3.12.0",
     "slickgrid": "^2.4.2",
     "sortablejs": "^1.7.0",
-    "split.js": "^1.5.7",
     "sql.js": "^0.5.0"
   }
 }

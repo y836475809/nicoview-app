@@ -37,7 +37,7 @@
 - [ ] foreach->mapをなるべく使用する
 - [x] datatablesの代わりにslickgridを使用
 - [x] datatables削除
-- [ ] 使用していないsplit.js削除
+- [x] 使用していないsplit.js削除
 - [ ] 使用していないtest\dummy_server以下のファイル削除
 - [ ] 1分間？の最大表示コメント数の実装
 - [ ] flvの再生

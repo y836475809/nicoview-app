@@ -4,8 +4,10 @@
             display: grid;
             --panel-padding: 4px;
             --video-panel-height: 100px;
+            --user-panel-height: 60px;
+            --user-thumbnail-size: 50px;
             --description-panel-height: 100px;
-            grid-template-rows: var(--video-panel-height) var(--description-panel-height) 1fr;
+            grid-template-rows: var(--video-panel-height) var(--user-panel-height) var(--description-panel-height) 1fr;
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
@@ -33,14 +35,33 @@
             overflow-x: hidden;
         }
         
+        .viewinfo-user-panel{
+            grid-row: 2 / 3;
+            grid-column: 1 / 3; 
+            display: flex; 
+        } 
+        .viewinfo-user-thumbnail{
+            user-select: none;
+            margin-left: calc(0px - var(--panel-padding));
+            width: var(--user-thumbnail-size); 
+            height: var(--user-thumbnail-size); 
+        }
+        .viewinfo-user-name{
+            user-select: none;
+            padding-left: 5px;
+            vertical-align: middle;
+            height: var(--user-thumbnail-size); 
+            line-height: var(--user-thumbnail-size); 
+        }
+
         /* TODO: add scrolly auto */
         .viewinfo-description-panel{
-            grid-row: 2 / 3;
+            grid-row: 3 / 4;
             grid-column: 1 / 3; 
             border: 1px solid var(--control-border-color);
         } 
         .viewinfo-comments-panel{
-            grid-row: 3 / 4;
+            grid-row: 4 / 5;
             grid-column: 1 / 3; 
             background-color: var(--control-color);
         }
@@ -62,6 +83,10 @@
             <div>コメント : {this.comment_num}</div>
             <div>マイリスト : {this.mylist_counter}</div>
         </div>
+    </div>
+    <div class="viewinfo-panel viewinfo-user-panel">
+            <img src={this.user_icon_url} alt="thumbnail" class="viewinfo-user-thumbnail">
+            <div class="viewinfo-user-name">{this.user_nickname}</div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">
         {this.description}
@@ -144,6 +169,8 @@
             this.view_counter = viewinfo.thumb_info.view_counter;
             this.comment_num = viewinfo.thumb_info.comment_num;
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
+            this.user_nickname = viewinfo.thumb_info.user_nickname;
+            this.user_icon_url = viewinfo.thumb_info.user_icon_url;
             this.description = viewinfo.thumb_info.description;
 
             sync_comment_scroll.setComments(viewinfo.commnets);
@@ -152,6 +179,8 @@
                 return Object.assign(value, { id: value.no });
             });
             grid_table.setData(commnets);
+
+            this.update();
         });
 
         obs.on("seek_update", (current_sec)=> {

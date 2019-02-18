@@ -1,18 +1,18 @@
 const test = require("ava");
-const SQLiteDB = require("../app/js/sqlite_db");
+const DBConverter = require("../app/js/db-converter");
 
 const db_file_path = `${__dirname}/data/sample.db`;
 
 test.cb("sqlite db dirpath", (t) => {
-    let db = new SQLiteDB();
+    let db = new DBConverter();
     db.init(db_file_path, (err)=>{
-        db.read_dirpath();
-        const dirpath_map = db.get_dirpath();
-
-        t.deepEqual(dirpath_map, 
-            new Map()
-                .set(1, "file:///C:/data/サンプル")
-                .set(2, "file:///C:/data")
+        db._read_dirpath();
+        const dirpath_list = db.get_dirpath();
+        t.deepEqual(dirpath_list, 
+            [
+                {dirpath_id: 1, dirpath: "file:///C:/data/サンプル"},
+                {dirpath_id: 2, dirpath: "file:///C:/data"}
+            ]
         );
 
         t.end();
@@ -20,10 +20,10 @@ test.cb("sqlite db dirpath", (t) => {
 });
 
 test.cb("sqlite db tag", (t) => {
-    let db = new SQLiteDB();
+    let db = new DBConverter();
     db.init(db_file_path, (err)=>{
-        db.read_tag_string();
-        db.read_tag();
+        db._read_tag_string();
+        db._read_tag();
         const tag_map = db.tag_map;
 
         t.deepEqual(tag_map,
@@ -40,22 +40,22 @@ test.cb("sqlite db tag", (t) => {
 });
 
 test.cb("sqlite db video", (t) => {
-    let db = new SQLiteDB();
+    let db = new DBConverter();
     db.init(db_file_path, (err)=>{
         db.read();
-        const video_map = db.get_video();
+        const video_list = db.get_video();
     
-        t.truthy(video_map.has("sm1"));
-        t.truthy(video_map.has("sm2"));
-        t.truthy(video_map.has("sm3"));
-        t.truthy(video_map.has("sm4"));
-        t.truthy(video_map.has("sm5"));
-    
-        const sm1 = video_map.get("sm1");
-        const sm2 = video_map.get("sm2");
-        const sm3 = video_map.get("sm3");
-        const sm4 = video_map.get("sm4");
-        const sm5 = video_map.get("sm5");
+        const sm1 = video_list[0];
+        const sm2 = video_list[1];
+        const sm3 = video_list[2];
+        const sm4 = video_list[3];
+        const sm5 = video_list[4];
+
+        t.is(sm1.video_id, "sm1");
+        t.is(sm2.video_id, "sm2");
+        t.is(sm3.video_id, "sm3");
+        t.is(sm4.video_id, "sm4");
+        t.is(sm5.video_id, "sm5");
     
         t.is(sm1.video_name, "サンプル1");
         t.is(sm1.video_filename, "サンプル1 - [sm1].mp4");

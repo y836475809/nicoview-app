@@ -3,7 +3,7 @@ const path = require("path");
 const sql = require("sql.js");
 
 
-class SQLiteDB {
+class DBConverter {
     /**
      * 
      * @param {string} db_file_path 
@@ -25,32 +25,32 @@ class SQLiteDB {
         });
     }
     get_dirpath() {
-        return this.dirpath_map;
+        return this.dirpath_list;
     }
 
     get_video() {
-        return this.video_map;
+        return this.video_list;
     }
 
     read() {
-        this.read_dirpath();
-        this.read_tag_string();
-        this.read_tag();
-        this.read_video();
+        this._read_dirpath();
+        this._read_tag_string();
+        this._read_tag();
+        this._read_video();
     }
 
-    read_dirpath() {
-        this.dirpath_map = new Map();
+    _read_dirpath() {
+        // this.dirpath_map = new Map();
         let res = this.db.exec("SELECT * FROM file");
         const values = res[0].values;
-        values.forEach((value) => {
-            const id = value[0];
+        this.dirpath_list = values.map(value=>{
+            const dirpath_id = value[0];
             const dirpath = decodeURIComponent(value[1]);
-            this.dirpath_map.set(id, dirpath);
+            return { dirpath_id, dirpath };
         });
     }
 
-    read_tag_string() {
+    _read_tag_string() {
         this.tag_string_map = new Map();
 
         let res = this.db.exec("SELECT * FROM tagstring");
@@ -62,7 +62,7 @@ class SQLiteDB {
         });
     }
 
-    read_tag() {
+    _read_tag() {
         this.tag_map = new Map();
         let res = this.db.exec("SELECT * FROM nnddvideo_tag");
         const values = res[0].values;
@@ -79,11 +79,10 @@ class SQLiteDB {
         });
     }
 
-    read_video() {
-        this.video_map = new Map();
+    _read_video() {
         let res = this.db.exec("SELECT * FROM nnddvideo");
         const values = res[0].values;
-        values.forEach((value) => {
+        this.video_list = values.map(value=>{
             const id = value[0];
             const key = value[1];
             const uri = value[2];
@@ -103,26 +102,26 @@ class SQLiteDB {
             const video_type = `video/${path.extname(uri).slice(1)}`;
 
             const tags = this.tag_map.get(id);
-            this.video_map.set(key,
-                {
-                    //uri: uri,
-                    dirpath_id: dirpath_id,
-                    video_name: video_name,
-                    video_filename: video_filename,
-                    video_type: video_type,
-                    is_economy: is_economy,
-                    modification_date: modification_date,
-                    creation_date: creation_date,
-                    // thumb_url: thumb_url,
-                    play_count: play_count,
-                    time: time,
-                    last_play_date: last_play_date,
-                    yet_reading: yet_reading,
-                    pub_date: pub_date,
-                    tags: tags
-                });
+            return {
+                video_id: key,
+                uri: uri,
+                dirpath_id: dirpath_id,
+                video_name: video_name,
+                video_filename: video_filename,
+                video_type: video_type,
+                is_economy: is_economy,
+                modification_date: modification_date,
+                creation_date: creation_date,
+                // thumb_url: thumb_url,
+                play_count: play_count,
+                time: time,
+                last_play_date: last_play_date,
+                yet_reading: yet_reading,
+                pub_date: pub_date,
+                tags: tags
+            };
         });
     }
 }
 
-module.exports = SQLiteDB;
+module.exports = DBConverter;

@@ -82,8 +82,9 @@
     <script>
         /* globals riot obs */
         const fs = require("fs");
-        const SQLiteDB = require("../js/sqlite_db");
-        const serializer = require("../js/serializer");
+        const DBConverter = require("../js/db-converter");
+        const Library = require("../js/library");
+        // const serializer = require("../js/serializer");
         const { ipcRenderer, remote } = require("electron");
         const { dialog } = require("electron").remote;
 
@@ -171,7 +172,7 @@
                 return;
             }
 
-            let db = new SQLiteDB();
+            let db_converter = new DBConverter();
             
             function asyncMkDir(data_path) {
                 return new Promise((resolve, reject) => {
@@ -187,32 +188,22 @@
 
             function asyncRead(file_path) {
                 return new Promise((resolve, reject) => {
-                    db.init(file_path, (error)=>{
+                    db_converter.init(file_path, (error)=>{
                         if(error){
                             reject(error);
                         }else{
-                            db.read();
+                            db_converter.read();
                             resolve();
                         }
                     });
                 });
             }
-            function asyncSave() {
-                return new Promise((resolve, reject) => {
-                    const file_path = ipcRenderer.sendSync("getPreferences", "library_file");
-                    const data = new Map([
-                        [ "dirpath", [...db.get_dirpath()] ],
-                        [ "video", [...db.get_video()] ]
-                    ]);
-
-                    serializer.save(file_path, data, (error)=>{
-                        if(error){
-                            reject(error);
-                        }else{
-                            resolve();
-                        }
-                    });
-                });
+            function syncSave() {
+                const file_path = ipcRenderer.sendSync("getPreferences", "library_file");
+                const dir_list = db_converter.get_dirpath();
+                const video_list = db_converter.get_video();
+                const library = new Library(file_path);
+                library.setData(dir_list, video_list);
             }
 
             async function convertPromise() {
@@ -225,7 +216,7 @@
 
                 await asyncMkDir(data_path);
                 await asyncRead(db_file_path);
-                await asyncSave();
+                syncSave();
             }
 
             convertPromise().then(() => {

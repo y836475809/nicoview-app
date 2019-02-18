@@ -1,41 +1,68 @@
 
 const fs = require("fs");
 const reader = require("./reader");
-const serializer = require("./serializer");
+const Datastore = require("nedb");
 
-class DB {
-    constructor() {
-
+class Library {
+    constructor(video_db_file, dir_db_file, in_memory_only=false) {
+        this.db = {};
+        this.db.video = new Datastore({ 
+            filename: video_db_file,
+            autoload: true,
+            inMemoryOnly: in_memory_only
+        });   
+        this.db.dir = new Datastore({ 
+            filename: dir_db_file,
+            autoload: true,
+            inMemoryOnly: in_memory_only
+        }); 
     }
 
     /**
      * 
-     * @param {Map} dir_path 
-     * @param {Map} video_info 
+     * @param {Array} dir_list
+     * @param {Array} video_list
      */
-    setData(dir_path, video_info) {
-        this.dir_path = dir_path;
-        this.video_info = video_info;
-        this.normalizePath();
+    async setData(dir_list, video_list) {
+        await this._clear(this.db.dir);
+        await this._clear(this.db.video);
+        await this._setData(this.db.dir, this._normalizePath(dir_list));
+        await this._setData(this.db.video, video_list);
     }
 
-    load(file_path){
-        const datas = new Map(serializer.load(file_path));
-        if (!datas.has("dirpath")) {
-            throw Error("not find id=dirpath");
-        }
-        if (!datas.has("video")) {
-            throw Error("not find id=video");
-        }
-        this.dir_path = new Map(datas.get("dirpath"));
-        this.video_info = new Map(datas.get("video"));
-        this.normalizePath();
+    _setData(db, data_list) {
+        return new Promise((resolve, reject) => {
+            db.insert(data_list, (err, new_doc) => {
+                if(err){
+                    reject(reject);
+                    return;
+                }
+                resolve();
+            });
+        });
     }
 
-    normalizePath(){
-        this.dir_path.forEach((value, key) => {
-            const path = value.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
-            this.dir_path.set(key, path);
+    _clear(db){
+        return new Promise((resolve, reject) => {
+            db.remove({}, { multi: true }, (err, num_removed) => {
+                if(err){
+                    reject(err);
+                    return;
+                }  
+                resolve();     
+            });
+        });
+    }
+
+    /**
+     * @param {Array} dir_list
+     */
+    _normalizePath(dir_list){
+        return dir_list.map(value=>{
+            return {
+                dirpath_id: value.dirpath_id,
+                dirpath: value.dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "")
+            };
         });
     }
 
@@ -43,45 +70,7 @@ class DB {
      * 
      * @param {string} id 
      */
-    // findVideoInfo(id) {
-    //     if(this.video_info.has(id)){
-    //         throw Error("not find video_info")
-    //     }
-
-    //     const video_info = this.video_info.get(id)
-
-    //     if(this.dir_path.has(video_info.id)){
-    //         throw Error("not find dir_path")
-    //     }
-
-    //     const dir_path = this.dir_path.get(video_info.id)
-    //     const src = path.join(dir_path,  `${video_info.video_name} - [${id}].${video_info.video_type}`)
-    //     const type = `video/${video_info.video_type}`
-
-    //     return {
-    //         src: src,
-    //         type: type
-    //     }
-    //}
-
-    /**
-     * 
-     * @param {string} id 
-     */
     findComments(id) {
-        // if (this.video_info.has(id)) {
-        //     throw Error("not find video_info")
-        // }
-
-        // const video_info = this.video_info.get(id)
-
-        // if (this.dir_path.has(video_info.id)) {
-        //     throw Error("not find dir_path")
-        // }
-
-        // const dir_path = this.dir_path.get(video_info.id)
-        // const file_path = path.join(dir_path, `${video_info.video_name} - [${id}].xml`)
-        
         const file_path = this.getCommentPath(id);
         const xml = fs.readFileSync(file_path, "utf-8");
         let comments = reader.comment(xml);
@@ -103,40 +92,9 @@ class DB {
         return reader.thumb_info(xml);
     }
 
-    // findLibrary(){
-    //     let ret = []
-    //     this.video_info.forEach((value, key) => {
-    //         let copyObj = {}
-    //         Object.assign(copyObj , value)
-    //         copyObj.id = key
-    //         const video_fname = this.getVideoFileName(key, value.video_name)
-    //         copyObj.video_fname = video_fname
-    //         copyObj.video_url = this.getPath(key, video_fname)
-    //         copyObj.thumb_url = this.getPath(key, this.getThumbFileName(key, value.video_name))
-    //         ret.push(copyObj)
-    //     })
-    //     return ret
-    // }
-
-
-    // getPath(id, filename){
-    //     const dir_path = this.dir_path.get(id)
-    //     return path.join(dir_path,  filename)       
-    // }
-    getVideoType(id){
-        if (!this.video_info.has(id)) {
-            throw Error(`not find video_info, id=${id}`);
-        }
-        const video_info = this.getVideoInfo(id);
+    async getVideoType(id){
+        const video_info = await this.getVideoInfo(id);
         return video_info.video_type;
-    }
-
-    getVideoTags(id){
-        if (!this.video_info.has(id)) {
-            throw Error(`not find video_info, id=${id}`);
-        }
-        const video_info = this.getVideoInfo(id);
-        return video_info.tags;
     }
 
     /**
@@ -145,27 +103,37 @@ class DB {
      * @param {string} filename 
      */
     getPath(dirpath_id, filename) {
-        if (!this.dir_path.has(dirpath_id)) {
-            throw Error(`not find dir_path, dirpath_id=${dirpath_id}`);
-        }
-        const dir_path = this.dir_path.get(dirpath_id);
-        return `${dir_path}/${filename}`;
+        return new Promise((resolve, reject) => {
+            this.db.dir.find({ dirpath_id: dirpath_id }, (err, docs) => {
+                if(docs.length==0){
+                    reject(new Error(`not find dir_path, dirpath_id=${dirpath_id}`));
+                    return;
+                }
+                resolve(`${docs[0].dirpath}/${filename}`);
+            });
+        });
     }
 
     getVideoInfo(id) {
-        if (!this.video_info.has(id)) {
-            throw Error(`not find video_info, id=${id}`);
-        }
-        return this.video_info.get(id);
+        return new Promise((resolve, reject) => {
+            this.db.video.find({ video_id: id }, (err, docs) => {   
+                if(docs.length==0){
+                    reject(new Error(`not find video_info, id=${id}`));
+                    return;
+                }
+                delete docs[0]._id;
+                resolve(docs[0]);
+            });
+        });
     }
 
     /**
      * 
      * @param {string} id 
      */
-    getVideoPath(id) {
-        const video_info = this.getVideoInfo(id);
-        return this.getPath(
+    async getVideoPath(id) {
+        const video_info = await this.getVideoInfo(id);
+        return await this.getPath(
             video_info.dirpath_id, 
             video_info.video_filename);
     }
@@ -173,16 +141,16 @@ class DB {
      * 
      * @param {string} id 
      */
-    getCommentPath(id) {
-        const video_info = this.getVideoInfo(id);
-        return this.getPath(
+    async getCommentPath(id) {
+        const video_info = await this.getVideoInfo(id);
+        return await this.getPath(
             video_info.dirpath_id, 
             `${video_info.video_name} - [${id}].xml`);
     }
 
-    getThumbInfoPath(id) {
-        const video_info = this.getVideoInfo(id);
-        return this.getPath(
+    async getThumbInfoPath(id) {
+        const video_info = await this.getVideoInfo(id);
+        return await this.getPath(
             video_info.dirpath_id, 
             `${video_info.video_name} - [${id}][ThumbInfo].xml`);
     }
@@ -191,9 +159,9 @@ class DB {
      * 
      * @param {string} id 
      */
-    getThumbPath(id) {
-        const video_info = this.getVideoInfo(id);
-        return this.getPath(
+    async getThumbPath(id) {
+        const video_info = await this.getVideoInfo(id);
+        return await this.getPath(
             video_info.dirpath_id, 
             `${video_info.video_name} - [${id}][ThumbImg].jpeg`);
     }
@@ -232,4 +200,4 @@ class DB {
     }
 }
 
-module.exports = DB;
+module.exports = Library;

@@ -182,6 +182,10 @@
         loadLibraryItems(library_items);
     });    
 
+    ipc.on("refresh_library", (event, args) => {     
+        ipc.send("get-library-items");
+    });   
+
     const resizeGridTable = () => {
         const container = this.root.querySelector("#library-grid-container");
         grid_table.resizeFitContainer(container);

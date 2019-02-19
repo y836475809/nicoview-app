@@ -12,7 +12,7 @@ const path = require("path");
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const Preference = require("./app/js/preference");
-const LibraryStore = require("./app/js/library_store");
+const Library = require("./app/js/library");
 const HistoryStore = require("./app/js/history_store");
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -20,7 +20,7 @@ let win = null;
 let player_win = null;
 let is_debug_mode = false;
 const pref = new Preference();
-let library_store = null;
+let library = null;
 let history_store = null;
 
 function createWindow() {
@@ -61,8 +61,8 @@ function createWindow() {
 app.on("ready", ()=>{
     pref.load();
 
-    library_store = new LibraryStore(pref.getValue("library_file"));
-    library_store.load();
+    const sys_path = pref.getValue("system_data_dir");
+    library = new Library(path.join(sys_path, "library.db"), path.join(sys_path, "dir.db"));
 
     history_store = new HistoryStore(pref.getValue("history_file"), 50);
     history_store.load(); 
@@ -146,19 +146,29 @@ ipcMain.on("setPreferences", (event, arg) => {
     pref.save();
 });
 
-ipcMain.on("get-library-items", (event, arg) => {
-    event.sender.send("get-library-items-reply", library_store.getItems());
+ipcMain.on("get-library-items", async (event, arg) => {
+    try {
+        event.sender.send("get-library-items-reply", await library.getLibraryData());
+    } catch (error) {
+        console.log("get-library-items error=", error);
+        event.sender.send("get-library-items-reply", []);
+    }
 });
 
 ipcMain.on("get-library-items-from-file", (event, arg) => {
-    library_store = new LibraryStore(arg);
-    library_store.load();
-    event.sender.send("get-library-items-reply", library_store.getItems());
+    // library_store = new LibraryStore(arg);
+    // library_store.load();
+    // event.sender.send("get-library-items-reply", library_store.getItems());
 });
 
-ipcMain.on("get-library-data", (event, arg) => {
+ipcMain.on("get-library-data", async (event, arg) => {
     const video_id = arg;
-    event.returnValue = library_store.getPlayData(video_id);
+    try {
+        event.returnValue = await library.getPlayData(video_id);
+    } catch (error) {
+        console.log("get-library-data error=", error);
+        event.returnValue = {};
+    }
 });
 
 

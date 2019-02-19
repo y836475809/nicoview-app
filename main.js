@@ -14,6 +14,8 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 const Preference = require("./app/js/preference");
 const Library = require("./app/js/library");
 const HistoryStore = require("./app/js/history_store");
+const DBConverter = require("./app/js/db-converter");
+
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
@@ -201,3 +203,35 @@ ipcMain.on("set-nicohistory", async (event, arg) => {
         event.returnValue = "error";
     }
 });
+
+const importDB = (db_file_path)=>{
+    const sys_path = pref.getValue("system_data_dir");
+    try {
+        fs.statSync(sys_path);
+    } catch (error) {
+        if (error.code === "ENOENT") {
+            fs.mkdirSync(sys_path);
+        }
+    }
+
+    const db_converter = new DBConverter();
+    db_converter.init(db_file_path);
+    db_converter.read();
+    const dir_list = db_converter.get_dirpath();
+    const video_list = db_converter.get_video();
+
+    library = new Library(path.join(sys_path, "library.db"), path.join(sys_path, "dir.db"));
+    library.setData(dir_list, video_list);  
+};
+
+ipcMain.on("import-db", (event, arg) => {
+    const db_file_path = arg;
+    try {
+        importDB(db_file_path);
+        event.returnValue = null;
+    } catch (error) {
+        event.returnValue = error;
+    }
+});
+
+

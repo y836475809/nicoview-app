@@ -83,19 +83,22 @@
         /* globals riot obs */
         const { ipcRenderer, remote } = require("electron");
         const { dialog } = require("electron").remote;
+        const SettingStore = require("./app/js/setting-store");
+        const setting_store = new SettingStore();
 
         require("./indicator.tag");
         riot.mount("indicator");
         
         this.isloading = false;
         let self = this;
+        const setting = setting_store.get();
 
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);
         };
 
         this.on("mount", () => {
-            const path = ipcRenderer.sendSync("getPreferences","library_dir");
+            const path = setting.library_dir;
             if(!path){
                 setLibraryDirAtt("");
             }else{
@@ -103,7 +106,7 @@
             } 
 
             let play_org_size_ch = this.root.querySelector(".pref-checkbox.play-org-size");
-            play_org_size_ch.checked = ipcRenderer.sendSync("getPreferences", "play_org_size");
+            play_org_size_ch.checked = setting.play_org_size;
         });
 
         obs.on("on_change_show_pref_page", (is_show)=> {
@@ -117,7 +120,8 @@
         };
 
         this.onclickPlayOrgSizeCheck = (e) => {
-            ipcRenderer.send("setPreferences", { key:"play_org_size", value: e.target.checked});
+            setting.play_org_size = e.target.checked;
+            setting_store.set(setting);
         };
 
         const selectFileDialog = (name, extensions)=>{
@@ -155,7 +159,8 @@
             }
             setLibraryDirAtt(path);
 
-            ipcRenderer.send("setPreferences", { key:"library_dir", value: path});
+            setting.library_dir = path;
+            setting_store.set(setting);
         };
 
         this.onclickRefreshLibrary = ()=>{

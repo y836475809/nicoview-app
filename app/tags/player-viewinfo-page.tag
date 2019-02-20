@@ -37,13 +37,19 @@
         /* globals obs */
         const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem} = remote;
+        const SettingStore = require("./app/js/setting-store");
+        const setting_store = new SettingStore();
+
         require("./player-page.tag");
-        require("./viewinfo-page.tag");
+        require("./viewinfo-page.tag");   
 
         let org_video_size = null;
-        this.sync_comment_checked = ipcRenderer.sendSync("getPreferences", "sync_comment");
         let gutter = false;
         let gutter_move = false;
+
+        const setting = setting_store.get();
+        this.sync_comment_checked = setting.sync_comment;
+        this.player_default_size = setting.player_default_size;
 
         this.mousemove = (e) => {
             if(gutter){   
@@ -88,13 +94,13 @@
                 {
                     label: "x1",
                     click: () => {
-                        resizeVideo(ipcRenderer.sendSync("getPreferences", "player_default_size"));
+                        resizeVideo(this.player_default_size);
                     }
                 },
                 {
                     label: "x1.5",
                     click: () => {
-                        const size = ipcRenderer.sendSync("getPreferences", "player_default_size");
+                        const size = this.player_default_size;
                         resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
                     }
                 },
@@ -120,21 +126,21 @@
         remote.getCurrentWindow().setMenu(menu);
 
         this.on("mount", () => {
-            const vw = ipcRenderer.sendSync("getPreferences", "info_view_width");
+            const vw = setting.info_view_width;
             if(vw){
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
-            const size = ipcRenderer.sendSync("getPreferences", "player_size");
+            const size = setting.player_size;
             resizeVideo(size);
         });   
   
         obs.on("load_meta_data", (video_size) => {
             org_video_size =  video_size;
 
-            const is_org_size = ipcRenderer.sendSync("getPreferences", "play_org_size");
+            const is_org_size = setting.play_org_size;
             if(is_org_size){  
                 resizeVideo(org_video_size);
             }
@@ -167,21 +173,13 @@
             const pf_elm = document.getElementById("player-frame");
             const width = pf_elm.offsetWidth;
             const height = pf_elm.offsetHeight - h;
-            ipcRenderer.send("setPreferences", {
-                key:"player_size", 
-                value: {width: width, height: height}
-            });
 
             const ve = document.getElementById("viewinfo-frame");  
-            ipcRenderer.send("setPreferences", { 
-                key:"info_view_width", 
-                value: parseInt(ve.offsetWidth)
-            });
 
-            ipcRenderer.send("setPreferences", { 
-                key:"sync_comment", 
-                value: this.refs.viewinfo_frame.getSyncCommentChecked()
-            });
+            setting.player_size = {width: width, height: height};
+            setting.info_view_width =parseInt(ve.offsetWidth);
+            setting.sync_comment = this.refs.viewinfo_frame.getSyncCommentChecked();
+            setting_store.set(setting);
         };
     </script>
 </player-viewinfo-page>

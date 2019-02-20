@@ -11,7 +11,7 @@ const path = require("path");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-const Preference = require("./app/js/preference");
+const SettingStore = require("./app/js/setting-store");
 const Library = require("./app/js/library");
 const HistoryStore = require("./app/js/history_store");
 const DBConverter = require("./app/js/db-converter");
@@ -21,7 +21,7 @@ const DBConverter = require("./app/js/db-converter");
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
-const pref = new Preference();
+let setting_store = null;
 let library = null;
 let history_store = null;
 
@@ -61,12 +61,12 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", ()=>{
-    pref.load();
+    setting_store = new SettingStore();
+    const setting = setting_store.get();
+    
+    library = new Library(path.join(setting.system_dir, "library.db"));
 
-    const sys_path = pref.getValue("system_data_dir");
-    library = new Library(path.join(sys_path, "library.db"));
-
-    history_store = new HistoryStore(pref.getValue("history_file"), 50);
+    history_store = new HistoryStore(path.join(setting.system_dir, "history.json"), 50);
     history_store.load(); 
 
     createWindow();
@@ -136,18 +136,6 @@ ipcMain.on("request-show-player", (event, arg) => {
     player_win.show();
 });
 
-ipcMain.on("getPreferences", (event, arg) => {
-    const key = arg;
-    event.returnValue = pref.getValue(key);
-});
-
-ipcMain.on("setPreferences", (event, arg) => {
-    const key = arg.key;
-    const value = arg.value;
-    pref.update(key, value);
-    pref.save();
-});
-
 ipcMain.on("get-library-items", async (event, arg) => {
     try {
         event.sender.send("get-library-items-reply", await library.getLibraryData());
@@ -210,12 +198,13 @@ ipcMain.on("set-nicohistory", async (event, arg) => {
 });
 
 const importDB = (db_file_path)=>{
-    const sys_path = pref.getValue("system_data_dir");
+    const setting = setting_store.get();
+    const system_dir = setting.system_dir;
     try {
-        fs.statSync(sys_path);
+        fs.statSync(system_dir);
     } catch (error) {
         if (error.code === "ENOENT") {
-            fs.mkdirSync(sys_path);
+            fs.mkdirSync(system_dir);
         }
     }
 
@@ -225,7 +214,7 @@ const importDB = (db_file_path)=>{
     const dir_list = db_converter.get_dirpath();
     const video_list = db_converter.get_video();
 
-    library = new Library(path.join(sys_path, "library.db"), path.join(sys_path, "dir.db"));
+    library = new Library(path.join(system_dir, "library.db"));
     library.setData(dir_list, video_list);  
 };
 

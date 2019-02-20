@@ -78,12 +78,17 @@
 
     <script>
         /* globals obs */
-        const { ipcRenderer } = require("electron");
+        const path = require("path");
         const Sortable = require("sortablejs");
-        const serializer = require("../js/serializer");
-        const seach_file_path = ipcRenderer.sendSync("getPreferences","search_file");
+        const JsonStore = require("../js/json-strore");
+        const SettingStore = require("./app/js/setting-store");
+
+        const setting_store = new SettingStore();
+        const seach_file_path = path.join(setting_store.get().system_dir, "search.json");
+
         try {
-            this.search_items = serializer.load(seach_file_path);
+            this.store = new JsonStore(seach_file_path);
+            this.search_items = this.store.load();
             this.search_items.forEach((item) => {
                 item.selected = false;
             });
@@ -99,12 +104,12 @@
             this.update();
         };
 
-        const savePref = () => {
-            serializer.save(seach_file_path, this.search_items, (error)=>{
-                if(error){
-                    console.log(error);
-                }
-            });
+        const save = () => {
+            try {
+                this.store.save(this.search_items);
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         const addSearchItem = (item) => {
@@ -115,7 +120,7 @@
 
             const clone_items = this.search_items.slice();
             refresh(clone_items);
-            savePref();
+            save();
         };
 
         const deleteSearchItem = (data_id) => {
@@ -127,7 +132,7 @@
             });
             
             refresh(new_search_items);
-            savePref();
+            save();
         };
 
         this.onmouseupSearchItem = (e) => {
@@ -189,7 +194,7 @@
                     });
 
                     refresh(sorted_items);
-                    savePref();
+                    save();
                 }
             });
         });

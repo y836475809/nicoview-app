@@ -35,6 +35,9 @@
     <script>
         /* globals obs */
         const { ipcRenderer } = require("electron");
+        const SettingStore = require("./app/js/setting-store");
+        const setting_store = new SettingStore();
+        const setting = setting_store.get();
 
         this.picker_mousedown = (e) => {
             let picker = this.root.querySelector("div.picker");
@@ -56,10 +59,8 @@
             let slider = this.root.querySelector("div.slider");
             const volume = pos / slider.clientWidth;
 
-            ipcRenderer.send("setPreferences", { 
-                key:"player_volume", 
-                value: volume
-            });
+            setting.player_volume = volume;
+            setting_store.set(setting);
 
             obs.trigger("on_change_volume", volume); 
         };
@@ -67,7 +68,7 @@
         this.on("mount", ()=> {
             let picker = this.root.querySelector("div.picker");
             let slider = this.root.querySelector("div.slider");   
-            const player_volume = ipcRenderer.sendSync("getPreferences", "player_volume");
+            const player_volume = setting.player_volume;
             picker.style.left = player_volume * slider.clientWidth - 5 + "px";
             
             obs.trigger("on_change_volume", player_volume); 

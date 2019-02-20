@@ -1,23 +1,27 @@
-const serializer = require("./serializer");
+const JsonStore = require("./json-strore");
 
 class HistoryStore{
     constructor(file_path, history_max){
-        this.file_path = file_path;
+        this.store = new JsonStore(file_path);
         this.history_max = history_max;
         this.history_items = [];
     }
 
     load(){    
         try {
-            this.history_items = serializer.load(this.file_path);
+            this.history_items = this.store.load();
             this.history_items.sort((a, b) => {
                 return a.play_date < b.play_date;
             });    
         } catch (error) {
             this.history_items = [];
-            console.error(error);
+            throw error;
         }
     }  
+
+    save(){
+        this.store.save(this.history_items);    
+    }
 
     getItems(){
         return this.history_items;
@@ -51,14 +55,6 @@ class HistoryStore{
 
         this.save();
     } 
-    
-    save(){
-        serializer.save(this.file_path, this.history_items, (error)=>{
-            if(error){
-                console.error(error);
-            }
-        });       
-    }
 }
 
 module.exports = HistoryStore;

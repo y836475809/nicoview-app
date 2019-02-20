@@ -32,7 +32,9 @@ class Library {
     }
 
     getLibraryData(){
-        return new Promise((resolve, reject) => {
+        return new Promise(async (resolve, reject) => {
+            const dir_map = await this._getDirMap();
+
             this.db.find({_db_type: "video"}, async (err, docs) => {   
                 if(docs.length==0){
                     reject(new Error("not find data"));
@@ -40,7 +42,7 @@ class Library {
                 }
                 const data = await Promise.all(docs.map(async value=>{
                     const video_id = value.video_id;
-                    const dir_path = await this._getDir(value.dirpath_id);
+                    const dir_path = dir_map.get(value.dirpath_id);
                     return {
                         thumb_img: this._getThumbPath(dir_path, value),
                         id: video_id,
@@ -125,6 +127,25 @@ class Library {
                     return;
                 }
                 resolve(docs[0].dirpath);
+            });
+        });
+    }
+
+    /**
+     * キャッシュとして使用する
+     */
+    _getDirMap() {
+        const dir_map = new Map();
+        return new Promise((resolve, reject) => {
+            this.db.find({_db_type: "dir"}, (err, docs) => {
+                if(docs.length==0){
+                    reject(new Error("not find dir_path"));
+                    return;
+                }
+                docs.forEach(value => {
+                    dir_map.set(value.dirpath_id, value.dirpath);
+                });
+                resolve(dir_map);
             });
         });
     }

@@ -64,7 +64,7 @@ app.on("ready", ()=>{
     pref.load();
 
     const sys_path = pref.getValue("system_data_dir");
-    library = new Library(path.join(sys_path, "library.db"), path.join(sys_path, "dir.db"));
+    library = new Library(path.join(sys_path, "library.db"));
 
     history_store = new HistoryStore(pref.getValue("history_file"), 50);
     history_store.load(); 
@@ -157,10 +157,15 @@ ipcMain.on("get-library-items", async (event, arg) => {
     }
 });
 
-ipcMain.on("get-library-items-from-file", (event, arg) => {
-    // library_store = new LibraryStore(arg);
-    // library_store.load();
-    // event.sender.send("get-library-items-reply", library_store.getItems());
+ipcMain.on("get-library-items-from-file", async (event, arg) => {
+    const data_path = arg;
+    try {
+        library = new Library(data_path);
+        event.sender.send("get-library-items-reply", await library.getLibraryData());      
+    } catch (error) {
+        console.log("get-library-items-from-file error=", error);
+        event.sender.send("get-library-items-reply", []);      
+    }
 });
 
 ipcMain.on("get-library-data", async (event, arg) => {

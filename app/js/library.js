@@ -4,15 +4,9 @@ const reader = require("./reader");
 const Datastore = require("nedb");
 
 class Library {
-    constructor(video_db_file, dir_db_file, in_memory_only=false) {
-        this.db = {};
-        this.db.video = new Datastore({ 
-            filename: video_db_file,
-            autoload: true,
-            inMemoryOnly: in_memory_only
-        });   
-        this.db.dir = new Datastore({ 
-            filename: dir_db_file,
+    constructor(db_file, in_memory_only=false) {
+        this.db = new Datastore({ 
+            filename: db_file,
             autoload: true,
             inMemoryOnly: in_memory_only
         }); 
@@ -24,15 +18,22 @@ class Library {
      * @param {Array} video_list
      */
     async setData(dir_list, video_list) {
-        await this._clear(this.db.dir);
-        await this._clear(this.db.video);
-        await this._setData(this.db.dir, this._normalizePath(dir_list));
-        await this._setData(this.db.video, video_list);
+        const data_list = 
+            this._normalizePath(dir_list).map(value=>{
+                value["_db_type"] = "dir";
+                return value;
+            }).concat(video_list.map(value=>{
+                value["_db_type"] = "video";
+                return value;
+            }));    
+
+        await this._clear(this.db);
+        await this._setData(this.db, data_list);
     }
 
     getLibraryData(){
         return new Promise((resolve, reject) => {
-            this.db.video.find({}, async (err, docs) => {   
+            this.db.find({_db_type: "video"}, async (err, docs) => {   
                 if(docs.length==0){
                     reject(new Error("not find data"));
                     return;
@@ -118,7 +119,7 @@ class Library {
 
     _getDir(dirpath_id) {
         return new Promise((resolve, reject) => {
-            this.db.dir.find({ dirpath_id: dirpath_id }, (err, docs) => {
+            this.db.find({ $and : [{_db_type: "dir"}, { dirpath_id: dirpath_id }]}, (err, docs) => {
                 if(docs.length==0){
                     reject(new Error(`not find dir_path, dirpath_id=${dirpath_id}`));
                     return;
@@ -149,11 +150,12 @@ class Library {
 
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
-            this.db.video.find({ video_id: video_id }, (err, docs) => {   
+            this.db.find({ $and : [{_db_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
                 if(docs.length==0){
                     reject(new Error(`not find video_info, id=${video_id}`));
                     return;
                 }
+                delete docs[0]._db_type;
                 delete docs[0]._id;
                 resolve(docs[0]);
             });

@@ -99,11 +99,11 @@
                     label: "Load",
                     click: () => {
                         const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-                            properties: ["openFile", "multiSelections"],
+                            properties: ["openFile"],
                             title: "Select",
                             defaultPath: ".",
                             filters: [
-                                {name: "library, dir db", extensions: "db"}, 
+                                {name: "library db", extensions: ["db"]}, 
                                 {name: "All", extensions: ["*"]},
                             ]
                         });

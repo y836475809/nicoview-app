@@ -2,7 +2,7 @@ const test = require("ava");
 const Library = require("../app/js/library");
 
 test("library get path, info", async (t) => {
-    let library = new Library("video.db", "dir.db", true);
+    let library = new Library("test.db", true);
     const dirpath_list = [
         { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
         { dirpath_id: 2, dirpath: "file:///C:/data"},
@@ -62,7 +62,7 @@ test("library get path, info", async (t) => {
 });
 
 test("library get data", async (t) => {
-    let library = new Library("video.db", "dir.db", true);
+    let library = new Library("test.db", true);
     const dirpath_list = [
         { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
         { dirpath_id: 2, dirpath: "file:///C:/data"},

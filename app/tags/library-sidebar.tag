@@ -78,13 +78,11 @@
 
     <script>
         /* globals obs */
-        const path = require("path");
         const Sortable = require("sortablejs");
         const JsonStore = require("../js/json-strore");
-        const SettingStore = require("./app/js/setting-store");
+        const { SettingStore } = require("../js/setting-store");
 
-        const setting_store = new SettingStore();
-        const seach_file_path = path.join(setting_store.get().system_dir, "search.json");
+        const seach_file_path = SettingStore.getSystemFile("search.json");
 
         try {
             this.store = new JsonStore(seach_file_path);

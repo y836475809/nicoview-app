@@ -70,10 +70,6 @@
         <label class="param">Import db</label>
         <input type="button" value="Import" onclick={onclickImport}>
     </div>
-    <div class="group">
-        <input class="pref-checkbox play-org-size" type="checkbox" onclick={onclickPlayOrgSizeCheck} />
-        <label>play with original size of video</label>
-    </div>
     <button class="pref-close-btn" type="button" onclick={onclickClose}>x</button>
     </div>
 </div>
@@ -83,30 +79,24 @@
         /* globals riot obs */
         const { ipcRenderer, remote } = require("electron");
         const { dialog } = require("electron").remote;
-        const SettingStore = require("./app/js/setting-store");
-        const setting_store = new SettingStore();
+        const { SettingStore } = require("../js/setting-store");
 
         require("./indicator.tag");
         riot.mount("indicator");
         
         this.isloading = false;
         let self = this;
-        const setting = setting_store.get();
-
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);
         };
 
         this.on("mount", () => {
-            const path = setting.library_dir;
+            const path = SettingStore.getLibraryDir();
             if(!path){
                 setLibraryDirAtt("");
             }else{
                 setLibraryDirAtt(path);
             } 
-
-            let play_org_size_ch = this.root.querySelector(".pref-checkbox.play-org-size");
-            play_org_size_ch.checked = setting.play_org_size;
         });
 
         obs.on("on_change_show_pref_page", (is_show)=> {
@@ -117,11 +107,6 @@
         this.onclickClose = () => {
             this.isloading = false;
             this.update();            
-        };
-
-        this.onclickPlayOrgSizeCheck = (e) => {
-            setting.play_org_size = e.target.checked;
-            setting_store.set(setting);
         };
 
         const selectFileDialog = (name, extensions)=>{
@@ -159,8 +144,7 @@
             }
             setLibraryDirAtt(path);
 
-            setting.library_dir = path;
-            setting_store.set(setting);
+            SettingStore.setLibraryDir(path);
         };
 
         this.onclickRefreshLibrary = ()=>{
@@ -174,24 +158,24 @@
             }
 
             self.refs.indicator.showLoading("Now Loading...");
-
-            setTimeout(() => {
-                const error = ipcRenderer.sendSync("import-db", db_file_path);
-                if(error){
-                    dialog.showMessageBox(remote.getCurrentWindow(),{
-                        type: "error",
-                        buttons: ["OK"],
-                        message: error.message
-                    });
-                }else{
-                    dialog.showMessageBox(remote.getCurrentWindow(),{
-                        type: "info",
-                        buttons: ["OK"],
-                        message: "Conversion complete"
-                    });
-                }
-                self.refs.indicator.hideLoading();        
-            }, 200);
+            obs.trigger("import-library-from-sqlite", db_file_path);
         };
+
+        obs.on("import-library-from-sqlite-rep", (error) => { 
+            if(error){
+                dialog.showMessageBox(remote.getCurrentWindow(),{
+                    type: "error",
+                    buttons: ["OK"],
+                    message: error.message
+                });
+            }else{
+                dialog.showMessageBox(remote.getCurrentWindow(),{
+                    type: "info",
+                    buttons: ["OK"],
+                    message: "Conversion complete"
+                });
+            }
+            self.refs.indicator.hideLoading();   
+        });
     </script>
 </preference-page>

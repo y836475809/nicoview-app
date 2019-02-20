@@ -82,7 +82,6 @@
     <script>
         /* globals obs base_dir */
         const {remote} = require("electron");
-        const ipc = require("electron").ipcRenderer;
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         let riot = require("riot");
@@ -111,7 +110,7 @@
                             return;
                         }
                         const data_path = paths[0];
-                        ipc.send("get-library-items-from-file", data_path);
+                        obs.trigger("get-library-items-from-file", data_path);
                     }
                 },
                 {

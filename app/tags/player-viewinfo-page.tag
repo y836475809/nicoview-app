@@ -37,8 +37,7 @@
         /* globals obs */
         const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        const SettingStore = require("./app/js/setting-store");
-        const setting_store = new SettingStore();
+        const { SettingStore } = require("../js/setting-store");
 
         require("./player-page.tag");
         require("./viewinfo-page.tag");   
@@ -47,9 +46,13 @@
         let gutter = false;
         let gutter_move = false;
 
-        const setting = setting_store.get();
-        this.sync_comment_checked = setting.sync_comment;
-        this.player_default_size = setting.player_default_size;
+        const pref_sync_comment = "player-sync-comment";
+        const pref_default_size = "player-default-size";
+        const pref_size = "player-size";
+        const pref_infoview_width = "player-infoview-width";
+
+        this.sync_comment_checked = SettingStore.getValue(pref_sync_comment, false);
+        this.player_default_size = SettingStore.getValue(pref_default_size, { width: 854 ,height: 480 });
 
         this.mousemove = (e) => {
             if(gutter){   
@@ -126,24 +129,19 @@
         remote.getCurrentWindow().setMenu(menu);
 
         this.on("mount", () => {
-            const vw = setting.info_view_width;
+            const vw = SettingStore.getValue(pref_infoview_width, 200);
             if(vw){
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
-            const size = setting.player_size;
+            const size = SettingStore.getValue(pref_size, { width: 854 ,height: 480 });
             resizeVideo(size);
         });   
   
         obs.on("load_meta_data", (video_size) => {
             org_video_size =  video_size;
-
-            const is_org_size = setting.play_org_size;
-            if(is_org_size){  
-                resizeVideo(org_video_size);
-            }
         });
 
         let resize_begin = false;
@@ -176,10 +174,9 @@
 
             const ve = document.getElementById("viewinfo-frame");  
 
-            setting.player_size = {width: width, height: height};
-            setting.info_view_width =parseInt(ve.offsetWidth);
-            setting.sync_comment = this.refs.viewinfo_frame.getSyncCommentChecked();
-            setting_store.set(setting);
+            SettingStore.setValue(pref_size, { width: width, height: height });
+            SettingStore.setValue(pref_infoview_width, parseInt(ve.offsetWidth));
+            SettingStore.setValue(pref_sync_comment, this.refs.viewinfo_frame.getSyncCommentChecked());
         };
     </script>
 </player-viewinfo-page>

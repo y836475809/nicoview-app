@@ -20,6 +20,11 @@
         /* globals obs */
         const ipc = require("electron").ipcRenderer;
         const { GridTable } = require("../js/gridtable");
+        const { SettingStore } = require("../js/setting-store");
+        const HistoryStore = require("../js/history_store");
+
+        const history_file_path = SettingStore.getSystemFile("history.json");
+        const history_store = new HistoryStore(history_file_path, 50);
 
         const row_img_width = 130/2;
         const row_hight = 100/2;
@@ -38,8 +43,8 @@
         }; 
         const grid_table = new GridTable("history-grid", columns, options);
 
-        const loadHistoryItems = (history_items) => {
-            grid_table.setData(history_items);
+        const loadHistoryItems = () => {
+            grid_table.setData(history_store.getItems());
         };
 
         const resizeGridTable = () => {
@@ -57,25 +62,38 @@
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 const url = data.url;    
-                ipc.send("add-history-items", {
+                const new_item = {
                     image: data.thumb_img, 
                     id: video_id, 
                     name: data.name, 
                     url: url
-                });
+                };
+                history_store.add(new_item);
+                grid_table.setData(history_store.getItems());
+
                 if(!/^(http)/.test(url)){
-                    const library_data = ipc.sendSync("get-library-data", data.id);
-                    ipc.send("request-show-player", library_data);
+                    obs.trigger("get-library-data", data.id);  
                 }
             });
 
             resizeGridTable();
 
-            ipc.send("get-history-items");
+            try {
+                history_store.load(); 
+                grid_table.setData(history_store.getItems());
+            } catch (error) {
+                console.log("player history load error=", error);
+                grid_table.setData([]); 
+            }
         });
 
-        ipc.on("get-history-items-reply", (event, history_items) => {     
-            loadHistoryItems(history_items);
+        obs.on("get-library-data-rep", (library_data) => { 
+            ipc.send("request-show-player", library_data);
+        });
+
+        obs.on("add-history-items", (item)=> {
+            history_store.add(item);
+            grid_table.setData(history_store.getItems());
         });
     </script>
 </play-history>

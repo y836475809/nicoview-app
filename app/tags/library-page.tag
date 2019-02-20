@@ -88,9 +88,14 @@
     const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
     const { GridTable } = require("../js/gridtable");
+    const Library = require("../js/library");
+    const { SettingStore } = require("../js/setting-store");
+    const DBConverter = require("../js/db-converter");
+    const fs = require("fs");
 
     require(`${base_dir}/app/tags/library-sidebar.tag`);  
     
+    let library = null;
     this.num_items = 0;
 
     const columns = [
@@ -146,7 +151,7 @@
     menu.append(new MenuItem({ type: "separator" }));
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
-    this.on("mount", () => {
+    this.on("mount", async () => {
         grid_table.init();
 
         grid_table.setFilter((column_id, value, word) => { 
@@ -156,12 +161,12 @@
             return false; 
         });
 
-        grid_table.onDblClick((e, data)=>{
+        grid_table.onDblClick(async (e, data)=>{
             console.log("onDblClick data=", data);
             const video_id = data.id;
-            const library_data = ipc.sendSync("get-library-data", video_id);
+            const library_data = await library.getPlayData(video_id);
             const thumb_info = library_data.viweinfo.thumb_info;   
-            ipc.send("add-history-items", {
+            obs.trigger("add-history-items", {
                 image: thumb_info.thumbnail_url, 
                 id: video_id, 
                 name: thumb_info.title, 
@@ -175,16 +180,72 @@
         });
         
         resizeGridTable();
-
-        ipc.send("get-library-items");
+        
+        try {
+            library = new Library(SettingStore.getSystemFile("library.db"));
+            loadLibraryItems(await library.getLibraryData());
+        } catch (error) {
+            console.log("library.getLibraryData error=", error);
+            loadLibraryItems([]);
+        }
     });
-    ipc.on("get-library-items-reply", (event, library_items) => {     
-        loadLibraryItems(library_items);
-    });    
 
-    ipc.on("refresh_library", (event, args) => {     
-        ipc.send("get-library-items");
+    obs.on("refresh_library", async () => {     
+        try {
+            library = new Library(SettingStore.getSystemFile("library.db"));
+            loadLibraryItems(await library.getLibraryData());
+        } catch (error) {
+            console.log("library.getLibraryData error=", error);
+            loadLibraryItems([]);
+        }
     });   
+
+    obs.on("get-library-data", async (video_id) => { 
+        const library_data = await library.getPlayData(video_id);
+        obs.trigger("get-library-data-rep", library_data);  
+    });  
+
+    obs.on("get-library-items-from-file", async (db_file_path) => { 
+        try {
+            library = new Library(db_file_path);
+            loadLibraryItems(await library.getLibraryData());
+        } catch (error) {
+            console.log("library.getLibraryData error=", error);
+            loadLibraryItems([]);
+        }
+    });  
+
+    const importDB = async (sqlite_file_path)=>{
+        const system_dir = SettingStore.getSystemDir();
+        try {
+            fs.statSync(system_dir);
+        } catch (error) {
+            if (error.code === "ENOENT") {
+                fs.mkdirSync(system_dir);
+            }
+        }
+
+        const db_converter = new DBConverter();
+        db_converter.init(sqlite_file_path);
+        db_converter.read();
+        const dir_list = db_converter.get_dirpath();
+        const video_list = db_converter.get_video();
+
+        library = new Library(SettingStore.getSystemFile("library.db"));
+        await library.setData(dir_list, video_list);  
+    };
+
+    obs.on("import-library-from-sqlite", async (sqlite_file_path) => { 
+        try {
+            await importDB(sqlite_file_path);
+            loadLibraryItems(await library.getLibraryData());
+            obs.trigger("import-library-from-sqlite-rep", null);
+        } catch (error) {
+            console.log("library.getLibraryData error=", error);
+            loadLibraryItems([]);
+            obs.trigger("import-library-from-sqlite-rep", error);
+        }
+    });  
 
     const resizeGridTable = () => {
         const container = this.root.querySelector("#library-grid-container");

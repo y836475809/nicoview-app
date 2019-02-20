@@ -11,19 +11,12 @@ const path = require("path");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-const SettingStore = require("./app/js/setting-store");
-const Library = require("./app/js/library");
-const HistoryStore = require("./app/js/history_store");
-const DBConverter = require("./app/js/db-converter");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
-let setting_store = null;
-let library = null;
-let history_store = null;
 
 function createWindow() {
     global.sharedObj = {
@@ -61,14 +54,6 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", ()=>{
-    setting_store = new SettingStore();
-    const setting = setting_store.get();
-    
-    library = new Library(path.join(setting.system_dir, "library.db"));
-
-    history_store = new HistoryStore(path.join(setting.system_dir, "history.json"), 50);
-    history_store.load(); 
-
     createWindow();
 });
 
@@ -136,46 +121,6 @@ ipcMain.on("request-show-player", (event, arg) => {
     player_win.show();
 });
 
-ipcMain.on("get-library-items", async (event, arg) => {
-    try {
-        event.sender.send("get-library-items-reply", await library.getLibraryData());
-    } catch (error) {
-        console.log("get-library-items error=", error);
-        event.sender.send("get-library-items-reply", []);
-    }
-});
-
-ipcMain.on("get-library-items-from-file", async (event, arg) => {
-    const data_path = arg;
-    try {
-        library = new Library(data_path);
-        event.sender.send("get-library-items-reply", await library.getLibraryData());      
-    } catch (error) {
-        console.log("get-library-items-from-file error=", error);
-        event.sender.send("get-library-items-reply", []);      
-    }
-});
-
-ipcMain.on("get-library-data", async (event, arg) => {
-    const video_id = arg;
-    try {
-        event.returnValue = await library.getPlayData(video_id);
-    } catch (error) {
-        console.log("get-library-data error=", error);
-        event.returnValue = {};
-    }
-});
-
-
-ipcMain.on("get-history-items", (event, arg) => {
-    event.sender.send("get-history-items-reply", history_store.getItems());
-});
-
-ipcMain.on("add-history-items", (event, arg) => {
-    history_store.add(arg);
-    event.sender.send("get-history-items-reply", history_store.getItems());
-});
-
 ipcMain.on("set-nicohistory", async (event, arg) => {
     const cookies = arg;
     const ps = cookies.map(cookie=>{
@@ -196,36 +141,3 @@ ipcMain.on("set-nicohistory", async (event, arg) => {
         event.returnValue = "error";
     }
 });
-
-const importDB = (db_file_path)=>{
-    const setting = setting_store.get();
-    const system_dir = setting.system_dir;
-    try {
-        fs.statSync(system_dir);
-    } catch (error) {
-        if (error.code === "ENOENT") {
-            fs.mkdirSync(system_dir);
-        }
-    }
-
-    const db_converter = new DBConverter();
-    db_converter.init(db_file_path);
-    db_converter.read();
-    const dir_list = db_converter.get_dirpath();
-    const video_list = db_converter.get_video();
-
-    library = new Library(path.join(system_dir, "library.db"));
-    library.setData(dir_list, video_list);  
-};
-
-ipcMain.on("import-db", (event, arg) => {
-    const db_file_path = arg;
-    try {
-        importDB(db_file_path);
-        event.returnValue = null;
-    } catch (error) {
-        event.returnValue = error;
-    }
-});
-
-

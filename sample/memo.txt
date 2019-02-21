@@ -39,3 +39,9 @@ http://d.hatena.ne.jp/s01149ht/20091216/1260983794
 https://qiita.com/gabdro/private/636c5e9e02f143b273e6
 
 “®‰æÅŒã‚Ü‚Å‚¢‚Á‚ÄI—¹‚µ‚Ä‚àhb‚Í‘±‚¢‚Ä‚¢‚é—lŽq
+
+window.onclickTag = (e) => {
+	console.log(e.href)         
+};
+
+this.refs.description.innerHTML = "<a href=\"https://www.nicovideo.jp/watch/sm33428963\" target=\"_blank\" onclick=\"onclickTag(this);return false;\">item</a>";

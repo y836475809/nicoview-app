@@ -35,9 +35,13 @@ class Library {
         return new Promise(async (resolve, reject) => {
             const dir_map = await this._getDirMap();
 
-            this.db.find({_db_type: "video"}, async (err, docs) => {   
+            this.db.find({_db_type: "video"}, async (err, docs) => { 
+                if(err){
+                    reject(err);
+                    return;
+                }
                 if(docs.length==0){
-                    reject(new Error("not find data"));
+                    resolve([]);
                     return;
                 }
                 const data = await Promise.all(docs.map(async value=>{
@@ -122,6 +126,10 @@ class Library {
     _getDir(dirpath_id) {
         return new Promise((resolve, reject) => {
             this.db.find({ $and : [{_db_type: "dir"}, { dirpath_id: dirpath_id }]}, (err, docs) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
                 if(docs.length==0){
                     reject(new Error(`not find dir_path, dirpath_id=${dirpath_id}`));
                     return;
@@ -138,6 +146,10 @@ class Library {
         const dir_map = new Map();
         return new Promise((resolve, reject) => {
             this.db.find({_db_type: "dir"}, (err, docs) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
                 if(docs.length==0){
                     reject(new Error("not find dir_path"));
                     return;
@@ -172,6 +184,10 @@ class Library {
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
             this.db.find({ $and : [{_db_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
+                if(err){
+                    reject(err);
+                    return;
+                }
                 if(docs.length==0){
                     reject(new Error(`not find video_info, id=${video_id}`));
                     return;

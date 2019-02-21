@@ -5,16 +5,7 @@
             height: 100%;
             background-color: var(--control-color);
         }
-       .library-sidebar > h2 {
-            font-size: 1.5em;
-            background-color: #2d8fdd;
-            color: white;
-            text-align: center;
-            height: 45px;
-            line-height: 45px;
-            margin: 0;
-            user-select: none;
-        }
+        
         .search-item,
         .search-item-fix {
             border-bottom: 1px solid gray;
@@ -37,9 +28,7 @@
         .search-item-fix:hover {
             background-color: #eee;
         }
-        .search-item-lable.select{
-            color: red;
-        }
+        
         div.search-item-del {
             position: relative;
             margin: 0;
@@ -64,13 +53,12 @@
     </style>
 
     <div class="library-sidebar">
-        <h2>Search</h2>
         <div class="search-item-fix" onclick={onclickClearSearch}>
-            <div id="fixed-search-item-lable" class="search-item-lable">Clear</div>
+            <div id="fixed-search-item-lable" class="search-item-lable">クリア</div>
         </div>
         <div class="search items">
             <div class="search-item" each="{ search, i in search_items }" data-id={i} >
-                <div class="{ search.selected ? 'search-item-lable select' : 'search-item-lable' }" onmouseup={onmouseupSearchItem}>{ search.label }</div>
+                <div class="search-item-lable" onmouseup={onmouseupSearchItem}>{ search.label }</div>
                 <div class="search-item-del"><span class="icono-cross" data-id={i} onclick={onclickDeleteSearchItem}></span></div>
             </div>
         </div>
@@ -87,9 +75,6 @@
         try {
             this.store = new JsonStore(seach_file_path);
             this.search_items = this.store.load();
-            this.search_items.forEach((item) => {
-                item.selected = false;
-            });
         } catch (error) {
             this.search_items = [];
         }
@@ -114,7 +99,10 @@
             if(!item){
                 return;
             }
-            this.search_items.push({ label: item, item: item, selected:false });
+            this.search_items.push({ 
+                label: item, 
+                item: item
+            });
 
             const clone_items = this.search_items.slice();
             refresh(clone_items);
@@ -134,36 +122,11 @@
         };
 
         this.onmouseupSearchItem = (e) => {
-            let elm = this.root.querySelector("#fixed-search-item-lable.search-item-lable.select");
-            if(elm){
-                elm.classList.remove("select");
-            }
-
-            const data_id = e.item.i;
-            this.search_items.forEach((item, i) => {
-                if(i===data_id){
-                    item.selected = true;
-                } else{
-                    item.selected = false;
-                }   
-            });
-            this.update();
-
             const item = e.item.search.item;
             obs.trigger("on_change_search_item", item);
         };
 
         this.onclickClearSearch = (e) =>{
-            let elm = this.root.querySelector("#fixed-search-item-lable.search-item-lable");
-            if(elm){
-                elm.classList.add("select");
-            }
-
-            this.search_items.forEach((item, i) => {
-                item.selected = false;
-            });
-            this.update();
-
             obs.trigger("on_change_search_item", "");
         };
 

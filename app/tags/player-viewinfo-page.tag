@@ -72,6 +72,7 @@
         this.mouseup = (e) => {
             if(gutter_move){
                 obs.trigger("reset_comment_timelime");
+                obs.trigger("on-resized-player-split");
             }
             gutter = false;
             gutter_move = false;

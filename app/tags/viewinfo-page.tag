@@ -54,12 +54,18 @@
             line-height: var(--user-thumbnail-size); 
         }
 
-        /* TODO: add scrolly auto */
         .viewinfo-description-panel{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
             border: 1px solid var(--control-border-color);
         } 
+        .viewinfo-description{
+            height: 100%;
+            white-space:nowrap;  
+            overflow-x: auto;
+            overflow-y: auto;
+        } 
+
         .viewinfo-comments-panel{
             grid-row: 4 / 5;
             grid-column: 1 / 3; 
@@ -89,7 +95,7 @@
             <div class="viewinfo-user-name">{this.user_nickname}</div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">
-        {this.description}
+        <div ref="description" class="viewinfo-panel viewinfo-description"></div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
@@ -176,6 +182,7 @@
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;
             this.description = viewinfo.thumb_info.description;
+            this.refs.description.innerHTML = viewinfo.thumb_info.description;
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 

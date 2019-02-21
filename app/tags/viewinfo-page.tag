@@ -81,7 +81,7 @@
     
     <div class="viewinfo-panel viewinfo-video-panel">
         <div>
-            <img src={this.thumbnail_url} alt="thumbnail" class="viewinfo-thumbnail">
+            <img src={this.thumbnail_url} class="viewinfo-thumbnail">
         </div>
         <div class="viewinfo-video-panel-info">
             <div>{this.title}</div>
@@ -92,7 +92,7 @@
         </div>
     </div>
     <div class="viewinfo-panel viewinfo-user-panel">
-            <img src={this.user_icon_url} alt="thumbnail" class="viewinfo-user-thumbnail">
+            <img src={this.user_icon_url} class="viewinfo-user-thumbnail">
             <div class="viewinfo-user-name">{this.user_nickname}</div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">

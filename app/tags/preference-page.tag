@@ -158,7 +158,9 @@
             }
 
             self.refs.indicator.showLoading("Now Loading...");
-            obs.trigger("import-library-from-sqlite", db_file_path);
+            setTimeout(() => {      
+                obs.trigger("import-library-from-sqlite", db_file_path);              
+            }, 100);
         };
 
         obs.on("import-library-from-sqlite-rep", (error) => { 

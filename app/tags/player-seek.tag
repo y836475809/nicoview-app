@@ -67,12 +67,12 @@
                 return;
             }
 
-            let picker = this.root.querySelector("div.picker");
+            const picker = this.root.querySelector("div.picker");
             const left = e.layerX;
             picker.style.left = left + "px";
-
-            let slider = this.root.querySelector("div.slider");
-            const per = left / slider.clientWidth;
+            
+            const slider = this.root.querySelector("div.slider");
+            const per = left / (slider.clientWidth-picker.clientWidth/2);
             const current = per * this.duration;
             updateSeek(current);
 
@@ -86,9 +86,10 @@
         let updateSeek = (current)=>{
             this.current = current;
             const per = this.current / this.duration;
-            let picker = this.root.querySelector("div.picker");
-            let slider = this.root.querySelector("div.slider");  
-            picker.style.left = (per * slider.clientWidth) + "px";
+
+            const picker = this.root.querySelector("div.picker");
+            const slider = this.root.querySelector("div.slider");  
+            picker.style.left = (per * (slider.clientWidth - picker.clientWidth)) + "px";
 
             this.fmt_current = time_format.toPlayTime(this.current);
             this.fmt_duration = time_format.toPlayTime(this.duration);

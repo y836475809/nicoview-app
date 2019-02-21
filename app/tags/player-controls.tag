@@ -4,6 +4,7 @@
             display:grid;
             grid-template-columns: 50px 1fr 100px;
             --margin-value: 2px;
+            --control-margin-value: 4px;
             margin : var(--margin-value);
             width: calc(100% - var(--margin-value) * 2);
             height: calc(100% - var(--margin-value) * 2);
@@ -12,6 +13,7 @@
         }
         .play-btn{
             grid-column: 1 / 2;
+            margin-top: var(--control-margin-value);
         }
         .play-btn > button{
             position: relative;
@@ -27,9 +29,11 @@
         }
         .seek{
             grid-column: 2 / 3;
+            margin-top: var(--control-margin-value);
         }
         .volume{
             grid-column: 3 / 4;
+            margin-top: var(--control-margin-value);
         }    
     </style>
 

@@ -5,8 +5,8 @@
             margin: 0;
             width: 100%;
             height: 100%;
-            --tags-height: 100px;
-            --controls-height: 100px;
+            --tags-height: 50px;
+            --controls-height: 50px;
             grid-template-rows: var(--tags-height) 1fr var(--controls-height);
             grid-template-columns: 1fr 1fr;  
             background-color: var(--control-color);

@@ -25,6 +25,7 @@
         } 
         .viewinfo-thumbnail{
             user-select: none;
+            margin-left: calc(0px - var(--panel-padding));
             width: calc(130px - var(--panel-padding) * 2);
             height: calc(var(--video-panel-height) - var(--panel-padding) * 2);
         }
@@ -98,7 +99,7 @@
         <div ref="description" class="viewinfo-panel viewinfo-description"></div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
-        <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>sync</label>
+        <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
         <div id="comment-grid-container">
             <div id="comment-grid"></div>
         </div>

@@ -3,7 +3,7 @@
          :scope {
             --border-width: 1px;
             --margin-value: 2px;
-            --total-margin: calc((var(--border-width) + var(--margin-value)) * 2);
+            --total-margin: calc((var(--border-width) * 2 + var(--margin-value)));
             width: calc(100% - var(--total-margin));
             height: calc(100% - var(--total-margin));
             border: var(--border-width) solid var(--control-border-color);

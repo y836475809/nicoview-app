@@ -37,7 +37,7 @@
 - [ ] コメントon/off切り替え？
 - [ ] playerで再生で+1sec, -1secの移動
 - [ ] playerでシーク上にマウスホバーで時間ポップアップ表示
-- [ ] 再生がさいごまでいった時にシークバーの位置がはみ出る
+- [x] 再生がさいごまでいった時にシークバーの位置がはみ出る
 - [ ] <script src="../node_modules/riot/riot+compiler.min.js"></script>はvar riot = require("riot"); でＯＫ？
 - [ ] foreach->mapをなるべく使用する
 - [x] datatablesの代わりにslickgridを使用

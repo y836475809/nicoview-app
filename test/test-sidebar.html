@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test sidebar</title>
+    <script src="../node_modules/riot/riot+compiler.min.js"></script>
+
+    <style type="text/css">
+        .cp_menu {
+            max-width: 360px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .cp_menu a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000000;
+            line-height: 1;
+        }
+
+        .cp_menu label {
+            display: block;
+            position: relative;
+            margin: 0 0 2px 0;
+            padding: 12px;
+            line-height: 1;
+            color: #ffffff;
+            background: #1b2538;
+            cursor: pointer;
+        }
+
+        .cp_menu label::before {
+            position: absolute;
+            content: '▼';
+            color: #ffffff;
+            right: 0.5em;
+            top: 25%;
+        }
+
+        .cp_menu input {
+            display: none;
+        }
+
+        .cp_menu ul {
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+            list-style: none;
+        }
+
+        .cp_menu li {
+            overflow-y: hidden;
+            max-height: 0;
+            transition: all 0.5s;
+        }
+        
+        #cp_menu_bar1:checked~#link1 li,
+        #cp_menu_bar2:checked~#link2 li {
+            max-height: 46px;
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <button type="button" onclick="onclickAddItem();">add item</button>
+    <button type="button" onclick="onclickgetItems();">get items</button>
+    <div class="cp_menu">
+        <label for="cp_menu_bar1">menu01</label>
+        <accordion ref="acc1" name_id="entries", entries={entries}></accordion>
+        <label for="cp_menu_bar2">menu02</label>
+        <input type="checkbox" name="radio" id="cp_menu_bar2" class="accordion" />
+        <ul id="link2">
+            <li><a href="">link01</a></li>
+            <li><a href="">link02</a></li>
+            <li><a href="">link03</a></li>
+            <li><a href="">link04</a></li>
+        </ul>
+    </div>
+</body>
+
+<script>
+    var riot = require("riot"); 
+    var obs = riot.observable();
+    require("../app/tags/accordion.tag");
+
+    const p = console.log;
+    this.name_id_entries = "entries";
+
+    const onclickAddItem = () => {
+        obs.trigger(`${this.name_id_entries}-add-items`, 
+            [{ title: "name6", data: "data6" }]
+        );
+    };
+    const onclickgetItems = () => {
+        obs.trigger(`${this.name_id_entries}-get-items`, (items)=>{
+            p("items = ", items);
+        });
+    };
+
+    this.entries = [
+        { title: "name1", data: "data1" },
+        { title: "name2", data: "data2" },
+        { title: "name3", data: "data3" },
+        { title: "name4", data: "data4" },
+        { title: "name5", data: "data5" },
+    ];
+    
+    riot.mount("accordion");
+</script>
+
+</html>

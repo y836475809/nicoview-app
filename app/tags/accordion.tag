@@ -1,107 +1,194 @@
 <accordion>
     <style scoped>
-        ul {
+        :scope {
+            max-width: 360px;
+        }
+
+        .acdn-menubar {
+            display: block;
+            position: relative;
+            margin: 0;
+            padding: 5px;
+            line-height: 1;
+            color: #ffffff;
+            background: #7fbfff;
+            cursor: pointer;
+            font-size: 1.5em;
+        }
+
+        .acdn-list {
             margin: 0;
             padding: 0;
             background: #f4f4f4;
             list-style: none;
         }
 
-        li {
-            overflow-y: hidden;
-            max-height: 0;
+        .acdn-item {
+            height: 25px;
+            padding: 5px 0 5px 10px;
             transition: all 0.5s;
             cursor: pointer;
         }
 
-        li:hover {
+        .acdn-item:hover {
             background-color: #6190cd6b;
         }
 
-        li.selected {
+        .acdn-item.selected {
             background-color: #0f468d6b;
         }
 
-        #cp_menu_bar1:checked~#link1 li {
-            max-height: 46px;
-            opacity: 1;
+        .toggle-menu {
+            overflow: hidden;
+            transition: all 0.5s;
+            background-color: #eee;
+            border-bottom: 1px solid lightgrey;
         }
     </style>
 
-    <input type="checkbox" name="radio" id="cp_menu_bar1" />
-    <ul id="link1">
-        <li class="acc-item" each={ item, i in this.entries } data-id={i} onclick={this.onclickItem}
-            ondblclick={this.ondblclickItem}>
-            {item.title}
-        </li>
-    </ul>
+    <label class="acdn-menubar" onclick={this.onclickMenubar}>{this.opts.params.title}</label>
+    <div class="toggle-menu">
+        <ul class="acdn-list">
+            <li class="acdn-item" each={ item, i in this.items } data-id={i} 
+                onclick={this.onclickItem} ondblclick={this.ondblclickItem}
+                onmouseup={this.onmouseUp}>
+                {item.title}
+            </li>
+        </ul>
+    </div>
 
     <script>
         /* globals obs */
         const Sortable = require("sortablejs");
         let sortable = null;
-        this.name_id = this.opts.name_id;
-        this.entries = this.opts.entries;
+        
+        const params = this.opts.params;
+        const id_name = params.name;
+        this.items = params.items;
 
-        this.gg = () => {
-            var obj = this.root.querySelector("#cp_menu_bar1");
-            return obj.checked;
+        const menu_item_h = 25;
+        
+
+        const getMenuElm = () => {
+            return this.root.querySelector(".toggle-menu");
         };
 
-        this.chanegExpand = (is_expand) => {
-            const elm = this.root.querySelector("#cp_menu_bar1");
-            elm.checked = is_expand;
+        const chanegExpand = (is_expand) => {
+            const elm = getMenuElm();
+            if(is_expand){
+                const _clientH = this.items.length * menu_item_h;
+                elm.style.height = _clientH + "px";
+            }else{
+                elm.style.height = "0px";
+            }
         };
 
-        obs.on(`${this.name_id}-add-items`, (items)=> {
-            console.log("add-items = ", items);
-            // this.entries.push(item);
-            Array.prototype.push.apply(this.entries, items);
-            this.update();
-        });
+        const isExpand = () => {
+            const elm = getMenuElm();
+            return elm.clientHeight!==0;
+        };
 
-        obs.on(`${this.name_id}-get-items`, (cb)=> {
+        const toggleExpand = () => {
+            const elm = getMenuElm();
+            chanegExpand(elm.clientHeight===0);
+        };
+
+        const getItems = () => {
             const order = sortable.toArray();
-            const sorted_items = order.map(value=>{
-                return this.entries[value];
+            return order.map(value => {
+                return this.items[value];
             });
-            cb(sorted_items);
-        });
+        };
 
-        this.onclickItem = (e) => {
-            const id = e.target.getAttribute("data-id");
-            const item = this.entries[id];
-            console.log("onclickItem id=", id, "item=", item);
+        const getSelectedItemIndices = () => {
+            const sel_indices = [];
+            const elms = this.root.querySelectorAll(".acdn-item");
+            elms.forEach((elm, index) => {
+                if(elm.classList.contains("selected")){
+                    sel_indices.push(index);
+                }
+            });
+            return sel_indices;
+        };
 
-            const elms = this.root.querySelectorAll(".acc-item");
+        const deleteItems = (/** @type {Array} */ indices) => {
+            /** @type {Array} */
+            const order = sortable.toArray();
+
+            const cp_items = order.map(value=>{
+                const index = parseInt(value);
+                return Object.assign({}, this.items[index]);
+            });
+            this.items = cp_items.filter((value, index)=>{
+                return !indices.includes(index);
+            });
+            this.update();
+        };
+
+        const setSelected = (target_elm) => {
+            const elms = this.root.querySelectorAll(".acdn-item");
             elms.forEach((elm) => {
                 elm.classList.remove("selected");
             });
-            e.target.classList.add("selected");
+            target_elm.classList.add("selected"); 
+        };
+
+        obs.on(`${id_name}-add-items`, (items) => {
+            Array.prototype.push.apply(this.items, items);
+            if(isExpand()){
+                chanegExpand(true);
+            }
+            this.update();
+        });
+
+        obs.on(`${id_name}-selected-item-indices`, (cb) => {
+            const sel_indices = getSelectedItemIndices();
+            cb(sel_indices);
+        });
+
+        obs.on(`${id_name}-delete-selected-items`, () => {
+            const sel_indices = getSelectedItemIndices();
+            deleteItems(sel_indices);
+            if(isExpand()){
+                chanegExpand(true);
+            }
+        });
+
+        obs.on(`${id_name}-get-data`, (cb) => {
+            cb({
+                is_expand: isExpand(), 
+                items: getItems()
+            });
+        });
+
+        this.onclickMenubar = (e) => {
+            toggleExpand();
+        };
+
+        this.onclickItem = (e) => {
+            setSelected(e.target);
         };
 
         this.ondblclickItem = (e) => {
             const id = e.target.getAttribute("data-id");
-            const item = this.entries[id];
-            console.log("ondblclickItem id=", id, "item=", item);
+            const item = this.items[id];
+            obs.trigger(`${id_name}-dlbclick-item`, item);
+        };
 
-            const order = sortable.toArray();
-            console.log("ondblclickItem order=", order);
-
-            obs.trigger(`${this.name_id}-dlbclick-item`, item);
+        this.onmouseUp= (e) => {
+            setSelected(e.target);
+            if(params.oncontextmenu==undefined){
+                return;
+            }
+            if(e.button===2){
+                params.oncontextmenu(e);
+            }
         };
 
         this.on("mount", () => {
-            const el = this.root.querySelector("#link1");
-            sortable = Sortable.create(el);
-            // sortable = Sortable.create(el, {
-            //     onSort: (evt) => {
-            //         const order = sortable.toArray();
-            //         console.log(order);
-            //     }
-            // });
-
-            this.chanegExpand(true);
+            const elm = this.root.querySelector(".acdn-list");
+            sortable = Sortable.create(elm);
+            chanegExpand(params.expand);
         });
     </script>
 </accordion>

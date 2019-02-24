@@ -28,6 +28,7 @@
             padding: 5px 0 5px 10px;
             transition: all 0.5s;
             cursor: pointer;
+            border-bottom: 1px solid lightgrey;
         }
 
         .acdn-item:hover {
@@ -41,8 +42,6 @@
         .toggle-menu {
             overflow: hidden;
             transition: all 0.5s;
-            background-color: #eee;
-            border-bottom: 1px solid lightgrey;
         }
     </style>
 
@@ -139,6 +138,11 @@
                 chanegExpand(true);
             }
             this.update();
+
+            obs.trigger(`${id_name}-state-change`, {
+                is_expand: isExpand(), 
+                items: getItems()
+            });
         });
 
         obs.on(`${id_name}-selected-item-indices`, (cb) => {
@@ -152,6 +156,11 @@
             if(isExpand()){
                 chanegExpand(true);
             }
+
+            obs.trigger(`${id_name}-state-change`, {
+                is_expand: isExpand(), 
+                items: getItems()
+            });
         });
 
         obs.on(`${id_name}-get-data`, (cb) => {
@@ -159,6 +168,10 @@
                 is_expand: isExpand(), 
                 items: getItems()
             });
+        });
+
+        obs.on(`${id_name}-change-expand`, (expand) => {
+            chanegExpand(expand);
         });
 
         this.onclickMenubar = (e) => {
@@ -187,7 +200,14 @@
 
         this.on("mount", () => {
             const elm = this.root.querySelector(".acdn-list");
-            sortable = Sortable.create(elm);
+            sortable = Sortable.create(elm, {
+                onSort: (evt) => {
+                    obs.trigger(`${id_name}-state-change`, {
+                        is_expand: isExpand(), 
+                        items: getItems()
+                    });
+                }
+            });
             chanegExpand(params.expand);
         });
     </script>

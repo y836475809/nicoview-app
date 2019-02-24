@@ -5,159 +5,80 @@
             height: 100%;
             background-color: var(--control-color);
         }
-        
-        .search-item,
-        .search-item-fix {
-            border-bottom: 1px solid gray;
-            padding-left: 10px;
-            background-color: white;
-            line-height: 30px;
-            user-select: none;
-            cursor: pointer;
-            display: flex;
-        }
-        .search-item > div,
-        .search-item-fix > div  {
-            margin: 0;
-            width: 100%;
-        }
-        .search-item-fix {
-            border-top: 1px solid gray;
-        }
-        .search-item:hover,
-        .search-item-fix:hover {
-            background-color: #eee;
-        }
-        
-        div.search-item-del {
-            position: relative;
-            margin: 0;
-            margin-left: auto;
-            width: 20px;
-            height: 20px;
-            top: 5px;
-        }
-        div.search-item-del:hover {
-            border-radius: 50% 50% 50% 50%;
-            background-color: darkgray;
-        }
-        div.search-item-del > span {
-            top: -7px;
-            left: -7px;
-            color: gray;
-            transform: scale(0.5) rotate(45deg);
-        }
-        div.search-item-del > span:hover {
-            color: white;
-        }
     </style>
 
     <div class="library-sidebar">
-        <div class="search-item-fix" onclick={onclickClearSearch}>
-            <div id="fixed-search-item-lable" class="search-item-lable">クリア</div>
-        </div>
         <div class="search items">
-            <div class="search-item" each="{ search, i in search_items }" data-id={i} >
-                <div class="search-item-lable" onmouseup={onmouseupSearchItem}>{ search.label }</div>
-                <div class="search-item-del"><span class="icono-cross" data-id={i} onclick={onclickDeleteSearchItem}></span></div>
-            </div>
+            <accordion params={acdn_search}></accordion>
         </div>
     </div>
 
     <script>
         /* globals obs */
-        const Sortable = require("sortablejs");
+        const {remote} = require("electron");
+        const {Menu} = remote;
         const JsonStore = require("../js/json-strore");
         const { SettingStore } = require("../js/setting-store");
+
+        require("./accordion.tag");
 
         const seach_file_path = SettingStore.getSystemFile("search.json");
 
         try {
             this.store = new JsonStore(seach_file_path);
-            this.search_items = this.store.load();
+            this.search_data = this.store.load();
         } catch (error) {
-            this.search_items = [];
+            this.search_data = {
+                is_expand: false, 
+                items: []
+            };
         }
 
-        const refresh = (new_search_items) => {
-            this.search_items = [];
-            this.update();
-
-            this.search_items = new_search_items.slice();
-            this.update();
-        };
-
-        const save = () => {
+        const save = (data) => {
             try {
-                this.store.save(this.search_items);
+                this.store.save(data);
             } catch (error) {
                 console.log(error);
             }
         };
 
-        const addSearchItem = (item) => {
-            if(!item){
-                return;
-            }
-            this.search_items.push({ 
-                label: item, 
-                item: item
-            });
-
-            const clone_items = this.search_items.slice();
-            refresh(clone_items);
-            save();
-        };
-
-        const deleteSearchItem = (data_id) => {
-            let new_search_items = [];
-            this.search_items.forEach((item, i) => {
-                if(i!==data_id){
-                    new_search_items.push(item);
-                }    
-            });
-            
-            refresh(new_search_items);
-            save();
-        };
-
-        this.onmouseupSearchItem = (e) => {
-            const item = e.item.search.item;
-            obs.trigger("on_change_search_item", item);
-        };
-
-        this.onclickClearSearch = (e) =>{
-            obs.trigger("on_change_search_item", "");
-        };
-
-        this.onclickDeleteSearchItem = (e) => {
-            const data_id = parseInt(e.target.getAttribute("data-id"));
-            deleteSearchItem(data_id);
-        };
-        
-        obs.on("on_add_search_item", (item)=> {
-            addSearchItem(item);
-        });
-
-        obs.on("on_clear_search", ()=> {
-            this.onclickClearSearch();
-        });
-
-        this.on("mount", () => {
-            const el = this.root.querySelector(".search.items");
-            const sortable = Sortable.create(el, {
-                onSort: (evt) => {
-                    const  order = sortable.toArray();
-
-                    let sorted_items = [];
-                    order.forEach(i => {
-                        sorted_items.push(this.search_items[i]);
-                    });
-
-                    refresh(sorted_items);
-                    save();
+        const createMenu = (sender) => {
+            const nemu_templete = [
+                { 
+                    label: "delete", click() {
+                        obs.trigger(`${sender}-delete-selected-items`);
+                    }
                 }
-            });
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
+        this.acdn_search = {
+            title : "検索",
+            name: "search",
+            expand: true,
+            items: this.search_data.items,
+            oncontextmenu: ()=> {
+                const menu = createMenu("search");
+                menu.popup({window: remote.getCurrentWindow()});
+            }
+        };
+
+        obs.on(`${this.acdn_search.name}-dlbclick-item`, (item) => {
+            obs.trigger("on_change_search_item", item.query);
+        });
+
+        obs.on(`${this.acdn_search.name}-state-change`, (data) => {
+            save(data);
+        });
+        
+        obs.on("on_add_search_item", (query) => {
+            obs.trigger(`${this.acdn_search.name}-add-items`, 
+                [
+                    { title: query, query: query }
+                ]
+            );
+            obs.trigger(`${this.acdn_search.name}-change-expand`, true);
         });
     </script>
 </library-sidebar>

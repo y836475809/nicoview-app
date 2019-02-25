@@ -8,7 +8,7 @@
             window.jQuery = window.$ = require("jquery");
     </script>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
 
     <style type="text/css">
         .test-button{
@@ -30,24 +30,26 @@
 </body>
 
 <script>
+    const path = require("path");
     const fs = require("fs");
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
-    var base_dir = shared_obj.base_dir;  // eslint-disable-line
+    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
+    const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
+
     var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     
-    const reader = require("../app/js/reader");
-
-    require(`${base_dir}/app/tags/player-viewinfo-page`);
-    riot.mount("player-viewinfo-page");
+    const reader = require(`${app_base_dir}/js/reader`);
+    require(`${app_base_dir}/tags/player-viewinfo-page`);
+    riot.mount("player-viewinfo-page");    
 
     const onclickLoad = () => {
-        const comment_path = `${base_dir}/test/data/test1-comment.xml`;
+        const comment_path = `${test_dir}/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
         const commnets = reader.comment(xml);
         const data = {
-            src: `${base_dir}/test/data/test1.mp4`,
+            src: `${test_dir}/data/test1.mp4`,
             type: "video/mp4",
             commnets: commnets
         };
@@ -57,7 +59,7 @@
                 title: "test sm100000",
                 description: "------------------動画-------------------- <br>"
                             + "---<br>--<br>--<br><br>----<br>---<br>--<br>--",
-                thumbnail_url: `${base_dir}/test/data/sample.jpeg`, //130x100
+                thumbnail_url: `${test_dir}/data/sample.jpeg`, //130x100
                 first_retrieve: "2017-07-07T18:30:00+09:00",
                 length: "10:00",
                 movie_type: "mp4",
@@ -78,7 +80,7 @@
                 ],
                 user_id: "1234567",
                 user_nickname: "abcdefg",
-                user_icon_url: `${base_dir}/test/data/user_icon.jpg` //50x50
+                user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
             },
             commnets: commnets
         };
@@ -106,7 +108,7 @@
                 video_id: "sm100000",
                 title: "test sm100000",
                 description: "動画",
-                thumbnail_url: `${base_dir}/test/data/sample.jpeg`, //130x100
+                thumbnail_url: `${test_dir}/data/sample.jpeg`, //130x100
                 first_retrieve: "2017-07-07T18:30:00+09:00",
                 length: "10:00",
                 movie_type: "mp4",
@@ -126,7 +128,7 @@
                 ],
                 user_id: "1234567",
                 user_nickname: "abcdefg",
-                user_icon_url: `${base_dir}/test/data/user_icon.jpg` //50x50
+                user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
             },
             commnets: commnets
         }); 

@@ -45,10 +45,10 @@
     </div>
 
     <script>
-        /* globals base_dir obs */
-        require(`${base_dir}/app/tags/player-tags.tag`);
-        require(`${base_dir}/app/tags/player-video.tag`);
-        require(`${base_dir}/app/tags/player-controls.tag`);
+        /* globals app_base_dir obs */
+        require(`${app_base_dir}/tags/player-tags.tag`);
+        require(`${app_base_dir}/tags/player-video.tag`);
+        require(`${app_base_dir}/tags/player-controls.tag`);
         
         let tags_height = 0;
         let controls_height = 0;

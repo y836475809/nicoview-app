@@ -76,12 +76,12 @@
     <indicator ref="indicator"></indicator>
 
     <script>
-        /* globals riot obs */
+        /* globals app_base_dir riot obs */
         const { ipcRenderer, remote } = require("electron");
         const { dialog } = require("electron").remote;
-        const { SettingStore } = require("../js/setting-store");
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        require("./indicator.tag");
+        require(`${app_base_dir}/tags/indicator.tag`);
         riot.mount("indicator");
         
         this.isloading = false;

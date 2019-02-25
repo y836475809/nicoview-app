@@ -14,13 +14,13 @@
     </div>
 
     <script>
-        /* globals obs */
+        /* globals app_base_dir obs */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require("../js/json-strore");
-        const { SettingStore } = require("../js/setting-store");
+        const JsonStore = require(`${app_base_dir}/js/json-strore`);
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        require("./accordion.tag");
+        require(`${app_base_dir}/tags/accordion.tag`);
 
         const seach_file_path = SettingStore.getSystemFile("search.json");
 

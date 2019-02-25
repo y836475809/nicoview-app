@@ -33,8 +33,8 @@
     </div>
 
     <script>
-        /* globals obs */
-        const { SettingStore } = require("../js/setting-store");
+        /* globals app_base_dir obs */
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const pref_volume_key = "player-volume";
 
         this.picker_mousedown = (e) => {

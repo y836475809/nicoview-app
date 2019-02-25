@@ -2,7 +2,7 @@
   "name": "riot_test",
   "version": "1.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
     "test": "ava -v -s  __tests__/*.test.js"
   },

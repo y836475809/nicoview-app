@@ -6,7 +6,7 @@
     <script>
         window.jQuery = window.$ = require("jquery");
     </script>
-    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
         html, body {
             height: 100%;
@@ -55,6 +55,9 @@
     const { remote } = require("electron");
     const { Menu, MenuItem } = remote;
     const { GridTable } = require("../app/js/gridtable");
+
+    const shared_obj = remote.getGlobal("sharedObj");
+    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
 
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},

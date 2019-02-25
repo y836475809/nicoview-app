@@ -44,9 +44,9 @@
     <player-volume class="volume"></player-volume>
 
     <script>
-        /* globals riot obs */
-        require("./player-seek.tag");
-        require("./player-volume.tag");
+        /* globals app_base_dir riot obs */
+        require(`${app_base_dir}/tags/player-seek.tag`);
+        require(`${app_base_dir}/tags/player-volume.tag`);
         riot.mount("player-seek");
         riot.mount("player-volume");
 

@@ -80,16 +80,16 @@
     <preference-page></preference-page>
 
     <script>
-        /* globals obs base_dir */
+        /* globals app_base_dir obs */
         const {remote} = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         let riot = require("riot");
 
-        require(`${base_dir}/app/tags/library-page.tag`);
-        require(`${base_dir}/app/tags/search-page.tag`);
-        require(`${base_dir}/app/tags/play-history.tag`);
-        require(`${base_dir}/app/tags/preference-page.tag`);
+        require(`${app_base_dir}/tags/library-page.tag`);
+        require(`${app_base_dir}/tags/search-page.tag`);
+        require(`${app_base_dir}/tags/play-history.tag`);
+        require(`${app_base_dir}/tags/preference-page.tag`);
 
         let template = [{
             label: "File",

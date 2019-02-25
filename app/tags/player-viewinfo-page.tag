@@ -34,13 +34,13 @@
     </div>
 
     <script>
-        /* globals obs */
+        /* globals app_base_dir obs */
         const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        const { SettingStore } = require("../js/setting-store");
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        require("./player-page.tag");
-        require("./viewinfo-page.tag");   
+        require(`${app_base_dir}/tags/player-page.tag`);
+        require(`${app_base_dir}/tags/viewinfo-page.tag`);   
 
         let org_video_size = null;
         let gutter = false;

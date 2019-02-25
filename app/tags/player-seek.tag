@@ -59,8 +59,8 @@
     <div class="duration">{this.fmt_duration}</div>
 
     <script>
-        /* globals obs */
-        const time_format = require("../../app/js/time_format");
+        /* globals app_base_dir obs */
+        const time_format = require(`${app_base_dir}/js/time_format`);
 
         this.mousedown = (e) => {
             if(this.duration===0){

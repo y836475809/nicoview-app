@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tets preference</title>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
 </head>
@@ -15,10 +15,13 @@
 </body>
 
 <script>
+    const remote = require("electron").remote;
+    const shared_obj = remote.getGlobal("sharedObj");
+    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     try {
-        require("../app/tags/preference-page.tag");
+        require(`${app_base_dir}/tags/preference-page.tag`);
         riot.mount("preference-page");
 
         obs.on("on_load_library", () => {

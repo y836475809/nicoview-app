@@ -17,10 +17,10 @@
 </div>  
 
 <script>
-    /* globals obs */
+    /* globals app_base_dir obs */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
-    const { GridTable } = require("../js/gridtable");
+    const { GridTable } = require(`${app_base_dir}/js/gridtable`);
 
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},

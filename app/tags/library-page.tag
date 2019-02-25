@@ -83,17 +83,17 @@
     </div>
 
 <script>
-    /* globals base_dir obs */
+    /* globals app_base_dir obs */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const ipc = require("electron").ipcRenderer;
-    const { GridTable } = require("../js/gridtable");
-    const Library = require("../js/library");
-    const { SettingStore } = require("../js/setting-store");
-    const DBConverter = require("../js/db-converter");
+    const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+    const Library = require(`${app_base_dir}/js/library`);
+    const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+    const DBConverter = require(`${app_base_dir}/js/db-converter`);
     const fs = require("fs");
 
-    require(`${base_dir}/app/tags/library-sidebar.tag`);  
+    require(`${app_base_dir}/tags/library-sidebar.tag`);  
     
     let library = null;
     this.num_items = 0;

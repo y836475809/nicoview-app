@@ -15,18 +15,16 @@
     <player-viewinfo-page></player-viewinfo-page>
 </body>
 <script>
-    const remote = require("electron").remote;
-    const base_dir = remote.getGlobal("sharedObj").base_dir;
     const ipc = require("electron").ipcRenderer;
+    const remote = require("electron").remote;
+    var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
 
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
-    require(`${base_dir}/app/tags/player-viewinfo-page`);
+    require(`${app_base_dir}/tags/player-viewinfo-page.tag`);
     riot.mount("player-viewinfo-page");
     
-
-
     ipc.on("request-send-video-data", (event, arg) => {
         console.log("request-send-video-data", arg);
         const video_data = arg.video_data;

@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>test sidebar</title>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
 </head>
@@ -24,9 +24,11 @@
 <script>
     const {remote} = require("electron");
     const {Menu} = remote;
+    const shared_obj = remote.getGlobal("sharedObj");
+    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     var riot = require("riot"); 
     var obs = riot.observable();
-    require("../app/tags/accordion.tag");
+    require(`${app_base_dir}/tags/accordion.tag`);
 
     const p = console.log;
 

@@ -4,8 +4,8 @@
         <meta charset="UTF-8">
         <title>Hello World!</title>
         <script>window.jQuery = window.$ = require("jquery");</script>
-        <script src="../node_modules/riot/riot+compiler.min.js"></script>
-        <script type="riot/tag" src="../app/tags/main-page.tag"></script>
+        <script src="../../node_modules/riot/riot+compiler.min.js"></script>
+        <script type="riot/tag" src="../tags/main-page.tag"></script>
         <link rel="stylesheet" type="text/css" href="../css/app.css">
 
         <style type="text/css">
@@ -20,7 +20,7 @@
         /* globals riot */
         const remote = require("electron").remote;
         var shared_obj = remote.getGlobal("sharedObj"); // eslint-disable-line
-        var base_dir = shared_obj.base_dir; // eslint-disable-line
+        var app_base_dir = shared_obj.base_dir; // eslint-disable-line
         var obs = riot.observable(); // eslint-disable-line
 
         riot.mount("main-page");

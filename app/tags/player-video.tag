@@ -26,8 +26,8 @@
     </div>
 
     <script>
-        /* globals base_dir obs */
-        const CommentTimeLineManager = require(`${base_dir}/app/js/comment_timeline_manager`);
+        /* globals app_base_dir obs */
+        const CommentTimeLineManager = require(`${app_base_dir}/js/comment_timeline_manager`);
         
         let ctls = null;
         let video_size = null;

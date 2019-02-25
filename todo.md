@@ -52,6 +52,7 @@
 - [ ] 1分間？の最大表示コメント数の実装
 - [ ] flvの再生
 - [x] sqlite dbのインポートで処理中にインジケータが表示されない
+- [ ] electron-builderのコマンドは「electron-builder --win --x64」
 - [ ] ニコニコ動画検索
 - [ ] ニコニコ動画再生
   - [x] テストhtmlでsmile再生

@@ -53,6 +53,9 @@
 - [ ] flvの再生
 - [x] sqlite dbのインポートで処理中にインジケータが表示されない
 - [ ] electron-builderのコマンドは「electron-builder --win --x64」
+- [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
+- [ ] histroty,searchでのデータの型チェックが必要
+- [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
 - [ ] ニコニコ動画検索
 - [ ] ニコニコ動画再生
   - [x] テストhtmlでsmile再生

@@ -1,71 +1,77 @@
 <main-page>
     <style scoped>
         :scope {
-            --main-group-buttons-height: 30px;
+            --main-group-buttons-width: 55px;
             display:grid;
-            grid-template-rows: var(--main-group-buttons-height) 1fr;
-            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            grid-template-columns: var(--main-group-buttons-width) 1fr;
             width: 100%;
             height: 100%;
             margin: 0;
             overflow-y: hidden;
         }
+
         .main-group-buttons{
-            grid-row: 1 / 2;
-            grid-column: 1 / 3;
+            grid-row: 1 / 3;
+            grid-column: 1 / 2;
+            background-color: #222222
         }
         #page1 {
-            grid-row: 2 / 3;
-            grid-column: 1 / 3;
+            grid-row: 1 / 3;
+            grid-column: 2 / 3;
         }
         #page2 {
-            grid-row: 2 / 3;
-            grid-column: 1 / 3;
+            grid-row: 1 / 3;
+            grid-column: 2 / 3;
         }  
         #page3 {
-            grid-row: 2 / 3;
-            grid-column: 1 / 3;
-        }   
+            grid-row: 1 / 3;
+            grid-column: 2 / 3;
+        }
+        #page4 {
+            grid-row: 1 / 3;
+            grid-column: 2 / 3;
+        }    
 
         .main-group-buttons input[type=radio] {
             display: none; 
         }
-        .main-group-buttons input[type=radio]:checked + .button {
-            background: lightgray;
-            color: black;
+        .main-group-buttons input[type=radio]:checked + .button{
+            background: #2C7CFF;
         }
         .main-group-buttons .button {
-            display: inline-block;
-            margin-right: -2px; 
-            margin-left: 2px;
-            margin-top: 2px;
-            margin-bottom: 2px;
-            padding: 3px 5px 5px 5px;
-            border: 1px solid gray;
+            margin: 2px;
             text-align: center;
             box-sizing: border-box;
             border-radius: 2px;
-            height: calc(var(--main-group-buttons-height) - 5px);
-            width: 80px;
         }
-        .main-group-buttons .button:hover {
-            box-shadow: 0 0 1px rgba(0, 0, 0, .2) inset,
-              2px 0 2px -2px rgba(0, 0, 0, .2) inset,
-              -2px 0 5px -2px rgba(0, 0, 0, .2) inset; 
+        .label .button{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 50px;
+            height: 50px;
+        }
+        .icono-book, .icono-search, .icono-clock, .icono-gear{
+           color: white;
         }
     </style>
     <div class="main-group-buttons">
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
-            <span class="button">ライブラリ</span>
+            <span title="ライブラリ" class="button"><span class="icono-book"></span></span>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
-            <span class="button">検索</span> 
+            <span title="検索" class="button"><span class="icono-search"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
-            <span class="button">履歴</span> 
+            <span title="履歴" class="button"><span class="icono-clock"></span></span> 
+        </label>
+        <label class="label">
+            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,3)}> 
+            <span title="設定" class="button"><span class="icono-gear"></span></span> 
         </label>
     </div>
     <div id="page1">
@@ -77,7 +83,9 @@
     <div id="page3">
         <play-history></play-history>
     </div>
-    <preference-page></preference-page>
+    <div id="page4">
+        <preference-page></preference-page>
+    </div>
 
     <script>
         /* globals app_base_dir obs */
@@ -112,12 +120,6 @@
                         const data_path = paths[0];
                         obs.trigger("get-library-items-from-file", data_path);
                     }
-                },
-                {
-                    label: "Preference",
-                    click: () => {
-                        obs.trigger("on_change_show_pref_page", true);  
-                    }
                 }
             ]
         },
@@ -132,21 +134,21 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const main_group_buttons_height = parseInt(getComputedStyle(this.root).getPropertyValue("--main-group-buttons-height"));
-
         this.index = 0;
-        let select_page = (index)=>{
+        const select_page = (index)=>{
             this.index = index;
 
-            let page1 = document.getElementById("page1");
-            let page2 = document.getElementById("page2");
-            let page3 = document.getElementById("page3");
+            const page1 = document.getElementById("page1");
+            const page2 = document.getElementById("page2");
+            const page3 = document.getElementById("page3");
+            const page4 = document.getElementById("page4");
 
-            let list = [0, 0, 0];
+            const list = [0, 0, 0, 0];
             list[index] = 1;
             page1.style.zIndex = list[0];
             page2.style.zIndex = list[1];
-            page3.style.zIndex = list[2];  
+            page3.style.zIndex = list[2];
+            page4.style.zIndex = list[3];  
 
             Array.from(this.root.querySelectorAll("[name=\"page_select\"]"), 
                 (elm, index) => {
@@ -179,9 +181,9 @@
             timer = setTimeout(() => {
                 obs.trigger("resizeEndEvent", {
                     w: this.root.offsetWidth, 
-                    h: this.root.offsetHeight - main_group_buttons_height,
+                    h: this.root.offsetHeight,
                     width: this.root.offsetWidth, 
-                    height: this.root.offsetHeight - main_group_buttons_height                   
+                    height: this.root.offsetHeight
                 });
             }, timeout);
         });

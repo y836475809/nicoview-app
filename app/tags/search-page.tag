@@ -5,55 +5,103 @@
         height: 100%;
     }
 
-    #search-grid-container {
+    .search-container {
         background-color: var(--control-color);
         width: 100%;
         height: 100%;
     }
 
-    #search-grid-container input[type=radio] {
+    .sort-kind-container,
+    .filter-kind-container {
+        display: inline-block;
+    }
+
+    .sort-kind-container input[type=radio],
+    .filter-kind-container input[type=radio]
+     {
         display: none; 
     }
-    #search-grid-container input[type=radio]:checked + .button{
+    .sort-kind-container input[type=radio]:checked + .button,
+    .filter-kind-container input[type=radio]:checked + .button
+    {
         background: gray;
     }
-    .label{   
+    .sort-kind-container .label{   
         display: inline-block;
         height: 30px;
-        width: 100px;      
+        width: 120px;
     }
     .label .button{
-        border: 1px solid gray;    
+        border: 1px solid gray;
         box-sizing: border-box;
         border-radius: 2px;
         padding-left: 10px;
         height: 100%;
         width: 100%;
     }
-    .label .button .icono-caretUp{
+    .sort-kind-container .icono-caretUp{
         margin-left: auto;
     }
-    .label .button .icono-caretDown {
+    .sort-kind-container .icono-caretDown {
         margin-left: auto;
         margin-bottom: 5px;
     }
+
+    .filter-kind-container .label{   
+        display: inline-block;
+        height: 30px;
+        width: 80px;
+    }
+    .filter-word-container form {
+        display: inline-block;
+    }
+    .filter-word-container button {
+        width: 25px;
+        height: 25px;
+    }
+    .filter-word-container {
+        display: inline-block;
+    }
+    .filter-word-container .icono-search {
+        color: #2C7CFF;
+        transform: scale(0.6) rotate(45deg);
+    }
 </style>
 
-<div id="search-grid-container">
-    <label class="label">
-        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
-                                        //TODO:
-        <span class="button">text1<span id="ppp" class="icono-caretUp"></span></span>
-    </label>
-    <label class="label">
-        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
-        <span class="button">text2<span class="icono-caretUp"></span></span>
-    </label>
-    <label class="label">
-        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
-        <span class="button">text3<span class="icono-caretUp"></span></span>
-    </label>
-    <div id="search-grid"></div>
+<div class="search-container">
+    <div class="sort-kind-container">
+        <label class="label">
+            <input type="radio" name="sort_select" class="radio" onclick={this.onclickSort.bind(this,0)}> 
+            <span class="button">投稿順<span id="ppp" class="icono-caretDown"></span></span>
+        </label>
+        <label class="label">
+            <input type="radio" name="sort_select" class="radio" onclick={this.onclickSort.bind(this,1)}> 
+            <span class="button">コメント数順<span class="icono-caretDown"></span></span>
+        </label>
+        <label class="label">
+            <input type="radio" name="sort_select" class="radio" onclick={this.onclickSort.bind(this,2)}> 
+            <span class="button">再生数順<span class="icono-caretDown"></span></span>
+        </label>
+    </div>
+    <div class="filter-kind-container">
+        <label class="label">
+            <input type="radio" name="filter_select" onclick={this.onclickSort.bind(this,0)}> 
+            <span class="button">キーワード</span>
+        </label>
+        <label class="label">
+            <input type="radio" name="filter_select" onclick={this.onclickSort.bind(this,1)}> 
+            <span class="button">タグ</span>
+        </label>
+    </div>
+    <div class="filter-word-container">
+        <form>
+            <input type="search" class="text">
+            <button type="button"><span class="icono-search"></span></button>
+        </form>
+    </div>
+    <div id="grid-container">
+        <div id="search-grid"></div>
+    </div>
 </div>  
 
 <script>
@@ -80,7 +128,7 @@
     };
 
     //TODO:
-    this.onclickPageSelect = (index, e) => {
+    this.onclickSort = (index, e) => {
         // select_page(index);
         const elm = this.root.querySelector("#ppp");
         elm.classList.remove("icono-caretUp");
@@ -89,7 +137,7 @@
     };
 
     const resizeGridTable = () => {
-        const container = this.root.querySelector("#search-grid-container");
+        const container = this.root.querySelector("#grid-container");
         grid_table.resizeFitContainer(container);
     };
 

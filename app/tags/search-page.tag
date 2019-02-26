@@ -10,9 +10,49 @@
         width: 100%;
         height: 100%;
     }
+
+    #search-grid-container input[type=radio] {
+        display: none; 
+    }
+    #search-grid-container input[type=radio]:checked + .button{
+        background: gray;
+    }
+    .label{   
+        display: inline-block;
+        height: 30px;
+        width: 100px;      
+    }
+    .label .button{
+        border: 1px solid gray;    
+        box-sizing: border-box;
+        border-radius: 2px;
+        padding-left: 10px;
+        height: 100%;
+        width: 100%;
+    }
+    .label .button .icono-caretUp{
+        margin-left: auto;
+    }
+    .label .button .icono-caretDown {
+        margin-left: auto;
+        margin-bottom: 5px;
+    }
 </style>
 
 <div id="search-grid-container">
+    <label class="label">
+        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
+                                        //TODO:
+        <span class="button">text1<span id="ppp" class="icono-caretUp"></span></span>
+    </label>
+    <label class="label">
+        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
+        <span class="button">text2<span class="icono-caretUp"></span></span>
+    </label>
+    <label class="label">
+        <input type="radio" name="sort_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
+        <span class="button">text3<span class="icono-caretUp"></span></span>
+    </label>
     <div id="search-grid"></div>
 </div>  
 
@@ -37,6 +77,15 @@
 
     this.serach = () => {
         console.log("serach");
+    };
+
+    //TODO:
+    this.onclickPageSelect = (index, e) => {
+        // select_page(index);
+        const elm = this.root.querySelector("#ppp");
+        elm.classList.remove("icono-caretUp");
+        elm.classList.add("icono-caretDown");
+        // e.target.classList.add("flow");
     };
 
     const resizeGridTable = () => {

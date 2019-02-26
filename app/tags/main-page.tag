@@ -2,36 +2,27 @@
     <style scoped>
         :scope {
             --main-group-buttons-width: 55px;
-            display:grid;
-            grid-template-rows: 1fr 1fr;
-            grid-template-columns: var(--main-group-buttons-width) 1fr;
+            --page-margin: 1px;
             width: 100%;
             height: 100%;
             margin: 0;
             overflow-y: hidden;
         }
 
-        .main-group-buttons{
-            grid-row: 1 / 3;
-            grid-column: 1 / 2;
+        .main-group-buttons {
+            display: inline-block;
+            width: var(--main-group-buttons-width);
+            height: 100%;
             background-color: #222222
         }
-        #page1 {
-            grid-row: 1 / 3;
-            grid-column: 2 / 3;
+
+        .page-container {
+            display: inline-block;
+            position: absolute;
+            height: 100%;
+            width: calc(100% - var(--main-group-buttons-width) - var(--page-margin)); 
+            overflow-x: hidden;          
         }
-        #page2 {
-            grid-row: 1 / 3;
-            grid-column: 2 / 3;
-        }  
-        #page3 {
-            grid-row: 1 / 3;
-            grid-column: 2 / 3;
-        }
-        #page4 {
-            grid-row: 1 / 3;
-            grid-column: 2 / 3;
-        }    
 
         .main-group-buttons input[type=radio] {
             display: none; 
@@ -74,16 +65,16 @@
             <span title="設定" class="button"><span class="icono-gear"></span></span> 
         </label>
     </div>
-    <div id="page1">
+    <div id="page1" class="page-container">
         <library-page></library-page>
     </div>
-    <div id="page2">
+    <div id="page2" class="page-container">
         <search-page></search-page>
     </div>
-    <div id="page3">
+    <div id="page3" class="page-container">
         <play-history></play-history>
     </div>
-    <div id="page4">
+    <div id="page4" class="page-container">
         <preference-page></preference-page>
     </div>
 

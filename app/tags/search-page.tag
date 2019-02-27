@@ -36,7 +36,6 @@
         border: 1px solid gray;
         box-sizing: border-box;
         border-radius: 2px;
-        /* padding-left: 10px; */
         height: 100%;
         width: 100%;
     }
@@ -47,9 +46,7 @@
 
     .label + .label {
         border-left: none;  
-        /* border-left: none; */
         margin-left: -1px;
-        /* border-left: 5px solid black; */
     }
 
     .sort-kind-container .icono-caretUp{
@@ -72,36 +69,60 @@
         margin-left: 30px;
     }
 
-    .filter-word-container form {
+    .filter-word-container {
+        vertical-align: top;
+        box-sizing: border-box;
         display: inline-block;
+    }
+    .filter-word-container * {
+        display: inline-block;
+    }
+    .filter-word-container form {
+        height: 30px;
+    }
+    .filter-word-container input {
+        vertical-align: top;
+        box-sizing: border-box;
+        width: 150px;
+        height: 30px;
+        font-size: 1.2em;
+        outline:0;
+        border: none;
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        border-left: 1px solid gray;
     }
     .filter-word-container button {
-        width: 25px;
-        height: 25px;
+        position: relative; 
+        left: 0px;
+        width: 30px;
+        height: 30px;
+        border: none;
+        border-top: 1px solid gray;
+        border-right: 1px solid gray;
+        border-bottom: 1px solid gray;
+        outline:0;
+        margin-left: -5px;
+        background:none;
     }
-    .filter-word-container {
-        display: inline-block;
+    .filter-word-container button:hover {
+        background-color:#7fbfff;
+        cursor: pointer; 
     }
     .filter-word-container .icono-search {
+        position:absolute;
         color: #2C7CFF;
-        transform: scale(0.6) rotate(45deg);
+        transform: scale(0.7) rotate(45deg);
+        top: -1px;
+        left: -1px;
+    }
+    .filter-word-container .icono-search:active {
+        left: 1px;
     }
 </style>
 
 <div class="search-container">
     <div class="sort-kind-container">
-        <!-- <label class="label">
-            <input ref="sort_select_pubdate" type="radio" name="sort_select" class="radio" onclick={ this.onclickSort.bind(this,"sort-state-pubdate") }> 
-            <span class="button">投稿日<span class="sort-state-pubdate icono-caretDown"></span></span>
-        </label>
-        <label class="label">
-            <input ref="sort_select_numcomment" type="radio" name="sort_select" class="radio" onclick={ this.onclickSort.bind(this,"sort-state-numcomment") }> 
-            <span class="button">コメント数<span class="sort-state-numcomment icono-caretDown"></span></span>
-        </label>
-        <label class="label">
-            <input ref="sort_select_numplay" type="radio" name="sort_select" class="radio" onclick={ this.onclickSort.bind(this,"sort-state-numplay") }> 
-            <span class="button">再生数<span class="sort-state-numplay icono-caretDown"></span></span>
-        </label> -->
         <label class="label" each={item, i in this.sort_items}>
             <input ref={item.ref_name} type="radio" name="sort_select" 
                 class="radio" onclick={ this.onclickSort.bind(this, item) }> 
@@ -119,10 +140,8 @@
         </label>
     </div>
     <div class="filter-word-container">
-        <form>
-            <input type="search" class="text">
-            <button type="button"><span class="icono-search"></span></button>
-        </form>
+        <input type="search" class="text">
+        <button type="button"><span class="icono-search"></span></button>
     </div>
     <div id="grid-container">
         <div id="search-grid"></div>
@@ -163,11 +182,6 @@
     };
 
     const setSortState = (ref_name, order) => {
-        // const radios = [
-        //     [this.refs.sort_select_pubdate, "sort-state-pubdate"],
-        //     [this.refs.sort_select_numcomment, "sort-state-numcomment"],
-        //     [this.refs.sort_select_numplay, "sort-state-numplay"]
-        // ];  
         const radios = {
             "sort_select_pubdate": "sort-state-pubdate",
             "sort_select_numcomment": "sort-state-numcomment",

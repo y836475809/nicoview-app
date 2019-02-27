@@ -12,29 +12,27 @@
         padding-left: 5px;
     }
 
-    .sort-kind-container,
-    .filter-kind-container {
+    .sort-kind-container, .sort-kind-container *,
+    .filter-kind-container, .filter-kind-container *,
+    .filter-word-container, .filter-word-container * {
         display: inline-block;
     }
 
     .sort-kind-container input[type=radio],
-    .filter-kind-container input[type=radio]
-     {
+    .filter-kind-container input[type=radio] {
         display: none; 
     }
     .sort-kind-container input[type=radio]:checked + .button,
-    .filter-kind-container input[type=radio]:checked + .button
-    {
+    .filter-kind-container input[type=radio]:checked + .button {
         background: gray;
+        color: lightgray;
     }
-    .sort-kind-container .label{   
-        display: inline-block;
+    .sort-kind-container .label {   
         height: 30px;
         width: 100px;
     }
-    .label .button{
+    .label .button {
         border: 1px solid gray;
-        box-sizing: border-box;
         border-radius: 2px;
         height: 100%;
         width: 100%;
@@ -49,7 +47,7 @@
         margin-left: -1px;
     }
 
-    .sort-kind-container .icono-caretUp{
+    .sort-kind-container .icono-caretUp {
         margin-left: auto;
         transform: scale(0.6) rotate(-90deg);
     }
@@ -59,8 +57,7 @@
         transform: scale(0.6) rotate(90deg);
     }
 
-    .filter-kind-container .label{   
-        display: inline-block;
+    .filter-kind-container .label {   
         height: 30px;
         width: 80px;
     }
@@ -71,22 +68,16 @@
 
     .filter-word-container {
         vertical-align: top;
-        box-sizing: border-box;
-        display: inline-block;
-    }
-    .filter-word-container * {
-        display: inline-block;
     }
     .filter-word-container form {
         height: 30px;
     }
     .filter-word-container input {
         vertical-align: top;
-        box-sizing: border-box;
         width: 150px;
         height: 30px;
         font-size: 1.2em;
-        outline:0;
+        outline: 0;
         border: none;
         border-top: 1px solid gray;
         border-bottom: 1px solid gray;
@@ -103,14 +94,14 @@
         border-bottom: 1px solid gray;
         outline:0;
         margin-left: -5px;
-        background:none;
+        background: none;
     }
     .filter-word-container button:hover {
-        background-color:#7fbfff;
+        background-color: #7fbfff;
         cursor: pointer; 
     }
     .filter-word-container .icono-search {
-        position:absolute;
+        position: absolute;
         color: #2C7CFF;
         transform: scale(0.7) rotate(45deg);
         top: -1px;
@@ -123,21 +114,18 @@
 
 <div class="search-container">
     <div class="sort-kind-container">
-        <label class="label" each={item, i in this.sort_items}>
-            <input ref={item.ref_name} type="radio" name="sort_select" 
-                class="radio" onclick={ this.onclickSort.bind(this, item) }> 
-            <span class="button">{item.title}<span class="{item.class} icono-caretDown"></span></span>
+        <label class="label" each="{item, i in this.sort_items}">
+            <input type="radio" name="sort_select" checked={item.select} 
+                onclick="{ this.onclickSort.bind(this, i) }"> 
+            <span class="button">{item.title}<span class="{item.order>0?'icono-caretUp':'icono-caretDown'}"></span></span>
         </label>
     </div>
     <div class="filter-kind-container">
-        <label class="label">
-            <input type="radio" name="filter_select" onclick={this.onclickSort.bind(this,0)}> 
-            <span class="button">キーワード</span>
-        </label>
-        <label class="label">
-            <input type="radio" name="filter_select" onclick={this.onclickSort.bind(this,1)}> 
-            <span class="button">タグ</span>
-        </label>
+        <label class="label" each="{item, i in this.search_items}">
+            <input type="radio" name="search_select" checked={item.select} 
+                onclick="{ this.onclickSearch.bind(this, i) }"> 
+            <span class="button">{item.title}</span>
+        </label>        
     </div>
     <div class="filter-word-container">
         <input type="search" class="text">
@@ -155,9 +143,13 @@
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
 
     this.sort_items = [
-        { ref_name:"sort_select_pubdate", title:"投稿日", class: "sort-state-pubdate", select: true },
-        { ref_name:"sort_select_numcomment", title:"コメント数", class: "sort-state-numcomment", select: false },
-        { ref_name:"sort_select_numplay", title:"再生数", class: "sort-state-numplay", select: false }
+        { kind: "pubdate",    order:-1, select: true, title:"投稿日" },
+        { kind: "numcomment", order:-1, select: false, title:"コメント数" },
+        { kind: "numplay",    order:-1, select: false, title:"再生数" }
+    ];
+    this.search_items = [
+        { kind: "keyword", select: false, title:"キーワード" },
+        { kind: "tag",     select: true,  title:"タグ" }
     ];
 
     const columns = [
@@ -177,72 +169,42 @@
         console.log("serach");
     };
 
-    const initSortState = () => {
-        setSortState("sort_select_pubdate", -1);
+    const setSortState = (sort_kind, order) => {
+        const index = this.sort_items.findIndex(value=>{
+            return value.kind == sort_kind;
+        });
+
+        this.sort_items.forEach((value) => {
+            value.select = false;
+        });
+
+        this.sort_items[index].select = true;
+        this.sort_items[index].order = order;
     };
 
-    const setSortState = (ref_name, order) => {
-        const radios = {
-            "sort_select_pubdate": "sort-state-pubdate",
-            "sort_select_numcomment": "sort-state-numcomment",
-            "sort_select_numplay": "sort-state-numplay"
-        };  
-        for (const key in radios) {
-            if (radios.hasOwnProperty(key)) {
-                this.refs[key].checked = false;
-            }
+    this.onclickSort = (index, e) => {
+        const pre_selected = this.sort_items.findIndex(value=>{
+            return value.select === true;
+        });
+
+        this.sort_items.forEach((value) => {
+            value.select = false;
+        });
+        this.sort_items[index].select = true;
+
+        if(pre_selected===index){
+            const pre_order = this.sort_items[index].order; 
+            this.sort_items[index].order = -1*pre_order;
         }
 
-        const elm = this.refs[ref_name];
-        elm.checked = true;
-
-        const icon_class_name = radios[ref_name];
-        const elm_icon = this.root.querySelector(`.${icon_class_name}`);
-        elm_icon.classList.remove("icono-caretUp");
-        elm_icon.classList.remove("icono-caretDown");
-        if(order>0){
-            elm_icon.classList.add("icono-caretUp");
-        }else{
-            elm_icon.classList.add("icono-caretDown");
-        }
+        this.update();
     };
 
-    const fffsame = () => {
-        let pre = 0;
-        return () => {
-            let current;
-            const radios = [
-                this.refs.sort_select_pubdate,
-                this.refs.sort_select_numcomment,
-                this.refs.sort_select_numplay
-            ];
-
-            for(let i=0; i<radios.length; i++){
-                if (radios[i].checked) {
-                    current = i;
-                    break;
-                }
-            }
-
-            const result = pre == current;
-            pre = current;
-            console.log("fff result=", result);
-            return result;
-        };  
-    };
-    const ffff = fffsame();
-
-    //TODO:
-    this.onclickSort = (sort_item, e) => {
-        const is_same = ffff();
-        if(is_same){
-            const elm = this.root.querySelector(`.${sort_item.class}`);
-            if(elm.classList.contains("icono-caretUp")){
-                elm.classList.replace("icono-caretUp", "icono-caretDown");
-            }else{
-                elm.classList.replace("icono-caretDown", "icono-caretUp");
-            }
-        }
+    this.onclickSearch = (index, e) => {
+        this.search_items.forEach((value) => {
+            value.select = false;
+        });
+        this.search_items[index].select = true;   
     };
 
     const resizeGridTable = () => {
@@ -266,7 +228,6 @@
         grid_table.onDblClick((e, data)=>{
         });
 
-        initSortState();
         resizeGridTable();
     });
 

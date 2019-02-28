@@ -1,3 +1,4 @@
+const { NicoRequest } = require("./nico-request");
 
 const sortkinds = [
     "viewCounter",
@@ -38,6 +39,35 @@ class NicoSearchParams {
         };
     }
 
+    service(name){
+        this._service = name;
+    }
+
+    keyword(query){
+        this._query = query;
+        this._targets = ["title", "description", "tags"];
+        this._resetParams();
+    }
+
+    tag(query){
+        this._query = query;
+        this._targets = ["tagsExact"];
+        this._resetParams();
+    }
+
+    page(num){
+        this._page = num;
+    }
+    
+    sortTarget(name){
+        this._sort_name = name;
+        this._resetParams();
+    }
+    sortOder(order){
+        this._sort_order = order;
+        this._resetParams();
+    }
+
     _calcOffset(){
         return this._limit * (this._page - 1);
     }
@@ -75,33 +105,56 @@ class NicoSearchParams {
     _resetParams(){
         this._page = 1;
     }
+}
 
-    keyword(query){
-        this._query = query;
-        this._targets = ["title", "description", "tags"];
-        this._resetParams();
-    }
-
-    tag(query){
-        this._query = query;
-        this._targets = ["tagsExact"];
-        this._resetParams();
+class NicoSearch extends NicoRequest {
+    constructor() { 
+        super();
+        this.req = null;
     }
 
-    page(num){
-        this._page = num;
+    cancel(){   
+        if (this.req) {
+            this._cancel();
+            this.req.abort();
+        }
     }
-    
-    sortTarget(name){
-        this._sort_name = name;
-        this._resetParams();
-    }
-    sortOder(order){
-        this._sort_order = order;
-        this._resetParams();
+
+    search(params){
+        const service = params.service;
+        const url = `https://api.search.nicovideo.jp/api/v2/${service}/contents/search`;
+        return new Promise((resolve, reject) => {
+            const options = {
+                method: "GET",
+                uri: url, 
+                qs: params,
+                timeout: 5 * 1000
+            };
+            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
+                const meta = body.meta;
+                if(meta.status === 200){
+                    resolve(meta); 
+                }else{
+                    if(meta.status === 400){
+                        reject(new Error("400, 不正なパラメータです")); 
+                        return;
+                    }
+                    if(meta.status === 500){
+                        reject(new Error("500, 検索サーバの異常です")); 
+                        return;
+                    }
+                    if(meta.status === 503){
+                        reject(new Error("503, サービスがメンテナンス中です")); 
+                        return;
+                    }
+                    reject(new Error("エラー")); 
+                }
+            });       
+        });
     }
 }
 
 module.exports = {
     NicoSearchParams: NicoSearchParams,
+    NicoSearch: NicoSearch
 };

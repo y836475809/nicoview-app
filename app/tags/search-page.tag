@@ -117,7 +117,7 @@
         <label class="label" each="{item, i in this.sort_items}">
             <input type="radio" name="sort_select" checked={item.select} 
                 onclick="{ this.onclickSort.bind(this, i) }"> 
-            <span class="button">{item.title}<span class="{item.order>0?'icono-caretUp':'icono-caretDown'}"></span></span>
+            <span class="button">{item.title}<span class="{item.order=='+'?'icono-caretUp':'icono-caretDown'}"></span></span>
         </label>
     </div>
     <div class="filter-kind-container">
@@ -142,10 +142,15 @@
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
 
+    // this.sort_items = [
+    //     { kind: "pubdate",    order:-1, select: true, title:"投稿日" },
+    //     { kind: "numcomment", order:-1, select: false, title:"コメント数" },
+    //     { kind: "numplay",    order:-1, select: false, title:"再生数" }
+    // ];
     this.sort_items = [
-        { kind: "pubdate",    order:-1, select: true, title:"投稿日" },
-        { kind: "numcomment", order:-1, select: false, title:"コメント数" },
-        { kind: "numplay",    order:-1, select: false, title:"再生数" }
+        { kind: "startTime",    order:"-", select: true, title:"投稿日" },
+        { kind: "commentCounter", order:"-", select: false, title:"コメント数" },
+        { kind: "viewCounter",    order:"-", select: false, title:"再生数" }
     ];
     this.search_items = [
         { kind: "keyword", select: false, title:"キーワード" },
@@ -194,7 +199,7 @@
 
         if(pre_selected===index){
             const pre_order = this.sort_items[index].order; 
-            this.sort_items[index].order = -1*pre_order;
+            this.sort_items[index].order = pre_order=="+"?"-":"+"; //-1*pre_order;
         }
 
         this.update();

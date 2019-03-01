@@ -28,14 +28,13 @@ class NicoSearchParams {
         this._validation();
 
         return {
-            service: this._service,
             q: this._query,
             targets: this._targets.join(","),
             fields: this._fields.join(","),
             _sort: `${this._sort_order}${this._sort_name}`,
             _offset: this._calcOffset(),
             _limit: this._limit,
-            _context: "test"
+            _context: "electron-app"
         };
     }
 
@@ -121,19 +120,24 @@ class NicoSearch extends NicoRequest {
     }
 
     search(params){
-        const service = params.service;
+        const service = params._service;
+        const query_json = params.get();
         const url = `https://api.search.nicovideo.jp/api/v2/${service}/contents/search`;
+        
         return new Promise((resolve, reject) => {
             const options = {
                 method: "GET",
                 uri: url, 
-                qs: params,
+                qs: query_json,
+                headers: {
+                    "User-Agent": "node request module"
+                },
                 timeout: 5 * 1000
             };
             this.req = this._reuqest(options, resolve, reject, (res, body)=>{
                 const meta = body.meta;
                 if(meta.status === 200){
-                    resolve(meta); 
+                    resolve(body); 
                 }else{
                     if(meta.status === 400){
                         reject(new Error("400, 不正なパラメータです")); 

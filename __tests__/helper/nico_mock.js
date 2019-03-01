@@ -1,6 +1,7 @@
 const nock = require("nock");
 const fs = require("fs");
 const path = require("path");
+const querystring = require("querystring");
 
 const base_dir = path.resolve(__dirname, "..");
 const video_id = "sm12345678";
@@ -170,6 +171,54 @@ class NicoMocks {
             .post(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" }) 
             .reply(code, `${code}`);  
+    }
+
+    //TODO
+    search(text, code=200, delay=1, rep_status=200){
+        const fields = 
+            "contentId,title,description,tags,"
+            + "viewCounter,commentCounter,startTime,"
+            + "thumbnailUrl,lengthSeconds";
+
+        this.search_nock = nock("https://api.search.nicovideo.jp", { encodedQueryParams: true });
+        this.search_nock
+            .get("/api/v2/video/contents/search")
+            .query({ 
+                // q: encodeURIComponent(text), 
+                // targets: encodeURIComponent("title,description,tags"), 
+                // fields: encodeURIComponent(fields), 
+                // _sort: encodeURIComponent("-startTime"),
+                // _offset: 0, 
+                // _limit:32, 
+                // _context: encodeURIComponent("electron-app")
+                q: text, 
+                targets: "title,description,tags", 
+                fields: fields, 
+                _sort: "-startTime",
+                _offset: 0, 
+                _limit:32, 
+                _context: "electorn-app"
+            })
+            .delay(delay)
+            .reply((uri, reqbody)=>{
+                return [
+                    code, 
+                    {
+                        meta: {
+                            status: rep_status,
+                            totalCount: 1,
+                            id:"012345-6789"
+                        },
+                        data: [{
+                            contentId: "sm100",
+                            title: text,
+                            description: "テスト",
+                            startTime: "2099-09-31T00:00:00+09:00",
+                            viewCounter: 100
+                        }]
+                    }
+                ];
+            });     
     }
 }
 

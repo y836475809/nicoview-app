@@ -1,5 +1,8 @@
 const test = require("ava");
-const { NicoSearchParams } = require("../app/js/niconico-search");
+const { NicoSearchParams, NicoSearch } = require("../app/js/niconico-search");
+const { NicoMocks } = require("./helper/nico_mock");
+
+const nico_mocks = new NicoMocks();
 
 const pre_fields = 
     "contentId,title,description,tags,"
@@ -14,17 +17,24 @@ const default_params = () => {
     return params;
 };
 
+test.after(t => {
+    nico_mocks.clean(); 
+});
+
+test.beforeEach(t => {
+    nico_mocks.clean(); 
+});
+
 test("nico search params", t => {
     const get_act_params =  () =>{      
         return {
-            service: "video",
             q: "test",
             targets: "title,description,tags",
             fields: pre_fields,
             _sort: "-startTime",
             _offset: 0,
             _limit: 32,
-            _context: "test"
+            _context: "electron-app"
         };
     };
 
@@ -105,5 +115,21 @@ test("nico search params error", t => {
         const error = t.throws(() => { params.get(); });
         t.is(error.message, "コンテンツの取得オフセットが\"1632\", 最大数は1600");
     }
+});
+
+//TODO
+test("nico search", async t => {
+    const word = "test";
+    nico_mocks.search(word);
+
+    const pramas = default_params();
+    pramas.keyword(word);
+    // pramas._sort_order = "+";
+    const nico_search = new NicoSearch();
+    const search_json = await nico_search.search(pramas);
+    const meta = search_json.meta;
+    t.is(meta.status, 200);
+    t.is(meta.totalCount, 1);
+    t.is(search_json.data.length, 1);
 });
 

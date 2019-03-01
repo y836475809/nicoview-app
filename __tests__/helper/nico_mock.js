@@ -173,8 +173,7 @@ class NicoMocks {
             .reply(code, `${code}`);  
     }
 
-    //TODO
-    search(text, code=200, delay=1, rep_status=200){
+    search(text, code=200, delay=1){
         const fields = 
             "contentId,title,description,tags,"
             + "viewCounter,commentCounter,startTime,"
@@ -184,41 +183,29 @@ class NicoMocks {
         this.search_nock
             .get("/api/v2/video/contents/search")
             .query({ 
-                // q: encodeURIComponent(text), 
-                // targets: encodeURIComponent("title,description,tags"), 
-                // fields: encodeURIComponent(fields), 
-                // _sort: encodeURIComponent("-startTime"),
-                // _offset: 0, 
-                // _limit:32, 
-                // _context: encodeURIComponent("electron-app")
-                q: text, 
-                targets: "title,description,tags", 
-                fields: fields, 
-                _sort: "-startTime",
+                q: encodeURIComponent(text), 
+                targets: encodeURIComponent("title,description,tags"), 
+                fields: encodeURIComponent(fields), 
+                _sort: encodeURIComponent("-startTime"),
                 _offset: 0, 
                 _limit:32, 
-                _context: "electorn-app"
+                _context: encodeURIComponent("electron-app")
             })
             .delay(delay)
-            .reply((uri, reqbody)=>{
-                return [
-                    code, 
-                    {
-                        meta: {
-                            status: rep_status,
-                            totalCount: 1,
-                            id:"012345-6789"
-                        },
-                        data: [{
-                            contentId: "sm100",
-                            title: text,
-                            description: "テスト",
-                            startTime: "2099-09-31T00:00:00+09:00",
-                            viewCounter: 100
-                        }]
-                    }
-                ];
-            });     
+            .reply(code, {
+                meta: {
+                    status: code,
+                    totalCount: 1,
+                    id:"012345-6789"
+                },
+                data: [{
+                    contentId: "sm100",
+                    title: text,
+                    description: "テスト",
+                    startTime: "2099-09-31T00:00:00+09:00",
+                    viewCounter: 100
+                }]
+            }); 
     }
 }
 

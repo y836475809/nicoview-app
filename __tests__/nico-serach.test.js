@@ -117,19 +117,16 @@ test("nico search params error", t => {
     }
 });
 
-//TODO
 test("nico search", async t => {
     const word = "test";
     nico_mocks.search(word);
 
     const pramas = default_params();
     pramas.keyword(word);
-    // pramas._sort_order = "+";
     const nico_search = new NicoSearch();
-    const search_json = await nico_search.search(pramas);
-    const meta = search_json.meta;
+    const result = await nico_search.search(pramas);
+    const meta = result.meta;
     t.is(meta.status, 200);
     t.is(meta.totalCount, 1);
-    t.is(search_json.data.length, 1);
+    t.is(result.data.length, 1);
 });
-

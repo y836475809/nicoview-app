@@ -135,20 +135,22 @@ class NicoSearch extends NicoRequest {
                 timeout: 5 * 1000
             };
             this.req = this._reuqest(options, resolve, reject, (res, body)=>{
-                const meta = body.meta;
+                const result = JSON.parse(body);
+                const meta = result.meta;
+                
                 if(meta.status === 200){
-                    resolve(body); 
+                    resolve(result); 
                 }else{
                     if(meta.status === 400){
-                        reject(new Error("400, 不正なパラメータです")); 
+                        reject(new Error(`status=${meta.status}, 不正なパラメータです`)); 
                         return;
                     }
                     if(meta.status === 500){
-                        reject(new Error("500, 検索サーバの異常です")); 
+                        reject(new Error(`status=${meta.status}, 検索サーバの異常です`)); 
                         return;
                     }
                     if(meta.status === 503){
-                        reject(new Error("503, サービスがメンテナンス中です")); 
+                        reject(new Error(`status=${meta.status}, サービスがメンテナンス中です`)); 
                         return;
                     }
                     reject(new Error("エラー")); 

@@ -134,27 +134,30 @@ class NicoSearch extends NicoRequest {
                 },
                 timeout: 5 * 1000
             };
-            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
-                const result = JSON.parse(body);
-                const meta = result.meta;
-                
-                if(meta.status === 200){
-                    resolve(result); 
-                }else{
-                    if(meta.status === 400){
-                        reject(new Error(`status=${meta.status}, 不正なパラメータです`)); 
-                        return;
+            this.req = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    if(error.status){
+                        let message = `status=${error.status}, エラー`;
+                        if(error.status === 400){
+                            message = `status=${error.status}, 不正なパラメータです`; 
+                        }
+                        else if(error.status === 404){
+                            message = `status=${error.status}, ページが見つかりません`; 
+                        }
+                        else if(error.status === 500){
+                            message = `status=${error.status}, 検索サーバの異常です`; 
+                        }
+                        else if(error.status === 503){
+                            message = `status=${error.status}, サービスがメンテナンス中です`; 
+                        }    
+                        reject(new Error(message));                     
+                    }else{
+                        reject(error);     
                     }
-                    if(meta.status === 500){
-                        reject(new Error(`status=${meta.status}, 検索サーバの異常です`)); 
-                        return;
-                    }
-                    if(meta.status === 503){
-                        reject(new Error(`status=${meta.status}, サービスがメンテナンス中です`)); 
-                        return;
-                    }
-                    reject(new Error("エラー")); 
+                    return;
                 }
+                const result = JSON.parse(body);
+                resolve(result); 
             });       
         });
     }

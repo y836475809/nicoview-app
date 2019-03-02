@@ -13,26 +13,27 @@ class NicoRequest {
         return status >= 200 && status < 300;
     }
 
-    _reuqest(options, resolve, reject, cb){
+    _reuqest(options, cb){
         this.canceled = false;
         return request(options, (error, res, body) => {
             if(error){
-                reject(error);
+                cb(error, null, null);
             }else if(this._validateStatus(res.statusCode)){
                 try {
-                    cb(res, body);
+                    cb(null, res, body);
                 } catch (error) {
-                    reject(error); 
+                    cb(error, null, null);
                 }
             }else{
-                const message = `${res.statusCode}: ${options.uri}`;
-                reject(new Error(message)); 
+                const error = new Error(`${res.statusCode}: ${options.uri}`);
+                error.status = res.statusCode;
+                cb(error, null, null); 
             }
         }).on("abort", () => {
             if(this.canceled){
                 const error = new Error("cancel");
                 error.cancel = true;
-                reject(error);
+                cb(error, null, null);
             } 
         });
     }

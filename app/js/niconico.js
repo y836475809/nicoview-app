@@ -42,7 +42,11 @@ class NicoWatch extends NicoRequest{
                 uri: uri, 
                 timeout: 5 * 1000
             };
-            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
+            this.req = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                    return;
+                }
                 const cookie_jar = request.jar();
                 const cookie_headers = getFromHeaders(res.headers, "Set-Cookie");
                 cookie_headers.forEach(value=>{
@@ -180,7 +184,11 @@ class NicoVideo extends NicoRequest {
                 json: json,
                 timeout: 5 * 1000
             };
-            this.req_session = this._reuqest(options, resolve, reject, (res, body)=>{
+            this.req_session = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                    return;
+                }
                 this.dmc_session = body.data;
                 resolve(this.dmc_session);
             });
@@ -204,7 +212,11 @@ class NicoVideo extends NicoRequest {
                 uri: url, 
                 timeout: 5 * 1000
             };
-            this.req_hb_options = this._reuqest(options, resolve, reject, (res, body)=>{
+            this.req_hb_options = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                    return;
+                }
                 resolve();
             });
         });
@@ -314,7 +326,11 @@ class NicoComment extends NicoRequest {
                 json: json,
                 timeout: 5 * 1000
             };
-            this.req = this._reuqest(options, resolve, reject, (res, body)=>{
+            this.req = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                    return;
+                }
                 const comment_data = body;
                 resolve(comment_data);    
             });

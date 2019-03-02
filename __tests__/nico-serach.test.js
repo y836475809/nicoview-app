@@ -130,3 +130,71 @@ test("nico search", async t => {
     t.is(meta.totalCount, 1);
     t.is(result.data.length, 1);
 });
+
+test("nico search cancel", async t => {
+    const word = "test";
+    nico_mocks.search(word, 200, 5*1000);
+
+    const pramas = default_params();
+    pramas.keyword(word);
+    const nico_search = new NicoSearch();
+
+    setTimeout(()=>{
+        nico_search.cancel();
+    }, 1000);
+
+    const error = await t.throwsAsync(nico_search.search(pramas));
+    t.truthy(error.cancel);
+});
+
+test("nico search timeout", async t => {
+    const word = "test";
+    nico_mocks.search(word, 200, 6*1000);
+
+    const pramas = default_params();
+    pramas.keyword(word);
+    const nico_search = new NicoSearch();
+    const error = await t.throwsAsync(nico_search.search(pramas));
+    t.regex(error.message, /time/i);
+});
+
+test("nico search status error", async t => {
+    const word = "test";
+
+    const pramas = default_params();
+    pramas.keyword(word);
+    const nico_search = new NicoSearch();
+
+    {
+        nico_mocks.search(word, 400);
+        const error = await t.throwsAsync(nico_search.search(pramas));
+        t.is(error.message, "status=400, 不正なパラメータです");
+    }
+    {
+        nico_mocks.search(word, 404);
+        const error = await t.throwsAsync(nico_search.search(pramas));
+        t.is(error.message, "status=404, ページが見つかりません");
+    }
+    {
+        nico_mocks.search(word, 500);
+        const error = await t.throwsAsync(nico_search.search(pramas));
+        t.is(error.message, "status=500, 検索サーバの異常です");
+    }
+    {
+        nico_mocks.search(word, 503);
+        const error = await t.throwsAsync(nico_search.search(pramas));
+        t.is(error.message, "status=503, サービスがメンテナンス中です");
+    }
+});
+
+test("nico search json error", async t => {
+    const word = "test";
+
+    const pramas = default_params();
+    pramas.keyword(word);
+    const nico_search = new NicoSearch();
+
+    nico_mocks.search_incorrect_json(word);
+    const error = await t.throwsAsync(nico_search.search(pramas));
+    t.regex(error.message, /json/i);
+});

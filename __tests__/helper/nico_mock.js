@@ -173,13 +173,14 @@ class NicoMocks {
             .reply(code, `${code}`);  
     }
 
-    search(text, code=200, delay=1){
+    _search(text, code, delay, res_json){
         const fields = 
             "contentId,title,description,tags,"
             + "viewCounter,commentCounter,startTime,"
             + "thumbnailUrl,lengthSeconds";
 
-        this.search_nock = nock("https://api.search.nicovideo.jp", { encodedQueryParams: true });
+        this.search_nock = nock("https://api.search.nicovideo.jp", 
+            { encodedQueryParams: true });
         this.search_nock
             .get("/api/v2/video/contents/search")
             .query({ 
@@ -192,20 +193,29 @@ class NicoMocks {
                 _context: encodeURIComponent("electron-app")
             })
             .delay(delay)
-            .reply(code, {
-                meta: {
-                    status: code,
-                    totalCount: 1,
-                    id:"012345-6789"
-                },
-                data: [{
-                    contentId: "sm100",
-                    title: text,
-                    description: "テスト",
-                    startTime: "2099-09-31T00:00:00+09:00",
-                    viewCounter: 100
-                }]
-            }); 
+            .reply(code, res_json); 
+    }
+
+    search(text, code=200, delay=1){
+        const res_json = {
+            meta: {
+                status: code,
+                totalCount: 1,
+                id:"012345-6789"
+            },
+            data: [{
+                contentId: "sm100",
+                title: text,
+                description: "テスト",
+                startTime: "2099-09-31T00:00:00+09:00",
+                viewCounter: 100
+            }]
+        };
+        this._search(text, code, delay, res_json);
+    }
+
+    search_incorrect_json(text, code=200, delay=1){
+        this._search(text, code, delay, "incorrect_json");
     }
 }
 

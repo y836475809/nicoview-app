@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test sidebar</title>
+    <script>window.jQuery = window.$ = require("jquery");</script>
+    <script src="../node_modules/riot/riot+compiler.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
+    <style type="text/css">
+    </style>
+</head>
+
+<body>
+    <search-page></search-page>
+</body>
+
+<script>
+    const {remote} = require("electron");
+    const shared_obj = remote.getGlobal("sharedObj");
+    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
+    var riot = require("riot");   // eslint-disable-line
+    var obs = riot.observable();  // eslint-disable-line
+
+    require(`${app_base_dir}/tags/search-page.tag`);
+    riot.mount("search-page");
+    // require(`${app_base_dir}/tags/pagination.tag`);
+    // riot.mount("pagination");
+ 
+</script>
+
+</html>

@@ -43,7 +43,7 @@
         transform: scale(0.6) rotate(90deg);
     }
 
-        .sort-kind-container .label {   
+    .sort-kind-container .label {   
         height: 30px;
         width: 100px;
     }
@@ -102,16 +102,20 @@
         <input class="column" type="search" class="text">
         <span class="column button"><span class="icono-search"></span></button>
     </div>
+    <pagination></pagination>
     <div id="grid-container">
         <div id="search-grid"></div>
     </div>
 </div>  
 
 <script>
-    /* globals app_base_dir obs */
+    /* globals app_base_dir riot obs */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+
+    require(`${app_base_dir}/tags/pagination.tag`);
+    riot.mount("pagination");
 
     this.sort_items = [
         { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -127,6 +131,7 @@
         {id: "thumb_img", name: "image", height:100, width: 130},
         {id: "id", name: "id"},
         {id: "info", name: "info"},
+        {id: "play_time", name: "time"},
         {id: "pub_date", name: "pub date"},
         {id: "state", name: "state"}
     ];
@@ -138,6 +143,21 @@
 
     this.serach = () => {
         console.log("serach");
+    };
+
+    const setData = (search_result) => {
+        const total_count = search_result.meta.totalCount;
+        const items = search_result.data.map(value => {
+            return {
+                thumb_img: value.thumbnailUrl,
+                id: value.contentId,
+                info: `${value.title}\n${value.tags}\n${value.viewCounter}\n${value.commentCounter}`,
+                play_time: value.lengthSeconds,
+                pub_date: value.startTime,
+                state: "" 
+            };
+        });
+        grid_table.setData(items);
     };
 
     const setSortState = (sort_kind, order) => {
@@ -205,5 +225,6 @@
     obs.on("resizeEndEvent", (size)=>{
         resizeGridTable();
     });
+    
 </script>
 </search-page>

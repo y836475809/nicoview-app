@@ -38,10 +38,12 @@ https://qiita.com/tor4kichi/items/74939b49954d3e72d789
 http://d.hatena.ne.jp/s01149ht/20091216/1260983794
 https://qiita.com/gabdro/private/636c5e9e02f143b273e6
 
-“®‰æÅŒã‚Ü‚Å‚¢‚Á‚ÄI—¹‚µ‚Ä‚àhb‚Í‘±‚¢‚Ä‚¢‚é—lŽq
+ï¿½ï¿½ï¿½ï¿½ÅŒï¿½Ü‚Å‚ï¿½ï¿½ï¿½ï¿½ÄIï¿½ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½hbï¿½Í‘ï¿½ï¿½ï¿½ï¿½Ä‚ï¿½ï¿½ï¿½lï¿½q
 
 window.onclickTag = (e) => {
 	console.log(e.href)         
 };
 
 this.refs.description.innerHTML = "<a href=\"https://www.nicovideo.jp/watch/sm33428963\" target=\"_blank\" onclick=\"onclickTag(this);return false;\">item</a>";
+
+json-server index.js  --routes route.json

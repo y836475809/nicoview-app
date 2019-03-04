@@ -102,7 +102,7 @@
         <input class="column" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
         <span class="column button"><span class="icono-search"></span></button>
     </div>
-    <pagination></pagination>
+    <pagination ref="page" onmovepage={this.onmovePage}></pagination>
     <div id="grid-container">
         <div id="search-grid"></div>
     </div>
@@ -128,7 +128,9 @@
         { kind: "tag",     select: true,  title:"タグ" }
     ];
 
-    const nico_search_params = new NicoSearchParams();
+    const search_offset = 1600;
+    const search_limit = 32;
+    const nico_search_params = new NicoSearchParams(search_limit);
     nico_search_params.page(0);
     nico_search_params.sortTarget("startTime");
     nico_search_params.sortOder("-");
@@ -160,8 +162,20 @@
         setData(search_result);
     };
 
+    this.onmovePage = async (page) => {
+        nico_search_params.page(page);
+        const search_result = await nico_search.search(nico_search_params);
+        setData(search_result);
+    };
+
     const setData = (search_result) => {     
         const total_count = search_result.meta.totalCount;
+        this.refs.page.setTotaCount(total_count);
+        if(total_count<search_offset+search_limit){
+            this.refs.page.setTotalPages(Math.ceil(total_count/search_limit));
+        }else{
+            this.refs.page.setTotalPages(Math.ceil((search_offset+search_limit)/search_limit))
+        }
         const items = search_result.data.map(value => {
             return {
                 thumb_img: value.thumbnailUrl,

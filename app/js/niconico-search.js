@@ -11,12 +11,12 @@ const sortkinds = [
 const sortOrders = [ "+","-"];
 
 class NicoSearchParams {
-    constructor(){
+    constructor(limit=32){
         this._service = "video";
         this._query = "";
         this._sort = "";
         this._page = 1;
-        this._limit = 32;
+        this._limit = limit;
         this._targets = [];
         this._fields = [
             "contentId","title","description","tags",

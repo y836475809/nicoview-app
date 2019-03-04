@@ -10,3 +10,4 @@ tmp/
 /data/
 test/data/
 *.lnk
+/test/mock_server/img

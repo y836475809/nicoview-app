@@ -10,7 +10,8 @@ const pre_fields =
 
 const default_params = () => {
     const params = new NicoSearchParams();
-    params.keyword("test");
+    params.query("test");
+    params.cond("keyword");
     params.sortTarget("startTime");
     params.sortOder("-");
     params.page(1);
@@ -63,14 +64,15 @@ test("nico search params", t => {
         t.deepEqual(params.get(), act_params);
     }
     {
-        params.keyword("test2");
+        params.query("test2");
         const act_params = get_act_params();
         act_params.q = "test2";
         act_params._sort = "+commentCounter";
         t.deepEqual(params.get(), act_params);
     }
     {
-        params.tag("test");
+        params.cond("tag");
+        params.query("test");
         const act_params = get_act_params();
         act_params.targets = "tagsExact";
         act_params._sort = "+commentCounter";
@@ -81,13 +83,7 @@ test("nico search params", t => {
 test("nico search params error", t => {
     {
         const params = default_params();
-        params.keyword("");
-        const error = t.throws(() => { params.get(); });
-        t.is(error.message, "検索語が空");
-    }
-    {
-        const params = default_params();
-        params.tag("");
+        params.query("");
         const error = t.throws(() => { params.get(); });
         t.is(error.message, "検索語が空");
     }
@@ -122,7 +118,7 @@ test("nico search", async t => {
     nico_mocks.search(word);
 
     const pramas = default_params();
-    pramas.keyword(word);
+    pramas.query(word);
     const nico_search = new NicoSearch();
     const result = await nico_search.search(pramas);
     const meta = result.meta;
@@ -136,7 +132,7 @@ test("nico search cancel", async t => {
     nico_mocks.search(word, 200, 5*1000);
 
     const pramas = default_params();
-    pramas.keyword(word);
+    pramas.query(word);
     const nico_search = new NicoSearch();
 
     setTimeout(()=>{
@@ -152,7 +148,7 @@ test("nico search timeout", async t => {
     nico_mocks.search(word, 200, 6*1000);
 
     const pramas = default_params();
-    pramas.keyword(word);
+    pramas.query(word);
     const nico_search = new NicoSearch();
     const error = await t.throwsAsync(nico_search.search(pramas));
     t.regex(error.message, /time/i);
@@ -162,7 +158,7 @@ test("nico search status error", async t => {
     const word = "test";
 
     const pramas = default_params();
-    pramas.keyword(word);
+    pramas.query(word);
     const nico_search = new NicoSearch();
 
     {
@@ -191,7 +187,7 @@ test("nico search json error", async t => {
     const word = "test";
 
     const pramas = default_params();
-    pramas.keyword(word);
+    pramas.query(word);
     const nico_search = new NicoSearch();
 
     nico_mocks.search_incorrect_json(word);

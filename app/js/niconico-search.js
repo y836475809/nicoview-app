@@ -42,16 +42,21 @@ class NicoSearchParams {
         this._service = name;
     }
 
-    keyword(query){
+    query(query){
         this._query = query;
-        this._targets = ["title", "description", "tags"];
         this._resetParams();
     }
 
-    tag(query){
-        this._query = query;
-        this._targets = ["tagsExact"];
-        this._resetParams();
+    cond(kind){
+        if(kind=="keyword"){
+            this._targets = ["title", "description", "tags"];
+            this._resetParams();
+        }else if(kind=="tag"){
+            this._targets = ["tagsExact"];
+            this._resetParams();
+        }else{
+            throw new Error("キーワードまたはタグが選択されていない");
+        }
     }
 
     page(num){
@@ -107,8 +112,9 @@ class NicoSearchParams {
 }
 
 class NicoSearch extends NicoRequest {
-    constructor() { 
+    constructor(host="https://api.search.nicovideo.jp") { 
         super();
+        this.host = host;
         this.req = null;
     }
 
@@ -122,7 +128,7 @@ class NicoSearch extends NicoRequest {
     search(params){
         const service = params._service;
         const query_json = params.get();
-        const url = `https://api.search.nicovideo.jp/api/v2/${service}/contents/search`;
+        const url = `${this.host}/api/v2/${service}/contents/search`;
         
         return new Promise((resolve, reject) => {
             const options = {

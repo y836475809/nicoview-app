@@ -99,7 +99,7 @@
         </label>        
     </div>
     <div class="column filter-word-container">
-        <input class="column" type="search" class="text">
+        <input class="column" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
         <span class="column button"><span class="icono-search"></span></button>
     </div>
     <pagination></pagination>
@@ -109,10 +109,11 @@
 </div>  
 
 <script>
-    /* globals app_base_dir riot obs */
+    /* globals app_base_dir riot obs debug_search_host */
     const {remote} = require("electron");
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+    const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
 
     require(`${app_base_dir}/tags/pagination.tag`);
     riot.mount("pagination");
@@ -127,10 +128,22 @@
         { kind: "tag",     select: true,  title:"タグ" }
     ];
 
+    const nico_search_params = new NicoSearchParams();
+    nico_search_params.page(0);
+    nico_search_params.sortTarget("startTime");
+    nico_search_params.sortOder("-");
+    nico_search_params.cond("tag");
+
+    const nico_search = debug_search_host?new NicoSearch(debug_search_host):new NicoSearch();
+
+    const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
+        return `<div>${value}</div>`;
+    };
+
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},
         {id: "id", name: "id"},
-        {id: "info", name: "info"},
+        {id: "info", name: "info", formatter:htmlFormatter},
         {id: "play_time", name: "time"},
         {id: "pub_date", name: "pub date"},
         {id: "state", name: "state"}
@@ -141,23 +154,26 @@
     };   
     const grid_table = new GridTable("search-grid", columns, options);
 
-    this.serach = () => {
+    this.serach = async () => {
         console.log("serach");
+        const search_result = await nico_search.search(nico_search_params);
+        setData(search_result);
     };
 
-    const setData = (search_result) => {
+    const setData = (search_result) => {     
         const total_count = search_result.meta.totalCount;
         const items = search_result.data.map(value => {
             return {
                 thumb_img: value.thumbnailUrl,
                 id: value.contentId,
-                info: `${value.title}\n${value.tags}\n${value.viewCounter}\n${value.commentCounter}`,
+                info: `${value.title}<br>${value.tags}\n${value.viewCounter}\n${value.commentCounter}`,
                 play_time: value.lengthSeconds,
                 pub_date: value.startTime,
                 state: "" 
             };
         });
         grid_table.setData(items);
+        grid_table.grid.scrollRowToTop(0); //TODO
     };
 
     const setSortState = (sort_kind, order) => {
@@ -188,6 +204,9 @@
             this.sort_items[index].order = pre_order=="+"?"-":"+";
         }
 
+        nico_search_params.sortTarget(this.sort_items[index].name);
+        nico_search_params.sortOder(this.sort_items[index].order);
+
         this.update();
     };
 
@@ -195,7 +214,17 @@
         this.search_items.forEach((value) => {
             value.select = false;
         });
-        this.search_items[index].select = true;   
+        this.search_items[index].select = true; 
+
+        nico_search_params.cond(this.sort_items[index].name);
+    };
+
+    this.onkeydownSearchInput = (e) =>{
+        if(e.keyCode===13){
+            const param = e.target.value;
+            nico_search_params.query(param);
+            this.serach();
+        }
     };
 
     const resizeGridTable = () => {

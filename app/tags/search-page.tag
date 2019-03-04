@@ -144,10 +144,11 @@
 
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},
-        {id: "id", name: "id"},
+        {id: "name", name: "名前"},
         {id: "info", name: "info", formatter:htmlFormatter},
-        {id: "play_time", name: "time"},
-        {id: "pub_date", name: "pub date"},
+        {id: "pub_date", name: "投稿日"},
+        {id: "play_time", name: "時間"},
+        {id: "tags", name: "タグ"},
         {id: "state", name: "state"}
     ];
     const options = {
@@ -180,9 +181,11 @@
             return {
                 thumb_img: value.thumbnailUrl,
                 id: value.contentId,
-                info: `${value.title}<br>${value.tags}\n${value.viewCounter}\n${value.commentCounter}`,
+                name: value.title,
+                info: `${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
                 play_time: value.lengthSeconds,
                 pub_date: value.startTime,
+                tags: value.tags,
                 state: "" 
             };
         });

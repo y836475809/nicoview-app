@@ -4,7 +4,8 @@
   "description": "",
   "main": "app/main.js",
   "scripts": {
-    "test": "ava -v -s  __tests__/*.test.js"
+    "test": "ava -v -s  __tests__/*.test.js",
+    "start_server": "json-server ./test/mock_server/index.js  --routes ./test/mock_server/route.json"
   },
   "author": "",
   "license": "MIT",

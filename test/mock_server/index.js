@@ -1,21 +1,23 @@
 
 module.exports = () => {
+    const total_pages = 10;
+    const limt = 32;
     const total_count = 1000;
     const result = {
         data: []
     };
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < total_pages; i++) {
         const search_result = {
             meta: {
                 totalCount: total_count
             },
             data: []
         };
-        for (let j = 0; j < 32; j++) {
+        for (let j = 0; j < limt; j++) {
             search_result.data.push({
                 thumbnailUrl: `http://localhost:3001/img${Math.floor(Math.random() * 6)}.jpeg`,
-                contentId: `sm${32 * i + j}`,
-                title: `user${32 * i + j}`,
+                contentId: `sm${limt * i + j}`,
+                title: `user${limt * i + j}`,
                 tags: "tag1, tsg2 tag3",
                 viewCounter: Math.floor(Math.random() * 100),
                 commentCounter: Math.floor(Math.random() * 100),

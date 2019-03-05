@@ -72,35 +72,29 @@ app.on("activate", () => {
     }
 });
 
-let creatPlayerWindow = (data) => {
+const createPlayerWindow = () => {
+    player_win = new BrowserWindow({ width: 800, height: 600 });
+    if(is_debug_mode){
+        player_win.webContents.openDevTools();
+    }
+    player_win.on("close", (e) => {
+        player_win = null;
+    });
+};
+
+const showPlayer = (data) => {    
     if (player_win === null) {
-        const player_path = `file://${__dirname}/html/player.html`;
-        player_win = new BrowserWindow({ width: 800, height: 600 });
-        if(is_debug_mode){
-            player_win.webContents.openDevTools();
-        }
+        createPlayerWindow();
+        const player_path = `file://${__dirname}/html/player.html`;      
         player_win.loadURL(player_path);
 
-        player_win.on("close", (e) => {
-            player_win = null;
-        });
-
         player_win.webContents.on("did-finish-load", () => {
-            if (data !== null) {
-                player_win.webContents.send("request-send-video-data", data);
-
-                const title = data.viweinfo.thumb_info.title;
-                player_win.setTitle(title);
-            }
+            player_win.webContents.send("request-send-video-data", data);
         });
     }else{
-        if (data !== null) {
-            player_win.webContents.send("request-send-video-data", data);
-
-            const title = data.viweinfo.thumb_info.title;
-            player_win.setTitle(title);
-        }      
+        player_win.webContents.send("request-send-video-data", data);   
     }
+    player_win.show();
 };
 
 app.on("login", function(event, webContents, request, authInfo, callback) {
@@ -117,8 +111,7 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
 });
 
 ipcMain.on("request-show-player", (event, arg) => {
-    creatPlayerWindow(arg);
-    player_win.show();
+    showPlayer(arg); 
 });
 
 ipcMain.on("set-nicohistory", async (event, arg) => {

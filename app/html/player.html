@@ -29,6 +29,7 @@
         console.log("request-send-video-data", arg);
         const video_data = arg.video_data;
         const viweinfo = arg.viweinfo;
+        document.title = viweinfo.thumb_info.title;
         obs.trigger("on_set_player_state", "play"); 
         obs.trigger("receivedData", video_data);
         obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);

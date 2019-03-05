@@ -1,5 +1,0 @@
-*.pyc
-.pytest_cache/
-.idea/
-images/
-views/

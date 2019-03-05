@@ -18,7 +18,7 @@ module.exports = () => {
                 thumbnailUrl: `http://localhost:3001/img${Math.floor(Math.random() * 6)}.jpeg`,
                 contentId: `sm${limt * i + j}`,
                 title: `user${limt * i + j}`,
-                tags: "tag1, tsg2 tag3",
+                tags: "tag1 tsg2 tag3",
                 viewCounter: Math.floor(Math.random() * 100),
                 commentCounter: Math.floor(Math.random() * 100),
                 lengthSeconds: Math.floor(Math.random() * 300),

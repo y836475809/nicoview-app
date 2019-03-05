@@ -5,7 +5,7 @@
             height: 100%;
         }
 
-        #history-grid-container {
+        .history-grid-container {
             background-color: var(--control-color);
             width: 100%;
             height: 100%;

@@ -110,7 +110,7 @@
 
 <script>
     /* globals app_base_dir riot obs debug_search_host */
-    const {remote} = require("electron");
+    const {remote, ipcRenderer} = require("electron");
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
@@ -141,6 +141,10 @@
     const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
         return `<div>${value}</div>`;
     };
+    const stateFormatter = (row, cell, value, columnDef, dataContext)=> {
+        const state_local = dataContext.has_local?"Local":"";
+        return `<div>${state_local}</div>`;
+    };
 
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},
@@ -149,7 +153,7 @@
         {id: "pub_date", name: "投稿日"},
         {id: "play_time", name: "時間"},
         {id: "tags", name: "タグ"},
-        {id: "state", name: "state"}
+        {id: "state", name: "state", formatter:stateFormatter}
     ];
     const options = {
         rowHeight: 100,
@@ -176,20 +180,28 @@
         }else{
             this.refs.page.setTotalPages(Math.ceil((search_offset+search_limit)/search_limit))
         }
-        const items = search_result.data.map(value => {
-            return {
-                thumb_img: value.thumbnailUrl,
-                id: value.contentId,
-                name: value.title,
-                info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
-                play_time: value.lengthSeconds,
-                pub_date: value.startTime,
-                tags: value.tags,
-                state: "" 
-            };
+        const video_ids = search_result.data.map(value => {
+            return value.contentId;
         });
-        grid_table.setData(items);
-        grid_table.grid.scrollRowToTop(0); //TODO
+
+        obs.trigger("get-library-data-callback", { video_ids: video_ids, cb: (id_map)=>{
+            const items = search_result.data.map(value => {
+                const has_local = id_map.has(value.contentId);
+                return {
+                    thumb_img: value.thumbnailUrl,
+                    id: value.contentId,
+                    name: value.title,
+                    info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
+                    play_time: value.lengthSeconds,
+                    pub_date: value.startTime,
+                    tags: value.tags,
+                    has_local: has_local,
+                    state: "" 
+                };
+            });
+            grid_table.setData(items);
+            grid_table.grid.scrollRowToTop(0); //TODO      
+        }});
     };
 
     const setSortState = (sort_kind, order) => {
@@ -274,6 +286,20 @@
 
         grid_table.onDblClick((e, data)=>{
             console.log("search dbl data=", data);
+            if(data.has_local){
+                const video_id = data.id;
+                obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
+                    const library_data = id_map.get(video_id);
+                    const thumb_info = library_data.viweinfo.thumb_info;   
+                    obs.trigger("add-history-items", {
+                        image: thumb_info.thumbnail_url, 
+                        id: video_id, 
+                        name: thumb_info.title, 
+                        url: library_data.video_data.src
+                    });
+                    ipcRenderer.send("request-show-player", library_data);
+                }});
+            }
         });
 
         resizeGridTable();

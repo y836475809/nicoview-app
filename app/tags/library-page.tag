@@ -207,6 +207,21 @@
         obs.trigger("get-library-data-rep", library_data);  
     });  
 
+    obs.on("get-library-data-callback", async (args) => { 
+        const { video_ids, cb } = args;
+        const ret = new Map();
+        for (let index = 0; index < video_ids.length; index++) {
+            const id = video_ids[index];
+            try {
+                const library_data = await library.getPlayData(id); 
+                ret.set(id, library_data);
+            } catch (error) {
+                //pass
+            }            
+        }
+        cb(ret);
+    }); 
+
     obs.on("get-library-items-from-file", async (db_file_path) => { 
         try {
             library = new Library(db_file_path);

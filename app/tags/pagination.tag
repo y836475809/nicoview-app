@@ -37,6 +37,13 @@
             this.update();
         };
 
+        this.resetPage = () => {
+            this.current_page = 1;
+            this.total_pages = 0;
+            this.total_count = 0;  
+            this.update();
+        };
+
         this.onkeypress = (e) =>{
             if(e.key=="Enter"){
                 this.opts.onmovepage(this.current_page);

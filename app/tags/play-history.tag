@@ -12,8 +12,8 @@
         }
     </style>
     
-    <div id="history-grid-container">
-        <div id="history-grid"></div>
+    <div class="history-grid-container">
+        <div class="history-grid"></div>
     </div>    
 
     <script>
@@ -48,7 +48,7 @@
         };
 
         const resizeGridTable = () => {
-            const container = this.root.querySelector("#history-grid-container");
+            const container = this.root.querySelector(".history-grid-container");
             grid_table.resizeFitContainer(container);
         };
 
@@ -57,7 +57,7 @@
         });
 
         this.on("mount", () => {
-            grid_table.init();
+            grid_table.init(this.root.querySelector(".history-grid"));
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;

@@ -77,8 +77,8 @@
                 <button title="test" onclick={onclickAdd}><span class="icono-plus"></span></button>
             </div>
         </div>
-        <div id="library-grid-container">
-            <div id="library-grid"></div>
+        <div class="library-grid-container">
+            <div class="library-grid"></div>
         </div>
     </div>
 
@@ -154,7 +154,7 @@
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
 
     this.on("mount", async () => {
-        grid_table.init();
+        grid_table.init(this.root.querySelector(".library-grid"));
 
         grid_table.setFilter((column_id, value, word) => { 
             if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
@@ -250,7 +250,7 @@
     });  
 
     const resizeGridTable = () => {
-        const container = this.root.querySelector("#library-grid-container");
+        const container = this.root.querySelector(".library-grid-container");
         grid_table.resizeFitContainer(container);
     };
 

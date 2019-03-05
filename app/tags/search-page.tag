@@ -94,17 +94,17 @@
     <div class="column filter-kind-container">
         <label class="column label" each="{item, i in this.search_items}">
             <input class="column" type="radio" name="search_select" checked={item.select} 
-                onclick="{ this.onclickSearch.bind(this, i) }"> 
+                onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
             <span class="column button">{item.title}</span>
         </label>        
     </div>
     <div class="column filter-word-container">
-        <input class="column" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
-        <span class="column button"><span class="icono-search"></span></button>
+        <input class="column input-search" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
+        <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></button>
     </div>
     <pagination ref="page" onmovepage={this.onmovePage}></pagination>
-    <div id="grid-container">
-        <div id="search-grid"></div>
+    <div class="search-grid-container">
+        <div class="search-grid"></div>
     </div>
 </div>  
 
@@ -158,7 +158,6 @@
     const grid_table = new GridTable("search-grid", columns, options);
 
     this.serach = async () => {
-        console.log("serach");
         const search_result = await nico_search.search(nico_search_params);
         setData(search_result);
     };
@@ -182,7 +181,7 @@
                 thumb_img: value.thumbnailUrl,
                 id: value.contentId,
                 name: value.title,
-                info: `${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
+                info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
                 play_time: value.lengthSeconds,
                 pub_date: value.startTime,
                 tags: value.tags,
@@ -226,8 +225,8 @@
 
         this.update();
     };
-
-    this.onclickSearch = (index, e) => {
+    
+    this.onclickSearchTarget = (index, e) => {
         this.search_items.forEach((value) => {
             value.select = false;
         });
@@ -236,16 +235,27 @@
         nico_search_params.cond(this.sort_items[index].name);
     };
 
+    this.onclickSearch = (e) => {
+        const elm = this.root.querySelector(".input-search");
+        const query = elm.value;
+        nico_search_params.query(query);
+        this.serach();
+
+        this.refs.page.resetPage();
+    };
+
     this.onkeydownSearchInput = (e) =>{
         if(e.keyCode===13){
             const param = e.target.value;
             nico_search_params.query(param);
             this.serach();
+
+            this.refs.page.resetPage();
         }
     };
 
     const resizeGridTable = () => {
-        const container = this.root.querySelector("#grid-container");
+        const container = this.root.querySelector(".search-grid-container");
         grid_table.resizeFitContainer(container);
     };
 
@@ -260,9 +270,10 @@
     menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
     
     this.on("mount", () => {
-        grid_table.init();
+        grid_table.init(this.root.querySelector(".search-grid"));
 
         grid_table.onDblClick((e, data)=>{
+            console.log("search dbl data=", data);
         });
 
         resizeGridTable();

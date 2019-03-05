@@ -8,7 +8,7 @@ const time_format = require("./time_format");
 /* globals $ */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
-    return `<img src='${value}' width="130" height="100"/>`;
+    return `<img src='${value}' width="${columnDef.width}" height="${columnDef.height}"/>`;
 };
 
 const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -27,8 +27,9 @@ const formatterMap = new Map([
 ]);
 
 class GridTable {
-    constructor(id, columns, options){
-        this.id = `#${id}`;
+    constructor(name, columns, options){
+        this.name = name;
+        // this.id = `#${id}`;
 
         this.columns = columns.map(val => {
             const id = val.id;
@@ -65,9 +66,10 @@ class GridTable {
         this.filter = (column_id, value, word) => { return true; };
     }
 
-    init(){
+    init(container){
+        this.container = $(container);
         this.dataView = new Slick.Data.DataView();
-        this.grid = new Slick.Grid(this.id, this.dataView, this.columns, this.options);
+        this.grid = new Slick.Grid(this.container, this.dataView, this.columns, this.options);
         this.grid.onSort.subscribe((e, args) => {
             const comparer = (a, b) => {
                 return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
@@ -133,8 +135,8 @@ class GridTable {
     }
 
     resize(new_size){
-        $(this.id).height(new_size.height);
-        $(this.id).width(new_size.width);
+        this.container.height(new_size.height);
+        this.container.width(new_size.width);
         this.grid.resizeCanvas();
     }
 
@@ -201,7 +203,7 @@ class GridTable {
             columns.forEach(val=>{
                 width_state[val.id] = val.width;
             });
-            localStorage.setItem(`${this.id}/columns/width`, JSON.stringify(width_state));
+            localStorage.setItem(`${this.name}/columns/width`, JSON.stringify(width_state));
         }
 
         if(this.options._saveSort){
@@ -211,14 +213,14 @@ class GridTable {
                     id: sort[0].columnId, 
                     sort_asc: sort[0].sortAsc 
                 };
-                localStorage.setItem(`${this.id}/columns/sort`, JSON.stringify(sort_state));
+                localStorage.setItem(`${this.name}/columns/sort`, JSON.stringify(sort_state));
             }
         }
     }
 
     _loadState(){
         if(this.options._saveColumnWidth){
-            const width_value = localStorage.getItem(`${this.id}/columns/width`);
+            const width_value = localStorage.getItem(`${this.name}/columns/width`);
             if(width_value){
                 const width_state = JSON.parse(width_value);
                 const columns = this.grid.getColumns();
@@ -232,7 +234,7 @@ class GridTable {
         }
 
         if(this.options._saveSort){
-            const sort_value = localStorage.getItem(`${this.id}/columns/sort`);
+            const sort_value = localStorage.getItem(`${this.name}/columns/sort`);
             if(sort_value){
                 const sort_state = JSON.parse(sort_value);
                 this.grid.setSortColumn(sort_state.id, sort_state.sort_asc); 

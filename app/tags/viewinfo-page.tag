@@ -100,8 +100,8 @@
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
-        <div id="comment-grid-container">
-            <div id="comment-grid"></div>
+        <div class="comment-grid-container">
+            <div class="comment-grid"></div>
         </div>
     </div>
 
@@ -156,7 +156,7 @@
         };
 
         const resizeCommnetList = () => {
-            const container = this.root.querySelector("#comment-grid-container");
+            const container = this.root.querySelector(".comment-grid-container");
             const new_height = $(window).height() - container.offsetTop;
             const new_width = container.clientWidth;
             const new_szie = {
@@ -205,7 +205,7 @@
         });
 
         this.on("mount", () => {  
-            grid_table.init();
+            grid_table.init(this.root.querySelector(".comment-grid"));
             grid_table.grid.registerPlugin(new Slick.AutoTooltips());
 
             updateSyncCommentCheckBox();

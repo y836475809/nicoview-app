@@ -114,6 +114,7 @@
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
+    // const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
     require(`${app_base_dir}/tags/pagination.tag`);
     riot.mount("pagination");
@@ -297,8 +298,37 @@
                         name: thumb_info.title, 
                         url: library_data.video_data.src
                     });
-                    ipcRenderer.send("request-show-player", library_data);
+                    ipcRenderer.send("request-play-library", library_data);
                 }});
+            }else{
+                const video_id = data.id;
+                ipcRenderer.send("request-play-niconico", video_id);
+                // const noco_play = new NicoPlay();
+                // noco_play.play(video_id, (state)=>{
+                //     // state_log += state + ":";
+                //     console.log(state);
+                // }).then((result)=>{
+                //     const {nico_cookies, comments, thumb_info, video_url} = result;
+                //     const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+                //     if(ret=="ok"){
+                //         const play_data = {
+                //             video_data: {
+                //                 src: video_url,
+                //                 type: thumb_info.video_type,
+                //                 commnets: comments
+                //             },
+                //             viweinfo: {
+                //                 thumb_info:thumb_info,
+                //                 commnets: comments
+                //             }
+                //         };
+                //         ipcRenderer.send("request-play-niconico", video_id);
+                //     }else{
+                //         console.log("set-nicohistory error: ", video_id);
+                //     }
+                // }).catch(error => {
+                //     console.log(error);
+                // });
             }
         });
 

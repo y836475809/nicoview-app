@@ -82,17 +82,19 @@ const createPlayerWindow = () => {
     });
 };
 
-const showPlayer = (data) => {    
+const play = (data, cb) => {    
     if (player_win === null) {
         createPlayerWindow();
         const player_path = `file://${__dirname}/html/player.html`;      
         player_win.loadURL(player_path);
 
         player_win.webContents.on("did-finish-load", () => {
-            player_win.webContents.send("request-send-video-data", data);
+            // player_win.webContents.send("request-send-video-data", data);
+            cb();
         });
     }else{
-        player_win.webContents.send("request-send-video-data", data);   
+        // player_win.webContents.send("request-send-video-data", data);
+        cb();
     }
     player_win.show();
 };
@@ -110,8 +112,16 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
 
 });
 
-ipcMain.on("request-show-player", (event, arg) => {
-    showPlayer(arg); 
+ipcMain.on("request-play-library", (event, library_data) => {
+    play(()=>{
+        player_win.webContents.send("request-send-video-data", library_data);
+    }); 
+});
+
+ipcMain.on("request-play-niconico", (event, video_id) => {
+    play(()=>{
+        player_win.webContents.send("request-send-videoid", video_id);
+    }); 
 });
 
 ipcMain.on("set-nicohistory", async (event, arg) => {

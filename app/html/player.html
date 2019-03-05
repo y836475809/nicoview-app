@@ -16,8 +16,10 @@
 </body>
 <script>
     const ipc = require("electron").ipcRenderer;
-    const remote = require("electron").remote;
+    // const remote = require("electron").remote;
+    const {remote, ipcRenderer} = require("electron");
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
+    const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
@@ -34,6 +36,37 @@
         obs.trigger("receivedData", video_data);
         obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);
         obs.trigger("on_change_viweinfo", viweinfo);
+    });
+
+    ipc.on("request-send-videoid", (event, video_id) => {
+        const noco_play = new NicoPlay();
+        noco_play.play(video_id, (state)=>{
+            // state_log += state + ":";
+            console.log(state);
+        }).then((result)=>{
+            const {nico_cookies, comments, thumb_info, video_url} = result;
+            const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+            if(ret=="ok"){
+                const video_data = {
+                    src: video_url,
+                    type: thumb_info.video_type,
+                    commnets: comments
+                };
+                const viweinfo = {
+                    thumb_info:thumb_info,
+                    commnets: comments
+                };
+                document.title = viweinfo.thumb_info.title;
+                obs.trigger("on_set_player_state", "play"); 
+                obs.trigger("receivedData", video_data);
+                obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);
+                obs.trigger("on_change_viweinfo", viweinfo);
+            }else{
+                console.log("set-nicohistory error: ", video_id);
+            }
+        }).catch(error => {
+            console.log(error);
+        });
     });
 
 </script>

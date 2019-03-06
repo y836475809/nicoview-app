@@ -107,7 +107,7 @@
         <div class="search-grid"></div>
     </div>
 </div>  
-<indicator show={ this.isloading } msg={ this.sp } ref="indicator" onstop={this.onstop}></indicator>
+<indicator ref="indicator" oncancel={this.onCancelSearch}></indicator>
 
 <script>
     /* globals app_base_dir riot obs debug_search_host */
@@ -115,12 +115,9 @@
     const {Menu, MenuItem} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
-    // const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
-    require(`${app_base_dir}/tags/pagination.tag`);
-    riot.mount("pagination");
 
+    require(`${app_base_dir}/tags/pagination.tag`);
     require(`${app_base_dir}/tags/indicator.tag`);
-    riot.mount("indicator");
 
     this.sort_items = [
         { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -166,10 +163,8 @@
     const grid_table = new GridTable("search-grid", columns, options);
 
     this.serach = async () => {
-        this.isloading = true;
-        this.sp = "Now Loading...";
-        // this.refs.indicator.showLoading("Now Loading...");
-        this.update();
+        console.log("serach=");
+        this.refs.indicator.showLoading("Now Loading...");
         try {
             const search_result = await nico_search.search(nico_search_params);
             setData(search_result);            
@@ -177,7 +172,8 @@
             //pass 
         }
 
-        //this.refs.indicator.hideLoading();
+        resizeGridTable(); //only first?
+        // this.refs.indicator.hideLoading();
     };
 
     this.onmovePage = async (page) => {
@@ -194,7 +190,7 @@
         //this.refs.indicator.hideLoading();
     };
 
-    this.onstop = () => {
+    this.onCancelSearch = () => {
         nico_search.cancel();
     };
 

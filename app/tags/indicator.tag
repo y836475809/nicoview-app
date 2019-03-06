@@ -1,57 +1,53 @@
 <indicator>
     <style scoped>
-        div {
-            position: absolute;
-            width: 100vw;
-            height: 100vh;
-            text-align: center;
-            top: 0;
-            /* bottom: 0; */
-            left: 0;
-            /* right: 0; */
-            margin: auto;
-            background-color:black;
-            opacity: 0.7;
-            z-index: 999;
-        }
-        .display-block{
-            display: block;
-        }
-        .display-none{
-            display: none;
-        }
         p {
-            position: relative;
-            top: 50%;
-            color: white;
+            color: black;
         }   
+        .button {
+            text-align: center;
+            top: 50%;
+            border: 1px solid #aaa;
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer; 
+            user-select: none;
+        }   
+        dialog {
+            border: solid 1px #aaa;
+            border-radius: 5px;
+            /* box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3); */
+        }
     </style>
 
-    <!-- <div class={ this.isloading === true ? "display-block" : "display-none" }> -->
-    <div >
-        <p>{this.opts.msg}</p>
-        <div class="button" onclick={this.onclickStop}>stop</div>
-    </div>
+    <dialog oncancel={this.oncancel}>
+        <p>{this.message}</p>
+        <div class="button" onclick={this.onclickCancel}>cancel</div>
+    </dialog>
 
     <script>
-        this.isloading = false;
-        this.stopButton = this.opts.onstop===undefined?false:true;
+        /* globals obs */
 
         this.showLoading = (message) => {
-            this.isloading = true;
             this.message = message;
-            this.update();
+
+            const dialog = this.root.querySelector("dialog");
+            dialog.showModal();
         };
 
         this.hideLoading = () => {
-            this.isloading = false;
-            this.update();
+            const dialog = this.root.querySelector("dialog");
+            dialog.close();
         };
 
-        this.onclickStop = () =>{
-            if(this.opts.onstop){
-                this.opts.onstop();
+        this.onclickCancel = () =>{
+            if(this.opts.oncancel){
+                this.opts.oncancel();
             }
+        };
+
+        this.oncancel = (e) => {
+            e.preventDefault();
         };
     </script>
 

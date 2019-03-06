@@ -82,7 +82,7 @@ const createPlayerWindow = () => {
     });
 };
 
-const play = (data, cb) => {    
+const play = (cb) => {    
     if (player_win === null) {
         createPlayerWindow();
         const player_path = `file://${__dirname}/html/player.html`;      

@@ -71,8 +71,11 @@
                 history_store.add(new_item);
                 grid_table.setData(history_store.getItems());
 
-                if(!/^(http)/.test(url)){
-                    obs.trigger("get-library-data", data.id);  
+                if(!/^(http)/.test(url)){ 
+                    obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
+                        const library_data = id_map.get(video_id);
+                        ipc.send("request-play-library", library_data);
+                    }});
                 }
             });
 
@@ -85,10 +88,6 @@
                 console.log("player history load error=", error);
                 grid_table.setData([]); 
             }
-        });
-
-        obs.on("get-library-data-rep", (library_data) => { 
-            ipc.send("request-show-player", library_data);
         });
 
         obs.on("add-history-items", (item)=> {

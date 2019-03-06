@@ -174,7 +174,7 @@
                 name: thumb_info.title, 
                 url: library_data.video_data.src
             });
-            ipc.send("request-show-player", library_data);
+            ipc.send("request-play-library", library_data);
         });
         
         grid_table.onContextMenu((e)=>{
@@ -200,12 +200,7 @@
             console.log("library.getLibraryData error=", error);
             loadLibraryItems([]);
         }
-    });   
-
-    obs.on("get-library-data", async (video_id) => { 
-        const library_data = await library.getPlayData(video_id);
-        obs.trigger("get-library-data-rep", library_data);  
-    });  
+    });
 
     obs.on("get-library-data-callback", async (args) => { 
         const { video_ids, cb } = args;

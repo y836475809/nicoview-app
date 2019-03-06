@@ -54,7 +54,6 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
         require(`${app_base_dir}/tags/indicator.tag`);
-        riot.mount("indicator");
         
         let self = this;
         const setLibraryDirAtt = (value) => {

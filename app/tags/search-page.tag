@@ -11,6 +11,9 @@
         height: 100%;
         padding-left: 5px;
     }
+    .search-controls-container {
+        display:flex;
+    }
 
     .column {
         display: inline-block;
@@ -89,25 +92,27 @@
 </style>
 
 <div class="search-container">
-    <div class="column sort-kind-container">
-        <label class="column label" each="{item, i in this.sort_items}">
-            <input class="column" type="radio" name="sort_select" checked={item.select} 
-                onclick="{ this.onclickSort.bind(this, i) }"> 
-            <span class="column button">{item.title}<span class="{item.order=='+'?'icono-caretUp':'icono-caretDown'}"></span></span>
-        </label>
+    <div class="search-controls-container">
+        <div class="column sort-kind-container">
+            <label class="column label" each="{item, i in this.sort_items}">
+                <input class="column" type="radio" name="sort_select" checked={item.select} 
+                    onclick="{ this.onclickSort.bind(this, i) }"> 
+                <span class="column button">{item.title}<span class="{item.order=='+'?'icono-caretUp':'icono-caretDown'}"></span></span>
+            </label>
+        </div>
+        <div class="column filter-kind-container">
+            <label class="column label" each="{item, i in this.search_items}">
+                <input class="column" type="radio" name="search_select" checked={item.select} 
+                    onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
+                <span class="column button">{item.title}</span>
+            </label>        
+        </div>
+        <div class="column filter-word-container">
+            <input class="column input-search" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
+            <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></button>
+        </div>
+        <pagination class="column" ref="page" onmovepage={this.onmovePage}></pagination>
     </div>
-    <div class="column filter-kind-container">
-        <label class="column label" each="{item, i in this.search_items}">
-            <input class="column" type="radio" name="search_select" checked={item.select} 
-                onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
-            <span class="column button">{item.title}</span>
-        </label>        
-    </div>
-    <div class="column filter-word-container">
-        <input class="column input-search" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
-        <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></button>
-    </div>
-    <pagination ref="page" onmovepage={this.onmovePage}></pagination>
     <div class="search-grid-container">
         <div class="search-grid"></div>
     </div>

@@ -81,6 +81,11 @@
         top: 1px;
         left: 1px;
     }
+
+    .line-break {
+        white-space: normal;
+        word-wrap: break-word;
+    }
 </style>
 
 <div class="search-container">
@@ -146,14 +151,17 @@
         const state_local = dataContext.has_local?"Local":"";
         return `<div>${state_local}</div>`;
     };
+    const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
+        return `<div class="line-break">${value}</div>`;
+    };
 
     const columns = [
         {id: "thumb_img", name: "image", height:100, width: 130},
-        {id: "name", name: "名前"},
+        {id: "name", name: "名前", formatter:lineBreakFormatter},
         {id: "info", name: "info", formatter:htmlFormatter},
         {id: "pub_date", name: "投稿日"},
         {id: "play_time", name: "時間"},
-        {id: "tags", name: "タグ"},
+        {id: "tags", name: "タグ", formatter:lineBreakFormatter},
         {id: "state", name: "state", formatter:stateFormatter}
     ];
     const options = {

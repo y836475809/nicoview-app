@@ -1,11 +1,42 @@
 <indicator>
     <style scoped>
-        p {
-            color: black;
-        }   
-        .button {
+        .container {
+            display: grid;
+            grid-template-rows: 1fr 30px;
+            grid-template-areas: 
+                "item1"
+                "item2";
+        }
+
+        dialog {
+            border: solid 1px #aaa;
+            border-radius: 5px;
+        }
+        dialog::backdrop {
+            background: #aaa;
+            opacity: 0.7;
+        }
+
+        .message-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .message {
+            grid-area: item1;
             text-align: center;
-            top: 50%;
+            vertical-align: middle;
+            color: black;
+            user-select: none;
+        } 
+
+        .button-container {
+            grid-area: item2;
+            margin: auto;
+        }
+        .button { 
+            display: inline-block;
+            text-align: center;
             border: 1px solid #aaa;
             width: 100px;
             height: 30px;
@@ -13,36 +44,39 @@
             cursor: pointer; 
             user-select: none;
         }   
-        dialog {
-            border: solid 1px #aaa;
-            border-radius: 5px;
-            /* box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3); */
-        }
     </style>
 
     <dialog oncancel={this.oncancel}>
-        <p>{this.message}</p>
-        <div class="button" onclick={this.onclickCancel}>cancel</div>
+        <div class="container">
+            <div class="message-container">
+                <p class="message">{this.message}</p>
+            </div>
+            <div class="button-container">
+                <div show={this.showok} class="button" onclick="{this.onclickButton.bind(this,'ok')}">ok</div>
+                <div show={this.showcancel} class="button" onclick="{this.onclickButton.bind(this,'cancel')}">cancel</div>
+            </div>
+        </div>
     </dialog>
 
     <script>
-        /* globals obs */
-
-        this.showLoading = (message) => {
+        this.showModal = (message, buttons, cb) => {
             this.message = message;
+            this.showok = buttons===undefined ? false : buttons.includes("ok");
+            this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
+            this.cb = cb;
 
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
         };
 
-        this.hideLoading = () => {
+        this.close = () => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();
         };
 
-        this.onclickCancel = () =>{
-            if(this.opts.oncancel){
-                this.opts.oncancel();
+        this.onclickButton = (result, e) =>{
+            if(this.cb){
+                this.cb(result);
             }
         };
 
@@ -50,5 +84,4 @@
             e.preventDefault();
         };
     </script>
-
 </indicator>

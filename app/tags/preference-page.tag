@@ -45,17 +45,16 @@
             <input type="button" value="Import" onclick={onclickImport}>
         </div>
     </div>
-    <indicator ref="indicator"></indicator>
+    <modal-dialog ref="message-dialog"></modal-dialog>
 
     <script>
-        /* globals app_base_dir riot obs */
+        /* globals app_base_dir obs */
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        require(`${app_base_dir}/tags/indicator.tag`);
+        require(`${app_base_dir}/tags/modal-dialog.tag`);
         
-        let self = this;
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);
         };
@@ -117,10 +116,8 @@
                 return;
             }
 
-            self.refs.indicator.showLoading("Now Loading...");
-            setTimeout(() => {
-                obs.trigger("import-library-from-sqlite", db_file_path);
-            }, 100);
+            this.refs["message-dialog"].showModal("インポート中...");
+            obs.trigger("import-library-from-sqlite", db_file_path);
         };
 
         obs.on("import-library-from-sqlite-rep", (error) => { 
@@ -137,7 +134,7 @@
                     message: "Conversion complete"
                 });
             }
-            self.refs.indicator.hideLoading();
+            this.refs["message-dialog"].close();
         });
     </script>
 </preference-page>

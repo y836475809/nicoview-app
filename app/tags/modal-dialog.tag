@@ -1,4 +1,4 @@
-<indicator>
+<modal-dialog>
     <style scoped>
         .container {
             display: grid;
@@ -13,8 +13,7 @@
             border-radius: 5px;
         }
         dialog::backdrop {
-            background: #aaa;
-            opacity: 0.7;
+            opacity: 0;
         }
 
         .message-container {
@@ -84,4 +83,4 @@
             e.preventDefault();
         };
     </script>
-</indicator>
+</modal-dialog>

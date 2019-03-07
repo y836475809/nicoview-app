@@ -107,7 +107,7 @@
         <div class="search-grid"></div>
     </div>
 </div>  
-<indicator ref="indicator" oncancel={this.onCancelSearch}></indicator>
+<modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 
 <script>
     /* globals app_base_dir riot obs debug_search_host */
@@ -117,7 +117,7 @@
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
 
     require(`${app_base_dir}/tags/pagination.tag`);
-    require(`${app_base_dir}/tags/indicator.tag`);
+    require(`${app_base_dir}/tags/modal-dialog.tag`);
 
     this.sort_items = [
         { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -163,8 +163,10 @@
     const grid_table = new GridTable("search-grid", columns, options);
 
     this.serach = async () => {
-        console.log("serach=");
-        this.refs.indicator.showLoading("Now Loading...");
+        this.refs["search-dialog"].showModal("Now Loading...", ["cancel"], result=>{
+            this.onCancelSearch();
+        });
+
         try {
             const search_result = await nico_search.search(nico_search_params);
             setData(search_result);            
@@ -172,22 +174,13 @@
             //pass 
         }
 
+        this.refs["search-dialog"].close();
         resizeGridTable(); //only first?
-        // this.refs.indicator.hideLoading();
     };
 
     this.onmovePage = async (page) => {
-        this.refs.indicator.showLoading("Now Loading...");
-
         nico_search_params.page(page);
-        try {
-            const search_result = await nico_search.search(nico_search_params);
-            setData(search_result);           
-        } catch (error) {
-            //pass
-        }
-
-        //this.refs.indicator.hideLoading();
+        this.serach();
     };
 
     this.onCancelSearch = () => {

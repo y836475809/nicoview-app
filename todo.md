@@ -8,7 +8,7 @@
 - [x] preference保存でobjectをjsonにして保存する
 - [x] preferenceの関数整理
 - [ ] preference -> settingにしたので合わせてtag(preference-page)をsetting-tag等に変更
-- [ ] preferenceで進行状況のモーダルダイアログを使用するように変更する
+- [x] preferenceで進行状況のモーダルダイアログを使用するように変更する
 - [ ] windowのサイズ、位置のsave,load
 - [ ] ライブラリの検索結果のアイテム数表示
 - [ ] ライブラリページのスクロール位置の記録(bookmark?)

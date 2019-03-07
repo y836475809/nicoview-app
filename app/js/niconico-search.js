@@ -48,6 +48,7 @@ class NicoSearchParams {
     }
 
     cond(kind){
+        this.search_kind = kind;
         if(kind=="keyword"){
             this._targets = ["title", "description", "tags"];
             this._resetParams();

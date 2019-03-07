@@ -69,7 +69,7 @@
         <library-page></library-page>
     </div>
     <div id="page2" class="page-container">
-        <search-page></search-page>
+        <search-container-page></search-container-page>
     </div>
     <div id="page3" class="page-container">
         <play-history></play-history>
@@ -86,7 +86,7 @@
         let riot = require("riot");
 
         require(`${app_base_dir}/tags/library-page.tag`);
-        require(`${app_base_dir}/tags/search-page.tag`);
+        require(`${app_base_dir}/tags/search-container-page.tag`);
         require(`${app_base_dir}/tags/play-history.tag`);
         require(`${app_base_dir}/tags/preference-page.tag`);
 
@@ -153,7 +153,7 @@
 
         this.on("mount", function () {
             riot.mount("library-page");
-            riot.mount("search-page");   
+            riot.mount("search-container-page");   
             riot.mount("play-history");
             riot.mount("preference-page");
 

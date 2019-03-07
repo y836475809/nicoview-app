@@ -86,6 +86,22 @@
         left: 1px;
     }
 
+    .add-cond-button {
+        width: 30px;
+        height: 30px;
+        margin-left: 10px;
+        background-color: lightseagreen;
+        border-radius: 50%;
+    }
+    .add-cond-button:hover {
+        opacity: 0.5;
+        cursor: pointer; 
+    }
+    .add-cond-button .icono-plus {
+        color: white;
+        transform: translateX(-2px) translateY(-2px)
+    }
+
     .line-break {
         white-space: normal;
         word-wrap: break-word;
@@ -110,7 +126,8 @@
         </div>
         <div class="column filter-word-container">
             <input class="column input-search" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
-            <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></button>
+            <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></span>
+            <span class="column add-cond-button" onclick={this.onclickAddNicoSearchCond}><span class="icono-plus"></span></span>
         </div>
         <pagination class="column" ref="page" onmovepage={this.onmovePage}></pagination>
     </div>
@@ -176,7 +193,7 @@
     };   
     const grid_table = new GridTable("search-grid", columns, options);
 
-    this.serach = async () => {
+    this.search = async () => {
         this.refs["search-dialog"].showModal("検索中...", ["cancel"], result=>{
             this.onCancelSearch();
         });
@@ -198,7 +215,7 @@
 
     this.onmovePage = async (page) => {
         nico_search_params.page(page);
-        this.serach();
+        this.search();
     };
 
     this.onCancelSearch = () => {
@@ -237,17 +254,33 @@
         }});
     };
 
-    const setSortState = (sort_kind, order) => {
-        const index = this.sort_items.findIndex(value=>{
-            return value.kind == sort_kind;
-        });
+    const setSearchCondState = (sort_kind, sort_order, search_kind) => {
+        {
+            const index = this.sort_items.findIndex(value=>{
+                return value.kind == sort_kind;
+            });
+            if(index!==-1){
+                this.sort_items.forEach((value) => {
+                    value.select = false;
+                });
 
-        this.sort_items.forEach((value) => {
-            value.select = false;
-        });
-
-        this.sort_items[index].select = true;
-        this.sort_items[index].order = order;
+                this.sort_items[index].select = true;
+                this.sort_items[index].order = sort_order;
+            }
+        }
+        {
+            const index = this.search_items.findIndex(value=>{
+                return value.kind == search_kind;
+            });
+            if(index!==-1){
+                this.search_items.forEach((value) => {
+                    value.select = false;
+                });
+                this.search_items[index].select = true;
+                this.search_items[index].kind = search_kind;
+            }
+        }
+        this.update();
     };
 
     this.onclickSort = (index, e) => {
@@ -277,14 +310,14 @@
         });
         this.search_items[index].select = true; 
 
-        nico_search_params.cond(this.sort_items[index].name);
+        nico_search_params.cond(this.search_items[index].kind);
     };
 
     this.onclickSearch = (e) => {
         const elm = this.root.querySelector(".input-search");
         const query = elm.value;
         nico_search_params.query(query);
-        this.serach();
+        this.search();
 
         this.refs.page.resetPage();
     };
@@ -293,11 +326,39 @@
         if(e.keyCode===13){
             const param = e.target.value;
             nico_search_params.query(param);
-            this.serach();
+            this.search();
 
             this.refs.page.resetPage();
         }
     };
+
+    this.onclickAddNicoSearchCond = (e) => {
+        const elm = this.root.querySelector(".filter-word-container .input-search");
+        const cond = {
+            query: elm.value,
+            sort_order: nico_search_params._sort_order,
+            sort_name: nico_search_params._sort_name,
+            search_kind: nico_search_params.search_kind,
+            page: 1
+        };
+
+        obs.trigger("on_add_nico_search_cond", cond);
+    };
+
+    obs.on("on_change_nico_search_cond", (cond)=> {
+        const elm = this.root.querySelector(".filter-word-container .input-search");
+        elm.value = cond.query;
+        nico_search_params.cond(cond.search_kind);
+        nico_search_params.query(cond.query);
+        nico_search_params.page(cond.page);
+        nico_search_params.sortTarget(cond.sort_name);
+        nico_search_params.sortOder(cond.sort_order);
+
+        setSearchCondState(cond.sort_name, cond.sort_order, cond.search_kind);
+
+        this.search();
+        this.refs.page.resetPage();
+    });
 
     const resizeGridTable = () => {
         const container = this.root.querySelector(".search-grid-container");

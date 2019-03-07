@@ -12,7 +12,8 @@
         padding-left: 5px;
     }
     .search-controls-container {
-        display:flex;
+        display: flex;
+        flex-wrap: wrap;
     }
 
     .column {
@@ -122,7 +123,7 @@
 <script>
     /* globals app_base_dir riot obs debug_search_host */
     const {remote, ipcRenderer} = require("electron");
-    const {Menu, MenuItem} = remote;
+    const {Menu, MenuItem, dialog} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
 
@@ -176,7 +177,7 @@
     const grid_table = new GridTable("search-grid", columns, options);
 
     this.serach = async () => {
-        this.refs["search-dialog"].showModal("Now Loading...", ["cancel"], result=>{
+        this.refs["search-dialog"].showModal("検索中...", ["cancel"], result=>{
             this.onCancelSearch();
         });
 
@@ -184,7 +185,11 @@
             const search_result = await nico_search.search(nico_search_params);
             setData(search_result);            
         } catch (error) {
-            //pass 
+            dialog.showMessageBox(remote.getCurrentWindow(),{
+                type: "error",
+                buttons: ["OK"],
+                message: error.message
+            });
         }
 
         this.refs["search-dialog"].close();
@@ -313,7 +318,6 @@
         grid_table.init(this.root.querySelector(".search-grid"));
 
         grid_table.onDblClick((e, data)=>{
-            console.log("search dbl data=", data);
             if(data.has_local){
                 const video_id = data.id;
                 obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
@@ -330,32 +334,6 @@
             }else{
                 const video_id = data.id;
                 ipcRenderer.send("request-play-niconico", video_id);
-                // const noco_play = new NicoPlay();
-                // noco_play.play(video_id, (state)=>{
-                //     // state_log += state + ":";
-                //     console.log(state);
-                // }).then((result)=>{
-                //     const {nico_cookies, comments, thumb_info, video_url} = result;
-                //     const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
-                //     if(ret=="ok"){
-                //         const play_data = {
-                //             video_data: {
-                //                 src: video_url,
-                //                 type: thumb_info.video_type,
-                //                 commnets: comments
-                //             },
-                //             viweinfo: {
-                //                 thumb_info:thumb_info,
-                //                 commnets: comments
-                //             }
-                //         };
-                //         ipcRenderer.send("request-play-niconico", video_id);
-                //     }else{
-                //         console.log("set-nicohistory error: ", video_id);
-                //     }
-                // }).catch(error => {
-                //     console.log(error);
-                // });
             }
         });
 

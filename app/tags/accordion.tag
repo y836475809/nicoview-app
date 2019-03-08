@@ -24,7 +24,8 @@
         }
 
         .acdn-item {
-            height: 25px;
+            display: flex;
+            height: 30px;
             padding: 5px 0 5px 10px;
             transition: all 0.5s;
             cursor: pointer;
@@ -39,6 +40,10 @@
             background-color: #0f468d6b;
         }
 
+        .icont-item {
+            margin-right: 5px;
+        }
+
         .toggle-menu {
             overflow: hidden;
             transition: all 0.5s;
@@ -51,7 +56,8 @@
             <li class="acdn-item" each={ item, i in this.items } data-id={i} 
                 onclick={this.onclickItem} ondblclick={this.ondblclickItem}
                 onmouseup={this.onmouseUp}>
-                {item.title}
+                <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
+                <div>{item.title}</div>
             </li>
         </ul>
     </div>
@@ -63,9 +69,17 @@
         
         const params = this.opts.params;
         const id_name = params.name;
-        this.items = params.items;
+        this.items = params.items.map(value=>{
+            if(!value.icon){
+                value.icon = {
+                    name: "",
+                    style: ""
+                };
+            }
+            return value;
+        });
 
-        const menu_item_h = 25;
+        const menu_item_h = 30;
         
 
         const getMenuElm = () => {
@@ -133,6 +147,12 @@
         };
 
         obs.on(`${id_name}-add-items`, (items) => {
+            if(!items.icon){
+                items.icon = {
+                    name: "",
+                    style: ""
+                };
+            }
             Array.prototype.push.apply(this.items, items);
             if(isExpand()){
                 chanegExpand(true);

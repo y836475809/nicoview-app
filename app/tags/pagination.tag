@@ -1,6 +1,6 @@
 <pagination>
     <style scoped>
-    .pagination-container{
+        .pagination-container{
             display: grid;
             grid-template-rows: 1fr;
             grid-template-columns: 20px 50px 20px 50px;
@@ -13,44 +13,52 @@
         }
 
         .label {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
             user-select: none;
+            width:auto;
         }
         .back-button {
             grid-area: area1;
         }
         .page-input {
             grid-area: area2;
+            margin: 0 10px 0 10px;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }     
         input {
             width: 50px;
-            height: 30px;
+            height: 25px;
+        }          
+        .current-page-label {
+            margin-left: 5px;
         }
         .forward-button {
             grid-area: area3; 
         }
         .total-label {
             grid-area: area4;
+            margin-left: 5px;
         }
 
-        [class^="icono-caret"]:hover{
+        i[class^="fas fa-chevron"]:hover{
             color: lightgray;
             cursor: pointer;
         }
-        .icono-caretLeft {
-            transform: scale(0.8) rotate(180deg);
-        }
-        .icono-caretRight {
-            transform: scale(0.8);
-        }
     </style>
     <div class="pagination-container">
-        <div class="icono-caretLeft back-button" onclick={this.onclickBack}></div>
+        <div class="back-button" onclick={this.onclickBack}><i class="fas fa-chevron-left fa-2x"></i></div>
         <div class="page-input">
             <input type="tel" name="sample" style="text-align: right;" 
                 value={this.current_page} onkeypress={this.onkeypress}/>
-            <div class="column label"> / {this.total_pages}</div>
+            <div class="column label current-page-label"> / {this.total_pages}</div>
         </div>
-        <div class="icono-caretRight forward-button" onclick={this.onclickForward}></div>
+        <div class="forward-button" onclick={this.onclickForward}><i class="fas fa-chevron-right fa-2x"></i></div>
         <div class="label total-label">ヒット件数: {this.total_count}</div>
     </div>
     <script>

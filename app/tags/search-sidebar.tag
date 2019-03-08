@@ -72,10 +72,11 @@
             save(data);
         });
         
-        obs.on("on_add_nico_search_cond", (cond) => {
+        obs.on("on_add_nico_search_cond", (args) => {
+            const { cond, icon } = args;
             obs.trigger(`${this.acdn_search.name}-add-items`, 
                 [
-                    { title: cond.query, cond: cond }
+                    { title: cond.query, cond: cond, icon: icon }
                 ]
             );
             obs.trigger(`${this.acdn_search.name}-change-expand`, true);

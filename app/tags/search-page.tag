@@ -5,33 +5,26 @@
         height: 100%;
     }
 
-    .search-container {
-        background-color: var(--control-color);
-        width: 100%;
-        height: 100%;
-        padding-left: 5px;
-    }
-    .search-controls-container {
-        display: flex;
-        flex-wrap: wrap;
-    }
-
     .column {
         display: inline-block;
     }
-    input[type=radio] {
+    .search-input[type=radio] {
         display: none; 
     }
-    input[type=radio]:checked + .button {
+    .search-input[type=radio]:checked + .search-button {
         background: gray;
         color: lightgray;
     }
-    .label .button {
+    .label {   
+        height: 30px;
+        width: 100px;
+        user-select: none;
+    }
+    .label .search-button {
         border: 1px solid gray;
         border-radius: 2px;
         height: 100%;
         width: 100%;
-
         display: flex;
         justify-content: center;
         align-items: center;
@@ -40,67 +33,78 @@
         border-left: none;  
         margin-left: -1px;
     }
-    .icono-caretUp {
-        transform: scale(0.6) rotate(-90deg) translateX(5px);
-    }
-    .icono-caretDown {
-        transform: scale(0.6) rotate(90deg);
+
+    .search-container {
+        background-color: var(--control-color);
+        width: 100%;
+        height: 100%;
+        padding-left: 5px;
     }
 
-    .sort-kind-container .label {   
-        height: 30px;
-        width: 100px;
+    .search-controls-container {
+        display: flex;
+        flex-wrap: wrap;
     }
 
-    .filter-kind-container {
+    .search-sort-container i.fa-sort-up {
+        position :relative;
+        top:10%;
+        left:5%;
+    }
+    .search-sort-container i.fa-sort-down {
+        position :relative;
+        top:-10%;
+        left:5%;
+    }
+    .search-sort-container .label:hover{
+        cursor: pointer; 
+    }  
+
+    .search-cond-container {
         margin-left: 30px;
     }
-    .filter-kind-container .label {   
-        height: 30px;
-        width: 80px;
+    .search-cond-container .label:hover{
+        cursor: pointer; 
+    } 
+
+    .search-query-container {
+        display: flex;
     }
-    .filter-word-container input {
+    .search-query-container input {
         width: 150px;
         height: 30px;
         font-size: 1.2em;
         outline: 0;
     }
-    .filter-word-container .button {
+
+    .search-query-container .search-button {
         width: 30px;
         height: 30px;
-        margin-left: -5px;
         background-color: #7fbfff;
     }
-    .filter-word-container .button:hover {
-        opacity: 0.5;
-        cursor: pointer; 
-    }
-    .filter-word-container .icono-search {
-        color: white;
-        transform: scale(0.7) rotate(45deg);
-        top: -1px;
-        left: -1px;
-    }
-    .filter-word-container .icono-search:active {
-        top: 1px;
-        left: 1px;
+    .search-query-container .search-query-icon {
+        position :relative;
+        top:30%;
+        left:30%;
     }
 
-    .add-cond-button {
+    .search-query-container .add-search-cond-button {
+        margin-left: 10px;
         width: 30px;
         height: 30px;
-        margin-left: 10px;
-        background-color: lightseagreen;
-        border-radius: 50%;
     }
-    .add-cond-button:hover {
+    .search-query-container .fa-plus-circle {
+        color: green;
+        top:10%;
+        left:10%;
+    }
+
+    .search-query-container .search-button:hover,
+    .search-query-container .fa-search:hover,
+    .search-query-container .fa-plus-circle:hover {
         opacity: 0.5;
         cursor: pointer; 
-    }
-    .add-cond-button .icono-plus {
-        color: white;
-        transform: translateX(-2px) translateY(-2px)
-    }
+    } 
 
     .line-break {
         white-space: normal;
@@ -110,27 +114,29 @@
 
 <div class="search-container">
     <div class="search-controls-container">
-        <div class="column sort-kind-container">
+        <div class="column search-sort-container">
             <label class="column label" each="{item, i in this.sort_items}">
-                <input class="column" type="radio" name="sort_select" checked={item.select} 
+                <input class="column search-input" type="radio" name="sort_select" checked={item.select} 
                     onclick="{ this.onclickSort.bind(this, i) }"> 
-                <span class="column button">{item.title}<span class="{item.order=='+'?'icono-caretUp':'icono-caretDown'}"></span></span>
+                <span class="column search-button">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
             </label>
         </div>
-        <div class="column filter-kind-container">
+        <div class="column search-cond-container">
             <label class="column label" each="{item, i in this.search_items}">
-                <input class="column" type="radio" name="search_select" checked={item.select} 
+                <input class="column search-input" type="radio" name="search_select" checked={item.select} 
                     onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
-                <span class="column button">{item.title}</span>
+                <span class="column search-button">{item.title}</span>
             </label>        
         </div>
-        <div class="column filter-word-container">
-            <input class="column input-search" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
-            <span class="column button" onclick={this.onclickSearch}><span class="icono-search"></span></span>
-            <span class="column add-cond-button" onclick={this.onclickAddNicoSearchCond}><span class="icono-plus"></span></span>
-        </div>
-        <pagination class="column" ref="page" onmovepage={this.onmovePage}></pagination>
+        <div class="column search-query-container">
+            <input class="search-query-input" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
+            <span class="search-button" onclick={this.onclickSearch}>
+                <i class="search-query-icon fas fa-search fa-lg" ></i></span>
+            <span class="add-search-cond-button" onclick={this.onclickAddNicoSearchCond}>
+                <i class="search-query-icon fas fa-plus-circle fa-2x"></i></span>
+        </div>      
     </div>
+    <pagination class="column" ref="page" onmovepage={this.onmovePage}></pagination>
     <div class="search-grid-container">
         <div class="search-grid"></div>
     </div>
@@ -314,7 +320,7 @@
     };
 
     this.onclickSearch = (e) => {
-        const elm = this.root.querySelector(".input-search");
+        const elm = this.root.querySelector(".search-query-input");
         const query = elm.value;
         nico_search_params.query(query);
         this.search();
@@ -333,7 +339,7 @@
     };
 
     this.onclickAddNicoSearchCond = (e) => {
-        const elm = this.root.querySelector(".filter-word-container .input-search");
+        const elm = this.root.querySelector(".search-query-input");
         const cond = {
             query: elm.value,
             sort_order: nico_search_params._sort_order,
@@ -341,12 +347,16 @@
             search_kind: nico_search_params.search_kind,
             page: 1
         };
+        const icon = cond.search_kind=="tag"? {
+            name: "fas fa-tag fa-lg",
+            style: "color:red;"
+        } : undefined;
 
-        obs.trigger("on_add_nico_search_cond", cond);
+        obs.trigger("on_add_nico_search_cond", { cond, icon });
     };
 
     obs.on("on_change_nico_search_cond", (cond)=> {
-        const elm = this.root.querySelector(".filter-word-container .input-search");
+        const elm = this.root.querySelector(".search-query-input");
         elm.value = cond.query;
         nico_search_params.cond(cond.search_kind);
         nico_search_params.query(cond.query);

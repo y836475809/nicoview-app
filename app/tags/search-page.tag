@@ -98,33 +98,33 @@
     }
 </style>
 
-    <div class="search-cond-container">
-        <div class="search-sort-container">
-            <label class="label" each="{item, i in this.sort_items}">
-                <input class="radio-input" type="radio" name="sort" checked={item.select} 
-                    onclick="{ this.onclickSort.bind(this, i) }"> 
-                <span class="radio-label">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
-            </label>
-        </div>
-        <div class="search-target-container">
-            <label class="label" each="{item, i in this.search_items}">
-                <input class="radio-input" type="radio" name="target" checked={item.select} 
-                    onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
-                <span class="radio-label">{item.title}</span>
-            </label>
-        </div>
-        <div class="search-query-container">
-            <input class="query-input" type="search" onkeydown={this.onkeydownSearchInput}>
-            <span class="search-button" onclick={this.onclickSearch}>
-                <i class="icon-button fas fa-search fa-lg" ></i></span>
-            <span class="add-search-cond-button" onclick={this.onclickAddNicoSearchCond}>
-                <i class="icon-button far fa-plus-square fa-3x"></i></span>
-        </div>      
+<div class="search-cond-container">
+    <div class="search-sort-container">
+        <label class="label" each="{item, i in this.sort_items}">
+            <input class="radio-input" type="radio" name="sort" checked={item.select} 
+                onclick="{ this.onclickSort.bind(this, i) }"> 
+            <span class="radio-label">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
+        </label>
     </div>
-    <pagination ref="page" onmovepage={this.onmovePage}></pagination>
-    <div class="search-grid-container">
-        <div class="search-grid"></div>
+    <div class="search-target-container">
+        <label class="label" each="{item, i in this.search_items}">
+            <input class="radio-input" type="radio" name="target" checked={item.select} 
+                onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
+            <span class="radio-label">{item.title}</span>
+        </label>
     </div>
+    <div class="search-query-container">
+        <input class="query-input" type="search" onkeydown={this.onkeydownSearchInput}>
+        <span class="search-button" onclick={this.onclickSearch}>
+            <i class="icon-button fas fa-search fa-lg" ></i></span>
+        <span class="add-search-cond-button" onclick={this.onclickAddNicoSearchCond}>
+            <i class="icon-button far fa-plus-square fa-3x"></i></span>
+    </div>      
+</div>
+<pagination ref="page" onmovepage={this.onmovePage}></pagination>
+<div class="search-grid-container">
+    <div class="search-grid"></div>
+</div>
 
 <modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 

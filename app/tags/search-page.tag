@@ -3,24 +3,31 @@
     :scope{
         width: 100%;
         height: 100%;
+        background-color: var(--control-color);
     }
 
-    .column {
-        display: inline-block;
-    }
-    .search-input[type=radio] {
+    .search-cond-container .radio-input[type=radio] {
         display: none; 
     }
-    .search-input[type=radio]:checked + .search-button {
+    .search-cond-container .radio-input[type=radio]:checked + .radio-label {
         background: gray;
         color: lightgray;
     }
-    .label {   
+
+    .search-cond-container,
+    .search-cond-container > * {
+        display: flex;
+    }
+    .search-cond-container {
+        flex-wrap: wrap;
+    }
+
+    .search-cond-container .label {   
         height: 30px;
         width: 100px;
         user-select: none;
     }
-    .label .search-button {
+    .search-cond-container .radio-label {
         border: 1px solid gray;
         border-radius: 2px;
         height: 100%;
@@ -29,21 +36,9 @@
         justify-content: center;
         align-items: center;
     }
-    .label + .label {
+    .search-cond-container .label + .label {
         border-left: none;  
         margin-left: -1px;
-    }
-
-    .search-container {
-        background-color: var(--control-color);
-        width: 100%;
-        height: 100%;
-        padding-left: 5px;
-    }
-
-    .search-controls-container {
-        display: flex;
-        flex-wrap: wrap;
     }
 
     .search-sort-container i.fa-sort-up {
@@ -56,20 +51,14 @@
         top:-10%;
         left:5%;
     }
-    .search-sort-container .label:hover{
+    .search-cond-container .label:hover{
         cursor: pointer; 
     }  
 
-    .search-cond-container {
+    .search-target-container {
         margin-left: 30px;
     }
-    .search-cond-container .label:hover{
-        cursor: pointer; 
-    } 
 
-    .search-query-container {
-        display: flex;
-    }
     .search-query-container input {
         width: 150px;
         height: 30px;
@@ -80,28 +69,25 @@
     .search-query-container .search-button {
         width: 30px;
         height: 30px;
+        border-radius: 2px;
         background-color: #7fbfff;
     }
-    .search-query-container .search-query-icon {
+    .search-query-container .fa-search {
         position :relative;
-        top:30%;
-        left:30%;
+        transform: translate(40%, 50%);
     }
-
     .search-query-container .add-search-cond-button {
         margin-left: 10px;
         width: 30px;
         height: 30px;
     }
-    .search-query-container .fa-plus-circle {
-        color: green;
-        top:10%;
-        left:10%;
+    .search-query-container .fa-plus-square {
+        position :relative;
+        transform: translate(-5%, -5%);
+        color: darkgray;
     }
-
     .search-query-container .search-button:hover,
-    .search-query-container .fa-search:hover,
-    .search-query-container .fa-plus-circle:hover {
+    .search-query-container .icon-button:hover { 
         opacity: 0.5;
         cursor: pointer; 
     } 
@@ -112,35 +98,34 @@
     }
 </style>
 
-<div class="search-container">
-    <div class="search-controls-container">
-        <div class="column search-sort-container">
-            <label class="column label" each="{item, i in this.sort_items}">
-                <input class="column search-input" type="radio" name="sort_select" checked={item.select} 
+    <div class="search-cond-container">
+        <div class="search-sort-container">
+            <label class="label" each="{item, i in this.sort_items}">
+                <input class="radio-input" type="radio" name="sort" checked={item.select} 
                     onclick="{ this.onclickSort.bind(this, i) }"> 
-                <span class="column search-button">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
+                <span class="radio-label">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
             </label>
         </div>
-        <div class="column search-cond-container">
-            <label class="column label" each="{item, i in this.search_items}">
-                <input class="column search-input" type="radio" name="search_select" checked={item.select} 
+        <div class="search-target-container">
+            <label class="label" each="{item, i in this.search_items}">
+                <input class="radio-input" type="radio" name="target" checked={item.select} 
                     onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
-                <span class="column search-button">{item.title}</span>
-            </label>        
+                <span class="radio-label">{item.title}</span>
+            </label>
         </div>
-        <div class="column search-query-container">
-            <input class="search-query-input" type="search" class="text" onkeydown={this.onkeydownSearchInput}>
+        <div class="search-query-container">
+            <input class="query-input" type="search" onkeydown={this.onkeydownSearchInput}>
             <span class="search-button" onclick={this.onclickSearch}>
-                <i class="search-query-icon fas fa-search fa-lg" ></i></span>
+                <i class="icon-button fas fa-search fa-lg" ></i></span>
             <span class="add-search-cond-button" onclick={this.onclickAddNicoSearchCond}>
-                <i class="search-query-icon fas fa-plus-circle fa-2x"></i></span>
+                <i class="icon-button far fa-plus-square fa-3x"></i></span>
         </div>      
     </div>
-    <pagination class="column" ref="page" onmovepage={this.onmovePage}></pagination>
+    <pagination ref="page" onmovepage={this.onmovePage}></pagination>
     <div class="search-grid-container">
         <div class="search-grid"></div>
     </div>
-</div>  
+
 <modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 
 <script>
@@ -320,7 +305,7 @@
     };
 
     this.onclickSearch = (e) => {
-        const elm = this.root.querySelector(".search-query-input");
+        const elm = this.root.querySelector(".search-query-container > .query-input");
         const query = elm.value;
         nico_search_params.query(query);
         this.search();
@@ -333,13 +318,12 @@
             const param = e.target.value;
             nico_search_params.query(param);
             this.search();
-
             this.refs.page.resetPage();
         }
     };
 
     this.onclickAddNicoSearchCond = (e) => {
-        const elm = this.root.querySelector(".search-query-input");
+        const elm = this.root.querySelector(".search-query-container > .query-input");
         const cond = {
             query: elm.value,
             sort_order: nico_search_params._sort_order,
@@ -356,7 +340,7 @@
     };
 
     obs.on("on_change_nico_search_cond", (cond)=> {
-        const elm = this.root.querySelector(".search-query-input");
+        const elm = this.root.querySelector(".search-query-container > .query-input");
         elm.value = cond.query;
         nico_search_params.cond(cond.search_kind);
         nico_search_params.query(cond.query);

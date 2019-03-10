@@ -19,7 +19,6 @@
     "@fortawesome/fontawesome-free": "^5.7.2",
     "animejs": "^2.2.0",
     "cheerio": "^1.0.0-rc.2",
-    "icono": "^1.3.2",
     "jquery": "^3.3.1",
     "jsdom": "^13.2.0",
     "nedb": "^1.8.0",

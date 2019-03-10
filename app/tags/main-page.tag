@@ -36,33 +36,37 @@
             box-sizing: border-box;
             border-radius: 2px;
         }
-        .label .button{
+        .main-group-buttons .label .button{
             display: flex;
             justify-content: center;
             align-items: center;
             width: 50px;
             height: 50px;
         }
-        .icono-book, .icono-search, .icono-clock, .icono-gear{
-           color: white;
+
+        .main-group-buttons .fa-book, 
+        .main-group-buttons .fa-search, 
+        .main-group-buttons .fa-history, 
+        .main-group-buttons .fa-cog {
+           color: lightgrey;
         }
     </style>
     <div class="main-group-buttons">
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
-            <span title="ライブラリ" class="button"><span class="icono-book"></span></span>
+            <span title="ライブラリ" class="button"><span class="fas fa-book fa-3x"></span></span>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
-            <span title="検索" class="button"><span class="icono-search"></span></span> 
+            <span title="検索" class="button"><span class="fas fa-search fa-3x"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
-            <span title="履歴" class="button"><span class="icono-clock"></span></span> 
+            <span title="履歴" class="button"><span class="fas fa-history fa-3x"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,3)}> 
-            <span title="設定" class="button"><span class="icono-gear"></span></span> 
+            <span title="設定" class="button"><span class="fas fa-cog fa-3x"></span></span> 
         </label>
     </div>
     <div id="page1" class="page-container">

@@ -30,3 +30,9 @@ html, body {
 .slick-cell.selected {
   background-color: #6190cd6b;
 }
+
+/* TODO */
+.center-horizontally-and-vertically {
+  display: table-cell;
+  vertical-align: middle;
+}

@@ -1,13 +1,12 @@
 <library-page>
     <style scoped>
         :scope {
-            /* width: 100%; */
-            /* height: 100%; */
+            width: 100%;
+            height: 100%;
             --right-width: 200px;
             --search-input-width: 200px;
-            --search-button-size: 25px;
+            --search-button-size: 30px;
             display: flex;
-            height: 100%;
         }
 
         .gutter {    
@@ -26,41 +25,45 @@
             overflow-y: hidden;
         }
 
-        .library-info{
+        .library-controls-container,
+        .library-controls-container .search-container {
             display: flex;
         }
-        .library-item-info{
-            height: 25px;
-            line-height: 25px;
+        .library-controls-container .item-info{
+            height: 30px;
             vertical-align: middle;
             user-select: none;
-        }
-        .library-search{
             display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .library-controls-container .search-container {
             width: calc(var(--search-input-width) + var(--search-button-size) + 6px);
             margin: 0;
             margin-left: auto;
             margin-right: 15px;
             margin-bottom: 4px;     
         }
-        .library-search > button{ 
+        .library-controls-container .filter-button { 
             margin: auto;
             width: var(--search-button-size);
             height: var(--search-button-size);
         }
-        .library-search-input{
+        .library-controls-container .filter-input {
             width: var(--search-input-width);
             height: var(--search-button-size);
         }
-        .library-search > button > span {
-            margin: 0;
-            top: -5px;
-            left: -10px;
-            color: black;
-            transform: scale(0.5);
-        }
 
-        .slick-cell.l2.r2 {
+        .library-controls-container .filter-button {
+            color: darkgray;
+            font-size: 30px;
+        }
+        .library-controls-container .filter-button > i:hover {
+            opacity: 0.5;
+            cursor: pointer; 
+        } 
+
+        .library-grid-container .slick-cell.l2.r2 {
             white-space: normal;
         }
     </style>
@@ -70,11 +73,12 @@
     </div>
     <div class="gutter"></div>
     <div class="split right">
-        <div class="library-info">
-            <div class="library-item-info">項目数 {this.num_items}</div>
-            <div class="library-search">
-                <input type="search" class="library-search-input" onkeydown={onkeydownSearchInput} />
-                <button title="test" onclick={onclickAdd}><span class="icono-plus"></span></button>
+        <div class="library-controls-container">
+            <div class="item-info">項目数 {this.num_items}</div>
+            <div class="search-container">
+                <input class="filter-input" type="search" onkeydown={onkeydownSearchInput} />
+                <span class="filter-button" onclick={onclickAdd}>
+                    <i class="far fa-fw fa-plus-square center-horizontally-and-vertically"></i></span>
             </div>
         </div>
         <div class="library-grid-container">

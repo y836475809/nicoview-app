@@ -48,3 +48,7 @@ this.refs.description.innerHTML = "<a href=\"https://www.nicovideo.jp/watch/sm33
 
 http:localhost:3000/api/v2/video/contents/search?q=test&targets=m&_sort=m&_offset=0&_limit=32&_context=app
 json-server index.js  --routes route.json
+
+
+http://www.webdesignleaves.com/pr/plugins/fontawesome_01.html
+https://niwaka-web.com/fontawsome5_css/

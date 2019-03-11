@@ -178,8 +178,8 @@
             const { video_data, viweinfo } = arg;
             play_by_video_data(video_data, viweinfo);
         });
-        obs.on("request-send-video-data", (video_id) => {
-            play_by_video_data(video_id);
+        obs.on("request-send-videoid", (video_id) => {
+            play_by_video_id(video_id);
         });
 
         this.on("mount", () => {

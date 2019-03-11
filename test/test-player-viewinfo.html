@@ -25,7 +25,8 @@
     <div class="test-button">
         <button type="button" onclick="onclickLoad();">load</button>
         <button type="button" onclick="onclickLoad2();">load comment</button>
-        <input class="watch-id-input" type="search" /><button type="button" onclick="onclickLoad3();">watch</button>
+        <button type="button" onclick="onclickLoad3();">watch dmc</button>
+        <button type="button" onclick="onclickLoad4();">watch smile</button>
     </div>    
     <player-viewinfo-page ref="pvi" class="test-player-viewinfo-page"></player-viewinfo-page>
 </body>
@@ -133,7 +134,11 @@
     };
 
     const onclickLoad3 = () => {
-        const video_id = document.querySelector("watch-id-input").value;
+        const video_id = "sm33851481"; //"sm32951089";
+        obs.trigger("request-send-videoid", video_id); 
+    };
+    const onclickLoad4 = () => {
+        const video_id = "sm29316071";
         obs.trigger("request-send-videoid", video_id); 
     };
 </script>

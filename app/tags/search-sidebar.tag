@@ -46,7 +46,7 @@
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        // obs.trigger(`${sender}-delete-selected-items`);
+                        obs.trigger(`${sender}-delete-selected-items`);
                     }
                 }
             ];

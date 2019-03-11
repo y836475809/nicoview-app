@@ -33,9 +33,6 @@
             height: 30px;
             vertical-align: middle;
             user-select: none;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
         .library-controls-container .search-container {
             width: calc(var(--search-input-width) + var(--search-button-size) + 6px);
@@ -74,11 +71,11 @@
     <div class="gutter"></div>
     <div class="split right">
         <div class="library-controls-container">
-            <div class="item-info">項目数 {this.num_items}</div>
+            <div class="item-info center-hv">項目数 {this.num_items}</div>
             <div class="search-container">
                 <input class="filter-input" type="search" onkeydown={onkeydownSearchInput} />
                 <span class="filter-button" onclick={onclickAdd}>
-                    <i class="far fa-fw fa-plus-square center-horizontally-and-vertically"></i></span>
+                    <i class="far fa-fw fa-plus-square center-hv"></i></span>
             </div>
         </div>
         <div class="library-grid-container">

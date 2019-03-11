@@ -16,15 +16,8 @@
             opacity: 0;
         }
 
-        .message-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
         .message {
             grid-area: item1;
-            text-align: center;
-            vertical-align: middle;
             color: black;
             user-select: none;
         } 
@@ -47,7 +40,7 @@
 
     <dialog oncancel={this.oncancel}>
         <div class="container">
-            <div class="message-container">
+            <div class="center-hv">
                 <p class="message">{this.message}</p>
             </div>
             <div class="button-container">

@@ -37,9 +37,6 @@
             border-radius: 2px;
         }
         .main-group-buttons .label .button{
-            display: flex;
-            justify-content: center;
-            align-items: center;
             width: 50px;
             height: 50px;
         }
@@ -48,25 +45,26 @@
         .main-group-buttons .fa-search, 
         .main-group-buttons .fa-history, 
         .main-group-buttons .fa-cog {
-           color: lightgrey;
+            font-size: 30px;
+            color: lightgrey;
         }
     </style>
     <div class="main-group-buttons">
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
-            <span title="ライブラリ" class="button"><span class="fas fa-book fa-3x"></span></span>
+            <span title="ライブラリ" class="button center-hv"><span class="fas fa-book"></span></span>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
-            <span title="検索" class="button"><span class="fas fa-search fa-3x"></span></span> 
+            <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
-            <span title="履歴" class="button"><span class="fas fa-history fa-3x"></span></span> 
+            <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,3)}> 
-            <span title="設定" class="button"><span class="fas fa-cog fa-3x"></span></span> 
+            <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
         </label>
     </div>
     <div id="page1" class="page-container">

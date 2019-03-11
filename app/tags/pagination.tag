@@ -6,9 +6,6 @@
         }
 
         .label {
-            display: flex;
-            justify-content: center;
-            align-items: center;
             user-select: none;
             margin-left: 5px;
         }
@@ -24,19 +21,23 @@
             outline: 0;
         }
 
+        i[class^="fas fa-chevron"] {
+            font-size: 20px;
+        }
+
         i[class^="fas fa-chevron"]:hover{
-            color: lightgray;
+            opacity: 0.5;
             cursor: pointer;
         }
     </style>
 
-    <div onclick={this.onclickBack}><i class="fas fa-chevron-left fa-2x"></i></div>
+    <div class="center-hv" onclick={this.onclickBack}><i class="fas fa-chevron-left"></i></div>
     <div class="page-input-container">
         <input type="tel" value={this.current_page} onkeypress={this.onkeypress}/>
-        <div class="label"> / {this.total_pages}</div>
+        <div class="label center-hv"> / {this.total_pages}</div>
     </div>
-    <div onclick={this.onclickForward}><i class="fas fa-chevron-right fa-2x"></i></div>
-    <div class="label">ヒット件数: {this.total_count}</div>
+    <div class="center-hv" onclick={this.onclickForward}><i class="fas fa-chevron-right"></i></div>
+    <div class="label center-hv">ヒット件数: {this.total_count}</div>
 
     <script>
         this.current_page = 1;

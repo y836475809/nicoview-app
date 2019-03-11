@@ -22,9 +22,6 @@
             height: 30px;
         }
         .play-btn > button > span{
-            position: absolute;
-            top: -4px;
-            left: -4px;
             color: gray;           
         }
         .seek{
@@ -38,7 +35,8 @@
     </style>
 
     <div class="play-btn">
-        <button onclick={play}><span class="icono-play"></span></button>
+        <button disabled={this.play_disabled} class="center-hv" onclick={play}>
+            <span class={this.current_state}></span></button>
     </div>
     <player-seek ref="seek" class="seek"></player-seek>
     <player-volume class="volume"></player-volume>
@@ -50,82 +48,67 @@
         riot.mount("player-seek");
         riot.mount("player-volume");
 
-        const STATE_PLAY = "play";
-        const STATE_PAUSE = "pause";
-        const STATE_STOP = "stop";
+        const stateMap = new Map([
+            ["play", "fas fa-play"],
+            ["pause", "fas fa-pause"],
+            ["stop", "fas fa-stop"]
+        ]);
 
-        let current_state = STATE_STOP;
-        let enable = false;
+        this.current_state = stateMap.get("stop");
+        this.play_disabled = true;
+
+        const updateButton = (state) => {
+            this.current_state = stateMap.get(state);
+            this.update();
+        };
+
+        const getPlayEnable = () => {
+            return !this.play_disabled;
+        };
+
+        const setPlayEnable = (value) => {
+            this.play_disabled = !value;
+            this.update();
+        };
 
         const isPlay = () => {
-            return current_state == STATE_PLAY;
+            return this.current_state == stateMap.get("play");
         };
         const isPause = () => {
-            return current_state == STATE_PAUSE;
+            return this.current_state == stateMap.get("pause");
         };
         const isStop = () => {
-            return current_state == STATE_STOP;
-        };
-
-        const setPlayBtnClass = () => {
-            let elm = this.root.querySelector(".play-btn > button > span");
-            elm.classList.remove("icono-play", "icono-pause");
-
-            if(isStop()){
-                elm.classList.add("icono-play");
-                return;
-            }
-            if(isPlay()){
-                elm.classList.add("icono-pause");
-                return;        
-            }
-            if(isPause()){
-                elm.classList.add("icono-play");
-                return;
-            } 
-
-            throw new Error(`state: ${current_state}`);                    
-        };
-
-        const setPlayBtnEnable = (enable) => {
-            let elm = this.root.querySelector(".play-btn > button");
-            elm.disabled = enable ? 0 : 1;
+            return this.current_state == stateMap.get("stop");
         };
 
         this.play = () => {
-            if(!enable){
+            if(!getPlayEnable()){
                 return;
             }
 
             if(isStop()){
                 obs.trigger("loadplaydata");
-                current_state = STATE_PLAY;
+                updateButton("play");
             }else if(isPlay()){
                 obs.trigger("pause");
-                current_state = STATE_PAUSE;
+                updateButton("pause");
             }else{
                 obs.trigger("play");
-                current_state = STATE_PLAY;
+                updateButton("play");
             }
-            setPlayBtnClass();
         };
 
         obs.on("loaded_data", ()=> {
-            enable = true;
-            setPlayBtnEnable(true);
+            setPlayEnable(true);
         });
         
         obs.on("on_set_player_state", (state)=> {
-            current_state = state;
-            setPlayBtnClass();
-            // setPlayBtnEnable(true);
+            updateButton(state);
         });
 
         this.on("mount", ()=> {
-            enable = false;
-            current_state = STATE_PAUSE;
-            setPlayBtnClass();
-            setPlayBtnEnable(false);
+            updateButton("play");
+            setPlayEnable(false);
 
             obs.on("resizeEndEvent", (video_size) => { 
                 this.refs.seek.redraw();

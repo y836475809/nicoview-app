@@ -32,24 +32,25 @@
         border-radius: 2px;
         height: 100%;
         width: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
     }
     .search-cond-container .label + .label {
         border-left: none;  
         margin-left: -1px;
     }
 
-    .search-sort-container i.fa-sort-up {
-        position :relative;
+    .search-sort-container i.fa-caret-up {
+        /* position :relative;
         top:10%;
-        left:5%;
+        left:5%; */
+        /* position :relative; */
+
+        font-size: 25px;
     }
-    .search-sort-container i.fa-sort-down {
-        position :relative;
+    .search-sort-container i.fa-caret-down {
+        /* position :relative;
         top:-10%;
-        left:5%;
+        left:5%; */
+        font-size: 25px;
     }
     .search-cond-container .label:hover{
         cursor: pointer; 
@@ -73,8 +74,7 @@
         background-color: #7fbfff;
     }
     .search-query-container .fa-search {
-        position :relative;
-        transform: translate(40%, 50%);
+        font-size: 25px;
     }
     .search-query-container .add-search-cond-button {
         margin-left: 10px;
@@ -82,8 +82,7 @@
         height: 30px;
     }
     .search-query-container .fa-plus-square {
-        position :relative;
-        transform: translate(-5%, -5%);
+        font-size: 30px;
         color: darkgray;
     }
     .search-query-container .search-button:hover,
@@ -103,22 +102,23 @@
         <label class="label" each="{item, i in this.sort_items}">
             <input class="radio-input" type="radio" name="sort" checked={item.select} 
                 onclick="{ this.onclickSort.bind(this, i) }"> 
-            <span class="radio-label">{item.title}<i class="fas fa-{item.order=='+'?'sort-up':'sort-down'}  fa-2x"></i></span>
+            <span class="radio-label center-hv">{item.title}
+                <i class="fas fa-fw fa-{item.order=='+'?'caret-up':'caret-down'}"></i></span>
         </label>
     </div>
     <div class="search-target-container">
         <label class="label" each="{item, i in this.search_items}">
             <input class="radio-input" type="radio" name="target" checked={item.select} 
                 onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
-            <span class="radio-label">{item.title}</span>
+            <span class="radio-label center-hv">{item.title}</span>
         </label>
     </div>
     <div class="search-query-container">
         <input class="query-input" type="search" onkeydown={this.onkeydownSearchInput}>
-        <span class="search-button" onclick={this.onclickSearch}>
-            <i class="icon-button fas fa-search fa-lg" ></i></span>
-        <span class="add-search-cond-button" onclick={this.onclickAddNicoSearchCond}>
-            <i class="icon-button far fa-plus-square fa-3x"></i></span>
+        <span class="search-button center-hv" onclick={this.onclickSearch}>
+            <i class="icon-button fas fa-search" ></i></span>
+        <span class="add-search-cond-button center-hv" onclick={this.onclickAddNicoSearchCond}>
+            <i class="icon-button far fa-plus-square"></i></span>
     </div>      
 </div>
 <pagination ref="page" onmovepage={this.onmovePage}></pagination>

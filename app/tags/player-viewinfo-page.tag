@@ -38,6 +38,7 @@
         const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
         require(`${app_base_dir}/tags/player-page.tag`);
         require(`${app_base_dir}/tags/viewinfo-page.tag`);   
@@ -128,6 +129,58 @@
         }];
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
+
+        const play_by_video_data = (video_data, viweinfo) => {
+            document.title = viweinfo.thumb_info.title;
+            obs.trigger("on_set_player_state", "play"); 
+            obs.trigger("receivedData", video_data);
+            obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);
+            obs.trigger("on_change_viweinfo", viweinfo);       
+        }; 
+
+        const play_by_video_id = (video_id) => {
+            const noco_play = new NicoPlay();
+            noco_play.play(video_id, (state)=>{
+                // state_log += state + ":";
+                console.log(state);
+            }).then((result)=>{
+                const {nico_cookies, comments, thumb_info, video_url} = result;
+                const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+                if(ret=="ok"){
+                    const video_data = {
+                        src: video_url,
+                        type: thumb_info.video_type,
+                        commnets: comments
+                    };
+                    const viweinfo = {
+                        thumb_info:thumb_info,
+                        commnets: comments
+                    };
+                    play_by_video_data(video_data, viweinfo);
+                }else{
+                    console.log("set-nicohistory error: ", video_id);
+                }
+            }).catch(error => {
+                console.log(error);
+            });
+        }; 
+
+        ipcRenderer.on("request-send-video-data", (event, arg) => {
+            const { video_data, viweinfo } = arg;
+            play_by_video_data(video_data, viweinfo);
+        });
+
+        ipcRenderer.on("request-send-videoid", (event, video_id) => {
+            play_by_video_id(video_id);
+        });
+
+        obs.on("request-send-video-data", (arg) => {
+            const { video_data, viweinfo } = arg;
+            play_by_video_data(video_data, viweinfo);
+        });
+        obs.on("request-send-video-data", (video_id) => {
+            play_by_video_data(video_id);
+        });
 
         this.on("mount", () => {
             const vw = SettingStore.getValue(pref_infoview_width, 200);

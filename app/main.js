@@ -100,16 +100,16 @@ const play = (cb) => {
 };
 
 app.on("login", function(event, webContents, request, authInfo, callback) {
-    event.preventDefault();
-
-    try {
-        const f = path.join(app.getPath("userData"), "p.json");
-        const p = JSON.parse(fs.readFileSync(f));
-        callback(p.name, p.pass);      
-    } catch (error) {
-        callback(null, null);
+    if(authInfo.isProxy){
+        event.preventDefault();
+        try {
+            const f = path.join(app.getPath("userData"), "proxy.json");
+            const p = JSON.parse(fs.readFileSync(f));
+            callback(p.name, p.pass);      
+        } catch (error) {
+            callback(null, null);
+        }
     }
-
 });
 
 ipcMain.on("request-play-library", (event, library_data) => {

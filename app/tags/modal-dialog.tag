@@ -61,6 +61,11 @@
             dialog.showModal();
         };
 
+        this.updateMessage = (message) =>{
+            this.message = message;
+            this.update();
+        };
+        
         this.close = () => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();

@@ -33,10 +33,12 @@
         </viewinfo-page>
     </div>
 
+    <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
+
     <script>
         /* globals app_base_dir obs */
         const {ipcRenderer, remote} = require("electron");
-        const {Menu, MenuItem} = remote;
+        const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
@@ -139,9 +141,13 @@
         }; 
 
         const play_by_video_id = (video_id) => {
-            const noco_play = new NicoPlay();
-            noco_play.play(video_id, (state)=>{
-                // state_log += state + ":";
+            const prog_dialog = this.refs["nico-play-dialog"];
+            const nico_play = new NicoPlay();
+            prog_dialog.showModal("...", ["cancel"], result=>{
+                nico_play.cancel();
+            });
+            nico_play.play(video_id, (state)=>{
+                prog_dialog.updateMessage(state);
                 console.log(state);
             }).then((result)=>{
                 const {nico_cookies, comments, thumb_info, video_url} = result;
@@ -159,9 +165,23 @@
                     play_by_video_data(video_data, viweinfo);
                 }else{
                     console.log("set-nicohistory error: ", video_id);
+                    dialog.showMessageBox(remote.getCurrentWindow(),{
+                        type: "error",
+                        buttons: ["OK"],
+                        message: `error: set-nicohistory ${video_id}`,
+                    });
                 }
+                prog_dialog.close();
             }).catch(error => {
                 console.log(error);
+                if(!error.cancel){
+                    dialog.showMessageBox(remote.getCurrentWindow(),{
+                        type: "error",
+                        buttons: ["OK"],
+                        message: error.message
+                    });
+                }
+                prog_dialog.close();
             });
         }; 
 

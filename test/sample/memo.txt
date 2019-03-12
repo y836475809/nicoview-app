@@ -38,7 +38,7 @@ https://qiita.com/tor4kichi/items/74939b49954d3e72d789
 http://d.hatena.ne.jp/s01149ht/20091216/1260983794
 https://qiita.com/gabdro/private/636c5e9e02f143b273e6
 
-����Ō�܂ł����ďI�����Ă�hb�͑����Ă���l�q
+動画最後までいって終了してもhbは続いている様子
 
 window.onclickTag = (e) => {
 	console.log(e.href)         

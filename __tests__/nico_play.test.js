@@ -39,8 +39,8 @@ test("nico play dmc", async (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay(hb_1s_rate);
-    noco_play.play(TestData.video_id, (state)=>{
+    const nico_play = new NicoPlay(hb_1s_rate);
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);    
@@ -56,7 +56,7 @@ test("nico play dmc", async (t) => {
     t.is(nico_mocks.hb_options_count, 1);
     t.is(nico_mocks.hb_post_count, 2);
 
-    noco_play.stopHB();
+    nico_play.stopHB();
 });
 
 test.cb("nico play dmc cancel", (t) => {
@@ -67,13 +67,13 @@ test.cb("nico play dmc cancel", (t) => {
     // nico_mocks.dmc_session();
     // nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay();
+    const nico_play = new NicoPlay();
 
     setTimeout(()=>{
-        noco_play.cancel();
+        nico_play.cancel();
     },1000);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);
@@ -92,10 +92,10 @@ test.cb("nico play dmc cancel hb", (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
     setTimeout(()=>{
-        noco_play.cancel();
+        nico_play.cancel();
     },2500);
 
     setTimeout(()=>{
@@ -104,7 +104,7 @@ test.cb("nico play dmc cancel hb", (t) => {
         t.end();
     },6000);   
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }, (error)=>{
         t.is(state_log, 
@@ -127,9 +127,9 @@ test.cb("nico play dmc error watch", (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);
@@ -149,9 +149,9 @@ test.cb("nico play dmc error comment", (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);
@@ -171,9 +171,9 @@ test.cb("nico play dmc error dmc_session", (t) => {
     nico_mocks.dmc_session_error();
     nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);
@@ -198,9 +198,9 @@ test.cb("nico play dmc error hb_options", (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb_options_error(403);
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);
@@ -225,9 +225,9 @@ test.cb("nico play dmc error hb_post", (t) => {
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb_post_error(403);
 
-    const noco_play = new NicoPlay(hb_1s_rate);
+    const nico_play = new NicoPlay(hb_1s_rate);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }, (hb_error)=>{
         t.is(hb_error.cancel, undefined);
@@ -238,7 +238,7 @@ test.cb("nico play dmc error hb_post", (t) => {
             + "start video:start HeartBeat:finish video:");
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 0);
-        t.is(noco_play.nico_video.heart_beat_id, null);
+        t.is(nico_play.nico_video.heart_beat_id, null);
         t.end();        
     }).then((result)=>{
         t.not(result, undefined);
@@ -255,10 +255,10 @@ test("nico play smile", async (t) => {
     // nico_mocks.dmc_session();
     // nico_mocks.dmc_hb();
 
-    const noco_play = new NicoPlay();
-    noco_play.setForceSmile(true);
+    const nico_play = new NicoPlay();
+    nico_play.setForceSmile(true);
 
-    noco_play.play(TestData.video_id, (state)=>{
+    nico_play.play(TestData.video_id, (state)=>{
         state_log += state + ":";
     }).then((result)=>{
         t.not(result, undefined);    

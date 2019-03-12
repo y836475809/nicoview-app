@@ -1,6 +1,8 @@
 <modal-dialog>
     <style scoped>
         .container {
+            width: 250px;
+            height: 150px;
             display: grid;
             grid-template-rows: 1fr 30px;
             grid-template-areas: 

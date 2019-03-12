@@ -43,7 +43,10 @@
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
         require(`${app_base_dir}/tags/player-page.tag`);
-        require(`${app_base_dir}/tags/viewinfo-page.tag`);   
+        require(`${app_base_dir}/tags/viewinfo-page.tag`); 
+        require(`${app_base_dir}/tags/modal-dialog.tag`);  
+
+        let nico_play = null;
 
         let org_video_size = null;
         let gutter = false;
@@ -132,7 +135,7 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const play_by_video_data = (video_data, viweinfo) => {
+        const play_by_video_data = (video_data, viweinfo) => {          
             document.title = viweinfo.thumb_info.title;
             obs.trigger("on_set_player_state", "play"); 
             obs.trigger("receivedData", video_data);
@@ -140,39 +143,42 @@
             obs.trigger("on_change_viweinfo", viweinfo);       
         }; 
 
-        const play_by_video_id = (video_id) => {
-            const prog_dialog = this.refs["nico-play-dialog"];
-            const nico_play = new NicoPlay();
+        const cancelPlay = () => {
+            if(nico_play){
+                nico_play.cancel();
+            }
+        };
+
+        const play_by_video_id = async (video_id) => {
+            cancelPlay();
+
+            const prog_dialog = this.refs["nico-play-dialog"];         
+            nico_play = new NicoPlay();
             prog_dialog.showModal("...", ["cancel"], result=>{
                 nico_play.cancel();
             });
-            nico_play.play(video_id, (state)=>{
-                prog_dialog.updateMessage(state);
-                console.log(state);
-            }).then((result)=>{
-                const {nico_cookies, comments, thumb_info, video_url} = result;
-                const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
-                if(ret=="ok"){
-                    const video_data = {
-                        src: video_url,
-                        type: thumb_info.video_type,
-                        commnets: comments
-                    };
-                    const viweinfo = {
-                        thumb_info:thumb_info,
-                        commnets: comments
-                    };
-                    play_by_video_data(video_data, viweinfo);
-                }else{
-                    console.log("set-nicohistory error: ", video_id);
-                    dialog.showMessageBox(remote.getCurrentWindow(),{
-                        type: "error",
-                        buttons: ["OK"],
-                        message: `error: set-nicohistory ${video_id}`,
+            try {
+                const {nico_cookies, comments, thumb_info, video_url} = 
+                    await nico_play.play(video_id, (state)=>{
+                        prog_dialog.updateMessage(state);
+                        console.log(state);
                     });
-                }
-                prog_dialog.close();
-            }).catch(error => {
+                const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+                if(ret!="ok"){
+                    throw new Error(`error: fault set nicohistory ${video_id}`);
+                } 
+                const video_data = {
+                    src: video_url,
+                    type: thumb_info.video_type,
+                    commnets: comments
+                };
+                const viweinfo = {
+                    thumb_info:thumb_info,
+                    commnets: comments
+                };
+                play_by_video_data(video_data, viweinfo);
+                prog_dialog.close();         
+            } catch (error) {
                 console.log(error);
                 if(!error.cancel){
                     dialog.showMessageBox(remote.getCurrentWindow(),{
@@ -181,8 +187,8 @@
                         message: error.message
                     });
                 }
-                prog_dialog.close();
-            });
+                prog_dialog.close();                
+            }
         }; 
 
         ipcRenderer.on("request-send-video-data", (event, arg) => {
@@ -240,6 +246,8 @@
         });
 
         window.onbeforeunload = (e) => {
+            cancelPlay();
+
             const h = this.refs.player_frame.getTagsPanelHeight() 
                     + this.refs.player_frame.getControlPanelHeight();
             const pf_elm = document.getElementById("player-frame");

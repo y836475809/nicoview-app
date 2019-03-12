@@ -39,19 +39,7 @@ class NicoPlay{
                 on_progress("start comment");
                 this.nico_comment = new NicoComment(api_data);
                 const comments = await this.nico_comment.getComment();
-                const chat_comments = comments.filter(value => {
-                    return value.hasOwnProperty("chat");
-                }).map(value => {
-                    const chat = value.chat;
-                    return {
-                        no:        chat.no, 
-                        vpos:      chat.vpos, 
-                        post_date: chat.date,
-                        user_id:   chat.user_id,
-                        mail:      chat.mail,
-                        text:      chat.content
-                    };  
-                });
+                const filter_comments = this._filterCommnets(comments);
                 on_progress("finish comment");
 
                 on_progress("start video");
@@ -65,7 +53,7 @@ class NicoPlay{
                     const video_url = this.nico_video.SmileUrl;
                     resolve({
                         nico_cookies: nico_cookies,
-                        comments: chat_comments,
+                        comments: filter_comments,
                         thumb_info: thumb_info,
                         video_url: video_url
                     });
@@ -84,7 +72,7 @@ class NicoPlay{
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 resolve({
                     nico_cookies: nico_cookies,
-                    comments: chat_comments,
+                    comments: filter_comments,
                     thumb_info: thumb_info,
                     video_url: dmc_video_url
                 });                                
@@ -92,6 +80,24 @@ class NicoPlay{
                 reject(error);
             }
         });      
+    }
+
+    _filterCommnets(comments){
+        return comments.filter(value => {
+            return value.hasOwnProperty("chat");
+        }).filter(value => {
+            return !value.chat.hasOwnProperty("deleted");
+        }). map(value => {
+            const chat = value.chat;
+            return {
+                no:        chat.no, 
+                vpos:      chat.vpos, 
+                post_date: chat.date,
+                user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
+                mail:      chat.mail,
+                text:      chat.content
+            };  
+        });
     }
 }
 

@@ -13,6 +13,7 @@
 - [ ] ライブラリの検索結果のアイテム数表示
 - [ ] ライブラリページのスクロール位置の記録(bookmark?)
 - [ ] ライブラリページのサイドバーをサイズ可変にする
+- [ ] 再生した時に情報(ライブラリページ,DBの再生数等)を更新する
 - [ ] スペースキーでplay/pause切り替えのkeyupでkeycode使用
 - [ ] viewfinfoのコメント数表示(ローカルのコメント数、web上のコメント数)
 - [ ] viewfinfoのコメントリストのコメントダブルクリックでその時間にシーク
@@ -44,6 +45,7 @@
 - [ ] playerで再生で+1sec, -1secの移動
 - [ ] playerでシーク上にマウスホバーで時間ポップアップ表示
 - [x] 再生がさいごまでいった時にシークバーの位置がはみ出る
+- [ ] 再生が動画最後までいって終了したらhbは止める？
 - [ ] <script src="../node_modules/riot/riot+compiler.min.js"></script>はvar riot = require("riot"); でＯＫ？
 - [ ] foreach->mapをなるべく使用する
 - [x] datatablesの代わりにslickgridを使用
@@ -58,6 +60,8 @@
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
 - [x] ニコニコ動画検索
+　- [ ] 次のページへ移動したら項目の選択状態を解除する
+　- [ ] playerのタグクリックで検索
 - [ ] ニコニコ動画再生
   - [x] テストhtmlでsmile再生
   - [x] テストhtmlでdmc再生

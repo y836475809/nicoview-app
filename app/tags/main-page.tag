@@ -164,6 +164,16 @@
             obs.trigger("on_clear_search");
         });
 
+        obs.on("main-page:select-page", (page_name)=>{
+            const page_map = new Map([
+                ["library", 0],
+                ["search", 1],
+                ["history", 2],
+                ["preference", 3]
+            ]);
+            select_page(page_map.get(page_name));
+        });
+
         window.onbeforeunload = (e) => {
         };
 

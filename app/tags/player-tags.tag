@@ -33,9 +33,8 @@
 
     <script>
         /* globals obs */
-
-        //TODO
         this.video_tags = [];
+        
         this.onclickTag = (item, e) => {
             const tag = item.text;
             obs.trigger("player-html:search-tag", {

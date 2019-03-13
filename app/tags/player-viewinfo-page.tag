@@ -135,7 +135,7 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const play_by_video_data = (video_data, viweinfo) => {          
+        const play_by_video_data = (video_data, viweinfo) => {  
             document.title = viweinfo.thumb_info.title;
             obs.trigger("on_set_player_state", "play"); 
             obs.trigger("receivedData", video_data);
@@ -150,8 +150,6 @@
         };
 
         const play_by_video_id = async (video_id) => {
-            cancelPlay();
-
             const prog_dialog = this.refs["nico-play-dialog"];         
             nico_play = new NicoPlay();
             prog_dialog.showModal("...", ["cancel"], result=>{
@@ -162,6 +160,12 @@
                     await nico_play.play(video_id, (state)=>{
                         prog_dialog.updateMessage(state);
                         console.log(state);
+                    }, (error)=>{
+                        if(error.cancel){
+                            console.log("hb canceled");
+                        }else{
+                            throw error;
+                        }
                     });
                 const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
                 if(ret!="ok"){
@@ -192,19 +196,27 @@
         }; 
 
         ipcRenderer.on("request-send-video-data", (event, arg) => {
+            cancelPlay();
+
             const { video_data, viweinfo } = arg;
             play_by_video_data(video_data, viweinfo);
         });
 
         ipcRenderer.on("request-send-videoid", (event, video_id) => {
+            cancelPlay();
+
             play_by_video_id(video_id);
         });
 
         obs.on("request-send-video-data", (arg) => {
+            cancelPlay();
+
             const { video_data, viweinfo } = arg;
             play_by_video_data(video_data, viweinfo);
         });
         obs.on("request-send-videoid", (video_id) => {
+            cancelPlay();
+
             play_by_video_id(video_id);
         });
 

@@ -176,26 +176,41 @@
             ch_elm.checked = sync_comment_checked;
         };
 
-        //TODO
-        const linkClick = (e) => {
+        const watchLinkClick = (e) => {
             e.preventDefault(); 
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
-            
-            console.log("linkClick e=", e, ", video_id=", video_id);
-
-            obs.triggrt("get-library-data-callback", {
-                video_ids:[video_id],
-                cb: (data_map) => {
-                    if(data_map.has(video_id)){
-                        obs.triggrt("request-send-video-data", data_map.get(video_id));
-                    }else{
-                        obs.trigger("request-send-videoid", video_id);
-                    }
-                }
-            });
+            obs.trigger("player-html:play-by-videoid", video_id);
             return false;
         };
+
+        const setDescription = (parent_elm, description) => {
+            if(parent_elm.firstElementChild){
+                parent_elm.removeChild(parent_elm.firstElementChild);
+            }
+
+            const temp_elm = document.createElement("div");
+            temp_elm.innerHTML = description;
+
+            if(temp_elm.childElementCount==0){
+                this.description_class = "viewinfo-description-text";
+            }else{
+                this.description_class = "viewinfo-description";
+                const a_tags = temp_elm.querySelectorAll("a");
+                a_tags.forEach(value=>{
+                    if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
+                        value.onclick = watchLinkClick;
+                    }else{
+                        value.onclick = (e) =>{
+                            e.preventDefault();
+                            return false;
+                        };
+                    }
+                });
+            }
+            parent_elm.appendChild(temp_elm);
+        };
+
         obs.on("on_change_viweinfo", (viewinfo)=> {
             resizeCommnetList();
 
@@ -207,31 +222,7 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;
-
-            //TODO
-            if(this.refs.description.firstElementChild){
-                this.refs.description.removeChild(this.refs.description.firstElementChild);
-            }
-            const tempEl = document.createElement("div");
-            tempEl.innerHTML = viewinfo.thumb_info.description;
-            if(tempEl.childElementCount==0){
-                this.description_class = "viewinfo-description-text";
-            }else{
-                this.description_class = "viewinfo-description";  
-                const ll = tempEl.querySelectorAll("a");
-                ll.forEach(value=>{
-                    console.log(value.href);
-                    if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
-                        value.onclick = linkClick;   
-                    }else{
-                        value.onclick = (e) =>{
-                            e.preventDefault();
-                            return false;
-                        };
-                    }
-                });   
-            }
-            this.refs.description.appendChild(tempEl);
+            setDescription(this.refs.description, viewinfo.thumb_info.description);
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 

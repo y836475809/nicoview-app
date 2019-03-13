@@ -359,6 +359,8 @@
     //TODO
     obs.on("search-page:search-tag", (args)=> {
         const { query, search_kind } = args;
+        const elm = this.root.querySelector(".search-query-container > .query-input");
+        elm.value = query;
         nico_search_params.cond(search_kind);
         nico_search_params.query(query);
         

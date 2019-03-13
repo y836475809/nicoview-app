@@ -18,12 +18,17 @@
 
     <script>
         /* globals riot */
-        const remote = require("electron").remote;
+        const { remote, ipcMain } = require("electron");
         var shared_obj = remote.getGlobal("sharedObj"); // eslint-disable-line
         var app_base_dir = shared_obj.base_dir; // eslint-disable-line
         var obs = riot.observable(); // eslint-disable-line
         var search_host = "https://api.search.nicovideo.jp"; // eslint-disable-line
 
         riot.mount("main-page");
+
+        //TODO
+        ipcMain.on("index-html:search-tag", (event, args)=>{
+            obs.triggrt("search-page:search-tag", args);
+        });
     </script>
 </html>

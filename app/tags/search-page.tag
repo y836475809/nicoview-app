@@ -246,8 +246,9 @@
         }});
     };
 
+    //TODO
     const setSearchCondState = (sort_kind, sort_order, search_kind) => {
-        {
+        if(sort_kind){
             const index = this.sort_items.findIndex(value=>{
                 return value.kind == sort_kind;
             });
@@ -259,8 +260,8 @@
                 this.sort_items[index].select = true;
                 this.sort_items[index].order = sort_order;
             }
-        }
-        {
+        }     
+        if(search_kind){
             const index = this.search_items.findIndex(value=>{
                 return value.kind == search_kind;
             });
@@ -350,6 +351,18 @@
         nico_search_params.sortOder(cond.sort_order);
 
         setSearchCondState(cond.sort_name, cond.sort_order, cond.search_kind);
+
+        this.search();
+        this.refs.page.resetPage();
+    });
+
+    //TODO
+    obs.on("search-page:search-tag", (args)=> {
+        const { query, search_kind } = args;
+        nico_search_params.cond(search_kind);
+        nico_search_params.query(query);
+        
+        setSearchCondState(null, null, search_kind);
 
         this.search();
         this.refs.page.resetPage();

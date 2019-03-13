@@ -24,6 +24,12 @@
     require(`${app_base_dir}/tags/player-viewinfo-page.tag`);
     riot.mount("player-viewinfo-page");
 
+    //TODO
+    obs.on("player-html:search-tag", (args) => {
+        ipcRenderer.send("index-html:search-tag", args);
+
+    });
+
 </script>
 
 </html>

@@ -27,16 +27,21 @@
     </style>
     
     <button type="button" class="tag-button" 
-        each={item, i in video_tags} data-index={i} onclick={onclickTag}>
-        {item.text}<div class="tag-lock" if={item.lock} data-index={i}>[lock]</div>
+        each={item, i in video_tags} onclick={onclickTag.bind(this,item)}>
+        {item.text}<div class="tag-lock" if={item.lock}>[lock]</div>
     </button>
 
     <script>
         /* globals obs */
+
+        //TODO
         this.video_tags = [];
-        this.onclickTag = (e) => {
-            const index = e.target.getAttribute("data-index");
-            console.log("index=", index, " value=", this.video_tags[index]);
+        this.onclickTag = (item, e) => {
+            const tag = item.text;
+            obs.trigger("player-html:search-tag", {
+                query: tag,
+                search_kind:"tag"
+            });
         };
 
         obs.on("on_load_player_tags", (video_tags) => {

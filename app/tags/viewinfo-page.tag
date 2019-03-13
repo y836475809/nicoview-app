@@ -66,6 +66,12 @@
             overflow-x: auto;
             overflow-y: auto;
         } 
+        .viewinfo-description-text{
+            height: 100%;
+            white-space: normal;; 
+            overflow-x: auto;
+            overflow-y: auto;
+        } 
 
         .viewinfo-comments-panel{
             grid-row: 4 / 5;
@@ -96,7 +102,7 @@
             <div class="viewinfo-user-name">{this.user_nickname}</div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">
-        <div ref="description" class="viewinfo-panel viewinfo-description"></div>
+        <div ref="description" class="viewinfo-panel {this.description_class}"></div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
@@ -120,7 +126,6 @@
         this.view_counter = 0;
         this.comment_num = 0;
         this.mylist_counter = 0;
-        this.description = "";
 
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
@@ -171,6 +176,26 @@
             ch_elm.checked = sync_comment_checked;
         };
 
+        //TODO
+        const linkClick = (e) => {
+            e.preventDefault(); 
+            const paths = e.target.href.split("/");
+            const video_id = paths.pop();
+            
+            console.log("linkClick e=", e, ", video_id=", video_id);
+
+            obs.triggrt("get-library-data-callback", {
+                video_ids:[video_id],
+                cb: (data_map) => {
+                    if(data_map.has(video_id)){
+                        obs.triggrt("request-send-video-data", data_map.get(video_id));
+                    }else{
+                        obs.trigger("request-send-videoid", video_id);
+                    }
+                }
+            });
+            return false;
+        };
         obs.on("on_change_viweinfo", (viewinfo)=> {
             resizeCommnetList();
 
@@ -182,8 +207,31 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;
-            this.description = viewinfo.thumb_info.description;
-            this.refs.description.innerHTML = viewinfo.thumb_info.description;
+
+            //TODO
+            if(this.refs.description.firstElementChild){
+                this.refs.description.removeChild(this.refs.description.firstElementChild);
+            }
+            const tempEl = document.createElement("div");
+            tempEl.innerHTML = viewinfo.thumb_info.description;
+            if(tempEl.childElementCount==0){
+                this.description_class = "viewinfo-description-text";
+            }else{
+                this.description_class = "viewinfo-description";  
+                const ll = tempEl.querySelectorAll("a");
+                ll.forEach(value=>{
+                    console.log(value.href);
+                    if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
+                        value.onclick = linkClick;   
+                    }else{
+                        value.onclick = (e) =>{
+                            e.preventDefault();
+                            return false;
+                        };
+                    }
+                });   
+            }
+            this.refs.description.appendChild(tempEl);
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 

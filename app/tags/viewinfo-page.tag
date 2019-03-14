@@ -14,6 +14,8 @@
             overflow-x: hidden;
             overflow-y: hidden;
             --row-height: 25px;
+            --toggle-icon-size: 15px;
+            --toggle-icon-margin: 2px;
         }    
         .viewinfo-panel{
             padding: var(--panel-padding);
@@ -59,18 +61,38 @@
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
             border: 1px solid var(--control-border-color);
+            margin-right:  5px;
         } 
-        .viewinfo-description{
+        .description-container-normal {
+            width: 100%;
             height: 100%;
+        }
+        .description-container-extend {
+            position: absolute;
+            top: 0px;
+            border: solid 1px #aaa;
+            border-radius: 5px;
+            background-color: bisque;
+            z-index: 999;
+        }
+        .description-toggle{
+            display: block;
+            width: var(--toggle-icon-size);
+            height: var(--toggle-icon-size);
+            margin: var(--toggle-icon-margin) var(--toggle-icon-margin) var(--toggle-icon-margin) auto;
+        }
+        .description-content {
+            padding: 2px;
+            width: 100%;
+            height: calc(100% - var(--toggle-icon-size) - var(--toggle-icon-margin) * 2);  
+            overflow-x: auto;
+            overflow-y: auto;         
+        }
+        .description-content-html {
             white-space:nowrap;  
-            overflow-x: auto;
-            overflow-y: auto;
         } 
-        .viewinfo-description-text{
-            height: 100%;
-            white-space: normal;; 
-            overflow-x: auto;
-            overflow-y: auto;
+        .description-content-text {
+            white-space: normal;
         } 
 
         .viewinfo-comments-panel{
@@ -82,18 +104,6 @@
         .viewinfo-checkbox{
             height: 25px;
             vertical-align:middle;
-        }
-
-        /* TODO */
-        .extend-description {
-            position: absolute;
-            top: 0px;
-            /* left: 0px; */
-            width: 300px;
-            border: solid 1px #aaa;
-            border-radius: 5px;
-            background-color: bisque;
-            z-index: 999;
         }
     </style>
     
@@ -112,10 +122,12 @@
     <div class="viewinfo-panel viewinfo-user-panel">
             <img src={this.user_icon_url} class="viewinfo-user-thumbnail">
             <div class="viewinfo-user-name">{this.user_nickname}</div>
-    </div>
-    <div class="viewinfo-panel viewinfo-description-panel">
-        <div ref="description" class="viewinfo-panel {this.description_class}"
-            onclick={this.onclickExtDescription}></div>
+    </div> 
+    <div class="viewinfo-description-panel">   
+        <div class="description-container {this.description_container_class}">
+            <div class="description-toggle fas fa-exchange-alt" onclick={this.onclickExtDescription}></div>   
+            <div class="description-content {this.description_content_class}"></div>
+        </div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
@@ -139,6 +151,9 @@
         this.view_counter = 0;
         this.comment_num = 0;
         this.mylist_counter = 0;
+        
+        this.description_container_class = "description-container-normal";
+        this.description_content_class = "description-content-text";
 
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
@@ -197,20 +212,14 @@
             return false;
         };
 
-        let description_class_bk;
-        const setDescription = (parent_elm, description) => {
-            if(parent_elm.firstElementChild){
-                parent_elm.removeChild(parent_elm.firstElementChild);
-            }
+        const setDescription = (content_elm, description) => {
+            content_elm.innerHTML = description;
 
-            const temp_elm = document.createElement("div");
-            temp_elm.innerHTML = description;
-
-            if(temp_elm.childElementCount==0){
-                this.description_class = "viewinfo-description-text";
+            if(content_elm.childElementCount==0){
+                this.description_content_class = "description-content-text";
             }else{
-                this.description_class = "viewinfo-description";
-                const a_tags = temp_elm.querySelectorAll("a");
+                this.description_content_class = "description-content-html";
+                const a_tags = content_elm.querySelectorAll("a");
                 a_tags.forEach(value=>{
                     if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
                         value.onclick = watchLinkClick;
@@ -222,29 +231,25 @@
                     }
                 });
             }
-            
-            //TODO
-            description_class_bk = this.description_class;
-
-            parent_elm.appendChild(temp_elm);
         };
 
-        //TODO
         this.onclickExtDescription = (e) => {
-            if(this.description_class=="extend-description"){
-                this.description_class = description_class_bk;
+            if(this.description_container_class=="description-container-extend"){
+                this.description_container_class = "description-container-normal";
+                this.update();
             }else{
-                description_class_bk = this.description_class;
-                this.description_class = "extend-description";
+                this.description_container_class = "description-container-extend";
+                this.update();
+
+                const parent_elm = this.root.querySelector(".viewinfo-description-panel");
+                const elm = this.root.querySelector(".description-container");
                 
-                const p_elm =this.root.querySelector(".viewinfo-description-panel");
+                const container_width = elm.clientWidth; 
+                const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
+                elm.style.top = parent_elm.offsetTop + "px";
+                elm.style.left = left + "px";
                 
-                const elm = this.refs.description;
-                elm.style.top = p_elm.offsetTop + "px";
-                elm.style.left = (p_elm.offsetLeft - (300-p_elm.offsetWidth)) + "px";
-                // elm.style.left = (window.innerWidth - p_elm.offsetWidth - 50) + "px";
             }
-            this.update();
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
@@ -258,7 +263,8 @@
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;
-            setDescription(this.refs.description, viewinfo.thumb_info.description);
+            
+            setDescription(this.root.querySelector(".description-content"), viewinfo.thumb_info.description);
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 

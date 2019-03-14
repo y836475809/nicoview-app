@@ -53,8 +53,8 @@
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{this.opts.params.title}</label>
     <div class="toggle-menu">
         <ul class="acdn-list">
-            <li class="acdn-item" each={ item, i in this.items } data-id={i} 
-                onclick={this.onclickItem} ondblclick={this.ondblclickItem}
+            <li class="acdn-item" each={ item in this.items }
+                onclick={this.onclickItem} ondblclick={this.ondblclickItem.bind(this,item)}
                 onmouseup={this.onmouseUp}>
                 <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
                 <div>{item.title}</div>
@@ -202,9 +202,9 @@
             setSelected(e.target);
         };
 
-        this.ondblclickItem = (e) => {
-            const id = e.target.getAttribute("data-id");
-            const item = this.items[id];
+        this.ondblclickItem = (item, e) => {
+            // const id = e.target.getAttribute("data-id");
+            // const item = this.items[id];
             obs.trigger(`${id_name}-dlbclick-item`, item);
         };
 

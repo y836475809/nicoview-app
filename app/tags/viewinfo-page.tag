@@ -83,6 +83,18 @@
             height: 25px;
             vertical-align:middle;
         }
+
+        /* TODO */
+        .extend-description {
+            position: absolute;
+            top: 0px;
+            /* left: 0px; */
+            width: 300px;
+            border: solid 1px #aaa;
+            border-radius: 5px;
+            background-color: bisque;
+            z-index: 999;
+        }
     </style>
     
     <div class="viewinfo-panel viewinfo-video-panel">
@@ -102,7 +114,8 @@
             <div class="viewinfo-user-name">{this.user_nickname}</div>
     </div>
     <div class="viewinfo-panel viewinfo-description-panel">
-        <div ref="description" class="viewinfo-panel {this.description_class}"></div>
+        <div ref="description" class="viewinfo-panel {this.description_class}"
+            onclick={this.onclickExtDescription}></div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
@@ -110,7 +123,7 @@
             <div class="comment-grid"></div>
         </div>
     </div>
-
+    
     <script>
         /* globals app_base_dir obs */
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
@@ -184,6 +197,7 @@
             return false;
         };
 
+        let description_class_bk;
         const setDescription = (parent_elm, description) => {
             if(parent_elm.firstElementChild){
                 parent_elm.removeChild(parent_elm.firstElementChild);
@@ -208,7 +222,29 @@
                     }
                 });
             }
+            
+            //TODO
+            description_class_bk = this.description_class;
+
             parent_elm.appendChild(temp_elm);
+        };
+
+        //TODO
+        this.onclickExtDescription = (e) => {
+            if(this.description_class=="extend-description"){
+                this.description_class = description_class_bk;
+            }else{
+                description_class_bk = this.description_class;
+                this.description_class = "extend-description";
+                
+                const p_elm =this.root.querySelector(".viewinfo-description-panel");
+                
+                const elm = this.refs.description;
+                elm.style.top = p_elm.offsetTop + "px";
+                elm.style.left = (p_elm.offsetLeft - (300-p_elm.offsetWidth)) + "px";
+                // elm.style.left = (window.innerWidth - p_elm.offsetWidth - 50) + "px";
+            }
+            this.update();
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {

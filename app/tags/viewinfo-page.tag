@@ -3,11 +3,11 @@
         :scope {
             display: grid;
             --panel-padding: 4px;
-            --video-panel-height: 100px;
-            --user-panel-height: 60px;
+            --video-panel-height: calc(100px + 6px);
+            --user-panel-height: 30px;
             --user-thumbnail-size: 50px;
             --description-panel-height: 100px;
-            grid-template-rows: var(--video-panel-height) var(--user-panel-height) var(--description-panel-height) 1fr;
+            grid-template-rows: var(--video-panel-height) calc(var(--user-panel-height) + var(--description-panel-height)) 1fr;
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
@@ -20,49 +20,44 @@
         .viewinfo-panel{
             padding: var(--panel-padding);
         }
+
         .viewinfo-video-panel{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
             display: flex; 
         } 
-        .viewinfo-thumbnail{
+        .video-thumbnail{
             user-select: none;
             margin-left: calc(0px - var(--panel-padding));
-            width: calc(130px - var(--panel-padding) * 2);
-            height: calc(var(--video-panel-height) - var(--panel-padding) * 2);
+            width: 130px;
+            height: 100px;
         }
-        .viewinfo-video-panel-info{
+        .video-info{
             user-select: none;
             margin-left: 5px;
             white-space: nowrap;
             overflow-x: hidden;
         }
         
-        .viewinfo-user-panel{
+        .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            display: flex; 
+            border: 1px solid var(--control-border-color);
+            border-radius: 2px;
+            margin-right:  5px;
         } 
-        .viewinfo-user-thumbnail{
+        .description-user-thumbnail{
             user-select: none;
-            margin-left: calc(0px - var(--panel-padding));
+            padding-top: 5px;
+            padding-left: 5px;
             width: var(--user-thumbnail-size); 
             height: var(--user-thumbnail-size); 
         }
-        .viewinfo-user-name{
+        .description-user-name{
             user-select: none;
-            padding-left: 5px;
             vertical-align: middle;
-            height: var(--user-thumbnail-size); 
-            line-height: var(--user-thumbnail-size); 
+            padding-left: 5px;
         }
-
-        .viewinfo-description-panel{
-            grid-row: 3 / 4;
-            grid-column: 1 / 3; 
-            border: 1px solid var(--control-border-color);
-            margin-right:  5px;
-        } 
         .description-container-normal {
             width: 100%;
             height: 100%;
@@ -76,6 +71,22 @@
             box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3);
             z-index: 999;
         }
+        .description-container-normal .description-user-thumbnail
+        {
+            display: none;
+        }
+        .description-container-extend .description-user-thumbnail
+        {
+            visibility: visible; 
+        }
+        .description-container-normal .description-user-name  {
+            height: 20px; 
+            line-height: 20px; 
+        }
+        .description-container-extend .description-user-name  {
+            height: var(--user-thumbnail-size); 
+            line-height: var(--user-thumbnail-size); 
+        }
         .description-toggle{
             display: block;
             width: var(--toggle-icon-size);
@@ -85,7 +96,7 @@
         .description-content {
             padding: 2px;
             width: 100%;
-            height: calc(100% - var(--toggle-icon-size) - var(--toggle-icon-margin) * 2);  
+            height: calc(100% - var(--user-panel-height) - var(--toggle-icon-margin) * 2);  
             overflow-x: auto;
             overflow-y: auto;         
         }
@@ -97,12 +108,11 @@
         } 
 
         .viewinfo-comments-panel{
-            grid-row: 4 / 5;
+            grid-row: 3 / 4;
             grid-column: 1 / 3; 
             background-color: var(--control-color);
-        }
-        
-        .viewinfo-checkbox{
+        }   
+        .comment-checkbox{
             height: 25px;
             vertical-align:middle;
         }
@@ -110,9 +120,9 @@
     
     <div class="viewinfo-panel viewinfo-video-panel">
         <div>
-            <img src={this.thumbnail_url} class="viewinfo-thumbnail">
+            <img src={this.video_thumbnail_url} class="video-thumbnail">
         </div>
-        <div class="viewinfo-video-panel-info">
+        <div class="video-info">
             <div>{this.title}</div>
             <div>投稿日 : {this.first_retrieve}</div>
             <div>再生 : {this.view_counter}</div>
@@ -120,18 +130,19 @@
             <div>マイリスト : {this.mylist_counter}</div>
         </div>
     </div>
-    <div class="viewinfo-panel viewinfo-user-panel">
-            <img src={this.user_icon_url} class="viewinfo-user-thumbnail">
-            <div class="viewinfo-user-name">{this.user_nickname}</div>
-    </div> 
     <div class="viewinfo-description-panel">   
         <div class="description-container {this.description_container_class}">
-            <div class="description-toggle fas fa-exchange-alt" onclick={this.onclickExtDescription}></div>   
+            <div style="display: flex;">
+                <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
+                <div class="description-user-name">投稿者: {this.user_nickname}</div>
+                <div class="description-toggle fas fa-exchange-alt" onclick={this.onclickExtDescription}></div>   
+            </div>
+            <hr>
             <div class="description-content {this.description_content_class}"></div>
         </div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
-        <input class="viewinfo-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
+        <input class="comment-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
         <div class="comment-grid-container">
             <div class="comment-grid"></div>
         </div>
@@ -146,12 +157,13 @@
 
         const row_height = 25;
 
-        this.thumbnail_url = "";
+        this.video_thumbnail_url = "";
         this.title =  "";
         this.first_retrieve =  "";
         this.view_counter = 0;
         this.comment_num = 0;
         this.mylist_counter = 0;
+        this.user_thumbnail_url = "";
         
         this.description_container_class = "description-container-normal";
         this.description_content_class = "description-content-text";
@@ -201,7 +213,7 @@
         };
 
         const updateSyncCommentCheckBox = () => {
-            let ch_elm = this.root.querySelector(".viewinfo-checkbox");
+            let ch_elm = this.root.querySelector(".comment-checkbox");
             ch_elm.checked = sync_comment_checked;
         };
 
@@ -253,6 +265,9 @@
             if(this.description_container_class=="description-container-extend"){
                 setDescriptionContainerClass("description-container-normal");
             }else{
+                if(this.user_thumbnail_url != this.user_icon_url){
+                    this.user_thumbnail_url = this.user_icon_url;
+                }
                 setDescriptionContainerClass("description-container-extend");
             }
         };
@@ -260,7 +275,7 @@
         obs.on("on_change_viweinfo", (viewinfo)=> {
             resizeCommnetList();
 
-            this.thumbnail_url = viewinfo.thumb_info.thumbnail_url;
+            this.video_thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
             this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);
             this.view_counter = viewinfo.thumb_info.view_counter;

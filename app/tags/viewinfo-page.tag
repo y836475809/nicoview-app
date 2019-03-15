@@ -234,14 +234,11 @@
             }
         };
 
-        this.onclickExtDescription = (e) => {
-            if(this.description_container_class=="description-container-extend"){
-                this.description_container_class = "description-container-normal";
-                this.update();
-            }else{
-                this.description_container_class = "description-container-extend";
-                this.update();
+        const setDescriptionContainerClass = (class_name) => {
+            this.description_container_class = class_name;
+            this.update();
 
+            if(class_name=="description-container-extend"){
                 const parent_elm = this.root.querySelector(".viewinfo-description-panel");
                 const elm = this.root.querySelector(".description-container");
                 
@@ -249,7 +246,14 @@
                 const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
                 elm.style.top = parent_elm.offsetTop + "px";
                 elm.style.left = left + "px";
-                
+            }
+        };
+
+        this.onclickExtDescription = (e) => {
+            if(this.description_container_class=="description-container-extend"){
+                setDescriptionContainerClass("description-container-normal");
+            }else{
+                setDescriptionContainerClass("description-container-extend");
             }
         };
 
@@ -266,6 +270,7 @@
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;
             
             setDescription(this.root.querySelector(".description-content"), viewinfo.thumb_info.description);
+            setDescriptionContainerClass("description-container-normal");
 
             sync_comment_scroll.setComments(viewinfo.commnets);
 

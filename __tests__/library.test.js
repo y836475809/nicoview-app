@@ -4,11 +4,13 @@ const Library = require("../app/js/library");
 test("library get path, info", async (t) => {
     let library = new Library("test.db", true);
     const dirpath_list = [
-        { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-        { dirpath_id: 2, dirpath: "file:///C:/data"},
+        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        { _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
     ];
     const video_list = [
         {
+            _data_type:"video", 
+            _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
@@ -16,6 +18,8 @@ test("library get path, info", async (t) => {
             video_type: "video/mp4"
         },
         {
+            _data_type:"video", 
+            _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",
@@ -64,11 +68,13 @@ test("library get path, info", async (t) => {
 test("library get data", async (t) => {
     let library = new Library("test.db", true);
     const dirpath_list = [
-        { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-        { dirpath_id: 2, dirpath: "file:///C:/data"},
+        {  _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        {  _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
     ];
     const video_list = [
         {
+            _data_type:"video", 
+            _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
@@ -81,6 +87,8 @@ test("library get data", async (t) => {
             tags: ["tag1 tag2"]
         },
         {
+            _data_type:"video", 
+            _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",

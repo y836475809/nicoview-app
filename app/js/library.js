@@ -18,15 +18,7 @@ class Library {
      * @param {Array} video_list
      */
     async setData(dir_list, video_list) {
-        const data_list = 
-            this._normalizePath(dir_list).map(value=>{
-                value["_db_type"] = "dir";
-                return value;
-            }).concat(video_list.map(value=>{
-                value["_db_type"] = "video";
-                return value;
-            }));    
-
+        const data_list = this._normalizePath(dir_list).concat(video_list);
         await this._clear(this.db);
         await this._setData(this.db, data_list);
     }
@@ -35,7 +27,7 @@ class Library {
         return new Promise(async (resolve, reject) => {
             const dir_map = await this._getDirMap();
 
-            this.db.find({_db_type: "video"}, async (err, docs) => { 
+            this.db.find({_data_type: "video"}, async (err, docs) => { 
                 if(err){
                     reject(err);
                     return;
@@ -69,8 +61,8 @@ class Library {
 
         const video_file_path = this._getVideoPath(dir_path, video_info);
         const video_type = this._getVideoType(video_info);
-        const commnets = await this._findComments(video_id);
-        const thumb_info = this._findThumbInfo(dir_path, video_info);
+        const commnets = await this._findComments(video_id); //
+        const thumb_info = this._findThumbInfo(dir_path, video_info); //
         const thumb_url = this._getThumbPath(dir_path, video_info);
         thumb_info.thumbnail_url = thumb_url;
 
@@ -116,16 +108,15 @@ class Library {
      */
     _normalizePath(dir_list){
         return dir_list.map(value=>{
-            return {
-                dirpath_id: value.dirpath_id,
-                dirpath: value.dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "")
-            };
+            const npath = value.dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
+            value.dirpath = npath;
+            return value;
         });
     }
 
     _getDir(dirpath_id) {
         return new Promise((resolve, reject) => {
-            this.db.find({ $and : [{_db_type: "dir"}, { dirpath_id: dirpath_id }]}, (err, docs) => {
+            this.db.find({ $and : [{_data_type: "dir"}, { dirpath_id: dirpath_id }]}, (err, docs) => {
                 if(err){
                     reject(err);
                     return;
@@ -145,7 +136,7 @@ class Library {
     _getDirMap() {
         const dir_map = new Map();
         return new Promise((resolve, reject) => {
-            this.db.find({_db_type: "dir"}, (err, docs) => {
+            this.db.find({_data_type: "dir"}, (err, docs) => {
                 if(err){
                     reject(err);
                     return;
@@ -183,7 +174,7 @@ class Library {
 
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
-            this.db.find({ $and : [{_db_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
+            this.db.find({ $and : [{_data_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
                 if(err){
                     reject(err);
                     return;
@@ -192,6 +183,7 @@ class Library {
                     reject(new Error(`not find video_info, id=${video_id}`));
                     return;
                 }
+                delete docs[0]._data_type;
                 delete docs[0]._db_type;
                 delete docs[0]._id;
                 resolve(docs[0]);

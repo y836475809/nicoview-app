@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download</title>
+    <style type="text/css">
+    </style>
+</head>
+
+<body>
+    <div>
+        <button onclick="onclickLocal();">local</button>
+        <button onclick="onclickLocalCancel();">local Cancel</button>
+        <button onclick="onclickLoadSmile();">Smile</button>
+        <div>
+            <button onclick="onclickLoadDmc();">Dmc</button>
+            <button onclick="onclickLoadDmcCancel();">cancel</button>
+        </div>
+        <button onclick="onclickLoadDmcCheck();">dmc check</button>
+    </div>
+</body>
+
+<script>
+    const fs = require("fs");
+    const request = require("request");
+    const { NicoWatch, NicoVideo } = require("../app/js/niconico");
+
+    let request_local=null;
+    let local_cancel = false;
+    const onclickLocal = ()=>{ 
+        local_cancel = false;
+        // const fileUrl = document.getElementById("url-id").value;
+        const write_stream = fs.createWriteStream("./saved.mp4");
+
+        write_stream
+            .on("drain", () =>         { console.log("write: drain"); })
+            .on("error", (exeption) => { console.log("write: error"); })
+            .on("close", ()     =>     { console.log("write: colse"); })
+            .on("finish", ()     =>    { console.log("write: finish"); })
+            .on("pipe",  (src)  =>     { console.log("write: pipe");  });
+        const fileUrl = "http://localhost:8000/test1.mp4";
+        let length = 0;
+        let did = 0;
+        request_local = request({method: "GET", uri: fileUrl}, (error, res, body) => {
+            if(error){
+                console.log("local error: ", error);
+            }
+        }).on("response", (res) => {
+            console.log("statusCode: ", res.statusCode);
+            console.log("content-length: ", res.headers["content-length"]);
+            length = res.headers["content-length"];
+            did = 0;
+        }).on("data", (chunk) => {
+            // console.log("chunk: ", chunk.length);
+            const pre = Math.floor((did/length)*100.0);
+            did += chunk.length;
+            const cur = Math.floor((did/length)*100.0);
+            if(cur > pre){
+                console.log("progress: ", cur, "%");
+            }
+            // console.log("progress: ", Math.floor((did/length)*100.0), "%");
+        // }).pipe(fs.createWriteStream("./saved.mp4"));
+        }).on("abort", () => {
+            if(dmc_cancel){
+                console.log("local cancel");
+            }else{
+                console.log("local abort");
+            }
+        });
+        request_local.pipe(write_stream);
+    };
+
+    const onclickLocalCancel = async ()=>{
+        if(request_local){
+            local_cancel = true;
+            console.log("request_local.abort()");
+            request_local.abort();
+        }
+    };
+
+    const onclickLoadSmile = async ()=>{
+        // const video_id = "sm34737947";
+        const write_stream = fs.createWriteStream("./saved-smile.mp4");
+
+        write_stream
+            .on("drain", () =>         { console.log("write: drain"); })
+            .on("error", (exeption) => { console.log("write: error"); })
+            .on("close", ()     =>     { console.log("write: colse"); })
+            .on("finish", ()     =>    { console.log("write: finish"); })
+            .on("pipe",  (src)  =>     { console.log("write: pipe");  });
+
+        const video_id = "sm34723782";
+        const nico_watch = new NicoWatch();
+        const { cookie_jar, api_data } = await nico_watch.watch(video_id);
+        const nico_video = new NicoVideo(api_data, 0.9);
+        const video_url = nico_video.SmileUrl;
+        const options = {
+            url:video_url, 
+            // jar: cookie_jar,
+            timeout: 5 * 1000
+        };
+
+        let length = 0;
+        let did = 0;
+        request.get(options).on("response", (res) => {
+            console.log("statusCode: ", res.statusCode);
+            console.log("content-length: ", res.headers["content-length"]);
+            length = res.headers["content-length"];
+            did = 0;
+        }).on("data", (chunk) => {
+            const pre = Math.floor((did/length)*100.0);
+            did += chunk.length;
+            const cur = Math.floor((did/length)*100.0);
+            if(cur > pre){
+                console.log("progress: ", cur, "%");
+            }
+        // }).pipe(fs.createWriteStream("./saved-smile.mp4"));
+        }).pipe(write_stream);
+    };  
+
+    let dmc_request = null;
+    let dmc_cancel = false;
+    const onclickLoadDmc = async ()=>{
+        dmc_cancel = false;
+        const video_id = "sm34731203";
+        const nico_watch = new NicoWatch();
+        const { cookie_jar, api_data } = await nico_watch.watch(video_id);
+
+        const nico_video = new NicoVideo(api_data, 0.9);
+
+        const write_stream = fs.createWriteStream(`./${video_id}-saved-dmc.mp4`);
+        write_stream
+            //.on("drain", () =>         { console.log("write: drain"); })
+            .on("error", (exeption) => { 
+                console.log("write: error=", exeption); 
+                nico_video.stopHeartBeat();
+            })
+            .on("close", ()     =>     { 
+                console.log("write: colse"); 
+                nico_video.stopHeartBeat();
+            })
+            .on("finish", ()     =>    { console.log("write: finish"); })
+            .on("pipe",  (src)  =>     { console.log("write: pipe");  });
+
+        await nico_video.postDmcSession();
+        await nico_video.optionsHeartBeat();
+        await nico_video.postHeartBeat((error)=>{
+            console.log("hb error=", error);
+        });
+        const video_url = nico_video.DmcContentUri;
+        // const video_url = nico_video.SmileUrl;
+        const options = {
+            method: "GET",
+            uri:video_url, 
+            //jar: cookie_jar,
+            timeout: 5 * 1000
+        };
+
+        let length = 0;
+        let did = 0;
+        dmc_request = request(options, (error, res, body) => {
+            if(error){
+                console.log("local error: ", error);
+            }
+        }).on("response", (res) => {
+            console.log("statusCode: ", res.statusCode);
+            console.log("content-length: ", res.headers["content-length"]);
+            length = res.headers["content-length"];
+            did = 0;
+        }).on("data", (chunk) => {
+            const pre = Math.floor((did/length)*100.0);
+            did += chunk.length;
+            const cur = Math.floor((did/length)*100.0);
+            if(cur > pre){
+                console.log("progress: ", cur, "%");
+            }
+        // }).pipe(fs.createWriteStream("./saved-dmc.mp4"));
+        }).on("abort", () => {
+            if(dmc_cancel){
+                console.log("dmc cancel");
+            }else{
+                console.log("dmc abort");
+            }
+        }); //.pipe(write_stream);
+        dmc_request.pipe(write_stream);
+    };  
+
+    const onclickLoadDmcCancel = async ()=>{
+        if(dmc_request){
+            dmc_cancel = true;
+            console.log("dmc_request.abort()");
+            dmc_request.abort();
+        }
+    };
+
+    const onclickLoadDmcCheck = async ()=>{
+        const video_id = "sm34731203";
+        const nico_watch = new NicoWatch();
+        const { cookie_jar, api_data } = await nico_watch.watch(video_id);
+
+        const nico_video = new NicoVideo(api_data, 0.9);
+        const dmc_session = await nico_video.postDmcSession();
+        fs.writeFileSync("api_data.json",  JSON.stringify(api_data, null, "  "), "utf-8");
+        fs.writeFileSync("dmc_session.json",  JSON.stringify(dmc_session, null, "  "), "utf-8");
+    }; 
+</script>
+
+</html>

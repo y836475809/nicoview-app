@@ -1,0 +1,92 @@
+{
+  "session": {
+    "id": "",
+    "recipe_id": "nicovideo-sm12345678",
+    "content_id": "out1",
+    "content_src_id_sets": [
+      {
+        "content_src_ids": [
+          {
+            "src_id_to_mux": {
+              "video_src_ids": [
+                "archive_h264_360p"
+              ],
+              "audio_src_ids": [
+                "archive_aac_64kbps"
+              ]
+            }
+          }
+        ],
+        "allow_subset": "yes"
+      }
+    ],
+    "content_type": "movie",
+    "timing_constraint": "unlimited",
+    "keep_method": {
+      "heartbeat": {
+        "lifetime": 120000,
+        "onetime_token": "",
+        "deletion_timeout_on_no_stream": 0
+      }
+    },
+    "protocol": {
+      "name": "http",
+      "parameters": {
+        "http_parameters": {
+          "method": "GET",
+          "parameters": {
+            "http_output_download_parameters": {
+              "file_extension": "",
+              "transfer_preset": "",
+              "use_ssl": "yes",
+              "use_well_known_port": "yes"
+            }
+          }
+        }
+      }
+    },
+    "play_seek_time": 0,
+    "play_speed": 1,
+    "play_control_range": {
+      "max_play_speed": 1,
+      "min_play_speed": 1
+    },
+    "content_uri": "",
+    "session_operation_auth": {
+      "session_operation_auth_by_signature": {
+        "created_time": 1,
+        "expire_time": 1,
+        "token": "",
+        "signature": ""
+      }
+    },
+    "content_auth": {
+      "auth_type": "ht2",
+      "max_content_count": 1,
+      "content_key_timeout": 600000,
+      "service_id": "nicovideo",
+      "service_user_id": "",
+      "content_auth_info": {
+        "method": "query",
+        "name": "",
+        "value": ""
+      }
+    },
+    "runtime_info": {
+      "node_id": "",
+      "execution_history": [],
+      "thumbnailer_state": []
+    },
+    "client_info": {
+      "player_id": "",
+      "remote_ip": "",
+      "tracking_info": ""
+    },
+    "created_time": 1,
+    "modified_time": 1,
+    "priority": 0,
+    "content_route": 0,
+    "version": "1.1",
+    "content_status": "ready"
+  }
+}

@@ -8,6 +8,7 @@ const video_id = "sm12345678";
 const no_owner_comment = require(`${base_dir}/data/res_no_owner_comment.json`);
 const owner_comment = require(`${base_dir}/data/res_owner_comment.json`);
 const data_api_data = require(`${base_dir}/data/sm12345678_data_api_data.json`);
+const dmc_session = require(`${base_dir}/data/sm12345678_dmc_session_max_quality.json`);
 
 class NicoMocks {
     constructor(){
@@ -219,6 +220,107 @@ class NicoMocks {
     }
 }
 
+class NicoDownLoadMocks {
+    constructor(){
+    }
+
+    clean(){
+        nock.cleanAll();
+    }
+
+    watch(delay=1){
+        this.watch_nock = nock("https://www.nicovideo.jp");
+        const headers = {
+            "Set-Cookie": [
+                `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
+                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
+            ]
+        };
+        const body = MockNicoUitl.getWatchHtml(video_id);
+        this.watch_nock
+            .get(`/watch/${video_id}`)
+            .delay(delay)
+            .reply(200, body, headers);
+    } 
+
+    dmc_session(delay=1){
+        this.dmc_session_nock = nock("https://api.dmc.nico");
+        this.dmc_session_nock
+            .post("/api/sessions")
+            .query({ _format: "json" })   
+            .delay(delay)
+            .reply((uri, reqbody)=>{
+                return [200, {
+                    meta: { status: 201,message: "created" },
+                    data: dmc_session
+                }];                    
+            });
+    }
+
+    comment(delay=1){
+        this.comment_nock = nock("https://nmsg.nicovideo.jp");
+        this.comment_nock
+            .post("/api.json/")
+            .delay(delay)
+            .reply((uri, reqbody)=>{
+                const data = reqbody;
+                if(data.length===0){
+                    return [404, "404 - \"Not Found\r\n\""];
+                }
+    
+                if(data.length===8){
+                    //no owner
+                    return [200, no_owner_comment];
+                }
+    
+                if(data.length===11){
+                    //owner
+                    return [200, owner_comment];
+                }
+    
+                return [200, [
+                    { "ping": { "content": "rs:0" } },
+                    { "ping": { "content": "rf:0" } }
+                ]]; 
+            });
+    }
+
+    thumbnail(delay=1){
+        this.thumbnail = nock("https://tn.smilevideo.jp");
+        this.thumbnail
+            .get("/smile")
+            .query({ i: "12345678.L" }) 
+            .delay(delay)
+            .reply(200, "thumbnail");
+    }
+
+    dmc_hb(options_delay=1, post_delay=1){
+        this.dmc_hb_nock = nock("https://api.dmc.nico");
+        this.dmc_hb_nock
+            .options(/\/api\/sessions\/.+/)
+            .query({ _format: "json", _method: "PUT" })
+            .delay(options_delay)
+            .reply((uri, reqbody)=>{
+                return [200, "ok"];
+            })
+            .post(/\/api\/sessions\/.+/)
+            .query({ _format: "json", _method: "PUT" })
+            .delay(post_delay)
+            .times(50)
+            .reply((uri, reqbody)=>{
+                return [200, "ok"];
+            });
+    } 
+
+    dmc_video(delay=1){
+        this.dmc_video = nock("https://pa0000.dmc.nico");
+        this.dmc_video
+            .get("/m")
+            .delay(delay)
+            .reply(200, "video dmc");
+    }
+}
+
 class MockNicoUitl {
     static _escapeHtml(str){
         str = str.replace(/&/g, "&amp;");
@@ -247,6 +349,7 @@ class MockNicoUitl {
 
 module.exports = {
     NicoMocks: NicoMocks,
+    NicoDownLoadMocks: NicoDownLoadMocks,
     MockNicoUitl: MockNicoUitl,
     TestData : {
         video_id : video_id,

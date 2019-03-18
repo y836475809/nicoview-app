@@ -94,7 +94,7 @@ class NicoNicoDownloder {
                     return {
                         state: "skip",
                         reason: "low",
-                        result: null
+                        data: null
                     };
                 }
                 
@@ -104,14 +104,14 @@ class NicoNicoDownloder {
                 return {
                     state: "ok",
                     reason: "",
-                    result: db_data
+                    data: db_data
                 };  
             }else{
                 if(!this._isSmileMaxQuality(api_data)){
                     return {
                         state: "skip",
                         reason: "low",
-                        result: null
+                        data: null
                     };
                 }
                 const fname = this._getName(api_data.video.title);
@@ -120,7 +120,7 @@ class NicoNicoDownloder {
                 return {
                     state: "ok",
                     reason: "",
-                    result: db_data
+                    data: db_data
                 };
             }
         } catch (error) {
@@ -128,13 +128,13 @@ class NicoNicoDownloder {
                 return {
                     state: "cancel",
                     reason: "",
-                    result: null
+                    data: null
                 };         
             }else{
                 return {
                     state: "error",
                     reason: error,
-                    result: null
+                    data: null
                 };                 
             }
         }
@@ -300,3 +300,7 @@ class NicoNicoDownloder {
             && max_quality.audio == session_quality.audio;
     }
 }
+
+module.exports = {
+    NicoNicoDownloder: NicoNicoDownloder
+};

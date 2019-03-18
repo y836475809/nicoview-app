@@ -51,7 +51,7 @@
       "max_play_speed": 1,
       "min_play_speed": 1
     },
-    "content_uri": "",
+    "content_uri": "https://pa0000.dmc.nico/m",
     "session_operation_auth": {
       "session_operation_auth_by_signature": {
         "created_time": 1,

@@ -562,5 +562,6 @@ module.exports = {
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,
     getCookies: getCookies,
-    getThumbInfo: getThumbInfo
+    getThumbInfo: getThumbInfo,
+    getVideoType: getVideoType
 };

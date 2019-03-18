@@ -62,7 +62,7 @@
             // console.log("progress: ", Math.floor((did/length)*100.0), "%");
         // }).pipe(fs.createWriteStream("./saved.mp4"));
         }).on("abort", () => {
-            if(dmc_cancel){
+            if(local_cancel){
                 console.log("local cancel");
             }else{
                 console.log("local abort");

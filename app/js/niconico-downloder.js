@@ -60,7 +60,53 @@ class DownlodRequest {
                     resolve();
                 });
         });
-    }   
+    }
+
+    download2(url, cookie, stream, on_progress=(state)=>{}){
+        this.canceled = false;
+        return new Promise(async (resolve, reject) => {
+            let content_len = 0;
+            let current = 0 ;
+            const options = {
+                method: "GET",
+                uri: url, 
+                timeout: 5 * 1000
+            };
+            if(cookie){
+                options.jar = cookie;
+            }
+            this.request = request(options, (error, res, body) => {
+                if(error){
+                    reject(error);
+                }
+            }).on("response", (res) => {
+                content_len = res.headers["content-length"];
+            }).on("data", (chunk) => {
+                if(content_len > 0){
+                    const pre_per = Math.floor((current/content_len)*100);
+                    current += chunk.length;
+                    const cur_per = Math.floor((current/content_len)*100);
+                    if(cur_per > pre_per){
+                        // console.log("progress: ", cur_per, "%");
+                        on_progress(`${cur_per}%`);
+                    }
+                }
+            }).on("abort", () => {
+                if(this.canceled){
+                    const error = new Error("cancel");
+                    error.cancel = true;
+                    reject(error);
+                }
+            }).pipe(stream)
+                .on("error", (error) => { 
+                    reject(error);
+                })
+                .on("close", () => {
+                    on_progress("finish");
+                    resolve();
+                });
+        });
+    }
 }
 
 class NicoNicoDownloder {
@@ -74,8 +120,9 @@ class NicoNicoDownloder {
         if(this.nico_comment){
             this.nico_watch.cancel();
         }  
-        if(this.img_download){
-            this.img_download.cancel();
+        if(this.img_request){
+            this.img_reuqest_canceled = true;
+            this.img_request.cancel();
         }  
         if(this.nico_video){
             this.nico_video.cancel();
@@ -160,7 +207,9 @@ class NicoNicoDownloder {
         const video_filepath = path.join(dist_dir, video_filename);
 
         this.video_download = new DownlodRequest();
-        await this.video_download.download(video_url, null, video_filepath, on_progress);
+        // await this.video_download.download(video_url, null, video_filepath, on_progress);
+        let ws = fs.createWriteStream(video_filepath);
+        await this.video_download.download2(video_url, null, ws, on_progress);
         this.nico_video.stopHeartBeat();
 
         const current_time = new Date().getTime();
@@ -233,9 +282,8 @@ class NicoNicoDownloder {
             path.join(dist_dir, this._getCommnetFilename(fname, video_id)), 
             comments);
 
-        await this._writeThumbImg(
-            path.join(dist_dir, this._getThumbImgFilename(fname, video_id)), 
-            api_data.video.largeThumbnailURL); 
+        const thumbimg_data = await this._getThumbImg(api_data.video.largeThumbnailURL); 
+        this._writeThumbImg(path.join(dist_dir, this._getThumbImgFilename(fname, video_id)), thumbimg_data);
     }
 
     /**
@@ -259,10 +307,39 @@ class NicoNicoDownloder {
         const json = JSON.stringify(data);
         fs.writeFileSync(file_path, json, "utf-8");
     }
+
+    _getThumbImg(url){
+        this.img_reuqest_canceled = false;
+        return new Promise(async (resolve, reject) => {
+            const options = {
+                method: "GET", 
+                uri: url, 
+                encoding: null
+            };
+
+            this.img_request = request(options, (error, response, body)=>{
+                if(error){
+                    reject(error);
+                }else if(response.statusCode === 200){
+                    // fs.writeFileSync('a.png', body, 'binary');
+                    resolve(body);
+                } else {
+                    reject(new Error(`statusCode=${response.statusCode}`));
+                }
+            }).on("abort", () => {
+                if(this.img_reuqest_canceled){
+                    const error = new Error("cancel");
+                    error.cancel = true;
+                    reject(error);
+                }
+            });
+        });
+    }
     
-    async _writeThumbImg(dist_path, url){
-        this.img_download = new DownlodRequest();
-        await this.img_download.download(url, null, dist_path);
+    _writeThumbImg(dist_path, data){
+        // this.img_download = new DownlodRequest();
+        // await this.img_download.download(url, null, dist_path);
+        fs.writeFileSync(dist_path, data, "binary");
     }
 
     _getVideoFilename(name, id, video_type){

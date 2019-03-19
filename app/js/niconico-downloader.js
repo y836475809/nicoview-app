@@ -190,6 +190,10 @@ class NicoNicoDownloader {
         }
     }
 
+    _createStream(dist_path){
+        return fs.createWriteStream(dist_path);
+    }
+
     async _downloadDmc(name, dist_dir, on_progress){
         //cancel
         await this.nico_video.optionsHeartBeat();
@@ -208,7 +212,8 @@ class NicoNicoDownloader {
 
         this.video_download = new DownloadRequest();
         // await this.video_download.download(video_url, null, video_filepath, on_progress);
-        let ws = fs.createWriteStream(video_filepath);
+        // let ws = fs.createWriteStream(video_filepath);
+        let ws = this._createStream(video_filepath);
         await this.video_download.download2(video_url, null, ws, on_progress);
         this.nico_video.stopHeartBeat();
 
@@ -244,7 +249,7 @@ class NicoNicoDownloader {
         const video_filename = this._getVideoFilename(name, video_id, video_type);
         const video_filepath = path.join(dist_dir, video_filename);
 
-        this.video_download = DownlodRequest();
+        this.video_download = new DownloadRequest();
         await this.video_download.download(url, cookie, video_filepath, on_progress);
 
         const current_time = new Date().getTime();
@@ -271,6 +276,25 @@ class NicoNicoDownloader {
         };
     }
 
+    //TODO
+    _filterCommnets(comments){
+        return comments.filter(value => {
+            return value.hasOwnProperty("chat");
+        }).filter(value => {
+            return !value.chat.hasOwnProperty("deleted");
+        }). map(value => {
+            const chat = value.chat;
+            return {
+                no:        chat.no, 
+                vpos:      chat.vpos, 
+                post_date: chat.date,
+                user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
+                mail:      chat.mail,
+                text:      chat.content
+            };  
+        });
+    }
+
     async _down1(dist_dir, fname, video_id, api_data){
         this._writeJson(
             path.join(dist_dir, this._getThumbInfoFilename(fname, video_id)), 
@@ -278,9 +302,10 @@ class NicoNicoDownloader {
 
         this.nico_comment = new NicoComment(api_data);
         const comments = await this.nico_comment.getComment();
+        const fcomments = this._filterCommnets(comments);
         this._writeJson(
             path.join(dist_dir, this._getCommnetFilename(fname, video_id)), 
-            comments);
+            fcomments);
 
         const thumbimg_data = await this._getThumbImg(api_data.video.largeThumbnailURL); 
         this._writeThumbImg(path.join(dist_dir, this._getThumbImgFilename(fname, video_id)), thumbimg_data);

@@ -52,7 +52,7 @@ test("downloder quality check", (t) => {
     t.falsy(isMaxQuality(api_data, dmc_session_low));
 });
 
-test("downloder dmc", (t) => {
+test("downloder dmc", async (t) => {
     nico_download_mocks.watch();
     nico_download_mocks.dmc_session();
     nico_download_mocks.comment();
@@ -63,9 +63,10 @@ test("downloder dmc", (t) => {
     const video_id = TestData.video_id;
     const dist_dir = __dirname;
     const nico_down = new NicoNicoDownloder();
-    const result = nico_down.download(video_id, dist_dir, (state)=>{
+    const result = await nico_down.download(video_id, dist_dir, (state)=>{
         console.log("progress: ",state);
     });
     //TODO
+    t.is(result.state, "ok");
 });
 

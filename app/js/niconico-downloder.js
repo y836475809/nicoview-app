@@ -76,7 +76,10 @@ class NicoNicoDownloder {
         }  
         if(this.img_download){
             this.img_download.cancel();
-        }                
+        }  
+        if(this.nico_video){
+            this.nico_video.cancel();
+        }              
         if(this.video_download){
             this.video_download.cancel();
         }
@@ -97,15 +100,15 @@ class NicoNicoDownloder {
                         data: null
                     };
                 }
-                
+
                 const fname = this._getName(api_data.video.title);
-                this._down1(dist_dir, fname, video_id, api_data);
-                const db_data = this._downloadDmc(fname, dist_dir, on_progress);
+                await this._down1(dist_dir, fname, video_id, api_data);
+                const db_data = await this._downloadDmc(fname, dist_dir, on_progress);
                 return {
                     state: "ok",
                     reason: "",
                     data: db_data
-                };  
+                };
             }else{
                 if(!this._isSmileMaxQuality(api_data)){
                     return {
@@ -116,7 +119,7 @@ class NicoNicoDownloder {
                 }
                 const fname = this._getName(api_data.video.title);
                 this._down1(dist_dir, fname, video_id, api_data);
-                const db_data = this._downloadSmile(api_data, cookie_jar, dist_dir);
+                const db_data = await this._downloadSmile(api_data, cookie_jar, dist_dir);
                 return {
                     state: "ok",
                     reason: "",
@@ -129,13 +132,13 @@ class NicoNicoDownloder {
                     state: "cancel",
                     reason: "",
                     data: null
-                };         
+                };
             }else{
                 return {
                     state: "error",
                     reason: error,
                     data: null
-                };                 
+                };
             }
         }
     }
@@ -143,21 +146,22 @@ class NicoNicoDownloder {
     async _downloadDmc(name, dist_dir, on_progress){
         //cancel
         await this.nico_video.optionsHeartBeat();
-        await this.nico_video.postHeartBeat((error)=>{
+        this.nico_video.postHeartBeat((error)=>{
             console.log("hb error=", error);
             //cancel
         });
 
         const api_data = this.nico_video.api_data;
         const video_id = api_data.video.id;
-        const video_type = getVideoType(api_data.video.smileInfo.url).movie_type;
+        const video_type = getVideoType(api_data.video.smileInfo.url);
 
         const video_url = this.nico_video.DmcContentUri;
         const video_filename = this._getVideoFilename(name, video_id, video_type);
         const video_filepath = path.join(dist_dir, video_filename);
 
-        this.video_download = NicoNicoDownloder();
+        this.video_download = new DownlodRequest();
         await this.video_download.download(video_url, null, video_filepath, on_progress);
+        this.nico_video.stopHeartBeat();
 
         const current_time = new Date().getTime();
         const tags = api_data.tags.map((value) => {
@@ -187,11 +191,11 @@ class NicoNicoDownloder {
         //cancel
         const url = api_data.video.smileInfo.url;
         const video_id = api_data.video.id;
-        const video_type = getVideoType(url).movie_type;
+        const video_type = getVideoType(url);
         const video_filename = this._getVideoFilename(name, video_id, video_type);
         const video_filepath = path.join(dist_dir, video_filename);
 
-        this.video_download = NicoNicoDownloder();
+        this.video_download = DownlodRequest();
         await this.video_download.download(url, cookie, video_filepath, on_progress);
 
         const current_time = new Date().getTime();
@@ -229,9 +233,9 @@ class NicoNicoDownloder {
             path.join(dist_dir, this._getCommnetFilename(fname, video_id)), 
             comments);
 
-        this._writeThumbImg(
+        await this._writeThumbImg(
             path.join(dist_dir, this._getThumbImgFilename(fname, video_id)), 
-            api_data.video.largeThumbnailURL);      
+            api_data.video.largeThumbnailURL); 
     }
 
     /**
@@ -248,7 +252,7 @@ class NicoNicoDownloder {
             .replace(/\*/g, "＊")
             .replace(/</g, "＜")
             .replace(/>/g, "＞")
-            .replace(/|/g, "｜");
+            .replace(/\|/g, "｜");
     }
 
     _writeJson(file_path, data){
@@ -258,7 +262,7 @@ class NicoNicoDownloder {
     
     async _writeThumbImg(dist_path, url){
         this.img_download = new DownlodRequest();
-        await this.img_download.download(url, dist_path);
+        await this.img_download.download(url, null, dist_path);
     }
 
     _getVideoFilename(name, id, video_type){

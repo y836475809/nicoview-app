@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoNicoDownloder } = require("../app/js/niconico-downloder");
+const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
 
 const api_data = require("./data/sm12345678_data_api_data.json");
 const dmc_session_max = require("./data/sm12345678_dmc_session_max_quality.json");
@@ -47,12 +47,12 @@ test.afterEach(t => {
     // prof_time.end(t);
 });
 
-test("downloder quality check", (t) => {
+test("downloader quality check", (t) => {
     t.truthy(isMaxQuality(api_data, dmc_session_max));
     t.falsy(isMaxQuality(api_data, dmc_session_low));
 });
 
-test("downloder dmc", async (t) => {
+test("downloader dmc", async (t) => {
     nico_download_mocks.watch();
     nico_download_mocks.dmc_session();
     nico_download_mocks.comment();
@@ -62,7 +62,7 @@ test("downloder dmc", async (t) => {
 
     const video_id = TestData.video_id;
     const dist_dir = __dirname;
-    const nico_down = new NicoNicoDownloder();
+    const nico_down = new NicoNicoDownloader();
     const result = await nico_down.download(video_id, dist_dir, (state)=>{
         console.log("progress: ",state);
     });

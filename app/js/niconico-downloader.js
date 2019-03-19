@@ -3,7 +3,7 @@ const path = require("path");
 const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment, getVideoType } = require("./niconico");
 
-class DownlodRequest {
+class DownloadRequest {
     constructor(){
         this.request = null;
         this.canceled = false;
@@ -109,7 +109,7 @@ class DownlodRequest {
     }
 }
 
-class NicoNicoDownloder {
+class NicoNicoDownloader {
     constructor(){
     }
 
@@ -206,7 +206,7 @@ class NicoNicoDownloder {
         const video_filename = this._getVideoFilename(name, video_id, video_type);
         const video_filepath = path.join(dist_dir, video_filename);
 
-        this.video_download = new DownlodRequest();
+        this.video_download = new DownloadRequest();
         // await this.video_download.download(video_url, null, video_filepath, on_progress);
         let ws = fs.createWriteStream(video_filepath);
         await this.video_download.download2(video_url, null, ws, on_progress);
@@ -383,5 +383,5 @@ class NicoNicoDownloder {
 }
 
 module.exports = {
-    NicoNicoDownloder: NicoNicoDownloder
+    NicoNicoDownloader: NicoNicoDownloader
 };

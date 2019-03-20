@@ -4,7 +4,9 @@ const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment, getVideoType } = require("./niconico");
 
 class DownloadRequest {
-    constructor(){
+    constructor(url, cookie){
+        this.url = url;
+        this.cookie = cookie;
         this.request = null;
         this.canceled = false;
     }
@@ -16,65 +18,17 @@ class DownloadRequest {
         }
     }
 
-    download(url, cookie, dist_path, on_progress=(state)=>{}){
+    download(stream, on_progress=(state)=>{}){
         this.canceled = false;
         return new Promise(async (resolve, reject) => {
             let content_len = 0;
             let current = 0 ;
             const options = {
                 method: "GET",
-                uri: url, 
+                uri: this.url, 
+                jar: this.cookie,
                 timeout: 5 * 1000
             };
-            if(cookie){
-                options.jar = cookie;
-            }
-            this.request = request(options, (error, res, body) => {
-                if(error){
-                    reject(error);
-                }
-            }).on("response", (res) => {
-                content_len = res.headers["content-length"];
-            }).on("data", (chunk) => {
-                if(content_len > 0){
-                    const pre_per = Math.floor((current/content_len)*100);
-                    current += chunk.length;
-                    const cur_per = Math.floor((current/content_len)*100);
-                    if(cur_per > pre_per){
-                        // console.log("progress: ", cur_per, "%");
-                        on_progress(`${cur_per}%`);
-                    }
-                }
-            }).on("abort", () => {
-                if(this.canceled){
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    reject(error);
-                }
-            }).pipe(fs.createWriteStream(dist_path))
-                .on("error", (error) => { 
-                    reject(error);
-                })
-                .on("close", () => {
-                    on_progress("finish");
-                    resolve();
-                });
-        });
-    }
-
-    download2(url, cookie, stream, on_progress=(state)=>{}){
-        this.canceled = false;
-        return new Promise(async (resolve, reject) => {
-            let content_len = 0;
-            let current = 0 ;
-            const options = {
-                method: "GET",
-                uri: url, 
-                timeout: 5 * 1000
-            };
-            if(cookie){
-                options.jar = cookie;
-            }
             this.request = request(options, (error, res, body) => {
                 if(error){
                     reject(error);
@@ -110,7 +64,9 @@ class DownloadRequest {
 }
 
 class NicoNicoDownloader {
-    constructor(){
+    constructor(video_id, dist_dir){
+        this.video_id = video_id;
+        this.dist_dir = dist_dir;
     }
 
     cancel(){
@@ -132,69 +88,136 @@ class NicoNicoDownloader {
         }
     }
 
-    async download(video_id, dist_dir, on_progress){
+    async download(on_progress){
         try {
-            this.nico_watch = new NicoWatch();
-            const { cookie_jar, api_data } = await this.nico_watch.watch(video_id);
+            await this._getWatchData(this.video_id);
+            await this._getVideoInfo();
 
-            this.nico_video = new NicoVideo(api_data);
-            if(this.nico_video.isDmc()){
-                const dmc_session = await this.nico_video.postDmcSession();
-                if(!this._isDMCMaxQuality(api_data, dmc_session)){
-                    return {
-                        state: "skip",
-                        reason: "low",
-                        data: null
-                    };
-                }
-
-                const fname = this._getName(api_data.video.title);
-                await this._down1(dist_dir, fname, video_id, api_data);
-                const db_data = await this._downloadDmc(fname, dist_dir, on_progress);
+            if(!this.videoinfo.maxQuality){
                 return {
-                    state: "ok",
-                    reason: "",
-                    data: db_data
-                };
-            }else{
-                if(!this._isSmileMaxQuality(api_data)){
-                    return {
-                        state: "skip",
-                        reason: "low",
-                        data: null
-                    };
-                }
-                const fname = this._getName(api_data.video.title);
-                this._down1(dist_dir, fname, video_id, api_data);
-                const db_data = await this._downloadSmile(api_data, cookie_jar, dist_dir);
-                return {
-                    state: "ok",
-                    reason: "",
-                    data: db_data
+                    state: "cancel",
+                    reason: "low quality"
                 };
             }
+
+            this._writeJson(this._getThumbInfoFilePath(), this._getThumbInfo());
+            this._writeJson(this._getCommnetFilePath(), await this._getCommnet());
+            this._writeBinary(this._getThumbImgFilePath(), await this._getThumbImg());
+
+            const stream = this._createStream(this._getVideoFilePath());
+            if(this.videoinfo.server=="dmc"){
+                await this._getVideoDmc(stream, on_progress);
+            }else{
+                await this._getVideoSmile(stream, on_progress);
+            }
+
+            return {
+                state: "ok",
+                reason: ""
+            };
         } catch (error) {
             if(error.cancel){
                 return {
                     state: "cancel",
-                    reason: "",
-                    data: null
-                };
-            }else{
-                return {
-                    state: "error",
-                    reason: error,
-                    data: null
+                    reason: "cancel"
                 };
             }
+
+            return {
+                state: "error",
+                reason: error
+            };
         }
+    }
+
+    async _getWatchData(video_id){
+        this.nico_watch = new NicoWatch();
+        this.watch_data = await this.nico_watch.watch(video_id);
+    }
+
+    async _getVideoInfo(){
+        const api_data = this.watch_data.api_data;
+        this.nico_video = new NicoVideo(this.watch_data.api_data);
+
+        if(this.nico_video.isDmc()){
+            const dmc_session = await this.nico_video.postDmcSession();
+            this.videoinfo = {
+                server: "dmc",
+                maxQuality: this._isDMCMaxQuality(api_data, dmc_session)
+            };
+        }else{
+            this.videoinfo = {
+                server: "smile",
+                maxQuality: this._isSmileMaxQuality(api_data)
+            };
+        }        
+    }
+
+    _getThumbInfo(){
+        const api_data = this.watch_data.api_data;
+        return {
+            video: {
+                id: api_data.video.id,
+                title: api_data.video.title, 
+                description: api_data.video.description, 
+                thumbnailURL: api_data.video.thumbnailURL, 
+                largeThumbnailURL: api_data.video.largeThumbnailURL, 
+                postedDateTime: api_data.video.postedDateTime, 
+                duration: api_data.video.duration, 
+                viewCount: api_data.video.viewCount, 
+                mylistCount: api_data.video.mylistCount, 
+                movieType: api_data.video.movieType,
+            },
+            tags: api_data.tags,
+            owner: {
+                id: api_data.owner.id, 
+                nickname: api_data.owner.nickname,
+                iconURL: api_data.owner.iconURL,
+            }
+        };
+    }
+    async _getCommnet(){
+        const api_data = this.watch_data.api_data;
+        this.nico_comment = new NicoComment(api_data);
+        const comments = await this.nico_comment.getComment();
+        return this._filterCommnets(comments);
+    }
+
+    _getThumbImg(){
+        const api_data = this.watch_data.api_data;
+        const url = api_data.video.largeThumbnailURL;
+        this.img_reuqest_canceled = false;
+
+        return new Promise(async (resolve, reject) => {
+            const options = {
+                method: "GET", 
+                uri: url, 
+                encoding: null
+            };
+
+            this.img_request = request(options, (error, response, body)=>{
+                if(error){
+                    reject(error);
+                }else if(response.statusCode === 200){
+                    resolve(body);
+                } else {
+                    reject(new Error(`statusCode=${response.statusCode}`));
+                }
+            }).on("abort", () => {
+                if(this.img_reuqest_canceled){
+                    const error = new Error("cancel");
+                    error.cancel = true;
+                    reject(error);
+                }
+            });
+        });
     }
 
     _createStream(dist_path){
         return fs.createWriteStream(dist_path);
     }
 
-    async _downloadDmc(name, dist_dir, on_progress){
+    async _getVideoDmc(stream, on_progress){
         //cancel
         await this.nico_video.optionsHeartBeat();
         this.nico_video.postHeartBeat((error)=>{
@@ -202,78 +225,41 @@ class NicoNicoDownloader {
             //cancel
         });
 
-        const api_data = this.nico_video.api_data;
-        const video_id = api_data.video.id;
-        const video_type = getVideoType(api_data.video.smileInfo.url);
-
+        const { cookie_jar } = this.watch_data;
         const video_url = this.nico_video.DmcContentUri;
-        const video_filename = this._getVideoFilename(name, video_id, video_type);
-        const video_filepath = path.join(dist_dir, video_filename);
 
-        this.video_download = new DownloadRequest();
-        // await this.video_download.download(video_url, null, video_filepath, on_progress);
-        // let ws = fs.createWriteStream(video_filepath);
-        let ws = this._createStream(video_filepath);
-        await this.video_download.download2(video_url, null, ws, on_progress);
+        this.video_download = new DownloadRequest(video_url, cookie_jar);
+        await this.video_download.download(stream, on_progress);
         this.nico_video.stopHeartBeat();
-
-        const current_time = new Date().getTime();
-        const tags = api_data.tags.map((value) => {
-            return value.name;
-        });
-        return {
-            _data_type: "video",
-            _db_type: "json",
-            video_id: api_data.video.id,
-            dirpath_id:1,
-            video_name: api_data.video.title,
-            video_filename: video_filename,
-            video_type:`video/${video_type}`,
-            is_economy:0,
-            modification_date: current_time,
-            creation_date: current_time,
-            play_count:0,
-            time: api_data.video.duration,
-            last_play_date:-1,
-            yet_reading:0,
-            pub_date: new Date(api_data.video.postedDateTime).getTime(),
-            tags:tags
-        };
     }
 
-    async _downloadSmile(api_data, cookie, dist_dir, on_progress){
+    async _getVideoSmile(stream, on_progress){
         //cancel
+        const { cookie_jar, api_data } = this.watch_data;
         const url = api_data.video.smileInfo.url;
+
+        this.video_download = new DownloadRequest(url, cookie_jar);
+        await this.video_download.download(stream, on_progress);
+    }   
+
+    getdd(){
+        const { api_data } = this.watch_data;
         const video_id = api_data.video.id;
-        const video_type = getVideoType(url);
-        const video_filename = this._getVideoFilename(name, video_id, video_type);
-        const video_filepath = path.join(dist_dir, video_filename);
-
-        this.video_download = new DownloadRequest();
-        await this.video_download.download(url, cookie, video_filepath, on_progress);
-
-        const current_time = new Date().getTime();
+        const video_type = getVideoType(api_data.video.smileInfo.url);
+        const video_filename = this._getVideoFilename();
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
         return {
-            _data_type: "video",
-            _db_type: "json",
-            video_id: api_data.video.id,
-            dirpath_id:1,
+            video_id: video_id,
             video_name: api_data.video.title,
             video_filename: video_filename,
-            video_type:`video/${video_type}`,
-            is_economy:0,
-            modification_date: current_time,
-            creation_date: current_time,
-            play_count:0,
+            video_type: video_type,
+            max_quality: this.videoinfo.maxQuality,
             time: api_data.video.duration,
-            last_play_date:-1,
-            yet_reading:0,
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
-            tags:tags
-        };
+            tags: tags
+        };      
     }
 
     //TODO
@@ -293,22 +279,6 @@ class NicoNicoDownloader {
                 text:      chat.content
             };  
         });
-    }
-
-    async _down1(dist_dir, fname, video_id, api_data){
-        this._writeJson(
-            path.join(dist_dir, this._getThumbInfoFilename(fname, video_id)), 
-            api_data);
-
-        this.nico_comment = new NicoComment(api_data);
-        const comments = await this.nico_comment.getComment();
-        const fcomments = this._filterCommnets(comments);
-        this._writeJson(
-            path.join(dist_dir, this._getCommnetFilename(fname, video_id)), 
-            fcomments);
-
-        const thumbimg_data = await this._getThumbImg(api_data.video.largeThumbnailURL); 
-        this._writeThumbImg(path.join(dist_dir, this._getThumbImgFilename(fname, video_id)), thumbimg_data);
     }
 
     /**
@@ -333,54 +303,31 @@ class NicoNicoDownloader {
         fs.writeFileSync(file_path, json, "utf-8");
     }
 
-    _getThumbImg(url){
-        this.img_reuqest_canceled = false;
-        return new Promise(async (resolve, reject) => {
-            const options = {
-                method: "GET", 
-                uri: url, 
-                encoding: null
-            };
-
-            this.img_request = request(options, (error, response, body)=>{
-                if(error){
-                    reject(error);
-                }else if(response.statusCode === 200){
-                    // fs.writeFileSync('a.png', body, 'binary');
-                    resolve(body);
-                } else {
-                    reject(new Error(`statusCode=${response.statusCode}`));
-                }
-            }).on("abort", () => {
-                if(this.img_reuqest_canceled){
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    reject(error);
-                }
-            });
-        });
-    }
-    
-    _writeThumbImg(dist_path, data){
-        // this.img_download = new DownlodRequest();
-        // await this.img_download.download(url, null, dist_path);
-        fs.writeFileSync(dist_path, data, "binary");
+    _writeBinary(file_path, data){
+        fs.writeFileSync(file_path, data, "binary");
     }
 
-    _getVideoFilename(name, id, video_type){
-        return `${name} - [${id}].${video_type}`;
+    _getVideoFilename(){
+        const { api_data } = this.watch_data;
+        const video_type = getVideoType(api_data.video.smileInfo.url);
+        return `${this.video_id}.${video_type}`;
     }
 
-    _getCommnetFilename(name, id){
-        return `${name} - [${id}].json`;
+    _getVideoFilePath(){
+        const filename = this._getVideoFilename();
+        return path.join(this.dist_dir, filename);
     }
 
-    _getThumbInfoFilename(name, id){
-        return `${name} - [${id}][ThumbInfo].json`;
+    _getCommnetFilePath(){
+        return path.join(this.dist_dir, `${this.video_id}[Comment].json`);
     }
 
-    _getThumbImgFilename(name, id){
-        return `${name} - [${id}][ThumbImg].jpeg`;
+    _getThumbInfoFilePath(){
+        return path.join(this.dist_dir, `${this.video_id}[ThumbInfo].json`);
+    }
+
+    _getThumbImgFilePath(){
+        return path.join(this.dist_dir, `${this.video_id}.jpeg`);
     }
 
     _isSmileMaxQuality(api_data){

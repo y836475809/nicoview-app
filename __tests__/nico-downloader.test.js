@@ -25,24 +25,6 @@ class writeBufStream extends stream.Writable {
     }
 }
 
-const isMaxQuality = (api_data, dmc_session) => {
-    const quality = api_data.video.dmcInfo.quality;
-    const max_quality = { 
-        video: quality.videos[0].id,
-        audio: quality.audios[0].id
-    };
-
-    const src_id_to_mux = 
-        dmc_session.session.content_src_id_sets[0].content_src_ids[0].src_id_to_mux;
-    const session_quality = { 
-        video: src_id_to_mux.video_src_ids[0],
-        audio: src_id_to_mux.audio_src_ids[0]
-    };
-
-    return max_quality.video == session_quality.video
-        && max_quality.audio == session_quality.audio;
-};
-
 const nico_download_mocks = new NicoDownLoadMocks();
 
 test.before(t => {
@@ -67,13 +49,14 @@ test.afterEach(t => {
 });
 
 test("downloader quality check", (t) => {
-    t.truthy(isMaxQuality(api_data, dmc_session_max));
-    t.falsy(isMaxQuality(api_data, dmc_session_low));
+    const nico_down = new NicoNicoDownloader();
+    t.truthy(nico_down._isDMCMaxQuality(api_data, dmc_session_max));
+    t.falsy(nico_down._isDMCMaxQuality(api_data, dmc_session_low));
 });
 
 class TestNicoDownloader extends NicoNicoDownloader {
-    constructor(){
-        super();
+    constructor(video_id, dist_dir){
+        super(video_id, dist_dir);
         this.map = new Map();
     }
 
@@ -85,10 +68,10 @@ class TestNicoDownloader extends NicoNicoDownloader {
     _writeJson(file_path, data){
         this.map.set(file_path, data);
     }
-    _writeThumbImg(dist_path, data){
+    _writeBinary(file_path, data){
         const text_decoder = new TextDecoder("utf-8");
         const str = text_decoder.decode(Uint8Array.from(data).buffer);
-        this.map.set(dist_path, str);
+        this.map.set(file_path, str);
     }
 }
 
@@ -102,30 +85,39 @@ test("downloader dmc", async (t) => {
 
     const video_id = TestData.video_id;
     const dist_dir = __dirname;
-    const nico_down = new TestNicoDownloader();
-    const result = await nico_down.download(video_id, dist_dir, (state)=>{
+    const nico_down = new TestNicoDownloader(video_id, dist_dir);
+    const result = await nico_down.download((state)=>{
         console.log("progress: ",state);
+    });  
+    t.deepEqual(result, { state: "ok", reason: "" });
+
+    const dd = nico_down.getdd();
+    t.deepEqual(dd, { 
+        video_id: "sm12345678", 
+        video_name: "test",
+        video_filename: "sm12345678.mp4",
+        video_type: "mp4",
+        max_quality: true,
+        time: 100,
+        pub_date: new Date("2018/01/01 01:00:00").getTime(),
+        tags:["tag1", "tag2", "tag3"]
     });
-    //TODO
-    t.is(result.state, "ok");
+
     {
-        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbImg].jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678.jpeg"));
         t.is(data, "thumbnail");
     }
     {
-        const writer = nico_down.map.get(path.join(dist_dir, "test - [sm12345678].mp4"));
+        const writer = nico_down.map.get(path.join(dist_dir, "sm12345678.mp4"));
         t.is(writer.buf, "video dmc");
     }
     {
-        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678].json"));
-        // const json = JSON.parse(data);
-        // console.log(data);
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
         t.is(data[0].text, "comment1");  
         t.is(data[1].text, "comment2");  
     } 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbInfo].json"));
-        // const json = JSON.parse(data);
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
         t.is(data.video.id, "sm12345678"); 
         t.is(data.video.title, "test"); 
         t.not(data.video.description, undefined); 
@@ -139,10 +131,13 @@ test("downloader dmc", async (t) => {
         
         t.is(data.tags[0].id, "1");  
         t.is(data.tags[0].name, "tag1");  
+        t.is(data.tags[0].isLocked, true);  
         t.is(data.tags[1].id, "2");  
         t.is(data.tags[1].name, "tag2");  
+        t.is(data.tags[1].isLocked, true);  
         t.is(data.tags[2].id, "3");  
         t.is(data.tags[2].name, "tag3");  
+        t.is(data.tags[2].isLocked, false);  
 
         t.is(data.owner.id, "123345677");  
         t.is(data.owner.nickname, "aaaaさん");  
@@ -150,3 +145,30 @@ test("downloader dmc", async (t) => {
     }      
 });
 
+//TODO
+test("downloader smile", async (t) => {
+});
+
+test("downloader dmc low quality", async (t) => {
+});
+
+test("downloader smile low quality", async (t) => {
+});
+
+test("downloader cancel dmc low quality", async (t) => {
+});
+
+test("downloader cancel smile low quality", async (t) => {
+});
+
+test("downloader cancel", async (t) => {
+});
+
+test("downloader timeout", async (t) => {
+});
+
+test("downloader network error", async (t) => {
+});
+
+test("downloader file save error", async (t) => {
+});

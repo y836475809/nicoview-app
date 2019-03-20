@@ -228,7 +228,7 @@ class NicoDownLoadMocks {
         nock.cleanAll();
     }
 
-    watch(delay=1){
+    watch(delay=1, kind="dmc"){
         this.watch_nock = nock("https://www.nicovideo.jp");
         const headers = {
             "Set-Cookie": [
@@ -236,14 +236,34 @@ class NicoDownLoadMocks {
                 "nicosid=123456.789; path=/; domain=.nicovideo.jp"
             ]
         };
-        const body = MockNicoUitl.getWatchHtml(video_id);
+        const cp_data_api_data = Object.assign({}, data_api_data);
+        if(kind=="smile max"){
+            cp_data_api_data.video.dmcInfo = null;
+        }else if(kind=="smile low"){
+            cp_data_api_data.video.dmcInfo = null;
+            cp_data_api_data.smileInfo.url += "low";
+        }
+
+        const body = MockNicoUitl.getWatchHtml(video_id, cp_data_api_data);
         this.watch_nock
             .get(`/watch/${video_id}`)
             .delay(delay)
             .reply(200, body, headers);
     } 
 
-    dmc_session(delay=1){
+    dmc_session(delay=1, quality="max"){
+        const cp_dmc_session = Object.assign({}, dmc_session);
+        if(quality!="max"){
+            cp_dmc_session.session.content_src_id_sets[0].content_src_ids = [
+                {
+                    "src_id_to_mux": {
+                        "video_src_ids": ["archive_h264_360p"],
+                        "audio_src_ids": ["archive_aac_64kbps"]
+                    }
+                }
+            ];
+        }
+
         this.dmc_session_nock = nock("https://api.dmc.nico");
         this.dmc_session_nock
             .post("/api/sessions")
@@ -252,7 +272,7 @@ class NicoDownLoadMocks {
             .reply((uri, reqbody)=>{
                 return [200, {
                     meta: { status: 201,message: "created" },
-                    data: dmc_session
+                    data: cp_dmc_session
                 }];                    
             });
     }
@@ -333,11 +353,15 @@ class MockNicoUitl {
         return str;
     }
 
-    static getWatchHtml(video_id){ 
-        const fpath = `${base_dir}/data/${video_id}_data_api_data.json`;
-        const j = fs.readFileSync(fpath, "utf-8");
-        const data_api_data = MockNicoUitl._escapeHtml(j);
-        // const html = escape("hh");
+    static getWatchHtml(video_id, json){ 
+        let data_api_data = "";
+        if(json){
+            data_api_data = MockNicoUitl._escapeHtml(JSON.stringify(json));
+        }else{   
+            const fpath = `${base_dir}/data/${video_id}_data_api_data.json`;
+            const j = fs.readFileSync(fpath, "utf-8");
+            data_api_data = MockNicoUitl._escapeHtml(j);
+        }
         return `<!DOCTYPE html>
         <html lang="ja">
             <body>

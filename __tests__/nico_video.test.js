@@ -30,7 +30,7 @@ test("nico smile", t => {
     const nico_video = new NicoVideo(data_api_data);
 
     t.truthy(nico_video.isDmc());
-    t.regex(nico_video.SmileUrl, /https:\/\/smile-cls\d\d.sl.nicovideo.jp\/smile\?m=\d+\.\d+low/);
+    t.regex(nico_video.SmileUrl, /https:\/\/smile-cls\d\d.sl.nicovideo.jp\/smile\?m=\d+\.\d+/);
 });
 
 test("nico session", t => {

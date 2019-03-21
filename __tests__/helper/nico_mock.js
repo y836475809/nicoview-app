@@ -333,20 +333,28 @@ class NicoDownLoadMocks {
     } 
 
     dmc_video({delay=1, code=200} = {}){
+        const data = "video dmc";
+        const headers = {
+            "content-length": Buffer.byteLength(data)
+        };
         this.dmc_video_nock = nock("https://pa0000.dmc.nico");
         this.dmc_video_nock
             .get("/m")
             .delay(delay)
-            .reply(code, "video dmc");
+            .reply(code, data, headers);
     }
 
     smile_video({delay=1, code=200, quality=""} = {}){
+        const data = "video smile";
+        const headers = {
+            "content-length": Buffer.byteLength(data)
+        };
         this.smile_video_nock = nock("https://smile-cls20.sl.nicovideo.jp");
         this.smile_video_nock
             .get("/smile")
             .query({ m: `12345678.67759${quality}`})
             .delay(delay)
-            .reply(code, "video smile");
+            .reply(code, data, headers);
     }
 }
 

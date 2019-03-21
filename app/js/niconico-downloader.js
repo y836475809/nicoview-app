@@ -3,6 +3,10 @@ const path = require("path");
 const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment, getVideoType } = require("./niconico");
 
+const validateStatus = (status) => {
+    return status >= 200 && status < 300;
+};
+
 class DownloadRequest {
     constructor(url, cookie){
         this.url = url;
@@ -21,13 +25,6 @@ class DownloadRequest {
     download(stream, on_progress=(state)=>{}){
         this.canceled = false;
         return new Promise(async (resolve, reject) => {
-            stream.on("error", (error) => { 
-                reject(error);
-            }).on("close", () => {
-                on_progress("finish");
-                resolve();
-            });
-
             let content_len = 0;
             let current = 0 ;
             const options = {
@@ -40,8 +37,24 @@ class DownloadRequest {
                 if(error){
                     reject(error);
                 }
+                else if(validateStatus(res.statusCode)){
+                    reject(new Error(`${res.statusCode}:${this.url}`));
+                }
+            }).on("error", (error) => {
+                reject(error);
             }).on("response", (res) => {
-                content_len = res.headers["content-length"];
+                if(validateStatus(res.statusCode)){
+                    content_len = res.headers["content-length"];
+
+                    stream.on("error", (error) => { 
+                        reject(error);
+                    }).on("close", () => {
+                        on_progress("finish");
+                        resolve();
+                    });
+                }else{
+                    reject(new Error(`${res.statusCode}:${this.url}`));
+                }
             }).on("data", (chunk) => {
                 if(content_len > 0){
                     const pre_per = Math.floor((current/content_len)*100);
@@ -212,10 +225,10 @@ class NicoNicoDownloader {
             this.img_request = request(options, (error, response, body)=>{
                 if(error){
                     reject(error);
-                }else if(response.statusCode === 200){
+                }else if(validateStatus(response.statusCode)){
                     resolve(body);
                 } else {
-                    reject(new Error(`statusCode=${response.statusCode}`));
+                    reject(new Error(`${response.statusCode}:${url}`));
                 }
             }).on("abort", () => {
                 if(this.img_reuqest_canceled){

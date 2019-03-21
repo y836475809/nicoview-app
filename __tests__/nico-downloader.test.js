@@ -1,7 +1,7 @@
 const test = require("ava");
 const path = require("path");
 const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
-const { NicoDownLoadMocks, writeBufStream, TestData } = require("./helper/nico_mock");
+const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico_mock");
 
 const data_api_data = TestData.data_api_data;
 const dmc_session_max = TestData.dmc_session;
@@ -56,12 +56,7 @@ test("downloader quality check", (t) => {
 });
 
 test("downloader dmc", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -127,10 +122,7 @@ test("downloader dmc", async (t) => {
 });
 
 test("downloader smile", async (t) => {
-    nico_download_mocks.watch({ kind:"smile max" });
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.smile_video();
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -196,12 +188,7 @@ test("downloader smile", async (t) => {
 });
 
 test("downloader dmc low quality", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session({quality:"low"});
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir, false);
     const result = await nico_down.download((state)=>{
@@ -226,10 +213,7 @@ test("downloader dmc low quality", async (t) => {
 });
 
 test("downloader smile low quality", async (t) => {
-    nico_download_mocks.watch({kind:"smile low"});
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.smile_video({quality:"low"});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir, false);
     const result = await nico_down.download((state)=>{
@@ -254,12 +238,7 @@ test("downloader smile low quality", async (t) => {
 });
 
 test("downloader cancel dmc low quality", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session({quality:"low"});
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -270,10 +249,7 @@ test("downloader cancel dmc low quality", async (t) => {
 });
 
 test("downloader cancel smile low quality", async (t) => {
-    nico_download_mocks.watch({ kind:"smile low" });
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.smile_video();
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -284,12 +260,7 @@ test("downloader cancel smile low quality", async (t) => {
 });
 
 test("downloader cancel watch", async (t) => {
-    nico_download_mocks.watch({ delay: 2000 });
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {watch_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -305,12 +276,7 @@ test("downloader cancel watch", async (t) => {
 });
 
 test("downloader cancel dmc_session", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session({delay:2000});
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {dmc_session_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -326,12 +292,7 @@ test("downloader cancel dmc_session", async (t) => {
 });
 
 test("downloader cancel comment", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment({ delay: 2000 });
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {comment_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -348,12 +309,7 @@ test("downloader cancel comment", async (t) => {
 });
 
 test("downloader cancel thumbnail", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail({ delay: 2000 });
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -371,12 +327,7 @@ test("downloader cancel thumbnail", async (t) => {
 });
 
 test("downloader cancel dmc_hb options", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb({ options_delay: 2000 });
-    nico_download_mocks.dmc_video();
+    setupNicoDownloadNock(nico_download_mocks, {hb_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -394,12 +345,7 @@ test("downloader cancel dmc_hb options", async (t) => {
 });
 
 test("downloader cancel dmc_video", async (t) => {
-    nico_download_mocks.watch();
-    nico_download_mocks.dmc_session();
-    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.dmc_hb();
-    nico_download_mocks.dmc_video({ delay: 2000 });
+    setupNicoDownloadNock(nico_download_mocks, {video_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 
@@ -417,9 +363,7 @@ test("downloader cancel dmc_video", async (t) => {
 });
 
 test("downloader cancel smile_video", async (t) => {
-    nico_download_mocks.watch({ kind:"smile max" });    nico_download_mocks.comment();
-    nico_download_mocks.thumbnail();
-    nico_download_mocks.smile_video({ delay: 2000 });
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
 

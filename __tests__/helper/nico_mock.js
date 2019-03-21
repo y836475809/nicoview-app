@@ -410,11 +410,45 @@ class writeBufStream extends stream.Writable {
     }
 }
 
+const setupNicoDownloadNock = (target_nock, {
+    video_kind="dmc", video_quality="max",
+    watch_delay=1, watch_code=200, 
+    dmc_session_delay=1, dmc_session_code=200, 
+    comment_delay=1, comment_code=200, 
+    thumbnail_delay=1, thumbnail_code=200, 
+    hb_delay=1, hb_code=200, 
+    video_delay=1, video_code=200}={}) => {
+
+    if(video_kind=="dmc"){
+        target_nock.watch({ delay:watch_delay, code:watch_code });
+        target_nock.dmc_session({quality:video_quality, delay:dmc_session_delay, code:dmc_session_code });
+        target_nock.comment({ delay:comment_delay, code:comment_code });
+        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
+        target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
+        target_nock.dmc_video({ delay:video_delay, code:video_code });  
+    }else if(video_kind=="smile"){
+        let watch_kind = "";
+        let smile_quality= "";
+        if(video_quality=="max"){
+            watch_kind = "smile max";
+            smile_quality = "";
+        }else{
+            watch_kind = "smile low";
+            smile_quality = "low";
+        }      
+        target_nock.watch({kind:watch_kind, delay:watch_delay, code:watch_code });
+        target_nock.comment({ delay:comment_delay, code:comment_code });
+        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
+        target_nock.smile_video({quality:smile_quality, delay:video_delay, code:video_code });  
+    }
+};
+
 module.exports = {
     NicoMocks: NicoMocks,
     NicoDownLoadMocks: NicoDownLoadMocks,
     MockNicoUitl: MockNicoUitl,
     writeBufStream: writeBufStream,
+    setupNicoDownloadNock: setupNicoDownloadNock,
     TestData : {
         video_id : video_id,
         no_owner_comment: no_owner_comment,

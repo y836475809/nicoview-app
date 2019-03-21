@@ -1,6 +1,6 @@
 const test = require("ava");
 const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
-const { NicoDownLoadMocks, writeBufStream, TestData } = require("./helper/nico_mock");
+const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico_mock");
 
 const video_id = TestData.video_id;
 const dist_dir = __dirname;
@@ -70,41 +70,8 @@ class TestNicoDownloader extends NicoNicoDownloader {
     }
 }
 
-const setupNicoNock = (target_nock, {
-    video_kind="dmc", video_quality="max",
-    watch_delay=1, watch_code=200, 
-    dmc_session_delay=1, dmc_session_code=200, 
-    comment_delay=1, comment_code=200, 
-    thumbnail_delay=1, thumbnail_code=200, 
-    hb_delay=1, hb_code=200, 
-    video_delay=1, video_code=200}={}) => {
-
-    if(video_kind=="dmc"){
-        target_nock.watch({ delay:watch_delay, code:watch_code });
-        target_nock.dmc_session({ delay:dmc_session_delay, code:dmc_session_code });
-        target_nock.comment({ delay:comment_delay, code:comment_code });
-        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
-        target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
-        target_nock.dmc_video({ delay:video_delay, code:video_code });  
-    }else if(video_kind=="smile"){
-        let watch_kind = "";
-        let smile_quality= "";
-        if(video_quality=="max"){
-            watch_kind = "smile max";
-            smile_quality = "";
-        }else{
-            watch_kind = "smile low";
-            smile_quality = "low";
-        }      
-        target_nock.watch({kind:watch_kind, delay:watch_delay, code:watch_code });
-        target_nock.comment({ delay:comment_delay, code:comment_code });
-        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
-        target_nock.smile_video({quality:smile_quality, delay:video_delay, code:video_code });  
-    }
-};
-
 test("downloader timeout watch", async (t) => {
-    setupNicoNock(nico_download_mocks, {watch_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {watch_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -117,7 +84,7 @@ test("downloader timeout watch", async (t) => {
 });
 
 test("downloader timeout dmc_session", async (t) => {
-    setupNicoNock(nico_download_mocks, {dmc_session_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {dmc_session_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -130,7 +97,7 @@ test("downloader timeout dmc_session", async (t) => {
 });
 
 test("downloader timeout comment", async (t) => {
-    setupNicoNock(nico_download_mocks, {comment_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {comment_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -143,7 +110,7 @@ test("downloader timeout comment", async (t) => {
 });
 
 test("downloader timeout thumbnail", async (t) => {
-    setupNicoNock(nico_download_mocks, {thumbnail_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -157,7 +124,7 @@ test("downloader timeout thumbnail", async (t) => {
 });
 
 test("downloader timeout dmc_hb", async (t) => {
-    setupNicoNock(nico_download_mocks, {hb_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {hb_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -171,7 +138,7 @@ test("downloader timeout dmc_hb", async (t) => {
 });
 
 test("downloader timeout dmc_video", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {video_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -185,7 +152,7 @@ test("downloader timeout dmc_video", async (t) => {
 });
 
 test("downloader timeout smile_video", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_kind:"smile", video_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:6000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -199,7 +166,7 @@ test("downloader timeout smile_video", async (t) => {
 });
 
 test("downloader network error watch 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {watch_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {watch_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -211,7 +178,7 @@ test("downloader network error watch 404", async (t) => {
 });
 
 test("downloader network error watch 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {watch_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {watch_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -223,7 +190,7 @@ test("downloader network error watch 500", async (t) => {
 });
 
 test("downloader network error dmc_session 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {dmc_session_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {dmc_session_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -235,7 +202,7 @@ test("downloader network error dmc_session 404", async (t) => {
 });
 
 test("downloader network error dmc_session 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {dmc_session_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {dmc_session_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -247,7 +214,7 @@ test("downloader network error dmc_session 500", async (t) => {
 });
 
 test("downloader network error comment 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {comment_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {comment_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -260,7 +227,7 @@ test("downloader network error comment 404", async (t) => {
 });
 
 test("downloader network error comment 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {comment_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {comment_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -273,7 +240,7 @@ test("downloader network error comment 500", async (t) => {
 });
 
 test("downloader network error thumbnail 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {thumbnail_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -287,7 +254,7 @@ test("downloader network error thumbnail 404", async (t) => {
 });
 
 test("downloader network error thumbnail 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {thumbnail_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -301,7 +268,7 @@ test("downloader network error thumbnail 500", async (t) => {
 });
 
 test("downloader network error dmc_hb 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {hb_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {hb_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -315,7 +282,7 @@ test("downloader network error dmc_hb 404", async (t) => {
 });
 
 test("downloader network error dmc_hb 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {hb_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {hb_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -329,7 +296,7 @@ test("downloader network error dmc_hb 500", async (t) => {
 });
 
 test("downloader network error dmc_video 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {video_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -343,7 +310,7 @@ test("downloader network error dmc_video 404", async (t) => {
 });
 
 test("downloader network error dmc_video 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {video_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -357,7 +324,7 @@ test("downloader network error dmc_video 500", async (t) => {
 });
 
 test("downloader network error smile_video 404", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_kind:"smile", video_code:404});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -371,7 +338,7 @@ test("downloader network error smile_video 404", async (t) => {
 });
 
 test("downloader network error smile_video 500", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_kind:"smile", video_code:500});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -385,7 +352,7 @@ test("downloader network error smile_video 500", async (t) => {
 });
 
 test("downloader save thumbinfo error", async (t) => {
-    setupNicoNock(nico_download_mocks);
+    setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     nico_down.writeThumbInfoError();
@@ -400,7 +367,7 @@ test("downloader save thumbinfo error", async (t) => {
 });
 
 test("downloader save comment error", async (t) => {
-    setupNicoNock(nico_download_mocks);
+    setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     nico_down.writeCommnetError();
@@ -415,7 +382,7 @@ test("downloader save comment error", async (t) => {
 });
 
 test("downloader save thumbimg error", async (t) => {
-    setupNicoNock(nico_download_mocks);
+    setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     nico_down.writeThumbImgError();
@@ -431,7 +398,7 @@ test("downloader save thumbimg error", async (t) => {
 });
 
 test("downloader save dmc error", async (t) => {
-    setupNicoNock(nico_download_mocks);
+    setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     nico_down.streamError();
@@ -447,7 +414,7 @@ test("downloader save dmc error", async (t) => {
 });
 
 test("downloader save smile error", async (t) => {
-    setupNicoNock(nico_download_mocks, {video_kind:"smile"});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     nico_down.streamError();

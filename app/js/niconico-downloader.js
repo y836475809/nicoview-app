@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const request = require("request");
-const { NicoWatch, NicoVideo, NicoComment, getVideoType } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment, getVideoType, filterCommnets } = require("./niconico");
 
 const validateStatus = (status) => {
     return status >= 200 && status < 300;
@@ -206,7 +206,7 @@ class NicoNicoDownloader {
         const api_data = this.watch_data.api_data;
         this.nico_comment = new NicoComment(api_data);
         const comments = await this.nico_comment.getComment();
-        return this._filterCommnets(comments);
+        return filterCommnets(comments);
     }
 
     _getThumbImg(){
@@ -287,25 +287,6 @@ class NicoNicoDownloader {
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
             tags: tags
         };      
-    }
-
-    //TODO
-    _filterCommnets(comments){
-        return comments.filter(value => {
-            return value.hasOwnProperty("chat");
-        }).filter(value => {
-            return !value.chat.hasOwnProperty("deleted");
-        }). map(value => {
-            const chat = value.chat;
-            return {
-                no:        chat.no, 
-                vpos:      chat.vpos, 
-                post_date: chat.date,
-                user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
-                mail:      chat.mail,
-                text:      chat.content
-            };  
-        });
     }
 
     /**

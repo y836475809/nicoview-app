@@ -274,16 +274,3 @@ test("nico play smile", async (t) => {
     t.is(nico_mocks.hb_options_count, 0);
     t.is(nico_mocks.hb_post_count, 0);
 });
-
-test("nico play filter comment", (t) => {
-    const comments = TestData.owner_comment;
-    const nico_play = new NicoPlay();
-    const filter_comments = nico_play._filterCommnets(comments);
-    t.is(filter_comments.length, 4);
-    t.deepEqual(filter_comments, [
-        {no:1, vpos:100, post_date:1360996778, user_id:"owner", mail:"shita green small", text:"owner comment1\ncomment1"},
-        {no:2, vpos:200, post_date:1360996778, user_id:"owner", mail:"shita green small", text:"owner comment2"},
-        {no:16, vpos:300, post_date:1359607148, user_id:"abcdefg", mail:"184", text:"comment3"},
-        {no:17, vpos:400, post_date:1359607224, user_id:"hijklnm", mail:"184", text:"comment4"},
-    ]);
-});

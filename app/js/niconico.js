@@ -494,20 +494,23 @@ function getCookies(cookie_jar) {
 
 /**
  * 
- * @param {Array} json 
+ * @param {Array} comments 
  */
-function ConvertJsonToComment(json){
-    return json.filter((elm, index) => {
-        return "chat" in json[index];
-    }).map((elm) =>{
+const filterCommnets = (comments) => {
+    return comments.filter(value => {
+        return value.hasOwnProperty("chat");
+    }).filter(value => {
+        return !value.chat.hasOwnProperty("deleted");
+    }). map(value => {
+        const chat = value.chat;
         return {
-            no: elm.no,
-            vpos: elm.vpos,
-            date: elm.date,
-            user_id: elm.user_id,
-            mail: elm.mail ? elm.mail : "184",
-            text: elm.content
-        };
+            no:        chat.no, 
+            vpos:      chat.vpos, 
+            post_date: chat.date,
+            user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
+            mail:      chat.mail,
+            text:      chat.content
+        };  
     });
 }
 
@@ -563,5 +566,6 @@ module.exports = {
     NicoComment: NicoComment,
     getCookies: getCookies,
     getThumbInfo: getThumbInfo,
-    getVideoType: getVideoType
+    getVideoType: getVideoType,
+    filterCommnets: filterCommnets
 };

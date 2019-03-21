@@ -1,7 +1,7 @@
 const nock = require("nock");
 const fs = require("fs");
 const path = require("path");
-const querystring = require("querystring");
+const stream = require("stream");
 
 const base_dir = path.resolve(__dirname, "..");
 const video_id = "sm12345678";
@@ -9,6 +9,7 @@ const no_owner_comment = require(`${base_dir}/data/res_no_owner_comment.json`);
 const owner_comment = require(`${base_dir}/data/res_owner_comment.json`);
 const data_api_data = require(`${base_dir}/data/sm12345678_data_api_data.json`);
 const dmc_session = require(`${base_dir}/data/sm12345678_dmc_session_max_quality.json`);
+const dmc_session_low = require(`${base_dir}/data/sm12345678_dmc_session_low_quality.json`);
 
 class NicoMocks {
     constructor(){
@@ -227,7 +228,7 @@ class NicoDownLoadMocks {
     clean(){
         nock.cleanAll();
     }
-    watch({kind="dmc", delay=1} = {}){
+    watch({kind="dmc", delay=1, code=200} = {}){
         this.watch_nock = nock("https://www.nicovideo.jp");
         const headers = {
             "Set-Cookie": [
@@ -247,7 +248,7 @@ class NicoDownLoadMocks {
         this.watch_nock
             .get(`/watch/${video_id}`)
             .delay(delay)
-            .reply(200, body, headers);
+            .reply(code, body, headers);
     } 
 
     dmc_session({quality="max", delay=1} = {}){
@@ -379,14 +380,34 @@ class MockNicoUitl {
     }
 }
 
+class writeBufStream extends stream.Writable {
+    constructor() {
+        super();
+        this.buf = "";
+    }
+
+    _write(chunk, enc, next) {
+        this.buf += chunk.toString();
+        next();
+    }
+
+    end() {
+        this.writable = false;
+        this.emit.apply(this, ["close"]);
+    }
+}
+
 module.exports = {
     NicoMocks: NicoMocks,
     NicoDownLoadMocks: NicoDownLoadMocks,
     MockNicoUitl: MockNicoUitl,
+    writeBufStream: writeBufStream,
     TestData : {
         video_id : video_id,
         no_owner_comment: no_owner_comment,
         owner_comment: owner_comment,
-        data_api_data: data_api_data
+        data_api_data: data_api_data,
+        dmc_session: dmc_session,
+        dmc_session_low: dmc_session_low
     }
 };

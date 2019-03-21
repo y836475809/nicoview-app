@@ -227,8 +227,7 @@ class NicoDownLoadMocks {
     clean(){
         nock.cleanAll();
     }
-
-    watch(delay=1, kind="dmc"){
+    watch({kind="dmc", delay=1} = {}){
         this.watch_nock = nock("https://www.nicovideo.jp");
         const headers = {
             "Set-Cookie": [
@@ -236,12 +235,12 @@ class NicoDownLoadMocks {
                 "nicosid=123456.789; path=/; domain=.nicovideo.jp"
             ]
         };
-        const cp_data_api_data = Object.assign({}, data_api_data);
+        const cp_data_api_data = JSON.parse(JSON.stringify(data_api_data));
         if(kind=="smile max"){
             cp_data_api_data.video.dmcInfo = null;
         }else if(kind=="smile low"){
             cp_data_api_data.video.dmcInfo = null;
-            cp_data_api_data.smileInfo.url += "low";
+            cp_data_api_data.video.smileInfo.url += "low";
         }
 
         const body = MockNicoUitl.getWatchHtml(video_id, cp_data_api_data);
@@ -251,8 +250,8 @@ class NicoDownLoadMocks {
             .reply(200, body, headers);
     } 
 
-    dmc_session(delay=1, quality="max"){
-        const cp_dmc_session = Object.assign({}, dmc_session);
+    dmc_session({quality="max", delay=1} = {}){
+        const cp_dmc_session = JSON.parse(JSON.stringify(dmc_session));
         if(quality!="max"){
             cp_dmc_session.session.content_src_id_sets[0].content_src_ids = [
                 {
@@ -277,7 +276,7 @@ class NicoDownLoadMocks {
             });
     }
 
-    comment(delay=1){
+    comment({delay=1} = {}){
         this.comment_nock = nock("https://nmsg.nicovideo.jp");
         this.comment_nock
             .post("/api.json/")
@@ -305,16 +304,16 @@ class NicoDownLoadMocks {
             });
     }
 
-    thumbnail(delay=1){
-        this.thumbnail = nock("https://tn.smilevideo.jp");
-        this.thumbnail
+    thumbnail({delay=1} = {}){
+        this.thumbnail_nock = nock("https://tn.smilevideo.jp");
+        this.thumbnail_nock
             .get("/smile")
             .query({ i: "12345678.L" }) 
             .delay(delay)
             .reply(200, "thumbnail");
     }
 
-    dmc_hb(options_delay=1, post_delay=1){
+    dmc_hb({options_delay=1, post_delay=1} = {}){
         this.dmc_hb_nock = nock("https://api.dmc.nico");
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
@@ -332,12 +331,21 @@ class NicoDownLoadMocks {
             });
     } 
 
-    dmc_video(delay=1){
-        this.dmc_video = nock("https://pa0000.dmc.nico");
-        this.dmc_video
+    dmc_video({delay=1} = {}){
+        this.dmc_video_nock = nock("https://pa0000.dmc.nico");
+        this.dmc_video_nock
             .get("/m")
             .delay(delay)
             .reply(200, "video dmc");
+    }
+
+    smile_video({delay=1} = {}){
+        this.smile_video_nock = nock("https://smile-cls20.sl.nicovideo.jp");
+        this.smile_video_nock
+            .get("/smile")
+            .query({ m: "12345678.67759"})
+            .delay(delay)
+            .reply(200, "video smile");
     }
 }
 

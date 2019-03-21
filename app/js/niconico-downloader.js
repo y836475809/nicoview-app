@@ -7,20 +7,27 @@ class DownloadRequest {
     constructor(url, cookie){
         this.url = url;
         this.cookie = cookie;
-        this.request = null;
+        this.req = null;
         this.canceled = false;
     }
 
     cancel(){
-        if(this.request){
+        if(this.req){
             this.canceled = true;
-            this.request.abort();
+            this.req.abort();
         }
     }
 
     download(stream, on_progress=(state)=>{}){
         this.canceled = false;
         return new Promise(async (resolve, reject) => {
+            stream.on("error", (error) => { 
+                reject(error);
+            }).on("close", () => {
+                on_progress("finish");
+                resolve();
+            });
+
             let content_len = 0;
             let current = 0 ;
             const options = {
@@ -29,7 +36,7 @@ class DownloadRequest {
                 jar: this.cookie,
                 timeout: 5 * 1000
             };
-            this.request = request(options, (error, res, body) => {
+            this.req = request(options, (error, res, body) => {
                 if(error){
                     reject(error);
                 }
@@ -51,14 +58,9 @@ class DownloadRequest {
                     error.cancel = true;
                     reject(error);
                 }
-            }).pipe(stream)
-                .on("error", (error) => { 
-                    reject(error);
-                })
-                .on("close", () => {
-                    on_progress("finish");
-                    resolve();
-                });
+            });
+
+            this.req.pipe(stream);
         });
     }
 }
@@ -73,16 +75,16 @@ class NicoNicoDownloader {
         if(this.nico_watch){
             this.nico_watch.cancel();
         }
+        if(this.nico_video){
+            this.nico_video.cancel();
+        }   
         if(this.nico_comment){
-            this.nico_watch.cancel();
+            this.nico_comment.cancel();
         }  
         if(this.img_request){
             this.img_reuqest_canceled = true;
-            this.img_request.cancel();
-        }  
-        if(this.nico_video){
-            this.nico_video.cancel();
-        }              
+            this.img_request.abort();
+        }         
         if(this.video_download){
             this.video_download.cancel();
         }
@@ -90,6 +92,7 @@ class NicoNicoDownloader {
 
     async download(on_progress){
         try {
+            on_progress("start getting watch");
             await this._getWatchData(this.video_id);
             await this._getVideoInfo();
 
@@ -100,14 +103,21 @@ class NicoNicoDownloader {
                 };
             }
 
+            on_progress("start getting thumbtnfo");
             this._writeJson(this._getThumbInfoFilePath(), this._getThumbInfo());
+
+            on_progress("start getting commnet");
             this._writeJson(this._getCommnetFilePath(), await this._getCommnet());
+
+            on_progress("start getting thumbimg");
             this._writeBinary(this._getThumbImgFilePath(), await this._getThumbImg());
 
             const stream = this._createStream(this._getVideoFilePath());
             if(this.videoinfo.server=="dmc"){
+                on_progress("start getting dmc");
                 await this._getVideoDmc(stream, on_progress);
             }else{
+                on_progress("start getting smile");
                 await this._getVideoSmile(stream, on_progress);
             }
 
@@ -192,6 +202,7 @@ class NicoNicoDownloader {
             const options = {
                 method: "GET", 
                 uri: url, 
+                timeout: 5 * 1000,
                 encoding: null
             };
 

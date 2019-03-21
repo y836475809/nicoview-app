@@ -251,7 +251,7 @@ class NicoDownLoadMocks {
             .reply(code, body, headers);
     } 
 
-    dmc_session({quality="max", delay=1} = {}){
+    dmc_session({quality="max", delay=1, code=200} = {}){
         const cp_dmc_session = JSON.parse(JSON.stringify(dmc_session));
         if(quality!="max"){
             cp_dmc_session.session.content_src_id_sets[0].content_src_ids = [
@@ -270,14 +270,14 @@ class NicoDownLoadMocks {
             .query({ _format: "json" })   
             .delay(delay)
             .reply((uri, reqbody)=>{
-                return [200, {
+                return [code, {
                     meta: { status: 201,message: "created" },
                     data: cp_dmc_session
                 }];                    
             });
     }
 
-    comment({delay=1} = {}){
+    comment({delay=1, code=200} = {}){
         this.comment_nock = nock("https://nmsg.nicovideo.jp");
         this.comment_nock
             .post("/api.json/")
@@ -290,63 +290,63 @@ class NicoDownLoadMocks {
     
                 if(data.length===8){
                     //no owner
-                    return [200, no_owner_comment];
+                    return [code, no_owner_comment];
                 }
     
                 if(data.length===11){
                     //owner
-                    return [200, owner_comment];
+                    return [code, owner_comment];
                 }
     
-                return [200, [
+                return [code, [
                     { "ping": { "content": "rs:0" } },
                     { "ping": { "content": "rf:0" } }
                 ]]; 
             });
     }
 
-    thumbnail({delay=1} = {}){
+    thumbnail({delay=1, code=200} = {}){
         this.thumbnail_nock = nock("https://tn.smilevideo.jp");
         this.thumbnail_nock
             .get("/smile")
             .query({ i: "12345678.L" }) 
             .delay(delay)
-            .reply(200, "thumbnail");
+            .reply(code, "thumbnail");
     }
 
-    dmc_hb({options_delay=1, post_delay=1} = {}){
+    dmc_hb({options_delay=1, post_delay=1, code=200} = {}){
         this.dmc_hb_nock = nock("https://api.dmc.nico");
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(options_delay)
             .reply((uri, reqbody)=>{
-                return [200, "ok"];
+                return [code, "ok"];
             })
             .post(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(post_delay)
             .times(50)
             .reply((uri, reqbody)=>{
-                return [200, "ok"];
+                return [code, "ok"];
             });
     } 
 
-    dmc_video({delay=1} = {}){
+    dmc_video({delay=1, code=200} = {}){
         this.dmc_video_nock = nock("https://pa0000.dmc.nico");
         this.dmc_video_nock
             .get("/m")
             .delay(delay)
-            .reply(200, "video dmc");
+            .reply(code, "video dmc");
     }
 
-    smile_video({delay=1} = {}){
+    smile_video({delay=1, code=200, quality=""} = {}){
         this.smile_video_nock = nock("https://smile-cls20.sl.nicovideo.jp");
         this.smile_video_nock
             .get("/smile")
-            .query({ m: "12345678.67759"})
+            .query({ m: `12345678.67759${quality}`})
             .delay(delay)
-            .reply(200, "video smile");
+            .reply(code, "video smile");
     }
 }
 

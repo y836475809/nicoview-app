@@ -66,9 +66,10 @@ class DownloadRequest {
 }
 
 class NicoNicoDownloader {
-    constructor(video_id, dist_dir){
+    constructor(video_id, dist_dir, only_max_quality=true){
         this.video_id = video_id;
         this.dist_dir = dist_dir;
+        this.only_max_quality = only_max_quality;
     }
 
     cancel(){
@@ -96,11 +97,13 @@ class NicoNicoDownloader {
             await this._getWatchData(this.video_id);
             await this._getVideoInfo();
 
-            if(!this.videoinfo.maxQuality){
-                return {
-                    state: "cancel",
-                    reason: "low quality"
-                };
+            if(this.only_max_quality){
+                if(!this.videoinfo.maxQuality){
+                    return {
+                        state: "cancel",
+                        reason: "low quality"
+                    };
+                }
             }
 
             on_progress("start getting thumbtnfo");

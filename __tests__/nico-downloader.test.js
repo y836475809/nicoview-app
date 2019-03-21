@@ -29,8 +29,8 @@ test.afterEach(t => {
 });
 
 class TestNicoDownloader extends NicoNicoDownloader {
-    constructor(video_id, dist_dir){
-        super(video_id, dist_dir);
+    constructor(video_id, dist_dir, only_max_quality=true){
+        super(video_id, dist_dir, only_max_quality);
         this.map = new Map();
     }
 
@@ -126,7 +126,6 @@ test("downloader dmc", async (t) => {
     }      
 });
 
-//TODO
 test("downloader smile", async (t) => {
     nico_download_mocks.watch({ kind:"smile max" });
     nico_download_mocks.comment();
@@ -196,11 +195,63 @@ test("downloader smile", async (t) => {
     }  
 });
 
-// test("downloader dmc low quality", async (t) => {
-// });
+test("downloader dmc low quality", async (t) => {
+    nico_download_mocks.watch();
+    nico_download_mocks.dmc_session({quality:"low"});
+    nico_download_mocks.comment();
+    nico_download_mocks.thumbnail();
+    nico_download_mocks.dmc_hb();
+    nico_download_mocks.dmc_video();
 
-// test("downloader smile low quality", async (t) => {
-// });
+    const nico_down = new TestNicoDownloader(video_id, dist_dir, false);
+    const result = await nico_down.download((state)=>{
+        log.push(state);
+    });  
+    t.deepEqual(log, [
+        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting thumbimg", "start getting dmc" , "finish"]);
+    t.deepEqual(result, { state: "ok", reason: "" });
+
+    const dd = nico_down.getdd();
+    t.deepEqual(dd, { 
+        video_id: "sm12345678", 
+        video_name: "test",
+        video_filename: "sm12345678.mp4",
+        video_type: "mp4",
+        max_quality: false,
+        time: 100,
+        pub_date: new Date("2018/01/01 01:00:00").getTime(),
+        tags:["tag1", "tag2", "tag3"]
+    });     
+});
+
+test("downloader smile low quality", async (t) => {
+    nico_download_mocks.watch({kind:"smile low"});
+    nico_download_mocks.comment();
+    nico_download_mocks.thumbnail();
+    nico_download_mocks.smile_video({quality:"low"});
+
+    const nico_down = new TestNicoDownloader(video_id, dist_dir, false);
+    const result = await nico_down.download((state)=>{
+        log.push(state);
+    });  
+    t.deepEqual(log, [
+        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting thumbimg", "start getting smile" , "finish"]);
+    t.deepEqual(result, { state: "ok", reason: "" });
+
+    const dd = nico_down.getdd();
+    t.deepEqual(dd, { 
+        video_id: "sm12345678", 
+        video_name: "test",
+        video_filename: "sm12345678.mp4",
+        video_type: "mp4",
+        max_quality: false,
+        time: 100,
+        pub_date: new Date("2018/01/01 01:00:00").getTime(),
+        tags:["tag1", "tag2", "tag3"]
+    }); 
+});
 
 test("downloader cancel dmc low quality", async (t) => {
     nico_download_mocks.watch();

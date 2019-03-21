@@ -389,14 +389,19 @@ class MockNicoUitl {
 }
 
 class writeBufStream extends stream.Writable {
-    constructor() {
+    constructor(raise_error=false) {
         super();
         this.buf = "";
+        this.raise_error = raise_error;
     }
 
     _write(chunk, enc, next) {
-        this.buf += chunk.toString();
-        next();
+        if(this.raise_error){
+            next(new Error("stream error"));
+        }else{
+            this.buf += chunk.toString();
+            next();
+        }
     }
 
     end() {

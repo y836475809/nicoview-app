@@ -68,7 +68,7 @@ test("downloader dmc", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc" , "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
@@ -137,7 +137,7 @@ test("downloader smile", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting smile" , "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
@@ -208,7 +208,7 @@ test("downloader dmc low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc" , "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
@@ -236,7 +236,7 @@ test("downloader smile low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting smile" , "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
@@ -343,7 +343,7 @@ test("downloader cancel comment", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet"]);
+        "start getting watch", "start getting thumbinfo", "start getting commnet"]);
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });
 
@@ -365,7 +365,7 @@ test("downloader cancel thumbnail", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg"]);
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });
@@ -388,7 +388,7 @@ test("downloader cancel dmc_hb options", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc"]);
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });
@@ -411,7 +411,7 @@ test("downloader cancel dmc_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc"]); 
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });
@@ -431,7 +431,7 @@ test("downloader cancel smile_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbtnfo", "start getting commnet",
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting smile"]); 
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });

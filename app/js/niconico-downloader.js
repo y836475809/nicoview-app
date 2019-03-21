@@ -106,7 +106,7 @@ class NicoNicoDownloader {
                 }
             }
 
-            on_progress("start getting thumbtnfo");
+            on_progress("start getting thumbinfo");
             this._writeJson(this._getThumbInfoFilePath(), this._getThumbInfo());
 
             on_progress("start getting commnet");

@@ -256,8 +256,14 @@ class NicoNicoDownloader {
         const video_url = this.nico_video.DmcContentUri;
 
         this.video_download = new DownloadRequest(video_url, cookie_jar);
-        await this.video_download.download(stream, on_progress);
-        this.nico_video.stopHeartBeat();
+        try {
+            await this.video_download.download(stream, on_progress);
+        } catch (error) {
+            throw error;
+        }finally{
+            this.nico_video.stopHeartBeat();
+            on_progress("stop HB");
+        }
     }
 
     async _getVideoSmile(stream, on_progress){

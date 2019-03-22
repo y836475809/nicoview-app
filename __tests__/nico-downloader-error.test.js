@@ -146,7 +146,7 @@ test("downloader timeout dmc_video", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]); 
+        "start getting thumbimg", "start getting dmc", "stop HB"]); 
     t.is(result.state, "error");
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -304,7 +304,7 @@ test("downloader network error dmc_video 404", async (t) => {
     });
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]);
+        "start getting thumbimg", "start getting dmc", "stop HB"]);
     t.is(result.state,  "error");
     t.regex(result.reason.message, /404/);
 });
@@ -318,7 +318,7 @@ test("downloader network error dmc_video 500", async (t) => {
     });
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]);
+        "start getting thumbimg", "start getting dmc", "stop HB"]);
     t.is(result.state,  "error");
     t.regex(result.reason.message, /500/);
 });
@@ -408,7 +408,7 @@ test("downloader save dmc error", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%"]);
+        "start getting thumbimg", "start getting dmc", "100%", "stop HB"]);
     t.is(result.state,  "error");
     t.is(result.reason.message, "stream error");
 });

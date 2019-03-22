@@ -64,7 +64,7 @@ test("downloader dmc", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc" , "100%", "finish"]);
+        "start getting thumbimg", "start getting dmc" , "100%", "finish", "stop HB"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const dd = nico_down.getdd();
@@ -196,7 +196,7 @@ test("downloader dmc low quality", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish"]);
+        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const dd = nico_down.getdd();
@@ -358,7 +358,7 @@ test("downloader cancel dmc_video", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]); 
+        "start getting thumbimg", "start getting dmc", "stop HB"]); 
     t.deepEqual(result, { state: "cancel", reason: "cancel" });
 });
 

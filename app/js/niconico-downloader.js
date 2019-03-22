@@ -37,7 +37,7 @@ class DownloadRequest {
                 if(error){
                     reject(error);
                 }
-                else if(validateStatus(res.statusCode)){
+                else if(!validateStatus(res.statusCode)){
                     reject(new Error(`${res.statusCode}:${this.url}`));
                 }
             }).on("error", (error) => {

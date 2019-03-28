@@ -128,7 +128,7 @@
             resizeGridTable();
         });
 
-        let dl = null;
+        // let dl = null;
         let d_cancel = false;
 
         const ff = async (count, do_cancel, on_progress) => {
@@ -151,11 +151,11 @@
         };
         obs.on("cancel-download", async() => {
             d_cancel = true;
-            if(dl){
-                dl.cancel();
-            }
+            // if(dl){
+            //     dl.cancel();
+            // }
         });
-        obs.on("start-download", async(downloaderCreater, cb) => {
+        obs.on("start-download", async(download) => {
             d_cancel = false;
             const column_index = grid_table.grid.getColumnIndex("progress");
 
@@ -176,25 +176,34 @@
                         grid_table.grid.updateCell(downloading_index, column_index);                   
                         break;
                     }
-                    dl = downloaderCreater(video_id);
-                    const result = await dl.download((state)=>{ 
+                    // dl = downloaderCreater(video_id);
+                    
+                    // const result = await dl.download((state)=>{ 
+                    //     downloading_index = grid_table.dataView.getRowById(video_id);
+                    //     downloading_item.progress = `${video_id}: ${state}`; 
+                    //     grid_table.grid.updateCell(downloading_index, column_index);
+                    // });
+                    const result = await download(video_id, (state)=>{ 
                         downloading_index = grid_table.dataView.getRowById(video_id);
                         downloading_item.progress = `${video_id}: ${state}`; 
                         grid_table.grid.updateCell(downloading_index, column_index);
                     });
-                    if(result.state=="ok"){
+                    if(result=="ok"){
                         downloading_item.progress = "finish";
-                        const dd = dl.getdd();
-                        cb(dd);
-                    }else if(result.state=="cancel"){
+                    }else if(result=="cancel"){
                         d_cancel=true;
-                    }else if(result.state=="error"){
+                    }else if(result=="skip"){
+                        downloading_item.progress = "skip";
+                    }else if(result=="error"){
                         downloading_item.progress = "error";
                     }
+                    downloading_index = grid_table.dataView.getRowById(video_id);
+                    // downloading_item.progress = "cancel";
+                    grid_table.grid.updateCell(downloading_index, column_index);
                     if(d_cancel){
-                        downloading_index = grid_table.dataView.getRowById(video_id);
-                        downloading_item.progress = "cancel";
-                        grid_table.grid.updateCell(downloading_index, column_index);                   
+                        // downloading_index = grid_table.dataView.getRowById(video_id);
+                        // downloading_item.progress = "cancel";
+                        // grid_table.grid.updateCell(downloading_index, column_index);                   
                         break;
                     }
                     // await ff(5, ()=>{return d_cancel;}, (state)=>{ 

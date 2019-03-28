@@ -228,6 +228,10 @@
         }
     });  
 
+    obs.on("add-library-item", async (item) => { 
+        //TODO
+    });  
+
     const importDB = async (sqlite_file_path)=>{
         const system_dir = SettingStore.getSystemDir();
         try {

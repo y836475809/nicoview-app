@@ -97,7 +97,15 @@
             }
 
             //TODO
-            obs.trigger("add-library-item");
+            const item = {
+                _db_type:"json", 
+                video_id: "sm1",
+                dirpath: `${app_base_dir}/data`,
+                video_name: "sm1",
+                video_filename: "sm1.mp4",
+                video_type: "video/mp4"
+            };
+            obs.trigger("add-library-item", item);
             return "ok";
         });
     };

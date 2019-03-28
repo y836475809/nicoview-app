@@ -23,6 +23,10 @@ class Library {
         await this._setData(this.db, data_list);
     }
 
+    add(item){
+        //TODO
+    }
+
     getLibraryData(){
         return new Promise(async (resolve, reject) => {
             const dir_map = await this._getDirMap();

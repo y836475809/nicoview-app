@@ -60,6 +60,7 @@
 
 <script>
     /* globals $ */
+    const path = require("path");
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
@@ -72,11 +73,11 @@
     riot.mount("library-page");
 
     let data = [
-        {thumb_img:"", id: "id1", name: "Item1", progress: ""},
-        {thumb_img:"", id: "id2", name: "Item2", progress: ""},
-        {thumb_img:"", id: "id3", name: "Item3", progress: ""},
-        {thumb_img:"", id: "id4", name: "Item4", progress: ""},
-        {thumb_img:"", id: "id5", name: "Item5", progress: ""},
+        {thumb_img:"", id: "sm10", name: "Item1", progress: ""},
+        {thumb_img:"", id: "sm20", name: "Item2", progress: ""},
+        {thumb_img:"", id: "sm30", name: "Item3", progress: ""},
+        {thumb_img:"", id: "sm40", name: "Item4", progress: ""},
+        {thumb_img:"", id: "sm50", name: "Item5", progress: ""},
     ];
 
     obs.trigger("set-download-items", data);
@@ -98,12 +99,17 @@
 
             //TODO
             const item = {
+                _data_type:"video", 
                 _db_type:"json", 
-                video_id: "sm1",
-                dirpath: `${app_base_dir}/data`,
-                video_name: "sm1",
-                video_filename: "sm1.mp4",
-                video_type: "video/mp4"
+                dirpath: path.joint(app_base_dir, "data"),
+                video_id: video_id,
+                video_name: `title ${video_id}`,
+                video_filename: `${video_id}.mp4`,
+                video_type: "mp4",
+                max_quality: true,
+                time: 600,
+                pub_date: new Date().getTime(),
+                tags: ["tag1", "tag2"]
             };
             obs.trigger("add-library-item", item);
             return "ok";

@@ -4,12 +4,14 @@ const reader = require("./reader");
 const Datastore = require("nedb");
 
 class Library {
-    constructor(db_file, in_memory_only=false) {
+    async init(db_file, in_memory_only=false) {
         this.db = new Datastore({ 
             filename: db_file,
             autoload: true,
             inMemoryOnly: in_memory_only
-        }); 
+        });
+
+        await this._updateDirPathMap();
     }
 
     /**
@@ -18,18 +20,138 @@ class Library {
      * @param {Array} video_list
      */
     async setData(dir_list, video_list) {
-        const data_list = this._normalizePath(dir_list).concat(video_list);
+        const data_list = this._normalizeDirData(dir_list).concat(video_list);
         await this._clear(this.db);
         await this._setData(this.db, data_list);
+
+        await this._updateDirPathMap();
     }
 
-    add(item){
-        //TODO
+    async _updateDirPathMap(){
+        const count = await new Promise(async (resolve, reject) => {
+            this.db.count({}, function (err, count) {
+                resolve(count);
+            });
+        });
+        if(count==0){
+            this.id_dirpath_map = new Map();
+            this.dirpath_id_map = new Map();
+            return;
+        }
+
+        this.id_dirpath_map = await this._getDirMap();
+        this.dirpath_id_map = new Map();
+        this.id_dirpath_map.forEach((value, key) => {
+            this.dirpath_id_map.set(value, key);
+        });
+    }
+
+    /**
+     * 
+     * @param {String} dirpath 
+     * @returns {Number} new_dirpath_id
+     */
+    async _addDirPath(dirpath){
+        const n_dirpath = this._normalizePath(dirpath);
+        if(this.dirpath_id_map.has(n_dirpath)){
+            return this.dirpath_id_map.get(n_dirpath);
+        }
+
+        let new_dirpath_id = null;
+        const max_dir_id = 10000;
+        for (let index = 0; index < max_dir_id; index++) {
+            if(!this.id_dirpath_map.has(index)){
+                new_dirpath_id = index;
+                break;
+            } 
+        }
+        if(!new_dirpath_id){
+            throw new Error("maximum id value has been exceeded");
+        }
+
+        await this._setData(this.db, [{ 
+            _data_type: "dir",
+            dirpath_id: new_dirpath_id,
+            dirpath: n_dirpath
+        }]);
+
+        await this._updateDirPathMap();
+
+        return new_dirpath_id;
+    }
+
+    /**
+     * 
+     * @param {object} item 
+     * @param {String} item._data_type      
+     * @param {String} item._db_type
+     * @param {String} item.dirpath
+     * @param {String} item.video_id
+     * @param {String} item.video_name
+     * @param {String} item.video_filename
+     * @param {String} item.video_type
+     * @param {boolean} item.max_quality
+     * @param {Number} item.time
+     * @param {Number} item.pub_date
+     * @param {Array} item.tags
+     */
+    async addItem(item){
+        const dirpath = item.dirpath;
+        const dirpath_id = this._addDirPath(dirpath);
+
+        const cu_date = new Date().getTime();
+        const library_item = {
+            _data_type: item._data_type,
+            _db_type: item._db_type,
+            video_id: item.video_id,
+            dirpath_id: dirpath_id,
+            video_name: item.video_name,
+            video_filename: item.video_filename,
+            video_type: item.video_type,
+            is_economy: !item.max_quality,
+            modification_date: cu_date,
+            creation_date: cu_date,
+            play_count: 0,
+            time: item.time,
+            last_play_date: cu_date,
+            yet_reading: 0,
+            pub_date: item.pub_date,
+            tags: item.tags
+        };
+        await this._setData(this.db, [library_item]);
+    }
+
+    getLibraryItem(video_id){
+        return new Promise(async (resolve, reject) => {
+            this.db.find({_data_type: "video", video_id: video_id}, async (err, docs) => { 
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(docs.length==0){
+                    resolve([]);
+                    return;
+                }
+                const value = docs[0];
+                const dir_path = this.id_dirpath_map.get(value.dirpath_id);
+                const data =  {
+                    thumb_img: this._getThumbPath(dir_path, value),
+                    id: video_id,
+                    name: value.video_name,
+                    creation_date: value.creation_date,
+                    pub_date: value.pub_date,
+                    play_count: value.play_count,
+                    play_time: value.time,
+                    tags: value.tags?value.tags.join(" "):""
+                };
+                resolve(data);
+            });
+        });       
     }
 
     getLibraryData(){
         return new Promise(async (resolve, reject) => {
-            const dir_map = await this._getDirMap();
+            const dir_map = await this._getDirMap(); //TODO
 
             this.db.find({_data_type: "video"}, async (err, docs) => { 
                 if(err){
@@ -110,12 +232,16 @@ class Library {
     /**
      * @param {Array} dir_list
      */
-    _normalizePath(dir_list){
+    _normalizeDirData(dir_list){
         return dir_list.map(value=>{
-            const npath = value.dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
+            const npath = this._normalizePath(value.dirpath);
             value.dirpath = npath;
             return value;
         });
+    }
+
+    _normalizePath(dirpath){
+        return dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
     }
 
     _getDir(dirpath_id) {
@@ -136,6 +262,7 @@ class Library {
 
     /**
      * キャッシュとして使用する
+     * @returns {Map<Number, String>}
      */
     _getDirMap() {
         const dir_map = new Map();

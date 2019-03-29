@@ -185,7 +185,8 @@
         resizeGridTable();
         
         try {
-            library = new Library(SettingStore.getSystemFile("library.db"));
+            library = new Library();
+            await library.init(SettingStore.getSystemFile("library.db"));
             loadLibraryItems(await library.getLibraryData());
         } catch (error) {
             console.log("library.getLibraryData error=", error);
@@ -195,7 +196,8 @@
 
     obs.on("refresh_library", async () => {     
         try {
-            library = new Library(SettingStore.getSystemFile("library.db"));
+            library = new Library();
+            await library.init(SettingStore.getSystemFile("library.db"));
             loadLibraryItems(await library.getLibraryData());
         } catch (error) {
             console.log("library.getLibraryData error=", error);
@@ -220,7 +222,8 @@
 
     obs.on("get-library-items-from-file", async (db_file_path) => { 
         try {
-            library = new Library(db_file_path);
+            library = new Library();
+            await library.init(db_file_path);
             loadLibraryItems(await library.getLibraryData());
         } catch (error) {
             console.log("library.getLibraryData error=", error);
@@ -230,6 +233,9 @@
 
     obs.on("add-library-item", async (item) => { 
         //TODO
+        await library.addItem(item);
+        const library_item = await library.getLibraryItem(item.video_id);
+        grid_table.addItem(library_item);
     });  
 
     const importDB = async (sqlite_file_path)=>{
@@ -248,7 +254,8 @@
         const dir_list = db_converter.get_dirpath();
         const video_list = db_converter.get_video();
 
-        library = new Library(SettingStore.getSystemFile("library.db"));
+        library = new Library();
+        await library.init(SettingStore.getSystemFile("library.db"));
         await library.setData(dir_list, video_list);  
     };
 

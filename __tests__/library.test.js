@@ -2,7 +2,8 @@ const test = require("ava");
 const Library = require("../app/js/library");
 
 test("library get path, info", async (t) => {
-    let library = new Library("test.db", true);
+    const library = new Library();
+    await library.init("test.db", true);
     const dirpath_list = [
         { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
         { _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
@@ -66,7 +67,8 @@ test("library get path, info", async (t) => {
 });
 
 test("library get data", async (t) => {
-    let library = new Library("test.db", true);
+    const library = new Library();
+    await library.init("test.db", true);
     const dirpath_list = [
         {  _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
         {  _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},

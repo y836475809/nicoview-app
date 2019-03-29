@@ -171,6 +171,11 @@ class GridTable {
         this._loadState();
     }
 
+    //TODO
+    addItem(item){
+        this.dataView.addItem(item);
+    }
+
     setFilter(filter){
         this.filter = filter;
     }

@@ -174,6 +174,7 @@ class GridTable {
     //TODO
     addItem(item){
         this.dataView.addItem(item);
+        this.dataView.reSort();
     }
 
     setFilter(filter){

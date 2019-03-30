@@ -97,7 +97,7 @@ class Library {
      */
     async addItem(item){
         const dirpath = item.dirpath;
-        const dirpath_id = this._addDirPath(dirpath);
+        const dirpath_id = await this._addDirPath(dirpath);
 
         const cu_date = new Date().getTime();
         const library_item = {

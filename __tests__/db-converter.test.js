@@ -56,7 +56,7 @@ test("sqlite db video", (t) => {
 
     t.is(sm1.video_name, "サンプル1");
     t.is(sm1.video_filename, "サンプル1 - [sm1].mp4");
-    t.is(sm1.video_type, "video/mp4");
+    t.is(sm1.video_type, "mp4");
 
     t.deepEqual(sm1.tags, ["タグ1", "タグ2"]);
     t.deepEqual(sm2.tags, ["タグ1", "タグ2", "タグ3"]);

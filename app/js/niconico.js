@@ -545,7 +545,7 @@ function getThumbInfo(api_data){
         thumbnail_url: video.largeThumbnailURL,
         first_retrieve: video.postedDateTime,
         length: video.duration,
-        movie_type: video_type,
+        video_type: video_type,
         view_counter: video.viewCount,
         comment_num: thread.commentCount,
         mylist_counter: video.mylistCount,

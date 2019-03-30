@@ -16,7 +16,7 @@ test("library get path, info", async (t) => {
             dirpath_id: 1,
             video_name: "サンプル1",
             video_filename: "サンプル1 - [sm1].mp4",
-            video_type: "video/mp4"
+            video_type: "mp4"
         },
         {
             _data_type:"video", 
@@ -25,7 +25,7 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル2",
             video_filename: "サンプル2 - [sm2].mp4",
-            video_type: "video/mp4"
+            video_type: "mp4"
         }
     ];
 
@@ -37,7 +37,7 @@ test("library get path, info", async (t) => {
             dirpath_id: 1,
             video_name: "サンプル1",
             video_filename: "サンプル1 - [sm1].mp4",
-            video_type: "video/mp4"
+            video_type: "mp4"
         }
     );
     t.deepEqual(
@@ -47,7 +47,7 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル2",
             video_filename: "サンプル2 - [sm2].mp4",
-            video_type: "video/mp4"
+            video_type: "mp4"
         }
     );
 
@@ -60,7 +60,7 @@ test("library get path, info", async (t) => {
     t.is(library._getVideoPath(dir, video_info1), "C:/data/サンプル1 - [sm1].mp4");
     t.is(library._getCommentPath(dir, video_info1), "C:/data/サンプル1 - [sm1].xml");
     t.is(library._getThumbPath(dir, video_info1), "C:/data/サンプル1 - [sm1][ThumbImg].jpeg");
-    t.is(library._getVideoType(video_info1), "video/mp4");
+    t.is(library._getVideoType(video_info1), "mp4");
 
     await t.throwsAsync(library._getDir(100));
     await t.throwsAsync(library._getVideoInfo("sm000"));
@@ -81,7 +81,7 @@ test("library get data", async (t) => {
             dirpath_id: 1,
             video_name: "サンプル1",
             video_filename: "サンプル1 - [sm1].mp4",
-            video_type: "video/mp4",
+            video_type: "mp4",
             creation_date: 1,
             pub_date: 2,
             play_count: 3,
@@ -95,7 +95,7 @@ test("library get data", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル2",
             video_filename: "サンプル2 - [sm2].mp4",
-            video_type: "video/mp4",
+            video_type: "mp4",
             creation_date: 10,
             pub_date: 20,
             play_count: 30,

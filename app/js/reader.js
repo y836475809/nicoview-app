@@ -77,7 +77,7 @@ function thumb_info(xml) {
         thumbnail_url: thumbnail_url,
         first_retrieve: first_retrieve,
         length: length,
-        movie_type: movie_type,
+        video_type: movie_type,
         size_high: size_high,
         size_low: size_low,
         view_counter: view_counter,

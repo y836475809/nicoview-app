@@ -39,7 +39,7 @@ test("read thumb info", (t) => {
     t.is(obj.thumbnail_url, "http://tn-skr2.smilevideo.jp/smile?i=1000");
     t.is(obj.first_retrieve, "2000-01-01T01:02:03+09:00");
     t.is(obj.length, "00:45");
-    t.is(obj.movie_type, "mp4");
+    t.is(obj.video_type, "mp4");
     t.is(obj.size_high, 1000);
     t.is(obj.size_low, 500);
     t.is(obj.view_counter, 100);

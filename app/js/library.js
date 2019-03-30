@@ -195,7 +195,7 @@ class Library {
         return {
             video_data: {
                 src: video_file_path,
-                type: video_type,
+                type: `video/${video_type}`,
                 commnets: commnets
             },
             viweinfo: {

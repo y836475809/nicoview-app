@@ -1,4 +1,5 @@
 const test = require("ava");
+const path = require("path");
 const Library = require("../app/js/library");
 
 test("library get path, info", async (t) => {
@@ -26,6 +27,14 @@ test("library get path, info", async (t) => {
             video_name: "サンプル2",
             video_filename: "サンプル2 - [sm2].mp4",
             video_type: "mp4"
+        },
+        {
+            _data_type:"video", 
+            _db_type:"json", 
+            video_id: "sm3",
+            dirpath_id: 2,
+            video_name: "サンプル3",
+            video_type: "mp4"
         }
     ];
 
@@ -33,6 +42,7 @@ test("library get path, info", async (t) => {
     t.deepEqual(
         await library._getVideoInfo("sm1"),
         {
+            _db_type: "xml",
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
@@ -43,10 +53,21 @@ test("library get path, info", async (t) => {
     t.deepEqual(
         await library._getVideoInfo("sm2"),
         {
+            _db_type: "xml",
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",
             video_filename: "サンプル2 - [sm2].mp4",
+            video_type: "mp4"
+        }
+    );
+    t.deepEqual(
+        await library._getVideoInfo("sm3"),
+        {
+            _db_type: "json",
+            video_id: "sm3",
+            dirpath_id: 2,
+            video_name: "サンプル3",
             video_type: "mp4"
         }
     );
@@ -55,12 +76,24 @@ test("library get path, info", async (t) => {
     t.is(await library._getDir(2), "C:/data");
 
     const dir = "C:/data";
-    const video_info1 = video_list[0];
-    t.is(library._getThumbInfoPath(dir, video_info1), "C:/data/サンプル1 - [sm1][ThumbInfo].xml");
-    t.is(library._getVideoPath(dir, video_info1), "C:/data/サンプル1 - [sm1].mp4");
-    t.is(library._getCommentPath(dir, video_info1), "C:/data/サンプル1 - [sm1].xml");
-    t.is(library._getThumbPath(dir, video_info1), "C:/data/サンプル1 - [sm1][ThumbImg].jpeg");
-    t.is(library._getVideoType(video_info1), "mp4");
+    {
+        const video_info = video_list[0];
+        const datafile = library._getDataFileInst(dir, video_info);
+        t.is(datafile.thumbInfoPath, path.resolve("C:/data/サンプル1 - [sm1][ThumbInfo].xml"));
+        t.is(datafile.videoPath, path.resolve("C:/data/サンプル1 - [sm1].mp4"));
+        t.is(datafile.commentPath, path.resolve("C:/data/サンプル1 - [sm1].xml"));
+        t.is(datafile.thumbImgPath, path.resolve("C:/data/サンプル1 - [sm1][ThumbImg].jpeg"));
+        t.is(library._getVideoType(video_info), "mp4");
+    }
+    {
+        const video_info = video_list[2];
+        const datafile = library._getDataFileInst(dir, video_info);
+        t.is(datafile.thumbInfoPath, path.resolve("C:/data/sm3[ThumbInfo].json"));
+        t.is(datafile.videoPath, path.resolve("C:/data/sm3.mp4"));
+        t.is(datafile.commentPath, path.resolve("C:/data/sm3[Comment].json"));
+        t.is(datafile.thumbImgPath, path.resolve("C:/data/sm3[ThumbImg].jpeg"));
+        t.is(library._getVideoType(video_info), "mp4");
+    }
 
     await t.throwsAsync(library._getDir(100));
     await t.throwsAsync(library._getVideoInfo("sm000"));
@@ -101,6 +134,19 @@ test("library get data", async (t) => {
             play_count: 30,
             time: 40,
             tags: ["tag10 tag20"]
+        },
+        {
+            _data_type:"video", 
+            _db_type:"json", 
+            video_id: "sm3",
+            dirpath_id: 2,
+            video_name: "サンプル3",
+            video_type: "mp4",
+            creation_date: 100,
+            pub_date: 200,
+            play_count: 300,
+            time: 400,
+            tags: ["tag100 tag200"]
         }
     ];
 
@@ -113,7 +159,7 @@ test("library get data", async (t) => {
     t.deepEqual(
         library_data,[
             {
-                thumb_img: "C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg",
+                thumb_img: path.resolve("C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg"),
                 id: "sm1",
                 name: "サンプル1",
                 creation_date: 1,
@@ -123,7 +169,7 @@ test("library get data", async (t) => {
                 tags: "tag1 tag2" 
             },
             {
-                thumb_img: "C:/data/サンプル2 - [sm2][ThumbImg].jpeg",
+                thumb_img: path.resolve("C:/data/サンプル2 - [sm2][ThumbImg].jpeg"),
                 id: "sm2",
                 name: "サンプル2",
                 creation_date: 10,
@@ -131,6 +177,16 @@ test("library get data", async (t) => {
                 play_count: 30,
                 play_time: 40,
                 tags: "tag10 tag20" 
+            },
+            {
+                thumb_img: path.resolve("C:/data/sm3[ThumbImg].jpeg"),
+                id: "sm3",
+                name: "サンプル3",
+                creation_date: 100,
+                pub_date: 200,
+                play_count: 300,
+                play_time: 400,
+                tags: "tag100 tag200" 
             }
         ]
     );

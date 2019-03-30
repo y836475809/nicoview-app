@@ -1,9 +1,13 @@
 
-const fs = require("fs");
-const reader = require("./reader");
 const Datastore = require("nedb");
+const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 class Library {
+    constructor(){
+        this.nico_xml = new NicoXMLFile();
+        this.nico_json = new NicoJsonFile();
+    }
+
     async init(db_file, in_memory_only=false) {
         this.db = new Datastore({ 
             filename: db_file,
@@ -135,7 +139,7 @@ class Library {
                 const value = docs[0];
                 const dir_path = this.id_dirpath_map.get(value.dirpath_id);
                 const data =  {
-                    thumb_img: this._getThumbPath(dir_path, value),
+                    thumb_img: this._getThumbImgPath(dir_path, value),
                     id: video_id,
                     name: value.video_name,
                     creation_date: value.creation_date,
@@ -166,7 +170,7 @@ class Library {
                     const video_id = value.video_id;
                     const dir_path = dir_map.get(value.dirpath_id);
                     return {
-                        thumb_img: this._getThumbPath(dir_path, value),
+                        thumb_img: this._getThumbImgPath(dir_path, value),
                         id: video_id,
                         name: value.video_name,
                         creation_date: value.creation_date,
@@ -184,23 +188,21 @@ class Library {
     async getPlayData(video_id){
         const video_info = await this._getVideoInfo(video_id);
         const dir_path = await this._getDir(video_info.dirpath_id);
-
-        const video_file_path = this._getVideoPath(dir_path, video_info);
+    
+        const video_path = this._getVideoPath(dir_path, video_info);
         const video_type = this._getVideoType(video_info);
-        const commnets = await this._findComments(video_id); //
-        const thumb_info = this._findThumbInfo(dir_path, video_info); //
-        const thumb_url = this._getThumbPath(dir_path, video_info);
-        thumb_info.thumbnail_url = thumb_url;
+        const comments = this._getComments(dir_path, video_info);
+        const thumb_info = this._getThumbInfo(dir_path, video_info);
 
         return {
             video_data: {
-                src: video_file_path,
+                src: video_path,
                 type: `video/${video_type}`,
-                commnets: commnets
+                commnets: comments
             },
             viweinfo: {
                 thumb_info:thumb_info,
-                commnets: commnets
+                commnets: comments
             }
         };
     }
@@ -284,25 +286,6 @@ class Library {
         });
     }
 
-    /**
-     * 
-     * @param {string} video_id 
-     */
-    async _findComments(video_id) {
-        const video_info = await this._getVideoInfo(video_id);
-        const dir_path = await this._getDir(video_info.dirpath_id);
-        const file_path = this._getCommentPath(dir_path, video_info);
-
-        const xml = fs.readFileSync(file_path, "utf-8");
-        let comments = reader.comment(xml);
-        comments.sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
-        return comments;
-    }
-
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
             this.db.find({ $and : [{_data_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
@@ -315,56 +298,54 @@ class Library {
                     return;
                 }
                 delete docs[0]._data_type;
-                delete docs[0]._db_type;
+                // delete docs[0]._db_type;
                 delete docs[0]._id;
                 resolve(docs[0]);
             });
         });
     }
 
-    /**
-     * 
-     * @param {string} dir_path 
-     * @param {object} video_info 
-     */
-    _findThumbInfo(dir_path, video_info) {
-        const path = this._getThumbInfoPath(dir_path, video_info);
-        const xml = fs.readFileSync(path, "utf-8");
-        return reader.thumb_info(xml);
+    _getDataFileInst(dir_path, video_info){
+        const db_type = video_info._db_type;
+        if(db_type=="xml"){
+            this.nico_xml.dirPath = dir_path;
+            this.nico_xml.videoInfo = video_info;
+            return this.nico_xml;
+        }
+        if(db_type=="json"){
+            this.nico_json.dirPath = dir_path;
+            this.nico_json.videoID = video_info.video_id;
+            this.nico_json.videoType = video_info.video_type;
+            return this.nico_json;
+        }
+
+        throw new Error(`${db_type} is unkown`);
+    }
+
+    _getVideoPath(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.videoPath;
+    }
+
+    _getThumbImgPath(dir_path, video_info){
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.thumbImgPath;
+    }
+
+    _getComments(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.getComments();
+    }
+
+    _getThumbInfo(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        const thumb_info = datafile.getThumbInfo();
+        thumb_info.thumbnail_url = this._getThumbImgPath(dir_path, video_info);
+        return thumb_info;
     }
 
     _getVideoType(video_info){
         return video_info.video_type;
-    }
-
-    /**
-     * 
-     * @param {string} dir_path 
-     * @param {object} video_info 
-     */
-    _getVideoPath(dir_path, video_info) {
-        return `${dir_path}/${video_info.video_filename}`;
-    }
-    /**
-     * 
-     * @param {string} dir_path 
-     * @param {object} video_info 
-     */
-    _getCommentPath(dir_path, video_info) {
-        return `${dir_path}/${video_info.video_name} - [${video_info.video_id}].xml`;
-    }
-
-    _getThumbInfoPath(dir_path, video_info) {
-        return `${dir_path}/${video_info.video_name} - [${video_info.video_id}][ThumbInfo].xml`;
-    }
-
-    /**
-     * 
-     * @param {string} dir_path 
-     * @param {object} video_info 
-     */
-    _getThumbPath(dir_path, video_info) {
-        return `${dir_path}/${video_info.video_name} - [${video_info.video_id}][ThumbImg].jpeg`;
     }
 }
 

@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment, getVideoType, filterCommnets } = require("./niconico");
+const { NicoJsonFile } = require("./nico-data-file");
 
 const validateStatus = (status) => {
     return status >= 200 && status < 300;
@@ -83,6 +84,8 @@ class NicoNicoDownloader {
         this.video_id = video_id;
         this.dist_dir = dist_dir;
         this.only_max_quality = only_max_quality;
+
+        this.nico_json = new NicoJsonFile();
     }
 
     cancel(){
@@ -119,16 +122,18 @@ class NicoNicoDownloader {
                 }
             }
 
+            this._setupNicoFilePath();
+
             on_progress("start getting thumbinfo");
-            this._writeJson(this._getThumbInfoFilePath(), this._getThumbInfo());
+            this._writeJson(this.nico_json.thumbInfoPath, this._getThumbInfo());
 
             on_progress("start getting commnet");
-            this._writeJson(this._getCommnetFilePath(), await this._getCommnet());
+            this._writeJson(this.nico_json.commentPath, await this._getCommnet());
 
             on_progress("start getting thumbimg");
-            this._writeBinary(this._getThumbImgFilePath(), await this._getThumbImg());
+            this._writeBinary(this.nico_json.thumbImgPath, await this._getThumbImg());
 
-            const stream = this._createStream(this._getVideoFilePath());
+            const stream = this._createStream(this.nico_json.videoPath);
             if(this.videoinfo.server=="dmc"){
                 on_progress("start getting dmc");
                 await this._getVideoDmc(stream, on_progress);
@@ -292,7 +297,7 @@ class NicoNicoDownloader {
         const { api_data } = this.watch_data;
         const video_id = api_data.video.id;
         const video_type = getVideoType(api_data.video.smileInfo.url);
-        const video_filename = this._getVideoFilename();
+        const video_filename = this.nico_json.videoFilename;
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
@@ -325,6 +330,14 @@ class NicoNicoDownloader {
             .replace(/\|/g, "｜");
     }
 
+    _setupNicoFilePath(){
+        this.nico_json.dirPath = this.dist_dir;
+        this.nico_json.videoID = this.video_id;
+
+        const { api_data } = this.watch_data;
+        this.nico_json.videoType = getVideoType(api_data.video.smileInfo.url);
+    }
+
     _writeJson(file_path, data){
         const json = JSON.stringify(data);
         fs.writeFileSync(file_path, json, "utf-8");
@@ -332,29 +345,6 @@ class NicoNicoDownloader {
 
     _writeBinary(file_path, data){
         fs.writeFileSync(file_path, data, "binary");
-    }
-
-    _getVideoFilename(){
-        const { api_data } = this.watch_data;
-        const video_type = getVideoType(api_data.video.smileInfo.url);
-        return `${this.video_id}.${video_type}`;
-    }
-
-    _getVideoFilePath(){
-        const filename = this._getVideoFilename();
-        return path.join(this.dist_dir, filename);
-    }
-
-    _getCommnetFilePath(){
-        return path.join(this.dist_dir, `${this.video_id}[Comment].json`);
-    }
-
-    _getThumbInfoFilePath(){
-        return path.join(this.dist_dir, `${this.video_id}[ThumbInfo].json`);
-    }
-
-    _getThumbImgFilePath(){
-        return path.join(this.dist_dir, `${this.video_id}.jpeg`);
     }
 
     _isSmileMaxQuality(api_data){

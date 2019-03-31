@@ -80,7 +80,7 @@ test("downloader dmc", async (t) => {
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678.jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].jpeg"));
         t.is(data, "thumbnail");
     }
     {
@@ -149,7 +149,7 @@ test("downloader smile", async (t) => {
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678.jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].jpeg"));
         t.is(data, "thumbnail");
     }
     {

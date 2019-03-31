@@ -1,4 +1,4 @@
-https://github.com/nathancahill/Split.js
+﻿https://github.com/nathancahill/Split.js
 https://github.com/electron/electron/blob/master/docs/api/app.md#appgetpathname
 
 https://www.webprofessional.jp/jquery-pagination-plugins/
@@ -52,3 +52,14 @@ json-server index.js  --routes route.json
 
 http://www.webdesignleaves.com/pr/plugins/fontawesome_01.html
 https://niwaka-web.com/fontawsome5_css/
+
+
+commnet
+first_retrieve
+
+    "playlist": {
+        "watchId": "sm000000",
+        "referer": "https://www.nicovideo.jp/mylist/000000",
+        "parameter": null,
+        "recipe": "eyJpZ"
+    },

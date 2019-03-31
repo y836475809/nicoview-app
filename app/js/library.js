@@ -110,15 +110,11 @@ class Library {
             video_id: item.video_id,
             dirpath_id: dirpath_id,
             video_name: item.video_name,
-            video_filename: item.video_filename,
             video_type: item.video_type,
             is_economy: !item.max_quality,
-            modification_date: cu_date,
             creation_date: cu_date,
             play_count: 0,
             time: item.time,
-            last_play_date: cu_date,
-            yet_reading: 0,
             pub_date: item.pub_date,
             tags: item.tags
         };

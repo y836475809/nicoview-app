@@ -64,6 +64,8 @@
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
+    const base_dir = path.resolve(app_base_dir, "..");
+
     var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
@@ -101,10 +103,9 @@
             const item = {
                 _data_type:"video", 
                 _db_type:"json", 
-                dirpath: path.join(app_base_dir, "data"),
+                dirpath: path.join(base_dir, "data"),
                 video_id: video_id,
                 video_name: `title ${video_id}`,
-                video_filename: `${video_id}.mp4`,
                 video_type: "mp4",
                 max_quality: true,
                 time: 600,

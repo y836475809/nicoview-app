@@ -181,24 +181,37 @@ class NicoNicoDownloader {
 
     _getThumbInfo(){
         const api_data = this.watch_data.api_data;
+        const video = api_data.video;
+        const thread = api_data.thread;
+        const owner = api_data.owner;
+        const tags = api_data.tags.map((value) => {
+            return {
+                id: value.id,
+                name: value.name,
+                isLocked: value.isLocked,
+            };
+        });
         return {
             video: {
-                id: api_data.video.id,
-                title: api_data.video.title, 
-                description: api_data.video.description, 
-                thumbnailURL: api_data.video.thumbnailURL, 
-                largeThumbnailURL: api_data.video.largeThumbnailURL, 
-                postedDateTime: api_data.video.postedDateTime, 
-                duration: api_data.video.duration, 
-                viewCount: api_data.video.viewCount, 
-                mylistCount: api_data.video.mylistCount, 
-                movieType: api_data.video.movieType,
+                id: video.id,
+                title: video.title, 
+                description: video.description, 
+                thumbnailURL: video.thumbnailURL, 
+                largeThumbnailURL: video.largeThumbnailURL, 
+                postedDateTime: video.postedDateTime, 
+                duration: video.duration, 
+                viewCount: video.viewCount, 
+                mylistCount: video.mylistCount, 
+                movieType: video.movieType,
             },
-            tags: api_data.tags,
+            thread: {
+                commentCount: thread.commentCount
+            },
+            tags: tags,
             owner: {
-                id: api_data.owner.id, 
-                nickname: api_data.owner.nickname,
-                iconURL: api_data.owner.iconURL,
+                id: owner.id, 
+                nickname: owner.nickname,
+                iconURL: owner.iconURL,
             }
         };
     }

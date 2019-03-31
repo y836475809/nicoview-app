@@ -110,7 +110,31 @@ class NicoJsonFile extends NicoDataFile {
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const text = fs.readFileSync(file_path, "utf-8");
-        return JSON.parse(text);
+        const json_data = JSON.parse(text);
+
+        const video = json_data.video;
+        const owner = json_data.owner;
+        const thread = json_data.thread;
+        const tags = json_data.tags.map((value) => {
+            return {
+                text: value.name,
+                lock: value.isLocked
+            };
+        });
+        return {
+            video_id: video.id,
+            title: video.title,
+            description: video.description,
+            thumbnail_url: video.largeThumbnailURL,
+            first_retrieve: video.postedDateTime,
+            length: video.duration,
+            view_counter: video.viewCount,
+            mylist_counter: video.mylistCount,
+            comment_counter: thread.commentCount,
+            tags: tags,
+            user_nickname: owner.nickname,
+            user_icon_url: owner.iconURL
+        };
     }
 }
 

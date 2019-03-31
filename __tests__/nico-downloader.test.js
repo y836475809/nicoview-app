@@ -94,30 +94,33 @@ test("downloader dmc", async (t) => {
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
-        t.is(data.video.id, "sm12345678"); 
-        t.is(data.video.title, "test"); 
-        t.not(data.video.description, undefined); 
-        t.is(data.video.thumbnailURL, "https://tn.smilevideo.jp/smile?i=12345678"); 
-        t.is(data.video.largeThumbnailURL, "https://tn.smilevideo.jp/smile?i=12345678.L"); 
-        t.is(data.video.postedDateTime, "2018/01/01 01:00:00"); 
-        t.is(data.video.duration, 100); 
-        t.is(data.video.viewCount, 200); 
-        t.is(data.video.mylistCount, 300); 
-        t.is(data.video.movieType, "mp4"); 
-        
-        t.is(data.tags[0].id, "1");  
-        t.is(data.tags[0].name, "tag1");  
-        t.is(data.tags[0].isLocked, true);  
-        t.is(data.tags[1].id, "2");  
-        t.is(data.tags[1].name, "tag2");  
-        t.is(data.tags[1].isLocked, true);  
-        t.is(data.tags[2].id, "3");  
-        t.is(data.tags[2].name, "tag3");  
-        t.is(data.tags[2].isLocked, false);  
-
-        t.is(data.owner.id, "123345677");  
-        t.is(data.owner.nickname, "aaaaさん");  
-        t.regex(data.owner.iconURL, /https:\/\/secure-dcdn\.cdn\.nimg\.jp\/nicoaccount\/usericon\/.+/);
+        t.deepEqual(data, {
+            video:{
+                id: "sm12345678",
+                title: "test",
+                description: "test description",
+                thumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678",
+                largeThumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678.L",
+                postedDateTime: "2018/01/01 01:00:00",
+                duration: 100,
+                viewCount: 200,
+                mylistCount: 300,
+                movieType: "mp4",
+            },
+            thread:{
+                commentCount: 1000
+            },
+            tags:[
+                {id: "1", name: "tag1", isLocked: true},
+                {id: "2", name: "tag2", isLocked: true},
+                {id: "3", name: "tag3", isLocked: false}
+            ],
+            owner: {
+                id: "123345677",
+                nickname: "aaaaさん",
+                iconURL: "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/100.123345677.jpg?1313765172"
+            }
+        });
     }      
 });
 
@@ -160,31 +163,34 @@ test("downloader smile", async (t) => {
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
-        t.is(data.video.id, "sm12345678"); 
-        t.is(data.video.title, "test"); 
-        t.not(data.video.description, undefined); 
-        t.is(data.video.thumbnailURL, "https://tn.smilevideo.jp/smile?i=12345678"); 
-        t.is(data.video.largeThumbnailURL, "https://tn.smilevideo.jp/smile?i=12345678.L"); 
-        t.is(data.video.postedDateTime, "2018/01/01 01:00:00"); 
-        t.is(data.video.duration, 100); 
-        t.is(data.video.viewCount, 200); 
-        t.is(data.video.mylistCount, 300); 
-        t.is(data.video.movieType, "mp4"); 
-        
-        t.is(data.tags[0].id, "1");  
-        t.is(data.tags[0].name, "tag1");  
-        t.is(data.tags[0].isLocked, true);  
-        t.is(data.tags[1].id, "2");  
-        t.is(data.tags[1].name, "tag2");  
-        t.is(data.tags[1].isLocked, true);  
-        t.is(data.tags[2].id, "3");  
-        t.is(data.tags[2].name, "tag3");  
-        t.is(data.tags[2].isLocked, false);  
-
-        t.is(data.owner.id, "123345677");  
-        t.is(data.owner.nickname, "aaaaさん");  
-        t.regex(data.owner.iconURL, /https:\/\/secure-dcdn\.cdn\.nimg\.jp\/nicoaccount\/usericon\/.+/);
-    }  
+        t.deepEqual(data, {
+            video:{
+                id: "sm12345678",
+                title: "test",
+                description: "test description",
+                thumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678",
+                largeThumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678.L",
+                postedDateTime: "2018/01/01 01:00:00",
+                duration: 100,
+                viewCount: 200,
+                mylistCount: 300,
+                movieType: "mp4",
+            },
+            thread:{
+                commentCount: 1000
+            },
+            tags:[
+                {id: "1", name: "tag1", isLocked: true},
+                {id: "2", name: "tag2", isLocked: true},
+                {id: "3", name: "tag3", isLocked: false}
+            ],
+            owner: {
+                id: "123345677",
+                nickname: "aaaaさん",
+                iconURL: "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/100.123345677.jpg?1313765172"
+            }
+        });
+    } 
 });
 
 test("downloader dmc low quality", async (t) => {

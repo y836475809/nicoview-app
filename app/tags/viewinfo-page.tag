@@ -279,7 +279,7 @@
             this.title = viewinfo.thumb_info.title;
             this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);
             this.view_counter = viewinfo.thumb_info.view_counter;
-            this.comment_num = viewinfo.thumb_info.comment_num;
+            this.comment_num = viewinfo.thumb_info.comment_counter;
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;

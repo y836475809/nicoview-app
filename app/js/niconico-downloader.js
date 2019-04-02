@@ -293,7 +293,7 @@ class NicoNicoDownloader {
         await this.video_download.download(stream, on_progress);
     }   
 
-    getdd(){
+    getDownloadedItem(){
         const { api_data } = this.watch_data;
         const video_id = api_data.video.id;
         const video_type = getVideoType(api_data.video.smileInfo.url);
@@ -302,7 +302,10 @@ class NicoNicoDownloader {
             return value.name;
         });
         return {
-            video_id: video_id,
+            _data_type:"video", 
+            _db_type:"json", 
+            dirpath: this.dist_dir,
+            video_id: video_id,      
             video_name: api_data.video.title,
             video_filename: video_filename,
             video_type: video_type,

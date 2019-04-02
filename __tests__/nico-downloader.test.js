@@ -67,8 +67,11 @@ test("downloader dmc", async (t) => {
         "start getting thumbimg", "start getting dmc" , "100%", "finish", "stop HB"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
-    const dd = nico_down.getdd();
-    t.deepEqual(dd, { 
+    const item = nico_down.getDownloadedItem();
+    t.deepEqual(item, { 
+        _data_type:"video", 
+        _db_type:"json", 
+        dirpath: dist_dir,
         video_id: "sm12345678", 
         video_name: "test",
         video_filename: "sm12345678.mp4",
@@ -136,8 +139,11 @@ test("downloader smile", async (t) => {
         "start getting thumbimg", "start getting smile" , "100%", "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
-    const dd = nico_down.getdd();
-    t.deepEqual(dd, { 
+    const item = nico_down.getDownloadedItem();
+    t.deepEqual(item, { 
+        _data_type:"video", 
+        _db_type:"json",
+        dirpath: dist_dir, 
         video_id: "sm12345678", 
         video_name: "test",
         video_filename: "sm12345678.mp4",
@@ -205,9 +211,12 @@ test("downloader dmc low quality", async (t) => {
         "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
-    const dd = nico_down.getdd();
-    t.deepEqual(dd, { 
-        video_id: "sm12345678", 
+    const item = nico_down.getDownloadedItem();
+    t.deepEqual(item, { 
+        _data_type:"video", 
+        _db_type:"json", 
+        dirpath: dist_dir,
+        video_id: "sm12345678",       
         video_name: "test",
         video_filename: "sm12345678.mp4",
         video_type: "mp4",
@@ -230,9 +239,12 @@ test("downloader smile low quality", async (t) => {
         "start getting thumbimg", "start getting smile", "100%", "finish"]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
-    const dd = nico_down.getdd();
-    t.deepEqual(dd, { 
-        video_id: "sm12345678", 
+    const item = nico_down.getDownloadedItem();
+    t.deepEqual(item, { 
+        _data_type:"video", 
+        _db_type:"json", 
+        dirpath: dist_dir,
+        video_id: "sm12345678",    
         video_name: "test",
         video_filename: "sm12345678.mp4",
         video_type: "mp4",

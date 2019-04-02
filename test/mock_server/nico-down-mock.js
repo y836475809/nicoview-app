@@ -1,14 +1,14 @@
 const nock = require("nock");
 const fs = require("fs");
-const path = require("path");
 
 const comment = require("./data/comment.json");
 const data_api_data = require("./data/api_data.json");
-const dmc_session = require(`./data/dmc_session.json`);
+const dmc_session = require("./data/dmc_session.json");
 
 
 class NicoDownLoadMocks {
-    constructor(){
+    constructor(id){
+        this.id = id;
     }
 
     clean(){
@@ -16,14 +16,19 @@ class NicoDownLoadMocks {
     }
 
     watch({delay=1, code=200} = {}){
+        const headers = {
+            "Set-Cookie": [
+                "nicohistory=123456%3A123456789; path=/; domain=.nicovideo.jp",
+                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
+            ]
+        };
         this.watch_nock = nock("https://www.nicovideo.jp");
         this.watch_nock
-            .get(/watch\/sm\d+/)
+            .get(`/watch/sm${this.id}`)
             .delay(delay)
             .reply(code, (uri, requestBody) => {
-                this.id = uri.match(/\d+/);
                 return MockNicoUitl.getWatchHtml(this.id);
-            });
+            }, headers);
     } 
 
     dmc_session({delay=1, code=200} = {}){
@@ -85,31 +90,29 @@ class NicoDownLoadMocks {
         const file_path = `${__dirname}/data/sm${this.id}.mp4`;
         const stat = fs.statSync(file_path);
         const headers = {
-            "content-length": Buffer.byteLength(stat.size)
+            "Content-Type": "audio/mp4 ",
+            "content-length": stat.size
         };
         this.dmc_video_nock = nock("https://pa0000.dmc.nico");
         this.dmc_video_nock
             .get(`/hlsvod/ht2_nicovideo/nicovideo-sm${this.id}`)
             .delay(delay)
-            .replyWithFile(code, file_path, {
-                "Content-Type": "audio/mp4 ",
-            }, headers);   
+            .replyWithFile(code, file_path, headers);   
     }
 
     smile_video({delay=1, code=200, quality=""} = {}){
         const file_path = `${__dirname}/data/sm${this.id}.mp4`;
         const stat = fs.statSync(file_path);
         const headers = {
-            "content-length": Buffer.byteLength(stat.size)
+            "Content-Type": "audio/mp4 ",
+            "content-length": stat.size
         };
         this.smile_video_nock = nock("https://smile-cls20.sl.nicovideo.jp");
         this.smile_video_nock
             .get("/smile")
             .query({ m: `${this.id}.67759${quality}`})
             .delay(delay)
-            .replyWithFile(code, file_path, {
-                "Content-Type": "audio/mp4 ",
-            }, headers);   
+            .replyWithFile(code, file_path, headers);   
     }
 }
 
@@ -148,7 +151,7 @@ class MockNicoUitl {
     }
 
     static getWatchHtml(id){ 
-        const data_api_data = MockNicoUitl._escapeHtml(createApiData(id);
+        const data_api_data = MockNicoUitl._escapeHtml(JSON.stringify(createApiData(id)));
         return `<!DOCTYPE html>
         <html lang="ja">
             <body>
@@ -172,7 +175,6 @@ const setupNicoDownloadNock = (target_nock, {
     target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
     target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
     target_nock.dmc_video({ delay:video_delay, code:video_code });  
-
 };
 
 module.exports = {

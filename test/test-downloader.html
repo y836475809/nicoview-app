@@ -77,24 +77,24 @@
     const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
     const { NicoDownLoadMocks, setupNicoDownloadNock } = require("./mock_server/nico-down-mock");
 
-    const nico_download_mocks = new NicoDownLoadMocks();
-    setupNicoDownloadNock(nico_download_mocks);
+    setupNicoDownloadNock(new NicoDownLoadMocks("10"));
+    setupNicoDownloadNock(new NicoDownLoadMocks("20"));
 
     let data = [
         {thumb_img:"", id: "sm10", name: "Item1", progress: ""},
         {thumb_img:"", id: "sm20", name: "Item2", progress: ""},
-        {thumb_img:"", id: "sm30", name: "Item3", progress: ""},
-        {thumb_img:"", id: "sm40", name: "Item4", progress: ""},
-        {thumb_img:"", id: "sm50", name: "Item5", progress: ""},
+        // {thumb_img:"", id: "sm30", name: "Item3", progress: ""},
+        // {thumb_img:"", id: "sm40", name: "Item4", progress: ""},
+        // {thumb_img:"", id: "sm50", name: "Item5", progress: ""},
     ];
 
     obs.trigger("set-download-items", data);
     
-    const dist_dir = path.join(base_dir, data);
+    const dist_dir = path.join(base_dir, "data");
     let is_cancel = false;
     let nico_down = null;
     const onclickStartTimer = async ()=>{
-        obs.trigger("start-download", async (video_id, on_progress)=>{]
+        obs.trigger("start-download", async (video_id, on_progress)=>{
             if(is_cancel){
                 return "cancel";
             }
@@ -103,14 +103,12 @@
                 on_progress(state);
             });  
             if(result.state=="ok"){
-                const item = nico_down.getdd();
+                const item = nico_down.getDownloadedItem();
                 obs.trigger("add-library-item", item);
                 return result.state;
             }else {
+                console.log("reason: ", result.reason);
                 return result.state;
-            }
-            if(is_cancel){
-                return "cancel";
             }
         });
     };
@@ -121,43 +119,6 @@
         }
         obs.trigger("cancel-download");
     };
-    // const onclickStartTimer = async ()=>{
-    //     obs.trigger("start-download", async (video_id, on_progress)=>{
-    //         const count = 5;
-    //         for (let index = 0; index < count; index++) {
-    //             if(is_cancel){
-    //                 break;
-    //             }
-    //             await new Promise(resolve => setTimeout(resolve, 1000));
-    //             on_progress(`${index}/${count}`);
-    //         }  
-    //         if(is_cancel){
-    //             return "cancel";
-    //         }
-
-    //         //TODO
-    //         const item = {
-    //             _data_type:"video", 
-    //             _db_type:"json", 
-    //             dirpath: path.join(base_dir, "data"),
-    //             video_id: video_id,
-    //             video_name: `title ${video_id}`,
-    //             video_type: "mp4",
-    //             max_quality: true,
-    //             time: 600,
-    //             pub_date: new Date().getTime(),
-    //             tags: ["tag1", "tag2"]
-    //         };
-    //         obs.trigger("add-library-item", item);
-    //         return "ok";
-    //     });
-    // };
-    // const onclickStopTimer = async ()=>{
-    //     is_cancel = true;
-    //     obs.trigger("cancel-download");
-    // };
-
-    const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
 
     let smile_downlader = null;
     const onclickLoadSmile = async ()=>{

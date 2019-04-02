@@ -9,5 +9,6 @@ tmp/
 /data/
 test/data/
 *.lnk
+/test/mock_server/img/
 /test/mock_server/data/*.jpeg
 /test/mock_server/data/*.mp4

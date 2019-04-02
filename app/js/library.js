@@ -69,7 +69,7 @@ class Library {
                 break;
             } 
         }
-        if(!new_dirpath_id){
+        if(new_dirpath_id===null){
             throw new Error("maximum id value has been exceeded");
         }
 
@@ -107,8 +107,8 @@ class Library {
         const library_item = {
             _data_type: item._data_type,
             _db_type: item._db_type,
-            video_id: item.video_id,
             dirpath_id: dirpath_id,
+            video_id: item.video_id,        
             video_name: item.video_name,
             video_type: item.video_type,
             is_economy: !item.max_quality,

@@ -129,7 +129,7 @@
 <modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 
 <script>
-    /* globals app_base_dir riot obs search_host */
+    /* globals app_base_dir riot obs */
     const {remote, ipcRenderer} = require("electron");
     const {Menu, MenuItem, dialog} = remote;
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
@@ -156,8 +156,7 @@
     nico_search_params.sortOder("-");
     nico_search_params.cond("tag");
 
-    // const nico_search = debug_search_host?new NicoSearch(debug_search_host):new NicoSearch();
-    const nico_search = new NicoSearch(search_host);
+    const nico_search = new NicoSearch();
 
     const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
         return `<div>${value}</div>`;

@@ -1,10 +1,55 @@
 const nock = require("nock");
 const fs = require("fs");
+const querystring = require("querystring");
 
 const comment = require("./data/comment.json");
 const data_api_data = require("./data/api_data.json");
 const dmc_session = require("./data/dmc_session.json");
 
+class NicoSearchMocks {
+    clean(){
+        nock.cleanAll();
+    }
+
+    search({delay=1, code=200} = {}){
+        this.search_nock = nock("https://api.search.nicovideo.jp");
+        this.search_nock
+            .get(/api\/v2\/video\/contents\/search\?.+/)
+            .delay(delay)
+            .reply(code, (uri, requestBody) => {
+                const q = querystring.parse(uri);
+                const text = q["api/v2/video/contents/search?q"];
+                const limit = parseInt(q["_limit"]);
+                const offset = parseInt(q["_offset"]);
+                const data = [];
+                for (let j = 0; j < limit; j++) {
+                    const tag_cnt = Math.floor(Math.random() * 5);
+                    const tags = [];
+                    for (let index = 0; index < tag_cnt; index++) {
+                        tags.push(`tag${index+1}`);
+                    }
+                    data.push({
+                        thumbnailUrl: `${__dirname}/img/sm${Math.floor(Math.random() * 10)}.jpeg`,
+                        contentId: `sm${offset + j}`,
+                        title: `title ${text} ${offset + j}`,
+                        tags: tags.join(" "),
+                        viewCounter: Math.floor(Math.random() * 100),
+                        commentCounter: Math.floor(Math.random() * 100),
+                        lengthSeconds: Math.floor(Math.random() * 300),
+                        startTime: new Date(new Date().getTime() - Math.floor(Math.random() * 5000)).toISOString()
+                    });
+                }
+                return [code, {
+                    meta: { 
+                        status: code,
+                        totalCount: 1000,
+                        id:"1234567890"
+                    },
+                    data: data
+                }];
+            });     
+    }
+}
 
 class NicoDownLoadMocks {
     constructor(id){
@@ -179,5 +224,6 @@ const setupNicoDownloadNock = (target_nock, {
 
 module.exports = {
     NicoDownLoadMocks: NicoDownLoadMocks,
+    NicoSearchMocks: NicoSearchMocks,
     setupNicoDownloadNock: setupNicoDownloadNock,
 };

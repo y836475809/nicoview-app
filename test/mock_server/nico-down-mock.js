@@ -16,9 +16,10 @@ class NicoSearchMocks {
         this.search_nock
             .get(/api\/v2\/video\/contents\/search\?.+/)
             .delay(delay)
+            .times(Infinity)
             .reply(code, (uri, requestBody) => {
                 const q = querystring.parse(uri);
-                const text = q["api/v2/video/contents/search?q"];
+                const text = q["/api/v2/video/contents/search?q"];
                 const limit = parseInt(q["_limit"]);
                 const offset = parseInt(q["_offset"]);
                 const data = [];

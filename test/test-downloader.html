@@ -75,7 +75,7 @@
     riot.mount("library-page");
 
     const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
-    const { NicoDownLoadMocks, setupNicoDownloadNock } = require("./mock_server/nico-down-mock");
+    const { NicoDownLoadMocks, setupNicoDownloadNock } = require("./mock_server/nico-mock");
 
     setupNicoDownloadNock(new NicoDownLoadMocks("10"));
     setupNicoDownloadNock(new NicoDownLoadMocks("20"));

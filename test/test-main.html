@@ -25,7 +25,7 @@
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-    const { NicoSearchMocks } = require("./mock_server/nico-down-mock");
+    const { NicoSearchMocks } = require("./mock_server/nico-mock");
     const nico_search_mock = new NicoSearchMocks();
     nico_search_mock.search();
 

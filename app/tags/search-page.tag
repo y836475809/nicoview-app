@@ -433,23 +433,26 @@
         grid_table.init(this.root.querySelector(".search-grid"));
 
         grid_table.onDblClick((e, data)=>{
-            if(data.saved){
-                const video_id = data.id;
-                obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
-                    const library_data = id_map.get(video_id);
-                    const thumb_info = library_data.viweinfo.thumb_info;   
-                    obs.trigger("add-history-items", {
-                        image: thumb_info.thumbnail_url, 
-                        id: video_id, 
-                        name: thumb_info.title, 
-                        url: library_data.video_data.src
-                    });
-                    ipcRenderer.send("request-play-library", library_data);
-                }});
-            }else{
-                const video_id = data.id;
-                ipcRenderer.send("request-play-niconico", video_id);
-            }
+            //TODO
+            const video_id = data.id;
+            obs.trigger("main-page:play-by-videoid", video_id);
+            // if(data.saved){
+            //     const video_id = data.id;
+            //     obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
+            //         const library_data = id_map.get(video_id);
+            //         const thumb_info = library_data.viweinfo.thumb_info;   
+            //         obs.trigger("add-history-items", {
+            //             image: thumb_info.thumbnail_url, 
+            //             id: video_id, 
+            //             name: thumb_info.title, 
+            //             url: library_data.video_data.src
+            //         });
+            //         ipcRenderer.send("request-play-library", library_data);
+            //     }});
+            // }else{
+            //     const video_id = data.id;
+            //     ipcRenderer.send("request-play-niconico", video_id);
+            // }
         });
         grid_table.onContextMenu((e)=>{
             context_menu.popup({window: remote.getCurrentWindow()});

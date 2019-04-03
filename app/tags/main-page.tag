@@ -90,7 +90,7 @@
 
     <script>
         /* globals app_base_dir obs */
-        const {remote} = require("electron");
+        const {remote, ipcRenderer } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         let riot = require("riot");
@@ -167,6 +167,28 @@
         obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
         });
+
+        //TODO
+        obs.on("main-page:play-by-videoid", (video_id)=>{
+            obs.trigger("get-library-data-callback", {
+                video_ids:[video_id],
+                cb: (data_map) => {
+                    if(data_map.has(video_id)){
+                        const library_data = data_map.get(video_id);
+                        const thumb_info = library_data.viweinfo.thumb_info;   
+                        obs.trigger("add-history-items", {
+                            image: thumb_info.thumbnail_url, 
+                            id: video_id, 
+                            name: thumb_info.title, 
+                            url: library_data.video_data.src
+                        });
+                        ipcRenderer.send("request-play-library", data_map.get(video_id));
+                    }else{
+                        ipcRenderer.send("request-play-niconico", video_id);
+                    }
+                }
+            });
+        });      
 
         window.onbeforeunload = (e) => {
         };

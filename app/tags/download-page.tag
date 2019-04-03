@@ -3,15 +3,19 @@
         :scope {
             width: 100%;
             height: 100%;
+            background-color: var(--control-color);
         }
 
+        .control-container,
         .download-grid-container {
             background-color: var(--control-color);
-            width: 100%;
-            height: 100%;
         }
     </style>
 
+    <div class="control-container">
+        <button>test</button>
+        <button>test2</button>
+    </div>
     <div class="download-grid-container">
         <div class="download-grid"></div>
     </div>

@@ -42,7 +42,8 @@
         }
 
         .main-group-buttons .fa-book, 
-        .main-group-buttons .fa-search, 
+        .main-group-buttons .fa-search,
+        .main-group-buttons .fa-download,  
         .main-group-buttons .fa-history, 
         .main-group-buttons .fa-cog {
             font-size: 30px;
@@ -59,6 +60,10 @@
             <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
         </label>
         <label class="label">
+            <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
+            <span title="download" class="button center-hv"><span class="fas fa-download"></span></span> 
+        </label>
+        <label class="label">
             <input type="radio" name="page_select" class="history-radio" onclick="{this.onclickPageSelect.bind(this,'history')}"> 
             <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
         </label>
@@ -72,6 +77,9 @@
     </div>
     <div class="page-container search-page">
         <search-container-page></search-container-page>
+    </div>
+    <div class="page-container download-page">
+        <download-page></download-page>
     </div>
     <div class="page-container history-page">
         <play-history></play-history>
@@ -89,6 +97,7 @@
 
         require(`${app_base_dir}/tags/library-page.tag`);
         require(`${app_base_dir}/tags/search-container-page.tag`);
+        require(`${app_base_dir}/tags/download-page.tag`);
         require(`${app_base_dir}/tags/play-history.tag`);
         require(`${app_base_dir}/tags/preference-page.tag`);
 
@@ -146,6 +155,7 @@
         this.on("mount", function () {
             riot.mount("library-page");
             riot.mount("search-container-page");   
+            riot.mount("download-page");
             riot.mount("play-history");
             riot.mount("preference-page");
 

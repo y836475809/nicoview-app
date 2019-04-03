@@ -22,6 +22,8 @@
 
     <script>
         /* globals app_base_dir obs */
+        const { remote } = require("electron");
+        const { Menu } = remote;
         require("slickgrid/lib/jquery.event.drag-2.3.0");
         require("slickgrid/lib/jquery.event.drop-2.3.0");
         require("slickgrid/plugins/slick.rowmovemanager");
@@ -46,6 +48,30 @@
             const container = this.root.querySelector(".download-grid-container");
             grid_table.resizeFitContainer(container);
         };
+
+        const hasItem = (id) => {
+            return grid_table.dataView.getRowById(id) !== undefined;
+        };
+
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "Play", click() {
+                    //TODO
+                }},
+                { label: "delete", click() {
+                    const items = grid_table.getSelectedDatas();
+                    items.forEach(value => {
+                        grid_table.dataView.deleteItem(value.id);
+                    });
+                    const ids = items.map(value => {
+                        return value.id;
+                    });
+                    obs.trigger("search-page:delete-download-ids", ids);
+                }},
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+        const context_menu = createMenu();
 
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".download-grid"));
@@ -114,6 +140,9 @@
 
             grid_table.grid.registerPlugin(moveRowsPlugin); 
 
+            grid_table.onContextMenu((e)=>{
+                context_menu.popup({window: remote.getCurrentWindow()});
+            });
             resizeGridTable();
         });
         
@@ -122,13 +151,15 @@
         });
 
         obs.on("add-download-item", (item) => {
+            if(hasItem(item.id)){
+                return;
+            }
             grid_table.dataView.addItem(item);
         });
         obs.on("delete-download-item", (video_id) => {
             grid_table.dataView.deleteItem(video_id);
         });
 
-        //TODO
         obs.on("get-download-item-callback", (cb) => {
             const items = grid_table.dataView.getItems();
             const id_set = new Set();

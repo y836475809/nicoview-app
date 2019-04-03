@@ -96,9 +96,17 @@
         word-wrap: break-word;
     }
 
-    .dd {
+    .state-content {
         display: inline-block;
+        border-radius: 2px;
+        padding: 3px;
+        margin-right: 5px;        
+    }
+    .state-saved {
         background-color: #7fbfff;
+    }
+    .state-reg-download {
+        background-color: hotpink;
     }
 </style>
 
@@ -164,13 +172,14 @@
     const nico_search = new NicoSearch();
 
     const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
-         //TODO
-        const state = dataContext.state;
-        return `<div>${value}</div><div class="dd">${state}</div>`;
-    };
-    const stateFormatter = (row, cell, value, columnDef, dataContext)=> {
-        const state_local = dataContext.has_local?"Local":"";
-        return `<div>${state_local}</div>`;
+        let content = `<div>${value}</div>`;
+        if(dataContext.saved){
+            content += "<div class='state-content state-saved'>Local</div>";
+        }
+        if(dataContext.reg_download){
+            content += "<div class='state-content state-reg-download'>download</div>";
+        }
+        return content;
     };
     const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
         return `<div class="line-break">${value}</div>`;
@@ -183,7 +192,6 @@
         {id: "pub_date", name: "投稿日"},
         {id: "play_time", name: "時間"},
         {id: "tags", name: "タグ", formatter:lineBreakFormatter},
-        {id: "state", name: "state", formatter:stateFormatter}
     ];
     const options = {
         rowHeight: 100,
@@ -232,17 +240,16 @@
             return value.contentId;
         });
 
-        //TODO
         const download_id_set = await new Promise((resolve, reject) => {
-            obs.trigger("get-download-item-callback", { cb: (id_set)=>{
+            obs.trigger("get-download-item-callback", (id_set)=>{
                 resolve(id_set);
-            }});
+            });
         });
 
         obs.trigger("get-library-data-callback", { video_ids: video_ids, cb: (id_map)=>{
             const items = search_result.data.map(value => {
-                const has_local = id_map.has(value.contentId);
-                const has_download = download_id_set.has(value.contentId); //TODO
+                const saved = id_map.has(value.contentId);
+                const reg_download = download_id_set.has(value.contentId);
                 return {
                     thumb_img: value.thumbnailUrl,
                     id: value.contentId,
@@ -251,8 +258,8 @@
                     play_time: value.lengthSeconds,
                     pub_date: value.startTime,
                     tags: value.tags,
-                    has_local: has_local,
-                    state: "" 
+                    saved: saved,
+                    reg_download: reg_download,
                 };
             });
             grid_table.setData(items);
@@ -384,16 +391,24 @@
         this.refs.page.resetPage();
     });
 
+    obs.on("search-page:delete-download-ids", (ids)=> {
+        ids.forEach(id => {
+            const item = grid_table.dataView.getItemById(id);
+            item.reg_download = false;
+            grid_table.dataView.updateItem(id, item);
+        });
+        grid_table.grid.render();
+    });
+
     const resizeGridTable = () => {
         const container = this.root.querySelector(".search-grid-container");
         grid_table.resizeFitContainer(container);
     };
 
-	//TODO
     const createMenu = () => {
         const nemu_templete = [
-            { label: "Play", click() {
-                //obs.trigger(`${sender}-delete-selected-items`);
+            { label: "bookmark", click() {
+                //TODO
             }},
             { label: "download", click() {
                 const items = grid_table.getSelectedDatas();
@@ -404,16 +419,11 @@
                         name: value.name,
                         progress: ""
                     });
+                    const item = grid_table.dataView.getItemById(value.id);
+                    item.reg_download = true;
+                    grid_table.dataView.updateItem(value.id, item);
                 });
-                items[0].state = "state test";
-                // const im = grid_table.dataView.getItem(0);
-                const im = grid_table.dataView.getItemById(items[0].id);
-                im.state = "state test";
-                // grid_table.dataView.updateItem(0, im);
-                grid_table.dataView.updateItem(im.id, im);
                 grid_table.grid.render();
-                // grid_table.grid.invalidate();
-                // console.log("search context menu data=", items);
             }},
         ];
         return Menu.buildFromTemplate(nemu_templete);
@@ -423,7 +433,7 @@
         grid_table.init(this.root.querySelector(".search-grid"));
 
         grid_table.onDblClick((e, data)=>{
-            if(data.has_local){
+            if(data.saved){
                 const video_id = data.id;
                 obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
                     const library_data = id_map.get(video_id);

@@ -128,6 +128,16 @@
             grid_table.dataView.deleteItem(video_id);
         });
 
+        //TODO
+        obs.on("get-download-item-callback", (cb) => {
+            const items = grid_table.dataView.getItems();
+            const id_set = new Set();
+            items.forEach(value => {
+                id_set.add(value.id);
+            });   
+            cb(id_set);
+        });
+
         obs.on("resizeEndEvent", (size)=> {
             resizeGridTable();
         });

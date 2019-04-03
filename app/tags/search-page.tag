@@ -95,6 +95,11 @@
         white-space: normal;
         word-wrap: break-word;
     }
+
+    .dd {
+        display: inline-block;
+        background-color: #7fbfff;
+    }
 </style>
 
 <div class="search-cond-container">
@@ -159,7 +164,9 @@
     const nico_search = new NicoSearch();
 
     const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
-        return `<div>${value}</div>`;
+         //TODO
+        const state = dataContext.state;
+        return `<div>${value}</div><div class="dd">${state}</div>`;
     };
     const stateFormatter = (row, cell, value, columnDef, dataContext)=> {
         const state_local = dataContext.has_local?"Local":"";
@@ -213,7 +220,7 @@
         nico_search.cancel();
     };
 
-    const setData = (search_result) => {     
+    const setData = async (search_result) => {     
         const total_count = search_result.meta.totalCount;
         this.refs.page.setTotaCount(total_count);
         if(total_count<search_offset+search_limit){
@@ -225,9 +232,17 @@
             return value.contentId;
         });
 
+        //TODO
+        const download_id_set = await new Promise((resolve, reject) => {
+            obs.trigger("get-download-item-callback", { cb: (id_set)=>{
+                resolve(id_set);
+            }});
+        });
+
         obs.trigger("get-library-data-callback", { video_ids: video_ids, cb: (id_map)=>{
             const items = search_result.data.map(value => {
                 const has_local = id_map.has(value.contentId);
+                const has_download = download_id_set.has(value.contentId); //TODO
                 return {
                     thumb_img: value.thumbnailUrl,
                     id: value.contentId,
@@ -374,16 +389,36 @@
         grid_table.resizeFitContainer(container);
     };
 
-    const menu = new Menu();
-    menu.append(new MenuItem({
-        label: "Play", click() {
-            const items = grid_table.getSelectedDatas();
-            console.log("search context menu data=", items);
-        }
-    }));
-    menu.append(new MenuItem({ type: "separator" }));
-    menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
-    
+	//TODO
+    const createMenu = () => {
+        const nemu_templete = [
+            { label: "Play", click() {
+                //obs.trigger(`${sender}-delete-selected-items`);
+            }},
+            { label: "download", click() {
+                const items = grid_table.getSelectedDatas();
+                items.forEach(value => {
+                    obs.trigger("add-download-item", {
+                        thumb_img: value.thumb_img,
+                        id: value.id,
+                        name: value.name,
+                        progress: ""
+                    });
+                });
+                items[0].state = "state test";
+                // const im = grid_table.dataView.getItem(0);
+                const im = grid_table.dataView.getItemById(items[0].id);
+                im.state = "state test";
+                // grid_table.dataView.updateItem(0, im);
+                grid_table.dataView.updateItem(im.id, im);
+                grid_table.grid.render();
+                // grid_table.grid.invalidate();
+                // console.log("search context menu data=", items);
+            }},
+        ];
+        return Menu.buildFromTemplate(nemu_templete);
+    };
+    const context_menu = createMenu();
     this.on("mount", () => {
         grid_table.init(this.root.querySelector(".search-grid"));
 
@@ -405,6 +440,9 @@
                 const video_id = data.id;
                 ipcRenderer.send("request-play-niconico", video_id);
             }
+        });
+        grid_table.onContextMenu((e)=>{
+            context_menu.popup({window: remote.getCurrentWindow()});
         });
 
         resizeGridTable();

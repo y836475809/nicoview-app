@@ -51,32 +51,32 @@
     </style>
     <div class="main-group-buttons">
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,0)}> 
+            <input type="radio" name="page_select" class="library-radio" onclick="{this.onclickPageSelect.bind(this,'library')}"> 
             <span title="ライブラリ" class="button center-hv"><span class="fas fa-book"></span></span>
         </label>
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,1)}> 
+            <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
             <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
         </label>
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,2)}> 
+            <input type="radio" name="page_select" class="history-radio" onclick="{this.onclickPageSelect.bind(this,'history')}"> 
             <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
         </label>
         <label class="label">
-            <input type="radio" name="page_select" class="radio" onclick={this.onclickPageSelect.bind(this,3)}> 
+            <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
             <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
         </label>
     </div>
-    <div id="page1" class="page-container">
+    <div class="page-container library-page">
         <library-page></library-page>
     </div>
-    <div id="page2" class="page-container">
+    <div class="page-container search-page">
         <search-container-page></search-container-page>
     </div>
-    <div id="page3" class="page-container">
+    <div class="page-container history-page">
         <play-history></play-history>
     </div>
-    <div id="page4" class="page-container">
+    <div class="page-container setting-page">
         <preference-page></preference-page>
     </div>
 
@@ -127,30 +127,20 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        this.index = 0;
-        const select_page = (index)=>{
-            this.index = index;
-
-            const page1 = document.getElementById("page1");
-            const page2 = document.getElementById("page2");
-            const page3 = document.getElementById("page3");
-            const page4 = document.getElementById("page4");
-
-            const list = [0, 0, 0, 0];
-            list[index] = 1;
-            page1.style.zIndex = list[0];
-            page2.style.zIndex = list[1];
-            page3.style.zIndex = list[2];
-            page4.style.zIndex = list[3];  
-
-            Array.from(this.root.querySelectorAll("[name=\"page_select\"]"), 
+        const select_page = (page_name)=>{
+            Array.from(this.root.querySelectorAll(".page-container"), 
                 (elm, index) => {
-                    elm.checked = index===this.index;
+                    elm.style.zIndex = 0;
                 });
+            const page = this.root.querySelector(`.${page_name}-page`);
+            page.style.zIndex = 1;
+
+            const radio = this.root.querySelector(`.${page_name}-radio`);
+            radio.checked = true;
         };
 
-        this.onclickPageSelect = (index, e) => {
-            select_page(index);
+        this.onclickPageSelect = (page_name, e) => {
+            select_page(page_name);
         };
 
         this.on("mount", function () {
@@ -159,19 +149,13 @@
             riot.mount("play-history");
             riot.mount("preference-page");
 
-            select_page(this.index);
+            select_page("library");
 
             obs.trigger("on_clear_search");
         });
 
         obs.on("main-page:select-page", (page_name)=>{
-            const page_map = new Map([
-                ["library", 0],
-                ["search", 1],
-                ["history", 2],
-                ["preference", 3]
-            ]);
-            select_page(page_map.get(page_name));
+            select_page(page_name);
         });
 
         window.onbeforeunload = (e) => {

@@ -1,4 +1,4 @@
-<download-page>
+<download-list>
     <style scoped>
         :scope {
             width: 100%;
@@ -330,4 +330,4 @@
             }
         });
     </script>
-</download-page>
+</download-list>

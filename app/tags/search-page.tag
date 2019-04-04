@@ -416,11 +416,23 @@
                     obs.trigger("add-download-item", {
                         thumb_img: value.thumb_img,
                         id: value.id,
-                        name: value.name,
-                        progress: ""
+                        name: value.name
                     });
                     const item = grid_table.dataView.getItemById(value.id);
                     item.reg_download = true;
+                    grid_table.dataView.updateItem(value.id, item);
+                });
+                grid_table.grid.render();
+            }},
+            { label: "delete download", click() {
+                const items = grid_table.getSelectedDatas();
+                const video_ids = items.map(value => {
+                    return value.id;
+                });
+                obs.trigger("delete-download-items", video_ids);
+                items.forEach(value => {       
+                    const item = grid_table.dataView.getItemById(value.id);
+                    item.reg_download = false;
                     grid_table.dataView.updateItem(value.id, item);
                 });
                 grid_table.grid.render();

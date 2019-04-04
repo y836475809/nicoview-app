@@ -28,14 +28,38 @@
         require("slickgrid/lib/jquery.event.drop-2.3.0");
         require("slickgrid/plugins/slick.rowmovemanager");
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const { DownloadItemStore } = require(`${app_base_dir}/js/download-item-store`);
+
+        const donwload_item_store = new DownloadItemStore(SettingStore.getSystemFile("download.json"));
 
         const wait_time = 5;
+
+        const donwload_state = Object.freeze({
+            pre_download: 0,
+            complete: 1,
+            error: 2
+        });
+
+        //TODO
+        const message_map = new Map([
+            [donwload_state.pre_download, "未"],
+            [donwload_state.complete, "完了"],
+            [donwload_state.error, "失敗"],
+        ]);
+
+        //TODO
+        const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
+            const msg = message_map.get(value);
+            const content = `<div>${msg}</div><div>${dataContext.progress}</div>`;
+            return content;
+        };
 
         const columns = [
             {id: "thumb_img", name: "image", height:100, width: 130, behavior: "selectAndMove"},
             {id: "id", name: "id", behavior: "selectAndMove"},
             {id: "name", name: "名前", behavior: "selectAndMove"},
-            {id: "progress", name: "進歩", behavior: "selectAndMove"}
+            {id: "state", name: "状態", behavior: "selectAndMove", formatter:htmlFormatter}
         ];
         const options = {
             rowHeight: 100,
@@ -53,19 +77,30 @@
             return grid_table.dataView.getRowById(id) !== undefined;
         };
 
+        const deleteSelectedItems = () => {
+            const items = grid_table.getSelectedDatas();
+            items.forEach(value => {
+                grid_table.dataView.deleteItem(value.id);
+            });
+            save();
+
+            return items.map(value => {
+                return value.id;
+            });
+        };
+
+        const save = () => {
+            donwload_item_store.setItems(grid_table.dataView.getItems()); 
+            donwload_item_store.save(); 
+        };
+
         const createMenu = () => {
             const nemu_templete = [
                 { label: "Play", click() {
                     //TODO
                 }},
                 { label: "delete", click() {
-                    const items = grid_table.getSelectedDatas();
-                    items.forEach(value => {
-                        grid_table.dataView.deleteItem(value.id);
-                    });
-                    const ids = items.map(value => {
-                        return value.id;
-                    });
+                    const ids = deleteSelectedItems();
                     obs.trigger("search-page:delete-download-ids", ids);
                 }},
             ];
@@ -136,6 +171,8 @@
                 grid_table.dataView.endUpdate();
 
                 grid_table.grid.setSelectedRows(selectedRows);
+
+                save();
             });
 
             grid_table.grid.registerPlugin(moveRowsPlugin); 
@@ -143,21 +180,40 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
+
+            try {
+                donwload_item_store.load(); 
+                grid_table.setData(donwload_item_store.getItems());
+            } catch (error) {
+                console.log("donwload item load error=", error);
+                grid_table.setData([]); 
+            }
+
             resizeGridTable();
         });
         
         obs.on("set-download-items", (items) => {
             grid_table.setData(items);
+
+            save();
         });
 
         obs.on("add-download-item", (item) => {
             if(hasItem(item.id)){
                 return;
             }
+            item["state"] = donwload_state.pre_download;
+            item["progress"] = "";
             grid_table.dataView.addItem(item);
+
+            save();
         });
-        obs.on("delete-download-item", (video_id) => {
-            grid_table.dataView.deleteItem(video_id);
+
+        obs.on("delete-download-items", (video_ids) => {
+            video_ids.forEach(video_id => {
+                grid_table.dataView.deleteItem(video_id);
+            });
+            save();
         });
 
         obs.on("get-download-item-callback", (cb) => {
@@ -234,17 +290,22 @@
                         grid_table.grid.updateCell(downloading_index, column_index);
                     });
                     if(result=="ok"){
+                        downloading_item.state = donwload_state.complete;
                         downloading_item.progress = "finish";
                     }else if(result=="cancel"){
                         d_cancel=true;
                     }else if(result=="skip"){
                         downloading_item.progress = "skip";
                     }else if(result=="error"){
+                        downloading_item.state = donwload_state.error;
                         downloading_item.progress = "error";
                     }
                     downloading_index = grid_table.dataView.getRowById(video_id);
                     // downloading_item.progress = "cancel";
                     grid_table.grid.updateCell(downloading_index, column_index);
+
+                    save();
+
                     if(d_cancel){
                         // downloading_index = grid_table.dataView.getRowById(video_id);
                         // downloading_item.progress = "cancel";

@@ -12,10 +12,6 @@
         }
     </style>
 
-    <div class="control-container">
-        <button>test</button>
-        <button>test2</button>
-    </div>
     <div class="download-grid-container">
         <div class="download-grid"></div>
     </div>
@@ -94,19 +90,19 @@
             donwload_item_store.save(); 
         };
 
-        const createMenu = () => {
-            const nemu_templete = [
-                { label: "Play", click() {
-                    //TODO
-                }},
-                { label: "delete", click() {
-                    const ids = deleteSelectedItems();
-                    obs.trigger("search-page:delete-download-ids", ids);
-                }},
-            ];
-            return Menu.buildFromTemplate(nemu_templete);
-        };
-        const context_menu = createMenu();
+        // const createMenu = () => {
+        //     const nemu_templete = [
+        //         { label: "Play", click() {
+        //             //TODO
+        //         }},
+        //         { label: "delete", click() {
+        //             const ids = deleteSelectedItems();
+        //             obs.trigger("search-page:delete-download-ids", ids);
+        //         }},
+        //     ];
+        //     return Menu.buildFromTemplate(nemu_templete);
+        // };
+        // const context_menu = createMenu();
 
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".download-grid"));
@@ -178,7 +174,7 @@
             grid_table.grid.registerPlugin(moveRowsPlugin); 
 
             grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
+                this.opts.contextmenu.popup({window: remote.getCurrentWindow()});
             });
 
             try {
@@ -216,6 +212,19 @@
                 }
             });
             save();
+        });
+
+        obs.on("delete-selected-items", (cb) => {
+            const items = grid_table.getSelectedDatas();
+            items.forEach(value => {
+                grid_table.dataView.deleteItem(value.id);
+            });
+            save();
+
+            const ids = items.map(value => {
+                return value.id;
+            });
+            cb(ids);
         });
 
         obs.on("get-download-item-callback", (cb) => {

@@ -400,6 +400,15 @@
         grid_table.grid.render();
     });
 
+    obs.on("search-page:complete-download-ids", (ids)=> {
+        ids.forEach(id => {
+            const item = grid_table.dataView.getItemById(id);
+            item.saved = true;
+            grid_table.dataView.updateItem(id, item);
+        });
+        grid_table.grid.render();
+    });
+
     const resizeGridTable = () => {
         const container = this.root.querySelector(".search-grid-container");
         grid_table.resizeFitContainer(container);

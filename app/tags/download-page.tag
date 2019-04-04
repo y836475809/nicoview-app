@@ -211,7 +211,9 @@
 
         obs.on("delete-download-items", (video_ids) => {
             video_ids.forEach(video_id => {
-                grid_table.dataView.deleteItem(video_id);
+                if(hasItem(video_id)){
+                    grid_table.dataView.deleteItem(video_id);
+                }
             });
             save();
         });

@@ -12,8 +12,8 @@
     </style>
 
     <div class="control-container">
-        <button onclick={onclickStartDownload}>test</button>
-        <button onclick={onclickStopDownload}>test2</button>
+        <button onclick={onclickStartDownload}>start</button>
+        <button onclick={onclickStopDownload}>stop</button>
     </div>
     <download-list contextmenu={this.context_menu}></download-list>
 

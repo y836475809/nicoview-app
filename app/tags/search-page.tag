@@ -392,19 +392,29 @@
     });
 
     obs.on("search-page:delete-download-ids", (ids)=> {
+        if(grid_table.dataView.getLength()===0){
+            return;
+        }
         ids.forEach(id => {
             const item = grid_table.dataView.getItemById(id);
-            item.reg_download = false;
-            grid_table.dataView.updateItem(id, item);
+            if(item!==undefined){
+                item.reg_download = false;
+                grid_table.dataView.updateItem(id, item);
+            }
         });
         grid_table.grid.render();
     });
 
     obs.on("search-page:complete-download-ids", (ids)=> {
+        if(grid_table.dataView.getLength()===0){
+            return;
+        }
         ids.forEach(id => {
             const item = grid_table.dataView.getItemById(id);
-            item.saved = true;
-            grid_table.dataView.updateItem(id, item);
+            if(item!==undefined){
+                item.saved = true;
+                grid_table.dataView.updateItem(id, item);
+            }
         });
         grid_table.grid.render();
     });

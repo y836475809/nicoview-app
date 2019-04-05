@@ -19,7 +19,6 @@
     <script>
         /* globals app_base_dir obs */
         const { remote } = require("electron");
-        const { Menu } = remote;
         require("slickgrid/lib/jquery.event.drag-2.3.0");
         require("slickgrid/lib/jquery.event.drop-2.3.0");
         require("slickgrid/plugins/slick.rowmovemanager");
@@ -71,18 +70,6 @@
 
         const hasItem = (id) => {
             return grid_table.dataView.getRowById(id) !== undefined;
-        };
-
-        const deleteSelectedItems = () => {
-            const items = grid_table.getSelectedDatas();
-            items.forEach(value => {
-                grid_table.dataView.deleteItem(value.id);
-            });
-            save();
-
-            return items.map(value => {
-                return value.id;
-            });
         };
 
         const save = () => {
@@ -269,13 +256,17 @@
         });
         obs.on("start-download", async(download) => {
             d_cancel = false;
-            const column_index = grid_table.grid.getColumnIndex("progress");
+            const column_index = grid_table.grid.getColumnIndex("state");
 
             const done_video_ids = [];
             let downloading_index = 0;
             let downloading_item = grid_table.dataView.getItemByIdx(downloading_index);
             let video_id = downloading_item.id;
             while(!d_cancel){
+                if(downloading_item.state===donwload_state.complete){
+                    done_video_ids.push(video_id);
+                }
+                
                 if(!done_video_ids.includes(video_id)){ 
                     await wait(()=>{return d_cancel;}, (state)=>{ 
                         downloading_index = grid_table.dataView.getRowById(video_id);

@@ -408,6 +408,10 @@ class writeBufStream extends stream.Writable {
         this.writable = false;
         this.emit.apply(this, ["close"]);
     }
+
+    close() {
+        this.end();
+    }
 }
 
 const setupNicoDownloadNock = (target_nock, {

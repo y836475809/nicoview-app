@@ -28,6 +28,11 @@ class DownloadRequest {
         return new Promise(async (resolve, reject) => {
             let content_len = 0;
             let current = 0 ;
+            let error_obj = null;
+            const closeWithError = (error) => {
+                error_obj = error;
+                stream.close();
+            };
             const options = {
                 method: "GET",
                 uri: this.url, 
@@ -36,25 +41,18 @@ class DownloadRequest {
             };
             this.req = request(options, (error, res, body) => {
                 if(error){
-                    reject(error);
+                    closeWithError(error);
                 }
                 else if(!validateStatus(res.statusCode)){
-                    reject(new Error(`${res.statusCode}:${this.url}`));
+                    closeWithError(new Error(`${res.statusCode}:${this.url}`));
                 }
             }).on("error", (error) => {
-                reject(error);
+                closeWithError(error);
             }).on("response", (res) => {
                 if(validateStatus(res.statusCode)){
                     content_len = res.headers["content-length"];
-
-                    stream.on("error", (error) => { 
-                        reject(error);
-                    }).on("close", () => {
-                        on_progress("finish");
-                        resolve();
-                    });
                 }else{
-                    reject(new Error(`${res.statusCode}:${this.url}`));
+                    closeWithError(new Error(`${res.statusCode}:${this.url}`));
                 }
             }).on("data", (chunk) => {
                 if(content_len > 0){
@@ -70,7 +68,18 @@ class DownloadRequest {
                 if(this.canceled){
                     const error = new Error("cancel");
                     error.cancel = true;
-                    reject(error);
+                    closeWithError(error);
+                }
+            });
+
+            stream.on("error", (error) => { 
+                reject(error);
+            }).on("close", () => {
+                if(error_obj!=null){
+                    reject(error_obj);
+                }else{
+                    on_progress("finish");
+                    resolve();
                 }
             });
 

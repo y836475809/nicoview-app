@@ -296,7 +296,10 @@
                         downloading_item.progress = "finish";
                     }else if(result=="cancel"){
                         d_cancel=true;
+                        downloading_item.state = donwload_state.pre_download;
+                        downloading_item.progress = "cancel";
                     }else if(result=="skip"){
+                        downloading_item.state = donwload_state.pre_download;
                         downloading_item.progress = "skip";
                     }else if(result=="error"){
                         downloading_item.state = donwload_state.error;

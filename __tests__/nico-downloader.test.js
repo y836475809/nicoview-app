@@ -32,6 +32,11 @@ class TestNicoDownloader extends NicoNicoDownloader {
     constructor(video_id, dist_dir, only_max_quality=true){
         super(video_id, dist_dir, only_max_quality);
         this.map = new Map();
+        this.rename_map = new Map();
+    }
+
+    async _renameTmp(oldname, newname){
+        this.rename_map.set(oldname, newname);
     }
 
     _createStream(dist_path){
@@ -64,7 +69,9 @@ test("downloader dmc", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc" , "100%", "finish", "stop HB"]);
+        "start getting thumbimg", "start getting dmc" , "100%", "finish", "stop HB",
+        "writting data", "rename video file"
+    ]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const item = nico_down.getDownloadedItem();
@@ -87,8 +94,10 @@ test("downloader dmc", async (t) => {
         t.is(data, "thumbnail");
     }
     {
-        const writer = nico_down.map.get(path.join(dist_dir, "sm12345678.mp4"));
+        const video_path = path.join(dist_dir, "-video.tmp");
+        const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video dmc");
+        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
     }
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
@@ -136,7 +145,9 @@ test("downloader smile", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile" , "100%", "finish"]);
+        "start getting thumbimg", "start getting smile" , "100%", "finish",
+        "writting data", "rename video file"
+    ]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const item = nico_down.getDownloadedItem();
@@ -159,8 +170,10 @@ test("downloader smile", async (t) => {
         t.is(data, "thumbnail");
     }
     {
-        const writer = nico_down.map.get(path.join(dist_dir, "sm12345678.mp4"));
+        const video_path = path.join(dist_dir, "-video.tmp");
+        const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video smile");
+        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
     }
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
@@ -208,7 +221,9 @@ test("downloader dmc low quality", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB"]);
+        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB",
+        "writting data", "rename video file"
+    ]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const item = nico_down.getDownloadedItem();
@@ -236,7 +251,9 @@ test("downloader smile low quality", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile", "100%", "finish"]);
+        "start getting thumbimg", "start getting smile", "100%", "finish",
+        "writting data", "rename video file"
+    ]);
     t.deepEqual(result, { state: "ok", reason: "" });
 
     const item = nico_down.getDownloadedItem();

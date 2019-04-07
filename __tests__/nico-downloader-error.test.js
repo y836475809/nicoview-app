@@ -34,6 +34,9 @@ class TestNicoDownloader extends NicoNicoDownloader {
         this.thumbimg_error = false;
     }
 
+    async _renameTmp(oldname, newname){
+    }
+
     streamError(){
         this.stream_error = true;
     }
@@ -361,7 +364,10 @@ test("downloader save thumbinfo error", async (t) => {
         log.push(state);
     }); 
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo"]); 
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
+        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "writting data"
+    ]); 
     t.is(result.state,  "error");
     t.is(result.reason.message, "write thumbinfo error");
 });
@@ -376,7 +382,10 @@ test("downloader save comment error", async (t) => {
         log.push(state);
     }); 
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet"]); 
+        "start getting watch", "start getting thumbinfo", "start getting commnet",
+        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "writting data"
+    ]); 
     t.is(result.state,  "error");
     t.is(result.reason.message, "write commnet error");
 });
@@ -392,7 +401,9 @@ test("downloader save thumbimg error", async (t) => {
     }); 
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg"]);
+        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "writting data"
+    ]); 
     t.is(result.state,  "error");
     t.is(result.reason.message, "write thumbimg error");
 });

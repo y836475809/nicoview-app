@@ -78,17 +78,16 @@ class NicoDownLoadMocks {
     } 
 
     dmc_session({delay=1, code=200} = {}){
-        const cp_dmc_session = createSession(this.id);
-
         this.dmc_session_nock = nock("https://api.dmc.nico");
         this.dmc_session_nock
             .post("/api/sessions")
             .query({ _format: "json" })   
             .delay(delay)
             .reply((uri, reqbody)=>{
+                const id = reqbody.session.recipe_id.match(/\d+/);
                 return [code, {
                     meta: { status: 201,message: "created" },
-                    data: cp_dmc_session
+                    data: createSession(id)
                 }];                    
             });
     }
@@ -143,7 +142,7 @@ class NicoDownLoadMocks {
         this.dmc_video_nock
             .get(`/hlsvod/ht2_nicovideo/nicovideo-sm${this.id}`)
             .delay(delay)
-            .replyWithFile(code, file_path, headers);   
+            .replyWithFile(code, file_path, headers);  
     }
 
     smile_video({delay=1, code=200, quality=""} = {}){

@@ -61,7 +61,7 @@
                     obs.trigger("add-library-item", item);
                     return result.state;
                 }else {
-                    console.log("reason: ", result.reason);
+                    console.log("reason: ", result);
                     return result.state;
                 }
             });

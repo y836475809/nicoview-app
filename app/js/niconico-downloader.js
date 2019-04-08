@@ -165,7 +165,7 @@ class NicoNicoDownloader {
             this._writeBinary(this.nico_json.thumbImgPath, thumbImg_data);
 
             on_progress("rename video file");
-            this._renameTmp(tmp_video_path, this.nico_json.videoPath);
+            await this._renameTmp(tmp_video_path, this.nico_json.videoPath);
 
             return {
                 state: "ok",

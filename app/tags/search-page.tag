@@ -448,7 +448,7 @@
                 const video_ids = items.map(value => {
                     return value.id;
                 });
-                obs.trigger("delete-download-items", video_ids);
+                obs.trigger("download-page:delete-download-items", video_ids);
                 items.forEach(value => {       
                     const item = grid_table.dataView.getItemById(value.id);
                     item.reg_download = false;

@@ -192,7 +192,7 @@
             save();
         });
 
-        obs.on("delete-download-items", (video_ids) => {
+        obs.on("download-list:delete-download-items", (video_ids) => {
             video_ids.forEach(video_id => {
                 if(hasItem(video_id)){
                     grid_table.dataView.deleteItem(video_id);
@@ -201,7 +201,7 @@
             save();
         });
 
-        obs.on("delete-selected-items", (cb) => {
+        obs.on("download-list:delete-selected-items", (cb) => {
             const items = grid_table.getSelectedDatas();
             items.forEach(value => {
                 grid_table.dataView.deleteItem(value.id);
@@ -295,7 +295,7 @@
                         downloading_item.state = donwload_state.complete;
                         downloading_item.progress = "finish";
                     }else if(result=="cancel"){
-                        d_cancel=true;
+                        // d_cancel=true;
                         downloading_item.state = donwload_state.pre_download;
                         downloading_item.progress = "cancel";
                     }else if(result=="skip"){

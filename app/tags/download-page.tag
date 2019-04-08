@@ -34,7 +34,12 @@
                     //TODO
                 }},
                 { label: "delete", click() {
-                    obs.trigger("delete-selected-items", (deleted_ids)=>{ 
+                    obs.trigger("download-list:delete-selected-items", (deleted_ids)=>{
+                        if(nico_down!=null){
+                            if(deleted_ids.includes(nico_down.video_id)){
+                                nico_down.cancel();
+                            }
+                        }    
                         obs.trigger("search-page:delete-download-ids", deleted_ids);
                     });
                 }},
@@ -42,7 +47,7 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
         this.context_menu = createMenu();
-        
+
         let is_cancel = false;
         let nico_down = null;
 
@@ -74,6 +79,15 @@
             }
             obs.trigger("cancel-download");
         };
+
+        obs.on("download-page:delete-download-items", (video_ids) => {
+            if(nico_down!=null){
+                if(video_ids.includes(nico_down.video_id)){
+                    nico_down.cancel();
+                }
+            }   
+            obs.trigger("download-list:delete-download-items", video_ids);  
+        });
 
         this.on("mount", () => {
             

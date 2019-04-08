@@ -191,3 +191,63 @@ test("library get data", async (t) => {
         ]
     );
 });
+
+test("library add item", async (t) => {
+    const library = new Library();
+    await library.init("test.db", true);
+    const dirpath_list = [
+        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+    ];
+    await library.setData(dirpath_list, []);
+
+    const item1 ={
+        _data_type:"video", 
+        _db_type:"json", 
+        dirpath: "C:/data",
+        video_id: "sm1",      
+        video_name: "サンプル1",
+        video_filename: "sm1.mp4",
+        video_type: "mp4",
+        max_quality: true,
+        time: 0,
+        pub_date: 0,
+        tags: []
+    };
+    await library.addItem(item1);
+    await library.addItem(item1);
+    {
+        const data = await library.getLibraryData();
+        t.is(1, data.length);
+    }
+
+    const item2 ={
+        _data_type:"video", 
+        _db_type:"json", 
+        dirpath: "C:/data",
+        video_id: "sm1",      
+        video_name: "サンプル1 update",
+        video_filename: "sm1.mp4",
+        video_type: "mp4",
+        max_quality: true,
+        time: 0,
+        pub_date: 0,
+        tags: ["tag1"]
+    };
+    await library.addItem(item2);
+    {
+        const data = await library.getLibraryData();
+        t.is(1, data.length);
+    }
+    {
+        const data = await library._getVideoInfo("sm1");
+        t.is(data.video_id, "sm1");
+        t.is(data.dirpath_id, 1);
+        t.is(data.video_name, "サンプル1 update");
+        t.is(data.video_type, "mp4");
+        t.is(data.dirpath_id, 1);
+        t.is(data.is_economy, false);
+        t.is(data.time, 0);
+        t.is(data.pub_date, 0);
+        t.deepEqual(data.tags, ["tag1"]);
+    }
+});

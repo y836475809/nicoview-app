@@ -177,6 +177,15 @@ class GridTable {
         this.dataView.reSort();
     }
 
+    updateItem(item, id){
+        if(this.dataView.getItemById(id) === undefined){
+            this.dataView.addItem(item);     
+        }else{
+            this.dataView.updateItem(id, item);
+        }
+        this.dataView.reSort();
+    }
+
     setFilter(filter){
         this.filter = filter;
     }

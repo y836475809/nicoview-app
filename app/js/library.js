@@ -118,7 +118,7 @@ class Library {
             pub_date: item.pub_date,
             tags: item.tags
         };
-        await this._setData(this.db, [library_item]);
+        await this._updateData(this.db, library_item);
     }
 
     getLibraryItem(video_id){
@@ -207,7 +207,19 @@ class Library {
         return new Promise((resolve, reject) => {
             db.insert(data_list, (err, new_doc) => {
                 if(err){
-                    reject(reject);
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    }
+
+    _updateData(db, data) {
+        return new Promise((resolve, reject) => {
+            db.update({ video_id: data.video_id }, data, { upsert: true }, (err, numReplaced, upsert) => {
+                if(err){
+                    reject(err);
                     return;
                 }
                 resolve();

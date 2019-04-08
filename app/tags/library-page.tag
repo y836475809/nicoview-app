@@ -235,7 +235,7 @@
         //TODO
         await library.addItem(item);
         const library_item = await library.getLibraryItem(item.video_id);
-        grid_table.addItem(library_item);
+        grid_table.updateItem(library_item, library_item.id);
     });  
 
     const importDB = async (sqlite_file_path)=>{

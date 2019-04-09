@@ -94,7 +94,7 @@ test("downloader dmc", async (t) => {
         t.is(data, "thumbnail");
     }
     {
-        const video_path = path.join(dist_dir, "-video.tmp");
+        const video_path = path.join(dist_dir, "_video.tmp");
         const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video dmc");
         t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
@@ -170,7 +170,7 @@ test("downloader smile", async (t) => {
         t.is(data, "thumbnail");
     }
     {
-        const video_path = path.join(dist_dir, "-video.tmp");
+        const video_path = path.join(dist_dir, "_video.tmp");
         const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video smile");
         t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));

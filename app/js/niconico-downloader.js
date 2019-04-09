@@ -368,7 +368,7 @@ class NicoNicoDownloader {
     }
 
     _getTmpVideoPath(){
-        return path.join(this.dist_dir, "-video.tmp");
+        return path.join(this.dist_dir, "_video.tmp");
     }
 
     _writeJson(file_path, data){

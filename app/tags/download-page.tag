@@ -48,14 +48,10 @@
         };
         this.context_menu = createMenu();
 
-        let is_cancel = false;
         let nico_down = null;
 
         this.onclickStartDownload = (e) => {
             obs.trigger("start-download", async (video_id, on_progress)=>{
-                if(is_cancel){
-                    return "cancel";
-                }
                 nico_down = new NicoNicoDownloader(video_id, library_dir);
                 const result = await nico_down.download((state)=>{
                     on_progress(state);
@@ -73,7 +69,6 @@
         };
 
         this.onclickStopDownload = (e) => {
-            is_cancel = true;
             if(nico_down){
                 nico_down.cancel();
             }

@@ -431,12 +431,8 @@
             }},
             { label: "download", click() {
                 const items = grid_table.getSelectedDatas();
+                obs.trigger("download-page:add-download-items", items);
                 items.forEach(value => {
-                    obs.trigger("add-download-item", {
-                        thumb_img: value.thumb_img,
-                        id: value.id,
-                        name: value.name
-                    });
                     const item = grid_table.dataView.getItemById(value.id);
                     item.reg_download = true;
                     grid_table.dataView.updateItem(value.id, item);

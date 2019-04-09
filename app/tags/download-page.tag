@@ -80,6 +80,10 @@
             obs.trigger("cancel-download");
         };
 
+        obs.on("download-page:add-download-items", (items) => {
+            obs.trigger("download-list:add-download-items", items);  
+        });
+
         obs.on("download-page:delete-download-items", (video_ids) => {
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){

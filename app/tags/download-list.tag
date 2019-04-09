@@ -186,22 +186,27 @@
             save();
         });
 
-        obs.on("add-download-item", (item) => {
-            const items = grid_table.dataView.getItems();
-            const f = items.find(value=>{
-                return value.id == item.id;
+        obs.on("download-list:add-download-items", (items) => {
+            items.forEach(item => {
+                const dv_items = grid_table.dataView.getItems();
+                const fd_item = dv_items.find(value=>{
+                    return value.id == item.id;
+                });
+                if(fd_item===undefined){
+                    item["visible"] = true;
+                    item["state"] = donwload_state.pre_download;
+                    item["progress"] = "";
+                    grid_table.dataView.addItem(item);
+                }else{
+                    grid_table.dataView.deleteItem(fd_item.id);
+                    fd_item["visible"] = true;
+                    fd_item["state"] = donwload_state.pre_download;
+                    fd_item["progress"] = "";
+                    grid_table.dataView.addItem(fd_item);
+                }
             });
-            if(f===undefined){
-                item["visible"] = true;
-                item["state"] = donwload_state.pre_download;
-                item["progress"] = "";
-                grid_table.dataView.addItem(item);
-            }else{
-                f["visible"] = true;
-                f["state"] = donwload_state.pre_download;
-                f["progress"] = "";
-            }
 
+            grid_table.dataView.refresh();
             save();
         });
 

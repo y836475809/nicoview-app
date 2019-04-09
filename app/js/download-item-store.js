@@ -27,7 +27,9 @@ class DownloadItemStore {
 
     //TODO
     save(){
-        const items = this.items.map(value => {
+        const items = this.items.filter(value => {
+            return value.visible === true;
+        }).map(value => {
             return {
                 thumb_img: value.thumb_img,
                 id: value.id,

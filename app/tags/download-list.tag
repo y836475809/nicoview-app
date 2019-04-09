@@ -228,6 +228,8 @@
                 item.visible = false;
             });
             grid_table.dataView.refresh();
+            grid_table.grid.setSelectedRows([]);
+            grid_table.grid.resetActiveCell();
             save();
 
             const ids = items.map(value => {

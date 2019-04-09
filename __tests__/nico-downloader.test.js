@@ -69,7 +69,7 @@ test("downloader dmc", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc" , "100%", "finish", "stop HB",
+        "start getting thumbimg", "start getting dmc" , "0.0MB 100%", "finish", "stop HB",
         "writting data", "rename video file"
     ]);
     t.deepEqual(result, { state: "ok", reason: "" });
@@ -145,7 +145,7 @@ test("downloader smile", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile" , "100%", "finish",
+        "start getting thumbimg", "start getting smile" , "0.0MB 100%", "finish",
         "writting data", "rename video file"
     ]);
     t.deepEqual(result, { state: "ok", reason: "" });
@@ -221,7 +221,7 @@ test("downloader dmc low quality", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB",
+        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB",
         "writting data", "rename video file"
     ]);
     t.deepEqual(result, { state: "ok", reason: "" });
@@ -251,7 +251,7 @@ test("downloader smile low quality", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile", "100%", "finish",
+        "start getting thumbimg", "start getting smile", "0.0MB 100%", "finish",
         "writting data", "rename video file"
     ]);
     t.deepEqual(result, { state: "ok", reason: "" });

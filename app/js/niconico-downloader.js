@@ -9,6 +9,11 @@ const validateStatus = (status) => {
     return status >= 200 && status < 300;
 };
 
+const convertMB = (size_byte) => {
+    const mb = 1024**2;
+    return (size_byte/mb).toFixed(1);
+};
+
 class DownloadRequest {
     constructor(url, cookie){
         this.url = url;
@@ -61,8 +66,7 @@ class DownloadRequest {
                     current += chunk.length;
                     const cur_per = Math.floor((current/content_len)*100);
                     if(cur_per > pre_per){
-                        // console.log("progress: ", cur_per, "%");
-                        on_progress(`${cur_per}%`);
+                        on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
                     }
                 }
             }).on("abort", () => {

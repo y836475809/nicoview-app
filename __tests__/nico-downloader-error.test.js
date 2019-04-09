@@ -365,7 +365,7 @@ test("downloader save thumbinfo error", async (t) => {
     }); 
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
         "writting data"
     ]); 
     t.is(result.state,  "error");
@@ -383,7 +383,7 @@ test("downloader save comment error", async (t) => {
     }); 
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
         "writting data"
     ]); 
     t.is(result.state,  "error");
@@ -401,7 +401,7 @@ test("downloader save thumbimg error", async (t) => {
     }); 
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "finish", "stop HB", 
+        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
         "writting data"
     ]); 
     t.is(result.state,  "error");
@@ -419,7 +419,7 @@ test("downloader save dmc error", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "100%", "stop HB"]);
+        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "stop HB"]);
     t.is(result.state,  "error");
     t.is(result.reason.message, "stream error");
 });
@@ -435,7 +435,7 @@ test("downloader save smile error", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile", "100%"]);
+        "start getting thumbimg", "start getting smile", "0.0MB 100%"]);
     t.is(result.state,  "error");
     t.is(result.reason.message, "stream error");
 });

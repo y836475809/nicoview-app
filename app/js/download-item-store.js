@@ -15,7 +15,8 @@ class DownloadItemStore {
                     id: value.id,
                     name: value.name,
                     state: value.state,
-                    progress: ""
+                    progress: "",
+                    visible: true
                 };       
             });
         } catch (error) {

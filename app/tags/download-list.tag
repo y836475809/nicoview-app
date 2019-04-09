@@ -77,6 +77,10 @@
             donwload_item_store.save(); 
         };
 
+        const filter = (item) => {
+            return item["visible"]===true;
+        };
+
         // const createMenu = () => {
         //     const nemu_templete = [
         //         { label: "Play", click() {
@@ -93,7 +97,7 @@
 
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".download-grid"));
-
+            
             grid_table.dataView.onRowCountChanged.subscribe((e, args) => {
                 grid_table.grid.updateRowCount();
                 grid_table.grid.render();
@@ -171,6 +175,7 @@
                 console.log("donwload item load error=", error);
                 grid_table.setData([]); 
             }
+            grid_table.dataView.setFilter(filter);
 
             resizeGridTable();
         });
@@ -182,12 +187,20 @@
         });
 
         obs.on("add-download-item", (item) => {
-            if(hasItem(item.id)){
-                return;
+            const items = grid_table.dataView.getItems();
+            const f = items.find(value=>{
+                return value.id == item.id;
+            });
+            if(f===undefined){
+                item["visible"] = true;
+                item["state"] = donwload_state.pre_download;
+                item["progress"] = "";
+                grid_table.dataView.addItem(item);
+            }else{
+                f["visible"] = true;
+                f["state"] = donwload_state.pre_download;
+                f["progress"] = "";
             }
-            item["state"] = donwload_state.pre_download;
-            item["progress"] = "";
-            grid_table.dataView.addItem(item);
 
             save();
         });
@@ -195,17 +208,21 @@
         obs.on("download-list:delete-download-items", (video_ids) => {
             video_ids.forEach(video_id => {
                 if(hasItem(video_id)){
-                    grid_table.dataView.deleteItem(video_id);
+                    const item = grid_table.dataView.getItemById(video_id);
+                    item.visible = false;
                 }
             });
+            grid_table.dataView.refresh();
             save();
         });
 
         obs.on("download-list:delete-selected-items", (cb) => {
             const items = grid_table.getSelectedDatas();
             items.forEach(value => {
-                grid_table.dataView.deleteItem(value.id);
+                const item = grid_table.dataView.getItemById(value.id);
+                item.visible = false;
             });
+            grid_table.dataView.refresh();
             save();
 
             const ids = items.map(value => {
@@ -218,7 +235,9 @@
             const items = grid_table.dataView.getItems();
             const id_set = new Set();
             items.forEach(value => {
-                id_set.add(value.id);
+                if(value.visible){
+                    id_set.add(value.id);
+                }
             });   
             cb(id_set);
         });
@@ -227,18 +246,6 @@
             resizeGridTable();
         });
 
-        // let dl = null;
-        let d_cancel = false;
-
-        const ff = async (count, do_cancel, on_progress) => {
-            for (let index = 0; index < count; index++) {
-                if(do_cancel()){
-                    break;
-                }
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                on_progress(`${index}/${count}`);
-            }   
-        };
         const wait = async (do_cancel, on_progress) => {
             for (let index = wait_time; index >= 0; index--) {
                 if(do_cancel()){
@@ -248,88 +255,123 @@
                 on_progress(`wait ${index}`);
             }   
         };
+
+        const updateGridItem = (video_id, progress, state=null) =>{
+            const row_index = grid_table.dataView.getRowById(video_id);
+            if(row_index===undefined){
+                return;
+            }
+            const column_index = grid_table.grid.getColumnIndex("state");     
+            const item = grid_table.dataView.getItemById(video_id);
+            if(item.visible===false){
+                return;
+            }
+            item.progress = progress;
+            if(state!=null){
+                item.state = state;
+            }
+            grid_table.grid.updateCell(row_index, column_index);
+        };
+
+        const canDownload = (video_id) =>{
+            const items = grid_table.dataView.getItems();
+            const f = items.find(value=>{
+                return value.id == video_id;
+            });
+            if(f===undefined){
+                return false;
+            }
+            if(f.visible===false){
+                return false;
+            }
+            return f.state === donwload_state.pre_download;
+        };
+
+        const getNextVideoID = (video_id) => {
+            const items = grid_table.dataView.getItems();
+            let index = items.findIndex(value=>{
+                return value.id == video_id;
+            });
+            if(index===-1){
+                throw new Error(`not find ${video_id}`);
+            }
+            index++;
+            if(index >= items.length){
+                return undefined;
+            }
+
+            let next_item = items[index];
+            if(next_item.visible===false){
+                while(index < items.length){  
+                    next_item = items[index];
+                    if(next_item.visible===true){
+                        return next_item.id;
+                    }
+                    index++;
+                }
+                return undefined;
+            }
+            return next_item.id;
+        };
+
+        let d_cancel = false;
+
         obs.on("cancel-download", async() => {
             d_cancel = true;
-            // if(dl){
-            //     dl.cancel();
-            // }
         });
         obs.on("start-download", async(download) => {
             d_cancel = false;
-            const column_index = grid_table.grid.getColumnIndex("state");
-
-            const done_video_ids = [];
-            let downloading_index = 0;
-            let downloading_item = grid_table.dataView.getItemByIdx(downloading_index);
-            let video_id = downloading_item.id;
+            const first_item = grid_table.dataView.getItemByIdx(0);
+            let video_id = first_item.id;
             while(!d_cancel){
-                if(downloading_item.state===donwload_state.complete){
-                    done_video_ids.push(video_id);
-                }
-                
-                if(!done_video_ids.includes(video_id)){ 
-                    await wait(()=>{return d_cancel;}, (state)=>{ 
-                        downloading_index = grid_table.dataView.getRowById(video_id);
-                        downloading_item.progress = state;
-                        grid_table.grid.updateCell(downloading_index, column_index);
-                    });
-                    if(d_cancel){
-                        downloading_index = grid_table.dataView.getRowById(video_id);
-                        downloading_item.progress = "cancel";
-                        grid_table.grid.updateCell(downloading_index, column_index);                   
+                if(!canDownload(video_id)){
+                    video_id = getNextVideoID(video_id);
+                    if(video_id===undefined){
                         break;
                     }
-                    // dl = downloaderCreater(video_id);
-                    
-                    // const result = await dl.download((state)=>{ 
-                    //     downloading_index = grid_table.dataView.getRowById(video_id);
-                    //     downloading_item.progress = `${video_id}: ${state}`; 
-                    //     grid_table.grid.updateCell(downloading_index, column_index);
-                    // });
-                    const result = await download(video_id, (state)=>{ 
-                        downloading_index = grid_table.dataView.getRowById(video_id);
-                        downloading_item.progress = `${video_id}: ${state}`; 
-                        grid_table.grid.updateCell(downloading_index, column_index);
+                    if(video_id===false){
+                        continue;
+                    }   
+                }
+                await wait(()=>{ return d_cancel || !hasItem(video_id);}, 
+                    (state)=>{ 
+                        updateGridItem(video_id, state);
                     });
-                    if(result=="ok"){
-                        downloading_item.state = donwload_state.complete;
-                        downloading_item.progress = "finish";
-                    }else if(result=="cancel"){
-                        // d_cancel=true;
-                        downloading_item.state = donwload_state.pre_download;
-                        downloading_item.progress = "cancel";
-                    }else if(result=="skip"){
-                        downloading_item.state = donwload_state.pre_download;
-                        downloading_item.progress = "skip";
-                    }else if(result=="error"){
-                        downloading_item.state = donwload_state.error;
-                        downloading_item.progress = "error";
-                    }
-                    downloading_index = grid_table.dataView.getRowById(video_id);
-                    // downloading_item.progress = "cancel";
-                    grid_table.grid.updateCell(downloading_index, column_index);
-
-                    save();
-
-                    if(d_cancel){
-                        // downloading_index = grid_table.dataView.getRowById(video_id);
-                        // downloading_item.progress = "cancel";
-                        // grid_table.grid.updateCell(downloading_index, column_index);                   
+                if(!hasItem(video_id)){
+                    video_id = getNextVideoID(video_id);
+                    if(video_id===undefined){
                         break;
                     }
-                    // await ff(5, ()=>{return d_cancel;}, (state)=>{ 
-                    //     downloading_index = grid_table.dataView.getRowById(video_id);
-                    //     downloading_item.progress = `${video_id}: ${state}`; 
-                    //     grid_table.grid.updateCell(downloading_index, column_index);
-                    // });
-                    done_video_ids.push(video_id);
+                    continue;
                 }
-                downloading_index++;
-                if(downloading_index>=grid_table.dataView.getLength()){
+                if(d_cancel){
+                    updateGridItem(video_id, "cancel");
                     break;
                 }
-                downloading_item = grid_table.dataView.getItemByIdx(downloading_index);
-                video_id = downloading_item.id;
+
+                const result = await download(video_id, (state)=>{ 
+                    updateGridItem(video_id, `${video_id}: ${state}`);
+                });
+                if(result=="ok"){
+                    updateGridItem(video_id, "finish", donwload_state.complete);
+                }else if(result=="cancel"){
+                    updateGridItem(video_id, "cancel", donwload_state.pre_download);
+                }else if(result=="skip"){
+                    updateGridItem(video_id, "skip", donwload_state.pre_download);
+                }else if(result=="error"){
+                    updateGridItem(video_id, "error", donwload_state.error);
+                }
+
+                save();
+
+                if(d_cancel){               
+                    break;
+                }
+
+                video_id = getNextVideoID(video_id);
+                if(video_id===undefined){
+                    break;
+                }
             }
         });
     </script>

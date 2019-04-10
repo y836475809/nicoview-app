@@ -31,16 +31,16 @@
         const wait_time = 5;
 
         const donwload_state = Object.freeze({
-            pre_download: 0,
+            wait: 0,
             complete: 1,
             error: 2
         });
 
         //TODO
         const message_map = new Map([
-            [donwload_state.pre_download, "未"],
-            [donwload_state.complete, "完了"],
-            [donwload_state.error, "失敗"],
+            [donwload_state.wait, "待機"],
+            [donwload_state.complete, "ダウンロード完了"],
+            [donwload_state.error, "ダウンロード失敗"],
         ]);
 
         //TODO
@@ -60,8 +60,9 @@
             rowHeight: 100,
             enableCellNavigation: true,
             enableColumnReorder: false,
+            _saveColumnWidth: true
         };
-        const grid_table = new GridTable("download-grid", columns, options);
+        const grid_table = new GridTable("download-item-grid", columns, options);
 
         const resizeGridTable = () => {
             const container = this.root.querySelector(".download-grid-container");
@@ -80,20 +81,6 @@
         const filter = (item) => {
             return item["visible"]===true;
         };
-
-        // const createMenu = () => {
-        //     const nemu_templete = [
-        //         { label: "Play", click() {
-        //             //TODO
-        //         }},
-        //         { label: "delete", click() {
-        //             const ids = deleteSelectedItems();
-        //             obs.trigger("search-page:delete-download-ids", ids);
-        //         }},
-        //     ];
-        //     return Menu.buildFromTemplate(nemu_templete);
-        // };
-        // const context_menu = createMenu();
 
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".download-grid"));
@@ -168,6 +155,10 @@
                 this.opts.contextmenu.popup({window: remote.getCurrentWindow()});
             });
 
+            grid_table.onDblClick((e, data)=>{
+                obs.trigger("main-page:play-by-videoid", data.id);
+            });
+
             try {
                 donwload_item_store.load(); 
                 grid_table.setData(donwload_item_store.getItems());
@@ -194,13 +185,13 @@
                 });
                 if(fd_item===undefined){
                     item["visible"] = true;
-                    item["state"] = donwload_state.pre_download;
+                    item["state"] = donwload_state.wait;
                     item["progress"] = "";
                     grid_table.dataView.addItem(item);
                 }else{
                     grid_table.dataView.deleteItem(fd_item.id);
                     fd_item["visible"] = true;
-                    fd_item["state"] = donwload_state.pre_download;
+                    fd_item["state"] = donwload_state.wait;
                     fd_item["progress"] = "";
                     grid_table.dataView.addItem(fd_item);
                 }
@@ -301,7 +292,7 @@
             if(f.visible===false){
                 return false;
             }
-            return f.state === donwload_state.pre_download;
+            return f.state === donwload_state.wait;
         };
 
         const getNextVideoID = (video_id) => {
@@ -372,9 +363,9 @@
                 if(result=="ok"){
                     updateGridItem(video_id, "finish", donwload_state.complete);
                 }else if(result=="cancel"){
-                    updateGridItem(video_id, "cancel", donwload_state.pre_download);
+                    updateGridItem(video_id, "cancel", donwload_state.wait);
                 }else if(result=="skip"){
-                    updateGridItem(video_id, "skip", donwload_state.pre_download);
+                    updateGridItem(video_id, "skip", donwload_state.wait);
                 }else if(result=="error"){
                     updateGridItem(video_id, "error", donwload_state.error);
                 }

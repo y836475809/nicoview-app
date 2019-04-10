@@ -42,9 +42,6 @@
 
         const createMenu = () => {
             const nemu_templete = [
-                { label: "Play", click() {
-                    //TODO
-                }},
                 { label: "delete", click() {
                     obs.trigger("download-list:delete-selected-items", (deleted_ids)=>{
                         if(nico_down!=null){

@@ -65,6 +65,7 @@
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
+- [ ] GridTable.resizeFitContainerのマージン「- 5」を削除する
 - [x] ニコニコ動画検索
   - [ ] 次のページへ移動したら項目の選択状態を解除する
   - [x] playerのタグクリックで検索

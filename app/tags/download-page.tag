@@ -14,6 +14,7 @@
     <div class="control-container">
         <button onclick={onclickStartDownload}>start</button>
         <button onclick={onclickStopDownload}>stop</button>
+        <button onclick={onclickClearDownloadedItems}>clear</button>
     </div>
     <download-list contextmenu={this.context_menu}></download-list>
 
@@ -73,6 +74,10 @@
                 nico_down.cancel();
             }
             obs.trigger("cancel-download");
+        };
+
+        this.onclickClearDownloadedItems = () => {
+            obs.trigger("download-list:clear-downloaded-items");  
         };
 
         obs.on("download-page:add-download-items", (items) => {

@@ -238,6 +238,16 @@
             cb(ids);
         });
 
+        obs.on("download-list:clear-downloaded-items", () => {
+            const items = grid_table.dataView.getItems();
+            items.forEach(item => {
+                if(item.state === donwload_state.complete){
+                    grid_table.dataView.deleteItem(item.id);
+                }
+            });
+            save();
+        });
+
         obs.on("get-download-item-callback", (cb) => {
             const items = grid_table.dataView.getItems();
             const id_set = new Set();

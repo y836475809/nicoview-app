@@ -6,15 +6,26 @@
             background-color: var(--control-color);
         }
 
+        .download-button { 
+            margin: auto;
+            width: 100px;
+            height: 30px;
+        }
+
+        .download-button.clear {
+            margin-left: 100px;
+        } 
+
         .control-container{
+            padding: 3px;
             background-color: var(--control-color);
         }
     </style>
 
     <div class="control-container">
-        <button onclick={onclickStartDownload}>start</button>
-        <button onclick={onclickStopDownload}>stop</button>
-        <button onclick={onclickClearDownloadedItems}>clear</button>
+        <button class="download-button" onclick={onclickStartDownload}>start</button>
+        <button class="download-button" onclick={onclickStopDownload}>stop</button>
+        <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
     </div>
     <download-list contextmenu={this.context_menu}></download-list>
 

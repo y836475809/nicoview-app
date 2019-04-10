@@ -32,13 +32,14 @@
 
         const donwload_state = Object.freeze({
             wait: 0,
-            complete: 1,
-            error: 2
+            downloading: 1,
+            complete: 2,
+            error: 3
         });
 
-        //TODO
         const message_map = new Map([
             [donwload_state.wait, "待機"],
+            [donwload_state.downloading, "ダウンロード中"],
             [donwload_state.complete, "ダウンロード完了"],
             [donwload_state.error, "ダウンロード失敗"],
         ]);
@@ -264,7 +265,7 @@
             }   
         };
 
-        const updateGridItem = (video_id, progress, state=null) =>{
+        const updateGridItem = (video_id, progress, state) =>{
             const row_index = grid_table.dataView.getRowById(video_id);
             if(row_index===undefined){
                 return;
@@ -275,9 +276,7 @@
                 return;
             }
             item.progress = progress;
-            if(state!=null){
-                item.state = state;
-            }
+            item.state = state;
             grid_table.grid.updateCell(row_index, column_index);
         };
 
@@ -342,8 +341,8 @@
                     }   
                 }
                 await wait(()=>{ return d_cancel || !hasItem(video_id);}, 
-                    (state)=>{ 
-                        updateGridItem(video_id, state);
+                    (progress)=>{ 
+                        updateGridItem(video_id, progress, donwload_state.wait);
                     });
                 if(!hasItem(video_id)){
                     video_id = getNextVideoID(video_id);
@@ -353,12 +352,12 @@
                     continue;
                 }
                 if(d_cancel){
-                    updateGridItem(video_id, "cancel");
+                    updateGridItem(video_id, "cancel", donwload_state.wait);
                     break;
                 }
 
-                const result = await download(video_id, (state)=>{ 
-                    updateGridItem(video_id, `${video_id}: ${state}`);
+                const result = await download(video_id, (progress)=>{ 
+                    updateGridItem(video_id, `${video_id}: ${progress}`, donwload_state.downloading);
                 });
                 if(result=="ok"){
                     updateGridItem(video_id, "finish", donwload_state.complete);

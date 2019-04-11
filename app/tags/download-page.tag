@@ -66,22 +66,7 @@
         let cancel_donwload = false;
 
         this.onclickStartDownload = (e) => {
-            cancel_donwload = false;
-            startDownload(async (video_id, on_progress)=>{
-                nico_down = new NicoNicoDownloader(video_id, library_dir);
-                const result = await nico_down.download((state)=>{
-                    on_progress(state);
-                });  
-                if(result.state=="ok"){
-                    const item = nico_down.getDownloadedItem();
-                    obs.trigger("search-page:complete-download-ids", [item.video_id]);
-                    obs.trigger("add-library-item", item);
-                    return result.state;
-                }else {
-                    console.log("reason: ", result);
-                    return result.state;
-                }
-            });
+            startDownload();
         };
 
         this.onclickStopDownload = (e) => {
@@ -125,7 +110,8 @@
             }   
         };
 
-        const startDownload = async(download) => {
+        const startDownload = async() => {
+            cancel_donwload = false;
             const first_item = grid_table_dl.getItemByIdx(0);
             let video_id = first_item.id;
             while(!cancel_donwload){
@@ -138,7 +124,7 @@
                         continue;
                     }   
                 }
-                
+
                 await wait(()=>{ 
                     return cancel_donwload || !grid_table_dl.hasItem(video_id);
                 }, (progress)=>{ 
@@ -153,21 +139,29 @@
                     continue;
                 }
                 if(cancel_donwload){
-                    grid_table_dl.updateItem(video_id, "cancel", donwload_state.wait);
+                    grid_table_dl.updateItem(video_id, "キャンセル", donwload_state.wait);
                     break;
                 }
 
-                const result = await download(video_id, (progress)=>{ 
+                nico_down = new NicoNicoDownloader(video_id, library_dir);
+                const result = await nico_down.download((progress)=>{
                     grid_table_dl.updateItem(video_id, `${progress}`, donwload_state.downloading);
                 });
-                if(result=="ok"){
-                    grid_table_dl.updateItem(video_id, "finish", donwload_state.complete);
-                }else if(result=="cancel"){
-                    grid_table_dl.updateItem(video_id, "cancel", donwload_state.wait);
-                }else if(result=="skip"){
-                    grid_table_dl.updateItem(video_id, "skip", donwload_state.wait);
-                }else if(result=="error"){
-                    grid_table_dl.updateItem(video_id, "error", donwload_state.error);
+                const state = result.state;
+                const reason = result.reason;
+
+                if(state=="ok"){
+                    grid_table_dl.updateItem(video_id, "終了", donwload_state.complete);
+                    const item = nico_down.getDownloadedItem();
+                    obs.trigger("search-page:complete-download-ids", [item.video_id]);
+                    obs.trigger("add-library-item", item);   
+                }else if(state=="cancel"){
+                    grid_table_dl.updateItem(video_id, "キャンセル", donwload_state.wait);
+                }else if(state=="skip"){ 
+                    grid_table_dl.updateItem(video_id, "スキップ", donwload_state.wait);
+                }else if(state=="error"){
+                    console.log("reason: ", reason);
+                    grid_table_dl.updateItem(video_id, `エラー: ${reason.message}`, donwload_state.error);
                 }
 
                 grid_table_dl.save();

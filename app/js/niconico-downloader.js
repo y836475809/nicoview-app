@@ -93,6 +93,13 @@ class DownloadRequest {
     }
 }
 
+const DownloadResultType = Object.freeze({
+    complete: "complete",
+    cancel: "cancel",
+    skip: "skip",
+    error: "error"
+});
+
 class NicoNicoDownloader {
     constructor(video_id, dist_dir, only_max_quality=true){
         this.video_id = video_id;
@@ -100,6 +107,10 @@ class NicoNicoDownloader {
         this.only_max_quality = only_max_quality;
 
         this.nico_json = new NicoJsonFile();
+    }
+
+    static get ResultType(){
+        return DownloadResultType;
     }
 
     cancel(){
@@ -135,8 +146,8 @@ class NicoNicoDownloader {
             if(this.only_max_quality){
                 if(!this.videoinfo.maxQuality){
                     return {
-                        state: "skip",
-                        reason: "low quality"
+                        type: DownloadResultType.skip,
+                        reason: "最高画質でないため"
                     };
                 }
             }
@@ -172,19 +183,19 @@ class NicoNicoDownloader {
             await this._renameTmp(tmp_video_path, this.nico_json.videoPath);
 
             return {
-                state: "ok",
+                type: DownloadResultType.complete,
                 reason: ""
             };
         } catch (error) {
             if(error.cancel){
                 return {
-                    state: "cancel",
+                    type: DownloadResultType.cancel,
                     reason: "cancel"
                 };
             }
 
             return {
-                state: "error",
+                type: DownloadResultType.error,
                 reason: error
             };
         }

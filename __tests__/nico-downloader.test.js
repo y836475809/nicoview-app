@@ -72,7 +72,7 @@ test("downloader dmc", async (t) => {
         "start getting thumbimg", "start getting dmc" , "0.0MB 100%", "finish", "stop HB",
         "writting data", "rename video file"
     ]);
-    t.deepEqual(result, { state: "ok", reason: "" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
@@ -148,7 +148,7 @@ test("downloader smile", async (t) => {
         "start getting thumbimg", "start getting smile" , "0.0MB 100%", "finish",
         "writting data", "rename video file"
     ]);
-    t.deepEqual(result, { state: "ok", reason: "" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
@@ -224,7 +224,7 @@ test("downloader dmc low quality", async (t) => {
         "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB",
         "writting data", "rename video file"
     ]);
-    t.deepEqual(result, { state: "ok", reason: "" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
@@ -254,7 +254,7 @@ test("downloader smile low quality", async (t) => {
         "start getting thumbimg", "start getting smile", "0.0MB 100%", "finish",
         "writting data", "rename video file"
     ]);
-    t.deepEqual(result, { state: "ok", reason: "" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
@@ -280,7 +280,7 @@ test("downloader cancel dmc low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "skip", reason: "low quality" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.skip, reason: "最高画質でないため" });
 });
 
 test("downloader cancel smile low quality", async (t) => {
@@ -291,7 +291,7 @@ test("downloader cancel smile low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "skip", reason: "low quality" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.skip, reason: "最高画質でないため" });
 });
 
 test("downloader cancel watch", async (t) => {
@@ -307,7 +307,7 @@ test("downloader cancel watch", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel dmc_session", async (t) => {
@@ -323,7 +323,7 @@ test("downloader cancel dmc_session", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel comment", async (t) => {
@@ -340,7 +340,7 @@ test("downloader cancel comment", async (t) => {
     });  
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet"]);
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel thumbnail", async (t) => {
@@ -358,7 +358,7 @@ test("downloader cancel thumbnail", async (t) => {
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg"]);
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel dmc_hb options", async (t) => {
@@ -376,7 +376,7 @@ test("downloader cancel dmc_hb options", async (t) => {
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc"]);
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel dmc_video", async (t) => {
@@ -394,7 +394,7 @@ test("downloader cancel dmc_video", async (t) => {
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting dmc", "stop HB"]); 
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
 test("downloader cancel smile_video", async (t) => {
@@ -412,5 +412,5 @@ test("downloader cancel smile_video", async (t) => {
     t.deepEqual(log, [
         "start getting watch", "start getting thumbinfo", "start getting commnet",
         "start getting thumbimg", "start getting smile"]); 
-    t.deepEqual(result, { state: "cancel", reason: "cancel" });
+    t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });

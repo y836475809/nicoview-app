@@ -134,7 +134,7 @@ class GridTableDownloadItem {
                 id_set.add(value.id);
             }
         });
-        return id_set;    
+        return id_set;
     }
 
     addItems(items, state){
@@ -204,7 +204,7 @@ class GridTableDownloadItem {
         if(row_index===undefined){
             return;
         }
-        const column_index = this.grid_table.grid.getColumnIndex("state");     
+        const column_index = this.grid_table.grid.getColumnIndex("state");
         const item = this.grid_table.dataView.getItemById(video_id);
         if(item.visible===false){
             return;

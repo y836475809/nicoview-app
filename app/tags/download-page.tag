@@ -16,13 +16,13 @@
             margin-left: 100px;
         } 
 
-        .control-container{
+        .download-control-container{
             padding: 3px;
             background-color: var(--control-color);
         }
     </style>
 
-    <div class="control-container">
+    <div class="download-control-container">
         <button class="download-button" onclick={onclickStartDownload}>start</button>
         <button class="download-button" onclick={onclickStopDownload}>stop</button>
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
@@ -65,26 +65,6 @@
         let nico_down = null;
         let cancel_donwload = false;
 
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".download-grid-container");
-            grid_table_dl.resizeFitContainer(container);
-        };
-
-        const createMenu = () => {
-            const nemu_templete = [
-                { label: "delete", click() {
-                    const deleted_ids = grid_table_dl.deleteSelectedItems();
-                    if(nico_down!=null){
-                        if(deleted_ids.includes(nico_down.video_id)){
-                            nico_down.cancel();
-                        }
-                    } 
-                    obs.trigger("search-page:delete-download-ids", deleted_ids);
-                }},
-            ];
-            return Menu.buildFromTemplate(nemu_templete);
-        };
-        
         this.onclickStartDownload = (e) => {
             cancel_donwload = false;
             startDownload(async (video_id, on_progress)=>{
@@ -113,52 +93,27 @@
 
         this.onclickClearDownloadedItems = () => {
             grid_table_dl.clearItems(donwload_state.complete);
+        }; 
+
+        const resizeGridTable = () => {
+            const container = this.root.querySelector(".download-grid-container");
+            grid_table_dl.resizeFitContainer(container);
         };
 
-        obs.on("download-page:add-download-items", (items) => {
-            grid_table_dl.addItems(items, donwload_state.wait);
-        });
-
-        obs.on("download-page:delete-download-items", (video_ids) => {
-            if(nico_down!=null){
-                if(video_ids.includes(nico_down.video_id)){
-                    nico_down.cancel();
-                }
-            }
-            grid_table_dl.deleteItems(video_ids);  
-        });
-
-        this.on("mount", () => {
-            grid_table_dl = new GridTableDownloadItem(
-                this.root.querySelector(".download-grid"), htmlFormatter);
-            
-            const context_menu = createMenu();
-            try {
-                grid_table_dl.init((e)=>{
-                    context_menu.popup({window: remote.getCurrentWindow()});
-                },(e, data)=>{
-                    obs.trigger("main-page:play-by-videoid", data.id);
-                });                
-            } catch (error) {
-                console.log("donwload item load error=", error);
-            }
-
-            resizeGridTable();            
-        });
-
-        // obs.on("set-download-items", (items) => {
-        //     grid_table.setData(items);
-        //     save();
-        // });
-
-        obs.on("get-download-item-callback", (cb) => { 
-            const id_set = grid_table_dl.getItemIDSet();
-            cb(id_set);
-        });
-
-        obs.on("resizeEndEvent", (size)=> {
-            resizeGridTable();
-        });
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "delete", click() {
+                    const deleted_ids = grid_table_dl.deleteSelectedItems();
+                    if(nico_down!=null){
+                        if(deleted_ids.includes(nico_down.video_id)){
+                            nico_down.cancel();
+                        }
+                    } 
+                    obs.trigger("search-page:delete-download-ids", deleted_ids);
+                }},
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
 
         const wait = async (do_cancel, on_progress) => {
             for (let index = wait_time; index >= 0; index--) {
@@ -183,10 +138,13 @@
                         continue;
                     }   
                 }
-                await wait(()=>{ return cancel_donwload || !grid_table_dl.hasItem(video_id);}, 
-                    (progress)=>{ 
-                        grid_table_dl.updateItem(video_id, progress, donwload_state.wait);
-                    });
+                
+                await wait(()=>{ 
+                    return cancel_donwload || !grid_table_dl.hasItem(video_id);
+                }, (progress)=>{ 
+                    grid_table_dl.updateItem(video_id, progress, donwload_state.wait);
+                });
+
                 if(!grid_table_dl.hasItem(video_id)){
                     video_id = grid_table_dl.getNextVideoID(video_id);
                     if(video_id===undefined){
@@ -224,5 +182,45 @@
                 }
             }
         };
+
+        obs.on("download-page:add-download-items", (items) => {
+            grid_table_dl.addItems(items, donwload_state.wait);
+        });
+
+        obs.on("download-page:delete-download-items", (video_ids) => {
+            if(nico_down!=null){
+                if(video_ids.includes(nico_down.video_id)){
+                    nico_down.cancel();
+                }
+            }
+            grid_table_dl.deleteItems(video_ids);  
+        });
+
+        this.on("mount", () => {
+            grid_table_dl = new GridTableDownloadItem(
+                this.root.querySelector(".download-grid"), htmlFormatter);
+            
+            const context_menu = createMenu();
+            try {
+                grid_table_dl.init((e)=>{
+                    context_menu.popup({window: remote.getCurrentWindow()});
+                },(e, data)=>{
+                    obs.trigger("main-page:play-by-videoid", data.id);
+                });                
+            } catch (error) {
+                console.log("donwload item load error=", error);
+            }
+
+            resizeGridTable();
+        });
+
+        obs.on("get-download-item-callback", (cb) => { 
+            const id_set = grid_table_dl.getItemIDSet();
+            cb(id_set);
+        });
+
+        obs.on("resizeEndEvent", (size)=> {
+            resizeGridTable();
+        });
     </script>
 </download-page>

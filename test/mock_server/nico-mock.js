@@ -142,6 +142,7 @@ class NicoDownLoadMocks {
         this.dmc_video_nock
             .get(`/hlsvod/ht2_nicovideo/nicovideo-sm${this.id}`)
             .delay(delay)
+            .times(50)
             .replyWithFile(code, file_path, headers);  
     }
 
@@ -157,6 +158,7 @@ class NicoDownLoadMocks {
             .get("/smile")
             .query({ m: `${this.id}.67759${quality}`})
             .delay(delay)
+            .times(50)
             .replyWithFile(code, file_path, headers);   
     }
 }

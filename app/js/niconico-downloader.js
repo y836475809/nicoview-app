@@ -135,7 +135,7 @@ class NicoNicoDownloader {
             if(this.only_max_quality){
                 if(!this.videoinfo.maxQuality){
                     return {
-                        state: "cancel",
+                        state: "skip",
                         reason: "low quality"
                     };
                 }

@@ -280,7 +280,7 @@ test("downloader cancel dmc low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "cancel", reason: "low quality" });
+    t.deepEqual(result, { state: "skip", reason: "low quality" });
 });
 
 test("downloader cancel smile low quality", async (t) => {
@@ -291,7 +291,7 @@ test("downloader cancel smile low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, ["start getting watch"]);
-    t.deepEqual(result, { state: "cancel", reason: "low quality" });
+    t.deepEqual(result, { state: "skip", reason: "low quality" });
 });
 
 test("downloader cancel watch", async (t) => {

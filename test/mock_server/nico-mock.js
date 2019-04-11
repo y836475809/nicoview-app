@@ -72,6 +72,7 @@ class NicoDownLoadMocks {
         this.watch_nock
             .get(`/watch/sm${this.id}`)
             .delay(delay)
+            .times(Infinity)
             .reply(code, (uri, requestBody) => {
                 return MockNicoUitl.getWatchHtml(this.id);
             }, headers);
@@ -83,6 +84,7 @@ class NicoDownLoadMocks {
             .post("/api/sessions")
             .query({ _format: "json" })   
             .delay(delay)
+            .times(Infinity)
             .reply((uri, reqbody)=>{
                 const id = reqbody.session.recipe_id.match(/\d+/);
                 return [code, {
@@ -97,6 +99,7 @@ class NicoDownLoadMocks {
         this.comment_nock
             .post("/api.json/")
             .delay(delay)
+            .times(Infinity)
             .reply((uri, reqbody)=>{
                 return [code, comment];
             });
@@ -108,6 +111,7 @@ class NicoDownLoadMocks {
             .get("/smile")
             .query({ i: `${this.id}.L` }) 
             .delay(delay)
+            .times(Infinity)
             .replyWithFile(code, `${__dirname}/data/sm${this.id}.jpeg`, {
                 "Content-Type": "image/jpeg",
             });
@@ -125,7 +129,7 @@ class NicoDownLoadMocks {
             .post(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(post_delay)
-            .times(50)
+            .times(Infinity)
             .reply((uri, reqbody)=>{
                 return [code, "ok"];
             });
@@ -142,7 +146,7 @@ class NicoDownLoadMocks {
         this.dmc_video_nock
             .get(`/hlsvod/ht2_nicovideo/nicovideo-sm${this.id}`)
             .delay(delay)
-            .times(50)
+            .times(Infinity)
             .replyWithFile(code, file_path, headers);  
     }
 
@@ -158,7 +162,7 @@ class NicoDownLoadMocks {
             .get("/smile")
             .query({ m: `${this.id}.67759${quality}`})
             .delay(delay)
-            .times(50)
+            .times(Infinity)
             .replyWithFile(code, file_path, headers);   
     }
 }

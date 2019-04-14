@@ -14,6 +14,19 @@ const convertMB = (size_byte) => {
     return (size_byte/mb).toFixed(1);
 };
 
+const DonwloadProgMsg =  Object.freeze({   
+    start_watch: "start getting watch",
+    start_thumbinfo: "start getting thumbinfo",
+    start_comment: "start getting commnet",
+    start_thumbimg: "start getting thumbimg",
+    start_dmc: "start getting dmc",
+    start_smile: "start getting smile",
+    write_data: "writting data",
+    complete: "finish",
+    rename_video_file: "rename video file",
+    stop_hb: "stop HB",
+});
+
 class DownloadRequest {
     constructor(url, cookie){
         this.url = url;
@@ -83,7 +96,7 @@ class DownloadRequest {
                 if(error_obj!=null){
                     reject(error_obj);
                 }else{
-                    on_progress("finish");
+                    on_progress(DonwloadProgMsg.complete);
                     resolve();
                 }
             });
@@ -139,7 +152,7 @@ class NicoNicoDownloader {
 
     async download(on_progress){
         try {
-            on_progress("start getting watch");
+            on_progress(DonwloadProgMsg.start_watch);
             await this._getWatchData(this.video_id);
             await this._getVideoInfo();
 
@@ -154,32 +167,32 @@ class NicoNicoDownloader {
 
             this._setupNicoFilePath();
 
-            on_progress("start getting thumbinfo");
+            on_progress(DonwloadProgMsg.start_thumbinfo);
             const thumbInfo_data = this._getThumbInfo();
 
-            on_progress("start getting commnet");
+            on_progress(DonwloadProgMsg.start_comment);
             const comment_data = await this._getCommnet();
 
 
-            on_progress("start getting thumbimg");
+            on_progress(DonwloadProgMsg.start_thumbimg);
             const thumbImg_data = await this._getThumbImg();
 
             const tmp_video_path = this._getTmpVideoPath();
             const stream = this._createStream(tmp_video_path);
             if(this.videoinfo.server=="dmc"){
-                on_progress("start getting dmc");
+                on_progress(DonwloadProgMsg.start_dmc);
                 await this._getVideoDmc(stream, on_progress);
             }else{
-                on_progress("start getting smile");
+                on_progress(DonwloadProgMsg.start_smile);
                 await this._getVideoSmile(stream, on_progress);
             }
 
-            on_progress("writting data");
+            on_progress(DonwloadProgMsg.write_data);
             this._writeJson(this.nico_json.thumbInfoPath, thumbInfo_data);
             this._writeJson(this.nico_json.commentPath, comment_data);
             this._writeBinary(this.nico_json.thumbImgPath, thumbImg_data);
 
-            on_progress("rename video file");
+            on_progress(DonwloadProgMsg.rename_video_file);
             await this._renameTmp(tmp_video_path, this.nico_json.videoPath);
 
             return {
@@ -320,7 +333,7 @@ class NicoNicoDownloader {
             throw error;
         }finally{
             this.nico_video.stopHeartBeat();
-            on_progress("stop HB");
+            on_progress(DonwloadProgMsg.stop_hb);
         }
     }
 
@@ -420,5 +433,6 @@ class NicoNicoDownloader {
 }
 
 module.exports = {
+    DonwloadProgMsg: DonwloadProgMsg,
     NicoNicoDownloader: NicoNicoDownloader
 };

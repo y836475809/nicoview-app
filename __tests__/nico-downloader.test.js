@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
+const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/niconico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico_mock");
 
 const data_api_data = TestData.data_api_data;
@@ -68,9 +68,11 @@ test("downloader dmc", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc" , "0.0MB 100%", "finish", "stop HB",
-        "writting data", "rename video file"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc , "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.stop_hb,
+        DonwloadProgMsg.write_data, DonwloadProgMsg.rename_video_file
     ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
@@ -144,9 +146,11 @@ test("downloader smile", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile" , "0.0MB 100%", "finish",
-        "writting data", "rename video file"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile , "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.write_data, 
+        DonwloadProgMsg.rename_video_file
     ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
@@ -220,9 +224,11 @@ test("downloader dmc low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB",
-        "writting data", "rename video file"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.stop_hb,
+        DonwloadProgMsg.write_data, DonwloadProgMsg.rename_video_file
     ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
@@ -250,9 +256,11 @@ test("downloader smile low quality", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile", "0.0MB 100%", "finish",
-        "writting data", "rename video file"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile, "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.write_data, 
+        DonwloadProgMsg.rename_video_file
     ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.complete, reason: "" });
 
@@ -279,7 +287,7 @@ test("downloader cancel dmc low quality", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });  
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.skip, reason: "最高画質でないため" });
 });
 
@@ -290,7 +298,7 @@ test("downloader cancel smile low quality", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });  
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.skip, reason: "最高画質でないため" });
 });
 
@@ -306,7 +314,7 @@ test("downloader cancel watch", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });  
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -322,7 +330,7 @@ test("downloader cancel dmc_session", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });  
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -339,7 +347,9 @@ test("downloader cancel comment", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment
+    ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -356,8 +366,9 @@ test("downloader cancel thumbnail", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg
+    ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -374,8 +385,10 @@ test("downloader cancel dmc_hb options", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc
+    ]);
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -392,8 +405,10 @@ test("downloader cancel dmc_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "stop HB"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, DonwloadProgMsg.stop_hb
+    ]); 
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
@@ -410,7 +425,9 @@ test("downloader cancel smile_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile
+    ]); 
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });

@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoNicoDownloader } = require("../app/js/niconico-downloader");
+const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/niconico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico_mock");
 
 const video_id = TestData.video_id;
@@ -81,7 +81,7 @@ test("downloader timeout watch", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch"]); 
+        DonwloadProgMsg.start_watch]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -94,7 +94,7 @@ test("downloader timeout dmc_session", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch"]); 
+        DonwloadProgMsg.start_watch]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -107,7 +107,9 @@ test("downloader timeout comment", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment
+    ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -120,8 +122,9 @@ test("downloader timeout thumbnail", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg
+    ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -134,8 +137,10 @@ test("downloader timeout dmc_hb", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc
+    ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -148,8 +153,10 @@ test("downloader timeout dmc_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "stop HB"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, DonwloadProgMsg.stop_hb
+    ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -162,8 +169,10 @@ test("downloader timeout smile_video", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile"]); 
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile
+    ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "ESOCKETTIMEDOUT");  
 });
@@ -175,7 +184,7 @@ test("downloader network error watch 404", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -187,7 +196,7 @@ test("downloader network error watch 500", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -199,7 +208,7 @@ test("downloader network error dmc_session 404", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.is(result.type, NicoNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -211,7 +220,7 @@ test("downloader network error dmc_session 500", async (t) => {
     const result = await nico_down.download((state)=>{
         log.push(state);
     });
-    t.deepEqual(log, ["start getting watch"]);
+    t.deepEqual(log, [DonwloadProgMsg.start_watch]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -224,7 +233,9 @@ test("downloader network error comment 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -237,7 +248,9 @@ test("downloader network error comment 500", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -250,8 +263,9 @@ test("downloader network error thumbnail 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -264,8 +278,9 @@ test("downloader network error thumbnail 500", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -278,8 +293,10 @@ test("downloader network error dmc_hb 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -292,8 +309,10 @@ test("downloader network error dmc_hb 500", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -306,8 +325,10 @@ test("downloader network error dmc_video 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "stop HB"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, DonwloadProgMsg.stop_hb
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -320,8 +341,10 @@ test("downloader network error dmc_video 500", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "stop HB"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, DonwloadProgMsg.stop_hb
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -334,8 +357,10 @@ test("downloader network error smile_video 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
@@ -348,8 +373,10 @@ test("downloader network error smile_video 500", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.regex(result.reason.message, /500/);
 });
@@ -364,9 +391,11 @@ test("downloader save thumbinfo error", async (t) => {
         log.push(state);
     }); 
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
-        "writting data"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.stop_hb, 
+        DonwloadProgMsg.write_data
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "write thumbinfo error");
@@ -382,9 +411,11 @@ test("downloader save comment error", async (t) => {
         log.push(state);
     }); 
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
-        "writting data"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.stop_hb, 
+        DonwloadProgMsg.write_data
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "write commnet error");
@@ -400,9 +431,11 @@ test("downloader save thumbimg error", async (t) => {
         log.push(state);
     }); 
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "finish", "stop HB", 
-        "writting data"
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, "0.0MB 100%", 
+        DonwloadProgMsg.complete, DonwloadProgMsg.stop_hb, 
+        DonwloadProgMsg.write_data
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "write thumbimg error");
@@ -418,8 +451,11 @@ test("downloader save dmc error", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting dmc", "0.0MB 100%", "stop HB"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_dmc, "0.0MB 100%", 
+        DonwloadProgMsg.stop_hb
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "stream error");
 });
@@ -434,8 +470,10 @@ test("downloader save smile error", async (t) => {
         log.push(state);
     });  
     t.deepEqual(log, [
-        "start getting watch", "start getting thumbinfo", "start getting commnet",
-        "start getting thumbimg", "start getting smile", "0.0MB 100%"]);
+        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
+        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
+        DonwloadProgMsg.start_smile, "0.0MB 100%"
+    ]);
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "stream error");
 });

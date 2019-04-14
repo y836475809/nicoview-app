@@ -106,7 +106,7 @@
                     break;
                 }
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                on_progress(`wait ${index}`);
+                on_progress(`待機中 ${index}秒`);
             }   
         };
 

@@ -15,16 +15,16 @@ const convertMB = (size_byte) => {
 };
 
 const DonwloadProgMsg =  Object.freeze({   
-    start_watch: "start getting watch",
-    start_thumbinfo: "start getting thumbinfo",
-    start_comment: "start getting commnet",
-    start_thumbimg: "start getting thumbimg",
-    start_dmc: "start getting dmc",
-    start_smile: "start getting smile",
-    write_data: "writting data",
-    complete: "finish",
-    rename_video_file: "rename video file",
-    stop_hb: "stop HB",
+    start_watch: "watch取得",
+    start_thumbinfo: "thumbinfo取得",
+    start_comment: "コメント取得",
+    start_thumbimg: "サムネイル取得",
+    start_dmc: "DMC取得",
+    start_smile: "smile取得",
+    write_data: "データ書き込み",
+    complete: "完了",
+    rename_video_file: "動画ファイルリネーム",
+    stop_hb: "HB停止",
 });
 
 class DownloadRequest {

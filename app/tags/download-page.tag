@@ -20,6 +20,13 @@
             padding: 3px;
             background-color: var(--control-color);
         }
+
+        .download-state-complete {
+            display: inline-block;
+            border-radius: 2px;
+            padding: 3px;
+            background-color: #7fbfff;
+        }
     </style>
 
     <div class="download-control-container">
@@ -55,9 +62,19 @@
             [donwload_state.complete, "ダウンロード完了"],
             [donwload_state.error, "ダウンロード失敗"],
         ]);
+
+        const getDlStateClass = (state) => {
+            if(state==donwload_state.complete){
+                return 'class="download-state-complete"'; // eslint-disable-line
+            }
+
+            return "";
+        };
+
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
             const msg = message_map.get(value);
-            const content = `<div>${msg}</div><div>${dataContext.progress}</div>`;
+            const class_value = getDlStateClass(value);
+            const content = `<div ${class_value}>${msg}</div><div>${dataContext.progress}</div>`;
             return content;
         };
 

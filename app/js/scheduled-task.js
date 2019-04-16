@@ -1,25 +1,14 @@
 
-class sk {
-    constructor(hour){
+class ScheduledTask {
+    constructor(hour, execution){
         this.hour = hour;
+        this.execution = execution;
         this.timer = null;
     }
 
     start(){
         const rest = this._getRestMinutes()+1;
-        this.timer = setTimeout(this.task, 1000*60*rest);
-    }
-
-    task(){
-        if(this.timer){
-            const d = new Date();
-            const h = d.getHours();
-            const m = d.getMinutes();
-            if(h==this.hour && m > 0){
-
-            }
-            this.timer = setTimeout(this.task, 1000*60);
-        }
+        this.timer = setTimeout(this._task, 1000*60*rest);
     }
 
     stop(){        
@@ -27,6 +16,14 @@ class sk {
             clearTimeout(this.timer);
             this.timer = null;  
         }     
+    }
+
+    _task(){
+        if(this.timer){
+            this.execution();
+            const rest = this._getRestMinutes()+1;
+            this.timer = setTimeout(this._task, 1000*60*rest);
+        }
     }
 
     _getRestMinutes(){
@@ -38,3 +35,7 @@ class sk {
         return rest;
     }
 }
+
+module.exports = {
+    ScheduledTask: ScheduledTask
+};

@@ -2,12 +2,12 @@
 class sk {
     constructor(hour){
         this.hour = hour;
-        this.timer = true;
+        this.timer = null;
     }
 
     start(){
-        this.timer = true;
-        setTimeout(this.task, 1000*60);
+        const rest = this._getRestMinutes()+1;
+        this.timer = setTimeout(this.task, 1000*60*rest);
     }
 
     task(){
@@ -15,11 +15,26 @@ class sk {
             const d = new Date();
             const h = d.getHours();
             const m = d.getMinutes();
-            setTimeout(this.task, 1000*60);
+            if(h==this.hour && m > 0){
+
+            }
+            this.timer = setTimeout(this.task, 1000*60);
         }
     }
 
-    stop(){
-        this.timer = false;
+    stop(){        
+        if(this.timer){
+            clearTimeout(this.timer);
+            this.timer = null;  
+        }     
+    }
+
+    _getRestMinutes(){
+        const d = new Date();
+        const rest = (this.hour-d.getHours())*60 - d.getMinutes();
+        if(rest<0){
+            return rest + 24*60;
+        } 
+        return rest;
     }
 }

@@ -33,10 +33,12 @@
         <button class="download-button" onclick={onclickStartDownload}>start</button>
         <button class="download-button" onclick={onclickStopDownload}>stop</button>
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
+        <button class="download-button" onclick={onclickScheduleDialog}>schedule</button>
     </div>
     <div class="download-grid-container">
         <div class="download-grid"></div>
     </div>
+    <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
 
     <script>
         /* globals app_base_dir obs */
@@ -45,6 +47,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
+        require(`${app_base_dir}/tags/download-schedule-dialog.tag`);
 
         const library_dir = SettingStore.getLibraryDir();
 
@@ -96,6 +99,12 @@
         this.onclickClearDownloadedItems = () => {
             grid_table_dl.clearItems(donwload_state.complete);
         }; 
+
+        this.onclickScheduleDialog = () => {
+            this.refs["schedule-dialog"].showModal(0, false, result=>{
+                
+            });            
+        };
 
         const resizeGridTable = () => {
             const container = this.root.querySelector(".download-grid-container");

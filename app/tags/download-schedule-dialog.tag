@@ -47,7 +47,7 @@
     <dialog class="dialog-shadow">
         <div class="container">
             <div class="center-hv">
-                <input type="checkbox" name="schedule-enable">
+                <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
                 <p class="message">{this.message}</p>
                 <select class="houer-select">
                     <option each={hour in options} value={hour} selected={current==hour}>{hour}</option>
@@ -80,13 +80,19 @@
             dialog.close();
         };
 
+        //TODO
         this.onclickButton = (result, e) =>{
             if(this.cb){
-                const elm = this.root.querySelector(".houer-select");
-                const houer = elm.value;
+                const sel_elm = this.root.querySelector(".houer-select");
+                const houer = sel_elm.value;
+
+                const ck_elm = this.root.querySelector(".schedule-enable-check");
+                const enable = ck_elm.checked;
+                
                 this.cb({
-                    result: result,
-                    houer: houer
+                    type: result,
+                    houer: houer,
+                    enable:enable
                 });
             }
             this.close();

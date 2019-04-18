@@ -7,9 +7,9 @@
         }
 
         .download-button { 
-            margin: auto;
             width: 100px;
             height: 30px;
+            margin-right: 5px;
         }
 
         .download-button.clear {
@@ -17,8 +17,19 @@
         } 
 
         .download-control-container{
+            display: flex;
             padding: 3px;
             background-color: var(--control-color);
+        }
+        
+        .download-control-container .schedule-container {
+            display: flex;
+            margin-left: auto;
+        }
+
+        .download-control-container .schedule-container .label {
+            margin-right: 3px;
+            user-select: none;
         }
 
         .download-state-complete {
@@ -30,10 +41,13 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button" onclick={onclickStartDownload}>start</button>
+        <button class="download-button" onclick={onclickStartDownload} disabled={this.ds_btn_diseble}>start</button>
         <button class="download-button" onclick={onclickStopDownload}>stop</button>
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
-        <button class="download-button" onclick={onclickScheduleDialog}>schedule</button>
+        <div class="schedule-container">
+            <div class="label center-hv">download schedule</div>
+            <button class="download-button" onclick={onclickScheduleDialog}>schedule</button>
+        </div>
     </div>
     <div class="download-grid-container">
         <div class="download-grid"></div>
@@ -47,9 +61,15 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
+        const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
         require(`${app_base_dir}/tags/download-schedule-dialog.tag`);
 
         const library_dir = SettingStore.getLibraryDir();
+
+        const donwload_schedule = {
+            houer: SettingStore.getValue("donwload-schedule-houer", 0),
+            enable: SettingStore.getValue("donwload-schedule-enable", false)
+        };
 
         const wait_time = 5;
         const donwload_state = Object.freeze({
@@ -81,12 +101,26 @@
             return content;
         };
 
+        this.ds_btn_diseble = "";
+        let scheduled_task = null;
         let grid_table_dl = null;
         let nico_down = null;
         let cancel_donwload = false;
 
-        this.onclickStartDownload = (e) => {
-            startDownload();
+        this.onclickStartDownload = async(e) => {
+            this.ds_btn_diseble = "disabled";
+            this.update();
+
+            scheduled_task.stop();
+
+            await startDownload();
+
+            if(donwload_schedule.enable==true){
+                scheduled_task.start();
+            }
+
+            this.ds_btn_diseble = "";
+            this.update();
         };
 
         this.onclickStopDownload = (e) => {
@@ -100,9 +134,23 @@
             grid_table_dl.clearItems(donwload_state.complete);
         }; 
 
+        //TODO
         this.onclickScheduleDialog = () => {
-            this.refs["schedule-dialog"].showModal(0, false, result=>{
-                
+            const houer = donwload_schedule.houer;
+            const enable = donwload_schedule.enable;
+            this.refs["schedule-dialog"].showModal(houer, enable, result=>{
+                if(result.type=="ok"){
+                    donwload_schedule.houer = result.houer;
+                    donwload_schedule.enable = result.enable;
+                    SettingStore.setValue("donwload-schedule-houer", donwload_schedule.houer);
+                    SettingStore.setValue("donwload-schedule-enable", donwload_schedule.enable);
+
+                    if(donwload_schedule.enable==true){
+                        scheduled_task.start();
+                    }else{
+                        scheduled_task.stop();
+                    }
+                }
             });            
         };
 
@@ -230,6 +278,14 @@
             }
 
             resizeGridTable();
+
+            const houer = donwload_schedule.houer;
+            scheduled_task = new ScheduledTask(houer, ()=>{
+                startDownload();
+            });
+            if(donwload_schedule.enable==true){
+                scheduled_task.start();
+            }
         });
 
         obs.on("get-download-item-callback", (cb) => { 

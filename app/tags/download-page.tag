@@ -41,7 +41,7 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button" onclick={onclickStartDownload} disabled={this.ds_btn_diseble}>start</button>
+        <button class="download-button" onclick={onclickStartDownload}>start</button>
         <button class="download-button" onclick={onclickStopDownload}>stop</button>
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
         <div class="schedule-container">
@@ -101,15 +101,13 @@
             return content;
         };
 
-        this.ds_btn_diseble = "";
         let scheduled_task = null;
         let grid_table_dl = null;
         let nico_down = null;
         let cancel_donwload = false;
 
         this.onclickStartDownload = async(e) => {
-            this.ds_btn_diseble = "disabled";
-            this.update();
+            e.target.disabled = true;
 
             scheduled_task.stop();
 
@@ -119,8 +117,7 @@
                 scheduled_task.start();
             }
 
-            this.ds_btn_diseble = "";
-            this.update();
+            e.target.disabled = false;
         };
 
         this.onclickStopDownload = (e) => {

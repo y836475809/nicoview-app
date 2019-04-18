@@ -1,6 +1,15 @@
 <download-schedule-dialog>
     <style scoped>
-        .container {
+        dialog {
+            border: solid 1px #aaa;
+            border-radius: 5px;
+        }
+
+        dialog::backdrop {
+            opacity: 0;
+        }
+
+        .download-schedule-dialog .container {
             width: 250px;
             height: 150px;
             display: grid;
@@ -10,29 +19,24 @@
                 "item2";
         }
 
-        dialog {
-            border: solid 1px #aaa;
-            border-radius: 5px;
-        }
-        dialog::backdrop {
-            opacity: 0;
-        }
-
-        .message {
-            grid-area: item1;
-            color: black;
+        .download-schedule-dialog .label {
             user-select: none;
         } 
 
-        .houer-select {
-            width: 100px;
+        .download-schedule-dialog .houer-select {
+            width: 50px;
         }
 
-        .button-container {
+        .download-schedule-dialog .params-container {
+            grid-area: item1;
+            display: flex;
+        }
+
+        .download-schedule-dialog .button-container {
             grid-area: item2;
             margin: auto;
         }
-        .button { 
+        .download-schedule-dialog .button { 
             display: inline-block;
             text-align: center;
             border: 1px solid #aaa;
@@ -44,14 +48,15 @@
         }   
     </style>
 
-    <dialog class="dialog-shadow">
+    <dialog class="download-schedule-dialog dialog-shadow">
         <div class="container">
-            <div class="center-hv">
+            <div class="params-container center-hv">
                 <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
-                <p class="message">{this.message}</p>
+                <div class="label">毎日</div>
                 <select class="houer-select">
                     <option each={hour in options} value={hour} selected={current==hour}>{hour}</option>
                 </select>
+                <div class="label">にダウンロード開始</div>
             </div>
             <div class="button-container">
                 <div class="button" onclick="{this.onclickButton.bind(this,'ok')}">ok</div>

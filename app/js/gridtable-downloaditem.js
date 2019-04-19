@@ -214,7 +214,7 @@ class GridTableDownloadItem {
         this.grid_table.grid.updateCell(row_index, column_index);
     }
 
-    canDownload(video_id, target_state){
+    canDownload(video_id, target_states){
         const items = this.grid_table.dataView.getItems();
         const f = items.find(value=>{
             return value.id == video_id;
@@ -225,7 +225,7 @@ class GridTableDownloadItem {
         if(f.visible===false){
             return false;
         }
-        return f.state === target_state;
+        return target_states.includes(f.state);
     }
 
     getNextVideoID(video_id){

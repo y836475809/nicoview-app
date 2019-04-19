@@ -152,7 +152,7 @@
                     
                     if(donwload_schedule.enable==true){
                         scheduled_task.stop();
-                        scheduled_task = new ScheduledTask(donwload_schedule.date.houer, ()=>{
+                        scheduled_task = new ScheduledTask(donwload_schedule.date, ()=>{
                             startDownload();
                         });
                         scheduled_task.start();
@@ -200,7 +200,7 @@
             const first_item = grid_table_dl.getItemByIdx(0);
             let video_id = first_item.id;
             while(!cancel_donwload){
-                if(!grid_table_dl.canDownload(video_id, donwload_state.wait)){
+                if(!grid_table_dl.canDownload(video_id, [donwload_state.wait, donwload_state.error])){
                     video_id = grid_table_dl.getNextVideoID(video_id);
                     if(video_id===undefined){
                         break;

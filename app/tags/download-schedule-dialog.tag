@@ -52,7 +52,7 @@
     <dialog class="download-schedule-dialog dialog-shadow">
         <div class="container">
             <div class="params-container center-hv">
-                <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
+                <input type="checkbox" class="schedule-enable-check" checked={this.enable} name="schedule-enable">
                 <div class="label">毎日</div>
                 <select class="houer-select">
                     <option each={hour in hours} value={hour} selected={sc_houer==hour}>{hour}</option>
@@ -83,7 +83,7 @@
         this.showModal = (date, enable, cb) => {
             this.sc_houer = date.houer;
             this.sc_minute = date.minute;
-            this.enable = enable;
+            this.enable = enable==true?"checked":"";
             this.cb = cb;
 
             const dialog = this.root.querySelector("dialog");

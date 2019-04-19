@@ -10,7 +10,7 @@
         }
 
         .download-schedule-dialog .container {
-            width: 250px;
+            width: 280px;
             height: 150px;
             display: grid;
             grid-template-rows: 1fr 30px;
@@ -23,7 +23,8 @@
             user-select: none;
         } 
 
-        .download-schedule-dialog .houer-select {
+        .download-schedule-dialog .houer-select,
+        .download-schedule-dialog .minute-select {
             width: 50px;
         }
 
@@ -54,7 +55,11 @@
                 <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
                 <div class="label">毎日</div>
                 <select class="houer-select">
-                    <option each={hour in options} value={hour} selected={current==hour}>{hour}</option>
+                    <option each={hour in hours} value={hour} selected={sc_houer==hour}>{hour}</option>
+                </select>
+                <div class="label"> : </div>
+                <select class="minute-select">
+                    <option each={minute in minutes} value={minute} selected={sc_minute==minute}>{minute}</option>
                 </select>
                 <div class="label">にダウンロード開始</div>
             </div>
@@ -66,13 +71,18 @@
     </dialog>
 
     <script> 
-        this.options = [];
+        this.hours = [];
+        this.minutes = [];
         for (let index = 0; index < 24; index++) {
-            this.options.push(index);
+            this.hours.push(index);
+        }
+        for (let index = 0; index < 60; index++) {
+            this.minutes.push(index);
         }
 
-        this.showModal = (hour, enable, cb) => {
-            this.current = hour;
+        this.showModal = (date, enable, cb) => {
+            this.sc_houer = date.houer;
+            this.sc_minute = date.minute;
             this.enable = enable;
             this.cb = cb;
 
@@ -85,18 +95,20 @@
             dialog.close();
         };
 
-        //TODO
         this.onclickButton = (result, e) =>{
             if(this.cb){
-                const sel_elm = this.root.querySelector(".houer-select");
-                const houer = sel_elm.value;
+                const h_elm = this.root.querySelector(".houer-select");
+                const houer = parseInt(h_elm.value);
+                
+                const m_elm = this.root.querySelector(".minute-select");
+                const minute = parseInt(m_elm.value);
 
                 const ck_elm = this.root.querySelector(".schedule-enable-check");
                 const enable = ck_elm.checked;
                 
                 this.cb({
                     type: result,
-                    houer: houer,
+                    date: {houer: houer, minute: minute},
                     enable:enable
                 });
             }

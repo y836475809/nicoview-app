@@ -68,7 +68,7 @@
         const library_dir = SettingStore.getLibraryDir();
 
         const donwload_schedule = {
-            houer: SettingStore.getValue("donwload-schedule-houer", 0),
+            date: SettingStore.getValue("donwload-schedule-date", {houer:0, minute:0}),
             enable: SettingStore.getValue("donwload-schedule-enable", false)
         };
 
@@ -139,18 +139,22 @@
             grid_table_dl.clearItems(donwload_state.complete);
         }; 
 
-        //TODO
         this.onclickScheduleDialog = () => {
-            const houer = donwload_schedule.houer;
+            const date = donwload_schedule.date;
             const enable = donwload_schedule.enable;
-            this.refs["schedule-dialog"].showModal(houer, enable, result=>{
+            this.refs["schedule-dialog"].showModal(date, enable, result=>{
                 if(result.type=="ok"){
-                    donwload_schedule.houer = result.houer;
-                    donwload_schedule.enable = result.enable;
-                    SettingStore.setValue("donwload-schedule-houer", donwload_schedule.houer);
-                    SettingStore.setValue("donwload-schedule-enable", donwload_schedule.enable);
+                    SettingStore.setValue("donwload-schedule-date", result.date);
+                    SettingStore.setValue("donwload-schedule-enable", result.enable);
 
+                    donwload_schedule.date = result.date;
+                    donwload_schedule.enable = result.enable;
+                    
                     if(donwload_schedule.enable==true){
+                        scheduled_task.stop();
+                        scheduled_task = new ScheduledTask(donwload_schedule.date.houer, ()=>{
+                            startDownload();
+                        });
                         scheduled_task.start();
                     }else{
                         scheduled_task.stop();
@@ -288,8 +292,8 @@
 
             resizeGridTable();
 
-            const houer = donwload_schedule.houer;
-            scheduled_task = new ScheduledTask(houer, ()=>{
+            const date = donwload_schedule.date;
+            scheduled_task = new ScheduledTask(date.houer, ()=>{
                 startDownload();
             });
             if(donwload_schedule.enable==true){

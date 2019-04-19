@@ -6,12 +6,12 @@ let clock = null;
 let log = [];
 let count = 0;
 
-const toMsec = (houer, minute=0) => {
-    return houer*60*60*1000 + minute*60*1000;
+const toMsec = (hour, minute=0) => {
+    return hour*60*60*1000 + minute*60*1000;
 };
 
-const mkDate = (houer, minute) => {
-    return { houer:houer, minute:minute };
+const mkDate = (hour, minute) => {
+    return { hour:hour, minute:minute };
 };
 
 test.beforeEach(t => {

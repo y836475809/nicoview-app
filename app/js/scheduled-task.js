@@ -39,7 +39,7 @@ class ScheduledTask extends EventEmitter{
         const date = new Date();
         date.setTime(date.getTime() - this._toMsec(0, date.getTimezoneOffset(), 0));
 
-        const sc_msec = this._toMsec(this.scheduled_date.houer, this.scheduled_date.minute, 0);
+        const sc_msec = this._toMsec(this.scheduled_date.hour, this.scheduled_date.minute, 0);
         const utc_msec = this._toMsec(date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
         const rest = sc_msec - utc_msec;
         if(rest<=0){

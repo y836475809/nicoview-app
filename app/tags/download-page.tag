@@ -68,7 +68,7 @@
         const library_dir = SettingStore.getLibraryDir();
 
         const donwload_schedule = {
-            date: SettingStore.getValue("donwload-schedule-date", {houer:0, minute:0}),
+            date: SettingStore.getValue("donwload-schedule-date", {hour:0, minute:0}),
             enable: SettingStore.getValue("donwload-schedule-enable", false)
         };
 

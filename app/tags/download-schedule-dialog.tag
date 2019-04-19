@@ -23,7 +23,7 @@
             user-select: none;
         } 
 
-        .download-schedule-dialog .houer-select,
+        .download-schedule-dialog .hour-select,
         .download-schedule-dialog .minute-select {
             width: 50px;
         }
@@ -54,8 +54,8 @@
             <div class="params-container center-hv">
                 <input type="checkbox" class="schedule-enable-check" checked={this.enable} name="schedule-enable">
                 <div class="label">毎日</div>
-                <select class="houer-select">
-                    <option each={hour in hours} value={hour} selected={sc_houer==hour}>{hour}</option>
+                <select class="hour-select">
+                    <option each={hour in hours} value={hour} selected={hour==hour}>{hour}</option>
                 </select>
                 <div class="label"> : </div>
                 <select class="minute-select">
@@ -81,7 +81,7 @@
         }
 
         this.showModal = (date, enable, cb) => {
-            this.sc_houer = date.houer;
+            this.sc_hour = date.hour;
             this.sc_minute = date.minute;
             this.enable = enable==true?"checked":"";
             this.cb = cb;
@@ -97,8 +97,8 @@
 
         this.onclickButton = (result, e) =>{
             if(this.cb){
-                const h_elm = this.root.querySelector(".houer-select");
-                const houer = parseInt(h_elm.value);
+                const h_elm = this.root.querySelector(".hour-select");
+                const hour = parseInt(h_elm.value);
                 
                 const m_elm = this.root.querySelector(".minute-select");
                 const minute = parseInt(m_elm.value);
@@ -108,7 +108,7 @@
                 
                 this.cb({
                     type: result,
-                    date: {houer: houer, minute: minute},
+                    date: {hour: hour, minute: minute},
                     enable:enable
                 });
             }

@@ -12,8 +12,8 @@ class ScheduledTask extends EventEmitter{
     start(){
         this.emit("start");
 
-        const rest = this._getRestMinutes();
-        this.timer = setTimeout(()=>{this._task();}, this._toMsec(rest));
+        const rest = this._getRestMsec();
+        this.timer = setTimeout(()=>{this._task();}, rest);
     }
 
     stop(){        
@@ -30,26 +30,26 @@ class ScheduledTask extends EventEmitter{
             this.emit("execute");
 
             this.execution();
-            const rest = this._getRestMinutes();
-            this.timer = setTimeout(()=>{this._task();}, this._toMsec(rest));
+            const rest = this._getRestMsec();
+            this.timer = setTimeout(()=>{this._task();}, rest);
         }
     }
 
-    _getRestMinutes(){
+    _getRestMsec(){
         const date = new Date();
-        const offset = date.getTimezoneOffset();
-        date.setTime(date.getTime() - this._toMsec(offset));
+        date.setTime(date.getTime() - this._toMsec(0, date.getTimezoneOffset(), 0));
 
-        const minute = this.scheduled_date.houer*60 + this.scheduled_date.minute;
-        const rest = minute - (date.getUTCHours()*60 + date.getUTCMinutes());
+        const sc_msec = this._toMsec(this.scheduled_date.houer, this.scheduled_date.minute, 0);
+        const utc_msec = this._toMsec(date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds());
+        const rest = sc_msec - utc_msec;
         if(rest<=0){
-            return rest + 24*60;
+            return rest + this._toMsec(24, 0, 0);
         } 
         return rest;
     }
 
-    _toMsec(minute){
-        return minute*60*1000;
+    _toMsec(h, m, s){
+        return (h*60*60 + m*60 + s)*1000;
     }
 }
 

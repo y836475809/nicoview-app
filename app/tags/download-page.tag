@@ -41,12 +41,12 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button" onclick={onclickStartDownload}>start</button>
+        <button class="download-button" disabled={this.dl_disabled} onclick={onclickStartDownload}>start</button>
         <button class="download-button" onclick={onclickStopDownload}>stop</button>
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
         <div class="schedule-container">
             <div class="label center-hv">download schedule</div>
-            <button class="download-button" onclick={onclickScheduleDialog}>schedule</button>
+            <button class="download-button" disabled={this.dl_disabled} onclick={onclickScheduleDialog}>schedule</button>
         </div>
     </div>
     <div class="download-grid-container">
@@ -56,6 +56,7 @@
 
     <script>
         /* globals app_base_dir obs */
+        const EventEmitter = require("events");
         const { remote } = require("electron");
         const { Menu } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
@@ -101,14 +102,23 @@
             return content;
         };
 
+        this.dl_disabled = "";
+        const event_em = new EventEmitter(); 
+        event_em.on("donwload-start", ()=>{
+            this.dl_disabled = "disabled";
+            this.update();
+        });
+        event_em.on("donwload-end", ()=>{
+            this.dl_disabled = "";
+            this.update();
+        });
+
         let scheduled_task = null;
         let grid_table_dl = null;
         let nico_down = null;
         let cancel_donwload = false;
 
         this.onclickStartDownload = async(e) => {
-            e.target.disabled = true;
-
             scheduled_task.stop();
 
             await startDownload();
@@ -116,8 +126,6 @@
             if(donwload_schedule.enable==true){
                 scheduled_task.start();
             }
-
-            e.target.disabled = false;
         };
 
         this.onclickStopDownload = (e) => {
@@ -182,6 +190,8 @@
         };
 
         const startDownload = async() => {
+            event_em.emit("donwload-start");
+
             cancel_donwload = false;
             const first_item = grid_table_dl.getItemByIdx(0);
             let video_id = first_item.id;
@@ -244,6 +254,8 @@
                     break;
                 }
             }
+
+            event_em.emit("donwload-end");
         };
 
         obs.on("download-page:add-download-items", (items) => {

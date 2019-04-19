@@ -2,9 +2,9 @@
 const EventEmitter = require("events");
 
 class ScheduledTask extends EventEmitter{
-    constructor(scheduled_hour, execution){
+    constructor(date, execution){
         super();
-        this.scheduled_hour = scheduled_hour;
+        this.scheduled_date = date;
         this.execution = execution;
         this.timer = null;
     }
@@ -12,8 +12,8 @@ class ScheduledTask extends EventEmitter{
     start(){
         this.emit("start");
 
-        const rest = this._getRestMinutes()+1;
-        this.timer = setTimeout(()=>{this._task();}, 1000*60*rest);
+        const rest = this._getRestMinutes();
+        this.timer = setTimeout(()=>{this._task();}, this._toMsec(rest));
     }
 
     stop(){        
@@ -30,16 +30,19 @@ class ScheduledTask extends EventEmitter{
             this.emit("execute");
 
             this.execution();
-            const rest = this._getRestMinutes()+1;
+            const rest = this._getRestMinutes();
             this.timer = setTimeout(()=>{this._task();}, this._toMsec(rest));
         }
     }
 
     _getRestMinutes(){
-        let date = new Date();
-        date = new Date(date.getTime()+this._toMsec(date.getTimezoneOffset()));
-        const rest = (this.scheduled_hour-date.getHours())*60 - date.getMinutes();
-        if(rest<0){
+        const date = new Date();
+        const offset = date.getTimezoneOffset();
+        date.setTime(date.getTime() - this._toMsec(offset));
+
+        const minute = this.scheduled_date.houer*60 + this.scheduled_date.minute;
+        const rest = minute - (date.getUTCHours()*60 + date.getUTCMinutes());
+        if(rest<=0){
             return rest + 24*60;
         } 
         return rest;

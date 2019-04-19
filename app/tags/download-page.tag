@@ -292,8 +292,7 @@
 
             resizeGridTable();
 
-            const date = donwload_schedule.date;
-            scheduled_task = new ScheduledTask(date.houer, ()=>{
+            scheduled_task = new ScheduledTask(donwload_schedule.date, ()=>{
                 startDownload();
             });
             if(donwload_schedule.enable==true){

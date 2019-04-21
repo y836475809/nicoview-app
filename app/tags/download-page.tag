@@ -146,6 +146,10 @@
                 nico_down.cancel();
             }
             cancel_donwload = true;
+
+            if(process.env.NODE_ENV == "DEBUG"){
+                obs.trigger("main-page:cancel-download");
+            }
         };
 
         this.onclickClearDownloadedItems = () => {

@@ -26,17 +26,29 @@
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     const { NicoSearchMocks, NicoDownLoadMocks, setupNicoDownloadNock } = require("./mock_server/nico-mock");
+    
+    process.env.NODE_ENV = "DEBUG";
+    
     const nico_search_mock = new NicoSearchMocks();
     nico_search_mock.search();
 
+    const video_fs = [];
     ["10", "20", "30", "40", "50"].forEach(value => {
-        setupNicoDownloadNock(new NicoDownLoadMocks(value));
+        const dl_nock = new NicoDownLoadMocks(value);
+        setupNicoDownloadNock(dl_nock);
+        video_fs.push(dl_nock);
     });
 
     riot.mount("main-page");
 
     obs.on("on_error", (error)=> {
         console.error(error);
+    });
+
+    obs.on("main-page:cancel-download", () => {
+        video_fs.forEach(value => {
+            value.closeStream();
+        });
     });
 </script>
 

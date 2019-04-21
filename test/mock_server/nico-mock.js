@@ -55,6 +55,7 @@ class NicoSearchMocks {
 class NicoDownLoadMocks {
     constructor(id){
         this.id = id;
+        this.video_fs = null;
     }
 
     clean(){
@@ -135,6 +136,12 @@ class NicoDownLoadMocks {
             });
     } 
 
+    closeStream(){
+        if(this.video_fs){
+            this.video_fs.close();
+        }
+    }
+
     dmc_video({delay=1, code=200} = {}){
         const file_path = `${__dirname}/data/sm${this.id}.mp4`;
         const stat = fs.statSync(file_path);
@@ -147,7 +154,12 @@ class NicoDownLoadMocks {
             .get(`/hlsvod/ht2_nicovideo/nicovideo-sm${this.id}`)
             .delay(delay)
             .times(Infinity)
-            .replyWithFile(code, file_path, headers);  
+            //.replyWithFile(code, file_path, headers);  
+            .reply(code, (uri, requestBody) => {
+                const sbuf = Math.floor(stat.size/(1638000));
+                this.video_fs = fs.createReadStream(file_path, { highWaterMark: sbuf });
+                return this.video_fs;
+            },headers);
     }
 
     smile_video({delay=1, code=200, quality=""} = {}){

@@ -28,7 +28,7 @@
         }
 
         .download-control-container .schedule-container .label {
-            margin-right: 3px;
+            margin-right: 10px;
             user-select: none;
         }
 
@@ -41,11 +41,11 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button" disabled={this.dl_disabled} onclick={onclickStartDownload}>start</button>
-        <button class="download-button" onclick={onclickStopDownload}>stop</button>
-        <button class="download-button clear" onclick={onclickClearDownloadedItems}>clear</button>
+        <button class="download-button" disabled={this.dl_disabled} onclick={onclickStartDownload}>開始</button>
+        <button class="download-button" onclick={onclickStopDownload}>停止</button>
+        <button class="download-button clear" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container">
-            <div class="label center-hv">download schedule</div>
+            <div class="label center-hv">{this.download_schedule_label}</div>
             <button class="download-button" disabled={this.dl_disabled} onclick={onclickScheduleDialog}>schedule</button>
         </div>
     </div>
@@ -70,6 +70,19 @@
         const donwload_schedule = {
             date: SettingStore.getValue("donwload-schedule-date", {hour:0, minute:0}),
             enable: SettingStore.getValue("donwload-schedule-enable", false)
+        };
+
+        const updateDonwloadScheduleLabel = () =>{
+            const enable = donwload_schedule.enable;
+            if(enable==false){
+                this.download_schedule_label = "ダウンロード実行 なし";
+            }else{
+                const date = donwload_schedule.date;
+                const hour = ("0" + date.hour).slice(-2);
+                const minute = ("0" + date.minute).slice(-2);
+                this.download_schedule_label = `ダウンロード実行 ${hour}:${minute}`;
+            }      
+            this.update();
         };
 
         const wait_time = 5;
@@ -159,6 +172,8 @@
                     }else{
                         scheduled_task.stop();
                     }
+
+                    updateDonwloadScheduleLabel();
                 }
             });            
         };
@@ -298,6 +313,8 @@
             if(donwload_schedule.enable==true){
                 scheduled_task.start();
             }
+
+            updateDonwloadScheduleLabel();
         });
 
         obs.on("get-download-item-callback", (cb) => { 

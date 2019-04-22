@@ -53,9 +53,11 @@ class NicoSearchMocks {
 }
 
 class NicoDownLoadMocks {
-    constructor(id){
+    constructor(id, lowq_set, smile_set){
         this.id = id;
         this.video_fs = null;
+        this.lowq_set = lowq_set;
+        this.smile_set = smile_set;
     }
 
     clean(){
@@ -75,7 +77,7 @@ class NicoDownLoadMocks {
             .delay(delay)
             .times(Infinity)
             .reply(code, (uri, requestBody) => {
-                return MockNicoUitl.getWatchHtml(this.id);
+                return MockNicoUitl.getWatchHtml(this.id, this.smile_set.has(this.id));
             }, headers);
     } 
 
@@ -87,10 +89,10 @@ class NicoDownLoadMocks {
             .delay(delay)
             .times(Infinity)
             .reply((uri, reqbody)=>{
-                const id = reqbody.session.recipe_id.match(/\d+/);
+                const id = reqbody.session.recipe_id.match(/\d+/)[0];
                 return [code, {
                     meta: { status: 201,message: "created" },
-                    data: createSession(id)
+                    data: createSession(id, this.lowq_set.has(id))
                 }];                    
             });
     }
@@ -175,28 +177,40 @@ class NicoDownLoadMocks {
             .query({ m: `${this.id}.67759${quality}`})
             .delay(delay)
             .times(Infinity)
-            .replyWithFile(code, file_path, headers);   
+            .reply(code, (uri, requestBody) => {
+                const sbuf = Math.floor(stat.size/(1638000));
+                this.video_fs = fs.createReadStream(file_path, { highWaterMark: sbuf });
+                return this.video_fs;
+            },headers);
     }
 }
 
-const createApiData = (id) =>{
+const createApiData = (id, is_smile) =>{
     const cp_data = JSON.parse(JSON.stringify(data_api_data));
     const video = cp_data.video;
     video.id = `sm${id}`;
     video.thumbnailURL = `https://tn.smilevideo.jp/smile?i=${id}`;
     video.largeThumbnailURL = `https://tn.smilevideo.jp/smile?i=${id}.L`;
     video.postedDateTime = "2018/01/01 01:00:00";
-    video.dmcInfo.video_id = `sm${id}`;
-    video.dmcInfo.session_api.recipe_id = `nicovideo-sm${id}`;
+    if(is_smile===true){
+        video.dmcInfo = null;
+    }else{
+        video.dmcInfo.video_id = `sm${id}`;
+        video.dmcInfo.session_api.recipe_id = `nicovideo-sm${id}`;
+    }
     video.smileInfo.url = `https://smile-cls20.sl.nicovideo.jp/smile?m=${id}.67759`;
     return cp_data;
 };
 
-const createSession = (id) =>{
+const createSession = (id, is_low_quality) =>{
     const cp_data = JSON.parse(JSON.stringify(dmc_session));
     cp_data.session.id = id;
     cp_data.session.recipe_id = `nicovideo-sm${id}`;
     cp_data.session.content_uri = `https://pa0000.dmc.nico/hlsvod/ht2_nicovideo/nicovideo-sm${id}`;
+    if(is_low_quality===true){
+        cp_data.session.content_src_id_sets[0].content_src_ids[0].src_id_to_mux.video_src_ids[0] 
+            = "archive_h264_600kbps_360p";
+    }
     return cp_data;
 };
 
@@ -213,8 +227,8 @@ class MockNicoUitl {
         return str;
     }
 
-    static getWatchHtml(id){ 
-        const data_api_data = MockNicoUitl._escapeHtml(JSON.stringify(createApiData(id)));
+    static getWatchHtml(id, is_smile){ 
+        const data_api_data = MockNicoUitl._escapeHtml(JSON.stringify(createApiData(id, is_smile)));
         return `<!DOCTYPE html>
         <html lang="ja">
             <body>
@@ -238,6 +252,7 @@ const setupNicoDownloadNock = (target_nock, {
     target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
     target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
     target_nock.dmc_video({ delay:video_delay, code:video_code });  
+    target_nock.smile_video({ delay:video_delay, code:video_code });  
 };
 
 module.exports = {

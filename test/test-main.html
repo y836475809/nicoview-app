@@ -33,8 +33,11 @@
     nico_search_mock.search();
 
     const video_fs = [];
-    ["10", "20", "30", "40", "50"].forEach(value => {
-        const dl_nock = new NicoDownLoadMocks(value);
+    const lowq_set = new Set(["10"]);
+    const smile_set = new Set(["20"]);
+    const ids = ["10", "20", "30", "40", "50"];
+    ids.forEach(id => {
+        const dl_nock = new NicoDownLoadMocks(id, lowq_set, smile_set);
         setupNicoDownloadNock(dl_nock);
         video_fs.push(dl_nock);
     });

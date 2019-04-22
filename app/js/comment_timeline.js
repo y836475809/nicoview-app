@@ -171,7 +171,7 @@ class FlowCommentTimeLine extends TimeLine {
                     return -(area_width + parseInt(el.getAttribute("data-width")));
                 },
                 duration: duration,
-                offset: 1,
+                // offset: 1,
                 complete: (anim) => {
                     console.log("complete=", selector);
                     anim.animatables.forEach((obj) => {
@@ -179,7 +179,7 @@ class FlowCommentTimeLine extends TimeLine {
                     });
                     this.is_cpmpleted = true;
                 }
-            });
+            }, 1);
     }
 }
 
@@ -214,12 +214,12 @@ class FixedCommentTimeLine extends TimeLine {
             }
         });
 
-        anime.easings["fixedCommentEasing"] = function(t) {
-            if(t>0.0 && t<1.0){
-                return 1;
-            }
-            return 0;
-        };
+        // anime.easings["fixedCommentEasing"] = function(t) {
+        //     if(t>0.0 && t<1.0){
+        //         return 1;
+        //     }
+        //     return 0;
+        // };
         this.timeline = anime({
             begin :()=>{
                 this.is_cpmpleted = false;
@@ -235,7 +235,15 @@ class FixedCommentTimeLine extends TimeLine {
                 });
                 this.is_cpmpleted = true;
             },
-            easing: "fixedCommentEasing",
+            // easing: "fixedCommentEasing",
+            easing: (el, i, total) => {
+                return (t) => {
+                    if(t>0.0 && t<1.0){
+                        return 1;
+                    }
+                    return 0;
+                };
+            },
             opacity: [1],
             duration:duration,
             loop: false,

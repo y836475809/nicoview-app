@@ -85,7 +85,7 @@
             this.update();
         };
 
-        const wait_time = 5;
+        const wait_time = 10;
         const donwload_state = Object.freeze({
             wait: 0,
             downloading: 1,

@@ -201,7 +201,7 @@
             return sync_comment_checked;
         };
 
-        const resizeCommnetList = () => {
+        const resizeCommentList = () => {
             const container = this.root.querySelector(".comment-grid-container");
             const new_height = $(window).height() - container.offsetTop;
             const new_width = container.clientWidth;
@@ -273,7 +273,7 @@
         };
 
         obs.on("on_change_viweinfo", (viewinfo)=> {
-            resizeCommnetList();
+            resizeCommentList();
 
             this.video_thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
@@ -287,12 +287,12 @@
             setDescription(this.root.querySelector(".description-content"), viewinfo.thumb_info.description);
             setDescriptionContainerClass("description-container-normal");
 
-            sync_comment_scroll.setComments(viewinfo.commnets);
+            sync_comment_scroll.setComments(viewinfo.comments);
 
-            const commnets = viewinfo.commnets.map(value => {
+            const comments = viewinfo.comments.map(value => {
                 return Object.assign(value, { id: value.no });
             });
-            grid_table.setData(commnets);
+            grid_table.setData(comments);
 
             this.update();
         });
@@ -302,7 +302,7 @@
                 return;
             }
 
-            const comment_index =  sync_comment_scroll.getCommnetIndex(current_sec);
+            const comment_index =  sync_comment_scroll.getCommentIndex(current_sec);
             grid_table.scrollRow(comment_index);
         });
 
@@ -311,15 +311,15 @@
             grid_table.grid.registerPlugin(new Slick.AutoTooltips());
 
             updateSyncCommentCheckBox();
-            resizeCommnetList();
+            resizeCommentList();
         });
         
         obs.on("resizeEndEvent", (size)=> {
-            resizeCommnetList();
+            resizeCommentList();
         });
 
         obs.on("on-resized-player-split", ()=> {
-            resizeCommnetList();
+            resizeCommentList();
         });
     </script>
 </viewinfo-page>

@@ -174,11 +174,11 @@
                 const video_data = {
                     src: video_url,
                     type: thumb_info.video_type,
-                    commnets: comments
+                    comments: comments
                 };
                 const viweinfo = {
                     thumb_info:thumb_info,
-                    commnets: comments
+                    comments: comments
                 };
                 play_by_video_data(video_data, viweinfo);
                 prog_dialog.close();         

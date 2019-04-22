@@ -35,7 +35,7 @@
         let get_time_func = ()=>{
             return this.refs.player_video.currentTime*1000;
         };
-        let createTimeLines = (commnets, div_num)=>{
+        let createTimeLines = (comments, div_num)=>{
             const parent_id = "player-video-screen";
             const row_num = 12;
             const interval_ms = 100;
@@ -47,7 +47,7 @@
                 row_num, 
                 interval_ms, 
                 get_time_func);
-            ctls.create(commnets, duration);
+            ctls.create(comments, duration);
             console.log("ctl_list.length=", ctls.timelines.length);
             console.log(".comment.length=", document.querySelectorAll(".comment").length);
         };
@@ -92,9 +92,9 @@
                 ctls.delete();
             }
             ctls = null;
-            if(data.commnets.length>0){
+            if(data.comments.length>0){
                 const div_num = 200;
-                createTimeLines(data.commnets, div_num);
+                createTimeLines(data.comments, div_num);
             }
 
             video.load();

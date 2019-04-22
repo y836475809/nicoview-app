@@ -49,11 +49,11 @@
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
-        const commnets = reader.comment(xml);
+        const comments = reader.comment(xml);
         const video_data = {
             src: `${test_dir}/data/test1.mp4`,
             type: "video/mp4",
-            commnets: commnets
+            comments: comments
         };
         const viweinfo = {
             thumb_info: {
@@ -85,16 +85,16 @@
                 user_nickname: "abcdefg",
                 user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
             },
-            commnets: commnets
+            comments: comments
         };
         
         obs.trigger("request-send-video-data", {video_data, viweinfo}); 
     };
     const onclickLoad2 = () => {
-        let commnets = [];
+        let comments = [];
         const nn = 5000;
         for (let index = 0; index < nn; index++) {
-            commnets.push({
+            comments.push({
                 no: index + 1,
                 vpos: 50 * index,
                 post_date: 1332592373506 + index*100,
@@ -130,7 +130,7 @@
                 user_nickname: "abcdefg",
                 user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
             },
-            commnets: commnets
+            comments: comments
         }); 
     };
 

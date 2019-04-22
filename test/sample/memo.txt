@@ -53,8 +53,6 @@ json-server index.js  --routes route.json
 http://www.webdesignleaves.com/pr/plugins/fontawesome_01.html
 https://niwaka-web.com/fontawsome5_css/
 
-
-commnet
 first_retrieve
 
     "playlist": {

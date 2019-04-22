@@ -2,7 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const path = require("path");
 const request = require("request");
-const { NicoWatch, NicoVideo, NicoComment, getVideoType, filterCommnets } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment, getVideoType, filterComments } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 
 const validateStatus = (status) => {
@@ -171,7 +171,7 @@ class NicoNicoDownloader {
             const thumbInfo_data = this._getThumbInfo();
 
             on_progress(DonwloadProgMsg.start_comment);
-            const comment_data = await this._getCommnet();
+            const comment_data = await this._getComment();
 
 
             on_progress(DonwloadProgMsg.start_thumbimg);
@@ -273,11 +273,11 @@ class NicoNicoDownloader {
             }
         };
     }
-    async _getCommnet(){
+    async _getComment(){
         const api_data = this.watch_data.api_data;
         this.nico_comment = new NicoComment(api_data);
         const comments = await this.nico_comment.getComment();
-        return filterCommnets(comments);
+        return filterComments(comments);
     }
 
     _getThumbImg(){

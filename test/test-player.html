@@ -37,15 +37,14 @@
     riot.mount("player-page");
 
     const onclickLoad = () => {
-        // let commnets = []
         const comment_path = `${test_dir}/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
-        const commnets = reader.comment(xml);
+        const comments = reader.comment(xml);
         const data = {
             src: `${test_dir}/data/test1.mp4`,
             // src: `${video_src}/test.mp4`,
             type: "video/mp4",
-            commnets: commnets
+            comments: comments
         };
         const video_tags = [
             { text: "タグ1", lock: true },

@@ -194,11 +194,11 @@ class Library {
             video_data: {
                 src: video_path,
                 type: `video/${video_type}`,
-                commnets: comments
+                comments: comments
             },
             viweinfo: {
                 thumb_info:thumb_info,
-                commnets: comments
+                comments: comments
             }
         };
     }

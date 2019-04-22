@@ -29,7 +29,7 @@ class TestNicoDownloader extends NicoNicoDownloader {
         super(video_id, dist_dir);
 
         this.stream_error = false;
-        this.commnet_error = false;
+        this.comment_error = false;
         this.thumbinfo_error = false;
         this.thumbimg_error = false;
     }
@@ -41,8 +41,8 @@ class TestNicoDownloader extends NicoNicoDownloader {
         this.stream_error = true;
     }
 
-    writeCommnetError(){
-        this.commnet_error = true;
+    writeCommentError(){
+        this.comment_error = true;
     }
 
     writeThumbInfoError(){
@@ -58,8 +58,8 @@ class TestNicoDownloader extends NicoNicoDownloader {
     }
 
     _writeJson(file_path, data){
-        if(this.commnet_error && /Comment/.test(file_path)){
-            throw new Error("write commnet error");
+        if(this.comment_error && /Comment/.test(file_path)){
+            throw new Error("write comment error");
         }
         if(this.thumbinfo_error && /ThumbInfo/.test(file_path)){
             throw new Error("write thumbinfo error");
@@ -405,7 +405,7 @@ test("downloader save comment error", async (t) => {
     setupNicoDownloadNock(nico_download_mocks);
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
-    nico_down.writeCommnetError();
+    nico_down.writeCommentError();
 
     const result = await nico_down.download((state)=>{
         log.push(state);
@@ -418,7 +418,7 @@ test("downloader save comment error", async (t) => {
         DonwloadProgMsg.write_data
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "write commnet error");
+    t.is(result.reason.message, "write comment error");
 });
 
 test("downloader save thumbimg error", async (t) => {

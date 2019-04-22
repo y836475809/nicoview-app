@@ -66,7 +66,7 @@
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
 - [ ] GridTable.resizeFitContainerのマージン「- 5」を削除する
-- [ ] typo修正(commnet -> comment)
+- [x] typo修正(commnet -> comment)
 - [ ] コメントの更新(差分ダウンロード)
 - [ ] 動画情報(タグ、コメント数、プレイリスト数、再生数、ユーザーコメント等)の更新
 - [ ] コメントや動画情報の更新時にライブラリデータをxml->jsonに変換する

@@ -1,5 +1,5 @@
 const { NicoWatch, NicoVideo, NicoComment, 
-    getCookies, getThumbInfo, filterCommnets } = require("./niconico");
+    getCookies, getThumbInfo, filterComments } = require("./niconico");
 
 class NicoPlay{
     constructor(heart_beat_rate=0.9){
@@ -39,7 +39,7 @@ class NicoPlay{
                 on_progress("start comment");
                 this.nico_comment = new NicoComment(api_data);
                 const comments = await this.nico_comment.getComment();
-                const filter_comments = filterCommnets(comments);
+                const filter_comments = filterComments(comments);
                 on_progress("finish comment");
 
                 on_progress("start video");

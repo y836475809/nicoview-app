@@ -7,7 +7,7 @@ const cheerio = require("cheerio");
  */
 function comment(xml) {
     let $ = cheerio.load(xml);
-    let commnets = [];
+    let comments = [];
     $("chat").each(function (i, el) {
         const item = $(el);
         if(!item.attr("deleted")){
@@ -17,7 +17,7 @@ function comment(xml) {
             const date = parseInt(item.attr("date"));
             const user_id = item.attr("user_id");
             const mail = item.attr("mail");
-            commnets.push({
+            comments.push({
                 no: no,
                 vpos: vpos,
                 post_date: date,
@@ -28,7 +28,7 @@ function comment(xml) {
         }
     });
 
-    return commnets;
+    return comments;
 }
 
 /**

@@ -4,8 +4,6 @@
             width: 100%;
             height: 100%;
             --right-width: 200px;
-            --search-input-width: 200px;
-            --search-button-size: 30px;
             display: flex;
         }
 

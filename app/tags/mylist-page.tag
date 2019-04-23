@@ -1,7 +1,4 @@
 <mylist-page>
-    <style scoped>
-    </style>
-
     <split-page-templete>
         <yield to="sidebar">
             <div>content1</div>
@@ -12,7 +9,8 @@
     </split-page-templete>
 
     <script>
-        /* globals app_base_dir */
+        /* globals app_base_dir riot*/
         require(`${app_base_dir}/tags/split-page-templete.tag`);  
+        riot.mount("split-page-templete");
     </script>
 </mylist-page>

@@ -17,25 +17,25 @@ class CommentTimeLineManager {
     }
 
     create(comments, duration) {
-        console.log("comments1=", performance.now());
+        // console.log("comments1=", performance.now());
         let parent_elm = document.getElementById(this.parent_id);
         const view_width = parent_elm.clientWidth;
 
         let [ flow_comments, 
             fixed_top_comments,
             fixed_bottom_comments ] = this.getEachComments(comments);
-        console.log("comments2=", performance.now());
+        // console.log("comments2=", performance.now());
 
         let flow_cmt = new FlowComment(this.row_num, view_width, duration);
         const flow_no_row_map = flow_cmt.getNoRowIndexMap(flow_comments);
         
-        console.log("comments3=", performance.now());
+        // console.log("comments3=", performance.now());
 
         let flixed_cmt = new FixedComment(this.row_num, duration);
         const fixed_top_no_row_map = flixed_cmt.getNoRowIndexMap(fixed_top_comments);
         const fixed_bottom_no_row_map = flixed_cmt.getNoRowIndexMap(fixed_bottom_comments);
 
-        console.log("comments4=", performance.now());
+        // console.log("comments4=", performance.now());
 
         let fragment = document.createDocumentFragment();
         
@@ -57,7 +57,7 @@ class CommentTimeLineManager {
             fragment.appendChild(elm);
         });
 
-        console.log("comments6=", performance.now());
+        // console.log("comments6=", performance.now());
 
         fixed_bottom_comments.forEach((cmt) => {
             let elm = this.createCommentElm(cmt);
@@ -67,29 +67,29 @@ class CommentTimeLineManager {
             fragment.appendChild(elm);
         });
 
-        console.log("comments7=", performance.now());
+        // console.log("comments7=", performance.now());
 
         parent_elm.appendChild(fragment);
 
-        console.log("comments7-2=", performance.now());
+        // console.log("comments7-2=", performance.now());
         this.sizeSetting();
 
-        console.log("comments8=", performance.now());
+        // console.log("comments8=", performance.now());
 
         this.timelines = [];
         this.createTimeLine(flow_comments, ".flow", duration, this.createFlowTimeLine);
 
-        console.log("comments9=", performance.now());
+        // console.log("comments9=", performance.now());
 
         this.createTimeLine(
             fixed_top_comments.concat(fixed_bottom_comments), 
             ".fixed", duration, this.createFixedTimeLine);
 
-        console.log("comments10=", performance.now());
+        // console.log("comments10=", performance.now());
 
         this.setdisplayNone();
 
-        console.log("comments11=", performance.now());
+        // console.log("comments11=", performance.now());
     }
 
     delete() {
@@ -122,12 +122,12 @@ class CommentTimeLineManager {
     }
 
     sizeSetting(){
-        console.log("sizeSetting0=", performance.now());
+        // console.log("sizeSetting0=", performance.now());
 
         let parent_elm = document.getElementById(this.parent_id);
         let elms = parent_elm.querySelectorAll(".comment");
 
-        console.log("sizeSetting1=", performance.now());
+        // console.log("sizeSetting1=", performance.now());
 
         let fragment = document.createDocumentFragment();
         elms.forEach((elm) => {
@@ -135,11 +135,11 @@ class CommentTimeLineManager {
             fragment.appendChild(elm);
         });
         
-        console.log("sizeSetting2=", performance.now());
+        // console.log("sizeSetting2=", performance.now());
         
         const view_height = parent_elm.clientHeight;
 
-        console.log("sizeSetting3=", performance.now());
+        // console.log("sizeSetting3=", performance.now());
 
         elms.forEach((elm) => {
             const font_size = elm.getAttribute("data-fontsize");
@@ -153,21 +153,21 @@ class CommentTimeLineManager {
             elm.style.opacity = 0;
             elm.style.display = "block";           
         });
-        console.log("sizeSetting4=", performance.now());
+        // console.log("sizeSetting4=", performance.now());
         
         parent_elm.appendChild(fragment);
 
-        console.log("sizeSetting5=", performance.now());
+        // console.log("sizeSetting5=", performance.now());
 
         elms.forEach((elm) => {
             const width = elm.getBoundingClientRect().width;
             elm.setAttribute("data-width", width.toString());
         });
-        console.log("sizeSetting6=", performance.now());
+        // console.log("sizeSetting6=", performance.now());
         elms.forEach((elm) => {
             elm.style.display = "none";
         });
-        console.log("sizeSetting7=", performance.now());
+        // console.log("sizeSetting7=", performance.now());
     }
 
     getEachComments(comments) {
@@ -258,7 +258,7 @@ class CommentTimeLineManager {
             timeline.start_time = Math.min.apply(null, vposes);
             timeline.last_time = Math.max.apply(null, vposes) + duration;
 
-            console.log("ctl.start_time=", timeline.start_time);
+            // console.log("ctl.start_time=", timeline.start_time);
 
             this.timelines.push(timeline);
         });       
@@ -286,8 +286,8 @@ class CommentTimeLineManager {
     test() {
         this.timelines.forEach((tl) => {
             if (!tl.is_play && !tl.is_cpmpleted && tl.start_time <= this.get_time_func()) {
-                console.log("test play=", tl.is_play, 
-                    "ctl.start_time=", tl.start_time, "cu time=", this.get_time_func());
+                // console.log("test play=", tl.is_play, 
+                //     "ctl.start_time=", tl.start_time, "cu time=", this.get_time_func());
                 tl.play();
             }
         });

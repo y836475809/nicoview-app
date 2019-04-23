@@ -53,12 +53,12 @@ class TimeLine {
 
     play() {
         if (this.timeline == null) {
-            console.log("create1=", performance.now());
+            // console.log("create1=", performance.now());
             this.elmsforEach((elm)=>{
                 elm.style.display = "block";
             });
             this.create();
-            console.log("create2=", performance.now());
+            // console.log("create2=", performance.now());
         }
         else{
             if(!this.is_cpmpleted){
@@ -82,7 +82,7 @@ class TimeLine {
         const seek_time = time_ms - this.start_time;
 
         if (this.start_time <= time_ms && time_ms < this.last_time) {
-            console.log("createFlow seek_time1=", this.params.selector);
+            // console.log("createFlow seek_time1=", this.params.selector);
             if (this.timeline == null) {
                 this.create();
             } else {
@@ -95,14 +95,14 @@ class TimeLine {
 
             this.is_cpmpleted = false;
         } else if(time_ms < this.start_time){
-            console.log("createFlow seek_time2=", this.params.selector);
+            // console.log("createFlow seek_time2=", this.params.selector);
             if (this.timeline != null) {
                 this.timeline.reset();
                 this.timeline.seek(seek_time);
             }
             this.is_cpmpleted = false;
         }else if(this.last_time <= time_ms){
-            console.log("createFlow seek_time3=", this.params.selector);
+            // console.log("createFlow seek_time3=", this.params.selector);
             if(this.timeline!=null){
                 this.timeline.seek(seek_time);
             }
@@ -124,7 +124,7 @@ class FlowCommentTimeLine extends TimeLine {
     }
 
     create() {
-        console.log("create=", this.params.selector);
+        // console.log("create=", this.params.selector);
         const selector = this.params.selector;
         const duration = this.params.duration;
 
@@ -147,7 +147,7 @@ class FlowCommentTimeLine extends TimeLine {
         this.timeline = anime.timeline({
             begin :()=>{
                 this.is_cpmpleted = false;
-                console.log("timeline begin", selector);
+                // console.log("timeline begin", selector);
             },
             targets: selector,
             easing: "linear",
@@ -171,9 +171,8 @@ class FlowCommentTimeLine extends TimeLine {
                     return -(area_width + parseInt(el.getAttribute("data-width")));
                 },
                 duration: duration,
-                // offset: 1,
                 complete: (anim) => {
-                    console.log("complete=", selector);
+                    // console.log("complete=", selector);
                     anim.animatables.forEach((obj) => {
                         obj.target.style.display = "none";
                     });
@@ -214,12 +213,6 @@ class FixedCommentTimeLine extends TimeLine {
             }
         });
 
-        // anime.easings["fixedCommentEasing"] = function(t) {
-        //     if(t>0.0 && t<1.0){
-        //         return 1;
-        //     }
-        //     return 0;
-        // };
         this.timeline = anime({
             begin :()=>{
                 this.is_cpmpleted = false;
@@ -229,13 +222,12 @@ class FixedCommentTimeLine extends TimeLine {
                 return parseFloat(el.getAttribute("data-delay")) - this.start_time;
             },
             complete: (anim) => {
-                console.log("complete=", selector);
+                // console.log("complete=", selector);
                 anim.animatables.forEach((obj) => {
                     obj.target.style.display = "none";
                 });
                 this.is_cpmpleted = true;
             },
-            // easing: "fixedCommentEasing",
             easing: (el, i, total) => {
                 return (t) => {
                     if(t>0.0 && t<1.0){

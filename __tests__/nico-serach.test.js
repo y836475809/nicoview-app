@@ -18,7 +18,7 @@ const default_params = () => {
     return params;
 };
 
-test.after(t => {
+test.afterEach(t => {
     nico_mocks.clean(); 
 });
 

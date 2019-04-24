@@ -61,3 +61,6 @@ first_retrieve
         "parameter": null,
         "recipe": "eyJpZ"
     },
+
+http://nico-archive.hatenablog.jp/entry/2017/09/24/172421
+http://www.nicovideo.jp/mylist/[動画ID]?rss=2.0&numbers=1&sort=[数値]

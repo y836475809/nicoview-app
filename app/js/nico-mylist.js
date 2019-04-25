@@ -68,12 +68,12 @@ class NicoMylistReader {
             items.push( {
                 title: item.find("title").text(),
                 link: item.find("link").text(),
-                memo: description.memo,
-                thumbnail_src: description.thumbnail_src,
+                description: description.memo,
+                thumb_img: description.thumbnail_src,
                 length: description.length,
                 date: description.date,
-                num_view: description.num_view,
-                num_comment: description.num_comment
+                view_count: description.num_view,
+                comment_count: description.num_comment
             });
         });
 
@@ -110,7 +110,7 @@ class NicoMylistReader {
         && mylist.items.every(item => {
             return item.title 
                 && item.link 
-                && item.thumbnail_src
+                && item.thumb_img
                 && item.length
                 && item.date;
         });

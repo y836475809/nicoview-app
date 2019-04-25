@@ -20,32 +20,32 @@ test("nico mylist parse xml", t => {
             {
                 title: "動画3",
                 link: "http://www.nicovideo.jp/watch/sm12345678",
-                memo: "動画3メモ",
-                thumbnail_src: "http://tn.smilevideo.jp/smile?i=12345678.63399.M",
+                description: "動画3メモ",
+                thumb_img: "http://tn.smilevideo.jp/smile?i=12345678.63399.M",
                 length: "100:10",
                 date: "2000年1月3日 03：03：03",
-                num_view: "10,000",
-                num_comment: "100"
+                view_count: "10,000",
+                comment_count: "100"
             },
             {
                 title: "動画2",
                 link: "http://www.nicovideo.jp/watch/sm20",
-                memo: "動画2メモ1\r\n動画2メモ2\r\n動画2メモ3",
-                thumbnail_src: "http://tn.smilevideo.jp/smile?i=20.M",
+                description: "動画2メモ1\r\n動画2メモ2\r\n動画2メモ3",
+                thumb_img: "http://tn.smilevideo.jp/smile?i=20.M",
                 length: "50:50",
                 date: "2000年1月2日 02：02：02",
-                num_view: "200,000",
-                num_comment: "1,000"
+                view_count: "200,000",
+                comment_count: "1,000"
             },
             {
                 title: "動画1",
                 link: "http://www.nicovideo.jp/watch/sm10",
-                memo: "動画1メモ1\r\n動画1メモ2\r\n動画1メモ3\r\n動画1メモ4",
-                thumbnail_src: "http://tn.smilevideo.jp/smile?i=10",
+                description: "動画1メモ1\r\n動画1メモ2\r\n動画1メモ3\r\n動画1メモ4",
+                thumb_img: "http://tn.smilevideo.jp/smile?i=10",
                 length: "0:10",
                 date: "2000年1月1日 01：01：01",
-                num_view: "20",
-                num_comment: "30"
+                view_count: "20",
+                comment_count: "30"
             }
         ]
     });
@@ -72,7 +72,7 @@ test("nico mylist result is correct", t => {
         items: [{
             title : "--",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: "--"
         }]
@@ -130,7 +130,7 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: "--"
         }]
@@ -144,7 +144,7 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "--",
             link : "",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: "--"
         }]
@@ -159,7 +159,7 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "--",
             link : "--",
-            thumbnail_src: "",
+            thumb_img: "",
             length: "--",
             date: "--"
         }]
@@ -173,7 +173,7 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "--",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "",
             date: "--"
         }]
@@ -187,7 +187,7 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "--",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: ""
         }]
@@ -201,14 +201,14 @@ test("nico mylist result is incorrect", t => {
         items: [{
             title : "--",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: "--"
         },
         {
             title : "",
             link : "--",
-            thumbnail_src: "--",
+            thumb_img: "--",
             length: "--",
             date: "--"
         }]

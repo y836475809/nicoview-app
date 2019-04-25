@@ -238,6 +238,43 @@ class MockNicoUitl {
     }
 }
 
+class NicoMylistMocks {
+    clean(){
+        nock.cleanAll();
+    }
+
+    mylist({delay=1, code=200} = {}){
+        const headers = {
+            "Content-Type": "application/xml",
+        };
+        this.myist_nock = nock("http://www.nicovideo.jp");
+        this.myist_nock
+            .get(/mylist\/\d+/)
+            .query({ rss: "2.0", numbers: 1, sort:1 })
+            .delay(delay)
+            .times(Infinity)
+            .reply((uri, requestBody) => {
+                const id = new URL(uri).pathname.replace("/mylist/", "");
+                const file_path = `${__dirname}/data/mylist${id}.xml`;
+                try {
+                    fs.statSync(file_path);
+                    const xml = fs.readFileSync(file_path, "utf-8");
+                    return [
+                        200,
+                        xml,
+                        headers
+                    ];
+                } catch (error) {
+                    return [
+                        404,
+                        "",
+                        headers
+                    ];                   
+                }
+            });
+    }
+}
+
 const setupNicoDownloadNock = (target_nock, {
     watch_delay=1, watch_code=200, 
     dmc_session_delay=1, dmc_session_code=200, 

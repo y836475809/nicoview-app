@@ -26,8 +26,14 @@
     var riot = require("riot");     // eslint-disable-line
     var obs = riot.observable();    // eslint-disable-line
     require(`${app_base_dir}/tags/mylist-page.tag`);
-
     riot.mount("mylist-page");
+
+    const { NicoDownLoadMocks } = require("./mock_server/nico-mock");
+    const ids = ["10", "20", "30", "40", "50"];
+    ids.forEach(id => {
+        const dl_nock = new NicoDownLoadMocks(id, new Set(), new Set());
+        dl_nock.thumbnail();
+    });
 </script>
 
 </html>

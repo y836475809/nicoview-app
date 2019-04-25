@@ -1,6 +1,6 @@
 const test = require("ava");
 const fs = require("fs");
-const { MylistReader } = require("../app/js/nico-mylist");
+const { NicoMylistReader } = require("../app/js/nico-mylist");
 
 let mylist_xml = null;
 test.before(t => {
@@ -8,7 +8,7 @@ test.before(t => {
 });
 
 test("nico mylist parse xml", t => {
-    const mrd = new MylistReader();
+    const mrd = new NicoMylistReader();
     const mylist = mrd.parse(mylist_xml);
 
     t.deepEqual(mylist, {
@@ -52,17 +52,17 @@ test("nico mylist parse xml", t => {
 });
 
 test("nico mylist error xml empty", t => {
-    const mrd = new MylistReader();
+    const mrd = new NicoMylistReader();
     t.throws(() => { mrd.parse(""); });
 });
 
 test("nico mylist error parse xml", t => {
-    const mrd = new MylistReader();
+    const mrd = new NicoMylistReader();
     t.throws(() => { mrd.parse(null); });
 });
 
 test("nico mylist result is correct", t => {
-    const mrd = new MylistReader();
+    const mrd = new NicoMylistReader();
 
     t.truthy(mrd._isCorrect({
         title: "--",
@@ -96,7 +96,7 @@ test("nico mylist result is correct", t => {
 });
 
 test("nico mylist result is incorrect", t => {
-    const mrd = new MylistReader();
+    const mrd = new NicoMylistReader();
 
     t.falsy(mrd._isCorrect({
         title: "",

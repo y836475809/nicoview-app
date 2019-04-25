@@ -51,7 +51,7 @@ class NicoMylist extends NicoRequest {
     }
 }
 
-class MylistReader {
+class NicoMylistReader {
     parse(xml){
         const $ = cheerio.load(xml, {xmlMode: true});
         
@@ -64,7 +64,7 @@ class MylistReader {
         $("channel > item").each((i, el) => {
             const item = $(el);
             
-            const description = this._pdesc(item.find("description").text());
+            const description = this._parseCDATA(item.find("description").text());
             items.push( {
                 title: item.find("title").text(),
                 link: item.find("link").text(),
@@ -91,7 +91,7 @@ class MylistReader {
         return mylist;
     }
 
-    _pdesc(xml){
+    _parseCDATA(xml){
         const $ = cheerio.load(xml, {xmlMode: true});
         return {
             memo: $(".nico-memo").text(),
@@ -119,5 +119,5 @@ class MylistReader {
 
 module.exports = {
     NicoMylist: NicoMylist,
-    MylistReader: MylistReader
+    NicoMylistReader: NicoMylistReader
 };

@@ -3,7 +3,6 @@ const cheerio = require("cheerio");
 class MylistReader {
     parse(xml){
         const $ = cheerio.load(xml, {xmlMode: true});
-        // const doc = new JSDOM(xml, {contentType:"text/xml"}).window.document;
         
         const title = $("channel > title").text();
         const link = $("channel > link").text();
@@ -21,29 +20,24 @@ class MylistReader {
                 memo: description.memo,
                 thumbnail_src: description.thumbnail_src,
                 length: description.length,
-                date: description.date
+                date: description.date,
+                num_view: description.num_view,
+                num_comment: description.num_comment
             });
         });
-        // const items = 
-        //     Array.from(doc.querySelectorAll("channel > item")).map(item => {
-        //         const description = this._pdesc(item.querySelector("description").textContent);
-        //         return {
-        //             title: item.querySelector("title").textContent,
-        //             link: item.querySelector("link").textContent,
-        //             memo: description.memo,
-        //             thumbnail_src: description.thumbnail_src,
-        //             length: description.length,
-        //             date: description.date
-        //         };
-        //     });
 
-        return {
+        const mylist = {
             title: title,
             link: link,
             creator: creator,
             description: description,
             items: items
         };
+
+        if(!this._isCorrect(mylist)){
+            throw new Error("empty");
+        }
+        return mylist;
     }
 
     _pdesc(xml){
@@ -53,7 +47,22 @@ class MylistReader {
             thumbnail_src: $(".nico-thumbnail > img").attr("src"),
             length: $(".nico-info-length").text(),
             date: $(".nico-info-date").text(),
+            num_view: $(".nico-numbers-view").text(),
+            num_comment: $(".nico-numbers-res").text(),
         };
+    }
+
+    _isCorrect(mylist){
+        return mylist.title 
+        && mylist.link 
+        && mylist.creator
+        && mylist.items.every(item => {
+            return item.title 
+                && item.link 
+                && item.thumbnail_src
+                && item.length
+                && item.date;
+        });
     }
 }
 

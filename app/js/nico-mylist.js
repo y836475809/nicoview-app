@@ -14,8 +14,8 @@ class NicoMylist extends NicoRequest {
         }
     }
 
-    async getXML(url){
-        const id = this._getID(url);
+    async getXML(mylist_id){
+        const id = this._getID(mylist_id);
         return await this._getXML(id);
     }
 
@@ -43,11 +43,11 @@ class NicoMylist extends NicoRequest {
     }
 
     /**
-     * 
-     * @param {string} url 
+     * mylist/00000 -> 00000
+     * @param {string} mylist_id 
      */
-    _getID(url){
-        return url.replace("https://www.nicovideo.jp/mylist/", "");
+    _getID(mylist_id){
+        return mylist_id.replace("mylist/", "");
     }
 }
 

@@ -1,4 +1,55 @@
 const cheerio = require("cheerio");
+const { NicoRequest } = require("./nico-request");
+
+class NicoMylist extends NicoRequest {
+    constructor(){
+        super();
+        this.req = null;
+    }
+
+    cancel(){   
+        if (this.req) {
+            this._cancel();
+            this.req.abort();
+        }
+    }
+
+    async getXML(url){
+        const id = this._getID(url);
+        return await this._getXML(id);
+    }
+
+    _getXML(id){
+        const sort = 1;
+        const url = `http://www.nicovideo.jp/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
+        
+        return new Promise((resolve, reject) => {
+            const options = {
+                method: "GET",
+                uri: url, 
+                headers: {
+                    "User-Agent": "node request module"
+                },
+                timeout: 5 * 1000
+            };
+            this.req = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                }else{
+                    resolve(body); 
+                }
+            });       
+        });
+    }
+
+    /**
+     * 
+     * @param {string} url 
+     */
+    _getID(url){
+        return url.replace("https://www.nicovideo.jp/mylist/", "");
+    }
+}
 
 class MylistReader {
     parse(xml){
@@ -67,5 +118,6 @@ class MylistReader {
 }
 
 module.exports = {
+    NicoMylist: NicoMylist,
     MylistReader: MylistReader
 };

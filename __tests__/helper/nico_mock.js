@@ -447,9 +447,29 @@ const setupNicoDownloadNock = (target_nock, {
     }
 };
 
+class NicoMylistMocks {
+    clean(){
+        nock.cleanAll();
+    }
+
+    mylist(id, delay=1, code=200){
+        const xml = `<rss>${id}<rss>`;
+        const headers = {
+            "Content-Type": "application/xml",
+        };
+        this.myist_nock = nock("http://www.nicovideo.jp");
+        this.myist_nock
+            .get(`/mylist/${id}`)
+            .query({ rss: "2.0", numbers: 1, sort:1 })
+            .delay(delay)
+            .reply(code, xml, headers);
+    }
+}
+
 module.exports = {
     NicoMocks: NicoMocks,
     NicoDownLoadMocks: NicoDownLoadMocks,
+    NicoMylistMocks: NicoMylistMocks,
     MockNicoUitl: MockNicoUitl,
     writeBufStream: writeBufStream,
     setupNicoDownloadNock: setupNicoDownloadNock,

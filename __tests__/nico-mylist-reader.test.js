@@ -1,6 +1,6 @@
 const test = require("ava");
 const fs = require("fs");
-const { MylistReader } = require("../app/js/mylist-reader");
+const { MylistReader } = require("../app/js/nico-mylist");
 
 let mylist_xml = null;
 test.before(t => {

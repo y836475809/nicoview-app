@@ -63,11 +63,13 @@ class NicoMylistReader {
         const items = [];
         $("channel > item").each((i, el) => {
             const item = $(el);
-            
+            const link = item.find("link").text();
+            const id = link.match(/[^/]+$/)[0];
             const description = this._parseCDATA(item.find("description").text());
             items.push( {
                 title: item.find("title").text(),
-                link: item.find("link").text(),
+                id: id,
+                link: link,
                 description: description.memo,
                 thumb_img: description.thumbnail_src,
                 length: description.length,
@@ -109,6 +111,7 @@ class NicoMylistReader {
         && mylist.creator
         && mylist.items.every(item => {
             return item.title 
+                && item.id 
                 && item.link 
                 && item.thumb_img
                 && item.length

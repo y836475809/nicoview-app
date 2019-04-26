@@ -4,7 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>test sidebar</title>
+    <title>test mylist</title>
+    <script>
+        window.jQuery = window.$ = require("jquery");
+    </script>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
@@ -13,9 +16,6 @@
 </head>
 
 <body>
-    <!-- <button type="button" onclick="onclickAddItem();">add item</button>
-    <button type="button" onclick="onclickgetData();">get data</button>
-    <button type="button" onclick="onclickdelselItems();">del selected items</button> -->
     <mylist-page></mylist-page>
 </body>
 
@@ -28,12 +28,10 @@
     require(`${app_base_dir}/tags/mylist-page.tag`);
     riot.mount("mylist-page");
 
-    const { NicoDownLoadMocks } = require("./mock_server/nico-mock");
-    const ids = ["10", "20", "30", "40", "50"];
-    ids.forEach(id => {
-        const dl_nock = new NicoDownLoadMocks(id, new Set(), new Set());
-        dl_nock.thumbnail();
-    });
+    const { NicoMylistMocks } = require("./mock_server/nico-mock");
+
+    const mylist_mock = new NicoMylistMocks();
+    mylist_mock.mylist();
 </script>
 
 </html>

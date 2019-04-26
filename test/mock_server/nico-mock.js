@@ -247,14 +247,15 @@ class NicoMylistMocks {
         const headers = {
             "Content-Type": "application/xml",
         };
-        this.myist_nock = nock("http://www.nicovideo.jp");
+        const host = "http://www.nicovideo.jp";
+        this.myist_nock = nock(host);
         this.myist_nock
             .get(/mylist\/\d+/)
             .query({ rss: "2.0", numbers: 1, sort:1 })
             .delay(delay)
             .times(Infinity)
             .reply((uri, requestBody) => {
-                const id = new URL(uri).pathname.replace("/mylist/", "");
+                const id = new URL(`${host}${uri}`).pathname.replace("/mylist/", "");
                 const file_path = `${__dirname}/data/mylist${id}.xml`;
                 try {
                     fs.statSync(file_path);
@@ -296,4 +297,5 @@ module.exports = {
     NicoDownLoadMocks: NicoDownLoadMocks,
     NicoSearchMocks: NicoSearchMocks,
     setupNicoDownloadNock: setupNicoDownloadNock,
+    NicoMylistMocks: NicoMylistMocks
 };

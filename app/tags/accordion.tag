@@ -53,7 +53,8 @@
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{this.opts.params.title}</label>
     <div class="toggle-menu">
         <ul class="acdn-list">
-            <li class="acdn-item" each={ item in this.items }
+            <li class="acdn-item" each={ item,i in this.items }
+                data-id={i}
                 onclick={this.onclickItem} ondblclick={this.ondblclickItem.bind(this,item)}
                 onmouseup={this.onmouseUp}>
                 <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
@@ -147,13 +148,16 @@
         };
 
         obs.on(`${id_name}-add-items`, (items) => {
-            if(!items.icon){
-                items.icon = {
-                    name: "",
-                    style: ""
-                };
-            }
-            Array.prototype.push.apply(this.items, items);
+            const new_items = items.map(value=>{
+                if(!value.icon){
+                    value.icon = {
+                        name: "",
+                        style: ""
+                    };
+                }
+                return value;
+            });
+            Array.prototype.push.apply(this.items, new_items);
             if(isExpand()){
                 chanegExpand(true);
             }

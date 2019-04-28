@@ -239,6 +239,9 @@ class MockNicoUitl {
 }
 
 class NicoMylistMocks {
+    constructor(){
+        nock.disableNetConnect();
+    }
     clean(){
         nock.cleanAll();
     }

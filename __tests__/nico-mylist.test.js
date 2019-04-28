@@ -32,7 +32,7 @@ test("mylist get", async (t) => {
     nico_mylist_mocks.mylist(id);
 
     const nico_mylist = new NicoMylist();
-    const xml = await nico_mylist.getXML(getMylisID(id));
+    const xml = await nico_mylist.requestXML(getMylisID(id));
 
     t.is(xml, `<rss>${id}<rss>`);
 });
@@ -48,7 +48,7 @@ test("mylist cancel", async(t) => {
         nico_mylist.cancel();
     }, 1000);
     try {
-        await nico_mylist.getXML(getMylisID(id));
+        await nico_mylist.requestXML(getMylisID(id));
     } catch (error) {
         t.truthy(error.cancel);
     }
@@ -62,7 +62,7 @@ test("mylist timetout", async (t) => {
         
     const nico_mylist = new NicoMylist();
     try {
-        await nico_mylist.getXML(getMylisID(id));
+        await nico_mylist.requestXML(getMylisID(id));
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -78,7 +78,7 @@ test("mylist 404", async t => {
     
     const nico_mylist = new NicoMylist();
     try {
-        await nico_mylist.getXML(getMylisID(id));
+        await nico_mylist.requestXML(getMylisID(id));
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

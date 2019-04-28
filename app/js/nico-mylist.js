@@ -5,6 +5,10 @@ class NicoMylist extends NicoRequest {
     constructor(){
         super();
         this.req = null;
+
+        this.reader = new NicoMylistReader();
+        this.mylist = null;
+        this.xml = null;
     }
 
     cancel(){   
@@ -14,12 +18,20 @@ class NicoMylist extends NicoRequest {
         }
     }
 
-    async getXML(mylist_id){
+    async getMylist(mylist_id){
         const id = this._getID(mylist_id);
-        return await this._getXML(id);
+        await this._requestXML(id);
+        this.mylist = this.reader.parse(this.xml);
+        return this.mylist;
     }
 
-    _getXML(id){
+    async requestXML(mylist_id){
+        const id = this._getID(mylist_id);
+        this.xml = await this._requestXML(id);
+        return this.xml;
+    }
+
+    _requestXML(id){
         const sort = 1;
         const url = `http://www.nicovideo.jp/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
         
@@ -57,6 +69,7 @@ class NicoMylistReader {
         
         const title = $("channel > title").text();
         const link = $("channel > link").text();
+        const mylist_id = link.match(/[^/]+$/)[0];
         const description = $("channel > description").text();
         const creator = $("channel > dc\\:creator").text();
 
@@ -81,6 +94,7 @@ class NicoMylistReader {
 
         const mylist = {
             title: title,
+            id: mylist_id,
             link: link,
             creator: creator,
             description: description,
@@ -107,6 +121,7 @@ class NicoMylistReader {
 
     _isCorrect(mylist){
         return mylist.title 
+        && mylist.id 
         && mylist.link 
         && mylist.creator
         && mylist.items.every(item => {

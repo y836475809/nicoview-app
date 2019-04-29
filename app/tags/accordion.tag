@@ -55,10 +55,11 @@
         <ul class="acdn-list">
             <li class="acdn-item" each={ item,i in this.items }
                 data-id={i}
-                onclick={this.onclickItem} ondblclick={this.ondblclickItem.bind(this,item)}
+                onclick={this.onclickItem.bind(this,item)} 
+                ondblclick={this.ondblclickItem.bind(this,item)}
                 onmouseup={this.onmouseUp}>
                 <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
-                <div>{item.title}</div>
+                {item.title}
             </li>
         </ul>
     </div>
@@ -202,8 +203,9 @@
             toggleExpand();
         };
 
-        this.onclickItem = (e) => {
+        this.onclickItem = (item, e) => {
             setSelected(e.target);
+            obs.trigger(`${id_name}:click-item`, item);
         };
 
         this.ondblclickItem = (item, e) => {

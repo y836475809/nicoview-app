@@ -1,3 +1,4 @@
+const fs = require("fs");
 const path = require("path");
 const remote = require("electron").remote;
 const app = remote.app;
@@ -31,6 +32,16 @@ class SettingStore {
             SettingStore.setValue("library-dir", library_dir);
         }
         return localStorage.getItem("library-dir");
+    }
+
+    static getMylistDir() {
+        const mylist_dir = path.join(SettingStore.getSystemDir(), "mylist");
+        try {
+            fs.statSync(mylist_dir);
+        } catch (error) {
+            fs.mkdirSync(mylist_dir);
+        }
+        return mylist_dir;
     }
 
     static getValue(key, default_value) {

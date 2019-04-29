@@ -1,4 +1,6 @@
 const cheerio = require("cheerio");
+const fs = require("fs");
+const path = require("path");
 const { NicoRequest } = require("./nico-request");
 
 class NicoMylist extends NicoRequest {
@@ -19,8 +21,7 @@ class NicoMylist extends NicoRequest {
     }
 
     async getMylist(mylist_id){
-        const id = this._getID(mylist_id);
-        await this._requestXML(id);
+        await this.requestXML(mylist_id);
         this.mylist = this.reader.parse(this.xml);
         return this.mylist;
     }
@@ -135,7 +136,31 @@ class NicoMylistReader {
     }
 }
 
+class NicoMylistStore {
+    constructor(get_dir_path){
+        this.get_dir_path = get_dir_path;
+        this.reader = new NicoMylistReader();
+    }
+
+    load(mylist_id){
+        const path = this._getFilePath(mylist_id);
+        const xml = fs.readFileSync(path, "utf-8");
+        return this.reader.parse(xml);
+    }
+
+    save(mylist_id, xml){
+        const path = this._getFilePath(mylist_id);
+        fs.writeFileSync(path, xml, "utf-8");
+    }
+
+    _getFilePath(mylist_id){
+        const dir = this.get_dir_path();
+        return path.join(dir, `mylist${mylist_id}.xml`);
+    }
+}
+
 module.exports = {
     NicoMylist: NicoMylist,
-    NicoMylistReader: NicoMylistReader
+    NicoMylistReader: NicoMylistReader,
+    NicoMylistStore: NicoMylistStore
 };

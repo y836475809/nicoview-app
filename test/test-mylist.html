@@ -32,6 +32,18 @@
 
     const mylist_mock = new NicoMylistMocks();
     mylist_mock.mylist();
+
+    const timeout = 200;
+    let timer;
+    window.addEventListener("resize", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            obs.trigger("resizeEndEvent", {
+                width: window.innerWidth, 
+                height: window.innerHeight 
+            });
+        }, timeout);
+    });
 </script>
 
 </html>

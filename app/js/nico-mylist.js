@@ -81,6 +81,7 @@ class NicoMylistReader {
             const id = link.match(/[^/]+$/)[0];
             const description = this._parseCDATA(item.find("description").text());
             items.push( {
+                no: i+1,
                 title: item.find("title").text(),
                 id: id,
                 link: link,

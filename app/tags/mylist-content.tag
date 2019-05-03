@@ -135,6 +135,7 @@
             return `<div>${result}</div>`;
         };
         const columns = [
+            {id: "no", name: "#"},
             {id: "thumb_img", name: "image", height:130, width: 200, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
             {id: "description", name: "説明", formatter:BRFormatter},

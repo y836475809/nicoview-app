@@ -150,6 +150,11 @@
         const grid_table = new GridTable("mylist-grid", columns, options);
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".mylist-grid"));
+            grid_table.onDblClick((e, data)=>{
+                const video_id = data.id;
+                obs.trigger("main-page:play-by-videoid", video_id);
+            });
+            
             resizeGridTable();
             try {
                 image_cache.load();

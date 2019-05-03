@@ -60,15 +60,68 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
-
+        const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
         const sidebar_name = "mylist-sidebar";
 
         this.mylist_description = "";
+
+        const image_cache = new CacheStore(
+            SettingStore.getMylistDir(), "image-cache.json");
 
         const nico_mylist_store = new NicoMylistStore(()=>{
             return SettingStore.getMylistDir();
         });
         let nico_mylist = null;
+
+        let is_local_item = false;
+
+        const hasLocalItem = () => {
+            const id = getMylistID();
+            return new Promise( (resolve, reject) => {
+                const cb = (has) =>{
+                    resolve(has);
+                };
+                obs.trigger(`${sidebar_name}:has-item`, {id, cb});
+            });
+        };
+
+        const getBase64 = (img, width, height) => {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext("2d");
+            // ctx.drawImage(img, 0, 0);
+            ctx.drawImage(img, 0, 0, width, height);
+            const data = canvas.toDataURL("image/jpeg");
+            return data;
+        };
+
+        const imageCacheFormatter = (row, cell, value, columnDef, dataContext)=> {
+            if(is_local_item){
+                const image = new Image();
+                image.width = columnDef.width;
+                image.height = columnDef.height;
+                if(image_cache.has(value)){
+                    console.log("cache value=", value);
+                    image.src = image_cache.get(value);    
+                }else{
+                    image.onload = (e) => {
+                        console.log("onload value=", value);
+                        const data = getBase64(e.target, image.width, image.height);
+                        image_cache.set(value, data);     
+                    };
+                    image.src = value;
+                }
+                
+                return image.outerHTML;
+            }else{
+                console.log("img value=", value);
+                return `<img src='${value}' 
+                    class="mylist-img"
+                    width="${columnDef.width}" 
+                    height="${columnDef.height}"/>`;
+            }
+        };
 
         const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
             return `<div class="line-break">${value}</div>`;
@@ -78,7 +131,7 @@
             return `<div>${result}</div>`;
         };
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130},
+            {id: "thumb_img", name: "image", height:100, width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
             {id: "description", name: "説明", formatter:BRFormatter},
             {id: "date", name: "投稿日"},
@@ -93,6 +146,11 @@
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".mylist-grid"));
             resizeGridTable();
+            try {
+                image_cache.load();
+            } catch (error) {
+                console.log(error);
+            }   
         });
 
         const resizeGridTable = () => {
@@ -102,7 +160,8 @@
 
         const getMylistID = () => {
             const elm = this.root.querySelector(".mylist-input");
-            return elm.value;
+            const value = elm.value;
+            return value.replace("mylist/", "");
         };
         const setMylistID = (id) => {
             const elm = this.root.querySelector(".mylist-input");
@@ -119,8 +178,12 @@
 
         const updateMylist = async(mylist_id) => {
             nico_mylist = new NicoMylist();
-            const mylist = await nico_mylist.getMylist(mylist_id);
-            setMylist(mylist);
+            try {
+                const mylist = await nico_mylist.getMylist(mylist_id);
+                setMylist(mylist);    
+            } catch (error) {
+                console.log(error);
+            }
         };
 
         const addMylist = (mylist) => {
@@ -135,17 +198,33 @@
             nico_mylist_store.save(id, nico_mylist.xml);
         };
 
+        const getImageCache = () => {
+            const elms = this.root.querySelectorAll(".mylist-img");
+            elms.forEach(elm => {
+                const src = elm.src;
+                const data = getBase64(elm);
+                image_cache.set(src, data);
+            });
+        };
+
         this.onclickUpdateMylist = async(e) => {  
+            is_local_item = await hasLocalItem();
             const mylist_id = getMylistID();
-            updateMylist(mylist_id);
+            await updateMylist(mylist_id);
+            if(is_local_item){
+                nico_mylist_store.save(mylist_id, nico_mylist.xml);
+            }
         };
 
         this.onclickAddMylist = (e) => {
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
+            getImageCache();
         };
 
         obs.on(`${sidebar_name}-dlbclick-item`, (item) => {
+            is_local_item = true;
+
             const id = item.id;
             const mylist = nico_mylist_store.load(id);
 
@@ -160,5 +239,9 @@
         obs.on("resizeEndEvent", (size)=> {
             resizeGridTable();
         });
+
+        window.onbeforeunload = (e) => {
+            image_cache.save();
+        };
     </script>
 </mylist-content>

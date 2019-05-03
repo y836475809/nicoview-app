@@ -35,6 +35,12 @@
             };
         }
 
+        const hasItem = (id) => {
+            return this.mylist_data.items.some(value=>{
+                return value.id == id;
+            });
+        };
+
         const save = (data) => {
             try {
                 this.store.save(data);
@@ -77,6 +83,11 @@
                 ]
             );
             obs.trigger(`${this.acdn.name}-change-expand`, true);
+        });
+
+        obs.on(`${this.acdn.name}:has-item`, (args) => {
+            const {id, cb} = args;
+            cb(hasItem(id));
         });
     </script>
 </mylist-sidebar>

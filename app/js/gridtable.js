@@ -196,6 +196,10 @@ class GridTable {
         this.dataView.refresh();
     }
 
+    scrollToTop(){
+        this.grid.scrollRowToTop(0);
+    }
+
     _filter(item, args) {
         if(args===undefined){
             return true;

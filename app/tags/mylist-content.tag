@@ -179,6 +179,7 @@
 
             const items = mylist.items;
             grid_table.setData(items);
+            grid_table.scrollToTop();
         };
 
         const updateMylist = async(mylist_id) => {

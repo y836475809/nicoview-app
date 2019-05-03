@@ -102,12 +102,16 @@
                 image.width = columnDef.width;
                 image.height = columnDef.height;
                 if(image_cache.has(value)){
-                    console.log("cache value=", value);
+                    // console.log("cache value=", value);
                     image.src = image_cache.get(value);    
                 }else{
                     image.onload = (e) => {
-                        console.log("onload value=", value);
-                        const data = getBase64(e.target, image.width, image.height);
+                        // console.log("onload value=", value);
+                        const org_width = e.target.width;
+                        const org_height = e.target.height;
+                        const width = columnDef.width;
+                        const height = org_height * (columnDef.width / org_width);
+                        const data = getBase64(e.target, width, height);
                         image_cache.set(value, data);     
                     };
                     image.src = value;
@@ -115,7 +119,7 @@
                 
                 return image.outerHTML;
             }else{
-                console.log("img value=", value);
+                // console.log("img value=", value);
                 return `<img src='${value}' 
                     class="mylist-img"
                     width="${columnDef.width}" 
@@ -131,7 +135,7 @@
             return `<div>${result}</div>`;
         };
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130, formatter:imageCacheFormatter},
+            {id: "thumb_img", name: "image", height:130, width: 200, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
             {id: "description", name: "説明", formatter:BRFormatter},
             {id: "date", name: "投稿日"},
@@ -139,7 +143,7 @@
             {id: "length", name: "時間"}
         ];
         const options = {
-            rowHeight: 100,
+            rowHeight: 130,
             _saveColumnWidth: true,
         };    
         const grid_table = new GridTable("mylist-grid", columns, options);

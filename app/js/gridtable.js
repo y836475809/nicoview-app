@@ -80,7 +80,8 @@ class GridTable {
         });
         this.dataView.onRowCountChanged.subscribe((e, args) => {
             this.grid.updateRowCount();
-            this.grid.render();
+            //todo
+            // this.grid.render();
         });
     
         this.dataView.onRowsChanged.subscribe((e, args) => {

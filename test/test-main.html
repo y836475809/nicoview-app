@@ -25,10 +25,13 @@
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-    const { NicoSearchMocks, NicoDownLoadMocks, setupNicoDownloadNock } = require("./mock_server/nico-mock");
-    
     process.env.NODE_ENV = "DEBUG";
-    
+    process.env.NODE_ENTRYPOINT = "test-main";
+
+    const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
+        setupNicoDownloadNock } = require("./mock_server/nico-mock");
+    require("./mock_server/http-server");
+
     const nico_search_mock = new NicoSearchMocks();
     nico_search_mock.search();
 
@@ -41,6 +44,9 @@
         setupNicoDownloadNock(dl_nock);
         video_fs.push(dl_nock);
     });
+
+    const mylist_mock = new NicoMylistMocks();
+    mylist_mock.mylist();
 
     riot.mount("main-page");
 

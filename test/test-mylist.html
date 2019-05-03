@@ -25,6 +25,10 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     var riot = require("riot");     // eslint-disable-line
     var obs = riot.observable();    // eslint-disable-line
+
+    process.env.NODE_ENV = "DEBUG";
+    process.env.NODE_ENTRYPOINT = "test-mylist";
+
     require(`${app_base_dir}/tags/mylist-page.tag`);
     riot.mount("mylist-page");
 

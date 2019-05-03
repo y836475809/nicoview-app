@@ -45,7 +45,8 @@
         .main-group-buttons .fa-search,
         .main-group-buttons .fa-download,  
         .main-group-buttons .fa-history, 
-        .main-group-buttons .fa-cog {
+        .main-group-buttons .fa-cog,
+        .main-group-buttons .fa-list {
             font-size: 30px;
             color: lightgrey;
         }
@@ -58,6 +59,10 @@
         <label class="label">
             <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
             <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
+        </label>
+        <label class="label">
+            <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
+            <span title="Mylist" class="button center-hv"><span class="fas fa-list"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
@@ -77,6 +82,9 @@
     </div>
     <div class="page-container search-page">
         <search-container-page></search-container-page>
+    </div>
+    <div class="page-container mylist-page">
+        <mylist-page></mylist-page>
     </div>
     <div class="page-container download-page">
         <download-page></download-page>
@@ -100,6 +108,7 @@
         require(`${app_base_dir}/tags/download-page.tag`);
         require(`${app_base_dir}/tags/play-history.tag`);
         require(`${app_base_dir}/tags/preference-page.tag`);
+        require(`${app_base_dir}/tags/mylist-page.tag`);
 
         let template = [{
             label: "File",
@@ -158,6 +167,7 @@
             riot.mount("download-page");
             riot.mount("play-history");
             riot.mount("preference-page");
+            riot.mount("mylist-page");
 
             select_page("library");
 

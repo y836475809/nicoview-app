@@ -21,7 +21,9 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
         require(`${app_base_dir}/tags/accordion.tag`);
-        riot.mount("accordion");
+        if(process.env.NODE_ENTRYPOINT == "test-mylist"){
+            riot.mount("accordion");
+        }
 
         const file_path = SettingStore.getSystemFile("mylist.json");
 

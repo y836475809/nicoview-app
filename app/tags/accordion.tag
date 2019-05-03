@@ -30,6 +30,8 @@
             transition: all 0.5s;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;
+            white-space: nowrap; 
+            overflow: hidden;
         }
 
         .acdn-item:hover {
@@ -54,6 +56,7 @@
     <div class="toggle-menu">
         <ul class="acdn-list">
             <li class="acdn-item" each={ item,i in this.items }
+                title={item.title}
                 data-id={i}
                 onclick={this.onclickItem.bind(this,item)} 
                 ondblclick={this.ondblclickItem.bind(this,item)}

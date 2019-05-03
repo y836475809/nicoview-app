@@ -29,6 +29,7 @@
     riot.mount("mylist-page");
 
     const { NicoMylistMocks } = require("./mock_server/nico-mock");
+    require("./mock_server/http-server");
 
     const mylist_mock = new NicoMylistMocks();
     mylist_mock.mylist();

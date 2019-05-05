@@ -65,7 +65,7 @@
 
 <script>
     // const anime = require("animejs");
-    const util = require("./test_comments");
+    const { randomComments, sampleComments, fixedSampleComments } = require("./test_comments");
     const CommentTimeLineManager = require("../app/js/comment_timeline_manager");
   
     let ctls = null;
@@ -80,7 +80,7 @@
     let loadSample = ()=>{
         init();
 
-        let comments = util.sampleComments();
+        let comments = sampleComments();
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;
@@ -94,7 +94,7 @@
     let loadFixedSample = ()=>{
         init();
 
-        let comments = util.fixedSampleComments();
+        let comments = fixedSampleComments();
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;
@@ -109,7 +109,7 @@
         init();
 
         const num = parseInt(document.getElementById("random-num").value);
-        let comments = util.randomComments(num, 1.5*1000);
+        let comments = randomComments(num, 500);
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;

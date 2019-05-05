@@ -15,7 +15,7 @@ let randomText = (min, max)=>{
     return cm;
 };
 
-module.exports.randomComments = function(cm_num, interval_ms){
+const randomComments = (cm_num, interval_ms) => {
     const interval_min = 200/10;
     const interval_max = interval_ms/10;
     const text_max = 30;
@@ -33,7 +33,7 @@ module.exports.randomComments = function(cm_num, interval_ms){
     return cms;
 };
 
-module.exports.sampleComments = function(){
+const sampleComments = () => {
     return  [
         { no: 1, vpos: 0,    text: "あああああああああAAAああああ" , mail:"" },
         { no: 2, vpos: 143,  text: "いいいいいい" , mail:"big" },
@@ -48,7 +48,7 @@ module.exports.sampleComments = function(){
     ];
 };
 
-module.exports.fixedSampleComments = function(){
+const fixedSampleComments = () => {
     return  [
         { no: 1, vpos: 0,    text: "あああああああああAAAああああ" , mail:"ue" },
         { no: 2, vpos: 100,  text: "いいいいいい" , mail:"big ue" },
@@ -64,4 +64,10 @@ module.exports.fixedSampleComments = function(){
         { no: 12, vpos: 400,    text: "#いいいいいい#" , mail:"shita" },
         { no: 13, vpos: 450,    text: "#ううう#" , mail:"shita" },
     ];
+};
+
+module.exports = {
+    randomComments,
+    sampleComments,
+    fixedSampleComments
 };

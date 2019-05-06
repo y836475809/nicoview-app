@@ -1,0 +1,258 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        #area{
+            position: absolute;
+            left: 100px;
+            top: 100px;
+            height: 80%;
+            width: 60%;
+            border: 1px solid #000000;
+        }
+        .comment{
+            position :absolute;
+
+            color: #000000;
+            border: 1px solid #FF6600;   
+            width: 60px;
+            /* display: none;         */
+        }
+
+        .test-btn{
+            width:80px;
+        }
+        .test-intput{
+            width:100px;
+        }   
+
+        .crt-group {
+            margin-left: 30px;
+            margin-right: 30px;
+        }   
+    </style>
+</head>
+
+<body>
+    <div id="timer">0</div>
+    <div style="display:flex;">
+        <div class="crt-group">
+            <button class="test-btn" type=button onclick="createtw();">load flow</button>
+            <button class="test-btn" type=button onclick="loadSample();">run flow</button>
+            <div>
+                <label>sample: div num
+                    <input type="number" id="seek-num" class="test-intput" value="2"/></label>
+                <button class="test-btn" type=button onclick="seektw();">seek flow</button>
+            </div>
+        </div>
+        <div>
+            <button class="test-btn" type=button onclick="createfix();">load fix</button>
+            <button class="test-btn" type=button onclick="runfix();">run fix</button>
+            <div>
+                <label>sample: div num
+                    <input type="number" id="seek-flow-num" class="test-intput" value="2"/></label>
+                <button class="test-btn" type=button onclick="seekfix();">seek fix</button>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div id="area"></div>
+</body>
+
+<script>
+    const { CommentFlow } = require("../app/js/comment-flow");
+    const { randomComments, sampleComments } = require("./test_comments");
+    const area_elm = document.getElementById("area");
+    const duration_msec = 4000;
+    const commnet_flow = new CommentFlow(duration_msec, 12);
+        
+    const TextComments = (text) => {
+        return  [
+            { no: 1, vpos: 0,    text: `${text}-0` , mail:"" },
+            { no: 2, vpos: 50,  text:  `${text}-50` , mail:"" },
+            { no: 3, vpos: 100,  text:  `${text}-100` , mail:"" },
+            { no: 4, vpos: 150,  text:  `${text}-150` , mail:"" },
+            { no: 5, vpos: 200,  text:  `${text}-200` , mail:"" },
+            { no: 6, vpos: 250,  text:  `${text}-250` , mail:"" },
+            { no: 7, vpos: 300,  text:  `${text}-300` , mail:"" },
+            { no: 8, vpos: 350,  text:  `${text}-350` , mail:"" },
+            { no: 9, vpos: 400,  text:  `${text}-400` , mail:"" },
+            { no: 10, vpos: 450, text:   `${text}-450` , mail:"" },
+        ];
+    };
+
+    const mm = new Map();
+    const tws = [];
+    let createtw = ()=>{
+        console.log("start createtw=");
+        // const commnets = TextComments("ああああ");
+        // const commnets = sampleComments();
+        const commnets = randomComments(4000, 500);
+        commnet_flow.create(area_elm, commnets);
+        console.log("end createtw=");
+    };
+
+    let cutimer = 0;
+    let cutimer_id = null;
+    let is_running = false;
+    let loadSample = ()=>{
+        if(is_running){
+            commnet_flow.pause();
+            // cutimer = 0;
+            if(cutimer_id){
+                clearInterval(cutimer_id);
+            }
+        }else{
+            commnet_flow.play();
+            cutimer_id = setInterval(()=>{
+                const target = document.getElementById("timer");
+                target.textContent = cutimer;
+                cutimer+=100;
+            }, 100);
+        }
+        is_running = !is_running;
+    };
+
+    let seektw = ()=>{
+        const num  = parseFloat(document.getElementById("seek-num").value);
+        
+
+        const current_sec= cutimer/1000;
+        console.log("start=");
+        commnet_flow.seek(num, current_sec); 
+        // is_running=false;
+        console.log("end=");
+
+        cutimer=num*1000;
+        const target = document.getElementById("timer");
+        target.textContent = cutimer;
+        // TweenMax.resumeAll();
+    };
+    
+    const createfix = ()=>{
+        const num  = 10;
+
+        const elems = [];
+        let fragment = document.createDocumentFragment();
+        for (let index = 0; index < num; index++) {
+            let elm = document.createElement("div");
+            elm.innerText = `text flow${index}`;
+            elm.id = `tw-comment${index}`;
+            elm.style.display = "none";
+            elm.classList.add("comment");
+            const rowindex = index % 12;
+            const row_h = 30;
+            elm.style.left = 200 + "px";
+            elm.style.top = (rowindex * row_h) + "px";
+            // elm.setAttribute("data-delay", index*0.2 + getRandom(0.1, 1.0));
+            elm.setAttribute("data-delay", index*1);
+            elems.push(elm);
+            fragment.appendChild(elm);   
+        }
+        document.getElementById("area").appendChild(fragment);
+
+        elems.forEach(elm => {
+            const id = elm.id;      
+            const delay = elm.getAttribute("data-delay");
+            const tw = TweenMax.to(`#${id}`, 4, 
+                { 
+                    delay: delay,
+                    paused:true,
+                    alpha: 1, display: "block", 
+                    onStart: function(){
+                        mm.set(this.target[0].id, false);
+                        // console.log("onStart");
+                        this.target[0].style.display = "block";
+                    },
+                    onComplete: function(){
+                        mm.set(this.target[0].id, true);
+                        // console.log(this.target);
+                        this.target[0].style.display = "none";
+                    }
+                });
+            tws.push(tw);      
+        });
+    };
+
+    const runfix = ()=>{
+        if(is_running){
+            TweenMax.pauseAll();
+            // cutimer = 0;
+            if(cutimer_id){
+                clearInterval(cutimer_id);
+            }
+        }else{
+            TweenMax.resumeAll();
+            cutimer_id = setInterval(()=>{
+                const target = document.getElementById("timer");
+                target.textContent = cutimer;
+                cutimer+=100;
+            }, 100);
+        }
+        is_running = !is_running;
+    };
+    const seekfix = ()=>{
+        const num  = parseFloat(document.getElementById("seek-flow-num").value);
+        console.log("start=");
+        tws.forEach(value=>{
+            const elm = value.target[0];
+            const delay = parseFloat(elm.getAttribute("data-delay"));
+            
+            const ss = num - delay; 
+            if(mm.has(elm.id)){
+                if(mm.get(elm.id)==true){
+                    if(ss<0){
+                        // elm.style.display = "none";
+                        // value.time(0);
+                        value.delay(delay-num);
+                        value.restart(true,true);
+                        // value.seek(0);
+                    }else{
+                        // elm.style.display = "block";
+                        value.time(ss);
+                        // value.seek(ss);
+                    }
+                }else{
+                    if(ss<0){
+                        // elm.style.display = "none";
+                        // value.time(ss);
+                        value.delay(delay-num);
+                        value.restart(true,true);
+                        // value.time(delay-num);
+                        // value.seek(0);
+                    }else{
+                        // elm.style.display = "block";
+                        value.time(ss);
+                        // value.seek(ss);
+                    }
+                }
+            }else{
+                if(ss<0){
+                    // elm.style.display = "none";
+                    // value.time(0);
+                    value.delay(delay-num);
+                    value.restart(true,true);
+                    // value.seek(0);
+                }else{
+                    // elm.style.display = "block";
+                    value.time(ss);
+                    // value.seek(ss);
+                }
+            }
+        });
+        TweenMax.pauseAll();
+        is_running=false;
+        console.log("end=");
+        // TweenMax.resumeAll();
+    };
+</script>
+
+</html>

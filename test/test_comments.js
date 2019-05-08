@@ -66,8 +66,28 @@ const fixedSampleComments = () => {
     ];
 };
 
+const randomfixedComments = (cm_num, interval_ms) => {
+    const interval_min = 200/10;
+    const interval_max = interval_ms/10;
+    const text_max = 30;
+
+    let cms = [];
+    cms.push({ no: 1, vpos: 0, text: randomText(1, text_max), mail:"ue" });
+
+    for (let index = 1; index < cm_num; index++) {
+        const text = randomText(1, text_max);
+        const interval = getRandom(interval_min, interval_max);
+        const vpos = cms[cms.length-1].vpos + interval;
+        const pos = getRandom(0, 1) < 0.5?"ue":"shita";
+        cms.push({ no: index+1, vpos: vpos, text: text, mail:pos });
+    }
+
+    return cms;
+};
+
 module.exports = {
     randomComments,
     sampleComments,
-    fixedSampleComments
+    fixedSampleComments,
+    randomfixedComments
 };

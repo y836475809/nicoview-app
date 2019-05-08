@@ -126,7 +126,7 @@
             <div>{this.title}</div>
             <div>投稿日 : {this.first_retrieve}</div>
             <div>再生 : {this.view_counter}</div>
-            <div>コメント : {this.comment_num}</div>
+            <div>コメント : {this.comment_counter}</div>
             <div>マイリスト : {this.mylist_counter}</div>
         </div>
     </div>
@@ -161,7 +161,7 @@
         this.title =  "";
         this.first_retrieve =  "";
         this.view_counter = 0;
-        this.comment_num = 0;
+        this.comment_counter = 0;
         this.mylist_counter = 0;
         this.user_thumbnail_url = "";
         
@@ -279,7 +279,7 @@
             this.title = viewinfo.thumb_info.title;
             this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);
             this.view_counter = viewinfo.thumb_info.view_counter;
-            this.comment_num = viewinfo.thumb_info.comment_counter;
+            this.comment_counter = viewinfo.thumb_info.comment_counter;
             this.mylist_counter = viewinfo.thumb_info.mylist_counter;
             this.user_nickname = viewinfo.thumb_info.user_nickname;
             this.user_icon_url = viewinfo.thumb_info.user_icon_url;

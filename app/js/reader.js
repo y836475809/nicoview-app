@@ -81,7 +81,7 @@ function thumb_info(xml) {
         size_high: size_high,
         size_low: size_low,
         view_counter: view_counter,
-        comment_num: comment_num,
+        comment_counter: comment_num,
         mylist_counter: mylist_counter,
         last_res_body: last_res_body,
         watch_url: watch_url,

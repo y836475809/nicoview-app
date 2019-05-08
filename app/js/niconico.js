@@ -550,7 +550,7 @@ function getThumbInfo(api_data){
         length: video.duration,
         video_type: video_type,
         view_counter: video.viewCount,
-        comment_num: thread.commentCount,
+        comment_counter: thread.commentCount,
         mylist_counter: video.mylistCount,
         tags: tags,
         user_id: owner.id,

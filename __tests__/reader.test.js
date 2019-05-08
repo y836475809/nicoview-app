@@ -43,7 +43,7 @@ test("read thumb info", (t) => {
     t.is(obj.size_high, 1000);
     t.is(obj.size_low, 500);
     t.is(obj.view_counter, 100);
-    t.is(obj.comment_num, 10);
+    t.is(obj.comment_counter, 10);
     t.is(obj.mylist_counter, 5);
     t.is(obj.last_res_body, "最新コメント1 最新コメント2");
     t.is(obj.watch_url, "http://www.nicovideo.jp/watch/sm1000");

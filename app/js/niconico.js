@@ -1,4 +1,5 @@
-const { JSDOM } = require("jsdom");
+// const { JSDOM } = require("jsdom");
+const cheerio = require("cheerio");
 const request = require("request");
 const { NicoRequest } = require("./nico-request");
 
@@ -52,8 +53,10 @@ class NicoWatch extends NicoRequest{
                 cookie_headers.forEach(value=>{
                     cookie_jar.setCookie(value, uri);
                 });
-                const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                const data_json = data_elm.getAttribute("data-api-data");
+                let $ = cheerio.load(body);
+                const data_json = $("#js-initial-watch-data").attr("data-api-data");
+                // const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
+                // const data_json = data_elm.getAttribute("data-api-data");
                 if(!data_json){
                     reject(new Error("not find data-api-data")); 
                 }else{                     

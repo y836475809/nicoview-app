@@ -181,6 +181,6 @@ test("watch no js-initial-watch-data", async (t) => {
         await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.message, "Cannot read property 'getAttribute' of null");
+        t.is(error.message, "not find data-api-data");
     }
 });

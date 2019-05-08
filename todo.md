@@ -73,7 +73,7 @@
 - [ ] mylist、userlistページ追加
 - [ ] requestのパラメータ(タイムアウト時間等)を設定ページから設定する
 - [ ] ファイル名の形式を統一する(区切りを-にする、niconico～をnico～にする等)
-- [ ] jsdom -> cheerio?
+- [x] jsdom -> cheerio
 - [ ] テストでnock.disableNetConnect();を追加する
 - [ ] obsのメッセージ形式を「from」: 「イベント」にする
 - [ ] accordionのアイテムの保存でアイコン名、スタイルの項目は保存しないようにする

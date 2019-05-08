@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.7.2",
-    "animejs": "^3.0.1",
     "cheerio": "^1.0.0-rc.2",
     "gsap": "^2.1.2",
     "jquery": "^3.3.1",

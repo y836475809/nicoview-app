@@ -1,4 +1,4 @@
-const JsonStore = require("./json-strore");
+const JsonStore = require("./json-store");
 
 class HistoryStore{
     constructor(file_path, history_max){

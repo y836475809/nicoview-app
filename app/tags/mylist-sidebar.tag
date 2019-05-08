@@ -17,7 +17,7 @@
         /* globals app_base_dir obs riot */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require(`${app_base_dir}/js/json-strore`);
+        const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
         require(`${app_base_dir}/tags/accordion.tag`);

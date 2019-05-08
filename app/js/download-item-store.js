@@ -1,4 +1,4 @@
-const JsonStore = require("./json-strore");
+const JsonStore = require("./json-store");
 
 class DownloadItemStore {
     constructor(file_path){

@@ -2,7 +2,7 @@ const { TweenMax, TimelineMax } = require("gsap");
 const FlowComment = require("./flow_comment");
 const FixedComment = require("./fixed_comment");
 
-class CommentFlow {
+class CommentTimeLine {
     /**
      * 
      * @param {HTMLElement} parent_elm 
@@ -272,5 +272,5 @@ class CommentFlow {
 }
 
 module.exports = {
-    CommentFlow: CommentFlow,
+    CommentTimeLine: CommentTimeLine,
 };

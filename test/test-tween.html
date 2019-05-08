@@ -61,7 +61,7 @@
 </body>
 
 <script>
-    const { CommentFlow } = require("../app/js/comment-flow");
+    const { CommentTimeLine } = require("../app/js/comment-timeline");
     const { randomComments, sampleComments, 
         fixedSampleComments, randomfixedComments } = require("./test_comments");
     
@@ -70,7 +70,7 @@
     
     window.addEventListener("DOMContentLoaded", () => {
         const area_elm = document.getElementById("area");
-        commnet_tl = new CommentFlow(area_elm, duration_sec, 12);
+        commnet_tl = new CommentTimeLine(area_elm, duration_sec, 12);
     });
 
     const TextComments = (text) => {

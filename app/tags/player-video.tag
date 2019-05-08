@@ -29,6 +29,7 @@
         /* globals app_base_dir obs */
         const { CommentTimeLine } = require(`${app_base_dir}/js/comment-timeline`);
         
+        let video_elm = null;
         let play_data = null;
         let comment_tl = null;
 
@@ -44,76 +45,77 @@
             comment_tl.create(comments);
         };
 
-        const moveSeek = (current) => {
-            if(this.refs.player_video.paused){
-                this.refs.player_video.currentTime = current;
+        const seek = (current) => {
+            if(video_elm.paused){
+                video_elm.currentTime = current;
                 if(comment_tl){
                     comment_tl.seek(current);
                 }
             }else{
-                this.refs.player_video.pause();
-                this.refs.player_video.currentTime = current;
-                this.refs.player_video.play();
+                video_elm.pause();
+                video_elm.currentTime = current;
+                video_elm.play();
             } 
         };
 
         obs.on("receivedData", (data) => {
             play_data = data;
-            
-            const video = this.refs.player_video;
-            video.src = data.src;
-            video.type = data.type;
+
+            video_elm.src = data.src;
+            video_elm.type = data.type;
 
             createTimeLine(data.comments);
 
-            video.load();
+            video_elm.load();
         });
 
         this.on("mount", function () {
-            this.refs.player_video.addEventListener("loadedmetadata", (event) => {
+            video_elm = this.root.querySelector("#player");
+
+            video_elm.addEventListener("loadedmetadata", (event) => {
                 const video_size = {
                     width: event.target.videoWidth,
                     height: event.target.videoHeight
                 };
                 obs.trigger("load_meta_data", video_size);
-                obs.trigger("seek_reload", this.refs.player_video.duration);
+                obs.trigger("seek_reload", video_elm.duration);
             });
 
-            this.refs.player_video.addEventListener("loadeddata", (event) => {
+            video_elm.addEventListener("loadeddata", (event) => {
                 console.log("loadeddata event=", event);
                 obs.trigger("loaded_data");
             });
-            this.refs.player_video.addEventListener("play", () => {
+            video_elm.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
                 if(comment_tl){
                     comment_tl.play();
                 }
             });
-            this.refs.player_video.addEventListener("pause", () => {
+            video_elm.addEventListener("pause", () => {
                 console.log("addEventListener pauseによるイベント発火");
                 if(comment_tl){
                     comment_tl.pause();
                 }
             });
 
-            this.refs.player_video.addEventListener("timeupdate", () => {
-                const current = this.refs.player_video.currentTime;
+            video_elm.addEventListener("timeupdate", () => {
+                const current = video_elm.currentTime;
                 obs.trigger("seek_update", current);
             });
-            this.refs.player_video.addEventListener("progress", function(){
+            video_elm.addEventListener("progress", function(){
                 console.log("addEventListener progressによるイベント発火");
             }); 
-            this.refs.player_video.addEventListener("waiting", function(){
+            video_elm.addEventListener("waiting", function(){
                 console.log("addEventListener waitingによるイベント発火");
             }); 
-            this.refs.player_video.addEventListener("canplay", function(){
+            video_elm.addEventListener("canplay", function(){
                 console.log("addEventListener canplayによるイベント発火");
             }); 
-            this.refs.player_video.addEventListener("playing", () => {
+            video_elm.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
                 //TODO
                 if(comment_tl){
-                    const current = this.refs.player_video.currentTime;
+                    const current = video_elm.currentTime;
                     comment_tl.pause();
                     comment_tl.seek(current);
                     comment_tl.play();
@@ -122,19 +124,19 @@
             
             obs.on("play", () => {
                 console.log("player.tag play");
-                this.refs.player_video.play();
+                video_elm.play();
             });
             obs.on("pause", () => {
                 console.log("player.tag pause");
-                this.refs.player_video.pause();
+                video_elm.pause();
             });
 
             obs.on("on_seeked", (current) => {  
-                moveSeek(current); 
+                seek(current); 
             });
 
             obs.on("on_change_volume", (volume) => {
-                this.refs.player_video.volume = volume ;
+                video_elm.volume = volume ;
             });
            
             obs.on("on_resize_begin", () => {
@@ -146,15 +148,15 @@
             obs.on("resizeEndEvent", (wsize) => {
                 if(comment_tl){
                     createTimeLine(play_data.comments);
-                    const current = this.refs.player_video.currentTime;
-                    moveSeek(current);
+                    const current = video_elm.currentTime;
+                    seek(current);
                 }
             });
             obs.on("reset_comment_timelime", () => {
                 if(comment_tl){
                     createTimeLine(play_data.comments);
-                    const current = this.refs.player_video.currentTime;
-                    moveSeek(current);
+                    const current = video_elm.currentTime;
+                    seek(current);
                 }
             });
         });

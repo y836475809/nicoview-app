@@ -15,12 +15,14 @@
     <player-viewinfo-page></player-viewinfo-page>
 </body>
 <script>
+    //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
+    //Uncaught DOMException: Failed to execute 'createElement' on 'Document': The tag name provided ('http://www.w3.org/2000/svg') is not a valid name.
+    var { TweenMax, TimelineMax } = require("gsap"); // eslint-disable-line
     const {remote, ipcRenderer} = require("electron");
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
-
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-
+    
     require(`${app_base_dir}/tags/player-viewinfo-page.tag`);
     riot.mount("player-viewinfo-page");
 

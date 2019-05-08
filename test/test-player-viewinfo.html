@@ -32,6 +32,9 @@
 </body>
 
 <script>
+    //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
+    //Uncaught DOMException: Failed to execute 'createElement' on 'Document': The tag name provided ('http://www.w3.org/2000/svg') is not a valid name.
+    var { TweenMax, TimelineMax } = require("gsap"); // eslint-disable-line
     const path = require("path");
     const fs = require("fs");
     const remote = require("electron").remote;

@@ -27,36 +27,50 @@
 
     <script>
         /* globals app_base_dir obs */
-        const CommentTimeLineManager = require(`${app_base_dir}/js/comment_timeline_manager`);
+        // const CommentTimeLineManager = require(`${app_base_dir}/js/comment_timeline_manager`);
         
-        let ctls = null;
-        let video_size = null;
+        const { CommentFlow } = require(`${app_base_dir}/js/comment-flow`);
+        
+        // let ctls = null;
+        let play_data = null;
+        let comment_tl = null;
+        // let video_size = null;
 
-        let get_time_func = ()=>{
-            return this.refs.player_video.currentTime*1000;
-        };
+        // let get_time_func = ()=>{
+        //     return this.refs.player_video.currentTime*1000;
+        // };
         let createTimeLines = (comments, div_num)=>{
-            const parent_id = "player-video-screen";
+            // const parent_id = "player-video-screen";
             const row_num = 12;
-            const interval_ms = 100;
-            const duration = 3000;
+            // const interval_ms = 100;
+            // const duration = 3000;
+            const duration_sec = 4;
 
-            ctls = new CommentTimeLineManager(
-                parent_id, 
-                div_num, 
-                row_num, 
-                interval_ms, 
-                get_time_func);
-            ctls.create(comments, duration);
-            console.log("ctl_list.length=", ctls.timelines.length);
-            console.log(".comment.length=", document.querySelectorAll(".comment").length);
+            // ctls = new CommentTimeLineManager(
+            //     parent_id, 
+            //     div_num, 
+            //     row_num, 
+            //     interval_ms, 
+            //     get_time_func);
+            // ctls.create(comments, duration);
+            // console.log("ctl_list.length=", ctls.timelines.length);
+            // console.log(".comment.length=", document.querySelectorAll(".comment").length);
+            const parent = this.root.querySelector("#player-video-screen");
+            if(comment_tl){
+                comment_tl.clear();
+            }
+            comment_tl = new CommentFlow(parent, duration_sec, row_num);
+            comment_tl.create(comments);
         };
 
         const moveSeek = (current) => {
             if(this.refs.player_video.paused){
                 this.refs.player_video.currentTime = current;
-                if(ctls!=null){
-                    ctls.seek(current * 1000);
+                // if(ctls!=null){
+                //     ctls.seek(current * 1000);
+                // }
+                if(comment_tl){
+                    comment_tl.seek(current);
                 }
             }else{
                 this.refs.player_video.pause();
@@ -83,19 +97,21 @@
 
         obs.on("receivedData", (data) => {
             console.log("data=", data);
-
+            play_data = data;
+            
             let video = this.refs.player_video;
             video.src = data.src;
             video.type = data.type;
          
-            if(ctls){
-                ctls.delete();
-            }
-            ctls = null;
-            if(data.comments.length>0){
-                const div_num = 200;
-                createTimeLines(data.comments, div_num);
-            }
+            // if(ctls){
+            //     ctls.delete();
+            // }
+            // ctls = null;
+            // if(data.comments.length>0){
+            //     const div_num = 200;
+            //     createTimeLines(data.comments, div_num);
+            // }
+            createTimeLines(data.comments);
 
             video.load();
         });
@@ -104,7 +120,7 @@
             console.log("mount");
 
             this.refs.player_video.addEventListener("loadedmetadata", (event) => {
-                video_size = {
+                const video_size = {
                     width: event.target.videoWidth,
                     height: event.target.videoHeight
                 };
@@ -118,14 +134,20 @@
             });
             this.refs.player_video.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
-                if(ctls!=null){
-                    ctls.play();
+                // if(ctls!=null){
+                //     ctls.play();
+                // }
+                if(comment_tl){
+                    comment_tl.play();
                 }
             });
             this.refs.player_video.addEventListener("pause", () => {
                 console.log("addEventListener pauseによるイベント発火");
-                if(ctls!=null){
-                    ctls.pause();
+                // if(ctls!=null){
+                //     ctls.pause();
+                // }
+                if(comment_tl){
+                    comment_tl.pause();
                 }
             });
 
@@ -144,12 +166,19 @@
             }); 
             this.refs.player_video.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
-                if(ctls!=null){
+                // if(ctls!=null){
+                //     const current = this.refs.player_video.currentTime;
+                //     console.log("addEventListener playingによるイベント発火 current= ", current);
+                //     ctls.pause();
+                //     ctls.seek(current * 1000);
+                //     ctls.play();
+                // }
+                //TODO
+                if(comment_tl){
                     const current = this.refs.player_video.currentTime;
-                    console.log("addEventListener playingによるイベント発火 current= ", current);
-                    ctls.pause();
-                    ctls.seek(current * 1000);
-                    ctls.play();
+                    comment_tl.pause();
+                    comment_tl.seek(current);
+                    comment_tl.play();
                 }
             });
             
@@ -171,22 +200,36 @@
             });
            
             obs.on("on_resize_begin", () => {
-                if(ctls!=null){
-                    ctls.pause();
+                // if(ctls!=null){
+                //     ctls.pause();
+                // }
+                if(comment_tl){
+                    comment_tl.pause();
                 }
             });
 
             obs.on("resizeEndEvent", (wsize) => {
-                if(ctls!=null){
-                    ctls.reset();
+                // if(ctls!=null){
+                //     ctls.reset();
+                //     const current = this.refs.player_video.currentTime;
+                //     moveSeek(current);
+                // }
+                if(comment_tl){
+                    createTimeLines(play_data.comments);
                     const current = this.refs.player_video.currentTime;
                     moveSeek(current);
                 }
             });
             obs.on("reset_comment_timelime", () => {
-                if(ctls!=null){
-                    ctls.pause();
-                    ctls.reset();
+                // if(ctls!=null){
+                //     ctls.pause();
+                //     ctls.reset();
+                //     const current = this.refs.player_video.currentTime;
+                //     moveSeek(current);
+                // }
+                if(comment_tl){
+                    // comment_tl.pause();
+                    createTimeLines(play_data.comments);
                     const current = this.refs.player_video.currentTime;
                     moveSeek(current);
                 }

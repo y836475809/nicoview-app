@@ -19,6 +19,7 @@ test("nico mylist parse xml", t => {
         creator: "user1",
         items: [
             {
+                no: 1,
                 title: "動画3",
                 id: "sm12345678",
                 link: "http://www.nicovideo.jp/watch/sm12345678",
@@ -30,6 +31,7 @@ test("nico mylist parse xml", t => {
                 comment_count: "100"
             },
             {
+                no: 2,
                 title: "動画2",
                 id: "sm20",
                 link: "http://www.nicovideo.jp/watch/sm20",
@@ -41,6 +43,7 @@ test("nico mylist parse xml", t => {
                 comment_count: "1,000"
             },
             {
+                no: 3,
                 title: "動画1",
                 id: "sm10",
                 link: "http://www.nicovideo.jp/watch/sm10",

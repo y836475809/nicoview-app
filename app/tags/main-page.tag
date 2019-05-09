@@ -103,14 +103,8 @@
         const {Menu} = remote;
         let riot = require("riot");
 
-        require(`${app_base_dir}/tags/split-page-templete.tag`); 
-        require(`${app_base_dir}/tags/accordion.tag`);
-        require(`${app_base_dir}/tags/library-page.tag`);
-        require(`${app_base_dir}/tags/search-container-page.tag`);
-        require(`${app_base_dir}/tags/download-page.tag`);
-        require(`${app_base_dir}/tags/play-history.tag`);
-        require(`${app_base_dir}/tags/preference-page.tag`);
-        require(`${app_base_dir}/tags/mylist-page.tag`);
+        const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
+        requireMainTags(app_base_dir);
 
         let template = [{
             label: "File",
@@ -165,11 +159,11 @@
 
         this.on("mount", function () {
             riot.mount("library-page");
-            // riot.mount("search-container-page");   
-            // riot.mount("download-page");
-            // riot.mount("play-history");
+            riot.mount("search-container-page");   
+            riot.mount("download-page");
+            riot.mount("play-history");
             riot.mount("preference-page");
-            // riot.mount("mylist-page");
+            riot.mount("mylist-page");
 
             select_page("library");
 

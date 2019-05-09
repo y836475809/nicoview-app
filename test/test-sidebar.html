@@ -26,9 +26,11 @@
     const {Menu} = remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var riot = require("riot"); 
-    var obs = riot.observable();
-    require(`${app_base_dir}/tags/accordion.tag`);
+    var riot = require("riot"); // eslint-disable-line
+    var obs = riot.observable(); // eslint-disable-line
+    
+    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
+    requireMainTags(app_base_dir);
 
     const p = console.log;
 

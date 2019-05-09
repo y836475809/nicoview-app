@@ -20,8 +20,10 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
+
+    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
+    requireMainTags(app_base_dir);
     try {
-        require(`${app_base_dir}/tags/preference-page.tag`);
         riot.mount("preference-page");
 
         obs.on("on_load_library", () => {

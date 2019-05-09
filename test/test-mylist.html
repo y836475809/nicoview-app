@@ -26,10 +26,9 @@
     var riot = require("riot");     // eslint-disable-line
     var obs = riot.observable();    // eslint-disable-line
 
-    process.env.NODE_ENV = "DEBUG";
-    process.env.NODE_ENTRYPOINT = "test-mylist";
+    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
+    requireMainTags(app_base_dir);
 
-    require(`${app_base_dir}/tags/mylist-page.tag`);
     riot.mount("mylist-page");
 
     const { NicoMylistMocks } = require("./mock_server/nico-mock");

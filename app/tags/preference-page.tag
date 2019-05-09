@@ -52,8 +52,6 @@
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-
-        require(`${app_base_dir}/tags/modal-dialog.tag`);
         
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);

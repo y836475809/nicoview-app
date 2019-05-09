@@ -63,7 +63,6 @@
         const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
-        require(`${app_base_dir}/tags/download-schedule-dialog.tag`);
 
         const library_dir = SettingStore.getLibraryDir();
 

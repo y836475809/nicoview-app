@@ -23,10 +23,16 @@
     var riot = require("riot");   // eslint-disable-line
     var obs = riot.observable();  // eslint-disable-line
 
-    require(`${app_base_dir}/tags/search-page.tag`);
+    process.env.NODE_ENV = "SEARCH-PAGE-DEBUG";
+
+    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
+    requireMainTags(app_base_dir);
+
+    const { NicoSearchMocks } = require("./mock_server/nico-mock");
+    const nico_search_mock = new NicoSearchMocks();
+    nico_search_mock.search();
+
     riot.mount("search-page");
-    // require(`${app_base_dir}/tags/pagination.tag`);
-    // riot.mount("pagination");
  
 </script>
 

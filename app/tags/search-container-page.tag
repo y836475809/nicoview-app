@@ -30,10 +30,4 @@
     <div class="split right">
         <search-page></search-page>
     </div>
-
-    <script>
-        /* globals app_base_dir */
-        require(`${app_base_dir}/tags/search-sidebar.tag`);
-        require(`${app_base_dir}/tags/search-page.tag`);
-    </script>
 </search-container-page>

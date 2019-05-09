@@ -26,7 +26,6 @@
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
-    process.env.NODE_ENTRYPOINT = "test-main";
 
     const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
         setupNicoDownloadNock } = require("./mock_server/nico-mock");

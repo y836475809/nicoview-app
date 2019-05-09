@@ -148,9 +148,6 @@
     const { GridTable } = require(`${app_base_dir}/js/gridtable`);
     const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
 
-    require(`${app_base_dir}/tags/pagination.tag`);
-    require(`${app_base_dir}/tags/modal-dialog.tag`);
-
     this.sort_items = [
         { kind: "startTime",    order:"-", select: true, title:"投稿日" },
         { kind: "commentCounter", order:"-", select: false, title:"コメント数" },
@@ -239,6 +236,24 @@
         const video_ids = search_result.data.map(value => {
             return value.contentId;
         });
+
+        if(process.env.NODE_ENV == "SEARCH-PAGE-DEBUG"){
+            const items = search_result.data.map(value => {
+                return {
+                    thumb_img: value.thumbnailUrl,
+                    id: value.contentId,
+                    name: value.title,
+                    info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
+                    play_time: value.lengthSeconds,
+                    pub_date: value.startTime,
+                    tags: value.tags,
+                    saved: false,
+                    reg_download: false,
+                };
+            });
+            grid_table.setData(items);
+            grid_table.scrollToTop();
+        }
 
         const download_id_set = await new Promise((resolve, reject) => {
             obs.trigger("get-download-item-callback", (id_set)=>{

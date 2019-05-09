@@ -20,8 +20,6 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        // require(`${app_base_dir}/tags/accordion.tag`);
-
         const seach_file_path = SettingStore.getSystemFile("search.json");
 
         try {
@@ -156,11 +154,6 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const fs = require("fs");
-
-        // require(`${app_base_dir}/tags/library-sidebar.tag`);  
-        // require(`${app_base_dir}/tags/split-page-templete.tag`);  
-        // riot.mount("split-page-templete");
-        // riot.mount("library-sidebar");
     
         let library = null;
         this.num_items = 0;
@@ -220,10 +213,7 @@
         menu.append(new MenuItem({ type: "separator" }));
         menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
     
-        this.on("mount", async () => {
-            // require(`${app_base_dir}/tags/split-page-templete.tag`);  
-            // require(`${app_base_dir}/tags/library-sidebar.tag`);  
-    
+        this.on("mount", async () => {    
             grid_table.init(this.root.querySelector(".library-grid"));
     
             grid_table.setFilter((column_id, value, word) => { 
@@ -371,30 +361,4 @@
             <library-content></library-content>
         </yield>
     </split-page-templete>
-
-<script>
-    /* globals app_base_dir obs */
-    // const {remote} = require("electron");
-    // const {Menu, MenuItem} = remote;
-    // const ipc = require("electron").ipcRenderer;
-    // const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-    // const Library = require(`${app_base_dir}/js/library`);
-    // const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-    // const DBConverter = require(`${app_base_dir}/js/db-converter`);
-    // const fs = require("fs");
-
-    
-    // require(`${app_base_dir}/tags/library-sidebar.tag`);  
-    // require(`${app_base_dir}/tags/accordion.tag`);
-    // riot.mount("split-page-templete");
-
-    this.on("mount",  () => {
-        // require(`${app_base_dir}/tags/split-page-templete.tag`); 
-        // riot.mount("library-content");
-        // riot.mount("library-sidebar");
-        // require(`${app_base_dir}/tags/split-page-templete.tag`);  
-        // riot.mount("split-page-templete");
-        
-    });
-</script>
 </library-page>

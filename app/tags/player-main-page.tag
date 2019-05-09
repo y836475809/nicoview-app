@@ -36,16 +36,26 @@
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir riot obs */
         const {ipcRenderer, remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
-        require(`${app_base_dir}/tags/player-page.tag`);
-        require(`${app_base_dir}/tags/player-viewinfo-page.tag`); 
         require(`${app_base_dir}/tags/modal-dialog.tag`);  
 
+        require(`${app_base_dir}/tags/player-seek.tag`);
+        require(`${app_base_dir}/tags/player-volume.tag`);
+        require(`${app_base_dir}/tags/player-tags.tag`);
+        require(`${app_base_dir}/tags/player-controls.tag`);
+        require(`${app_base_dir}/tags/player-video.tag`);
+ 
+        require(`${app_base_dir}/tags/player-page.tag`);
+        require(`${app_base_dir}/tags/player-viewinfo-page.tag`); 
+
+        riot.mount("player-page");
+        riot.mount("player-viewinfo-page"); 
+        
         let nico_play = null;
 
         let org_video_size = null;

@@ -45,11 +45,7 @@
     </div>
 
     <script>
-        /* globals app_base_dir obs */
-        require(`${app_base_dir}/tags/player-tags.tag`);
-        require(`${app_base_dir}/tags/player-video.tag`);
-        require(`${app_base_dir}/tags/player-controls.tag`);
-        
+        /* globals obs */
         let tags_height = 0;
         let controls_height = 0;
         this.video_size = null;

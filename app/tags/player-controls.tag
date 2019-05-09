@@ -42,12 +42,7 @@
     <player-volume class="volume"></player-volume>
 
     <script>
-        /* globals app_base_dir riot obs */
-        require(`${app_base_dir}/tags/player-seek.tag`);
-        require(`${app_base_dir}/tags/player-volume.tag`);
-        riot.mount("player-seek");
-        riot.mount("player-volume");
-
+        /* globals obs */
         const stateMap = new Map([
             ["play", "fas fa-play"],
             ["pause", "fas fa-pause"],

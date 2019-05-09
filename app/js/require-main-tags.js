@@ -7,9 +7,7 @@ const requireMainTags = (app_base_dir) => {
     
     require(`${app_base_dir}/tags/library-page.tag`);
     
-    require(`${app_base_dir}/tags/search-sidebar.tag`);
     require(`${app_base_dir}/tags/search-page.tag`);
-    require(`${app_base_dir}/tags/search-container-page.tag`);
     
     require(`${app_base_dir}/tags/download-schedule-dialog.tag`);
     require(`${app_base_dir}/tags/download-page.tag`);

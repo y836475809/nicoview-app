@@ -81,7 +81,7 @@
         <library-page></library-page>
     </div>
     <div class="page-container search-page">
-        <search-container-page></search-container-page>
+        <search-page></search-page>
     </div>
     <div class="page-container mylist-page">
         <mylist-page></mylist-page>
@@ -159,7 +159,7 @@
 
         this.on("mount", function () {
             riot.mount("library-page");
-            riot.mount("search-container-page");   
+            riot.mount("search-page");   
             riot.mount("download-page");
             riot.mount("play-history");
             riot.mount("preference-page");

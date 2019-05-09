@@ -2,11 +2,13 @@
     <style scoped>
         :scope {
             max-width: 360px;
+            --menubar-height: 30px;
         }
 
         .acdn-menubar {
             display: block;
             position: relative;
+            height: var(--menubar-height);
             margin: 0;
             padding: 5px;
             line-height: 1;
@@ -46,6 +48,12 @@
             margin-right: 5px;
         }
 
+        .acdn-menu-container {
+            width: 100%;
+            height: calc(100vh - var(--menubar-height) - 5px);
+            overflow: auto;
+        }
+
         .toggle-menu {
             overflow: hidden;
             transition: all 0.5s;
@@ -53,18 +61,20 @@
     </style>
 
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{this.opts.params.title}</label>
-    <div class="toggle-menu">
-        <ul class="acdn-list">
-            <li class="acdn-item" each={ item,i in this.items }
-                title={item.title}
-                data-id={i}
-                onclick={this.onclickItem.bind(this,item)} 
-                ondblclick={this.ondblclickItem.bind(this,item)}
-                onmouseup={this.onmouseUp}>
-                <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
-                {item.title}
-            </li>
-        </ul>
+    <div class="acdn-menu-container">
+        <div class="toggle-menu">
+            <ul class="acdn-list">
+                <li class="acdn-item" each={ item,i in this.items }
+                    title={item.title}
+                    data-id={i}
+                    onclick={this.onclickItem.bind(this,item)} 
+                    ondblclick={this.ondblclickItem.bind(this,item)}
+                    onmouseup={this.onmouseUp}>
+                    <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
+                    {item.title}
+                </li>
+            </ul>
+        </div>
     </div>
 
     <script>

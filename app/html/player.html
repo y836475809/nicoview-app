@@ -12,7 +12,7 @@
 </head>
 
 <body>
-    <player-viewinfo-page></player-viewinfo-page>
+    <player-main-page></player-main-page>
 </body>
 <script>
     //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
@@ -23,8 +23,8 @@
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     
-    require(`${app_base_dir}/tags/player-viewinfo-page.tag`);
-    riot.mount("player-viewinfo-page");
+    require(`${app_base_dir}/tags/player-main-page.tag`);
+    riot.mount("player-main-page");
 
     obs.on("player-html:search-tag", (args) => {
         ipcRenderer.send("index-html:search-tag", args);

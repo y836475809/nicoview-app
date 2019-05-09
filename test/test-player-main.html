@@ -14,7 +14,7 @@
         .test-button{
             height: 25px;
         }
-        .test-player-viewinfo-page{
+        .test-player-main-page{
             height: calc(100% - 25px);
         }
     </style>
@@ -28,7 +28,7 @@
         <button type="button" onclick="onclickLoad3();">watch dmc</button>
         <button type="button" onclick="onclickLoad4();">watch smile</button>
     </div>    
-    <player-viewinfo-page ref="pvi" class="test-player-viewinfo-page"></player-viewinfo-page>
+    <player-main-page ref="pvi" class="test-player-main-page"></player-main-page>
 </body>
 
 <script>
@@ -46,8 +46,8 @@
     var obs = riot.observable(); // eslint-disable-line
     
     const reader = require(`${app_base_dir}/js/reader`);
-    require(`${app_base_dir}/tags/player-viewinfo-page`);
-    riot.mount("player-viewinfo-page");    
+    require(`${app_base_dir}/tags/player-main-page`);
+    riot.mount("player-main-page");    
 
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;

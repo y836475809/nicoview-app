@@ -1,4 +1,4 @@
-<player-viewinfo-page onmousemove={mousemove} onmouseup={mouseup}>
+<player-main-page onmousemove={mousemove} onmouseup={mouseup}>
     <style scoped>
         :scope {
             display: flex;
@@ -29,8 +29,8 @@
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
-        <viewinfo-page ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
-        </viewinfo-page>
+        <player-viewinfo-page ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
+        </player-viewinfo-page>
     </div>
 
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
@@ -43,7 +43,7 @@
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
 
         require(`${app_base_dir}/tags/player-page.tag`);
-        require(`${app_base_dir}/tags/viewinfo-page.tag`); 
+        require(`${app_base_dir}/tags/player-viewinfo-page.tag`); 
         require(`${app_base_dir}/tags/modal-dialog.tag`);  
 
         let nico_play = null;
@@ -273,4 +273,4 @@
             SettingStore.setValue(pref_sync_comment, this.refs.viewinfo_frame.getSyncCommentChecked());
         };
     </script>
-</player-viewinfo-page>
+</player-main-page>

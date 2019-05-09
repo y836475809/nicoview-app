@@ -1,4 +1,4 @@
-<viewinfo-page>
+<player-viewinfo-page>
     <style scoped>
         :scope {
             display: grid;
@@ -322,4 +322,4 @@
             resizeCommentList();
         });
     </script>
-</viewinfo-page>
+</player-viewinfo-page>

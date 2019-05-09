@@ -103,6 +103,8 @@
         const {Menu} = remote;
         let riot = require("riot");
 
+        require(`${app_base_dir}/tags/split-page-templete.tag`); 
+        require(`${app_base_dir}/tags/accordion.tag`);
         require(`${app_base_dir}/tags/library-page.tag`);
         require(`${app_base_dir}/tags/search-container-page.tag`);
         require(`${app_base_dir}/tags/download-page.tag`);
@@ -163,11 +165,11 @@
 
         this.on("mount", function () {
             riot.mount("library-page");
-            riot.mount("search-container-page");   
-            riot.mount("download-page");
-            riot.mount("play-history");
+            // riot.mount("search-container-page");   
+            // riot.mount("download-page");
+            // riot.mount("play-history");
             riot.mount("preference-page");
-            riot.mount("mylist-page");
+            // riot.mount("mylist-page");
 
             select_page("library");
 

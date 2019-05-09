@@ -20,7 +20,7 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        require(`${app_base_dir}/tags/accordion.tag`);
+        // require(`${app_base_dir}/tags/accordion.tag`);
 
         const seach_file_path = SettingStore.getSystemFile("nico-search.json");
 

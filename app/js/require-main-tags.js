@@ -17,9 +17,7 @@ const requireMainTags = (app_base_dir) => {
     require(`${app_base_dir}/tags/play-history.tag`);
     
     require(`${app_base_dir}/tags/preference-page.tag`);
-    
-    require(`${app_base_dir}/tags/mylist-sidebar.tag`);  
-    require(`${app_base_dir}/tags/mylist-content.tag`);  
+      
     require(`${app_base_dir}/tags/mylist-page.tag`);
 };
 

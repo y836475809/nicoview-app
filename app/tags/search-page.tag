@@ -22,9 +22,23 @@
 
         const seach_file_path = SettingStore.getSystemFile("nico-search.json");
 
+        const getIcon = (kind) => {
+            return kind=="tag"? {
+                name: "fas fa-tag fa-lg",
+                style: "color:red;"
+            } : undefined;  
+        };
+
         try {
             this.store = new JsonStore(seach_file_path);
-            this.nico_search_data = this.store.load();
+            const { is_expand, items } = this.store.load();
+            this.nico_search_data = {
+                is_expand: is_expand,
+                items: items.map(value=>{
+                    value.icon = getIcon(value.cond.search_kind);
+                    return value;
+                })
+            };
         } catch (error) {
             this.nico_search_data = {
                 is_expand: false, 
@@ -33,8 +47,13 @@
         }
 
         const save = (data) => {
+            const copied_data = JSON.parse(JSON.stringify(data));
+            copied_data.items.forEach(value=>{
+                delete value.icon;
+                delete value.cond.page;
+            });
             try {
-                this.store.save(data);
+                this.store.save(copied_data);
             } catch (error) {
                 console.log(error);
             }
@@ -70,8 +89,8 @@
             save(data);
         });
         
-        obs.on("on_add_nico_search_cond", (args) => {
-            const { cond, icon } = args;
+        obs.on("on_add_nico_search_cond", (cond) => {
+            const icon = getIcon(cond.search_kind);
             obs.trigger(`${this.acdn_search.name}-add-items`, 
                 [
                     { title: cond.query, cond: cond, icon: icon }
@@ -453,12 +472,8 @@
                 search_kind: nico_search_params.search_kind,
                 page: 1
             };
-            const icon = cond.search_kind=="tag"? {
-                name: "fas fa-tag fa-lg",
-                style: "color:red;"
-            } : undefined;
 
-            obs.trigger("on_add_nico_search_cond", { cond, icon });
+            obs.trigger("on_add_nico_search_cond", cond);
         };
 
         obs.on("on_change_nico_search_cond", (cond)=> {

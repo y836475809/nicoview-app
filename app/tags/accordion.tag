@@ -70,7 +70,7 @@
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
                     onmouseup={this.onmouseUp}>
-                    <i show={item.icon!==undefined} style="{item.icon.style}" class="icont-item {item.icon.name}"></i>
+                    <i show={item.icon!==undefined} style="{item.icon.style}" class="center-hv icont-item {item.icon.name}"></i>
                     {item.title}
                 </li>
             </ul>

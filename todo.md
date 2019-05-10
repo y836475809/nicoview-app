@@ -76,7 +76,7 @@
 - [x] jsdom -> cheerio
 - [ ] テストでnock.disableNetConnect();を追加する
 - [ ] obsのメッセージ形式を「from」: 「イベント」にする
-- [ ] accordionのアイテムの保存でアイコン名、スタイルの項目は保存しないようにする
+- [x] ニコニコ動画検索のアイテムの保存でアイコン名、スタイルの項目は保存しないようにする
 - [x] fix json-strore -> json-store
 - [ ] ライブラリのサムネイルのサイズをheight:130, width: 200にする
 - [ ] 履歴のサムネイルのサイズをheight:130, width: 200にする

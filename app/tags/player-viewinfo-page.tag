@@ -293,7 +293,8 @@
                 return Object.assign(value, { id: value.no });
             });
             grid_table.setData(comments);
-
+            grid_table.scrollToTop();
+            
             this.update();
         });
 

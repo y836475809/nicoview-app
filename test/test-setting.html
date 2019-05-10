@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tets preference</title>
+    <title>Test setting</title>
     <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
@@ -11,7 +11,7 @@
 </head>
 
 <body>
-    <preference-page></preference-page>
+    <setting-page></setting-page>
 </body>
 
 <script>
@@ -24,15 +24,11 @@
     const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
     requireMainTags(app_base_dir);
     try {
-        riot.mount("preference-page");
+        riot.mount("setting-page");
 
         obs.on("on_load_library", () => {
             console.log("on_load_library");
         });
-
-        //this.on("mount", () => {
-        //    obs.trigger("on_change_show_pref_page", true);  
-        //});
     } catch (error) {
         console.log("error=", error);
     }

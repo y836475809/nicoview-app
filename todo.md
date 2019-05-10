@@ -9,7 +9,7 @@
 - [ ] イベントの文字列を定数にする
 - [x] preference保存でobjectをjsonにして保存する
 - [x] preferenceの関数整理
-- [ ] preference -> settingにしたので合わせてtag(preference-page)をsetting-tag等に変更
+- [x] preference -> settingにしたので合わせてtag(preference-page)をsetting-tag等に変更
 - [x] preferenceで進行状況のモーダルダイアログを使用するように変更する
 - [ ] windowのサイズ、位置のsave,load
 - [ ] ライブラリの検索結果のアイテム数表示
@@ -45,7 +45,7 @@
 - [ ] コメント表示NG機能(単語、IDで判定)
 - [ ] 投稿者コメント表示
 - [ ] 投稿者コメントコマンド(デフォルトコメント色等)
-- [ ] コメント表示でduration,分割数等のパラメータをpreferenceから取得する
+- [ ] コメント表示でduration,分割数等のパラメータを設定から取得する
 - [ ] コメント表示で1分間の最大数の制限の実装
 - [ ] 動画情報(ローカル動画かどうか等)の表示
 - [ ] コメントon/off切り替え？

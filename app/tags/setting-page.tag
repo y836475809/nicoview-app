@@ -1,4 +1,4 @@
-<preference-page>
+<setting-page>
     <style scoped>
         :scope {
             margin: 0;
@@ -6,7 +6,7 @@
             height: 100%;
         }
 
-        .pref-page{
+        .setting-page{
             width: 100%;
             height: 100%;
             background-color: var(--control-color);
@@ -30,7 +30,7 @@
         }
     </style>
 
-    <div class="pref-page">
+    <div class="setting-page">
         <div class="group">
             <label class="param">Library dir</label>
             <input id="library-dir" type="text" readonly>
@@ -135,4 +135,4 @@
             this.refs["message-dialog"].close();
         });
     </script>
-</preference-page>
+</setting-page>

@@ -93,7 +93,7 @@
         <play-history></play-history>
     </div>
     <div class="page-container setting-page">
-        <preference-page></preference-page>
+        <setting-page></setting-page>
     </div>
 
     <script>
@@ -162,7 +162,7 @@
             riot.mount("search-page");   
             riot.mount("download-page");
             riot.mount("play-history");
-            riot.mount("preference-page");
+            riot.mount("setting-page");
             riot.mount("mylist-page");
 
             select_page("library");

@@ -142,8 +142,8 @@ class GridTable {
     }
 
     resizeFitContainer(container){
-        const new_height = $(window).height() - container.offsetTop - 5;
-        const new_width = container.clientWidth - 5;
+        const new_height = $(window).height() - container.offsetTop;
+        const new_width = container.clientWidth;
         const new_szie = {
             height: new_height,
             width: new_width

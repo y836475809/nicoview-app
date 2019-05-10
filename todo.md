@@ -65,7 +65,7 @@
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
-- [ ] GridTable.resizeFitContainerのマージン「- 5」を削除する
+- [x] GridTable.resizeFitContainerのマージン「- 5」を削除する
 - [x] typo修正(commnet -> comment)
 - [ ] コメントの更新(差分ダウンロード)
 - [ ] 動画情報(タグ、コメント数、プレイリスト数、再生数、ユーザーコメント等)の更新

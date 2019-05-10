@@ -8,9 +8,7 @@
     </style>
 
     <div class="nico-search-sidebar">
-        <div class="search items">
-            <accordion params={acdn_search}></accordion>
-        </div>
+        <accordion params={acdn_search}></accordion>
     </div>
 
     <script>
@@ -71,7 +69,7 @@
         };
 
         this.acdn_search = {
-            title : "検索",
+            title : "ニコニコ動画検索",
             name: "nico-search",
             expand: true,
             items: this.nico_search_data.items,

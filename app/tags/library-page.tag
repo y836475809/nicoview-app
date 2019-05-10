@@ -8,9 +8,7 @@
     </style>
 
     <div class="library-sidebar">
-        <div class="search items">
-            <accordion params={acdn_search}></accordion>
-        </div>
+        <accordion params={acdn_search}></accordion>
     </div>
 
     <script>
@@ -52,7 +50,7 @@
         };
 
         this.acdn_search = {
-            title : "検索",
+            title : "ライブラリ検索",
             name: "search",
             expand: true,
             items: this.search_data.items,

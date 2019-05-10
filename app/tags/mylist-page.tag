@@ -8,9 +8,7 @@
     </style>
 
     <div class="nico-mylist-sidebar">
-        <div class="mylist items">
-            <accordion params={acdn}></accordion>
-        </div>
+        <accordion params={acdn}></accordion>
     </div>
 
     <script>
@@ -58,7 +56,7 @@
         };
 
         this.acdn = {
-            title : "mylist",
+            title : "マイリスト",
             name: "mylist-sidebar",
             expand: true,
             items: this.mylist_data.items,

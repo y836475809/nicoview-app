@@ -189,7 +189,7 @@
         };
         
         obs.on("on_change_search_item", (param)=> {
-            const search_elm = this.root.querySelector(".library-search-input");
+            const search_elm = this.root.querySelector(".filter-input");
             search_elm.value = param;
             grid_table.filterData(param);
         });

@@ -146,10 +146,11 @@
         remote.getCurrentWindow().setMenu(menu);
 
         const play_by_video_data = (video_data, viweinfo) => {  
-            document.title = viweinfo.thumb_info.title;
+            const thumb_info = viweinfo.thumb_info;
+            document.title = `${thumb_info.title}[${thumb_info.video_id}][${thumb_info.video_type}]`;
             obs.trigger("on_set_player_state", "play"); 
             obs.trigger("receivedData", video_data);
-            obs.trigger("on_load_player_tags", viweinfo.thumb_info.tags);
+            obs.trigger("on_load_player_tags", thumb_info.tags);
             obs.trigger("on_change_viweinfo", viweinfo);       
         }; 
 

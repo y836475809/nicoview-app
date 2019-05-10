@@ -20,7 +20,7 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        const seach_file_path = SettingStore.getSystemFile("search.json");
+        const seach_file_path = SettingStore.getSystemFile("library-search.json");
 
         try {
             this.store = new JsonStore(seach_file_path);

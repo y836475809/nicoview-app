@@ -215,6 +215,10 @@
             grid_table.init(this.root.querySelector(".library-grid"));
     
             grid_table.setFilter((column_id, value, word) => { 
+                if(column_id=="thumb_img"){
+                    //画像のパスは対象外
+                    return false;
+                }
                 if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
                     return true;
                 }   

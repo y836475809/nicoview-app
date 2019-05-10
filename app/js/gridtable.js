@@ -26,6 +26,12 @@ const formatterMap = new Map([
     ["_time", timeFormatter],
 ]);
 
+const splitBySpace = (search_string) => {
+    return search_string.split(/[\u{20}\u{3000}]/u).filter(value=>{
+        return value != "";
+    });
+};
+
 class GridTable {
     constructor(name, columns, options){
         this.name = name;
@@ -207,13 +213,17 @@ class GridTable {
         if(args.searchString == ""){
             return true;
         }
-        for(let column_id in item){
-            const value = String(item[column_id]);
-            if(args.filter(column_id, value, args.searchString)){
-                return true;
+        //空白区切りのand検索
+        const words = splitBySpace(args.searchString);
+        return words.every(word=>{        
+            for(let column_id in item){
+                const value = String(item[column_id]);
+                if(args.filter(column_id, value, word)){
+                    return true;
+                }
             }
-        }
-        return false;
+            return false;
+        });
     }
 
     _saveState(){

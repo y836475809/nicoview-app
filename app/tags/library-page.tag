@@ -146,7 +146,6 @@
         /* globals app_base_dir obs */
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        const ipc = require("electron").ipcRenderer;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const Library = require(`${app_base_dir}/js/library`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
@@ -228,15 +227,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
-                const library_data = await library.getPlayData(video_id);
-                const thumb_info = library_data.viweinfo.thumb_info;   
-                obs.trigger("add-history-items", {
-                    image: thumb_info.thumbnail_url, 
-                    id: video_id, 
-                    name: thumb_info.title, 
-                    url: library_data.video_data.src
-                });
-                ipc.send("request-play-library", library_data);
+                obs.trigger("main-page:play-by-videoid", video_id);
             });
             
             grid_table.onContextMenu((e)=>{

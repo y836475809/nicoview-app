@@ -73,30 +73,27 @@ app.on("activate", () => {
 });
 
 const createPlayerWindow = () => {
-    player_win = new BrowserWindow({ width: 800, height: 600 });
-    if(is_debug_mode){
-        player_win.webContents.openDevTools();
-    }
-    player_win.on("close", (e) => {
-        player_win = null;
-    });
-};
+    return new Promise((resolve, reject) => {
+        if(player_win !== null){
+            resolve();
+            return;
+        }
 
-const play = (cb) => {    
-    if (player_win === null) {
-        createPlayerWindow();
-        const player_path = `file://${__dirname}/html/player.html`;      
-        player_win.loadURL(player_path);
-
+        player_win = new BrowserWindow({ width: 800, height: 600 });
         player_win.webContents.on("did-finish-load", () => {
-            // player_win.webContents.send("request-send-video-data", data);
-            cb();
+            if(is_debug_mode){
+                player_win.webContents.openDevTools();
+            }
+            player_win.on("close", (e) => {
+                player_win = null;
+            });
+
+            resolve();
         });
-    }else{
-        // player_win.webContents.send("request-send-video-data", data);
-        cb();
-    }
-    player_win.show();
+
+        const player_path = `file://${__dirname}/html/player.html`;
+        player_win.loadURL(player_path);
+    });  
 };
 
 app.on("login", function(event, webContents, request, authInfo, callback) {
@@ -112,16 +109,16 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
     }
 });
 
-ipcMain.on("request-play-library", (event, library_data) => {
-    play(()=>{
-        player_win.webContents.send("request-send-video-data", library_data);
-    }); 
+ipcMain.on("request-play-library", async(event, library_data) => {
+    await createPlayerWindow();
+    player_win.show();
+    player_win.webContents.send("request-send-video-data", library_data);
 });
 
-ipcMain.on("request-play-niconico", (event, video_id) => {
-    play(()=>{
-        player_win.webContents.send("request-send-videoid", video_id);
-    }); 
+ipcMain.on("request-play-niconico", async(event, video_id) => {
+    await createPlayerWindow();
+    player_win.show();
+    player_win.webContents.send("request-send-videoid", video_id);
 });
 
 ipcMain.on("set-nicohistory", async (event, arg) => {

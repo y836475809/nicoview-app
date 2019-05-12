@@ -210,18 +210,16 @@
             }
         }; 
 
-        ipc_monitor.on(IPCMsg.PLAY_LIBRARY, (event, args) => {
+        ipc_monitor.on(IPCMsg.PLAY, (event, args) => {
             cancelPlay();
 
-            const { video_data, viweinfo } = args;
-            play_by_video_data(video_data, viweinfo);
-        });
-
-        ipc_monitor.on(IPCMsg.PLAY_NICONICO, (event, args) => {
-            cancelPlay();
-
-            const video_id = args;
-            play_by_video_id(video_id);
+            const { video_id, data } = args;
+            if(data==null){
+                play_by_video_id(video_id);
+            }else{
+                const { video_data, viweinfo } = data;
+                play_by_video_data(video_data, viweinfo);
+            }
         });
 
         obs.on("play-by-videoid", (video_id) => {

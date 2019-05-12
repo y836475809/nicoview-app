@@ -177,28 +177,30 @@
             select_page(page_name);
         });
 
-        const PlayByVideoID = (video_id) => {
-            obs.trigger("get-library-data-callback", {
-                video_ids:[video_id],
-                cb: (data_map) => {
-                    if(data_map.has(video_id)){
-                        const library_data = data_map.get(video_id);
-                        const thumb_info = library_data.viweinfo.thumb_info; 
-                        
-                        //move to player?
-                        obs.trigger("add-history-items", {
-                            image: thumb_info.thumbnail_url, 
-                            id: video_id, 
-                            name: thumb_info.title, 
-                            url: library_data.video_data.src
-                        });
-
-                        ipc_monitor.playLibrary(data_map.get(video_id));
-                    }else{
-                        ipc_monitor.playNiconico(video_id);
+        const PlayByVideoID = async(video_id) => {
+            const data = await new Promise((resolve, reject) => {
+                obs.trigger("get-library-data-callback", {
+                    video_ids:[video_id],
+                    cb: (data_map) => {
+                        if(data_map.has(video_id)){
+                            const library_data = data_map.get(video_id);
+                            const thumb_info = library_data.viweinfo.thumb_info; 
+                            
+                            //move to player?
+                            obs.trigger("add-history-items", {
+                                image: thumb_info.thumbnail_url, 
+                                id: video_id, 
+                                name: thumb_info.title, 
+                                url: library_data.video_data.src
+                            });
+                            resolve(data_map.get(video_id));
+                        }else{
+                            resolve(null);
+                        }
                     }
-                }
-            });  
+                });
+            });
+            ipc_monitor.play({ video_id, data }); 
         };
 
         obs.on("play-by-videoid", (video_id)=>{

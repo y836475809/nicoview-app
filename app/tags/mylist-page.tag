@@ -332,8 +332,9 @@
             setMylist(mylist);
         });
 
-        obs.on("mylist-page:load", (id)=> {
-
+        obs.on("load-mylist", async(id)=> {
+            setMylistID(id);
+            await updateMylist(id);
         });
 
         obs.on("resizeEndEvent", (size)=> {

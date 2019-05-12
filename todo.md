@@ -25,7 +25,7 @@
 - [x] viewfinfoの説明でスクロール有効にする
 - [x] viewfinfoの説明でhtml表示にする
 - [x] viewfinfoの説明で動画のリンクを有効にする
-- [ ] viewfinfoの説明でマイリストのリンクを有効にする
+- [x] viewfinfoの説明でマイリストのリンクを有効にする
 - [ ] viewfinfoの説明でuserのリンクを有効にする
 - [ ] viewfinfoの説明でシークのリンクを有効にする
 - [ ] viewfinfoの説明でsm****を選択してコンテキストメニューでその動画を再生する

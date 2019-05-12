@@ -9,6 +9,7 @@ const IPCMsg =  Object.freeze({
     SET_COOKIE_SYNC: "ipc-set-cookie",
 
     SEARCH_TAG: "ipc-search-tag",
+    LOAD_MYLIST: "ipc-load-nylist",
 });
 
 
@@ -30,6 +31,11 @@ class IPCMonitor extends EventEmitter {
     searchTag(args){
         const win = remote.getGlobal ("main_window");
         win.webContents.send(IPCMsg.SEARCH_TAG, args);
+    }
+
+    loadMylist(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.LOAD_MYLIST, args);
     }
 
     showPlayerSync(args) {
@@ -61,6 +67,10 @@ class IPCMonitor extends EventEmitter {
 
         ipcRenderer.on(IPCMsg.SEARCH_TAG, (event, args) => {
             this.emit(IPCMsg.SEARCH_TAG, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.LOAD_MYLIST, (event, args) => {
+            this.emit(IPCMsg.LOAD_MYLIST, event, args); 
         });
     }
 }

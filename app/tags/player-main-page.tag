@@ -230,6 +230,10 @@
             ipc_monitor.searchTag(args);
         });
 
+        obs.on("load-mylist", (args) => {
+            ipc_monitor.loadMylist(args);
+        });
+
         obs.on("request-send-video-data", (arg) => {
             cancelPlay();
 

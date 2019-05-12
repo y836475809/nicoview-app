@@ -219,6 +219,11 @@
             obs.trigger("search-page:search-tag", args);
         });
 
+        ipc_monitor.on(IPCMsg.LOAD_MYLIST, (event, args)=>{
+            obs.trigger("main-page:select-page", "mylist");
+            obs.trigger("load-mylist", args);
+        });
+
         window.onbeforeunload = (e) => {
         };
 

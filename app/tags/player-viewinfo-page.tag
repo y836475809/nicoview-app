@@ -225,6 +225,14 @@
             return false;
         };
 
+        const mylistLinkClick = (e) => {
+            e.preventDefault(); 
+            const paths = e.target.href.split("/");
+            const video_id = paths.pop();
+            obs.trigger("load-mylist", video_id);
+            return false;
+        };
+
         const setDescription = (content_elm, description) => {
             content_elm.innerHTML = description;
 
@@ -236,6 +244,8 @@
                 a_tags.forEach(value=>{
                     if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
                         value.onclick = watchLinkClick;
+                    }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
+                        value.onclick = mylistLinkClick;
                     }else{
                         value.onclick = (e) =>{
                             e.preventDefault();

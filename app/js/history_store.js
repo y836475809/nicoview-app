@@ -11,7 +11,9 @@ class HistoryStore{
         try {
             this.history_items = this.store.load();
             this.history_items.sort((a, b) => {
-                return a.play_date < b.play_date;
+                if (a.play_date < b.play_date) return 1;
+                if (a.play_date > b.play_date) return -1;
+                return 0;
             });    
         } catch (error) {
             this.history_items = [];
@@ -49,7 +51,9 @@ class HistoryStore{
                 item.url = new_item.url;
             }
             this.history_items.sort((a, b) => {
-                return a.play_date < b.play_date;
+                if (a.play_date < b.play_date) return 1;
+                if (a.play_date > b.play_date) return -1;
+                return 0;
             });
         }
 

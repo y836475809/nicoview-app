@@ -99,6 +99,7 @@
 - [ ] videoの"playing"イベントのpauseと再開は削除してもOK?
 - [x] 動画再生時にplayerの再生ボタンがポーズアイコンになっていない
 - [ ] timelineのclear時にtimeline.removeを入れておく
+- [ ] TweenMax.ticker.fpsでfpsの調整ができるようにする
 - [x] ニコニコ動画検索
   - [ ] 次のページへ移動したら項目の選択状態を解除する
   - [x] playerのタグクリックで検索

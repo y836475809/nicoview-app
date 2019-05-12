@@ -36,24 +36,32 @@
 
     <div class="play-btn">
         <button disabled={this.play_disabled} class="center-hv" onclick={play}>
-            <span class={this.current_state}></span></button>
+            <span class={this.button_class}></span></button>
     </div>
     <player-seek ref="seek" class="seek"></player-seek>
     <player-volume class="volume"></player-volume>
 
     <script>
         /* globals obs */
-        const stateMap = new Map([
+        const button_class_map = new Map([
             ["play", "fas fa-play"],
             ["pause", "fas fa-pause"],
             ["stop", "fas fa-stop"]
         ]);
 
-        this.current_state = stateMap.get("stop");
+        const state_button_map = new Map([
+            ["play", "pause"],
+            ["pause", "play"],
+            ["stop", "play"]
+        ]);
+
+        this.current_state = "stop";
+        this.button_class = button_class_map.get(state_button_map.get("stop"));
         this.play_disabled = true;
 
-        const updateButton = (state) => {
-            this.current_state = stateMap.get(state);
+        const updateState = (state) => {
+            this.current_state = state;
+            this.button_class = button_class_map.get(state_button_map.get(state));
             this.update();
         };
 
@@ -67,13 +75,13 @@
         };
 
         const isPlay = () => {
-            return this.current_state == stateMap.get("play");
+            return this.current_state == "play";
         };
         const isPause = () => {
-            return this.current_state == stateMap.get("pause");
+            return this.current_state == "pause";
         };
         const isStop = () => {
-            return this.current_state == stateMap.get("stop");
+            return this.current_state == "stop";
         };
 
         this.play = () => {
@@ -83,13 +91,13 @@
 
             if(isStop()){
                 obs.trigger("loadplaydata");
-                updateButton("play");
+                updateState("play");
             }else if(isPlay()){
                 obs.trigger("pause");
-                updateButton("pause");
+                updateState("pause");
             }else{
                 obs.trigger("play");
-                updateButton("play");
+                updateState("play");
             }
         };
 
@@ -98,11 +106,11 @@
         });
         
         obs.on("on_set_player_state", (state)=> {
-            updateButton(state);
+            updateState(state);
         });
 
         this.on("mount", ()=> {
-            updateButton("play");
+            updateState("play");
             setPlayEnable(false);
 
             obs.on("resizeEndEvent", (video_size) => { 

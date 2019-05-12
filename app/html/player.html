@@ -18,22 +18,13 @@
     //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
     //Uncaught DOMException: Failed to execute 'createElement' on 'Document': The tag name provided ('http://www.w3.org/2000/svg') is not a valid name.
     var { TweenMax, TimelineMax } = require("gsap"); // eslint-disable-line
-    const {remote, ipcRenderer} = require("electron");
+    const {remote} = require("electron");
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
     var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     
     require(`${app_base_dir}/tags/player-main-page.tag`);
     riot.mount("player-main-page");
-
-    obs.on("player-html:search-tag", (args) => {
-        ipcRenderer.send("index-html:search-tag", args);
-    });
-
-    obs.on("player-html:play-by-videoid", (args) => {
-        ipcRenderer.send("index-html:play-by-videoid", args);
-    });
-
 </script>
 
 </html>

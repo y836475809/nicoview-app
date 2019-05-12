@@ -98,10 +98,13 @@
 
     <script>
         /* globals app_base_dir obs */
-        const {remote, ipcRenderer } = require("electron");
+        const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
+        const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         let riot = require("riot");
+        const ipc_monitor = new IPCMonitor();
+        ipc_monitor.listenRemote();
 
         const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
         requireMainTags(app_base_dir);
@@ -174,27 +177,45 @@
             select_page(page_name);
         });
 
-        //TODO
-        obs.on("main-page:play-by-videoid", (video_id)=>{
+        const PlayByVideoID = (video_id) => {
             obs.trigger("get-library-data-callback", {
                 video_ids:[video_id],
                 cb: (data_map) => {
                     if(data_map.has(video_id)){
                         const library_data = data_map.get(video_id);
-                        const thumb_info = library_data.viweinfo.thumb_info;   
+                        const thumb_info = library_data.viweinfo.thumb_info; 
+                        
+                        //move to player?
                         obs.trigger("add-history-items", {
                             image: thumb_info.thumbnail_url, 
                             id: video_id, 
                             name: thumb_info.title, 
                             url: library_data.video_data.src
                         });
-                        ipcRenderer.send("request-play-library", data_map.get(video_id));
+
+                        ipc_monitor.playLibrary(data_map.get(video_id));
                     }else{
-                        ipcRenderer.send("request-play-niconico", video_id);
+                        ipc_monitor.playNiconico(video_id);
                     }
                 }
-            });
-        });      
+            });  
+        };
+
+        obs.on("play-by-videoid", (video_id)=>{
+            ipc_monitor.showPlayerSync();
+            PlayByVideoID(video_id);            
+        });     
+
+        ipc_monitor.on(IPCMsg.PLAY_BY_ID, (event, args) => {
+            ipc_monitor.showPlayerSync();
+            const video_id = args;
+            PlayByVideoID(video_id);   
+        });
+
+        ipc_monitor.on(IPCMsg.SEARCH_TAG, (event, args)=>{
+            obs.trigger("main-page:select-page", "search");
+            obs.trigger("search-page:search-tag", args);
+        });
 
         window.onbeforeunload = (e) => {
         };

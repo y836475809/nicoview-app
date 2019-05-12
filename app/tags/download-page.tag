@@ -302,7 +302,7 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    obs.trigger("main-page:play-by-videoid", data.id);
+                    obs.trigger("play-by-videoid", data.id);
                 });                
             } catch (error) {
                 console.log("donwload item load error=", error);

@@ -227,7 +227,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
-                obs.trigger("main-page:play-by-videoid", video_id);
+                obs.trigger("play-by-videoid", video_id);
             });
             
             grid_table.onContextMenu((e)=>{

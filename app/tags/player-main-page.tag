@@ -37,10 +37,11 @@
 
     <script>
         /* globals app_base_dir riot obs */
-        const {ipcRenderer, remote} = require("electron");
+        const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
+        const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
 
         require(`${app_base_dir}/tags/modal-dialog.tag`);  
 
@@ -56,6 +57,9 @@
         riot.mount("player-page");
         riot.mount("player-viewinfo-page"); 
         
+        const ipc_monitor = new IPCMonitor();
+        ipc_monitor.listenRemote();
+
         let nico_play = null;
 
         let org_video_size = null;
@@ -178,7 +182,7 @@
                             throw error;
                         }
                     });
-                const ret = ipcRenderer.sendSync("set-nicohistory", nico_cookies);
+                const ret = ipc_monitor.setCookieSync(nico_cookies);
                 if(ret!="ok"){
                     throw new Error(`error: fault set nicohistory ${video_id}`);
                 } 
@@ -206,17 +210,26 @@
             }
         }; 
 
-        ipcRenderer.on("request-send-video-data", (event, arg) => {
+        ipc_monitor.on(IPCMsg.PLAY_LIBRARY, (event, args) => {
             cancelPlay();
 
-            const { video_data, viweinfo } = arg;
+            const { video_data, viweinfo } = args;
             play_by_video_data(video_data, viweinfo);
         });
 
-        ipcRenderer.on("request-send-videoid", (event, video_id) => {
+        ipc_monitor.on(IPCMsg.PLAY_NICONICO, (event, args) => {
             cancelPlay();
 
+            const video_id = args;
             play_by_video_id(video_id);
+        });
+
+        obs.on("play-by-videoid", (video_id) => {
+            ipc_monitor.playByID(video_id);
+        });
+
+        obs.on("search-tag", (args) => {
+            ipc_monitor.searchTag(args);
         });
 
         obs.on("request-send-video-data", (arg) => {

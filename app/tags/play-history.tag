@@ -18,7 +18,6 @@
 
     <script>
         /* globals app_base_dir obs */
-        const ipc = require("electron").ipcRenderer;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const HistoryStore = require(`${app_base_dir}/js/history_store`);
@@ -61,22 +60,7 @@
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                const url = data.url;    
-                const new_item = {
-                    image: data.thumb_img, 
-                    id: video_id, 
-                    name: data.name, 
-                    url: url
-                };
-                history_store.add(new_item);
-                grid_table.setData(history_store.getItems());
-
-                if(!/^(http)/.test(url)){ 
-                    obs.trigger("get-library-data-callback", { video_ids: [video_id], cb: (id_map)=>{
-                        const library_data = id_map.get(video_id);
-                        ipc.send("request-play-library", library_data);
-                    }});
-                }
+                obs.trigger("play-by-videoid", video_id);
             });
 
             resizeGridTable();

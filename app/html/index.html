@@ -18,31 +18,11 @@
 
     <script>
         /* globals riot */
-        const { remote, ipcRenderer } = require("electron");
-        const ipcMain = remote.ipcMain;
+        const { remote } = require("electron");
         var shared_obj = remote.getGlobal("sharedObj"); // eslint-disable-line
         var app_base_dir = shared_obj.base_dir; // eslint-disable-line
         var obs = riot.observable(); // eslint-disable-line
 
         riot.mount("main-page");
-
-        ipcMain.on("index-html:search-tag", (event, args)=>{
-            obs.trigger("main-page:select-page", "search");
-            obs.trigger("search-page:search-tag", args);
-        });
-
-        ipcMain.on("index-html:play-by-videoid", (event, args)=>{
-            const video_id = args;
-            obs.trigger("get-library-data-callback", {
-                video_ids:[video_id],
-                cb: (data_map) => {
-                    if(data_map.has(video_id)){
-                        ipcRenderer.send("request-play-library", data_map.get(video_id));
-                    }else{
-                        ipcRenderer.send("request-play-niconico", video_id);
-                    }
-                }
-            });
-        });
     </script>
 </html>

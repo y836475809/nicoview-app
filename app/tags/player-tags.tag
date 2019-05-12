@@ -37,7 +37,7 @@
         
         this.onclickTag = (item, e) => {
             const tag = item.text;
-            obs.trigger("player-html:search-tag", {
+            obs.trigger("search-tag", {
                 query: tag,
                 search_kind:"tag"
             });

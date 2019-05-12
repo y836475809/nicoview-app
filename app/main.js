@@ -5,18 +5,22 @@ const { app } = electron;
 // ネイティブブラウザウィンドウを作成するモジュール
 const { BrowserWindow } = electron;
 
-const { ipcMain } = electron;
 const fs = require("fs");
 const path = require("path");
+const { IPCMsg, IPCMonitor } = require("./js/ipc-monitor");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-
+global.main_window = null;
+global.player_window = null;
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
+
+const ipc_monitor = new IPCMonitor();
+ipc_monitor.listenMain();
 
 function createWindow() {
     global.sharedObj = {
@@ -49,12 +53,41 @@ function createWindow() {
         }
         win = null;
     });
+
+    global.main_window = win;
 }
 
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", ()=>{
     createWindow();
+
+    ipc_monitor.on(IPCMsg.SHOW_PLAYER_SYNC, async (event, args) => {
+        await createPlayerWindow();
+        player_win.show();
+        event.returnValue = true;
+    });
+
+    ipc_monitor.on(IPCMsg.SET_COOKIE_SYNC, async (event, args) => {
+        const cookies = args;
+        const ps = cookies.map(cookie=>{
+            return new Promise((resolve, reject) => {
+                session.defaultSession.cookies.set(cookie, (error) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve();
+                    }
+                });
+            });
+        });
+        try {
+            await Promise.all(ps);
+            event.returnValue = "ok";
+        } catch (error) {
+            event.returnValue = "error";
+        }
+    });
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。
@@ -93,6 +126,8 @@ const createPlayerWindow = () => {
 
         const player_path = `file://${__dirname}/html/player.html`;
         player_win.loadURL(player_path);
+
+        global.player_window = player_win;
     });  
 };
 
@@ -106,38 +141,5 @@ app.on("login", function(event, webContents, request, authInfo, callback) {
         } catch (error) {
             callback(null, null);
         }
-    }
-});
-
-ipcMain.on("request-play-library", async(event, library_data) => {
-    await createPlayerWindow();
-    player_win.show();
-    player_win.webContents.send("request-send-video-data", library_data);
-});
-
-ipcMain.on("request-play-niconico", async(event, video_id) => {
-    await createPlayerWindow();
-    player_win.show();
-    player_win.webContents.send("request-send-videoid", video_id);
-});
-
-ipcMain.on("set-nicohistory", async (event, arg) => {
-    const cookies = arg;
-    const ps = cookies.map(cookie=>{
-        return new Promise((resolve, reject) => {
-            session.defaultSession.cookies.set(cookie, (error) => {
-                if (error) {
-                    reject(error);
-                } else {
-                    resolve();
-                }
-            });
-        });
-    });
-    try {
-        await Promise.all(ps);
-        event.returnValue = "ok";
-    } catch (error) {
-        event.returnValue = "error";
     }
 });

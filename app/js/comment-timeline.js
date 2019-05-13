@@ -75,7 +75,7 @@ class CommentOptionParser {
 
             const size = mail.match(/big|small/gi);
             if(size!==null){
-                options.size = size[0];
+                options.font_size = size[0];
             }
 
             const p_color_code = this._getColorCode(
@@ -268,6 +268,7 @@ class CommentTimeLine {
         
         elm.style.top = (row_index * row_h) + "px";
         elm.style.left = view_width + "px";
+        elm.style.color = comment.color;
 
         return {elm, text_width};    
     }
@@ -336,29 +337,20 @@ class CommentTimeLine {
             return 0;
         });
 
+        const cmt_opt_parser = new CommentOptionParser();
         comments.forEach(comment=>{
             const p = {
                 no:comment.no, 
                 vpos:comment.vpos*10, 
                 text:comment.text, 
-                type:"naka", 
-                font_size:"middle"
             };
+            const opts = cmt_opt_parser.parse(comment.mail);
+            Object.assign(p, opts);
 
-            const m_type = comment.mail ? comment.mail.match(/ue|shita/gi) : null;
-            const m_size = comment.mail ? comment.mail.match(/big|small/gi) : null;
-
-            if(m_size!=null){
-                p.font_size = m_size[0];
-            }
-
-            if(m_type!=null){
-                p.type = m_type[0];
-                if(p.type=="ue"){
-                    fixed_top_comments.push(p);
-                }else if(p.type=="shita"){
-                    fixed_bottom_comments.push(p);
-                }
+            if(p.type=="ue"){
+                fixed_top_comments.push(p);
+            }else if(p.type=="shita"){
+                fixed_bottom_comments.push(p);
             }else{
                 flow_comments.push(p);
             }

@@ -2,6 +2,106 @@ const { TweenMax, TimelineMax } = require("gsap");
 const FlowComment = require("./flow_comment");
 const FixedComment = require("./fixed_comment");
 
+class CommentOptionParser {
+    constructor(){
+        this._default_color = "white";
+
+        this._p_color_map = new Map([
+            ["niconicowhite", "#CCCC99"],
+            ["white2", "#CCCC99"],
+            ["truered", "#CC0033"],
+            ["red2", "#CC0033"],
+            ["pink2", "#FF33CC"],
+            ["passionorange", "#FF6600"],
+            ["orange2", "#FF6600"],
+            ["madyellow", "#999900"],
+            ["yellow2", "#999900"],
+            ["elementalgreen", "#00CC66"],
+            ["green2", "#00CC66"],
+            ["cyan2", "#00CCCC"],
+            ["marineblue", "#3399FF"],
+            ["blue2", "#3399FF"],
+            ["nobleviolet", "#6633CC"],
+            ["purple2", "#6633CC"],
+            ["black2", "#666666"]
+        ]);
+        this._u_color_map = new Map([
+            ["white", "#FFFFFF"],
+            ["red", "#FF0000"],
+            ["pink", "#FF8080"],
+            ["orange", "#FFCC00"],
+            ["yellow", "#FFFF00"],
+            ["green", "#00FF00"],
+            ["cyan", "#00FFFF"],
+            ["blue", "#0000FF"],
+            ["purple", "#C000FF"],
+            ["black", "#000000"]
+        ]);
+
+        this._p_color_regex = this._create(this._p_color_map);
+        this._u_color_regex = this._create(this._u_color_map);
+    }
+
+    _create(color_map){
+        const keys = [];
+        color_map.forEach((value, key)=>{
+            keys.push(key);
+        });
+        return new RegExp(keys.join("|"), "i");
+    }
+
+    _getColorCode(mail, color_map, color_regex){
+        const color = color_regex.exec(mail);
+        if(color!=null){
+            if(color_map.has(color[0])===true){
+                return color_map.get(color[0]);
+            } 
+        }
+        return null;
+    }
+
+    parse(mail){
+        const options = {
+            type: "naka",
+            font_size:"middle",
+            color: this._u_color_map.get(this._default_color)
+        };
+
+        if(mail){
+            const type = mail.match(/ue|shita/gi);
+            if(type!==null){
+                options.type = type[0];
+            }
+
+            const size = mail.match(/big|small/gi);
+            if(size!==null){
+                options.size = size[0];
+            }
+
+            const p_color_code = this._getColorCode(
+                mail, this._p_color_map, this._p_color_regex);
+            if(p_color_code!==null){
+                options.color = p_color_code;
+                return options;
+            }
+
+            const u_color_code = this._getColorCode(
+                mail, this._u_color_map, this._u_color_regex);
+            if(u_color_code!==null){
+                options.color = u_color_code;
+                return options;
+            }
+
+            const color_code = mail.match(/#[a-f0-9]{6}/ig);
+            if(color_code!==null){
+                options.color = color_code[0];
+                return options;
+            }
+        }
+        return options;
+    }
+}
+
 class CommentTimeLine {
     /**
      * 
@@ -272,5 +372,6 @@ class CommentTimeLine {
 }
 
 module.exports = {
-    CommentTimeLine: CommentTimeLine,
+    CommentTimeLine,
+    CommentOptionParser
 };

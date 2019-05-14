@@ -2,7 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const path = require("path");
 const request = require("request");
-const { NicoWatch, NicoVideo, NicoComment, getVideoType, filterComments } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment, getVideoType, getThumbInfo, filterComments } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 
 const validateStatus = (status) => {
@@ -168,7 +168,7 @@ class NicoNicoDownloader {
             this._setupNicoFilePath();
 
             on_progress(DonwloadProgMsg.start_thumbinfo);
-            const thumbInfo_data = this._getThumbInfo();
+            const thumbInfo_data = getThumbInfo(this.watch_data.api_data);
 
             on_progress(DonwloadProgMsg.start_comment);
             const comment_data = await this._getComment();
@@ -237,42 +237,6 @@ class NicoNicoDownloader {
         }        
     }
 
-    _getThumbInfo(){
-        const api_data = this.watch_data.api_data;
-        const video = api_data.video;
-        const thread = api_data.thread;
-        const owner = api_data.owner;
-        const tags = api_data.tags.map((value) => {
-            return {
-                id: value.id,
-                name: value.name,
-                isLocked: value.isLocked,
-            };
-        });
-        return {
-            video: {
-                id: video.id,
-                title: video.title, 
-                description: video.description, 
-                thumbnailURL: video.thumbnailURL, 
-                largeThumbnailURL: video.largeThumbnailURL, 
-                postedDateTime: video.postedDateTime, 
-                duration: video.duration, 
-                viewCount: video.viewCount, 
-                mylistCount: video.mylistCount, 
-                movieType: video.movieType,
-            },
-            thread: {
-                commentCount: thread.commentCount
-            },
-            tags: tags,
-            owner: {
-                id: owner.id, 
-                nickname: owner.nickname,
-                iconURL: owner.iconURL,
-            }
-        };
-    }
     async _getComment(){
         const api_data = this.watch_data.api_data;
         this.nico_comment = new NicoComment(api_data);

@@ -530,34 +530,41 @@ function getVideoType(smile_url){
     throw new Error("not flv or mp4");
 }
 
-function getThumbInfo(api_data){
+const getThumbInfo = (api_data) => {
     const video = api_data.video;
     const thread = api_data.thread;
-    const video_type = getVideoType(video.smileInfo.url);
     const owner = api_data.owner;
-    const tags = api_data.tags.map((elm) => {
-        return { 
-            text: elm.name, 
-            lock: elm.isLocked
+    const tags = api_data.tags.map((value) => {
+        return {
+            id: value.id,
+            name: value.name,
+            isLocked: value.isLocked,
         };
     });
     return {
-        video_id: video.id,
-        title: video.title,
-        description: video.description,
-        thumbnail_url: video.largeThumbnailURL,
-        first_retrieve: video.postedDateTime,
-        length: video.duration,
-        video_type: video_type,
-        view_counter: video.viewCount,
-        comment_counter: thread.commentCount,
-        mylist_counter: video.mylistCount,
+        video: {
+            id: video.id,
+            title: video.title, 
+            description: video.description, 
+            thumbnailURL: video.thumbnailURL, 
+            largeThumbnailURL: video.largeThumbnailURL, 
+            postedDateTime: video.postedDateTime, 
+            duration: video.duration, 
+            viewCount: video.viewCount, 
+            mylistCount: video.mylistCount, 
+            movieType: video.movieType ? video.movieType : getVideoType(video.smileInfo.url)
+        },
+        thread: {
+            commentCount: thread.commentCount
+        },
         tags: tags,
-        user_id: owner.id,
-        user_nickname: owner.nickname,
-        user_icon_url: owner.iconURL
-    };    
-}
+        owner: {
+            id: owner.id, 
+            nickname: owner.nickname,
+            iconURL: owner.iconURL,
+        }
+    };
+};
 
 module.exports = {
     // NicoUrls:{

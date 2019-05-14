@@ -38,6 +38,10 @@ class NicoXMLFile extends NicoDataFile {
         return `${this.common_filename}.xml`;
     }
 
+    get ownerCommentPath(){
+        return path.join(this.dir_path, `${this.common_filename}[Owner].xml`);
+    }
+
     get thumbInfoFilename(){
         return `${this.common_filename}[ThumbInfo].xml`;
     }

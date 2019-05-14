@@ -1,48 +1,39 @@
-const fs = require("fs");
+// const fs = require("fs");
 const fsPromises = require("fs").promises;
-const util = require("util");
-const path = require("path");
+// const util = require("util");
+// const path = require("path");
 const reader = require("./reader");
+const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 class XMLDataConverter {
-    constructor(video_id){
-        this.video_id = video_id; 
+    /**
+     * 
+     * @param {NicoXMLFile} from 
+     * @param {NicoJsonFile} to 
+     */
+    constructor(video_id, from, to){
+        this.from = from; 
+        this.to = to; 
     }
-    
-    async convertThumbinfo(thumbinfo_filepath){
-        const xml = await fsPromises.readFile(thumbinfo_filepath, "utf-8");
+
+    async convertThumbinfo(){
+        const xml = await fsPromises.readFile(this.from.thumbInfoPath, "utf-8");
         const data = this._cnvThumbInfo(xml);
         const json = JSON.stringify(data, null, "  ");
-
-        const dir = path.dirname(thumbinfo_filepath);
-        const dist_path = path.join(dir,`${this.video_id}[ThumbInfo].json`);
-        await fsPromises.writeFile(dist_path, json, "utf-8");
+        // await fsPromises.writeFile(this.to.thumbInfoPath, json, "utf-8");
+        await this._write(this.to.thumbInfoPath, json);
     }
 
-    async convertComment(common_filepath, owner_filepath){
-        const common_xml = await fsPromises.readFile(common_filepath, "utf-8");
-        const owner_xml = await fsPromises.readFile(owner_filepath, "utf-8");
+    async convertComment(){
+        const common_xml = await fsPromises.readFile(this.from.commentPath, "utf-8");
+        const owner_xml = await fsPromises.readFile(this.from.ownerCommentPath, "utf-8");
         const data = this._cnvComment(common_xml, owner_xml);
         const json = JSON.stringify(data);
-
-        const dir = path.dirname(common_filepath);
-        const dist_path = path.join(dir,`${this.video_id}[Comment].json`);
-        await fsPromises.writeFile(dist_path, json, "utf-8");
+        await this._write(this.to.commentPath, json);
     }
 
-    async renameThumbImg(old_filepath){
-        const dir = path.dirname(old_filepath);
-        const ext = path.extname(old_filepath);
-        const new_path = path.join(dir, `${this.video_id}[ThumbImg]${ext}`);
-        await fsPromises.rename(old_filepath, new_path);
-        // await this._renameTmp(old_filepath, new_path);
-    }
-    async renameVideo(old_filepath){
-        const dir = path.dirname(old_filepath);
-        const ext = path.extname(old_filepath);
-        const new_path = path.join(dir, `${this.video_id}${ext}`);
-        // await this._renameTmp(old_filepath, new_path);
-        await fsPromises.rename(old_filepath, new_path);
+    async _write(file_path, json){
+        await fsPromises.writeFile(file_path, json, "utf-8");
     }
 
     _cnvComment(common_xml, owner_xml){

@@ -26,25 +26,24 @@ class NicoDataFile {
 
 class NicoXMLFile extends NicoDataFile {
     set videoInfo(video_info){
-        this.video_id = video_info.video_id;
-        this.video_name = video_info.video_name;
-        this.video_filename = video_info.video_filename;
+        this.common_filename = video_info.common_filename;
+        this.video_type = video_info.video_type;
     }
 
     get videoFilename(){
-        return this.video_filename;
+        return `${this.common_filename}.${this.video_type}`;
     }
 
     get commentFilename(){
-        return `${this.video_name} - [${this.video_id}].xml`;
+        return `${this.common_filename}.xml`;
     }
 
     get thumbInfoFilename(){
-        return `${this.video_name} - [${this.video_id}][ThumbInfo].xml`;
+        return `${this.common_filename}[ThumbInfo].xml`;
     }
 
     get thumbImgFilename(){
-        return `${this.video_name} - [${this.video_id}][ThumbImg].jpeg`;
+        return `${this.common_filename}[ThumbImg].jpeg`;
     }
 
     /**

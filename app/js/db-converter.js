@@ -88,8 +88,9 @@ class DBConverter {
             const yet_reading = value[12];
             const pub_date = value[13];
 
-            const video_filename = path.basename(decodeURIComponent(uri));
-            const video_type = path.extname(uri).slice(1);
+            const decoded_path = decodeURIComponent(uri);
+            const common_filename = path.basename(decoded_path, path.extname(decoded_path));
+            const video_type = path.extname(decoded_path).slice(1);
 
             const tags = this.tag_map.get(id);
             return {
@@ -99,7 +100,7 @@ class DBConverter {
                 //uri: uri,
                 dirpath_id: dirpath_id,
                 video_name: video_name,
-                video_filename: video_filename,
+                common_filename: common_filename,
                 video_type: video_type,
                 is_economy: is_economy,
                 modification_date: modification_date,

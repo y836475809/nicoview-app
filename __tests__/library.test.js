@@ -16,7 +16,7 @@ test("library get path, info", async (t) => {
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
-            video_filename: "サンプル1 - [sm1].mp4",
+            common_filename: "サンプル1 - [sm1]",
             video_type: "mp4"
         },
         {
@@ -25,7 +25,7 @@ test("library get path, info", async (t) => {
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",
-            video_filename: "サンプル2 - [sm2].mp4",
+            common_filename: "サンプル2 - [sm2]",
             video_type: "mp4"
         },
         {
@@ -46,7 +46,7 @@ test("library get path, info", async (t) => {
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
-            video_filename: "サンプル1 - [sm1].mp4",
+            common_filename: "サンプル1 - [sm1]",
             video_type: "mp4"
         }
     );
@@ -57,7 +57,7 @@ test("library get path, info", async (t) => {
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",
-            video_filename: "サンプル2 - [sm2].mp4",
+            common_filename: "サンプル2 - [sm2]",
             video_type: "mp4"
         }
     );
@@ -113,7 +113,7 @@ test("library get data", async (t) => {
             video_id: "sm1",
             dirpath_id: 1,
             video_name: "サンプル1",
-            video_filename: "サンプル1 - [sm1].mp4",
+            common_filename: "サンプル1 - [sm1]",
             video_type: "mp4",
             creation_date: 1,
             pub_date: 2,
@@ -127,7 +127,7 @@ test("library get data", async (t) => {
             video_id: "sm2",
             dirpath_id: 2,
             video_name: "サンプル2",
-            video_filename: "サンプル2 - [sm2].mp4",
+            common_filename: "サンプル2 - [sm2]",
             video_type: "mp4",
             creation_date: 10,
             pub_date: 20,
@@ -206,7 +206,7 @@ test("library add item", async (t) => {
         dirpath: "C:/data",
         video_id: "sm1",      
         video_name: "サンプル1",
-        video_filename: "sm1.mp4",
+        common_filename: "sm1",
         video_type: "mp4",
         max_quality: true,
         time: 0,
@@ -226,7 +226,7 @@ test("library add item", async (t) => {
         dirpath: "C:/data",
         video_id: "sm1",      
         video_name: "サンプル1 update",
-        video_filename: "sm1.mp4",
+        common_filename: "sm1",
         video_type: "mp4",
         max_quality: true,
         time: 0,

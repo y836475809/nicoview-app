@@ -92,7 +92,7 @@ class Library {
      * @param {String} item.dirpath
      * @param {String} item.video_id
      * @param {String} item.video_name
-     * @param {String} item.video_filename
+     * @param {String} item.common_filename
      * @param {String} item.video_type
      * @param {boolean} item.max_quality
      * @param {Number} item.time

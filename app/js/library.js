@@ -92,7 +92,6 @@ class Library {
      * @param {String} item.dirpath
      * @param {String} item.video_id
      * @param {String} item.video_name
-     * @param {String} item.common_filename
      * @param {String} item.video_type
      * @param {boolean} item.max_quality
      * @param {Number} item.time
@@ -111,6 +110,7 @@ class Library {
             video_id: item.video_id,        
             video_name: item.video_name,
             video_type: item.video_type,
+            common_filename: item.video_id,
             is_economy: !item.max_quality,
             creation_date: cu_date,
             play_count: 0,

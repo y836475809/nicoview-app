@@ -69,9 +69,9 @@ class NicoXMLFile extends NicoDataFile {
     }
 }
 
-class NicoJsonFile extends NicoDataFile {    
+class NicoJsonFile extends NicoDataFile {   
     set videoID(video_id){
-        this.video_id = video_id;
+        this.common_filename = video_id;
     }
 
     set videoType(video_type){
@@ -79,19 +79,19 @@ class NicoJsonFile extends NicoDataFile {
     }
 
     get videoFilename(){
-        return `${this.video_id}.${this.video_type}`;
+        return `${this.common_filename}.${this.video_type}`;
     }
 
     get commentFilename(){
-        return `${this.video_id}[Comment].json`;
+        return `${this.common_filename}[Comment].json`;
     }
 
     get thumbInfoFilename(){
-        return `${this.video_id}[ThumbInfo].json`;
+        return `${this.common_filename}[ThumbInfo].json`;
     }
 
     get thumbImgFilename(){
-        return `${this.video_id}[ThumbImg].jpeg`;
+        return `${this.common_filename}[ThumbImg].jpeg`;
     }
 
     getComments() {

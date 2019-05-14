@@ -350,7 +350,6 @@ class NicoNicoDownloader {
         const { api_data } = this.watch_data;
         const video_id = api_data.video.id;
         const video_type = getVideoType(api_data.video.smileInfo.url);
-        const video_filename = this.nico_json.videoFilename;
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
@@ -360,7 +359,6 @@ class NicoNicoDownloader {
             dirpath: this.dist_dir,
             video_id: video_id,      
             video_name: api_data.video.title,
-            video_filename: video_filename,
             video_type: video_type,
             max_quality: this.videoinfo.maxQuality,
             time: api_data.video.duration,

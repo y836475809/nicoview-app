@@ -34,6 +34,7 @@ test("library get path, info", async (t) => {
             video_id: "sm3",
             dirpath_id: 2,
             video_name: "サンプル3",
+            common_filename: "sm3",
             video_type: "mp4"
         }
     ];
@@ -68,6 +69,7 @@ test("library get path, info", async (t) => {
             video_id: "sm3",
             dirpath_id: 2,
             video_name: "サンプル3",
+            common_filename: "sm3",
             video_type: "mp4"
         }
     );
@@ -141,6 +143,7 @@ test("library get data", async (t) => {
             video_id: "sm3",
             dirpath_id: 2,
             video_name: "サンプル3",
+            common_filename: "sm3",
             video_type: "mp4",
             creation_date: 100,
             pub_date: 200,
@@ -243,6 +246,7 @@ test("library add item", async (t) => {
         t.is(data.video_id, "sm1");
         t.is(data.dirpath_id, 1);
         t.is(data.video_name, "サンプル1 update");
+        t.is(data.common_filename, "sm1");
         t.is(data.video_type, "mp4");
         t.is(data.dirpath_id, 1);
         t.is(data.is_economy, false);

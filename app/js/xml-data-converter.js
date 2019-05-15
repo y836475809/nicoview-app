@@ -5,6 +5,24 @@ const fsPromises = require("fs").promises;
 const reader = require("./reader");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
+const ConvertXMLDBItem = (item) => {
+    return {
+        _data_type: item._data_type,
+        _db_type: item._db_type,
+        dirpath_id: item.irpath_id,
+        video_id: item.video_id,
+        video_name: item.video_name,
+        video_type: item.video_type,
+        common_filename: item.common_filename,
+        is_economy: item.is_economy!==0,
+        creation_date: item.creation_date,
+        play_count: item.play_count,
+        time: item.time,
+        pub_date: item.pub_date,
+        tags: item.tags
+    };
+};
+
 class XMLDataConverter {
     /**
      * 
@@ -74,3 +92,9 @@ class XMLDataConverter {
         };
     }
 }
+
+
+module.exports = {
+    ConvertXMLDBItem,
+    XMLDataConverter
+};

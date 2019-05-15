@@ -150,6 +150,8 @@
         const Library = require(`${app_base_dir}/js/library`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
+        const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
+        const { ConvertXMLDBItem, XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
         const fs = require("fs");
     
         let library = null;
@@ -208,8 +210,31 @@
             }
         }));
         menu.append(new MenuItem({ type: "separator" }));
-        menu.append(new MenuItem({ label: "MenuItem2", type: "checkbox", checked: true }));
-    
+        menu.append(new MenuItem({
+            label: "Update", click() {
+                const items = grid_table.getSelectedDatas();
+                items.forEach(async item => {
+                    const video_info = await library._getVideoInfo(item.id);
+                    const dir_path = await library._getDir(video_info.dirpath_id);
+                    
+                    const nico_xml = new NicoXMLFile();
+                    nico_xml.dirPath = dir_path;
+                    nico_xml.commonFilename = video_info.common_filename;
+                    nico_xml.videoType = video_info.video_type;
+
+                    const nico_json = new NicoJsonFile();
+                    nico_json.dirPath = dir_path;
+                    nico_json.videoID = video_info.video_id;
+                    nico_json.videoType = video_info.video_type;
+
+                    const json_db_item = ConvertXMLDBItem(video_info);
+                    const cnv_data = new XMLDataConverter(nico_xml, nico_json);
+                    //TODO
+                    // add update 
+                });
+            }
+        }));
+
         this.on("mount", async () => {    
             grid_table.init(this.root.querySelector(".library-grid"));
     

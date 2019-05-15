@@ -317,7 +317,8 @@ class Library {
         const db_type = video_info._db_type;
         if(db_type=="xml"){
             this.nico_xml.dirPath = dir_path;
-            this.nico_xml.videoInfo = video_info;
+            this.nico_xml.commonFilename = video_info.common_filename;
+            this.nico_xml.videoType = video_info.video_type;
             return this.nico_xml;
         }
         if(db_type=="json"){

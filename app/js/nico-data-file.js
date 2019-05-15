@@ -25,9 +25,12 @@ class NicoDataFile {
 }
 
 class NicoXMLFile extends NicoDataFile {
-    set videoInfo(video_info){
-        this.common_filename = video_info.common_filename;
-        this.video_type = video_info.video_type;
+    set commonFilename(name){
+        this.common_filename = name;
+    }
+
+    set videoType(video_type){
+        this.video_type = video_type;
     }
 
     get videoFilename(){

@@ -135,6 +135,7 @@ class GridTable {
 
     getSelectedDatas(){
         const selected_rows = this.grid.getSelectedRows();
+        selected_rows.sort();
         const datas = selected_rows.map(row=>{
             return this.dataView.getItem(row);
         });

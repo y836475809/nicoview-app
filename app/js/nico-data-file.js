@@ -77,8 +77,8 @@ class NicoXMLFile extends NicoDataFile {
 }
 
 class NicoJsonFile extends NicoDataFile {   
-    set videoID(video_id){
-        this.common_filename = video_id;
+    set commonFilename(name){
+        this.common_filename = name;
     }
 
     set videoType(video_type){

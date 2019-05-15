@@ -353,7 +353,7 @@ class NicoNicoDownloader {
         const video_type = getVideoType(api_data.video.smileInfo.url);
 
         this.nico_json.dirPath = this.dist_dir;
-        this.nico_json.videoID = this.video_id;
+        this.nico_json.commonFilename = this.video_id;
         this.nico_json.videoType = video_type;
     }
 

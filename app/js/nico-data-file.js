@@ -128,12 +128,13 @@ class NicoJsonFile extends NicoDataFile {
             };
         });
         return {
-            video_id: video.id,
+            video_id: video.video_id,
             title: video.title,
             description: video.description,
             thumbnail_url: video.largeThumbnailURL,
             first_retrieve: video.postedDateTime,
             length: video.duration,
+            video_type: video.video_type,
             view_counter: video.viewCount,
             mylist_counter: video.mylistCount,
             comment_counter: thread.commentCount,

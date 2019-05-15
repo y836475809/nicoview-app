@@ -543,7 +543,7 @@ const getThumbInfo = (api_data) => {
     });
     return {
         video: {
-            id: video.id,
+            video_id: video.id,
             title: video.title, 
             description: video.description, 
             thumbnailURL: video.thumbnailURL, 
@@ -552,7 +552,7 @@ const getThumbInfo = (api_data) => {
             duration: video.duration, 
             viewCount: video.viewCount, 
             mylistCount: video.mylistCount, 
-            movieType: video.movieType ? video.movieType : getVideoType(video.smileInfo.url)
+            video_type: video.movieType ? video.movieType : getVideoType(video.smileInfo.url)
         },
         thread: {
             commentCount: thread.commentCount

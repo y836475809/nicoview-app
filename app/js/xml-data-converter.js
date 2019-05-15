@@ -11,7 +11,7 @@ class XMLDataConverter {
      * @param {NicoXMLFile} from 
      * @param {NicoJsonFile} to 
      */
-    constructor(video_id, from, to){
+    constructor(from, to){
         this.from = from; 
         this.to = to; 
     }
@@ -19,30 +19,28 @@ class XMLDataConverter {
     async convertThumbinfo(){
         const xml = await fsPromises.readFile(this.from.thumbInfoPath, "utf-8");
         const data = this._cnvThumbInfo(xml);
-        const json = JSON.stringify(data, null, "  ");
-        // await fsPromises.writeFile(this.to.thumbInfoPath, json, "utf-8");
-        await this._write(this.to.thumbInfoPath, json);
+        await this._write(this.to.thumbInfoPath, data);
     }
 
     async convertComment(){
         const common_xml = await fsPromises.readFile(this.from.commentPath, "utf-8");
         const owner_xml = await fsPromises.readFile(this.from.ownerCommentPath, "utf-8");
-        const data = this._cnvComment(common_xml, owner_xml);
-        const json = JSON.stringify(data);
-        await this._write(this.to.commentPath, json);
+        const data =  this._cnvComment(common_xml, owner_xml);
+        await this._write(this.to.commentPath, data);
     }
 
-    async _write(file_path, json){
+    async _write(file_path, data){
+        const json = JSON.stringify(data, null, "  ");
         await fsPromises.writeFile(file_path, json, "utf-8");
     }
 
-    _cnvComment(common_xml, owner_xml){
+    _convertComment(common_xml, owner_xml){
         const common_cmts = reader.comment(common_xml);
         const owner_cmts = reader.comment(owner_xml);
         return owner_cmts.concat(common_cmts);
     }
 
-    _cnvThumbInfo(xml){
+    _convertThumbinfo(xml){
         const obj = reader.thumb_info(xml);
         const tags = obj.tags.map((tag, index)=>{
             return {
@@ -75,9 +73,4 @@ class XMLDataConverter {
             }
         };
     }
-
-    // async _renameTmp(oldname, newname){
-    //     const promisify_rename = util.promisify(fs.rename);
-    //     await promisify_rename(oldname, newname);
-    // }
 }

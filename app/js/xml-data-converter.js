@@ -7,9 +7,9 @@ const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 const ConvertXMLDBItem = (item) => {
     return {
-        _data_type: item._data_type,
-        _db_type: item._db_type,
-        dirpath_id: item.irpath_id,
+        _data_type: "video",
+        _db_type: "json",
+        dirpath_id: item.dirpath_id,
         video_id: item.video_id,
         video_name: item.video_name,
         video_type: item.video_type,
@@ -34,16 +34,21 @@ class XMLDataConverter {
         this.to = to; 
     }
 
+    async convert(){
+        await this.convertThumbinfo();
+        await this.convertComment();
+    }
+
     async convertThumbinfo(){
         const xml = await fsPromises.readFile(this.from.thumbInfoPath, "utf-8");
-        const data = this._cnvThumbInfo(xml);
+        const data = this._convertThumbinfo(xml);
         await this._write(this.to.thumbInfoPath, data);
     }
 
     async convertComment(){
         const common_xml = await fsPromises.readFile(this.from.commentPath, "utf-8");
         const owner_xml = await fsPromises.readFile(this.from.ownerCommentPath, "utf-8");
-        const data =  this._cnvComment(common_xml, owner_xml);
+        const data =  this._convertComment(common_xml, owner_xml);
         await this._write(this.to.commentPath, data);
     }
 

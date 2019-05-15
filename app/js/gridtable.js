@@ -158,14 +158,6 @@ class GridTable {
         this.resize(new_szie);
     }
 
-    get scrollTop(){
-        return this.grid.getCanvasNode().offsetParent.scrollTop;
-    }
-
-    set scrollTop(value){
-        this.grid.getCanvasNode().offsetParent.scrollTop = value;
-    }
-
     scrollRow(row){
         this.grid.scrollRowIntoView(row, false);
     }
@@ -192,6 +184,15 @@ class GridTable {
             this.dataView.updateItem(id, item);
         }
         this.dataView.reSort();
+    }
+
+    updateCell(id, column_id, value){
+        const item = this.dataView.getItemById(id);
+        if(item === undefined){
+            return;
+        }
+        item[column_id] = value;
+        this.dataView.updateItem(id, item);
     }
 
     setFilter(filter){

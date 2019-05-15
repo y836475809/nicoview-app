@@ -164,7 +164,8 @@
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},
             {id: "play_count", name: "再生回数", sortable: true},
-            {id: "play_time", name: "時間", sortable: true}
+            {id: "play_time", name: "時間", sortable: true},
+            {id: "state", name: "state"}
         ];
         const options = {
             rowHeight: 100,
@@ -214,23 +215,39 @@
             label: "Update", click() {
                 const items = grid_table.getSelectedDatas();
                 items.forEach(async item => {
-                    const video_info = await library._getVideoInfo(item.id);
-                    const dir_path = await library._getDir(video_info.dirpath_id);
-                    
-                    const nico_xml = new NicoXMLFile();
-                    nico_xml.dirPath = dir_path;
-                    nico_xml.commonFilename = video_info.common_filename;
-                    nico_xml.videoType = video_info.video_type;
+                    try {
+                        grid_table.updateCell(item.id, "state", "更新中");
 
-                    const nico_json = new NicoJsonFile();
-                    nico_json.dirPath = dir_path;
-                    nico_json.videoID = video_info.video_id;
-                    nico_json.videoType = video_info.video_type;
+                        const video_info = await library._getVideoInfo(item.id);
 
-                    const json_db_item = ConvertXMLDBItem(video_info);
-                    const cnv_data = new XMLDataConverter(nico_xml, nico_json);
-                    //TODO
-                    // add update 
+                        if(video_info._db_type=="xml"){
+                            console.log("convert xml data");
+                            
+                            const dir_path = await library._getDir(video_info.dirpath_id);
+                            
+                            const cnv_item = ConvertXMLDBItem(video_info);
+                            await library.updateItem(cnv_item);
+
+                            const nico_xml = new NicoXMLFile();
+                            nico_xml.dirPath = dir_path;
+                            nico_xml.commonFilename = cnv_item.common_filename;
+                            nico_xml.videoType = video_info.video_type;
+
+                            const nico_json = new NicoJsonFile();
+                            nico_json.dirPath = dir_path;
+                            nico_json.commonFilename = cnv_item.common_filename;
+                            nico_json.videoType = video_info.video_type;
+                            const cnv_data = new XMLDataConverter(nico_xml, nico_json);
+                            
+                            await cnv_data.convert(); 
+                        }
+                        //TODO
+                        //update comment
+
+                        grid_table.updateCell(item.id, "state", "更新完了");
+                    } catch (error) {
+                        console.log(error);
+                    }
                 });
             }
         }));

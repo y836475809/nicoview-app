@@ -118,7 +118,11 @@ class Library {
             pub_date: item.pub_date,
             tags: item.tags
         };
-        await this._updateData(this.db, library_item);
+        await this._updateData(this.db, library_item, true);
+    }
+
+    async updateItem(item){
+        await this._updateData(this.db, item, false);
     }
 
     getLibraryItem(video_id){
@@ -215,9 +219,9 @@ class Library {
         });
     }
 
-    _updateData(db, data) {
+    _updateData(db, data, upsert) {
         return new Promise((resolve, reject) => {
-            db.update({ video_id: data.video_id }, data, { upsert: true }, (err, numReplaced, upsert) => {
+            db.update({ video_id: data.video_id }, data, { upsert: upsert }, (err, numReplaced, upsert) => {
                 if(err){
                     reject(err);
                     return;
@@ -323,7 +327,7 @@ class Library {
         }
         if(db_type=="json"){
             this.nico_json.dirPath = dir_path;
-            this.nico_json.videoID = video_info.video_id;
+            this.nico_json.commonFilename = video_info.common_filename;
             this.nico_json.videoType = video_info.video_type;
             return this.nico_json;
         }

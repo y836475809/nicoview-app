@@ -50,8 +50,8 @@ class XMLDataConverter {
 
     async _need(db_type, nico_json){
         try {
-            await fsPromises.stat(nico_json.thumbInfoPath);
-            await fsPromises.stat(nico_json.commentPath);       
+            await this._stat(nico_json.thumbInfoPath);
+            await this._stat(nico_json.commentPath);
         } catch (error) {
             return true;
         }
@@ -64,6 +64,10 @@ class XMLDataConverter {
         }
 
         throw new Error(`${db_type} is unkown`);
+    }
+
+    async _stat(file_path){
+        await fsPromises.stat(file_path);
     }
 
     _convertItem(item){

@@ -3,53 +3,89 @@ const fsPromises = require("fs").promises;
 // const util = require("util");
 // const path = require("path");
 const reader = require("./reader");
+const Library = require("./library");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
-
-const ConvertXMLDBItem = (item) => {
-    return {
-        _data_type: "video",
-        _db_type: "json",
-        dirpath_id: item.dirpath_id,
-        video_id: item.video_id,
-        video_name: item.video_name,
-        video_type: item.video_type,
-        common_filename: item.common_filename,
-        is_economy: item.is_economy!==0,
-        creation_date: item.creation_date,
-        play_count: item.play_count,
-        time: item.time,
-        pub_date: item.pub_date,
-        tags: item.tags
-    };
-};
 
 class XMLDataConverter {
     /**
      * 
-     * @param {NicoXMLFile} from 
-     * @param {NicoJsonFile} to 
+     * @param {Library} library 
+     * @param {*} video_id 
      */
-    constructor(from, to){
-        this.from = from; 
-        this.to = to; 
+    async convert(library, video_id){
+        const video_info = await library._getVideoInfo(video_id);
+        const dir_path = await library._getDir(video_info.dirpath_id);
+        const cnv_item = this._convertItem(video_info);
+
+        const nico_xml = new NicoXMLFile();
+        nico_xml.dirPath = dir_path;
+        nico_xml.commonFilename = cnv_item.common_filename;
+        nico_xml.videoType = video_info.video_type;
+
+        const nico_json = new NicoJsonFile();
+        nico_json.dirPath = dir_path;
+        nico_json.commonFilename = cnv_item.common_filename;
+        nico_json.videoType = video_info.video_type;
+
+        const need_cnv = await this._need(video_info._db_type, nico_json);
+        if(need_cnv===false){
+            return false;
+        }
+
+        try {
+            const thumbinfo_xml = await this._read(nico_xml.thumbInfoPath);
+            await this._write(nico_json.thumbInfoPath, this._convertThumbinfo(thumbinfo_xml));
+
+            const common_xml = await this._read(nico_xml.commentPath);
+            const owner_xml = await this._read(nico_xml.ownerCommentPath);
+            await this._write(nico_json.commentPath, this._convertComment(common_xml, owner_xml));
+
+        } catch (error) {
+            throw error;
+        }
+        await library.updateItem(cnv_item);
+
+        return true;
     }
 
-    async convert(){
-        await this.convertThumbinfo();
-        await this.convertComment();
+    async _need(db_type, nico_json){
+        try {
+            await fsPromises.stat(nico_json.thumbInfoPath);
+            await fsPromises.stat(nico_json.commentPath);       
+        } catch (error) {
+            return true;
+        }
+
+        if(db_type == "xml"){
+            return true;
+        }
+        if(db_type == "json"){
+            return false;
+        }
+
+        throw new Error(`${db_type} is unkown`);
     }
 
-    async convertThumbinfo(){
-        const xml = await fsPromises.readFile(this.from.thumbInfoPath, "utf-8");
-        const data = this._convertThumbinfo(xml);
-        await this._write(this.to.thumbInfoPath, data);
+    _convertItem(item){
+        return {
+            _data_type: "video",
+            _db_type: "json",
+            dirpath_id: item.dirpath_id,
+            video_id: item.video_id,
+            video_name: item.video_name,
+            video_type: item.video_type,
+            common_filename: item.common_filename,
+            is_economy: item.is_economy!==0,
+            creation_date: item.creation_date,
+            play_count: item.play_count,
+            time: item.time,
+            pub_date: item.pub_date,
+            tags: item.tags
+        };
     }
 
-    async convertComment(){
-        const common_xml = await fsPromises.readFile(this.from.commentPath, "utf-8");
-        const owner_xml = await fsPromises.readFile(this.from.ownerCommentPath, "utf-8");
-        const data =  this._convertComment(common_xml, owner_xml);
-        await this._write(this.to.commentPath, data);
+    async _read(file_path){
+        return await fsPromises.readFile(file_path, "utf-8");
     }
 
     async _write(file_path, data){
@@ -100,6 +136,5 @@ class XMLDataConverter {
 
 
 module.exports = {
-    ConvertXMLDBItem,
     XMLDataConverter
 };

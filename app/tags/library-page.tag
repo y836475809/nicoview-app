@@ -151,7 +151,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
-        const { ConvertXMLDBItem, XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
+        const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
         const fs = require("fs");
     
         let library = null;
@@ -203,34 +203,14 @@
             this.update();
         };
 
+        //TODO
         const convertData = async(video_id) => {
-            const video_info = await library._getVideoInfo(video_id);
-            if(video_info._db_type == "json"){
-                return;
-            }
-            console.log("convert xml data");
-
-            const cnv_item = ConvertXMLDBItem(video_info);
             try {
-                const dir_path = await library._getDir(video_info.dirpath_id);
-                
-                const nico_xml = new NicoXMLFile();
-                nico_xml.dirPath = dir_path;
-                nico_xml.commonFilename = cnv_item.common_filename;
-                nico_xml.videoType = video_info.video_type;
-
-                const nico_json = new NicoJsonFile();
-                nico_json.dirPath = dir_path;
-                nico_json.commonFilename = cnv_item.common_filename;
-                nico_json.videoType = video_info.video_type;
-                const cnv_data = new XMLDataConverter(nico_xml, nico_json);
-                
-                await cnv_data.convert(); 
+                const cnv_data = new XMLDataConverter();
+                await cnv_data.convert(library, video_id);
             } catch (error) {
                 throw error;
             }
-
-            await library.updateItem(cnv_item);
         };
     
         const menu = new Menu();

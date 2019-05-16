@@ -109,7 +109,7 @@ test("downloader dmc", async (t) => {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
         t.deepEqual(data, {
             video:{
-                id: "sm12345678",
+                video_id: "sm12345678",
                 title: "test",
                 description: "test description",
                 thumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678",
@@ -118,7 +118,7 @@ test("downloader dmc", async (t) => {
                 duration: 100,
                 viewCount: 200,
                 mylistCount: 300,
-                movieType: "mp4",
+                video_type: "mp4",
             },
             thread:{
                 commentCount: 1000
@@ -186,7 +186,7 @@ test("downloader smile", async (t) => {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
         t.deepEqual(data, {
             video:{
-                id: "sm12345678",
+                video_id: "sm12345678",
                 title: "test",
                 description: "test description",
                 thumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678",
@@ -195,7 +195,7 @@ test("downloader smile", async (t) => {
                 duration: 100,
                 viewCount: 200,
                 mylistCount: 300,
-                movieType: "mp4",
+                video_type: "mp4",
             },
             thread:{
                 commentCount: 1000

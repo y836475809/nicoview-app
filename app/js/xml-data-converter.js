@@ -74,7 +74,7 @@ class XMLDataConverter {
         });
         return {
             video: {
-                id: obj.video_id,
+                video_id: obj.video_id,
                 title: obj.title,
                 description: obj.description,
                 thumbnailURL: obj.thumbnail_url,
@@ -83,7 +83,7 @@ class XMLDataConverter {
                 duration: obj.length,
                 viewCount: obj.view_counter,
                 mylistCount: obj.mylist_counter,
-                movieType: obj.video_type
+                video_type: obj.video_type
             },
             thread: {
                 commentCount: obj.comment_counter

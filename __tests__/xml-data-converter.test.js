@@ -91,34 +91,34 @@ class TestWriteErrorXMLDataConverter extends XMLDataConverter {
     async _stat(file_path){}
 }
 
-test("xml data converter need", async (t) => {
+test("need func xml", async (t) => {
     const cnv_data = new TestXMLDataConverter();
-    t.is(await cnv_data._need("xml", nico_json), true);
+    t.truthy(await cnv_data._need("xml", nico_json));
 });
 
-test("xml data converter need2", async (t) => {
+test("need func json", async (t) => {
     const cnv_data = new TestXMLDataConverter();
-    t.is(await cnv_data._need("json", nico_json), false);
+    t.falsy(await cnv_data._need("json", nico_json));
 });
 
-test("xml data converter need3", async (t) => {
+test("need func xml, not exist src xml file", async (t) => {
     const cnv_data = new TestStatErrorXMLDataConverter();
-    t.is(await cnv_data._need("xml", nico_json), true);
+    t.truthy(await cnv_data._need("xml", nico_json));
 });
 
-test("xml data converter need4", async (t) => {
+test("need func json, not exist src xml file", async (t) => {
     const cnv_data = new TestStatErrorXMLDataConverter();
-    t.is(await cnv_data._need("json", nico_json), true);
+    t.truthy(await cnv_data._need("json", nico_json));
 });
 
-test("xml data converter need unkown", async (t) => {
+test("need func unkown db type", async (t) => {
     const cnv_data = new TestXMLDataConverter();
     await t.throwsAsync(cnv_data._need("dummy", nico_json));
 });
 
-test("xml data converter convert1", async (t) => {
+test("convert xml", async (t) => {
     const cnv_data = new TestXMLDataConverter();
-    t.is(await cnv_data.convert(library, "sm1"), true);
+    t.truthy(await cnv_data.convert(library, "sm1"));
     t.deepEqual(
         await getLibraryItem("sm1"),
         {
@@ -139,7 +139,7 @@ test("xml data converter convert1", async (t) => {
     );
 });
 
-test("xml data converter convert2", async (t) => {
+test("convert xml, not exist src xml file", async (t) => {
     const cnv_data = new TestWriteErrorXMLDataConverter();
     await t.throwsAsync(cnv_data.convert(library, "sm1"));
 
@@ -166,9 +166,9 @@ test("xml data converter convert2", async (t) => {
     );
 });
 
-test("xml data converter convert3", async (t) => {
+test("convert json", async (t) => {
     const cnv_data = new TestXMLDataConverter();
-    t.is(await cnv_data.convert(library, "sm2"), false);
+    t.falsy(await cnv_data.convert(library, "sm2"));
     t.deepEqual(
         await getLibraryItem("sm2"),
         {
@@ -189,9 +189,9 @@ test("xml data converter convert3", async (t) => {
     );
 });
 
-test("xml data converter convert4", async (t) => {
+test("convert json, not exist src xml file", async (t) => {
     const cnv_data = new TestWriteErrorXMLDataConverter();
-    t.is(await cnv_data.convert(library, "sm2"), false);
+    t.falsy(await cnv_data.convert(library, "sm2"));
     t.deepEqual(
         await getLibraryItem("sm2"),
         {
@@ -212,7 +212,7 @@ test("xml data converter convert4", async (t) => {
     );
 });
 
-test("xml data converter convert5", async (t) => {
+test("convert not exist db", async (t) => {
     const cnv_data = new TestXMLDataConverter();
     await t.throwsAsync(cnv_data.convert(library, "sm10000"));
     const data = await library.getLibraryData();

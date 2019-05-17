@@ -202,16 +202,6 @@
     
             this.update();
         };
-
-        //TODO
-        const convertData = async(video_id) => {
-            try {
-                const cnv_data = new XMLDataConverter();
-                await cnv_data.convert(library, video_id);
-            } catch (error) {
-                throw error;
-            }
-        };
     
         const menu = new Menu();
         menu.append(new MenuItem({
@@ -223,11 +213,12 @@
         menu.append(new MenuItem({ type: "separator" }));
         menu.append(new MenuItem({
             label: "Update", click() {
+                const cnv_data = new XMLDataConverter();
                 const items = grid_table.getSelectedDatas();
                 items.forEach(async item => {   
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        await convertData(item.id);
+                        await cnv_data.convert(library, item.id);
                         grid_table.updateCell(item.id, "state", "更新完了");
                     } catch (error) {
                         console.log(error);

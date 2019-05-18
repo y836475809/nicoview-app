@@ -15,6 +15,8 @@ class NicoMocks {
     constructor(){
         this.hb_options_count = 0;
         this.hb_post_count = 0;
+
+        nock.disableNetConnect();
     }
 
     clean(){
@@ -223,6 +225,7 @@ class NicoMocks {
 
 class NicoDownLoadMocks {
     constructor(){
+        nock.disableNetConnect();
     }
 
     clean(){
@@ -448,6 +451,10 @@ const setupNicoDownloadNock = (target_nock, {
 };
 
 class NicoMylistMocks {
+    constructor(){
+        nock.disableNetConnect();
+    }
+    
     clean(){
         nock.cleanAll();
     }

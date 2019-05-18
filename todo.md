@@ -82,7 +82,7 @@
 
 - [ ] ファイル名の形式を統一する(区切りを-にする、niconico～をnico～にする等)
 - [x] jsdom -> cheerio
-- [ ] テストでnock.disableNetConnect();を追加する
+- [x] テストでnock.disableNetConnect();を追加する
 - [x] ニコニコ動画検索のアイテムの保存でアイコン名、スタイルの項目は保存しないようにする
 - [x] fix json-strore -> json-store
 - [ ] ライブラリのサムネイルのサイズをheight:130, width: 200にする

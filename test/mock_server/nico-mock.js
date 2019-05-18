@@ -7,6 +7,10 @@ const data_api_data = require("./data/api_data.json");
 const dmc_session = require("./data/dmc_session.json");
 
 class NicoSearchMocks {
+    constructor(){
+        nock.disableNetConnect();
+    }
+    
     clean(){
         nock.cleanAll();
     }
@@ -58,6 +62,8 @@ class NicoDownLoadMocks {
         this.video_fs = null;
         this.lowq_set = lowq_set;
         this.smile_set = smile_set;
+
+        nock.disableNetConnect();
     }
 
     clean(){

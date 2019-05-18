@@ -125,6 +125,24 @@ class Library {
         await this._updateData(this.db, item, false);
     }
 
+    async getFieldValue(video_id, field_name){
+        return new Promise(async (resolve, reject) => {
+            const fields = {};
+            fields[`${field_name}`] = 1;
+            this.db.find({ _data_type: "video", video_id: video_id}, fields, (err, docs) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(docs.length==0){
+                    resolve(undefined);
+                    return;
+                }
+                resolve(docs[0][`${field_name}`]);
+            });
+        });
+    }
+
     getLibraryItem(video_id){
         return new Promise(async (resolve, reject) => {
             this.db.find({_data_type: "video", video_id: video_id}, async (err, docs) => { 

@@ -69,15 +69,17 @@
 - [x] typo修正(commnet -> comment)
 - [ ] コメントや動画情報(タグ、コメント数、プレイリスト数、再生数、ユーザーコメント等)の更新
   - [x] ライブラリデータのxml->json変換
+  - [ ] 動画情報(ThumbInfo)にapi_dataのisDeletedを追加する
+  - [ ] ライブラリデータのxml->json変換時isDeletedはfalseにしておく
   - [ ] 更新中はモーダルダイアログを表示させ、キャンセルできるようにする
   - [ ] ライブラリデータがxmlの場合はjsonに変換してから更新する
+  - [ ] 取得した動画情報がisDeleted==trueであれば削除済みなので動画情報は更新しない
+  - [ ] 取得した動画情報がisDeleted==trueであれば削除済みなのでコメント更新しない？
   - [ ] 動画情報の更新(watchページから取得したapt_dataを「sm*[ThumbInfo].json」として保存)
-  - [ ] 更新した動画情報をdbに反映させる
+  - [ ] 更新した動画情報(tag)をdbに反映させる(マージする？)
   - [ ] コメントの更新(差分ダウンロード)
-  - [ ] isDeleted==trueであれば削除済みなので更新しない
-  - [ ] 動画情報isDeleted==trueであれば削除済みなのでコメント更新しない？
-- [ ] 動画情報(sm*[ThumbInfo].json)にapi_dataのvideo.isDeletedを追加する
 - [ ] requestのパラメータ(タイムアウト時間等)を設定ページから設定する
+
 - [ ] ファイル名の形式を統一する(区切りを-にする、niconico～をnico～にする等)
 - [x] jsdom -> cheerio
 - [ ] テストでnock.disableNetConnect();を追加する

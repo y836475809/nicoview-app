@@ -84,7 +84,8 @@ class XMLDataConverter {
             play_count: item.play_count,
             time: item.time,
             pub_date: item.pub_date,
-            tags: item.tags
+            tags: item.tags,
+            is_deleted: false
         };
     }
 

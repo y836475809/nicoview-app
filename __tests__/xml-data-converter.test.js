@@ -61,7 +61,8 @@ test.beforeEach(async t => {
             play_count: 20,
             pub_date: 200,
             time: 2000,
-            tags: ["tag2"]
+            tags: ["tag2"],
+            is_deleted: false
         }
     ];
 
@@ -134,7 +135,8 @@ test("convert xml", async (t) => {
             play_count: 100,
             time: 10000,
             pub_date: 1000,
-            tags: ["tag1"]
+            tags: ["tag1"],
+            is_deleted: false
         }
     );
 });
@@ -184,7 +186,8 @@ test("convert json", async (t) => {
             play_count: 20,
             pub_date: 200,
             time: 2000,
-            tags: ["tag2"]
+            tags: ["tag2"],
+            is_deleted: false
         }
     );
 });
@@ -207,7 +210,8 @@ test("convert json, not exist src xml file", async (t) => {
             play_count: 20,
             pub_date: 200,
             time: 2000,
-            tags: ["tag2"]
+            tags: ["tag2"],
+            is_deleted: false
         }
     );
 });
@@ -253,7 +257,8 @@ test("convert not exist db", async (t) => {
             play_count: 20,
             pub_date: 200,
             time: 2000,
-            tags: ["tag2"]
+            tags: ["tag2"],
+            is_deleted: false
         }
     );
 });

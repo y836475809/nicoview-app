@@ -1,40 +1,38 @@
-const { NicoWatch, NicoComment, getThumbInfo, filterComments } = require("./niconico");
+const { NicoWatch, NicoComment, 
+    getThumbInfo, filterComments } = require("./niconico");
+const Library = require("./library");
 
 class NicoUpdate {
+    /**
+     * 
+     * @param {String} video_id 
+     */
     constructor(video_id){
         this.video_id = video_id;
         this.nico_watch = null;
         this.nico_comment = null;
     }
+
+    /**
+     * 
+     * @param {Library} library 
+     */
+    async isDeleted(library){
+        const value = await library.getField(this.video_id, "is_deleted");
+        return value;
+    }
+
+    /**
+     * 
+     * @param {Array} comments 
+     */
+    async get(cur_comments){
+        const watch_data = await this._getWatchData();
+        const thumbInfo = getThumbInfo(watch_data.api_data);
+        const comments = await this._getComments(watch_data.api_data, cur_comments);
+        return { thumbInfo, comments };
+    }
     
-    /**
-     * 
-     * @param {String} video_id 
-     * @param {Array} comments 
-     */
-    async getInfo(){
-        this.nico_watch = new NicoWatch();
-        const watch_data = await this.nico_watch.watch(this.video_id);
-        const thumbInfo_data = getThumbInfo(watch_data.api_data);
-    }
-
-    /**
-     * 
-     * @param {Array} comments 
-     */
-    async getCommnets(comments){
-        this.nico_watch = new NicoWatch();
-        const watch_data = await this.nico_watch.watch(this.video_id);
-        const thumbInfo_data = getThumbInfo(watch_data.api_data);
-        
-        this.nico_comment = new NicoComment(watch_data.api_data);
-        const res_from = this._getMaxCommentNo(comments) + 1;
-        const comments_diff = await this.nico_comment.getCommentDiff(res_from);
-        const result = comments.concat(comments_diff);
-
-        
-    }
-
     cancel(){
         if(this.nico_watch){
             this.nico_watch.cancel();
@@ -43,6 +41,20 @@ class NicoUpdate {
             this.nico_comment.cancel();
         }        
     }
+
+    async _getWatchData(){
+        this.nico_watch = new NicoWatch();
+        const watch_data = await this.nico_watch.watch(this.video_id);
+        return watch_data;
+    }
+
+    async _getComments(api_data, cur_comments){
+        this.nico_comment = new NicoComment(api_data);
+        const res_from = this._getMaxCommentNo(cur_comments) + 1;
+        const comments_diff = await this.nico_comment.getCommentDiff(res_from);
+        return cur_comments.concat(filterComments(comments_diff));
+    }
+
     /**
      * 
      * @param {Array} comments 
@@ -52,14 +64,8 @@ class NicoUpdate {
             return comment.no;
         }));
     }
-    _getWatch(){
-
-    }
-
-    _getThumbInfo(){
-
-    }
-    _getComment(){
-
-    }
 }
+
+module.exports = {
+    NicoUpdate
+};

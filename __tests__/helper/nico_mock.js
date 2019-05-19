@@ -65,6 +65,11 @@ class NicoMocks {
                     return [code, owner_comment];
                 }
 
+                if(data.length===5){
+                    const comment = MockNicoUitl.getCommnet(data, no_owner_comment);
+                    return [code, comment];
+                }
+    
                 return [code, [
                     { "ping": { "content": "rs:0" } },
                     { "ping": { "content": "rf:0" } }
@@ -372,6 +377,63 @@ class MockNicoUitl {
             <div id="js-initial-watch-data" data-api-data="${data_api_data}"
             </body>
         </html>`;
+    }
+
+    /**
+     * 
+     * @param {Array} post_data 
+     * @param {Array} comments 
+     */
+    static getCommnet(post_data, comments){
+        const res_from = post_data[2].thread.res_from;
+        if(res_from < 0){
+            return comments;
+        }
+        return [
+            {ping: {content: "rs:0"}},
+            {ping: {content: "ps:0"}},
+            {
+                "thread": {
+                    resultcode: 0,
+                    thread: "1",
+                    server_time: 1,
+                    last_res: res_from+1,
+                    ticket: "0x00000",
+                    revision: 1
+                }
+            },
+            { 
+                chat:
+                { 
+                    thread: "1",
+                    no: res_from,
+                    vpos: 10,
+                    date: 1555754900,
+                    date_usec: 388400,
+                    anonymity: 1,
+                    user_id: "a",
+                    mail: "184",
+                    content: `! no ${res_from}`
+                } 
+            },
+            { 
+                chat:
+                { 
+                    thread: "1",
+                    no: res_from+1,
+                    vpos: 20,
+                    date: 1555754900,
+                    date_usec: 388400,
+                    anonymity: 1,
+                    user_id: "b",
+                    mail: "184",
+                    content: `! no ${res_from+1}`
+                } 
+            },
+            {global_num_res: {thread: "1",num_res: res_from+1}},
+            {ping: {content: "pf:0"}},
+            {ping: {content: "rf:0"}}
+        ];
     }
 }
 

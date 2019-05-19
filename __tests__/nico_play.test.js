@@ -122,7 +122,7 @@ test.cb("nico play dmc cancel hb", (t) => {
 test.cb("nico play dmc error watch", (t) => {
     t.plan(3);
 
-    nico_mocks.watchNotFindPage(TestData.video_id);
+    nico_mocks.watch(1, 404);
     nico_mocks.comment();
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
@@ -145,7 +145,7 @@ test.cb("nico play dmc error comment", (t) => {
     t.plan(3);
 
     nico_mocks.watch();
-    nico_mocks.comment_error(403);
+    nico_mocks.comment(1, 403);
     nico_mocks.dmc_session();
     nico_mocks.dmc_hb();
 

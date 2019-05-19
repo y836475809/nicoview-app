@@ -26,7 +26,7 @@ class NicoMocks {
         this.hb_post_count = 0;
     }
 
-    watch(delay=1, body){
+    watch(delay=1, code=200, body){
         this.watch_nock = nock("https://www.nicovideo.jp");
         const headers = {
             "Set-Cookie": [
@@ -40,16 +40,10 @@ class NicoMocks {
         this.watch_nock
             .get(`/watch/${video_id}`)
             .delay(delay)
-            .reply(200, body, headers);
-    }
-
-    watchNotFindPage(video_id){
-        nock("https://www.nicovideo.jp")
-            .get(`/watch/${video_id}`)
-            .reply(404, "not find page");    
+            .reply(code, body, headers);
     }
     
-    comment(delay=1){
+    comment(delay=1, code=200){
         this.comment_nock = nock("https://nmsg.nicovideo.jp");
         this.comment_nock
             .post("/api.json/")
@@ -60,32 +54,22 @@ class NicoMocks {
                 if(data.length===0){
                     return [404, "404 - \"Not Found\r\n\""];
                 }
-    
+
                 if(data.length===8){
                     //no owner
-                    return [200, no_owner_comment];
+                    return [code, no_owner_comment];
                 }
     
                 if(data.length===11){
                     //owner
-                    return [200, owner_comment];
+                    return [code, owner_comment];
                 }
-    
-                return [200, [
+
+                return [code, [
                     { "ping": { "content": "rs:0" } },
                     { "ping": { "content": "rf:0" } }
                 ]]; 
             });
-    }
-
-    comment_error(code){
-        if(!code){
-            throw new Error("code is undefined");
-        }
-        this.comment_nock = nock("https://nmsg.nicovideo.jp");
-        this.comment_nock
-            .post("/api.json/")
-            .reply(code, `${code}`);
     }
 
     dmc_session(delay=1){

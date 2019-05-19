@@ -198,7 +198,7 @@ test("get comment cancel 2", async(t) => {
 test("get comment 403", async (t) => {
     t.plan(3);
 
-    nico_mocks.comment_error(403);
+    nico_mocks.comment(1, 403);
 
     const nico_comment = new NicoComment(data_api_data);
     try {
@@ -213,7 +213,7 @@ test("get comment 403", async (t) => {
 test("get comment 500", async (t) => {
     t.plan(3);
 
-    nico_mocks.comment_error(500);
+    nico_mocks.comment(1, 500);
 
     const nico_comment = new NicoComment(data_api_data);
     try {

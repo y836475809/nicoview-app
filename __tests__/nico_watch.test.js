@@ -110,11 +110,11 @@ test("watch timetout", async (t) => {
 test("watch page not find", async t => {
     t.plan(3);
 
-    nico_mocks.watchNotFindPage("ms00000000");
+    nico_mocks.watch(1, 404);
         
     try {
         const nico_watch = new NicoWatch();
-        await nico_watch.watch("ms00000000");
+        await nico_watch.watch(TestData.video_id);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -132,7 +132,7 @@ test("watch data-api-data json error", async (t) => {
         <div id="js-initial-watch-data" data-api-data="dummy"
         </body>
     </html>`;
-    nico_mocks.watch(1, body);
+    nico_mocks.watch(1, 200, body);
 
     try {
         const nico_watch = new NicoWatch();
@@ -153,7 +153,7 @@ test("watch no data-api-data", async (t) => {
         <div id="js-initial-watch-data" fault-data-api-data="{&quot;video&quot;:null}"
         </body>
     </html>`;
-    nico_mocks.watch(1, body);
+    nico_mocks.watch(1, 200, body);
 
     try {
         const nico_watch = new NicoWatch();
@@ -174,7 +174,7 @@ test("watch no js-initial-watch-data", async (t) => {
         <div id="fault-js-initial-watch-data" data-api-data="{&quot;video&quot;:null}"
         </body>
     </html>`;
-    nico_mocks.watch(1, body);
+    nico_mocks.watch(1, 200, body);
 
     try {
         const nico_watch = new NicoWatch();

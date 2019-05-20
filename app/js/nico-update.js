@@ -39,7 +39,7 @@ class NicoUpdate {
         nico_json.videoType = video_info.video_type;
 
         await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-        await this._writeFile(nico_json.commentFilename, comments);
+        await this._writeFile(nico_json.commentPath, comments);
 
         return { is_deleted, thumbInfo, comments };
     }
@@ -61,7 +61,7 @@ class NicoUpdate {
     }
 
     async _isDeleted(){
-        const value = await this.library.getField(this.video_id, "is_deleted");
+        const value = await this.library.getFieldValue(this.video_id, "is_deleted");
         return value;
     }
     /**

@@ -21,7 +21,7 @@ test("get", async t => {
     nico_mocks.comment();
 
     const nico_update = new NicoUpdate(video_id);
-    const { thumbInfo, comments } = await nico_update.get(cur_comment);
+    const { thumbInfo, comments } = await nico_update._get(cur_comment);
     t.not(thumbInfo, undefined);
     t.deepEqual(comments, [
         {
@@ -71,7 +71,7 @@ test("watch cancel", async(t) => {
         nico_update.cancel();
     }, 1000);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.truthy(error.cancel);
     }
@@ -89,7 +89,7 @@ test("comment cancel", async(t) => {
         nico_update.cancel();
     }, 1000);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.truthy(error.cancel);
     }
@@ -103,7 +103,7 @@ test("watch timetout", async (t) => {
         
     const nico_update = new NicoUpdate(video_id);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -119,7 +119,7 @@ test("comment timetout", async (t) => {
         
     const nico_update = new NicoUpdate(video_id);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -135,7 +135,7 @@ test("watch 404", async t => {
 
     const nico_update = new NicoUpdate(video_id);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -151,7 +151,7 @@ test("comment 404", async t => {
 
     const nico_update = new NicoUpdate(video_id);
     try {
-        await nico_update.get(cur_comment);
+        await nico_update._get(cur_comment);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

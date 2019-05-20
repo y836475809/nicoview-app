@@ -143,6 +143,24 @@ class Library {
         });
     }
 
+    async setFieldValue(video_id, field_name, value){
+        return new Promise(async (resolve, reject) => {
+            const fields = {};
+            fields[`${field_name}`] = value;
+            this.db.update({ _data_type: "video", video_id: video_id}, {$set: fields}, (err, numReplaced) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(numReplaced==0){
+                    reject(new Error(`not find ${video_id} ${field_name}`));
+                    return;
+                }
+                resolve();
+            });
+        });
+    }
+
     getLibraryItem(video_id){
         return new Promise(async (resolve, reject) => {
             this.db.find({_data_type: "video", video_id: video_id}, async (err, docs) => { 

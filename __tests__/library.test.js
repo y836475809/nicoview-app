@@ -394,3 +394,44 @@ test("library getFieldValue", async (t) => {
     t.is(await library.getFieldValue("sm3", field_name), undefined);
     t.is(await library.getFieldValue("sm4", field_name), undefined);
 });
+
+test("library setFieldValue", async (t) => {
+    const library = new Library();
+    await library.init("test.db", true);
+    const dirpath_list = [
+        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+    ];
+    const video_list = [
+        {
+            _data_type:"video", 
+            _db_type:"xml", 
+            video_id: "sm1",
+            dirpath_id: 1,
+            is_deleted: false
+        },
+        {
+            _data_type:"video", 
+            _db_type:"xml", 
+            video_id: "sm2",
+            dirpath_id: 1,
+            is_deleted: true
+        },
+        {
+            _data_type:"video", 
+            _db_type:"xml", 
+            video_id: "sm3",
+            dirpath_id: 1,
+        }
+    ];
+
+    await library.setData(dirpath_list, video_list);
+
+    const field_name = "is_deleted";
+    await library.setFieldValue("sm1", field_name, true);
+    await library.setFieldValue("sm3", field_name, true);
+
+    t.is(await library.getFieldValue("sm1", field_name), true);
+    t.is(await library.getFieldValue("sm2", field_name), true);
+    t.is(await library.getFieldValue("sm3", field_name), true);
+});
+

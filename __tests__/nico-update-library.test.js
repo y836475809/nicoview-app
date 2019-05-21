@@ -135,22 +135,28 @@ test("update if video is deleted", async t => {
     ]);
 });
 
-test("not update if is_deleted of librasy is true, video is not deleted", async t => {
+test("update if is_deleted of librasy is true, video is not deleted", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, false);
 
-    t.falsy(await nico_update.update([]));
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
+    t.truthy(await nico_update.update([]));
+    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
+    t.deepEqual(nico_update.paths, [
+        path.normalize("/data/sm2[ThumbInfo].json"),
+        path.normalize("/data/sm2[Comment].json")
+    ]);
 });
 
-test("not update if is_deleted of librasy is true, video is deleted", async t => {
+test("update if is_deleted of librasy is true, video is deleted", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, true);
 
-    t.falsy(await nico_update.update([]));
+    t.truthy(await nico_update.update([]));
     t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
+    t.deepEqual(nico_update.paths, [
+        path.normalize("/data/sm2[ThumbInfo].json"),
+        path.normalize("/data/sm2[Comment].json")
+    ]);
 });
 
 test("not update if dbtype is xml(video is not deleted)", async t => {

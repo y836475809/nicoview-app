@@ -27,17 +27,10 @@ class NicoUpdate {
         if(!await this._isDBTypeJson()){
             return false;
         }
-        if(await this._isDeleted()===true){
-            return false;
-        }
 
         const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
         await this._setDeleted(is_deleted);
         await this._setTags(tags);
-
-        // if(is_deleted===true){
-        //     return true;
-        // }
 
         const video_info = await this.library._getVideoInfo(this.video_id);
         const dir_path = await this.library._getDir(video_info.dirpath_id);

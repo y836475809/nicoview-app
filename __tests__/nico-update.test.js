@@ -1,10 +1,14 @@
 const test = require("ava");
 const path = require("path");
+const { NicoMocks, TestData} = require("./helper/nico_mock");
+const { getThumbInfo, filterComments } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 const Library = require("../app/js/library");
 
 /** @type {Library} */
 let library = null;
+const cur_comment = filterComments(TestData.no_owner_comment);
+const nico_mocks = new NicoMocks();
 
 test.beforeEach(async t => {
     library = new Library();
@@ -16,128 +20,95 @@ test.beforeEach(async t => {
         {
             _data_type:"video", 
             _db_type:"json", 
-            video_id: "sm1",
+            video_id: TestData.video_id,
             dirpath_id: 1,
-            video_name: "サンプル1",
-            common_filename: "sm1",
+            video_name: "サンプル12345678",
+            common_filename: TestData.video_id,
             video_type: "mp4",
             is_deleted: false
-        },
-        {
-            _data_type:"video", 
-            _db_type:"json", 
-            video_id: "sm2",
-            dirpath_id: 1,
-            video_name: "サンプル2",
-            common_filename: "sm2",
-            video_type: "mp4",
-            is_deleted: true
-        },
-        {
-            _data_type:"video", 
-            _db_type:"xml", 
-            video_id: "sm3",
-            dirpath_id: 1,
-            video_name: "サンプル3",
-            common_filename: "サンプル3 - [sm3]",
-            video_type: "mp4",
-            is_deleted: false
-        },
-        {
-            _data_type:"video", 
-            _db_type:"xml", 
-            video_id: "sm4",
-            dirpath_id: 1,
-            video_name: "サンプル4",
-            common_filename: "サンプル4 - [sm4]",
-            video_type: "mp4",
-            is_deleted: true
         }
     ];
     await library.setData(dirpath_list, video_list);
 });
 
 class TestNicoUpdate extends NicoUpdate {
-    constructor(video_id, library, nico_video_deleted){
+    constructor(video_id, library){
         super(video_id, library);
-        this.nico_video_deleted = nico_video_deleted;
         this.paths = [];
+        this.data = [];
     }
-    async _get(cur_comments){
-        return { is_deleted: this.nico_video_deleted, thumbInfo: {}, comments: [] };
-    }
+
     async _writeFile(file_path, data){
         this.paths.push(file_path);
+        this.data.push(data);
     }
 }
 
-test("update1", async t => {
-    const video_id = "sm1";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+test("update", async(t) => {
+    nico_mocks.watch();
+    nico_mocks.comment();
 
-    t.truthy(await nico_update.update([]));
-    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
+    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+
+    t.truthy(await nico_update.update(cur_comment));
+    t.falsy(await library.getFieldValue(TestData.video_id, "is_deleted"));
+    t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
+    t.is(nico_update.data[1].length,4);
     t.deepEqual(nico_update.paths, [
-        path.normalize("/data/sm1[ThumbInfo].json"),
-        path.normalize("/data/sm1[Comment].json")
+        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
     ]);
 });
 
-test("update2", async t => {
-    const video_id = "sm1";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+test("update cancel", async(t) => {
+    t.plan(2);
 
-    t.truthy(await nico_update.update([]));
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
+    nico_mocks.watch(3000);
+    nico_mocks.comment();
+
+    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+
+    setTimeout(()=>{
+        nico_update.cancel();
+    }, 1000);
+    try {
+        await nico_update.update([]);
+    } catch (error) {
+        t.truthy(error.cancel);
+        t.deepEqual(nico_update.paths, []);
+    }
 });
 
-test("update3", async t => {
-    const video_id = "sm2";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+test("update timetout", async (t) => {
+    t.plan(4);
 
-    t.falsy(await nico_update.update([]));
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
+    nico_mocks.watch(6000);
+    nico_mocks.comment();
+        
+    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    try {
+        await nico_update.update([]);
+    } catch (error) {
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /time/i);
+        t.deepEqual(nico_update.paths, []);
+    }
 });
 
-test("update4", async t => {
-    const video_id = "sm2";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+test("update 404", async t => {
+    t.plan(4);
 
-    t.falsy(await nico_update.update([]));
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
-});
+    nico_mocks.watch(1, 404);
+    nico_mocks.comment();
 
-test("update xml1", async t => {
-    const video_id = "sm3";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
-
-    t.falsy(await nico_update.update([]));
-    t.deepEqual(nico_update.paths, []);
-});
-
-test("update xml2", async t => {
-    const video_id = "sm3";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
-
-    t.falsy(await nico_update.update([]));
-    t.deepEqual(nico_update.paths, []);
-});
-
-test("update xml3", async t => {
-    const video_id = "sm4";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
-
-    t.falsy(await nico_update.update([]));
-    t.deepEqual(nico_update.paths, []);
-});
-
-test("update xml4", async t => {
-    const video_id = "sm4";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
-    
-    t.falsy(await nico_update.update([]));
-    t.deepEqual(nico_update.paths, []);
+    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    try {
+        await nico_update.update([]);
+    } catch (error) {
+        t.is(error.cancel, undefined);
+        t.is(error.name, "Error");
+        t.regex(error.message, /404:/);
+        t.deepEqual(nico_update.paths, []);
+    }
 });

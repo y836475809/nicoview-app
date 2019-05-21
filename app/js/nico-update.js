@@ -31,8 +31,9 @@ class NicoUpdate {
             return false;
         }
 
-        const { is_deleted, thumbInfo, comments } = await this._get(cur_comments);
+        const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
         await this._setDeleted(is_deleted);
+        await this._setTags(tags);
 
         if(is_deleted===true){
             return true;
@@ -57,15 +58,15 @@ class NicoUpdate {
      */
     async _get(cur_comments){
         const watch_data = await this._getWatchData();
-        
         const is_deleted = watch_data.api_data.video.isDeleted;
+        const tags = watch_data.api_data.tags;
         if(is_deleted===true){
-            return { is_deleted: is_deleted, thumbInfo: null, comments: null };
+            return { is_deleted: is_deleted, tags: tags, thumbInfo: null, comments: null };
         }
 
         const thumbInfo = getThumbInfo(watch_data.api_data);
         const comments = await this._getComments(watch_data.api_data, cur_comments);
-        return { is_deleted, thumbInfo, comments };
+        return { is_deleted, tags, thumbInfo, comments };
     }
 
     async _isDBTypeJson(){
@@ -82,7 +83,16 @@ class NicoUpdate {
      * @param {boolean} is_deleted 
      */
     async _setDeleted(is_deleted){
-        this.library.setFieldValue(this.video_id, "is_deleted", is_deleted);
+        await this.library.setFieldValue(this.video_id, "is_deleted", is_deleted);
+    }
+
+    async _setTags(tags){
+        const tag_names = tags.map(value => {
+            return value.name;
+        });
+        const cur_tags = await this.library.getFieldValue(this.video_id, "tags");
+        const new_tags = Array.from(new Set([...cur_tags, ...tag_names]));
+        await this.library.setFieldValue(this.video_id, "tags", new_tags);
     }
     
     cancel(){

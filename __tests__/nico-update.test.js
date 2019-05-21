@@ -25,7 +25,8 @@ test.beforeEach(async t => {
             video_name: "サンプル12345678",
             common_filename: TestData.video_id,
             video_type: "mp4",
-            is_deleted: false
+            is_deleted: false,
+            tags:[]
         }
     ];
     await library.setData(dirpath_list, video_list);

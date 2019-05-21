@@ -1,5 +1,6 @@
 const test = require("ava");
 const path = require("path");
+const { TestData} = require("./helper/nico_mock");
 const { NicoUpdate } = require("../app/js/nico-update");
 const Library = require("../app/js/library");
 
@@ -21,7 +22,8 @@ test.beforeEach(async t => {
             video_name: "サンプル1",
             common_filename: "sm1",
             video_type: "mp4",
-            is_deleted: false
+            is_deleted: false,
+            tags: []
         },
         {
             _data_type:"video", 
@@ -31,7 +33,8 @@ test.beforeEach(async t => {
             video_name: "サンプル2",
             common_filename: "sm2",
             video_type: "mp4",
-            is_deleted: true
+            is_deleted: true,
+            tags: []
         },
         {
             _data_type:"video", 
@@ -41,7 +44,8 @@ test.beforeEach(async t => {
             video_name: "サンプル3",
             common_filename: "サンプル3 - [sm3]",
             video_type: "mp4",
-            is_deleted: false
+            is_deleted: false,
+            tags: []
         },
         {
             _data_type:"video", 
@@ -51,8 +55,31 @@ test.beforeEach(async t => {
             video_name: "サンプル4",
             common_filename: "サンプル4 - [sm4]",
             video_type: "mp4",
-            is_deleted: true
-        }
+            is_deleted: true,
+            tags: []
+        },
+        {
+            _data_type:"video", 
+            _db_type:"json", 
+            video_id: "sm5",
+            dirpath_id: 1,
+            video_name: "サンプル5",
+            common_filename: "sm5",
+            video_type: "mp4",
+            is_deleted: false,
+            tags: ["tag1"]
+        },
+        {
+            _data_type:"video", 
+            _db_type:"json", 
+            video_id: "sm6",
+            dirpath_id: 1,
+            video_name: "サンプル6",
+            common_filename: "sm6",
+            video_type: "mp4",
+            is_deleted: false,
+            tags: ["tag1", "tag2", "tag3"]
+        },
     ];
     await library.setData(dirpath_list, video_list);
 });
@@ -64,10 +91,23 @@ class TestNicoUpdate extends NicoUpdate {
         this.paths = [];
     }
     async _get(cur_comments){
-        return { is_deleted: this.nico_video_deleted, thumbInfo: {}, comments: [] };
+        return { 
+            is_deleted: this.nico_video_deleted, tags: [], 
+            thumbInfo: {}, comments: [] };
     }
     async _writeFile(file_path, data){
         this.paths.push(file_path);
+    }
+}
+
+class TestNicoUpdateTags extends NicoUpdate {
+    async _getWatchData(){
+        return { api_data: TestData.data_api_data };
+    }
+    async _getComments(api_data, cur_comments){
+        return [];
+    }
+    async _writeFile(file_path, data){
     }
 }
 
@@ -144,4 +184,22 @@ test("update xml4", async t => {
     t.falsy(await nico_update.update([]));
     t.truthy(await library.getFieldValue(video_id, "is_deleted"));
     t.deepEqual(nico_update.paths, []);
+});
+
+test("update tag add", async t => {
+    const video_id = "sm5";
+    const nico_update = new TestNicoUpdateTags(video_id, library);
+    
+    t.truthy(await nico_update.update([]));
+    const tags = await library.getFieldValue(video_id, "tags");
+    t.deepEqual(tags, ["tag1", "tag2", "tag3"]);
+});
+
+test("update tag same", async t => {
+    const video_id = "sm6";
+    const nico_update = new TestNicoUpdateTags(video_id, library);
+    
+    t.truthy(await nico_update.update([]));
+    const tags = await library.getFieldValue(video_id, "tags");
+    t.deepEqual(tags, ["tag1", "tag2", "tag3"]);
 });

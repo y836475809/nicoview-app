@@ -110,6 +110,55 @@ class NicoDownLoadMocks {
             .delay(delay)
             .times(Infinity)
             .reply((uri, reqbody)=>{
+                const data = reqbody;
+                if(data.length===5){
+                    const res_from = data[2].thread.res_from;
+                    const comment_diff = [
+                        {ping: {content: "rs:0"}},
+                        {ping: {content: "ps:0"}},
+                        {
+                            "thread": {
+                                resultcode: 0,
+                                thread: "1",
+                                server_time: 1,
+                                last_res: res_from+1,
+                                ticket: "0x00000",
+                                revision: 1
+                            }
+                        },
+                        { 
+                            chat:{ 
+                                thread: "1",
+                                no: res_from,
+                                vpos: 10,
+                                date: 1555754900,
+                                date_usec: 388400,
+                                anonymity: 1,
+                                user_id: "a",
+                                mail: "184",
+                                content: `! no ${res_from}`
+                            } 
+                        },
+                        { 
+                            chat:{ 
+                                thread: "1",
+                                no: res_from+1,
+                                vpos: 20,
+                                date: 1555754900,
+                                date_usec: 388400,
+                                anonymity: 1,
+                                user_id: "b",
+                                mail: "184",
+                                content: `! no ${res_from+1}`
+                            } 
+                        },
+                        {global_num_res: {thread: "1",num_res: res_from+1}},
+                        {ping: {content: "pf:0"}},
+                        {ping: {content: "rf:0"}}
+                    ];
+                    return [code, comment_diff];
+                }
+
                 return [code, comment];
             });
     }

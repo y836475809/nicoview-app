@@ -151,6 +151,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
+        const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
         const fs = require("fs");
     
@@ -219,6 +220,8 @@
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
                         await cnv_data.convert(library, item.id);
+                        const nico_update = new NicoUpdate(item.id, library);
+                        await nico_update.update();
                         grid_table.updateCell(item.id, "state", "更新完了");
                     } catch (error) {
                         console.log(error);

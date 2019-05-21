@@ -74,10 +74,9 @@ class TestNicoUpdate extends NicoUpdate {
 test("update1", async t => {
     const video_id = "sm1";
     const nico_update = new TestNicoUpdate(video_id, library, false);
-    const { is_deleted, thumbInfo, comments } = await nico_update.update([]);
-    t.falsy(is_deleted);
-    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
 
+    t.truthy(await nico_update.update([]));
+    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
     t.deepEqual(nico_update.paths, [
         path.normalize("/data/sm1[ThumbInfo].json"),
         path.normalize("/data/sm1[Comment].json")
@@ -87,55 +86,58 @@ test("update1", async t => {
 test("update2", async t => {
     const video_id = "sm1";
     const nico_update = new TestNicoUpdate(video_id, library, true);
-    const { is_deleted, thumbInfo, comments } = await nico_update.update([]);
-    t.truthy(is_deleted);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
 
+    t.truthy(await nico_update.update([]));
+    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
     t.deepEqual(nico_update.paths, []);
 });
 
 test("update3", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, false);
-    const { is_deleted, thumbInfo, comments } = await nico_update.update([]);
-    t.truthy(is_deleted);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
 
+    t.falsy(await nico_update.update([]));
+    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
     t.deepEqual(nico_update.paths, []);
 });
 
 test("update4", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, true);
-    const { is_deleted, thumbInfo, comments } = await nico_update.update([]);
-    t.truthy(is_deleted);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
 
+    t.falsy(await nico_update.update([]));
+    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
     t.deepEqual(nico_update.paths, []);
 });
 
 test("update xml1", async t => {
     const video_id = "sm3";
     const nico_update = new TestNicoUpdate(video_id, library, false);
-    await t.throwsAsync(nico_update.update([]));
+
+    t.falsy(await nico_update.update([]));
+    t.deepEqual(nico_update.paths, []);
 });
 
 test("update xml2", async t => {
     const video_id = "sm3";
     const nico_update = new TestNicoUpdate(video_id, library, true);
-    await t.throwsAsync(nico_update.update([]));
+
+    t.falsy(await nico_update.update([]));
+    t.deepEqual(nico_update.paths, []);
 });
 
 test("update xml3", async t => {
     const video_id = "sm4";
     const nico_update = new TestNicoUpdate(video_id, library, false);
-    await t.throwsAsync(nico_update.update([]));
+
+    t.falsy(await nico_update.update([]));
+    t.deepEqual(nico_update.paths, []);
 });
 
 test("update xml4", async t => {
     const video_id = "sm4";
     const nico_update = new TestNicoUpdate(video_id, library, true);
-    await t.throwsAsync(nico_update.update([]));
+    
+    t.falsy(await nico_update.update([]));
+    t.deepEqual(nico_update.paths, []);
 });
-
-

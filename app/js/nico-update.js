@@ -18,16 +18,24 @@ class NicoUpdate {
         this.nico_comment = null;
     }
 
+    /**
+     * 
+     * @param {Array} cur_comments 
+     * @returns {boolean} true:update false:not update 
+     */
     async update(cur_comments){
+        if(!await this._isDBTypeJson()){
+            return false;
+        }
         if(await this._isDeleted()===true){
-            return { is_deleted: true, thumbInfo: null, comments: null };
+            return false;
         }
 
         const { is_deleted, thumbInfo, comments } = await this._get(cur_comments);
         await this._setDeleted(is_deleted);
 
         if(is_deleted===true){
-            return { is_deleted: true, thumbInfo: null, comments: null };
+            return true;
         }
 
         const video_info = await this.library._getVideoInfo(this.video_id);
@@ -41,7 +49,7 @@ class NicoUpdate {
         await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
         await this._writeFile(nico_json.commentPath, comments);
 
-        return { is_deleted, thumbInfo, comments };
+        return true;
     }
     /**
      * 
@@ -58,6 +66,11 @@ class NicoUpdate {
         const thumbInfo = getThumbInfo(watch_data.api_data);
         const comments = await this._getComments(watch_data.api_data, cur_comments);
         return { is_deleted, thumbInfo, comments };
+    }
+
+    async _isDBTypeJson(){
+        const value = await this.library.getFieldValue(this.video_id, "_db_type");
+        return value=="json";
     }
 
     async _isDeleted(){

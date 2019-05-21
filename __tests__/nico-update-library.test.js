@@ -111,7 +111,7 @@ class TestNicoUpdateTags extends NicoUpdate {
     }
 }
 
-test("update1", async t => {
+test("update if video is not deleted", async t => {
     const video_id = "sm1";
     const nico_update = new TestNicoUpdate(video_id, library, false);
 
@@ -123,7 +123,7 @@ test("update1", async t => {
     ]);
 });
 
-test("update2", async t => {
+test("update if video is deleted", async t => {
     const video_id = "sm1";
     const nico_update = new TestNicoUpdate(video_id, library, true);
 
@@ -135,7 +135,7 @@ test("update2", async t => {
     ]);
 });
 
-test("update3", async t => {
+test("not update if is_deleted of librasy is true, video is not deleted", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, false);
 
@@ -144,7 +144,7 @@ test("update3", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update4", async t => {
+test("not update if is_deleted of librasy is true, video is deleted", async t => {
     const video_id = "sm2";
     const nico_update = new TestNicoUpdate(video_id, library, true);
 
@@ -153,7 +153,7 @@ test("update4", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update xml1", async t => {
+test("not update if dbtype is xml(video is not deleted)", async t => {
     const video_id = "sm3";
     const nico_update = new TestNicoUpdate(video_id, library, false);
 
@@ -162,7 +162,7 @@ test("update xml1", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update xml2", async t => {
+test("not update if dbtype is xml(video is deleted)", async t => {
     const video_id = "sm3";
     const nico_update = new TestNicoUpdate(video_id, library, true);
 
@@ -171,7 +171,7 @@ test("update xml2", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update xml3", async t => {
+test("not update if dbtype is xml(is_deleted of librasy is false)", async t => {
     const video_id = "sm4";
     const nico_update = new TestNicoUpdate(video_id, library, false);
 
@@ -180,7 +180,7 @@ test("update xml3", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update xml4", async t => {
+test("not update if dbtype is xml(is_deleted of librasy is true)", async t => {
     const video_id = "sm4";
     const nico_update = new TestNicoUpdate(video_id, library, true);
     
@@ -189,7 +189,7 @@ test("update xml4", async t => {
     t.deepEqual(nico_update.paths, []);
 });
 
-test("update tag add", async t => {
+test("update tag, add tags", async t => {
     const video_id = "sm5";
     const nico_update = new TestNicoUpdateTags(video_id, library);
     
@@ -198,7 +198,7 @@ test("update tag add", async t => {
     t.deepEqual(tags, ["tag1", "tag2", "tag3"]);
 });
 
-test("update tag same", async t => {
+test("update tag, same tags", async t => {
     const video_id = "sm6";
     const nico_update = new TestNicoUpdateTags(video_id, library);
     

@@ -38,7 +38,9 @@ class TestNicoUpdate extends NicoUpdate {
         this.paths = [];
         this.data = [];
     }
-
+    async _getCurrentComments(dir_path, video_info){
+        return cur_comment;
+    }
     async _writeFile(file_path, data){
         this.paths.push(file_path);
         this.data.push(data);
@@ -51,7 +53,7 @@ test("update", async(t) => {
 
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
 
-    t.truthy(await nico_update.update(cur_comment));
+    t.truthy(await nico_update.update());
     t.falsy(await library.getFieldValue(TestData.video_id, "is_deleted"));
     t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
     t.is(nico_update.data[1].length,4);
@@ -73,7 +75,7 @@ test("update cancel", async(t) => {
         nico_update.cancel();
     }, 1000);
     try {
-        await nico_update.update([]);
+        await nico_update.update();
     } catch (error) {
         t.truthy(error.cancel);
         t.deepEqual(nico_update.paths, []);
@@ -88,7 +90,7 @@ test("update timetout", async (t) => {
         
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
     try {
-        await nico_update.update([]);
+        await nico_update.update();
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -105,7 +107,7 @@ test("update 404", async t => {
 
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
     try {
-        await nico_update.update([]);
+        await nico_update.update();
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

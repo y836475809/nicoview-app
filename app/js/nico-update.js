@@ -20,21 +20,21 @@ class NicoUpdate {
 
     /**
      * 
-     * @param {Array} cur_comments 
      * @returns {boolean} true:update false:not update 
      */
-    async update(cur_comments){
+    async update(){
         if(!await this._isDBTypeJson()){
             return false;
         }
+
+        const video_info = await this.library._getVideoInfo(this.video_id);
+        const dir_path = await this.library._getDir(video_info.dirpath_id);
+        const cur_comments = await this._getCurrentComments(dir_path, video_info)
 
         const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
         await this._setDeleted(is_deleted);
         await this._setTags(tags);
 
-        const video_info = await this.library._getVideoInfo(this.video_id);
-        const dir_path = await this.library._getDir(video_info.dirpath_id);
-        
         const nico_json = new NicoJsonFile();
         nico_json.dirPath = dir_path;
         nico_json.commonFilename = video_info.common_filename;
@@ -60,6 +60,10 @@ class NicoUpdate {
         const thumbInfo = getThumbInfo(watch_data.api_data);
         const comments = await this._getComments(watch_data.api_data, cur_comments);
         return { is_deleted, tags, thumbInfo, comments };
+    }
+
+    async _getCurrentComments(dir_path, video_info){
+        return await this.library._getComments(dir_path, video_info);
     }
 
     async _isDBTypeJson(){

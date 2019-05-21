@@ -35,9 +35,9 @@ class NicoUpdate {
         await this._setDeleted(is_deleted);
         await this._setTags(tags);
 
-        if(is_deleted===true){
-            return true;
-        }
+        // if(is_deleted===true){
+        //     return true;
+        // }
 
         const video_info = await this.library._getVideoInfo(this.video_id);
         const dir_path = await this.library._getDir(video_info.dirpath_id);

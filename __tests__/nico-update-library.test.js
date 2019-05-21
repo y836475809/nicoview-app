@@ -129,7 +129,10 @@ test("update2", async t => {
 
     t.truthy(await nico_update.update([]));
     t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.deepEqual(nico_update.paths, []);
+    t.deepEqual(nico_update.paths, [
+        path.normalize("/data/sm1[ThumbInfo].json"),
+        path.normalize("/data/sm1[Comment].json")
+    ]);
 });
 
 test("update3", async t => {

@@ -10,6 +10,10 @@ const IPCMsg =  Object.freeze({
 
     SEARCH_TAG: "ipc-search-tag",
     LOAD_MYLIST: "ipc-load-nylist",
+
+    UPDATE_DATA: "ipc-update-data",
+    RETURN_UPDATE_DATA: "ipc-return-update-data",
+    CANCEL_UPDATE_DATA: "ipc-cancel-update-data"
 });
 
 
@@ -36,6 +40,21 @@ class IPCMonitor extends EventEmitter {
     loadMylist(args){
         const win = remote.getGlobal ("main_window");
         win.webContents.send(IPCMsg.LOAD_MYLIST, args);
+    }
+
+    updateData(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.UPDATE_DATA, args);
+    }
+
+    returnUpdateData(args){
+        const win = remote.getGlobal ("player_window");
+        win.webContents.send(IPCMsg.RETURN_UPDATE_DATA, args);
+    }
+
+    cancelUpdateData(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.CANCEL_UPDATE_DATA, args);
     }
 
     showPlayerSync(args) {
@@ -71,6 +90,18 @@ class IPCMonitor extends EventEmitter {
 
         ipcRenderer.on(IPCMsg.LOAD_MYLIST, (event, args) => {
             this.emit(IPCMsg.LOAD_MYLIST, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.UPDATE_DATA, (event, args) => {
+            this.emit(IPCMsg.UPDATE_DATA, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
+            this.emit(IPCMsg.RETURN_UPDATE_DATA, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args) => {
+            this.emit(IPCMsg.CANCEL_UPDATE_DATA, event, args); 
         });
     }
 }

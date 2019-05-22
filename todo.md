@@ -67,6 +67,7 @@
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
 - [x] GridTable.resizeFitContainerのマージン「- 5」を削除する
 - [x] typo修正(commnet -> comment)
+- [ ] typo修正(ipc-load-nylist -> ipc-load-mylist)
 - [ ] コメントや動画情報(タグ、コメント数、プレイリスト数、再生数、ユーザーコメント等)の更新
   - [x] ライブラリデータのxml->json変換
   - [x] ライブラリデータのxml->json変換時library dbに削除情報(is_deleted:false)を追加する

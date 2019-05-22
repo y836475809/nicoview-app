@@ -310,6 +310,31 @@
             const library_item = await library.getLibraryItem(item.video_id);
             grid_table.updateItem(library_item, library_item.id);
         });  
+
+        this.nico_update = null;
+        obs.on("update-data", async (args) => { 
+            const { video_id, cb } = args;
+            try {
+                const cnv_data = new XMLDataConverter();
+                await cnv_data.convert(library, video_id);
+                this.nico_update = new NicoUpdate(video_id, library);
+                await this.nico_update.update();
+                cb({ state:"ok", reason:null });
+            } catch (error) {
+                console.log(error);
+                if(error.cancel===true){
+                    cb({ state:"cancel", reason:null });
+                }else{
+                    cb({ state:"error", reason:error });
+                }     
+            }
+        });  
+
+        obs.on("cancel-update-data", (args) => { 
+            if(this.nico_update){
+                this.nico_update.cancel();
+            }
+        });
     
         const importDB = async (sqlite_file_path)=>{
             const system_dir = SettingStore.getSystemDir();

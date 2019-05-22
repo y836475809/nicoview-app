@@ -224,6 +224,26 @@
             obs.trigger("load-mylist", args);
         });
 
+        ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
+            const video_id = args;
+            console.log("main update video_id=", video_id);
+            obs.trigger("update-data", { 
+                video_id: video_id,
+                cb: (result)=>{
+                    console.log("main update cb result=", result);
+                    if(result.state == "ok"){
+                        PlayByVideoID(video_id);
+                    }
+                    ipc_monitor.returnUpdateData(result);
+                }
+            });
+        });
+
+        ipc_monitor.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
+            const video_id = args;
+            obs.trigger("cancel-update-data", video_id);
+        });
+
         window.onbeforeunload = (e) => {
         };
 

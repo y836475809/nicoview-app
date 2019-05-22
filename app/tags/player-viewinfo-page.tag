@@ -116,6 +116,14 @@
             height: 25px;
             vertical-align:middle;
         }
+        .icon-button{
+            font-size: 20px;
+            margin-left: auto;
+        }
+        .icon-button:hover{
+            cursor: pointer; 
+            opacity: 0.5;
+        }
     </style>
     
     <div class="viewinfo-panel viewinfo-video-panel">
@@ -142,7 +150,14 @@
         </div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
-        <input class="comment-checkbox" type="checkbox" onclick={this.onclickSyncCommentCheck} /><label>同期</label>
+        <div style="display: flex;">
+            <div>
+                <input class="comment-checkbox" type="checkbox" 
+                    onclick={this.onclickSyncCommentCheck} /><label>同期</label>
+            </div>
+            <span class="icon-button center-hv" onclick={this.onclickUpdate}>
+                <i title="update" class="fas fa-sync-alt"></i></span>
+        </div>
         <div class="comment-grid-container">
             <div class="comment-grid"></div>
         </div>
@@ -282,9 +297,15 @@
             }
         };
 
+        this.onclickUpdate = (e) => {
+            console.log("player update video_id=", this.video_id);
+            obs.trigger("update-data", this.video_id);
+        };
+
         obs.on("on_change_viweinfo", (viewinfo)=> {
             resizeCommentList();
 
+            this.video_id = viewinfo.thumb_info.video_id;
             this.video_thumbnail_url = viewinfo.thumb_info.thumbnail_url;
             this.title = viewinfo.thumb_info.title;
             this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);

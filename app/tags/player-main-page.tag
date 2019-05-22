@@ -246,6 +246,24 @@
             play_by_video_id(video_id);
         });
 
+        obs.on("update-data", async(video_id) => {
+            console.log("player main update video_id=", video_id);
+            const prog_dialog = this.refs["nico-play-dialog"]; 
+            prog_dialog.showModal("update...", ["cancel"], result=>{
+                console.log("player main cancel update video_id=", video_id);
+                ipc_monitor.cancelUpdateData(video_id);
+            });
+            await new Promise((resolve, reject) => {
+                ipc_monitor.updateData(video_id);
+                ipc_monitor.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
+                    console.log("return-update-data result=", args);
+                    resolve();   
+                });
+            });
+            prog_dialog.close(); 
+            console.log("player main prog_dialog.close update video_id=", video_id);
+        });
+
         this.on("mount", () => {
             const vw = SettingStore.getValue(pref_infoview_width, 200);
             if(vw){

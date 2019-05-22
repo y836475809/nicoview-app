@@ -225,7 +225,8 @@ class Library {
     async getPlayData(video_id){
         const video_info = await this._getVideoInfo(video_id);
         const dir_path = await this._getDir(video_info.dirpath_id);
-    
+        const is_deleted = await this.getFieldValue(video_id, "is_deleted");
+
         const video_path = this._getVideoPath(dir_path, video_info);
         const video_type = this._getVideoType(video_info);
         const comments = this._getComments(dir_path, video_info);
@@ -238,6 +239,8 @@ class Library {
                 comments: comments
             },
             viewinfo: {
+                is_deleted: is_deleted,
+                is_local: true,
                 thumb_info:thumb_info,
                 comments: comments
             }

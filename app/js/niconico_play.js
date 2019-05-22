@@ -34,6 +34,7 @@ class NicoPlay{
                 on_progress("start watch");
                 this.nico_watch = new NicoWatch();
                 const { cookie_jar, api_data } = await this.nico_watch.watch(video_id); 
+                const is_deleted = api_data.video.isDeleted;
                 on_progress("finish watch");
 
                 on_progress("start comment");
@@ -52,6 +53,7 @@ class NicoPlay{
                     const thumb_info = getThumbInfo(api_data); 
                     const video_url = this.nico_video.SmileUrl;
                     resolve({
+                        is_deleted: is_deleted,
                         nico_cookies: nico_cookies,
                         comments: filter_comments,
                         thumb_info: thumb_info,
@@ -71,6 +73,7 @@ class NicoPlay{
                 const thumb_info = getThumbInfo(api_data); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 resolve({
+                    is_deleted: is_deleted,
                     nico_cookies: nico_cookies,
                     comments: filter_comments,
                     thumb_info: thumb_info,

@@ -172,7 +172,7 @@
                 nico_play.cancel();
             });
             try {
-                const {nico_cookies, comments, thumb_info, video_url} = 
+                const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id, (state)=>{
                         prog_dialog.updateMessage(state);
                         console.log(state);
@@ -193,6 +193,8 @@
                     comments: comments
                 };
                 const viewinfo = {
+                    is_deleted: is_deleted,
+                    is_local: false,
                     thumb_info:thumb_info,
                     comments: comments
                 };

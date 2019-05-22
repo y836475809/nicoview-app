@@ -305,6 +305,10 @@
         obs.on("on_change_viewinfo", (viewinfo)=> {
             resizeCommentList();
 
+            //TODO
+            const is_deleted = viewinfo.is_deleted;
+            const is_local = viewinfo.true;
+
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             const thread = thumb_info.thread;

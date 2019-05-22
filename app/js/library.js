@@ -236,7 +236,7 @@ class Library {
                 type: `video/${video_type}`,
                 comments: comments
             },
-            viweinfo: {
+            viewinfo: {
                 thumb_info:thumb_info,
                 comments: comments
             }

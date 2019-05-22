@@ -28,7 +28,7 @@
     
     <button type="button" class="tag-button" 
         each={item, i in video_tags} onclick={onclickTag.bind(this,item)}>
-        {item.text}<div class="tag-lock" if={item.lock}>[lock]</div>
+        {item.name}<div class="tag-lock" if={item.isLocked}>[lock]</div>
     </button>
 
     <script>
@@ -36,7 +36,7 @@
         this.video_tags = [];
         
         this.onclickTag = (item, e) => {
-            const tag = item.text;
+            const tag = item.name;
             obs.trigger("search-tag", {
                 query: tag,
                 search_kind:"tag"

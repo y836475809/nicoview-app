@@ -184,14 +184,15 @@
                     cb: (data_map) => {
                         if(data_map.has(video_id)){
                             const library_data = data_map.get(video_id);
-                            const thumb_info = library_data.viweinfo.thumb_info; 
+                            const video_data = library_data.video_data;
+                            const thumb_info = library_data.viewinfo.thumb_info; 
                             
                             //move to player?
                             obs.trigger("add-history-items", {
-                                image: thumb_info.thumbnail_url, 
                                 id: video_id, 
-                                name: thumb_info.title, 
-                                url: library_data.video_data.src
+                                image: thumb_info.video.largeThumbnailURL, 
+                                name: thumb_info.video.title, 
+                                url: video_data.src
                             });
                             resolve(data_map.get(video_id));
                         }else{

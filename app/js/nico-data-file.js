@@ -72,7 +72,37 @@ class NicoXMLFile extends NicoDataFile {
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const xml = fs.readFileSync(file_path, "utf-8");
-        return reader.thumb_info(xml);
+        const thumb_info = reader.thumb_info(xml);
+        const tags = thumb_info.tags.map((value, index) => {
+            return {
+                id: index+1,
+                name: value.text,
+                isLocked: value.lock,
+            };
+        });
+        return {
+            video: {
+                video_id: thumb_info.video_id,
+                title: thumb_info.title, 
+                description: thumb_info.description, 
+                thumbnailURL: thumb_info.thumbnail_url, 
+                largeThumbnailURL: thumb_info.thumbnail_url, 
+                postedDateTime: thumb_info.first_retrieve, 
+                duration: thumb_info.length, 
+                viewCount: thumb_info.view_counter, 
+                mylistCount: thumb_info.mylist_counter, 
+                video_type: thumb_info.video_type
+            },
+            thread: {
+                commentCount: thumb_info.comment_counter
+            },
+            tags: tags,
+            owner: {
+                id: thumb_info.user_id, 
+                nickname: thumb_info.user_nickname,
+                iconURL: thumb_info.user_icon_url,
+            }
+        };
     }
 }
 
@@ -116,32 +146,8 @@ class NicoJsonFile extends NicoDataFile {
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const text = fs.readFileSync(file_path, "utf-8");
-        const json_data = JSON.parse(text);
-
-        const video = json_data.video;
-        const owner = json_data.owner;
-        const thread = json_data.thread;
-        const tags = json_data.tags.map((value) => {
-            return {
-                text: value.name,
-                lock: value.isLocked
-            };
-        });
-        return {
-            video_id: video.video_id,
-            title: video.title,
-            description: video.description,
-            thumbnail_url: video.largeThumbnailURL,
-            first_retrieve: video.postedDateTime,
-            length: video.duration,
-            video_type: video.video_type,
-            view_counter: video.viewCount,
-            mylist_counter: video.mylistCount,
-            comment_counter: thread.commentCount,
-            tags: tags,
-            user_nickname: owner.nickname,
-            user_icon_url: owner.iconURL
-        };
+        const thumb_info = JSON.parse(text);
+        return thumb_info;
     }
 }
 

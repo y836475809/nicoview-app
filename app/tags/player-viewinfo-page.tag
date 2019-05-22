@@ -302,28 +302,35 @@
             obs.trigger("update-data", this.video_id);
         };
 
-        obs.on("on_change_viweinfo", (viewinfo)=> {
+        obs.on("on_change_viewinfo", (viewinfo)=> {
             resizeCommentList();
 
-            this.video_id = viewinfo.thumb_info.video_id;
-            this.video_thumbnail_url = viewinfo.thumb_info.thumbnail_url;
-            this.title = viewinfo.thumb_info.title;
-            this.first_retrieve = time_format.toDate(viewinfo.thumb_info.first_retrieve);
-            this.view_counter = viewinfo.thumb_info.view_counter;
-            this.comment_counter = viewinfo.thumb_info.comment_counter;
-            this.mylist_counter = viewinfo.thumb_info.mylist_counter;
-            this.user_nickname = viewinfo.thumb_info.user_nickname;
-            this.user_icon_url = viewinfo.thumb_info.user_icon_url;
+            const thumb_info = viewinfo.thumb_info;
+            const video = thumb_info.video;
+            const thread = thumb_info.thread;
+            const owner = thumb_info.owner;
+            const comments = viewinfo.comments;
+            const description = video.description;
+
+            this.video_id = video.video_id;
+            this.title = video.title;
+            this.video_thumbnail_url = video.thumbnailURL;
+            this.first_retrieve = time_format.toDate(video.postedDateTime);
+            this.view_counter = video.viewCount;
+            this.comment_counter = video.viewCount;
+            this.mylist_counter = thread.commentCount;
+            this.user_nickname = owner.nickname;
+            this.user_icon_url = owner.iconURL;
             
-            setDescription(this.root.querySelector(".description-content"), viewinfo.thumb_info.description);
+            setDescription(this.root.querySelector(".description-content"), description);
             setDescriptionContainerClass("description-container-normal");
 
-            sync_comment_scroll.setComments(viewinfo.comments);
+            sync_comment_scroll.setComments(comments);
 
-            const comments = viewinfo.comments.map(value => {
+            const grid_table_comments = comments.map(value => {
                 return Object.assign(value, { id: value.no });
             });
-            grid_table.setData(comments);
+            grid_table.setData(grid_table_comments);
             grid_table.scrollToTop();
             
             this.update();

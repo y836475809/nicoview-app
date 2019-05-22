@@ -58,40 +58,40 @@
             type: "video/mp4",
             comments: comments
         };
-        const viweinfo = {
+        const viewinfo = {
             thumb_info: {
-                video_id: "sm100000",
-                title: "test sm100000",
-                description: "前：<a href=\"https://www.nicovideo.jp/watch/sm10\" class=\"watch\">sm10</a>"
+                video: {
+                    video_id: "sm100000",
+                    title: "test sm100000",
+                    description: "前：<a href=\"https://www.nicovideo.jp/watch/sm10\" class=\"watch\">sm10</a>"
                             + "------------------動画-------------------- <br>"
-                            + "---<br>--<br>--<br><br>----<br>---<br>--<br>--",          
-                thumbnail_url: `${test_dir}/data/sample.jpeg`, //130x100
-                first_retrieve: "2017-07-07T18:30:00+09:00",
-                length: "10:00",
-                video_type: "mp4",
-                size_high: 1000000,
-                size_low: 2000000,
-                view_counter: 1000,
-                comment_counter: 2000,
-                mylist_counter: 100,
-                last_res_body: "test",
-                watch_url: "http://www.nicovideo.jp/watch/sm100000",
-                thumb_type: "video",
-                embeddable: 1,
-                no_live_play: 0,
-                tags: [            
-                    { text: "タグ1", lock: true },
-                    { text: "タグ2", lock: true },
-                    { text: "タグ3", lock: false }
+                            + "---<br>--<br>--<br><br>----<br>---<br>--<br>--",
+                    thumbnailURL: `${test_dir}/data/sample.jpeg`, //130x100
+                    largeThumbnailURL: `${test_dir}/data/sample.jpeg`, //130x100
+                    postedDateTime: "2017-07-07T18:30:00+09:00",
+                    duration: "10:00",
+                    viewCount: 1000, 
+                    mylistCount: 100, 
+                    video_type: "mp4",
+                },
+                thread: {
+                    commentCount: 2000
+                },
+                tags: [
+                    { id: 1, name: "タグ1", isLocked: true },
+                    { id: 2, name: "タグ2", isLocked: true },
+                    { id: 3, name: "タグ3", isLocked: false }
                 ],
-                user_id: "1234567",
-                user_nickname: "abcdefg",
-                user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
+                owner: {
+                    id: "1234567",
+                    nickname: "abcdefg",
+                    iconURL: `${test_dir}/data/user_icon.jpg` //50x50
+                }
             },
             comments: comments
         };
         
-        obs.trigger("request-send-video-data", {video_data, viweinfo}); 
+        obs.trigger("request-send-video-data", {video_data, viewinfo}); 
     };
     const onclickLoad2 = () => {
         let comments = [];
@@ -106,32 +106,32 @@
                 text: "------------------text1------------------------"
             });
         }
-        obs.trigger("on_change_viweinfo",{
+        obs.trigger("on_change_viewinfo",{
             thumb_info: {
-                video_id: "sm100000",
-                title: "test sm100000",
-                description: "--------- ---------動画----- ---------------",
-                thumbnail_url: `${test_dir}/data/sample.jpeg`, //130x100
-                first_retrieve: "2017-07-07T18:30:00+09:00",
-                length: "10:00",
-                video_type: "mp4",
-                size_high: 1000000,
-                size_low: 2000000,
-                view_counter: 1000,
-                comment_counter: 2000,
-                mylist_counter: 100,
-                last_res_body: "test",
-                watch_url: "http://www.nicovideo.jp/watch/sm100000",
-                thumb_type: "video",
-                embeddable: 1,
-                no_live_play: 0,
-                tags: [            
-                    { text: "タグ1", lock: true },
-                    { text: "タグ2", lock: true }
+                video: {
+                    video_id: "sm100000",
+                    title: "test sm100000",
+                    description: "--------- ---------動画----- ---------------",
+                    thumbnailURL: `${test_dir}/data/sample.jpeg`, //130x100
+                    largeThumbnailURL: `${test_dir}/data/sample.jpeg`, //130x100
+                    postedDateTime: "2017-07-07T18:30:00+09:00",
+                    duration: "10:00",
+                    viewCount: 1000, 
+                    mylistCount: 100, 
+                    video_type: "mp4",
+                },
+                thread: {
+                    commentCount: 2000
+                },
+                tags: [
+                    { id: 1, name: "タグ1", isLocked: true },
+                    { id: 2, name: "タグ2", isLocked: true },
                 ],
-                user_id: "1234567",
-                user_nickname: "abcdefg",
-                user_icon_url: `${test_dir}/data/user_icon.jpg` //50x50
+                owner: {
+                    id: "1234567",
+                    nickname: "abcdefg",
+                    iconURL: `${test_dir}/data/user_icon.jpg` //50x50
+                }
             },
             comments: comments
         }); 

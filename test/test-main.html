@@ -40,7 +40,7 @@
     const ids = ["10", "20", "30", "40", "50"];
     ids.forEach(id => {
         const dl_nock = new NicoDownLoadMocks(id, lowq_set, smile_set);
-        setupNicoDownloadNock(dl_nock);
+        setupNicoDownloadNock(dl_nock, { comment_delay:3000 });
         video_fs.push(dl_nock);
     });
 

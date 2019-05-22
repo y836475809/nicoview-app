@@ -87,7 +87,8 @@ test("downloader dmc", async (t) => {
         max_quality: true,
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
-        tags:["tag1", "tag2", "tag3"]
+        tags:["tag1", "tag2", "tag3"],
+        is_deleted: false
     });
 
     {
@@ -164,7 +165,8 @@ test("downloader smile", async (t) => {
         max_quality: true,
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
-        tags:["tag1", "tag2", "tag3"]
+        tags:["tag1", "tag2", "tag3"],
+        is_deleted: false
     });
 
     {
@@ -241,7 +243,8 @@ test("downloader dmc low quality", async (t) => {
         max_quality: false,
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
-        tags:["tag1", "tag2", "tag3"]
+        tags:["tag1", "tag2", "tag3"],
+        is_deleted: false
     });     
 });
 
@@ -272,7 +275,8 @@ test("downloader smile low quality", async (t) => {
         max_quality: false,
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
-        tags:["tag1", "tag2", "tag3"]
+        tags:["tag1", "tag2", "tag3"],
+        is_deleted: false
     }); 
 });
 

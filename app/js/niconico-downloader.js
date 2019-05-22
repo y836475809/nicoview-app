@@ -312,6 +312,7 @@ class NicoNicoDownloader {
 
     getDownloadedItem(){
         const { api_data } = this.watch_data;
+        const is_deleted = api_data.video.isDeleted;
         const video_id = api_data.video.id;
         const video_type = getVideoType(api_data.video.smileInfo.url);
         const tags = api_data.tags.map((value) => {
@@ -327,7 +328,8 @@ class NicoNicoDownloader {
             max_quality: this.videoinfo.maxQuality,
             time: api_data.video.duration,
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
-            tags: tags
+            tags: tags,
+            is_deleted: is_deleted
         };      
     }
 

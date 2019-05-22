@@ -116,7 +116,8 @@ class Library {
             play_count: 0,
             time: item.time,
             pub_date: item.pub_date,
-            tags: item.tags
+            tags: item.tags,
+            is_deleted: item.is_deleted
         };
         await this._updateData(this.db, library_item, true);
     }

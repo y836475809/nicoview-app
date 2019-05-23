@@ -192,8 +192,6 @@ class Library {
 
     getLibraryData(){
         return new Promise(async (resolve, reject) => {
-            const dir_map = await this._getDirMap(); //TODO
-
             this.db.find({_data_type: "video"}, async (err, docs) => { 
                 if(err){
                     reject(err);
@@ -205,7 +203,7 @@ class Library {
                 }
                 const data = await Promise.all(docs.map(async value=>{
                     const video_id = value.video_id;
-                    const dir_path = dir_map.get(value.dirpath_id);
+                    const dir_path = this.id_dirpath_map.get(value.dirpath_id);
                     return {
                         thumb_img: this._getThumbImgPath(dir_path, value),
                         id: video_id,

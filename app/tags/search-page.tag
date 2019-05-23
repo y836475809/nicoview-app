@@ -302,6 +302,7 @@
                 this.onCancelSearch();
             });
 
+            grid_table.clearSelected();
             try {
                 const search_result = await nico_search.search(nico_search_params);
                 setData(search_result);            

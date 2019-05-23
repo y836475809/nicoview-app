@@ -142,6 +142,10 @@ class GridTable {
         return datas;
     }
 
+    clearSelected(){
+        this.grid.setSelectedRows([]);
+    }
+
     resize(new_size){
         this.container.height(new_size.height);
         this.container.width(new_size.width);

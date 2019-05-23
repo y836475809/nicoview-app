@@ -209,7 +209,7 @@
                 return image.outerHTML;
             }else{
                 // console.log("img value=", value);
-                return `<img src='${value}' 
+                return `<img src="${value}" 
                     class="mylist-img"
                     width="${columnDef.width}" 
                     height="${columnDef.height}"/>`;

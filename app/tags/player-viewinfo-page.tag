@@ -118,11 +118,13 @@
         }
         .icon-button{
             font-size: 20px;
+            width: 30px;
             margin-left: auto;
         }
         .icon-button:hover{
-            cursor: pointer; 
-            opacity: 0.5;
+            cursor: pointer;
+            background-color: lightgray; 
+            /* opacity: 0.5; */
         }
     </style>
     

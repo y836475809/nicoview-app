@@ -9,7 +9,7 @@ const IPCMsg =  Object.freeze({
     SET_COOKIE_SYNC: "ipc-set-cookie",
 
     SEARCH_TAG: "ipc-search-tag",
-    LOAD_MYLIST: "ipc-load-nylist",
+    LOAD_MYLIST: "ipc-load-mylist",
 
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",

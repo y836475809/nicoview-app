@@ -346,8 +346,8 @@
             this.video_thumbnail_url = video.thumbnailURL;
             this.first_retrieve = time_format.toDate(video.postedDateTime);
             this.view_counter = video.viewCount;
-            this.comment_counter = video.viewCount;
-            this.mylist_counter = thread.commentCount;
+            this.comment_counter = thread.commentCount;
+            this.mylist_counter = video.mylistCount;
             this.user_nickname = owner.nickname;
             this.user_icon_url = owner.iconURL;
             

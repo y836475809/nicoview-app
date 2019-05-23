@@ -60,6 +60,7 @@
 - [x] 使用していないsplit.js削除
 - [x] 使用していないtest\dummy_server以下のファイル削除
 - [ ] flvの再生
+- [ ] swfの再生
 - [x] sqlite dbのインポートで処理中にインジケータが表示されない
 - [ ] electron-builderのコマンドは「electron-builder --win --x64」
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
@@ -118,6 +119,7 @@
 - [ ] watchページが削除されていて404の場合がある
 - [ ] ライブラリの数が多いと、ニコニコの検索結果に「local」「download」をタグ付けするため、少し遅くなる
 - [x] ライブラリへのデータ追加(addItem)でデータに「is_deleted」がない(ダウンロードした動画情報取得(getDownloadedItem)のデータに「is_deleted」がないから)
+- [ ] requireのパスでテンプレートリテラルを使用しているのを相対パスにする(補完等が効くように)
 - [x] ニコニコ動画検索
   - [ ] 次のページへ移動したら項目の選択状態を解除する
   - [x] playerのタグクリックで検索

@@ -393,7 +393,9 @@ class Library {
     _getThumbInfo(dir_path, video_info) {
         const datafile = this._getDataFileInst(dir_path, video_info);
         const thumb_info = datafile.getThumbInfo();
-        thumb_info.thumbnail_url = this._getThumbImgPath(dir_path, video_info);
+        const thumb_img_path = this._getThumbImgPath(dir_path, video_info);
+        thumb_info.video.thumbnailURL = thumb_img_path;
+        thumb_info.video.largeThumbnailURL = thumb_img_path;
         return thumb_info;
     }
 

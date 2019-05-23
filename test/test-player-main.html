@@ -59,6 +59,8 @@
             comments: comments
         };
         const viewinfo = {
+            is_deleted: true,
+            is_local: true,
             thumb_info: {
                 video: {
                     video_id: "sm100000",
@@ -107,6 +109,8 @@
             });
         }
         obs.trigger("on_change_viewinfo",{
+            is_deleted: false,
+            is_local: false,
             thumb_info: {
                 video: {
                     video_id: "sm100000",

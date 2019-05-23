@@ -3,7 +3,7 @@
         :scope {
             display: grid;
             --panel-padding: 4px;
-            --video-panel-height: calc(100px + 6px);
+            --video-panel-height: 120px;
             --user-panel-height: 30px;
             --user-thumbnail-size: 50px;
             --description-panel-height: 100px;
@@ -124,7 +124,20 @@
         .icon-button:hover{
             cursor: pointer;
             background-color: lightgray; 
-            /* opacity: 0.5; */
+        }
+        .icon-islocal,
+        .icon-isdeleted{
+            font-size: 20px;
+        }
+        .icon-islocal[data-state="true"]{
+            color: green;
+        }
+        .icon-isdeleted[data-state="true"]{
+            color: red;
+        }
+        .icon-islocal[data-state="false"],
+        .icon-isdeleted[data-state="false"]{
+            opacity: 0.2;
         }
     </style>
     
@@ -138,6 +151,8 @@
             <div>再生 : {this.view_counter}</div>
             <div>コメント : {this.comment_counter}</div>
             <div>マイリスト : {this.mylist_counter}</div>
+            <i title={this.is_local?"local":""} data-state={String(this.is_local)} class="icon-islocal fas fa-book"></i>
+            <i title={this.is_deleted?"動画は削除されています":""} data-state={String(this.is_deleted)} class="icon-isdeleted fas fa-ban"></i>
         </div>
     </div>
     <div class="viewinfo-description-panel">   
@@ -174,8 +189,11 @@
 
         const row_height = 25;
 
+        this.is_deleted = false;
+        this.is_local = false;
+
         this.video_thumbnail_url = "";
-        this.title =  "";
+        this.title =  "-";
         this.first_retrieve =  "";
         this.view_counter = 0;
         this.comment_counter = 0;
@@ -307,9 +325,14 @@
         obs.on("on_change_viewinfo", (viewinfo)=> {
             resizeCommentList();
 
-            //TODO
-            const is_deleted = viewinfo.is_deleted;
-            const is_local = viewinfo.true;
+            this.is_deleted = viewinfo.is_deleted;
+            this.is_local = viewinfo.is_local;
+            if(this.is_deleted===undefined){
+                this.is_deleted = false;
+            }
+            if(this.is_local===undefined){
+                this.is_local = false;
+            }
 
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;

@@ -14,16 +14,22 @@
 <body>
     <player-main-page></player-main-page>
 </body>
+<script src="../../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../tags/player-main-page.tag"></script>
+<script type="riot/tag" src="../tags/modal-dialog.tag"></script>
+<script type="riot/tag" src="../tags/player-tags.tag"></script>
+<script type="riot/tag" src="../tags/player-seek.tag"></script>
+<script type="riot/tag" src="../tags/player-volume.tag"></script>
+<script type="riot/tag" src="../tags/player-controls.tag"></script>
+<script type="riot/tag" src="../tags/player-video.tag"></script>
+<script type="riot/tag" src="../tags/player-page.tag"></script>
+<script type="riot/tag" src="../tags/player-viewinfo-page.tag"></script>
 <script>
-    //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
-    //Uncaught DOMException: Failed to execute 'createElement' on 'Document': The tag name provided ('http://www.w3.org/2000/svg') is not a valid name.
-    var { TweenMax, TimelineMax } = require("gsap"); // eslint-disable-line
+    /* globals riot */
     const {remote} = require("electron");
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
-    var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     
-    require(`${app_base_dir}/tags/player-main-page.tag`);
     riot.mount("player-main-page");
 </script>
 

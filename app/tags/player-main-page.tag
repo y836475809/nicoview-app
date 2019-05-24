@@ -34,7 +34,7 @@
     </div>
 
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
-
+    
     <script>
         /* globals app_base_dir riot obs */
         const {remote} = require("electron");
@@ -42,20 +42,6 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-
-        require(`${app_base_dir}/tags/modal-dialog.tag`);  
-
-        require(`${app_base_dir}/tags/player-seek.tag`);
-        require(`${app_base_dir}/tags/player-volume.tag`);
-        require(`${app_base_dir}/tags/player-tags.tag`);
-        require(`${app_base_dir}/tags/player-controls.tag`);
-        require(`${app_base_dir}/tags/player-video.tag`);
- 
-        require(`${app_base_dir}/tags/player-page.tag`);
-        require(`${app_base_dir}/tags/player-viewinfo-page.tag`); 
-
-        riot.mount("player-page");
-        riot.mount("player-viewinfo-page"); 
         
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();

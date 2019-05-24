@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>test sidebar</title>
     <script>window.jQuery = window.$ = require("jquery");</script>
-    <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
@@ -16,17 +15,20 @@
     <search-page></search-page>
 </body>
 
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../app/tags/split-page-templete.tag"></script>
+<script type="riot/tag" src="../app/tags/accordion.tag"></script>
+<script type="riot/tag" src="../app/tags/pagination.tag"></script>
+<script type="riot/tag" src="../app/tags/modal-dialog.tag"></script>
+<script type="riot/tag" src="../app/tags/search-page.tag"></script>
 <script>
+    /* globals riot */
     const {remote} = require("electron");
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var riot = require("riot");   // eslint-disable-line
     var obs = riot.observable();  // eslint-disable-line
 
     process.env.NODE_ENV = "SEARCH-PAGE-DEBUG";
-
-    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
-    requireMainTags(app_base_dir);
 
     const { NicoSearchMocks } = require("./mock_server/nico-mock");
     const nico_search_mock = new NicoSearchMocks();

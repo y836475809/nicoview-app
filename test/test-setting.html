@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test setting</title>
-    <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
@@ -14,15 +13,16 @@
     <setting-page></setting-page>
 </body>
 
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../app/tags/modal-dialog.tag"></script>
+<script type="riot/tag" src="../app/tags/setting-page.tag"></script>
 <script>
+    /* globals riot */
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
 
-    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
-    requireMainTags(app_base_dir);
     try {
         riot.mount("setting-page");
 

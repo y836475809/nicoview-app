@@ -6,8 +6,6 @@
     <script>
         window.jQuery = window.$ = require("jquery");
     </script>
-    <script src="../node_modules/riot/riot+compiler.min.js"></script>
-    <script type="riot/tag" src="../app/tags/main-page.tag"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
 
     <style type="text/css">
@@ -17,7 +15,19 @@
 <body>
     <main-page></main-page>
 </body>
-
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../app/tags/main-page.tag"></script>
+<script type="riot/tag" src="../app/tags/split-page-templete.tag"></script>
+<script type="riot/tag" src="../app/tags/accordion.tag"></script>
+<script type="riot/tag" src="../app/tags/pagination.tag"></script>
+<script type="riot/tag" src="../app/tags/modal-dialog.tag"></script>
+<script type="riot/tag" src="../app/tags/library-page.tag"></script>
+<script type="riot/tag" src="../app/tags/search-page.tag"></script>
+<script type="riot/tag" src="../app/tags/download-schedule-dialog.tag"></script>
+<script type="riot/tag" src="../app/tags/download-page.tag"></script>
+<script type="riot/tag" src="../app/tags/play-history.tag"></script>
+<script type="riot/tag" src="../app/tags/setting-page.tag"></script>
+<script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
     const remote = require("electron").remote;
@@ -26,6 +36,8 @@
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
+
+    riot.mount("main-page");
 
     const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
         setupNicoDownloadNock } = require("./mock_server/nico-mock");
@@ -46,8 +58,6 @@
 
     const mylist_mock = new NicoMylistMocks();
     mylist_mock.mylist();
-
-    riot.mount("main-page");
 
     obs.on("on_error", (error)=> {
         console.error(error);

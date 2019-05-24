@@ -102,12 +102,8 @@
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        let riot = require("riot");
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
-
-        const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
-        requireMainTags(app_base_dir);
 
         let template = [{
             label: "File",
@@ -161,12 +157,6 @@
         };
 
         this.on("mount", function () {
-            riot.mount("library-page");
-            riot.mount("search-page");   
-            riot.mount("download-page");
-            riot.mount("play-history");
-            riot.mount("setting-page");
-            riot.mount("mylist-page");
 
             select_page("library");
 

@@ -7,7 +7,6 @@
     <script>
             window.jQuery = window.$ = require("jquery");
     </script>
-    <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
 
     <style type="text/css">
@@ -31,10 +30,18 @@
     <player-main-page ref="pvi" class="test-player-main-page"></player-main-page>
 </body>
 
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../app/tags/player-main-page.tag"></script>
+<script type="riot/tag" src="../app/tags/modal-dialog.tag"></script>
+<script type="riot/tag" src="../app/tags/player-tags.tag"></script>
+<script type="riot/tag" src="../app/tags/player-seek.tag"></script>
+<script type="riot/tag" src="../app/tags/player-volume.tag"></script>
+<script type="riot/tag" src="../app/tags/player-controls.tag"></script>
+<script type="riot/tag" src="../app/tags/player-video.tag"></script>
+<script type="riot/tag" src="../app/tags/player-page.tag"></script>
+<script type="riot/tag" src="../app/tags/player-viewinfo-page.tag"></script>
 <script>
-    //require("gsap")はrequire("riot")の前でないと以下のエラーが出る
-    //Uncaught DOMException: Failed to execute 'createElement' on 'Document': The tag name provided ('http://www.w3.org/2000/svg') is not a valid name.
-    var { TweenMax, TimelineMax } = require("gsap"); // eslint-disable-line
+    /* globals riot */
     const path = require("path");
     const fs = require("fs");
     const remote = require("electron").remote;
@@ -42,12 +49,10 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
 
-    var riot = require("riot");  // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-    
+    riot.mount("player-main-page");
+      
     const reader = require(`${app_base_dir}/js/reader`);
-    require(`${app_base_dir}/tags/player-main-page`);
-    riot.mount("player-main-page");    
 
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;

@@ -4,8 +4,6 @@
         <meta charset="UTF-8">
         <title>Hello World!</title>
         <script>window.jQuery = window.$ = require("jquery");</script>
-        <script src="../../node_modules/riot/riot+compiler.min.js"></script>
-        <script type="riot/tag" src="../tags/main-page.tag"></script>
         <link rel="stylesheet" type="text/css" href="../css/app.css">
 
         <style type="text/css">
@@ -15,7 +13,19 @@
     <body>
         <main-page></main-page>
     </body>
-
+    <script src="../../node_modules/riot/riot+compiler.min.js"></script>
+    <script type="riot/tag" src="../tags/main-page.tag"></script>
+    <script type="riot/tag" src="../tags/split-page-templete.tag"></script>
+    <script type="riot/tag" src="../tags/accordion.tag"></script>
+    <script type="riot/tag" src="../tags/pagination.tag"></script>
+    <script type="riot/tag" src="../tags/modal-dialog.tag"></script>
+    <script type="riot/tag" src="../tags/library-page.tag"></script>
+    <script type="riot/tag" src="../tags/search-page.tag"></script>
+    <script type="riot/tag" src="../tags/download-schedule-dialog.tag"></script>
+    <script type="riot/tag" src="../tags/download-page.tag"></script>
+    <script type="riot/tag" src="../tags/play-history.tag"></script>
+    <script type="riot/tag" src="../tags/setting-page.tag"></script>
+    <script type="riot/tag" src="../tags/mylist-page.tag"></script>
     <script>
         /* globals riot */
         const { remote } = require("electron");

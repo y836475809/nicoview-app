@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>test sidebar</title>
-    <script src="../node_modules/riot/riot+compiler.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
@@ -21,17 +20,16 @@
     </div>
 </body>
 
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script type="riot/tag" src="../app/tags/accordion.tag"></script>
 <script>
+    /* globals riot */
     const {remote} = require("electron");
     const {Menu} = remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var riot = require("riot"); // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
-    
-    const requireMainTags = require(`${app_base_dir}/js/require-main-tags`); 
-    requireMainTags(app_base_dir);
-
+    riot.mount("accordion");
     const p = console.log;
 
     const createMenu = (sender) => {
@@ -89,8 +87,6 @@
     const onclickdelselItems = () => {
         obs.trigger(`${this.acdn1.id_name}-delete-selected-items`);
     };
-    
-    riot.mount("accordion");
 </script>
 
 </html>

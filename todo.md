@@ -11,6 +11,7 @@
 - [ ] 再生した時にライブラリdb(再生数等)を更新する
 - [ ] スペースキーでplay/pause切り替えのkeyupでkeycode使用
 - [ ] viewfinfo
+  - [ ] 日付、コメント数の縦並びをそろえる
   - [ ] コメント数はローカルのコメント数を優先して表示する
   - [ ] コメントリストのダブルクリックでその時間にシーク
   - [ ] 説明のuserのリンクを有効にする
@@ -35,7 +36,6 @@
 - [ ] playerで再生で+1sec, -1secの移動
 - [ ] playerでシーク上にマウスホバーで時間ポップアップ表示
 - [ ] 再生が動画最後までいって終了したらhbは止める？
-- [ ] <script src="../node_modules/riot/riot+compiler.min.js"></script>はvar riot = require("riot"); でＯＫ？
 - [ ] flvの再生
 - [ ] swfの再生
 - [ ] electron-builderのコマンドは「electron-builder --win --x64」

@@ -129,6 +129,10 @@
             cursor: pointer;
             background-color: lightgray; 
         }
+        .icon-button[data-state="false"]{
+            pointer-events: none;
+            opacity: 0.2;
+        }
         .icon-islocal,
         .icon-isdeleted{
             font-size: 20px;
@@ -179,7 +183,7 @@
             <div class="icon-contain">
                 <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
                         <i title="comment" class={this.toggle_comment_class}></i></span>
-                <span class="icon-button center-hv" onclick={this.onclicAddDownload}>
+                <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
                         <i title="download" class="fas fa-download"></i></span>
                 <span class="icon-button center-hv" onclick={this.onclickUpdate}>
                     <i title="update" class="fas fa-sync-alt"></i></span>
@@ -341,6 +345,16 @@
             this.update();
 
             obs.trigger("show-player-comment", comment_visible);
+        };
+
+        this.onclicAddDownload = (e) => {
+            const item = {
+                thumb_img: this.video_thumbnail_url,
+                id: this.video_id,
+                name: this.title,
+                state: 0
+            };
+            obs.trigger("add-download-item", item);
         };
 
         this.onclickUpdate = (e) => {

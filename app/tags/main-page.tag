@@ -215,6 +215,11 @@
             obs.trigger("load-mylist", args);
         });
 
+        ipc_monitor.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
+            const item = args;
+            obs.trigger("download-page:add-download-items", [item]);
+        });
+
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
             const video_id = args;
             console.log("main update video_id=", video_id);

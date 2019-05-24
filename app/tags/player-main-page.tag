@@ -253,6 +253,10 @@
             console.log("player main prog_dialog.close update video_id=", video_id);
         });
 
+        obs.on("add-download-item", (args) => {
+            ipc_monitor.addDonwloadItem(args);
+        });
+
         this.on("mount", () => {
             const vw = SettingStore.getValue(pref_infoview_width, 200);
             if(vw){

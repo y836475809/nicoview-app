@@ -116,10 +116,14 @@
             height: 25px;
             vertical-align:middle;
         }
+
+        .icon-contain{
+            display: flex;
+            margin-left: auto;
+        }
         .icon-button{
             font-size: 20px;
             width: 30px;
-            margin-left: auto;
         }
         .icon-button:hover{
             cursor: pointer;
@@ -172,8 +176,14 @@
                 <input class="comment-checkbox" type="checkbox" 
                     onclick={this.onclickSyncCommentCheck} /><label>同期</label>
             </div>
-            <span class="icon-button center-hv" onclick={this.onclickUpdate}>
-                <i title="update" class="fas fa-sync-alt"></i></span>
+            <div class="icon-contain">
+                <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
+                        <i title="comment" class={this.toggle_comment_class}></i></span>
+                <span class="icon-button center-hv" onclick={this.onclicAddDownload}>
+                        <i title="download" class="fas fa-download"></i></span>
+                <span class="icon-button center-hv" onclick={this.onclickUpdate}>
+                    <i title="update" class="fas fa-sync-alt"></i></span>
+            </div>
         </div>
         <div class="comment-grid-container">
             <div class="comment-grid"></div>
@@ -315,6 +325,22 @@
                 }
                 setDescriptionContainerClass("description-container-extend");
             }
+        };
+
+        this.toggle_comment_class = "far fa-comment-dots";
+        this.onclickToggleComment = (e) => {
+            let comment_visible = true;
+            
+            if(/dots/.test(this.toggle_comment_class)){
+                this.toggle_comment_class = "fas fa-comment-slash";
+                comment_visible = false;
+            }else{
+                this.toggle_comment_class = "far fa-comment-dots";
+                comment_visible = true;
+            }
+            this.update();
+
+            obs.trigger("show-player-comment", comment_visible);
         };
 
         this.onclickUpdate = (e) => {

@@ -119,6 +119,7 @@ class CommentTimeLine {
             width: parent_elm.clientWidth
         };
         this.timeLine = null;
+        this.enable = true;
     }
 
     /**
@@ -204,6 +205,9 @@ class CommentTimeLine {
     }
 
     clear(){
+        if(this.enable!==true){
+            return;
+        }
         if(!this.timeLine){
             return;
         }
@@ -216,14 +220,23 @@ class CommentTimeLine {
     }
 
     play(){
+        if(this.enable!==true){
+            return;
+        }
         this.timeLine.play();
     }
 
     pause(){
+        if(this.enable!==true){
+            return;
+        }
         this.timeLine.pause();
     }
 
     seek(seek_sec){
+        if(this.enable!==true){
+            return;
+        }
         this.timeLine.time(seek_sec, false);
     }
 

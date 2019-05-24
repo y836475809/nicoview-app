@@ -159,6 +159,21 @@
                     seek(current);
                 }
             });
+
+            obs.on("show-player-comment", (visible) => {
+                if(visible){
+                    comment_tl.enable = true;
+                    const current = video_elm.currentTime;
+                    seek(current);
+                    if(video_elm.paused===false){
+                        video_elm.play();
+                    }
+                }else{
+                    comment_tl.pause();
+                    comment_tl.seek(0);
+                    comment_tl.enable = false;
+                }
+            });
         });
     </script>
 </player-video>

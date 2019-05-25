@@ -1,12 +1,16 @@
 require("slickgrid/lib/jquery.event.drag-2.3.0");
 require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
+const EventEmitter = require("events");
 const { GridTable } = require("./gridtable");
 const { SettingStore } = require("./setting-store");
 const { DownloadItemStore } = require("./download-item-store");
 
-class GridTableDownloadItem {
+const CHANGE_ITEM_NUM = "change-item-num";
+
+class GridTableDownloadItem extends EventEmitter {
     constructor(parent_elm, state_formatter){
+        super();
         const columns = [
             {id: "thumb_img", name: "image", height:100, width: 130, behavior: "selectAndMove"},
             {id: "id", name: "id", behavior: "selectAndMove"},
@@ -107,6 +111,8 @@ class GridTableDownloadItem {
         this.grid_table.dataView.setFilter((item)=>{
             return item.visible===true;
         });
+
+        this.emit(CHANGE_ITEM_NUM, this.grid_table.dataView.getLength()); 
     }
 
     resizeFitContainer(container){
@@ -159,6 +165,8 @@ class GridTableDownloadItem {
 
         this.grid_table.dataView.refresh();
         this.save();
+
+        this.emit(CHANGE_ITEM_NUM, this.grid_table.dataView.getLength()); 
     }
 
     deleteItems(video_ids){
@@ -170,6 +178,8 @@ class GridTableDownloadItem {
         });
         this.grid_table.dataView.refresh();
         this.save();
+
+        this.emit(CHANGE_ITEM_NUM, this.grid_table.dataView.getLength()); 
     }
 
     deleteSelectedItems(){
@@ -182,6 +192,8 @@ class GridTableDownloadItem {
         this.grid_table.grid.setSelectedRows([]);
         this.grid_table.grid.resetActiveCell();
         this.save();
+
+        this.emit(CHANGE_ITEM_NUM, this.grid_table.dataView.getLength()); 
 
         const deleted_ids = items.map(value => {
             return value.id;
@@ -197,6 +209,8 @@ class GridTableDownloadItem {
             }
         });
         this.save();
+
+        this.emit(CHANGE_ITEM_NUM, this.grid_table.dataView.getLength()); 
     }
 
     updateItem(video_id, progress, state){

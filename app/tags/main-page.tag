@@ -50,6 +50,24 @@
             font-size: 30px;
             color: lightgrey;
         }
+
+        .download-badge {
+            position: relative;
+        }
+        .download-badge > .item-num {
+            position: absolute;
+            text-align: center;
+            left: 50%;
+            top: 0px;
+            font-size: 12px;
+            line-height: 20px;
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: red;
+            text-align: center;
+        }
     </style>
     <div class="main-group-buttons">
         <label class="label">
@@ -66,7 +84,12 @@
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
-            <span title="download" class="button center-hv"><span class="fas fa-download"></span></span> 
+            <div>
+            <span title="download" class="button download-badge center-hv">
+                <span class="fas fa-download"></span>
+                <span class="item-num">{this.donwnload_item_num}</span>
+            </span> 
+            </div>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="history-radio" onclick="{this.onclickPageSelect.bind(this,'history')}"> 
@@ -104,6 +127,8 @@
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
+
+        this.donwnload_item_num = 0;
 
         let template = [{
             label: "File",
@@ -165,6 +190,11 @@
 
         obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
+        });
+
+        obs.on("main-page:download-item-num", (num)=>{
+            this.donwnload_item_num = num;
+            this.update();
         });
 
         const PlayByVideoID = async(video_id) => {

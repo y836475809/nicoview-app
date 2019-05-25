@@ -186,15 +186,20 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
+        const deleteDownloadItems = (video_ids) => {
+            if(nico_down!=null){
+                if(video_ids.includes(nico_down.video_id)){
+                    nico_down.cancel();
+                }
+            } 
+            grid_table_dl.deleteItems(video_ids); 
+        };
+
         const createMenu = () => {
             const nemu_templete = [
                 { label: "delete", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
-                    if(nico_down!=null){
-                        if(deleted_ids.includes(nico_down.video_id)){
-                            nico_down.cancel();
-                        }
-                    } 
+                    deleteDownloadItems(deleted_ids);
                     obs.trigger("search-page:delete-download-ids", deleted_ids);
                 }},
             ];
@@ -285,12 +290,7 @@
         });
 
         obs.on("download-page:delete-download-items", (video_ids) => {
-            if(nico_down!=null){
-                if(video_ids.includes(nico_down.video_id)){
-                    nico_down.cancel();
-                }
-            }
-            grid_table_dl.deleteItems(video_ids);  
+            deleteDownloadItems(video_ids);
         });
 
         this.on("mount", () => {
@@ -299,11 +299,15 @@
             
             const context_menu = createMenu();
             try {
+                grid_table_dl.on("change-item-num", (num) => {
+                    obs.trigger("main-page:download-item-num", num);
+                });
+
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
                     obs.trigger("play-by-videoid", data.id);
-                });                
+                });
             } catch (error) {
                 console.log("donwload item load error=", error);
             }

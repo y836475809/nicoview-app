@@ -218,6 +218,7 @@
         ipc_monitor.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
             obs.trigger("download-page:add-download-items", [item]);
+            obs.trigger("search-page:add-download-items", [item.id]);
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{

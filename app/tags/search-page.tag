@@ -537,6 +537,19 @@
             grid_table.resizeFitContainer(container);
         };
 
+        obs.on("search-page:add-download-items", (video_ids)=> {
+            setDownloadTag(video_ids);
+        });
+
+        const setDownloadTag = (video_ids) => {
+            video_ids.forEach(video_id => {
+                const item = grid_table.dataView.getItemById(video_id);
+                item.reg_download = true;
+                grid_table.dataView.updateItem(video_id, item);
+            });
+            grid_table.grid.render();
+        };
+
         const createMenu = () => {
             const nemu_templete = [
                 { label: "bookmark", click() {
@@ -545,12 +558,10 @@
                 { label: "download", click() {
                     const items = grid_table.getSelectedDatas();
                     obs.trigger("download-page:add-download-items", items);
-                    items.forEach(value => {
-                        const item = grid_table.dataView.getItemById(value.id);
-                        item.reg_download = true;
-                        grid_table.dataView.updateItem(value.id, item);
+                    const video_ids = items.map(value => {
+                        return value.id;
                     });
-                    grid_table.grid.render();
+                    setDownloadTag(video_ids);
                 }},
                 { label: "delete download", click() {
                     const items = grid_table.getSelectedDatas();

@@ -101,6 +101,10 @@
             }
         };
 
+        obs.on("player-controls:play", ()=> {
+            this.play();
+        });
+
         obs.on("loaded_data", ()=> {
             setPlayEnable(true);
         });
@@ -117,11 +121,5 @@
                 this.refs.seek.redraw();
             });
         });
-
-        window.addEventListener("keyup", (e) => {
-            if(e.key==" "){
-                this.play();
-            }
-        }, true);   
     </script>
 </player-controls>

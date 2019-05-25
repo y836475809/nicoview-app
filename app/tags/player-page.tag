@@ -14,15 +14,18 @@
         #player-tags-content{
             grid-row: 1 / 2;
             grid-column: 1 / 3; 
+            outline: none;
         }  
         #player-video-content{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
             background-color: black;
+            outline: none;
         }  
         #player-controls-content{
             grid-row: 3 / 4;
             grid-column: 1 / 3; 
+            outline: none;
         }  
         #player-video {
             overflow: hidden; 
@@ -32,15 +35,15 @@
         }
     </style>
 
-    <div id="player-tags-content">
+    <div id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <player-tags></player-tags>
     </div>
-    <div id="player-video-content">
+    <div id="player-video-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <div id="player-video">
             <player-video></player-video>
         </div>
     </div>
-    <div id="player-controls-content">
+    <div id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <player-controls></player-controls>
     </div>
 
@@ -78,6 +81,12 @@
         obs.on("on_resize_window", (window_size) => { 
             adjustPlayerVideoSize();       
         });
+
+        this.onkeyupTogglePlay = (e) => {
+            if (e.keyCode === 32) {
+                obs.trigger("player-controls:play");
+            }
+        };
     </script>  
       
 </player-page>

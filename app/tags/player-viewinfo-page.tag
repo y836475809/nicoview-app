@@ -147,6 +147,13 @@
         .icon-isdeleted[data-state="false"]{
             opacity: 0.2;
         }
+
+        .video-info > .content {
+            display: flex
+        }
+        .video-info > .content > .label {
+            min-width: calc(5em + 3px);
+        }
     </style>
     
     <div class="viewinfo-panel viewinfo-video-panel">
@@ -155,10 +162,18 @@
         </div>
         <div class="video-info">
             <div>{this.title}</div>
-            <div>投稿日 : {this.first_retrieve}</div>
-            <div>再生 : {this.view_counter}</div>
-            <div>コメント : {this.comment_counter}</div>
-            <div>マイリスト : {this.mylist_counter}</div>
+            <div class="content">
+                <div class="label">投稿日</div>: {this.first_retrieve}
+            </div>
+            <div class="content">
+                <div class="label">再生</div>: {this.view_counter}
+            </div>
+            <div class="content">
+                <div class="label">コメント</div>: {this.comment_counter}
+            </div>
+            <div class="content">
+                <div class="label">マイリスト</div>: {this.mylist_counter}
+            </div>
             <i title={this.is_local?"local":""} data-state={String(this.is_local)} class="icon-islocal fas fa-book"></i>
             <i title={this.is_deleted?"動画は削除されています":""} data-state={String(this.is_deleted)} class="icon-isdeleted fas fa-ban"></i>
         </div>

@@ -7,6 +7,7 @@ const IPCMsg =  Object.freeze({
     
     SHOW_PLAYER_SYNC: "ipc-show-player",
     SET_COOKIE_SYNC: "ipc-set-cookie",
+    SET_PLAYER_PATH: "ipc-set-player-path",
 
     SEARCH_TAG: "ipc-search-tag",
     LOAD_MYLIST: "ipc-load-mylist",
@@ -70,6 +71,10 @@ class IPCMonitor extends EventEmitter {
     setCookieSync(cookies){
         return ipcRenderer.sendSync(IPCMsg.SET_COOKIE_SYNC, cookies);
     }
+    
+    setPlayerPath(path){
+        return ipcRenderer.send(IPCMsg.SET_PLAYER_PATH, path);
+    }
 
     listenMain(){
         ipcMain.on(IPCMsg.SHOW_PLAYER_SYNC, (event, args) => {
@@ -78,6 +83,10 @@ class IPCMonitor extends EventEmitter {
 
         ipcMain.on(IPCMsg.SET_COOKIE_SYNC, (event, args) => {
             this.emit(IPCMsg.SET_COOKIE_SYNC, event, args); 
+        });
+
+        ipcMain.on(IPCMsg.SET_PLAYER_PATH, (event, args) => {
+            this.emit(IPCMsg.SET_PLAYER_PATH, event, args); 
         });
     }
 

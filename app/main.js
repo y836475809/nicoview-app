@@ -19,6 +19,8 @@ let win = null;
 let player_win = null;
 let is_debug_mode = false;
 
+let player_html_path = `file://${__dirname}/html/player.html`;
+
 const ipc_monitor = new IPCMonitor();
 ipc_monitor.listenMain();
 
@@ -27,9 +29,10 @@ function createWindow() {
         base_dir: __dirname
     };
 
-    let html = "html/index.html";
+    let main_html_path = `file://${__dirname}/html/index.html`;
     if (process.argv.length > 2) {
-        html = process.argv[2];
+        const filename = process.argv[2];
+        main_html_path = `file://${path.resolve(__dirname, "..")}/test/${filename}`;
         is_debug_mode = true;
     }
 
@@ -37,7 +40,7 @@ function createWindow() {
     win = new BrowserWindow({ width: 1000, height: 600 });
 
     // アプリケーションのindex.htmlの読み込み
-    win.loadURL(`file://${__dirname}/${html}`);
+    win.loadURL(main_html_path);
 
     if(is_debug_mode){
         // DevToolsを開く
@@ -88,6 +91,10 @@ app.on("ready", ()=>{
             event.returnValue = "error";
         }
     });
+
+    ipc_monitor.on(IPCMsg.SET_PLAYER_PATH, (event, args) => {
+        player_html_path = args;
+    });
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。
@@ -123,9 +130,7 @@ const createPlayerWindow = () => {
 
             resolve();
         });
-
-        const player_path = `file://${__dirname}/html/player.html`;
-        player_win.loadURL(player_path);
+        player_win.loadURL(player_html_path);
 
         global.player_window = player_win;
     });  

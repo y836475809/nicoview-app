@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <title>test</title>
     <script>
         window.jQuery = window.$ = require("jquery");
     </script>
@@ -30,12 +31,17 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
-    const remote = require("electron").remote;
+    const path = require("path");
+    const { IPCMonitor } = require("../app/js/ipc-monitor");
+    const { remote } = require("electron");
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     var obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
+
+    const ipc_monitor = new IPCMonitor();
+    ipc_monitor.setPlayerPath(path.join(__dirname, "test-player.html"));
 
     riot.mount("main-page");
 
@@ -47,9 +53,9 @@
     nico_search_mock.search();
 
     const video_fs = [];
-    const lowq_set = new Set(["10"]);
-    const smile_set = new Set(["20"]);
-    const ids = ["10", "20", "30", "40", "50"];
+    const lowq_set = new Set(["sm10"]);
+    const smile_set = new Set(["sm20"]);
+    const ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];
     ids.forEach(id => {
         const dl_nock = new NicoDownLoadMocks(id, lowq_set, smile_set);
         setupNicoDownloadNock(dl_nock, { comment_delay:3000 });

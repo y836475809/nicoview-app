@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoMocks, TestData} = require("./helper/nico_mock");
+const { NicoMocks, TestData} = require("./helper/nico-mock");
 const { NicoUpdate } = require("../app/js/nico-update");
 const { filterComments } = require("../app/js/niconico");
 

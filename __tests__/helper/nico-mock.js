@@ -5,11 +5,11 @@ const stream = require("stream");
 
 const base_dir = path.resolve(__dirname, "..");
 const video_id = "sm12345678";
-const no_owner_comment = require(`${base_dir}/data/res_no_owner_comment.json`);
-const owner_comment = require(`${base_dir}/data/res_owner_comment.json`);
-const data_api_data = require(`${base_dir}/data/sm12345678_data_api_data.json`);
-const dmc_session = require(`${base_dir}/data/sm12345678_dmc_session_max_quality.json`);
-const dmc_session_low = require(`${base_dir}/data/sm12345678_dmc_session_low_quality.json`);
+const no_owner_comment = require(`${base_dir}/data/no-owner-comment.json`);
+const owner_comment = require(`${base_dir}/data/owner-comment.json`);
+const data_api_data = require(`${base_dir}/data/sm12345678-data-api-data.json`);
+const dmc_session = require(`${base_dir}/data/sm12345678-dmc-session-max-quality.json`);
+const dmc_session_low = require(`${base_dir}/data/sm12345678-dmc-session-low-quality.json`);
 
 class NicoMocks {
     constructor(){
@@ -367,7 +367,7 @@ class MockNicoUitl {
         if(json){
             data_api_data = MockNicoUitl._escapeHtml(JSON.stringify(json));
         }else{   
-            const fpath = `${base_dir}/data/${video_id}_data_api_data.json`;
+            const fpath = `${base_dir}/data/${video_id}-data-api-data.json`;
             const j = fs.readFileSync(fpath, "utf-8");
             data_api_data = MockNicoUitl._escapeHtml(j);
         }

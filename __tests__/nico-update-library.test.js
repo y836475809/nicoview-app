@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { TestData} = require("./helper/nico_mock");
+const { TestData} = require("./helper/nico-mock");
 const { NicoUpdate } = require("../app/js/nico-update");
 const Library = require("../app/js/library");
 

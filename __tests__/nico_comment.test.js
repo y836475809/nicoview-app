@@ -1,7 +1,7 @@
 const test = require("ava");
 const { NicoComment, filterComments } = require("../app/js/niconico");
-const { NicoMocks, TestData} = require("./helper/nico_mock");
-const { ProfTime } = require("./helper/ava_prof_time");
+const { NicoMocks, TestData} = require("./helper/nico-mock");
+const { ProfTime } = require("./helper/ava-prof-time");
 
 const data_api_data = TestData.data_api_data;
 

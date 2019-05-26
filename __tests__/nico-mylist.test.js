@@ -1,7 +1,7 @@
 const test = require("ava");
 const { NicoMylist } = require("../app/js/nico-mylist");
-const { NicoMylistMocks } = require("./helper/nico_mock");
-const { ProfTime } = require("./helper/ava_prof_time");
+const { NicoMylistMocks } = require("./helper/nico-mock");
+const { ProfTime } = require("./helper/ava-prof-time");
 
 const prof_time = new ProfTime();
 const nico_mylist_mocks = new NicoMylistMocks();

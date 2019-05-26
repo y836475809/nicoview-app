@@ -1,7 +1,7 @@
 const test = require("ava");
 const { NicoWatch, getCookies } = require("../app/js/niconico");
-const { NicoMocks, TestData } = require("./helper/nico_mock");
-const { ProfTime } = require("./helper/ava_prof_time");
+const { NicoMocks, TestData } = require("./helper/nico-mock");
+const { ProfTime } = require("./helper/ava-prof-time");
 
 const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();

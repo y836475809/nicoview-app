@@ -19,7 +19,7 @@ test("read comment", (t) => {
 });
 
 test("read comment deleted", (t) => {
-    const xml = fs.readFileSync(`${dir}/sample_deleted.xml`, "utf-8");
+    const xml = fs.readFileSync(`${dir}/sample-deleted.xml`, "utf-8");
     const obj = reader.comment(xml);
     t.deepEqual(obj, 
         [

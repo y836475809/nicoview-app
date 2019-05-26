@@ -1,5 +1,5 @@
 const test = require("ava");
-const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/nico-downloader");
+const { DonwloadProgMsg, NicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 
 const video_id = TestData.video_id;
@@ -24,7 +24,7 @@ test.afterEach(t => {
     nico_download_mocks.clean();
 });
 
-class TestNicoDownloader extends NicoNicoDownloader {
+class TestNicoDownloader extends NicoDownloader {
     constructor(video_id, dist_dir){
         super(video_id, dist_dir);
 
@@ -209,7 +209,7 @@ test("downloader network error dmc_session 404", async (t) => {
         log.push(state);
     });
     t.deepEqual(log, [DonwloadProgMsg.start_watch]);
-    t.is(result.type, NicoNicoDownloader.ResultType.error);
+    t.is(result.type, NicoDownloader.ResultType.error);
     t.regex(result.reason.message, /404/);
 });
 

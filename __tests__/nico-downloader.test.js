@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/nico-downloader");
+const { DonwloadProgMsg, NicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 
 const data_api_data = TestData.data_api_data;
@@ -28,7 +28,7 @@ test.afterEach(t => {
     nico_download_mocks.clean();
 });
 
-class TestNicoDownloader extends NicoNicoDownloader {
+class TestNicoDownloader extends NicoDownloader {
     constructor(video_id, dist_dir, only_max_quality=true){
         super(video_id, dist_dir, only_max_quality);
         this.map = new Map();
@@ -55,7 +55,7 @@ class TestNicoDownloader extends NicoNicoDownloader {
 }
 
 test("downloader quality check", (t) => {
-    const nico_down = new NicoNicoDownloader();
+    const nico_down = new NicoDownloader();
     t.truthy(nico_down._isDMCMaxQuality(data_api_data, dmc_session_max));
     t.falsy(nico_down._isDMCMaxQuality(data_api_data, dmc_session_low));
 });

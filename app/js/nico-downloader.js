@@ -113,7 +113,7 @@ const DownloadResultType = Object.freeze({
     error: "error"
 });
 
-class NicoNicoDownloader {
+class NicoDownloader {
     constructor(video_id, dist_dir, only_max_quality=true){
         this.video_id = video_id;
         this.dist_dir = dist_dir;
@@ -398,5 +398,5 @@ class NicoNicoDownloader {
 
 module.exports = {
     DonwloadProgMsg: DonwloadProgMsg,
-    NicoNicoDownloader: NicoNicoDownloader
+    NicoDownloader: NicoDownloader
 };

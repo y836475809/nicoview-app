@@ -60,7 +60,7 @@
         const { remote } = require("electron");
         const { Menu } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoNicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
+        const { NicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
 
@@ -251,21 +251,21 @@
                     break;
                 }
 
-                nico_down = new NicoNicoDownloader(video_id, library_dir);
+                nico_down = new NicoDownloader(video_id, library_dir);
                 const result = await nico_down.download((progress)=>{
                     grid_table_dl.updateItem(video_id, `${progress}`, donwload_state.downloading);
                 });
 
-                if(result.type==NicoNicoDownloader.ResultType.complete){
+                if(result.type==NicoDownloader.ResultType.complete){
                     grid_table_dl.updateItem(video_id, "終了", donwload_state.complete);
                     const item = nico_down.getDownloadedItem();
                     obs.trigger("search-page:complete-download-ids", [item.video_id]);
                     obs.trigger("add-library-item", item);   
-                }else if(result.type==NicoNicoDownloader.ResultType.cancel){
+                }else if(result.type==NicoDownloader.ResultType.cancel){
                     grid_table_dl.updateItem(video_id, "キャンセル", donwload_state.wait);
-                }else if(result.type==NicoNicoDownloader.ResultType.skip){ 
+                }else if(result.type==NicoDownloader.ResultType.skip){ 
                     grid_table_dl.updateItem(video_id, `スキップ: ${result.reason}`, donwload_state.wait);
-                }else if(result.type==NicoNicoDownloader.ResultType.error){
+                }else if(result.type==NicoDownloader.ResultType.error){
                     console.log("reason: ", result.reason);
                     grid_table_dl.updateItem(video_id, `エラー: ${result.reason.message}`, donwload_state.error);
                 }

@@ -133,18 +133,13 @@
             pointer-events: none;
             opacity: 0.2;
         }
-        .icon-islocal,
-        .icon-isdeleted{
+        .icon-islocal{
             font-size: 20px;
         }
         .icon-islocal[data-state="true"]{
             color: green;
         }
-        .icon-isdeleted[data-state="true"]{
-            color: red;
-        }
-        .icon-islocal[data-state="false"],
-        .icon-isdeleted[data-state="false"]{
+        .icon-islocal[data-state="false"]{
             opacity: 0.2;
         }
 
@@ -153,6 +148,9 @@
         }
         .video-info > .content > .label {
             min-width: calc(5em + 3px);
+        }
+        .video-info > .notice-deleted {
+            color: red;
         }
     </style>
     
@@ -175,7 +173,7 @@
                 <div class="label">マイリスト</div>: {this.mylist_counter}
             </div>
             <i title={this.is_local?"local":""} data-state={String(this.is_local)} class="icon-islocal fas fa-book"></i>
-            <i title={this.is_deleted?"動画は削除されています":""} data-state={String(this.is_deleted)} class="icon-isdeleted fas fa-ban"></i>
+            <i class="notice-deleted" if={this.is_deleted}>動画は削除されています</i>
         </div>
     </div>
     <div class="viewinfo-description-panel">   

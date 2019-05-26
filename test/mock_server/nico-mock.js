@@ -4,8 +4,8 @@ const querystring = require("querystring");
 
 const base_dir = __dirname;
 const comment = require("./data/comment.json");
-const data_api_data = require("./data/api_data.json");
-const dmc_session = require("./data/dmc_session.json");
+const data_api_data = require("./data/api-data.json");
+const dmc_session = require("./data/dmc-session.json");
 
 class NicoVideoMocks {
     constructor(video_id){

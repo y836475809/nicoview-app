@@ -203,17 +203,6 @@
                     video_ids:[video_id],
                     cb: (data_map) => {
                         if(data_map.has(video_id)){
-                            const library_data = data_map.get(video_id);
-                            const video_data = library_data.video_data;
-                            const thumb_info = library_data.viewinfo.thumb_info; 
-                            
-                            //move to player?
-                            obs.trigger("add-history-items", {
-                                id: video_id, 
-                                image: thumb_info.video.largeThumbnailURL, 
-                                name: thumb_info.video.title, 
-                                url: video_data.src
-                            });
                             resolve(data_map.get(video_id));
                         }else{
                             resolve(null);
@@ -249,6 +238,11 @@
             const item = args;
             obs.trigger("download-page:add-download-items", [item]);
             obs.trigger("search-page:add-download-items", [item.id]);
+        });
+
+        ipc_monitor.on(IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
+            const item = args;
+            obs.trigger("add-history-item", item);
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{

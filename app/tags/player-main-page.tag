@@ -142,7 +142,15 @@
             obs.trigger("on_set_player_state", "play"); 
             obs.trigger("receivedData", video_data);
             obs.trigger("on_load_player_tags", thumb_info.tags);
-            obs.trigger("on_change_viewinfo", viewinfo);       
+            obs.trigger("on_change_viewinfo", viewinfo);   
+            
+            const history_item = {
+                id: video.video_id, 
+                image: video.largeThumbnailURL, 
+                name: video.title, 
+                url: video_data.src
+            };
+            ipc_monitor.addPlayHistory(history_item);       
         }; 
 
         const cancelPlay = () => {

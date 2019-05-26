@@ -74,7 +74,7 @@
             }
         });
 
-        obs.on("add-history-items", (item)=> {
+        obs.on("add-history-item", (item)=> {
             history_store.add(item);
             grid_table.setData(history_store.getItems());
         });

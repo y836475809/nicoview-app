@@ -12,6 +12,7 @@ const IPCMsg =  Object.freeze({
     SEARCH_TAG: "ipc-search-tag",
     LOAD_MYLIST: "ipc-load-mylist",
     ADD_DOWNLOAD_ITEM: "ipc-add-download-item",
+    ADD_PLAY_HISTORY: "ipc-add-play-history",
 
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",
@@ -47,6 +48,11 @@ class IPCMonitor extends EventEmitter {
     addDonwloadItem(args){
         const win = remote.getGlobal ("main_window");
         win.webContents.send(IPCMsg.ADD_DOWNLOAD_ITEM, args);
+    }
+
+    addPlayHistory(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.ADD_PLAY_HISTORY, args);
     }
 
     updateData(args){
@@ -109,6 +115,10 @@ class IPCMonitor extends EventEmitter {
 
         ipcRenderer.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args) => {
             this.emit(IPCMsg.ADD_DOWNLOAD_ITEM, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.ADD_PLAY_HISTORY, (event, args) => {
+            this.emit(IPCMsg.ADD_PLAY_HISTORY, event, args); 
         });
 
         ipcRenderer.on(IPCMsg.UPDATE_DATA, (event, args) => {

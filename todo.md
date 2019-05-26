@@ -58,7 +58,7 @@
 - [ ] videoの"playing"イベントのpauseと再開は削除してもOK?
 - [ ] timelineのclear時にtimeline.removeを入れておく
 - [ ] TweenMax.ticker.fpsでfpsの調整ができるようにする
-- [ ] nedbのfindのオプションで「_data_type, _id: 0」とすればプロパティの削除が不要になる
+- [x] nedbのfindのオプションで「_data_type, _id: 0」とすればプロパティの削除が不要になる
 - [ ] watchページが削除されていて404の場合がある
 - [ ] ライブラリの数が多いと、ニコニコの検索結果に「local」「download」をタグ付けするため、少し遅くなる
 - [ ] requireのパスでテンプレートリテラルを使用しているのを相対パスにする(補完等が効くように)

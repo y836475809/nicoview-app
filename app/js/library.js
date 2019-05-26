@@ -338,7 +338,7 @@ class Library {
 
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
-            this.db.find({ $and : [{_data_type: "video"}, { video_id: video_id }] }, (err, docs) => {   
+            this.db.find({ $and : [{_data_type: "video"}, { video_id: video_id }] }, {_data_type: 0, _id: 0}, (err, docs) => {   
                 if(err){
                     reject(err);
                     return;
@@ -347,9 +347,6 @@ class Library {
                     reject(new Error(`not find video_info, id=${video_id}`));
                     return;
                 }
-                delete docs[0]._data_type;
-                // delete docs[0]._db_type;
-                delete docs[0]._id;
                 resolve(docs[0]);
             });
         });

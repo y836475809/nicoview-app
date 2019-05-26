@@ -284,7 +284,7 @@
         };
 
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130},
+            {id: "thumb_img", name: "image", width: 130},
             {id: "name", name: "名前", formatter:lineBreakFormatter},
             {id: "info", name: "info", formatter:htmlFormatter},
             {id: "pub_date", name: "投稿日"},

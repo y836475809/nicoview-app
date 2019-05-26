@@ -176,8 +176,8 @@
 
         const getBase64 = (img, width, height) => {
             const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
+            canvas.width = width;
+            canvas.height = height;
             const ctx = canvas.getContext("2d");
             // ctx.drawImage(img, 0, 0);
             ctx.drawImage(img, 0, 0, width, height);
@@ -188,8 +188,6 @@
         const imageCacheFormatter = (row, cell, value, columnDef, dataContext)=> {
             if(is_local_item){
                 const image = new Image();
-                image.width = columnDef.width;
-                image.height = columnDef.height;
                 if(image_cache.has(value)){
                     // console.log("cache value=", value);
                     image.src = image_cache.get(value);    
@@ -198,21 +196,19 @@
                         // console.log("onload value=", value);
                         const org_width = e.target.width;
                         const org_height = e.target.height;
-                        const width = columnDef.width;
-                        const height = org_height * (columnDef.width / org_width);
+                        const width = 130;
+                        const height = org_height * (width / org_width);
                         const data = getBase64(e.target, width, height);
                         image_cache.set(value, data);     
                     };
                     image.src = value;
                 }
-                
+                image.classList.add("gridtable-thumbnail", "mylist-img");
                 return image.outerHTML;
             }else{
                 // console.log("img value=", value);
                 return `<img src="${value}" 
-                    class="mylist-img"
-                    width="${columnDef.width}" 
-                    height="${columnDef.height}"/>`;
+                    class="gridtable-thumbnail mylist-img"/>`;
             }
         };
 
@@ -225,7 +221,7 @@
         };
         const columns = [
             {id: "no", name: "#"},
-            {id: "thumb_img", name: "image", height:130, width: 200, formatter:imageCacheFormatter},
+            {id: "thumb_img", name: "image", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
             {id: "description", name: "説明", formatter:BRFormatter},
             {id: "date", name: "投稿日"},
@@ -233,7 +229,7 @@
             {id: "length", name: "時間"}
         ];
         const options = {
-            rowHeight: 130,
+            rowHeight: 100,
             _saveColumnWidth: true,
         };    
         const grid_table = new GridTable("mylist-grid", columns, options);

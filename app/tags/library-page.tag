@@ -128,6 +128,12 @@
         .library-grid-container .slick-cell.l2.r2 {
             white-space: normal;
         }
+
+        .gridtable-thumbnail {
+            object-fit: contain;
+            width: 180px;
+            height: 135px;
+        }
     </style>
 
     <div class="library-controls-container">
@@ -159,7 +165,7 @@
         this.num_items = 0;
     
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130},
+            {id: "thumb_img", name: "image", width: 180},
             {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
             {id: "creation_date", name: "作成日", sortable: true},
@@ -169,7 +175,7 @@
             {id: "state", name: "state"}
         ];
         const options = {
-            rowHeight: 100,
+            rowHeight: 135,
             _saveColumnWidth: true,
             _saveSort: true,
         };   

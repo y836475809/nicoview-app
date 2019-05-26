@@ -8,7 +8,7 @@ const time_format = require("./time_format");
 /* globals $ */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
-    return `<img src="${value}" width="${columnDef.width}" height="${columnDef.height}"/>`;
+    return `<img class="gridtable-thumbnail" src="${value}"/>`;
 };
 
 const dateFormatter = (row, cell, value, columnDef, dataContext)=> {

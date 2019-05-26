@@ -42,3 +42,9 @@ html, body {
   0 3px 14px 2px rgba(0,0,0,0.12), 
   0 5px 5px -3px rgba(0,0,0,0.3);
 }
+
+.gridtable-thumbnail {
+  object-fit: contain;
+  width: 130px;
+  height: 100px;
+}

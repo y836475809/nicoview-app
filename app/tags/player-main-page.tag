@@ -40,7 +40,7 @@
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoPlay } = require(`${app_base_dir}/js/niconico_play`);
+        const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         
         const ipc_monitor = new IPCMonitor();

@@ -3,7 +3,7 @@ require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
-const time_format = require("./time_format");
+const time_format = require("./time-format");
 
 /* globals $ */
 

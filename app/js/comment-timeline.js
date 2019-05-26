@@ -1,6 +1,6 @@
 const { TweenMax, TimelineMax } = require("gsap");
-const FlowComment = require("./flow_comment");
-const FixedComment = require("./fixed_comment");
+const FlowComment = require("./flow-comment");
+const FixedComment = require("./fixed-comment");
 
 class CommentOptionParser {
     constructor(){

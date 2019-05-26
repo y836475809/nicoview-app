@@ -213,8 +213,8 @@
         /* globals app_base_dir obs */
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         require("slickgrid/plugins/slick.autotooltips");
-        const time_format = require(`${app_base_dir}/js/time_format`);
-        const SyncCommentScroll = require(`${app_base_dir}/js/sync_comment_scroll`);
+        const time_format = require(`${app_base_dir}/js/time-format`);
+        const SyncCommentScroll = require(`${app_base_dir}/js/sync-comment-scroll`);
 
         const row_height = 25;
 

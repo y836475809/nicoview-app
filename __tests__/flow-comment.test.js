@@ -1,5 +1,5 @@
 const test = require("ava");
-const FlowComment = require("../app/js/flow_comment");
+const FlowComment = require("../app/js/flow-comment");
 
 test("calc", (t) => {
     let parames = [

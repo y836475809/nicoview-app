@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoSearchParams, NicoSearch } = require("../app/js/niconico-search");
+const { NicoSearchParams, NicoSearch } = require("../app/js/nico-search");
 const { NicoMocks } = require("./helper/nico-mock");
 
 const nico_mocks = new NicoMocks();

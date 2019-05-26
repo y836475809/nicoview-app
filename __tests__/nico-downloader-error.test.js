@@ -1,5 +1,5 @@
 const test = require("ava");
-const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/niconico-downloader");
+const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 
 const video_id = TestData.video_id;

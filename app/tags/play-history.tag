@@ -20,7 +20,7 @@
         /* globals app_base_dir obs */
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const HistoryStore = require(`${app_base_dir}/js/history_store`);
+        const HistoryStore = require(`${app_base_dir}/js/history-store`);
 
         const history_file_path = SettingStore.getSystemFile("history.json");
         const history_store = new HistoryStore(history_file_path, 50);

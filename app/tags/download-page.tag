@@ -60,7 +60,7 @@
         const { remote } = require("electron");
         const { Menu } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoNicoDownloader } = require(`${app_base_dir}/js/niconico-downloader`);
+        const { NicoNicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
 

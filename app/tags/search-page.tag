@@ -247,7 +247,7 @@
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/niconico-search`);
+        const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },

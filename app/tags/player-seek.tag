@@ -60,7 +60,7 @@
 
     <script>
         /* globals app_base_dir obs */
-        const time_format = require(`${app_base_dir}/js/time_format`);
+        const time_format = require(`${app_base_dir}/js/time-format`);
 
         this.mousedown = (e) => {
             if(this.duration===0){

@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/niconico-downloader");
+const { DonwloadProgMsg, NicoNicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 
 const data_api_data = TestData.data_api_data;

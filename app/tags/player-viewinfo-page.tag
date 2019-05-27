@@ -375,8 +375,10 @@
             obs.trigger("update-data", this.video_id);
         };
 
-        obs.on("on_change_viewinfo", (viewinfo)=> {
+        obs.on("on_change_viewinfo", (args)=> {
             resizeCommentList();
+
+            const { viewinfo, comments } = args;
 
             this.is_deleted = viewinfo.is_deleted;
             this.is_local = viewinfo.is_local;
@@ -391,7 +393,6 @@
             const video = thumb_info.video;
             const thread = thumb_info.thread;
             const owner = thumb_info.owner;
-            const comments = viewinfo.comments;
             const description = video.description;
 
             this.video_id = video.video_id;

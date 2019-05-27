@@ -61,10 +61,11 @@
         obs.on("receivedData", (data) => {
             play_data = data;
 
-            video_elm.src = data.src;
-            video_elm.type = data.type;
+            const video_data = play_data.video_data;
+            video_elm.src = video_data.src;
+            video_elm.type = video_data.type;
 
-            createTimeLine(data.comments);
+            createTimeLine(play_data.comments);
 
             video_elm.load();
         });

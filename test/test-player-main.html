@@ -95,10 +95,9 @@
                     iconURL: `${test_dir}/data/user_icon.jpg` //50x50
                 }
             },
-            comments: comments
         };
         
-        obs.trigger("request-send-video-data", {video_data, viewinfo}); 
+        obs.trigger("request-send-video-data", {video_data, viewinfo, comments}); 
     };
     const onclickLoad2 = () => {
         let comments = [];
@@ -113,7 +112,7 @@
                 text: "------------------text1------------------------"
             });
         }
-        obs.trigger("on_change_viewinfo",{
+        const viewinfo = {
             is_deleted: false,
             is_local: false,
             thumb_info: {
@@ -141,9 +140,9 @@
                     nickname: "abcdefg",
                     iconURL: `${test_dir}/data/user_icon.jpg` //50x50
                 }
-            },
-            comments: comments
-        }); 
+            }
+        }; 
+        obs.trigger("on_change_viewinfo",{ viewinfo, comments });
     };
 
     const onclickLoad3 = () => {

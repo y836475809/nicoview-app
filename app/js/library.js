@@ -234,14 +234,14 @@ class Library {
             video_data: {
                 src: video_path,
                 type: `video/${video_type}`,
-                comments: comments
             },
             viewinfo: {
                 is_deleted: is_deleted,
                 is_local: true,
                 thumb_info:thumb_info,
-                comments: comments
-            }
+                
+            },
+            comments: comments
         };
     }
 

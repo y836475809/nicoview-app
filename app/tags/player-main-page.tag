@@ -135,14 +135,14 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const play_by_video_data = (video_data, viewinfo) => {  
+        const play_by_video_data = (video_data, viewinfo, comments) => {  
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
             obs.trigger("on_set_player_state", "play"); 
-            obs.trigger("receivedData", video_data);
+            obs.trigger("receivedData", { video_data, comments });
             obs.trigger("on_load_player_tags", thumb_info.tags);
-            obs.trigger("on_change_viewinfo", viewinfo);   
+            obs.trigger("on_change_viewinfo", { viewinfo, comments });   
             
             const history_item = {
                 id: video.video_id, 
@@ -184,15 +184,13 @@
                 const video_data = {
                     src: video_url,
                     type: `video/${thumb_info.video.video_type}`,
-                    comments: comments
                 };
                 const viewinfo = {
                     is_deleted: is_deleted,
                     is_local: false,
                     thumb_info:thumb_info,
-                    comments: comments
                 };
-                play_by_video_data(video_data, viewinfo);
+                play_by_video_data(video_data, viewinfo, comments);
                 prog_dialog.close();         
             } catch (error) {
                 console.log(error);
@@ -214,8 +212,8 @@
             if(data==null){
                 play_by_video_id(video_id);
             }else{
-                const { video_data, viewinfo } = data;
-                play_by_video_data(video_data, viewinfo);
+                const { video_data, viewinfo, comments } = data;
+                play_by_video_data(video_data, viewinfo, comments);
             }
         });
 
@@ -234,8 +232,8 @@
         obs.on("request-send-video-data", (arg) => {
             cancelPlay();
 
-            const { video_data, viewinfo } = arg;
-            play_by_video_data(video_data, viewinfo);
+            const { video_data, viewinfo, comments } = arg;
+            play_by_video_data(video_data, viewinfo, comments);
         });
         obs.on("request-send-videoid", (video_id) => {
             cancelPlay();

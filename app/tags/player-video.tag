@@ -175,6 +175,17 @@
                     comment_tl.enable = false;
                 }
             });
+
+            obs.on("update-comments", (args)=> {       
+                if(comment_tl){
+                    const comments = args;
+                    play_data.comments = comments;
+                    
+                    createTimeLine(play_data.comments);
+                    const current = video_elm.currentTime;
+                    seek(current);
+                }
+            });
         });
     </script>
 </player-video>

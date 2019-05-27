@@ -209,6 +209,8 @@
     
     <script>
         /* globals app_base_dir obs */
+        const { remote } = require("electron");
+        const { Menu } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         require("slickgrid/plugins/slick.autotooltips");
         const time_format = require(`${app_base_dir}/js/time-format`);
@@ -375,6 +377,22 @@
             obs.trigger("update-data", this.video_id);
         };
 
+        const setComments = (comments) => {
+            sync_comment_scroll.setComments(comments);
+
+            const grid_table_comments = comments.map(value => {
+                return Object.assign(value, { id: value.no });
+            });
+            grid_table.clearSelected();
+            grid_table.setData(grid_table_comments);    
+            grid_table.scrollToTop();
+        };
+
+        obs.on("update-comments", (args)=> {
+            const comments = args;
+            setComments(comments);
+        });
+
         obs.on("on_change_viewinfo", (args)=> {
             resizeCommentList();
 
@@ -408,13 +426,7 @@
             setDescription(this.root.querySelector(".description-content"), description);
             setDescriptionContainerClass("description-container-normal");
 
-            sync_comment_scroll.setComments(comments);
-
-            const grid_table_comments = comments.map(value => {
-                return Object.assign(value, { id: value.no });
-            });
-            grid_table.setData(grid_table_comments);
-            grid_table.scrollToTop();
+            setComments(comments);
             
             this.update();
         });
@@ -428,9 +440,38 @@
             grid_table.scrollRow(comment_index);
         });
 
+        const triggerAddCommentNG = (args) => {
+            obs.trigger("add-comment-ng", args);
+        };
+
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "コメントをNGリストに登録", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const texts = items.map(item=>{
+                        return item.text;
+                    });
+                    triggerAddCommentNG({ ng_texts: texts, ng_user_ids: [] });
+                }},
+                { label: "ユーザーIDをNGリストに登録", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const user_ids = items.map(item=>{
+                        return item.user_id;
+                    });
+                    triggerAddCommentNG({ ng_texts: [], ng_user_ids: user_ids });
+                }},
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
         this.on("mount", () => {  
             grid_table.init(this.root.querySelector(".comment-grid"));
             grid_table.grid.registerPlugin(new Slick.AutoTooltips());
+
+            const context_menu = createMenu();
+            grid_table.onContextMenu((e)=>{
+                context_menu.popup({window: remote.getCurrentWindow()});
+            });
 
             updateSyncCommentCheckBox();
             resizeCommentList();

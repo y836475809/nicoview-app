@@ -42,9 +42,12 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
+        const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
+
+        const comment_filter = new CommentFilter(SettingStore.getSystemFile("comment-filter.json"));
 
         let nico_play = null;
 
@@ -136,13 +139,21 @@
         remote.getCurrentWindow().setMenu(menu);
 
         const play_by_video_data = (video_data, viewinfo, comments) => {  
+            comment_filter.setComments(comments);
+            const filtered_comments = comment_filter.getComments();
+
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
             obs.trigger("on_set_player_state", "play"); 
-            obs.trigger("receivedData", { video_data, comments });
+            obs.trigger("receivedData", { 
+                video_data: video_data, 
+                comments: filtered_comments 
+            });
             obs.trigger("on_load_player_tags", thumb_info.tags);
-            obs.trigger("on_change_viewinfo", { viewinfo, comments });   
+            obs.trigger("on_change_viewinfo", { 
+                viewinfo: viewinfo, 
+                comments: filtered_comments });   
             
             const history_item = {
                 id: video.video_id, 
@@ -263,6 +274,23 @@
             ipc_monitor.addDonwloadItem(args);
         });
 
+        obs.on("add-comment-ng", (args) => {
+            comment_filter.addNG(args);
+            try {
+                comment_filter.save();
+            } catch (error) {
+                console.log("error comment_filter: ", error);
+            }
+
+            const comments = comment_filter.getComments();
+            comments.sort((a, b) => {
+                if (a.vpos < b.vpos) return -1;
+                if (a.vpos > b.vpos) return 1;
+                return 0;
+            });
+            obs.trigger("update-comments", comments);
+        });
+
         this.on("mount", () => {
             const vw = SettingStore.getValue(pref_infoview_width, 200);
             if(vw){
@@ -273,6 +301,12 @@
             }
             const size = SettingStore.getValue(pref_size, { width: 854 ,height: 480 });
             resizeVideo(size);
+
+            try {
+                comment_filter.load();
+            } catch (error) {
+                console.log("comment ng load error=", error);
+            }
         });   
   
         obs.on("load_meta_data", (video_size) => {

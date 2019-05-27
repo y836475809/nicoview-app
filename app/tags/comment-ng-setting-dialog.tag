@@ -3,6 +3,8 @@
         dialog {
             border: solid 1px #aaa;
             border-radius: 5px;
+            width: 50vw;
+            height: 50vh;
         }
 
         dialog::backdrop {
@@ -10,13 +12,18 @@
         }
 
         .container {
-            width: 280px;
-            height: 150px;
+            width: 100%;
+            height: 100%;
             display: grid;
-            grid-template-rows: 1fr 30px;
+            grid-template-rows: 30px 1fr 30px;
             grid-template-areas: 
+                "header"
                 "item1"
                 "item2";
+        }
+
+        .title-header {
+            grid-area: header;
         }
 
         .params-container {
@@ -29,6 +36,12 @@
             margin: auto;
         }
         
+        .comment-ng-grid-container ,
+        .omment-ng-grid{
+            width: 100%;
+            height: 100%;
+        }
+
         .button { 
             display: inline-block;
             text-align: center;
@@ -43,8 +56,11 @@
 
     <dialog class="dialog-shadow">
         <div class="container">
-            <div class="comment-ng-grid-container">
-                <div class="comment-ng-grid"></div>
+            <div class="title-header">test</div>
+            <div class="params-container center-hv">
+                <div class="comment-ng-grid-container">
+                    <div class="comment-ng-grid"></div>
+                </div>
             </div>
             <div class="button-container">
                 <div class="button" onclick="{this.onclickButton.bind(this,'ok')}">ok</div>
@@ -64,11 +80,13 @@
             {id: "value", name: "値"},
         ];
         const options = {
+            rowHeight: 25,
             _saveColumnWidth: true,
         };   
-        const grid_table = new GridTable("comment-ng-grid", columns, options);
 
+        let grid_table = null;
         let deleted_items = [];
+
         const createMenu = () => {
             const nemu_templete = [
                 { label: "NGリストから削除", click() {
@@ -78,28 +96,29 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        this.on("mount", async () => {
-            grid_table.init(this.root.querySelector(".comment-ng-grid"));
-            const context_menu = createMenu();
-            grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
-            });
-
-            resizeGridTable();
-        });
-
         const resizeGridTable = () => {
             const container = this.root.querySelector(".comment-ng-grid-container");
-            grid_table.resizeFitContainer(container);
+            const new_height =container.clientHeight;
+            const new_width = container.clientWidth;
+            const new_szie = {
+                height: new_height,
+                width: new_width
+            };
+            grid_table.resize(new_szie);
         };
 
-        obs.on("comment-ng-setting-dialog:show", (args) => {
-            showModal(args);
-        });
+        const setup = (args) => {
+            if(grid_table==null){
+                grid_table = new GridTable("comment-ng-grid", columns, options);
+                grid_table.init(this.root.querySelector(".comment-ng-grid"));
+                const context_menu = createMenu();
+                grid_table.onContextMenu((e)=>{
+                    context_menu.popup({window: remote.getCurrentWindow()});
+                });
+            }
 
-        const showModal = (args) => {
+            deleted_items = [];
             const { ng_texts, ng_user_ids } = args;
-
             const items1 = ng_texts.map((text, index)=>{
                 return {
                     id: index,
@@ -121,11 +140,15 @@
             const items = items1.concat(items2);
             grid_table.setData(items);
 
-            deleted_items = [];
+            resizeGridTable();
+        };
 
+        obs.on("comment-ng-setting-dialog:show", (args) => {
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
-        };
+
+            setup(args);
+        }); 
 
         const close = () => {
             const dialog = this.root.querySelector("dialog");
@@ -149,10 +172,6 @@
                 });
             }
             close();
-        };
-
-        this.oncancel = (e) => {
-            e.preventDefault();
         };
     </script>
 </comment-ng-setting-dialog>

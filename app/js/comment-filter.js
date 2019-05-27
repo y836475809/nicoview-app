@@ -42,6 +42,13 @@ class CommentFilter {
         });
     }
 
+    getNG(){
+        return {
+            ng_texts: this._ng_texts, 
+            ng_user_ids: this._ng_user_ids
+        };
+    }
+
     load(){
         try {
             const { ng_texts, ng_user_ids } = this._store.load();

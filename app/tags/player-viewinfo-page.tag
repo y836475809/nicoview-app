@@ -200,6 +200,8 @@
                         <i title="download" class="fas fa-download"></i></span>
                 <span class="icon-button center-hv" onclick={this.onclickUpdate}>
                     <i title="update" class="fas fa-sync-alt"></i></span>
+                <span class="icon-button center-hv" onclick={this.onclickConfig}>
+                    <i title="update" class="fas fa-cog"></i></span>
             </div>
         </div>
         <div class="comment-grid-container">
@@ -375,6 +377,20 @@
         this.onclickUpdate = (e) => {
             console.log("player update video_id=", this.video_id);
             obs.trigger("update-data", this.video_id);
+        };
+
+        const createConfigMenu = () => {
+            const nemu_templete = [
+                { label: "NG設定", click() {
+                    obs.trigger("show-comment-ng-setting-dialog");
+                }},
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
+        const config_context_menu = createConfigMenu(); 
+        this.onclickConfig = (e) => {
+            config_context_menu.popup({window: remote.getCurrentWindow()});
         };
 
         const setComments = (comments) => {

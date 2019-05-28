@@ -6,7 +6,7 @@
             /* width: 50vw;
             height: 50vh; */
             width: 500px;
-            height: 300px;
+            height: 400px;
         }
 
         dialog::backdrop {
@@ -41,9 +41,30 @@
         .comment-ng-grid-container,
         .omment-ng-grid {
             width: 100%;
-            height: 100%;
+            height: calc(100% - 25px);
+            /* border: 1px solid var(--control-border-color); */
         }
 
+        .ng-delete-item-button {
+            float: right;
+            width: 60px;
+            height: 25px;
+            border-radius: 2px;
+            /* background-color: green; */
+            /* padding: 20px; */
+            text-align: center;
+            color: black;
+            user-select: none;
+            border-style: none;
+            border: 1px solid var(--control-border-color);
+            
+        }
+        .ng-delete-item-button:active {
+            background-color: var(--control-color);
+        }
+        .ng-delete-item-button:hover {
+            cursor: pointer;
+        }
         /* .button {
             display: inline-block;
             text-align: center;
@@ -135,6 +156,7 @@
             cursor: pointer;
             background-color: lightgray; 
         }
+
     </style>
 
     <dialog class="dialog-shadow">
@@ -164,6 +186,7 @@
                     <div class="comment-ng-grid-container">
                         <div class="comment-ng-grid"></div>
                     </div>
+                    <button type="button" class="ng-delete-item-button">Delete</button>
                 </div>
                 <div class="tab2 tab_panel">
                     <p>panel2</p>
@@ -194,6 +217,12 @@
         let deleted_items = [];
 
         this.onclickSelect = (page_name, e)=>{
+            ["tab1_label","tab2_label","tab3_label"].forEach(value => {
+                const elm = this.root.querySelector(`.${value}`);
+                elm.classList.remove("active");
+            });
+            e.target.classList.add("active");
+
             ["tab1","tab2","tab3"].forEach(value => {
                 const page = this.root.querySelector(`.${value}`);
                 if(value==page_name){
@@ -260,6 +289,18 @@
             grid_table.setData(items);
 
             resizeGridTable();
+
+            const tab_label = this.root.querySelector(".tab1_label");
+            tab_label.classList.add("active");
+
+            ["tab1","tab2","tab3"].forEach(value => {
+                const page = this.root.querySelector(`.${value}`);
+                if(value=="tab1"){
+                    page.style.zIndex = 1;
+                }else{
+                    page.style.zIndex = 0;
+                }  
+            });
         };
 
         obs.on("comment-ng-setting-dialog:show", (args) => {

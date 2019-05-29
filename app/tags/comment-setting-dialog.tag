@@ -1,4 +1,4 @@
-<comment-ng-setting-dialog>
+<comment-setting-dialog>
     <style scoped>
         dialog {
             border: solid 1px #aaa;
@@ -131,7 +131,7 @@
             dialog.close();
         };
 
-        obs.on("comment-ng-setting-dialog:show", (args) => {
+        obs.on("comment-setting-dialog:show", (args) => {
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
 
@@ -141,4 +141,4 @@
             obs.trigger("comment-ng-setting:ng-items", ng_items);
         });
     </script>
-</comment-ng-setting-dialog>
+</comment-setting-dialog>

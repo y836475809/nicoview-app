@@ -382,7 +382,8 @@
         const createConfigMenu = () => {
             const nemu_templete = [
                 { label: "NG設定", click() {
-                    obs.trigger("show-comment-ng-setting-dialog");
+                    // TODO "show-comment-setting-dialog"
+                    obs.trigger("show-comment-setting-dialog");
                 }},
             ];
             return Menu.buildFromTemplate(nemu_templete);

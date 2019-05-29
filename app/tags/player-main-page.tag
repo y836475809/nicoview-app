@@ -34,7 +34,7 @@
     </div>
 
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
-    <comment-ng-setting-dialog></comment-ng-setting-dialog>
+    <comment-setting-dialog></comment-setting-dialog>
 
     <script>
         /* globals app_base_dir riot obs */
@@ -292,7 +292,7 @@
             obs.trigger("update-comments", comments);
         });
 
-        //TODO
+        //TODO "add-comment-ng"
         obs.on("delete-comment-ng", (args) => {
             comment_filter.deleteNG(args);
             try {
@@ -310,8 +310,9 @@
             obs.trigger("update-comments", comments);
         });
 
-        obs.on("show-comment-ng-setting-dialog", () => {
-            obs.trigger("comment-ng-setting-dialog:show", comment_filter.getNG());
+        //TODO "show-comment-setting-dialog"
+        obs.on("show-comment-setting-dialog", () => {
+            obs.trigger("comment-setting-dialog:show", comment_filter.getNG());
         });
 
         this.on("mount", () => {

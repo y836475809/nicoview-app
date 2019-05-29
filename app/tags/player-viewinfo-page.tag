@@ -457,14 +457,14 @@
                     const texts = items.map(item=>{
                         return item.text;
                     });
-                    triggerAddCommentNG({ ng_texts: texts, ng_user_ids: [] });
+                    triggerAddCommentNG({ ng_matching_texts: texts, ng_user_ids: [] });
                 }},
                 { label: "ユーザーIDをNGリストに登録", click() {
                     const items = grid_table.getSelectedDatas();
                     const user_ids = items.map(item=>{
                         return item.user_id;
                     });
-                    triggerAddCommentNG({ ng_texts: [], ng_user_ids: user_ids });
+                    triggerAddCommentNG({ ng_matching_texts: [], ng_user_ids: user_ids });
                 }},
             ];
             return Menu.buildFromTemplate(nemu_templete);

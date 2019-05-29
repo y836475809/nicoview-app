@@ -67,6 +67,7 @@
             obs.trigger("delete-comment-ng", { ng_texts, ng_user_ids });
 
             grid_table.deleteItems(items);
+            grid_table.clearSelected();
         };
 
         const createMenu = () => {

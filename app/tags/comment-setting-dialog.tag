@@ -59,7 +59,7 @@
         .tab-panel {
             position: absolute;
             top: 65px;
-            background-color: aliceblue
+            background-color: var(--control-color);
         }
 
         .tab-panel.active {

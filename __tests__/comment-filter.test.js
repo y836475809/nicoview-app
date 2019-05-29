@@ -32,6 +32,12 @@ class TestCommentFilter extends CommentFilter{
 test.beforeEach(t => {
     t.context.cf = new TestCommentFilter();
     t.context.cf.setComments(test_comments);
+
+    t.context.delete_cf = new TestCommentFilter();
+    t.context.delete_cf.addNG({ 
+        ng_texts: ["text1", "text2", "text3"], 
+        ng_user_ids :["id1", "id2", "id3"] 
+    });
 });
 
 test("add ng words, ng user ids", t => {
@@ -58,6 +64,56 @@ test("add ng words, ng user ids", t => {
     cf.addNG({ ng_texts: ["a", "b"], ng_user_ids: ["a", "b"] });
     t.deepEqual(cf._ng_texts, ["a", "b"]);
     t.deepEqual(cf._ng_user_ids, ["b", "a"]);
+});
+
+test("delete ng words, ng user ids", t => {
+    const cf = t.context.delete_cf;
+
+    cf.deleteNG({ ng_texts: ["text1"], ng_user_ids: [] });
+    t.deepEqual(cf._ng_texts, ["text2", "text3"]);
+    t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
+
+    cf.deleteNG({ ng_texts: ["text3"], ng_user_ids: [] });
+    t.deepEqual(cf._ng_texts, ["text2"]);
+    t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
+
+    cf.deleteNG({ ng_texts: [], ng_user_ids: ["id1"] });
+    t.deepEqual(cf._ng_texts, ["text2"]);
+    t.deepEqual(cf._ng_user_ids, ["id2", "id3"]);
+
+    cf.deleteNG({ ng_texts: [], ng_user_ids: ["id3"] });
+    t.deepEqual(cf._ng_texts, ["text2"]);
+    t.deepEqual(cf._ng_user_ids, ["id2"]);   
+});
+
+test("delete some ng words, ng user ids", t => {
+    const cf = t.context.delete_cf;
+
+    cf.deleteNG({ ng_texts: ["text1", "text3"], ng_user_ids: ["id1", "id3"] });
+    t.deepEqual(cf._ng_texts, ["text2"]);
+    t.deepEqual(cf._ng_user_ids, ["id2"]);
+});
+
+test("delete empty ng words, ng user ids", t => {
+    const cf = t.context.delete_cf;
+
+    cf.deleteNG({ 
+        ng_texts: ["text1", "text2", "text3"], 
+        g_user_ids: ["id1", "id2", "id3"] });
+    t.deepEqual(cf._ng_texts, []);
+    t.deepEqual(cf._ng_user_ids, []);
+    
+    cf.deleteNG({ ng_texts: ["text1"], ng_user_ids: ["id1"] });
+    t.deepEqual(cf._ng_texts, []);
+    t.deepEqual(cf._ng_user_ids, []);
+});
+
+test("delete not exist ng words, ng user ids", t => {
+    const cf = t.context.delete_cf;
+
+    cf.deleteNG({ ng_texts: ["text100"], ng_user_ids: ["id100"] });
+    t.deepEqual(cf._ng_texts, ["text1", "text2", "text3"]);
+    t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
 });
 
 test("no filtering", t => {

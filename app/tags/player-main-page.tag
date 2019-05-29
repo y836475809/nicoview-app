@@ -292,6 +292,24 @@
             obs.trigger("update-comments", comments);
         });
 
+        //TODO
+        obs.on("delete-comment-ng", (args) => {
+            comment_filter.deleteNG(args);
+            try {
+                comment_filter.save();
+            } catch (error) {
+                console.log("error comment_filter: ", error);
+            }
+
+            const comments = comment_filter.getComments();
+            comments.sort((a, b) => {
+                if (a.vpos < b.vpos) return -1;
+                if (a.vpos > b.vpos) return 1;
+                return 0;
+            });
+            obs.trigger("update-comments", comments);
+        });
+
         obs.on("show-comment-ng-setting-dialog", () => {
             obs.trigger("comment-ng-setting-dialog:show", comment_filter.getNG());
         });

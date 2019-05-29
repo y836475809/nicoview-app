@@ -42,6 +42,16 @@ class CommentFilter {
         });
     }
 
+    deleteNG(args){
+        const { ng_texts, ng_user_ids } = args;
+        this._ng_texts = this._ng_texts.filter(text => {
+            return !ng_texts.includes(text);
+        });
+        this._ng_user_ids = this._ng_user_ids.filter(user_id => {
+            return !ng_user_ids.includes(user_id);
+        });
+    }
+
     getNG(){
         return {
             ng_texts: this._ng_texts, 

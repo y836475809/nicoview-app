@@ -181,6 +181,14 @@ class GridTable {
         this.dataView.reSort();
     }
 
+    deleteItems(items){
+        items.forEach(item => {
+            this.dataView.deleteItem(item.id);
+        });
+        this.grid.invalidate();
+        this.grid.render();
+    }
+
     updateItem(item, id){
         if(this.dataView.getItemById(id) === undefined){
             this.dataView.addItem(item);     

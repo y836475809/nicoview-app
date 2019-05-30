@@ -32,6 +32,10 @@
             user-select: none;
         }
 
+        .download-grid-container {
+            background-color: var(--control-color);
+        }
+
         .download-state-complete {
             display: inline-block;
             border-radius: 2px;

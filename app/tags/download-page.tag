@@ -152,7 +152,7 @@
         };
 
         this.onclickClearDownloadedItems = () => {
-            grid_table_dl.clearItems(donwload_state.complete);
+            clearDownloadItems(donwload_state.complete);
         }; 
 
         this.onclickScheduleDialog = () => {
@@ -186,6 +186,21 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
+        const onChangeDownloadItem = () => {
+            const items = grid_table_dl.filterItems([
+                donwload_state.wait,
+                donwload_state.downloading,
+                donwload_state.error,
+            ]);
+            obs.trigger("main-page:download-item-num", items.length);
+        };
+
+        const addDownloadItems = (items) => {
+            grid_table_dl.addItems(items, donwload_state.wait);
+
+            onChangeDownloadItem();
+        };
+
         const deleteDownloadItems = (video_ids) => {
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){
@@ -193,6 +208,14 @@
                 }
             } 
             grid_table_dl.deleteItems(video_ids); 
+
+            onChangeDownloadItem();
+        };
+
+        const clearDownloadItems = (state) => {
+            grid_table_dl.clearItems(state);
+
+            onChangeDownloadItem();
         };
 
         const createMenu = () => {
@@ -272,6 +295,8 @@
 
                 grid_table_dl.save();
 
+                onChangeDownloadItem();
+
                 if(cancel_donwload){
                     break;
                 }
@@ -286,7 +311,7 @@
         };
 
         obs.on("download-page:add-download-items", (items) => {
-            grid_table_dl.addItems(items, donwload_state.wait);
+            addDownloadItems(items);
         });
 
         obs.on("download-page:delete-download-items", (video_ids) => {
@@ -299,9 +324,6 @@
             
             const context_menu = createMenu();
             try {
-                grid_table_dl.on("change-item-num", (num) => {
-                    obs.trigger("main-page:download-item-num", num);
-                });
 
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -311,6 +333,8 @@
             } catch (error) {
                 console.log("donwload item load error=", error);
             }
+
+            onChangeDownloadItem();
 
             resizeGridTable();
 

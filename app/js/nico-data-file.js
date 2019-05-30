@@ -58,9 +58,15 @@ class NicoXMLFile extends NicoDataFile {
      * @returns {Array} comments 
      */
     getComments() {
-        const file_path = this.commentPath;
-        const xml = fs.readFileSync(file_path, "utf-8");
-        let comments = reader.comment(xml);
+        const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
+        const owner_comments = reader.comment(owner_xml).map(comment=>{
+            return Object.assign(comment, {user_id: "owner"});
+        });
+
+        const user_xml = fs.readFileSync(this.commentPath, "utf-8");
+        const user_comments = reader.comment(user_xml);
+
+        const comments = owner_comments.concat(user_comments);
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;

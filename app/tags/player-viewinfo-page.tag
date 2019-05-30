@@ -386,8 +386,8 @@
         const setComments = (comments) => {
             sync_comment_scroll.setComments(comments);
 
-            const grid_table_comments = comments.map(value => {
-                return Object.assign(value, { id: value.no });
+            const grid_table_comments = comments.map((value, index) => {
+                return Object.assign(value, { id: index });
             });
             grid_table.clearSelected();
             grid_table.setData(grid_table_comments);    

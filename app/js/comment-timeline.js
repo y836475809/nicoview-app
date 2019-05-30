@@ -2,6 +2,30 @@ const { TweenMax, TimelineMax } = require("gsap");
 const FlowComment = require("./flow-comment");
 const FixedComment = require("./fixed-comment");
 
+class NicoScript {
+    constructor(){
+        this._scripts = [
+            "@デフォルト",
+            "@置換",
+            "@逆",
+            "@コメント禁止",
+            "@シーク禁止",
+            "@ジャンプ",
+            "@ピザ"
+        ];
+
+        this._scritp_re = new RegExp(this._scripts.join("|"), "ig");
+    }
+
+    apply(comments){
+        
+    }
+
+    hasScript(text){
+        return this._scritp_re.test(text);
+    }
+}
+
 class CommentOptionParser {
     constructor(){
         this._default_color = "white";

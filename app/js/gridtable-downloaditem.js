@@ -210,19 +210,27 @@ class GridTableDownloadItem {
         this.save();
     }
 
-    updateItem(video_id, progress, state){
+    updateItem(video_id, prop){
         const row_index = this.grid_table.dataView.getRowById(video_id);
         if(row_index===undefined){
             return;
         }
-        const column_index = this.grid_table.grid.getColumnIndex("state");
+        
         const item = this.grid_table.dataView.getItemById(video_id);
         if(item.visible===false){
             return;
         }
-        item.progress = progress;
-        item.state = state;
-        this.grid_table.grid.updateCell(row_index, column_index);
+
+        Object.assign(item, prop);
+        
+        if(prop.hasOwnProperty("state")){
+            const column_index = this.grid_table.grid.getColumnIndex("state");
+            this.grid_table.grid.updateCell(row_index, column_index);
+        }
+        if(prop.hasOwnProperty("thumb_img")){
+            const column_index = this.grid_table.grid.getColumnIndex("thumb_img");
+            this.grid_table.grid.updateCell(row_index, column_index);
+        }
     }
 
     canDownload(video_id, target_states){

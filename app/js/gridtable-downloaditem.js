@@ -134,6 +134,9 @@ class GridTableDownloadItem {
     }
 
     getItemByIdx(index){
+        if(this.grid_table.dataView.getLength() === 0){
+            return null;
+        }
         return this.grid_table.dataView.getItemByIdx(index);
     }
 

@@ -526,6 +526,7 @@
                 const item = grid_table.dataView.getItemById(id);
                 if(item!==undefined){
                     item.saved = true;
+                    item.reg_download = false;
                     grid_table.dataView.updateItem(id, item);
                 }
             });

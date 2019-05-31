@@ -14,11 +14,95 @@ class NicoScript {
             "@ピザ"
         ];
 
-        this._scritp_re = new RegExp(this._scripts.join("|"), "ig");
+        this._scritp_re = new RegExp(this._scripts.join("|"), "i");
+
+        this._colors = [
+            "white", 
+            "red",
+            "pink", 
+            "orange", 
+            "yellow",
+            "green", 
+            "cyan", 
+            "blue", 
+            "purple", 
+            "black",
+        ];
+        this._color_re = new RegExp(this._colors.join("|"), "i");
+
+        this._fontsize_re = new RegExp("big|middle|small", "i");
+
+        // /^\s*@\d+\s*$/.test("@12")
+        // /^\s*@\d+\s*/.test("@12")
     }
 
+    /**
+     * 
+     * @param {Array} comments 
+     */
     apply(comments){
-        
+        const sc = comments.filter(comment => {
+            return this.hasScript(comment.text);
+        });
+        const uc = comments.filter(comment => {
+            return !this.hasScript(comment.text);
+        });
+
+        // const def = this.getDefault(this.sc);
+        // if(def){
+        //     um.map(comment => {
+        //         const mail = comment.mail;
+        //         if(this._color_re.test(mail)===false){
+        //             comment.mail = `${comment.mail} ${def.color}`;
+        //         }
+        //         if(this._fontsize_re.test(mail)===false){
+        //             comment.mail = `${comment.mail} ${def.font_size}`;
+        //         }
+        //     });
+        // }
+
+        const def = this.getDefault(sc, uc);
+
+    }
+
+    /**
+     * 
+     * @param {Array} sc 
+     * @param {Array} nc 
+     */
+    getDefault(sc, uc){
+        const f = sc.find(comment => {
+            return /@デフォルト/ig.test(comment.text);
+        });
+        if(f===undefined){
+            return uc;
+        }
+
+        const color = this._color_re(f.mail);
+        const font_size = this._fontsize_re(f.mail);
+        const opt = {};
+        if(color){
+            Object.assign(opt, {color});
+        }
+        if(font_size){
+            Object.assign(opt, {font_size});
+        }
+        // if(Object.keys(opt).length === 0){
+        //     return uc;
+        // }
+        // return opt;
+        if( Object.keys(opt).length === 0){
+            return uc;
+        }
+        return uc.map(comment => {
+            const mail = comment.mail;
+            if(this._color_re.test(mail)===false){
+                comment.mail = `${comment.mail} ${opt.color}`;
+            }
+            if(this._fontsize_re.test(mail)===false){
+                comment.mail = `${comment.mail} ${opt.font_size}`;
+            }
+        });
     }
 
     hasScript(text){
@@ -402,5 +486,6 @@ class CommentTimeLine {
 
 module.exports = {
     CommentTimeLine,
-    CommentOptionParser
+    CommentOptionParser,
+    NicoScript
 };

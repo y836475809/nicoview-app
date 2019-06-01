@@ -5,12 +5,16 @@ class FixedComment{
         this.duration = duration;
     }
 
+    getRowIndex(comment) {
+        return this.id_row_map.get(`${comment.no}:${comment.user_id}`);
+    }
+
     /**
      * 
      * @param {Array} comments 
      */
-    getNoRowIndexMap(comments){
-        let no_row_map = new Map();
+    createRowIndexMap(comments){
+        this.id_row_map = new Map();
 
         this.rows = [];
         for (let i = 0; i < this.row_num; i++) {
@@ -26,11 +30,9 @@ class FixedComment{
             }else{
                 row_index = this.getMin();
             }
-            no_row_map.set(comment.no, row_index);
+            this.id_row_map.set(`${comment.no}:${comment.user_id}`, row_index);
             this.rows[row_index].push({no:comment.no, vpos:comment.vpos});
         });
-
-        return no_row_map;
     }
 
     update(cur_vpos) {

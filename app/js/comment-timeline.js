@@ -285,14 +285,18 @@ class CommentTimeLine {
     _createFixedTL(top_comments, bottom_comments){
         const duration_msec = this.duration_sec * 1000;
 
-        const cmt = new FixedComment(this.row_num, duration_msec);
-        const top_row_map = cmt.getNoRowIndexMap(top_comments);
-        const bottom_row_map = cmt.getNoRowIndexMap(bottom_comments);
-        const row_map = new Map([...top_row_map, ...bottom_row_map]);
-        const comments = top_comments.concat(bottom_comments);
+        const fixed_top_cmt = new FixedComment(this.row_num, duration_msec);
+        fixed_top_cmt.createRowIndexMap(top_comments);
+        
+        const fixed_bottom_cmt = new FixedComment(this.row_num, duration_msec);
+        fixed_bottom_cmt.createRowIndexMap(bottom_comments);
 
+        const row_h = this.area_size.height / this.row_num;
         const fragment = document.createDocumentFragment();
-        const params = this._createFixedParams(comments, row_map, fragment);
+        const fixed_top_params = this._createFixedParams("ue", top_comments, fixed_top_cmt, row_h, fragment);
+        const fixed_bottom_params = this._createFixedParams("shita", bottom_comments, fixed_bottom_cmt, row_h, fragment);
+        const params = fixed_top_params.concat(fixed_bottom_params);
+
         this.parent_elm.appendChild(fragment);
 
         params.forEach((param)=>{
@@ -401,7 +405,7 @@ class CommentTimeLine {
      */
     _createFlowParams(comments, flow_cmt, fragment){
         flow_cmt.createRowIndexMap(comments);
-        
+
         return comments.map((comment, index)=>{
             const row_index = flow_cmt.getRowIndex(comment);
             const { elm, text_width } = 
@@ -417,26 +421,26 @@ class CommentTimeLine {
 
     /**
      * 
+     * @param {String} pos_type 
      * @param {Array} comments 
-     * @param {Map} row_index_map 
+     * @param {FixedComment} fixed_cmt 
+     * @param {Number} row_h 
      * @param {DocumentFragment} fragment 
      */
-    _createFixedParams(comments, row_index_map, fragment){
-        const row_h = this.area_size.height / this.row_num;
+    _createFixedParams(pos_type, comments, fixed_cmt, row_h, fragment){
         return comments.map((comment, index)=>{
-            const row_index = row_index_map.get(comment.no);
+            const row_index = fixed_cmt.getRowIndex(comment);
             const { elm, text_width } = 
                 this._createElm(comment, row_index, fragment);
-            const id = `fixed-comment-id${index}`;
+            const id = `fixed-${pos_type}-comment-id${index}`;
             elm.id = id;
             elm.classList.add("fixed");
             const delay = comment.vpos / 1000; //sec
-            const type = comment.type;
             elm.style.left = (this.area_size.width / 2 - text_width / 2) + "px";
 
-            if(type=="ue"){
+            if(pos_type=="ue"){
                 elm.style.top = (row_index * row_h) + "px";
-            }else if(type=="shita"){
+            }else if(pos_type=="shita"){
                 elm.style.top = ((this.row_num - row_index - 1) * row_h) + "px";
             }
 

@@ -27,50 +27,52 @@ test("calc fix fill", (t) => {
 
 test("calc fix ", (t) => {
     let comments = [
-        { no: 1, vpos: 0 },
-        { no: 2, vpos: 5 },
-        { no: 3, vpos: 10 },
-        { no: 4, vpos: 15 }
+        { user_id: "a", no: 1, vpos: 0 },
+        { user_id: "a", no: 2, vpos: 5 },
+        { user_id: "a", no: 3, vpos: 10 },
+        { user_id: "a", no: 4, vpos: 15 }
     ];
 
     const num = 3;
     const duration = 100;
     let fixed_cmt = new FixedComment(num, duration);
-    const no_row_map = fixed_cmt.getNoRowIndexMap(comments);
+    fixed_cmt.createRowIndexMap(comments);
+    const id_row_map = fixed_cmt.id_row_map;
 
-    t.is(no_row_map.size, 4);
-    t.is(no_row_map.get(1), 0);
-    t.is(no_row_map.get(2), 1);
-    t.is(no_row_map.get(3), 2);
-    t.is(no_row_map.get(4), 0);
+    t.is(id_row_map.size, 4);
+    t.is(id_row_map.get("1:a"), 0);
+    t.is(id_row_map.get("2:a"), 1);
+    t.is(id_row_map.get("3:a"), 2);
+    t.is(id_row_map.get("4:a"), 0);
 });
 
 test("calc fix2 ", (t) => {
     let comments = [
-        { no: 1, vpos: 0 },
-        { no: 2, vpos: 5 },
-        { no: 3, vpos: 10 },
-        { no: 4, vpos: 15 }
+        { user_id: "a", no: 1, vpos: 0 },
+        { user_id: "a", no: 2, vpos: 5 },
+        { user_id: "a", no: 3, vpos: 10 },
+        { user_id: "a", no: 4, vpos: 15 }
     ];
 
     const num = 3;
     const duration = 10;
     let fixed_cmt = new FixedComment(num, duration);
-    const no_row_map = fixed_cmt.getNoRowIndexMap(comments);
+    fixed_cmt.createRowIndexMap(comments);
+    const id_row_map = fixed_cmt.id_row_map;
 
-    t.is(no_row_map.size, 4);
-    t.is(no_row_map.get(1), 0);
-    t.is(no_row_map.get(2), 1);
-    t.is(no_row_map.get(3), 0);
-    t.is(no_row_map.get(4), 1);
+    t.is(id_row_map.size, 4);
+    t.is(id_row_map.get("1:a"), 0);
+    t.is(id_row_map.get("2:a"), 1);
+    t.is(id_row_map.get("3:a"), 0);
+    t.is(id_row_map.get("4:a"), 1);
 });
 
 test("calc fix sort by vpos", (t) => {
     let comments = [
-        { no: 1, vpos: 0 },
-        { no: 2, vpos: 15 },
-        { no: 3, vpos: 10 },
-        { no: 4, vpos: 5 },
+        { user_id: "a", no: 1, vpos: 0 },
+        { user_id: "a", no: 2, vpos: 15 },
+        { user_id: "a", no: 3, vpos: 10 },
+        { user_id: "a", no: 4, vpos: 5 },
     ];
     comments.sort((a, b) => {
         if (a.vpos < b.vpos) return -1;
@@ -80,11 +82,34 @@ test("calc fix sort by vpos", (t) => {
     const num = 3;
     const duration = 10;
     let fixed_cmt = new FixedComment(num, duration);
-    const no_row_map = fixed_cmt.getNoRowIndexMap(comments);
+    fixed_cmt.createRowIndexMap(comments);
+    const id_row_map = fixed_cmt.id_row_map;
 
-    t.is(no_row_map.size, 4);
-    t.is(no_row_map.get(1), 0);
-    t.is(no_row_map.get(4), 1);
-    t.is(no_row_map.get(3), 0);
-    t.is(no_row_map.get(2), 1);
+    t.is(id_row_map.size, 4);
+    t.is(id_row_map.get("1:a"), 0);
+    t.is(id_row_map.get("4:a"), 1);
+    t.is(id_row_map.get("3:a"), 0);
+    t.is(id_row_map.get("2:a"), 1);
+});
+
+
+test("calc row index, no is duplicated", (t) => {
+    let comments = [
+        { user_id: "owner", no: 1, vpos: 0 },
+        { user_id: "a", no: 1, vpos: 5 },
+        { user_id: "a", no: 2, vpos: 10 },
+        { user_id: "a", no: 3, vpos: 15 }
+    ];
+
+    const num = 3;
+    const duration = 100;
+    let fixed_cmt = new FixedComment(num, duration);
+    fixed_cmt.createRowIndexMap(comments);
+    const id_row_map = fixed_cmt.id_row_map;
+
+    t.is(id_row_map.size, 4);
+    t.is(id_row_map.get("1:owner"), 0);
+    t.is(id_row_map.get("1:a"), 1);
+    t.is(id_row_map.get("2:a"), 2);
+    t.is(id_row_map.get("3:a"), 0);
 });

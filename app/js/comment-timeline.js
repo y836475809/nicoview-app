@@ -255,11 +255,10 @@ class CommentTimeLine {
         const view_width = this.area_size.width;
         const duration_msec = this.duration_sec * 1000;
 
-        const cmt = new FlowComment(this.row_num, view_width, duration_msec);
-        const row_map = cmt.getNoRowIndexMap(comments);
+        const flow_cmt = new FlowComment(this.row_num, view_width, duration_msec);
 
         const fragment = document.createDocumentFragment();
-        const params = this._createFlowParams(comments, row_map, fragment);
+        const params = this._createFlowParams(comments, flow_cmt, fragment);
         this.parent_elm.appendChild(fragment);
 
         params.forEach((param)=>{
@@ -397,12 +396,14 @@ class CommentTimeLine {
     /**
      * 
      * @param {Array} comments 
-     * @param {Map} row_index_map 
+     * @param {FlowComment} flow_cmt 
      * @param {DocumentFragment} fragment 
      */
-    _createFlowParams(comments, row_index_map, fragment){
+    _createFlowParams(comments, flow_cmt, fragment){
+        flow_cmt.createRowIndexMap(comments);
+        
         return comments.map((comment, index)=>{
-            const row_index = row_index_map.get(comment.no);
+            const row_index = flow_cmt.getRowIndex(comment);
             const { elm, text_width } = 
                 this._createElm(comment, row_index, fragment);
             const id = `flow-comment-id${index}`;

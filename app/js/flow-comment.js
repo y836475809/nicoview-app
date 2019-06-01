@@ -6,31 +6,35 @@ class FlowComment {
         this.duration = duration;
     }
 
-    getNoRowIndexMap(comments) {
-        let params = this._getParams(comments, this.duration);
-        return this._getNoRowIndexMap(params);
+    getRowIndex(comment) {
+        return this.id_row_map.get(`${comment.no}:${comment.user_id}`);
     }
 
-    _getNoRowIndexMap(params) {
+    createRowIndexMap(comments) {
+        let params = this._getParams(comments, this.duration);
+        this.id_row_map = this._createRowIndexMap(params);
+    }
+
+    _createRowIndexMap(params) {
         let no_row_map = new Map();
 
         this.params = params;
         this.rows = [];
         for (let i = 0; i < this.row_num; i++) {
-            this.rows.push({ no: -1, nokori: 0 });
+            this.rows.push({ id: null, nokori: 0 });
         }
 
-        this.no_index_map = new Map();
+        this.id_index_map = new Map();
         this.params.forEach((p, index) => {
-            this.no_index_map.set(p.no, index);
+            this.id_index_map.set(p.id, index);
         });
 
         this.params.forEach((param) => {
             this._update_lane(param.vpos);
             const row_index = this._get_index_of_priority_lane();
-            no_row_map.set(param.no, row_index);
+            no_row_map.set(param.id, row_index);
 
-            this.rows[row_index].no = param.no;
+            this.rows[row_index].id = param.id;
             this.rows[row_index].nokori = this.view_width + param.width;
         });
 
@@ -57,6 +61,7 @@ class FlowComment {
             const speed = len / duration;
 
             return {
+                id: `${comment.no}:${comment.user_id}`,
                 no: comment.no,
                 vpos: comment.vpos,
                 width: text_width,
@@ -67,9 +72,9 @@ class FlowComment {
 
     _update_lane(cu_vpos) {
         this.rows.forEach((lane) => {
-            if (lane.no !== -1) {
-                const no = lane.no;
-                const index = this.no_index_map.get(no);
+            if (lane.id !== null) {
+                const id = lane.id;
+                const index = this.id_index_map.get(id);
                 const vpos = this.params[index].vpos;
                 const time = cu_vpos - vpos;
                 const pos =
@@ -77,7 +82,7 @@ class FlowComment {
                     + this.params[index].width
                     - time * this.params[index].speed;
                 if (pos <= 0) {
-                    lane.no = -1;
+                    lane.id = null;
                     lane.nokori = 0;
                 } else {
                     lane.nokori = pos;
@@ -88,7 +93,7 @@ class FlowComment {
 
     _get_index_of_priority_lane() {
         for (let i = 0; i < this.rows.length; i++) {
-            if (this.rows[i].no === -1) {
+            if (this.rows[i].id === null) {
                 return i;
             }
         }

@@ -466,6 +466,7 @@ class CommentTimeLine {
         const cmt_opt_parser = new CommentOptionParser();
         comments.forEach(comment=>{
             const p = {
+                user_id:comment.user_id,
                 no:comment.no, 
                 vpos:comment.vpos*10, 
                 text:comment.text, 

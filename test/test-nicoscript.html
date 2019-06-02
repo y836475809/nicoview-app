@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <style type="text/css">
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            overflow: hidden;
+            background-color: gray
+        }
+        #area{
+            position: absolute;
+            left: 100px;
+            top: 100px;
+            height: 80%;
+            width: 60%;
+            border: 1px solid #000000;
+
+        }
+        .comment{
+            position :absolute;
+
+            color: #000000;
+            border: 1px solid #FF6600;
+            width: 60px;
+        }
+        .test-btn{
+            width:80px;
+        } 
+    </style>
+</head>
+
+<body>
+    <div id="timer">0</div>
+    <div style="display:flex;">
+        <button class="test-btn" type=button onclick="create();">create</button>
+        <button class="test-btn" type=button onclick="play();">play</button>
+    </div>
+    <div id="area"></div>
+</body>
+
+<script>
+    const { CommentTimeLine, NicoScript } = require("../app/js/comment-timeline");
+    
+    const duration_sec = 4;
+    let commnet_tl = null;
+    
+    window.addEventListener("DOMContentLoaded", () => {
+        const area_elm = document.getElementById("area");
+        commnet_tl = new CommentTimeLine(area_elm, duration_sec, 12);
+    });
+
+    const default_comments = [
+        { user_id: "owner", no: 1,  vpos: 0,    text: "@デフォルト", mail:"red big" },
+        { user_id: "owner", no: 2,  vpos: 0,    text: "text-owner-0" , mail:"" },
+        { user_id: "owner", no: 3,  vpos: 20,   text: "text-owner-20", mail:"" },
+        { user_id: "a",     no: 1,  vpos: 10,   text: "text-0",   mail:"" },
+        { user_id: "a",     no: 2,  vpos: 50,   text: "text-50-green",  mail:"green" },
+        { user_id: "a",     no: 3,  vpos: 100,  text: "text-100", mail:"" },
+        { user_id: "a",     no: 4,  vpos: 150,  text: "text-150", mail:"" },
+        { user_id: "a",     no: 5,  vpos: 200,  text: "text-200", mail:"" },
+        { user_id: "a",     no: 6,  vpos: 250,  text: "text-250", mail:"" }
+    ];
+
+    let cutimer = 0;
+    let cutimer_id = null;
+    let is_running = false;
+
+    const updateTimer = (time) => {
+        const target = document.getElementById("timer");
+        target.textContent = time;
+    };
+
+    const create = ()=>{
+        if(cutimer_id){
+            clearInterval(cutimer_id);
+        }
+        cutimer = 0;
+        updateTimer(cutimer);
+        
+        console.log("start create");
+        const nico_script = new NicoScript();
+        const app_comments = nico_script.getApplied(default_comments);
+        commnet_tl.create(app_comments);
+        console.log("end create");
+    };
+
+    const play = ()=>{
+        if(is_running){
+            commnet_tl.pause();
+            if(cutimer_id){
+                clearInterval(cutimer_id);
+            }
+        }else{
+            commnet_tl.play();
+            cutimer_id = setInterval(()=>{
+                updateTimer(cutimer);
+                cutimer+=100;
+            }, 100);
+        }
+        is_running = !is_running;
+    };
+</script>
+
+</html>

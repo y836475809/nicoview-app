@@ -27,7 +27,7 @@
 
     <script>
         /* globals app_base_dir obs */
-        const { CommentTimeLine } = require(`${app_base_dir}/js/comment-timeline`);
+        const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
         
         let video_elm = null;
         let play_data = null;
@@ -38,11 +38,13 @@
             const duration_sec = 4;
             const parent = this.root.querySelector("#player-video-screen");
 
+            const nico_script = new NicoScript();
+
             if(comment_tl){
                 comment_tl.clear();
             }
             comment_tl = new CommentTimeLine(parent, duration_sec, row_num);
-            comment_tl.create(comments);
+            comment_tl.create(nico_script.getApplied(comments));
         };
 
         const seek = (current) => {

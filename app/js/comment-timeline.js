@@ -40,68 +40,58 @@ class NicoScript {
      * 
      * @param {Array} comments 
      */
-    apply(comments){
-        const sc = comments.filter(comment => {
+    getApplied(comments){
+        const script_comments = comments.filter(comment => {
             return this.hasScript(comment.text);
         });
-        const uc = comments.filter(comment => {
+        const normal_comments = comments.filter(comment => {
             return !this.hasScript(comment.text);
         });
 
-        // const def = this.getDefault(this.sc);
-        // if(def){
-        //     um.map(comment => {
-        //         const mail = comment.mail;
-        //         if(this._color_re.test(mail)===false){
-        //             comment.mail = `${comment.mail} ${def.color}`;
-        //         }
-        //         if(this._fontsize_re.test(mail)===false){
-        //             comment.mail = `${comment.mail} ${def.font_size}`;
-        //         }
-        //     });
-        // }
-
-        const def = this.getDefault(sc, uc);
-
+        const applied_comments = this.applyDefault(script_comments, normal_comments);
+        return applied_comments;
     }
 
     /**
      * 
-     * @param {Array} sc 
-     * @param {Array} nc 
+     * @param {Array} script_comments 
+     * @param {Array} normal_comments 
      */
-    getDefault(sc, uc){
-        const f = sc.find(comment => {
+    applyDefault(script_comments, normal_comments){
+        const f = script_comments.find(comment => {
             return /@デフォルト/ig.test(comment.text);
         });
         if(f===undefined){
-            return uc;
+            return normal_comments;
         }
 
-        const color = this._color_re(f.mail);
-        const font_size = this._fontsize_re(f.mail);
+        const color = this._color_re.exec(f.mail);
+        const font_size = this._fontsize_re.exec(f.mail);
         const opt = {};
         if(color){
-            Object.assign(opt, {color});
+            Object.assign(opt, {color:color[0]});
         }
         if(font_size){
-            Object.assign(opt, {font_size});
+            Object.assign(opt, {font_size:font_size[0]});
         }
-        // if(Object.keys(opt).length === 0){
-        //     return uc;
-        // }
-        // return opt;
+        
         if( Object.keys(opt).length === 0){
-            return uc;
+            return normal_comments;
         }
-        return uc.map(comment => {
+        return normal_comments.map(comment => {
             const mail = comment.mail;
-            if(this._color_re.test(mail)===false){
-                comment.mail = `${comment.mail} ${opt.color}`;
+            const opts = [];
+            if(mail){
+                opts.push(mail);
             }
-            if(this._fontsize_re.test(mail)===false){
-                comment.mail = `${comment.mail} ${opt.font_size}`;
+            if(this._color_re.test(mail)===false && opt.color){
+                opts.push(opt.color);
             }
+            if(this._fontsize_re.test(mail)===false && opt.font_size){
+                opts.push(opt.font_size);
+            }
+            comment.mail = opts.join(" ");
+            return comment;
         });
     }
 

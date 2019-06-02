@@ -1,8 +1,7 @@
 
 class FixedComment{
-    constructor(row_num, duration){
+    constructor(row_num){
         this.row_num = row_num;
-        this.duration = duration;
     }
 
     getRowIndex(comment) {
@@ -31,7 +30,7 @@ class FixedComment{
                 row_index = this.getMin();
             }
             this.id_row_map.set(`${comment.no}:${comment.user_id}`, row_index);
-            this.rows[row_index].push({no:comment.no, vpos:comment.vpos});
+            this.rows[row_index].push(comment);
         });
     }
 
@@ -72,7 +71,7 @@ class FixedComment{
     fill(ary, cur_vpos) {
         return ary.filter(n => 
         {
-            return cur_vpos < (n.vpos+this.duration);
+            return cur_vpos < (n.vpos + n.duration);
         });
     }
 }

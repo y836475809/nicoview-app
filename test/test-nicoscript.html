@@ -36,7 +36,8 @@
 <body>
     <div id="timer">0</div>
     <div style="display:flex;">
-        <button class="test-btn" type=button onclick="create();">create</button>
+        <button class="test-btn" type=button onclick="createFlow();">create flow</button>
+        <button class="test-btn" type=button onclick="createFix();">create fix</button>
         <button class="test-btn" type=button onclick="play();">play</button>
     </div>
     <div id="area"></div>
@@ -65,6 +66,18 @@
         { user_id: "a",     no: 6,  vpos: 250,  text: "text-250", mail:"" }
     ];
 
+    const duration_comments = [
+        { user_id: "owner", no: 1,  vpos: 0,    text: "text-owner-1", mail:"ue @10" },
+        { user_id: "owner", no: 2,  vpos: 100,  text: "text-owner-2" , mail:"ue" },
+        { user_id: "owner", no: 3,  vpos: 200,  text: "text-owner-3", mail:"ue" },
+        { user_id: "a",     no: 1,  vpos: 300,  text: "text-1", mail:"ue" },
+        { user_id: "a",     no: 2,  vpos: 400,  text: "text-2", mail:"ue" },
+        { user_id: "a",     no: 3,  vpos: 500,  text: "text-3", mail:"ue" },
+        { user_id: "a",     no: 4,  vpos: 600,  text: "text-4", mail:"ue" },
+        { user_id: "a",     no: 5,  vpos: 700,  text: "text-5", mail:"ue" },
+        { user_id: "a",     no: 6,  vpos: 800,  text: "text-6", mail:"ue" }
+    ];
+
     let cutimer = 0;
     let cutimer_id = null;
     let is_running = false;
@@ -74,16 +87,30 @@
         target.textContent = time;
     };
 
-    const create = ()=>{
+    const createFlow = ()=>{
         if(cutimer_id){
             clearInterval(cutimer_id);
         }
         cutimer = 0;
         updateTimer(cutimer);
-        
+
         console.log("start create");
         const nico_script = new NicoScript();
         const app_comments = nico_script.getApplied(default_comments);
+        commnet_tl.create(app_comments);
+        console.log("end create");
+    };
+
+    const createFix = ()=>{
+        if(cutimer_id){
+            clearInterval(cutimer_id);
+        }
+        cutimer = 0;
+        updateTimer(cutimer);
+
+        console.log("start create");
+        const nico_script = new NicoScript();
+        const app_comments = nico_script.getApplied(duration_comments);
         commnet_tl.create(app_comments);
         console.log("end create");
     };

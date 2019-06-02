@@ -31,9 +31,6 @@ class NicoScript {
         this._color_re = new RegExp(this._colors.join("|"), "i");
 
         this._fontsize_re = new RegExp("big|middle|small", "i");
-
-        // /^\s*@\d+\s*$/.test("@12")
-        // /^\s*@\d+\s*/.test("@12")
     }
 
     /**
@@ -137,7 +134,7 @@ class CommentOptionParser {
         ]);
 
         this._p_color_regex = this._create(this._p_color_map);
-        this._u_color_regex = this._create(this._u_color_map);
+        this._u_color_regex = this._create(this._u_color_map);        
     }
 
     _create(color_map){
@@ -158,7 +155,7 @@ class CommentOptionParser {
         return null;
     }
 
-    parse(mail){
+    parse(mail, user_id){
         const options = {
             type: "naka",
             font_size:"middle",
@@ -174,6 +171,14 @@ class CommentOptionParser {
             const size = mail.match(/big|small/gi);
             if(size!==null){
                 options.font_size = size[0];
+            }
+
+            if(user_id=="owner"){
+                const duration = /\s*@\d+\s*/.exec(mail);
+                if(duration){
+                    const sec = parseInt(duration[0].replace("@", ""));
+                    Object.assign(options, { duration:sec*1000 });
+                }
             }
 
             const p_color_code = this._getColorCode(
@@ -273,12 +278,10 @@ class CommentTimeLine {
      * @param {Array} bottom_comments 
      */
     _createFixedTL(top_comments, bottom_comments){
-        const duration_msec = this.duration_sec * 1000;
-
-        const fixed_top_cmt = new FixedComment(this.row_num, duration_msec);
+        const fixed_top_cmt = new FixedComment(this.row_num);
         fixed_top_cmt.createRowIndexMap(top_comments);
-        
-        const fixed_bottom_cmt = new FixedComment(this.row_num, duration_msec);
+
+        const fixed_bottom_cmt = new FixedComment(this.row_num);
         fixed_bottom_cmt.createRowIndexMap(bottom_comments);
 
         const row_h = this.area_size.height / this.row_num;
@@ -290,10 +293,10 @@ class CommentTimeLine {
         this.parent_elm.appendChild(fragment);
 
         params.forEach((param)=>{
-            const { elm, delay } = param; 
+            const { elm, delay, duration } = param; 
             const id = elm.id;
             this.timeLine.add(
-                TweenMax.to(`#${id}`, this.duration_sec, {
+                TweenMax.to(`#${id}`, duration, {
                     alpha: 1, 
                     display : "block",
                 }), delay);
@@ -301,7 +304,7 @@ class CommentTimeLine {
                 TweenMax.to(`#${id}`, 0.001 , {
                     alpha: 0, 
                     display : "none"
-                }), delay + this.duration_sec);
+                }), delay + duration);
         });
     }
 
@@ -427,6 +430,7 @@ class CommentTimeLine {
             elm.classList.add("fixed");
             const delay = comment.vpos / 1000; //sec
             elm.style.left = (this.area_size.width / 2 - text_width / 2) + "px";
+            const duration = comment.duration / 1000; //sec
 
             if(pos_type=="ue"){
                 elm.style.top = (row_index * row_h) + "px";
@@ -434,7 +438,7 @@ class CommentTimeLine {
                 elm.style.top = ((this.row_num - row_index - 1) * row_h) + "px";
             }
 
-            return { elm, delay };
+            return { elm, delay, duration };
         });
     }
 
@@ -460,9 +464,10 @@ class CommentTimeLine {
                 no:comment.no, 
                 vpos:comment.vpos*10, 
                 text:comment.text, 
+                duration: this.duration_sec*1000
             };
-            const opts = cmt_opt_parser.parse(comment.mail);
-            Object.assign(p, opts);
+            const opts = cmt_opt_parser.parse(comment.mail, comment.user_id);
+            Object.assign(p, opts);  
 
             if(p.type=="ue"){
                 fixed_top_comments.push(p);

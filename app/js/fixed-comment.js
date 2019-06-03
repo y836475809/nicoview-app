@@ -21,29 +21,29 @@ class FixedComment{
         }
         
         comments.forEach((comment)=>{
-            this.update(comment.vpos);
-            const index = this.getEmptyIndex();
+            this._update(comment.vpos);
+            const index = this._getEmptyIndex();
             let row_index = 0;
             if(index>=0){
                 row_index = index;
             }else{
-                row_index = this.getMin();
+                row_index = this._getMin();
             }
             this.id_row_map.set(`${comment.no}:${comment.user_id}`, row_index);
             this.rows[row_index].push(comment);
         });
     }
 
-    update(cur_vpos) {
+    _update(cur_vpos) {
         for (let i = 0; i < this.rows.length; i++) {
             if(this.rows[i].length>0){
                 const array = this.rows[i];
-                this.rows[i] = this.fill(array, cur_vpos);
+                this.rows[i] = this._fill(array, cur_vpos);
             }
         }
     }
 
-    getEmptyIndex(){
+    _getEmptyIndex(){
         for (let i = 0; i < this.rows.length; i++) {
             if(this.rows[i].length===0){
                 return i;
@@ -52,7 +52,7 @@ class FixedComment{
         return -1;
     }
 
-    getMin(){
+    _getMin(){
         for (let i = 0; i < this.rows.length-1; i++) {
             const cur = this.rows[i].length;
             const next = this.rows[i+1].length;
@@ -68,7 +68,7 @@ class FixedComment{
      * @param {Array} ary 
      * @param {number} cur_vpos 
      */  
-    fill(ary, cur_vpos) {
+    _fill(ary, cur_vpos) {
         return ary.filter(n => 
         {
             return cur_vpos < (n.vpos + n.duration);

@@ -6,7 +6,7 @@ test("calc fix fill", (t) => {
     const duration = 100;
     let fixed_cmt = new FixedComment(num);
 
-    let ret = fixed_cmt.fill([
+    let ret = fixed_cmt._fill([
         { vpos: 0, duration: duration },
         { vpos: 20, duration: duration },
         { vpos: 50, duration: duration },
@@ -16,7 +16,7 @@ test("calc fix fill", (t) => {
     t.is(ret[1].vpos, 20);
     t.is(ret[2].vpos, 50);
 
-    let ret2 = fixed_cmt.fill([
+    let ret2 = fixed_cmt._fill([
         { vpos: 0, duration: duration },
         { vpos: 20, duration: duration },
         { vpos: 50, duration: duration },
@@ -25,7 +25,7 @@ test("calc fix fill", (t) => {
     t.is(ret2[0].vpos, 20);
     t.is(ret2[1].vpos, 50);
 
-    let ret3 = fixed_cmt.fill([
+    let ret3 = fixed_cmt._fill([
         { vpos: 0, duration: duration },
         { vpos: 20, duration: duration },
         { vpos: 50, duration: duration },
@@ -33,7 +33,7 @@ test("calc fix fill", (t) => {
     t.is(ret3.length, 1);
     t.is(ret3[0].vpos, 50);
 
-    let ret4 = fixed_cmt.fill([
+    let ret4 = fixed_cmt._fill([
         { vpos: 0, duration: duration },
         { vpos: 20, duration: duration },
         { vpos: 50, duration: duration },

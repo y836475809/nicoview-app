@@ -4,7 +4,7 @@ const FixedComment = require("./fixed-comment");
 
 class NicoScript {
     constructor(){
-        this._scripts = [
+        const scripts = [
             "@デフォルト",
             "@置換",
             "@逆",
@@ -13,10 +13,9 @@ class NicoScript {
             "@ジャンプ",
             "@ピザ"
         ];
+        this._scritp_re = new RegExp(scripts.join("|"), "i");
 
-        this._scritp_re = new RegExp(this._scripts.join("|"), "i");
-
-        this._colors = [
+        const colors = [
             "white", 
             "red",
             "pink", 
@@ -28,7 +27,7 @@ class NicoScript {
             "purple", 
             "black",
         ];
-        this._color_re = new RegExp(this._colors.join("|"), "i");
+        this._color_re = new RegExp(colors.join("|"), "i");
 
         this._fontsize_re = new RegExp("big|middle|small", "i");
     }
@@ -39,13 +38,13 @@ class NicoScript {
      */
     getApplied(comments){
         const script_comments = comments.filter(comment => {
-            return this.hasScript(comment.text);
+            return this._hasScript(comment.text);
         });
         const normal_comments = comments.filter(comment => {
-            return !this.hasScript(comment.text);
+            return !this._hasScript(comment.text);
         });
 
-        const applied_comments = this.applyDefault(script_comments, normal_comments);
+        const applied_comments = this._applyDefault(script_comments, normal_comments);
         return applied_comments;
     }
 
@@ -54,7 +53,7 @@ class NicoScript {
      * @param {Array} script_comments 
      * @param {Array} normal_comments 
      */
-    applyDefault(script_comments, normal_comments){
+    _applyDefault(script_comments, normal_comments){
         const f = script_comments.find(comment => {
             return /@デフォルト/ig.test(comment.text);
         });
@@ -92,7 +91,7 @@ class NicoScript {
         });
     }
 
-    hasScript(text){
+    _hasScript(text){
         return this._scritp_re.test(text);
     }
 }

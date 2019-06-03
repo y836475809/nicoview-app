@@ -255,6 +255,10 @@ class CommentTimeLine {
         const params = this._createFlowParams(comments, flow_cmt, fragment);
         this.parent_elm.appendChild(fragment);
 
+        this._createFlowTweenMax(params);
+    }
+    
+    _createFlowTweenMax(params){
         params.forEach((param)=>{
             const { elm, left, delay } = param; 
             const id = elm.id;
@@ -270,7 +274,7 @@ class CommentTimeLine {
                 }), delay + this.duration_sec);
         });
     }
-    
+
     /**
      * 
      * @param {Array} top_comments 
@@ -291,6 +295,10 @@ class CommentTimeLine {
 
         this.parent_elm.appendChild(fragment);
 
+        this._createFixedTweenMax(params);
+    }
+
+    _createFixedTweenMax(params){
         params.forEach((param)=>{
             const { elm, delay, duration } = param; 
             const id = elm.id;

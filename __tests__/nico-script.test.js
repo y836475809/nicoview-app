@@ -39,3 +39,44 @@ test("default script", t => {
         { user_id: "a", text: "text8", mail:"green small 184" },
     ]);
 });
+
+test("other script", t => {
+    const nico_script = new NicoScript();
+
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@置換", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@逆", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@コメント禁止", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@シーク禁止", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@ジャンプ", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+    {
+        const comments = nico_script.getApplied([
+            { user_id: "owner", text: "@ピザ", mail:"" },
+            { user_id: "a", text: "text", mail:"184" }]);
+        t.deepEqual(comments, [{ user_id: "a", text: "text", mail:"184" }]);
+    }
+});

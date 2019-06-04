@@ -72,7 +72,6 @@ class XMLDataConverter {
 
     _convertItem(item){
         return {
-            _data_type: "video",
             _db_type: "json",
             dirpath_id: item.dirpath_id,
             video_id: item.video_id,

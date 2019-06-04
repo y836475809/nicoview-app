@@ -8,7 +8,7 @@ let nico_json = null;
 
 const getLibraryItem = (video_id) => {
     return new Promise(async (resolve, reject) => {
-        library.db.find({_data_type: "video", video_id: video_id}, async (err, docs) => { 
+        library.video_db.find({video_id: video_id}, {_id: 0}, async (err, docs) => { 
             if(err){
                 reject(err);
                 return;
@@ -17,7 +17,6 @@ const getLibraryItem = (video_id) => {
                 resolve([]);
                 return;
             }
-            delete docs[0]._id;
             resolve(docs[0]);
         });
     });
@@ -25,13 +24,12 @@ const getLibraryItem = (video_id) => {
 
 test.beforeEach(async t => {
     library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 0, dirpath: "./data" },
+        { dirpath_id: 0, dirpath: "./data" },
     ];
     const video_list = [
         {
-            _data_type: "video",
             _db_type: "xml",
             video_id: "sm1",
             dirpath_id: 0,
@@ -49,7 +47,6 @@ test.beforeEach(async t => {
             tags: ["tag1"],
         },
         {
-            _data_type:"video",
             _db_type:"json",
             dirpath_id: 0,
             video_id: "sm2",
@@ -123,7 +120,6 @@ test("convert xml", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm1"),
         {
-            _data_type: "video",
             _db_type: "json",
             dirpath_id: 0,
             video_id: "sm1",
@@ -148,7 +144,6 @@ test("convert xml, not exist src xml file", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm1"),
         {
-            _data_type: "video",
             _db_type: "xml",
             video_id: "sm1", 
             dirpath_id: 0,
@@ -174,7 +169,6 @@ test("convert json", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm2"),
         {
-            _data_type:"video", 
             _db_type:"json", 
             dirpath_id: 0,
             video_id: "sm2",
@@ -198,7 +192,6 @@ test("convert json, not exist src xml file", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm2"),
         {
-            _data_type:"video", 
             _db_type:"json", 
             dirpath_id: 0,
             video_id: "sm2",
@@ -224,7 +217,6 @@ test("convert not exist db", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm1"),
         {
-            _data_type: "video",
             _db_type: "xml",
             video_id: "sm1", 
             dirpath_id: 0,
@@ -245,7 +237,6 @@ test("convert not exist db", async (t) => {
     t.deepEqual(
         await getLibraryItem("sm2"),
         {
-            _data_type:"video", 
             _db_type:"json", 
             dirpath_id: 0,
             video_id: "sm2",

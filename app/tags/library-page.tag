@@ -265,7 +265,7 @@
             
             try {
                 library = new Library();
-                await library.init(SettingStore.getSystemFile("library.db"));
+                await library.init(SettingStore.getSystemDir());
                 loadLibraryItems(await library.getLibraryData());
             } catch (error) {
                 console.log("library.getLibraryData error=", error);
@@ -276,7 +276,7 @@
         obs.on("refresh_library", async () => {     
             try {
                 library = new Library();
-                await library.init(SettingStore.getSystemFile("library.db"));
+                await library.init(SettingStore.getSystemDir());
                 loadLibraryItems(await library.getLibraryData());
             } catch (error) {
                 console.log("library.getLibraryData error=", error);
@@ -299,16 +299,17 @@
             cb(ret);
         }); 
     
-        obs.on("get-library-items-from-file", async (db_file_path) => { 
-            try {
-                library = new Library();
-                await library.init(db_file_path);
-                loadLibraryItems(await library.getLibraryData());
-            } catch (error) {
-                console.log("library.getLibraryData error=", error);
-                loadLibraryItems([]);
-            }
-        });  
+        //TODO
+        // obs.on("get-library-items-from-file", async (db_file_path) => { 
+        //     try {
+        //         library = new Library();
+        //         await library.init(db_file_path);
+        //         loadLibraryItems(await library.getLibraryData());
+        //     } catch (error) {
+        //         console.log("library.getLibraryData error=", error);
+        //         loadLibraryItems([]);
+        //     }
+        // });  
     
         obs.on("add-library-item", async (item) => { 
             //TODO
@@ -359,7 +360,7 @@
             const video_list = db_converter.get_video();
     
             library = new Library();
-            await library.init(SettingStore.getSystemFile("library.db"));
+            await library.init(SettingStore.getSystemDir());
             await library.setData(dir_list, video_list);  
         };
     

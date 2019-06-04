@@ -33,10 +33,9 @@ class DBConverter {
         let res = this.db.exec("SELECT * FROM file");
         const values = res[0].values;
         this.dirpath_list = values.map(value=>{
-            const _data_type = "dir";
             const dirpath_id = value[0];
             const dirpath = decodeURIComponent(value[1]);
-            return { _data_type, dirpath_id, dirpath };
+            return { dirpath_id, dirpath };
         });
     }
 
@@ -94,7 +93,6 @@ class DBConverter {
 
             const tags = this.tag_map.get(id);
             return {
-                _data_type: "video",
                 _db_type: "xml",
                 video_id: key,
                 //uri: uri,

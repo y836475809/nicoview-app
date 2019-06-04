@@ -4,14 +4,13 @@ const Library = require("../app/js/library");
 
 test("library get path, info", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-        { _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
+        { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        { dirpath_id: 2, dirpath: "file:///C:/data"},
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
@@ -20,7 +19,6 @@ test("library get path, info", async (t) => {
             video_type: "mp4"
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 2,
@@ -29,7 +27,6 @@ test("library get path, info", async (t) => {
             video_type: "mp4"
         },
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm3",
             dirpath_id: 2,
@@ -103,14 +100,13 @@ test("library get path, info", async (t) => {
 
 test("library get data", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        {  _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-        {  _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
+        {  dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        {  dirpath_id: 2, dirpath: "file:///C:/data"},
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
@@ -124,7 +120,6 @@ test("library get data", async (t) => {
             tags: ["tag1 tag2"]
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 2,
@@ -138,7 +133,6 @@ test("library get data", async (t) => {
             tags: ["tag10 tag20"]
         },
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm3",
             dirpath_id: 2,
@@ -197,14 +191,13 @@ test("library get data", async (t) => {
 
 test("library add item", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+        { dirpath_id: 1, dirpath: "file:///C:/data" },
     ];
     await library.setData(dirpath_list, []);
 
     const item1 ={
-        _data_type:"video", 
         _db_type:"json", 
         dirpath: "C:/data",
         video_id: "sm1",      
@@ -224,7 +217,6 @@ test("library add item", async (t) => {
     }
 
     const item2 ={
-        _data_type:"video", 
         _db_type:"json", 
         dirpath: "C:/data",
         video_id: "sm1",      
@@ -258,14 +250,13 @@ test("library add item", async (t) => {
 
 test("library update item", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-        { _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data"},
+        { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        { dirpath_id: 2, dirpath: "file:///C:/data"},
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
@@ -274,7 +265,6 @@ test("library update item", async (t) => {
             video_type: "mp4"
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 2,
@@ -286,7 +276,6 @@ test("library update item", async (t) => {
 
     await library.setData(dirpath_list, video_list);
     library.updateItem({
-        _data_type:"video", 
         _db_type:"json", 
         video_id: "sm2",
         dirpath_id: 2,
@@ -321,13 +310,12 @@ test("library update item", async (t) => {
 
 test("library update item error", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+        { dirpath_id: 1, dirpath: "file:///C:/data" },
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
@@ -340,7 +328,6 @@ test("library update item error", async (t) => {
     await library.setData(dirpath_list, video_list);
 
     const uitem = {
-        _data_type:"video", 
         _db_type:"json", 
         video_id: "sm100",
         dirpath_id: 2,
@@ -359,27 +346,24 @@ test("library update item error", async (t) => {
 
 test("library getFieldValue", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+        { dirpath_id: 1, dirpath: "file:///C:/data" },
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
             is_deleted: false
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 1,
             is_deleted: true
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm3",
             dirpath_id: 1,
@@ -397,27 +381,24 @@ test("library getFieldValue", async (t) => {
 
 test("library setFieldValue", async (t) => {
     const library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data" },
+        { dirpath_id: 1, dirpath: "file:///C:/data" },
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm1",
             dirpath_id: 1,
             is_deleted: false
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm2",
             dirpath_id: 1,
             is_deleted: true
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm3",
             dirpath_id: 1,

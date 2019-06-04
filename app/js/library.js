@@ -1,5 +1,6 @@
 
 const Datastore = require("nedb");
+const path = require("path");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 class Library {
@@ -8,9 +9,18 @@ class Library {
         this.nico_json = new NicoJsonFile();
     }
 
-    async init(db_file, in_memory_only=false) {
-        this.db = new Datastore({ 
-            filename: db_file,
+    async init(dir_path, in_memory_only=false) {
+        const dir_db_file = "library-dir.db";
+        const video_db_file = "library-video.db";
+
+        this.dir_db = new Datastore({ 
+            filename: path.join(dir_path, dir_db_file),
+            autoload: true,
+            inMemoryOnly: in_memory_only
+        });
+
+        this.video_db = new Datastore({ 
+            filename: path.join(dir_path, video_db_file),
             autoload: true,
             inMemoryOnly: in_memory_only
         });
@@ -24,16 +34,19 @@ class Library {
      * @param {Array} video_list
      */
     async setData(dir_list, video_list) {
-        const data_list = this._normalizeDirData(dir_list).concat(video_list);
-        await this._clear(this.db);
-        await this._setData(this.db, data_list);
+        await this._clear(this.video_db);
+        await this._setData(this.video_db, video_list);
+
+        const n_dir_list = this._normalizeDirData(dir_list);
+        await this._clear(this.dir_db);
+        await this._setData(this.dir_db, n_dir_list);
 
         await this._updateDirPathMap();
     }
 
     async _updateDirPathMap(){
         const count = await new Promise(async (resolve, reject) => {
-            this.db.count({}, function (err, count) {
+            this.dir_db.count({}, function (err, count) {
                 resolve(count);
             });
         });
@@ -73,8 +86,7 @@ class Library {
             throw new Error("maximum id value has been exceeded");
         }
 
-        await this._setData(this.db, [{ 
-            _data_type: "dir",
+        await this._setData(this.dir_db, [{ 
             dirpath_id: new_dirpath_id,
             dirpath: n_dirpath
         }]);
@@ -87,7 +99,6 @@ class Library {
     /**
      * 
      * @param {object} item 
-     * @param {String} item._data_type      
      * @param {String} item._db_type
      * @param {String} item.dirpath
      * @param {String} item.video_id
@@ -104,7 +115,6 @@ class Library {
 
         const cu_date = new Date().getTime();
         const library_item = {
-            _data_type: item._data_type,
             _db_type: item._db_type,
             dirpath_id: dirpath_id,
             video_id: item.video_id,        
@@ -119,18 +129,18 @@ class Library {
             tags: item.tags,
             is_deleted: item.is_deleted
         };
-        await this._updateData(this.db, library_item, true);
+        await this._updateData(this.video_db, library_item, true);
     }
 
     async updateItem(item){
-        await this._updateData(this.db, item, false);
+        await this._updateData(this.video_db, item, false);
     }
 
     async getFieldValue(video_id, field_name){
         return new Promise(async (resolve, reject) => {
             const fields = {};
             fields[`${field_name}`] = 1;
-            this.db.find({ _data_type: "video", video_id: video_id}, fields, (err, docs) => {
+            this.video_db.find({video_id: video_id}, fields, (err, docs) => {
                 if(err){
                     reject(err);
                     return;
@@ -148,7 +158,7 @@ class Library {
         return new Promise(async (resolve, reject) => {
             const fields = {};
             fields[`${field_name}`] = value;
-            this.db.update({ _data_type: "video", video_id: video_id}, {$set: fields}, (err, numReplaced) => {
+            this.video_db.update({video_id: video_id}, {$set: fields}, (err, numReplaced) => {
                 if(err){
                     reject(err);
                     return;
@@ -164,7 +174,7 @@ class Library {
 
     getLibraryItem(video_id){
         return new Promise(async (resolve, reject) => {
-            this.db.find({_data_type: "video", video_id: video_id}, async (err, docs) => { 
+            this.video_db.find({video_id: video_id}, async (err, docs) => { 
                 if(err){
                     reject(err);
                     return;
@@ -192,7 +202,7 @@ class Library {
 
     getLibraryData(){
         return new Promise(async (resolve, reject) => {
-            this.db.find({_data_type: "video"}, async (err, docs) => { 
+            this.video_db.find({}, async (err, docs) => { 
                 if(err){
                     reject(err);
                     return;
@@ -298,7 +308,7 @@ class Library {
 
     _getDir(dirpath_id) {
         return new Promise((resolve, reject) => {
-            this.db.find({ $and : [{_data_type: "dir"}, { dirpath_id: dirpath_id }]}, (err, docs) => {
+            this.dir_db.find({dirpath_id: dirpath_id}, (err, docs) => {
                 if(err){
                     reject(err);
                     return;
@@ -319,7 +329,7 @@ class Library {
     _getDirMap() {
         const dir_map = new Map();
         return new Promise((resolve, reject) => {
-            this.db.find({_data_type: "dir"}, (err, docs) => {
+            this.dir_db.find({}, (err, docs) => {
                 if(err){
                     reject(err);
                     return;
@@ -338,7 +348,7 @@ class Library {
 
     _getVideoInfo(video_id) {
         return new Promise((resolve, reject) => {
-            this.db.find({ $and : [{_data_type: "video"}, { video_id: video_id }] }, {_data_type: 0, _id: 0}, (err, docs) => {   
+            this.video_db.find({video_id: video_id}, {_id: 0}, (err, docs) => {   
                 if(err){
                     reject(err);
                     return;

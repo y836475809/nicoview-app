@@ -12,13 +12,12 @@ const nico_mocks = new NicoMocks();
 
 test.beforeEach(async t => {
     library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "/data/" }
+        { dirpath_id: 1, dirpath: "/data/" }
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: TestData.video_id,
             dirpath_id: 1,

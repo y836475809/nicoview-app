@@ -78,7 +78,6 @@ test("downloader dmc", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _data_type:"video", 
         _db_type:"json", 
         dirpath: dist_dir,
         video_id: "sm12345678", 
@@ -156,7 +155,6 @@ test("downloader smile", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _data_type:"video", 
         _db_type:"json",
         dirpath: dist_dir, 
         video_id: "sm12345678", 
@@ -234,7 +232,6 @@ test("downloader dmc low quality", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _data_type:"video", 
         _db_type:"json", 
         dirpath: dist_dir,
         video_id: "sm12345678",       
@@ -266,7 +263,6 @@ test("downloader smile low quality", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _data_type:"video", 
         _db_type:"json", 
         dirpath: dist_dir,
         video_id: "sm12345678",    

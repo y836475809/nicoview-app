@@ -10,8 +10,8 @@ test("sqlite db dirpath", (t) => {
     const dirpath_list = db.get_dirpath();
     t.deepEqual(dirpath_list, 
         [
-            { _data_type:"dir", dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-            { _data_type:"dir", dirpath_id: 2, dirpath: "file:///C:/data" }
+            { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+            { dirpath_id: 2, dirpath: "file:///C:/data" }
         ]
     );    
 });
@@ -45,7 +45,6 @@ test("sqlite db video", (t) => {
     const sm4 = video_list[3];
     const sm5 = video_list[4];
 
-    t.is(sm1._data_type, "video");
     t.is(sm1._db_type, "xml");
 
     t.is(sm1.video_id, "sm1");

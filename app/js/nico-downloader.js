@@ -319,7 +319,6 @@ class NicoDownloader {
             return value.name;
         });
         return {
-            _data_type:"video", 
             _db_type:"json", 
             dirpath: this.dist_dir,
             video_id: video_id,      

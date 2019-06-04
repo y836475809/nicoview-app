@@ -9,13 +9,12 @@ let library = null;
 
 test.beforeEach(async t => {
     library = new Library();
-    await library.init("test.db", true);
+    await library.init(__dirname, true);
     const dirpath_list = [
-        { _data_type:"dir", dirpath_id: 1, dirpath: "/data/" }
+        { dirpath_id: 1, dirpath: "/data/" }
     ];
     const video_list = [
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm1",
             dirpath_id: 1,
@@ -26,7 +25,6 @@ test.beforeEach(async t => {
             tags: []
         },
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm2",
             dirpath_id: 1,
@@ -37,7 +35,6 @@ test.beforeEach(async t => {
             tags: []
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm3",
             dirpath_id: 1,
@@ -48,7 +45,6 @@ test.beforeEach(async t => {
             tags: []
         },
         {
-            _data_type:"video", 
             _db_type:"xml", 
             video_id: "sm4",
             dirpath_id: 1,
@@ -59,7 +55,6 @@ test.beforeEach(async t => {
             tags: []
         },
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm5",
             dirpath_id: 1,
@@ -70,7 +65,6 @@ test.beforeEach(async t => {
             tags: ["tag1"]
         },
         {
-            _data_type:"video", 
             _db_type:"json", 
             video_id: "sm6",
             dirpath_id: 1,

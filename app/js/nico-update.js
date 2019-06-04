@@ -3,7 +3,7 @@ const path = require("path");
 const { NicoWatch, NicoComment, 
     getThumbInfo, filterComments } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
-const Library = require("./library");
+const { Library } = require("./library");
 
 class NicoUpdate {
     /**

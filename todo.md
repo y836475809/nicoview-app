@@ -1,10 +1,10 @@
 
-- [ ] ライブラリdbで使用していない項目を削除
 - [x] ライブラリdbを動画とパスで分ける
 - [ ] ライブラリから動画を削除できるようにする
 - [ ] dbインポートでは既存データに追加する
 - [ ] dbインポートでは重複するデータは上書きする
-- [ ] データのxml->json変換でlastPlayDate(最後に再生された日時), modificationDate(最後に更新された日時)も取得するようにする
+- [x] データのxml->json変換でlastPlayDate(最後に再生された日時), modificationDate(最後に更新された日時)も取得するようにする
+- [x] データのxml->json変換に伴うライブラリdbの更新で項目にlastPlayDate(最後に再生された日時), modificationDate(最後に更新された日時)を追加する
 - [ ] データのlastPlayDate(最後に再生された日時), modificationDate(最後に更新された日時)をライブラリページで列に追加する
 - [ ] データの更新時にdbのmodificationDateを更新する(ライブラリページの表示も更新)
 - [ ] ライブラリの動画再生時にdbのlastPlayDateを更新する(ライブラリページの表示も更新)

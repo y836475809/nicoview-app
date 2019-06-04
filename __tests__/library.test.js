@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const Library = require("../app/js/library");
+const { Library } = require("../app/js/library");
 
 test("library get path, info", async (t) => {
     const library = new Library();
@@ -204,7 +204,7 @@ test("library add item", async (t) => {
         video_name: "サンプル1",
         common_filename: "sm1",
         video_type: "mp4",
-        max_quality: true,
+        is_economy: false,
         time: 0,
         pub_date: 0,
         tags: []
@@ -223,7 +223,7 @@ test("library add item", async (t) => {
         video_name: "サンプル1 update",
         common_filename: "sm1",
         video_type: "mp4",
-        max_quality: true,
+        is_economy: false,
         time: 0,
         pub_date: 0,
         tags: ["tag1"]

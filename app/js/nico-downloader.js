@@ -318,13 +318,14 @@ class NicoDownloader {
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
+        
         return {
             _db_type:"json", 
             dirpath: this.dist_dir,
             video_id: video_id,      
             video_name: api_data.video.title,
             video_type: video_type,
-            max_quality: this.videoinfo.maxQuality,
+            is_economy: !this.videoinfo.maxQuality,
             time: api_data.video.duration,
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
             tags: tags,

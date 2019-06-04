@@ -63,3 +63,29 @@ test("sqlite db video", (t) => {
     t.deepEqual(sm4.tags, ["タグ5"]);
     t.deepEqual(sm5.tags, ["タグ3", "タグ4", "タグ5"]);
 });
+
+test("sqlite db item", (t) => {
+    const db = new DBConverter();
+    db.init(db_file_path);
+    db.read();
+    const video_list = db.get_video();
+
+    const sm1 = video_list[0];
+    t.deepEqual(sm1, {
+        _db_type: "xml",
+        dirpath_id: 1,
+        video_id: "sm1",
+        video_name: "サンプル1",
+        video_type: "mp4",
+        common_filename: "サンプル1 - [sm1]",
+        is_economy: false,
+        modification_date: 1307213799000,
+        creation_date: 1332592373506,
+        pub_date: 1305678645000,
+        last_play_date: -1,
+        play_count:10,
+        time: 100,
+        tags: ["タグ1", "タグ2"],
+        is_deleted:false
+    });
+});

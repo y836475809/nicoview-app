@@ -3,7 +3,7 @@ const fsPromises = require("fs").promises;
 // const util = require("util");
 // const path = require("path");
 const reader = require("./reader");
-const Library = require("./library");
+const { createDBItem, Library } = require("./library");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 class XMLDataConverter {
@@ -71,21 +71,10 @@ class XMLDataConverter {
     }
 
     _convertItem(item){
-        return {
-            _db_type: "json",
-            dirpath_id: item.dirpath_id,
-            video_id: item.video_id,
-            video_name: item.video_name,
-            video_type: item.video_type,
-            common_filename: item.common_filename,
-            is_economy: item.is_economy!==0,
-            creation_date: item.creation_date,
-            play_count: item.play_count,
-            time: item.time,
-            pub_date: item.pub_date,
-            tags: item.tags,
-            is_deleted: false
-        };
+        const cnv_item = createDBItem();
+        Object.assign(cnv_item, item);
+        cnv_item._db_type = "json";
+        return cnv_item;
     }
 
     async _read(file_path){

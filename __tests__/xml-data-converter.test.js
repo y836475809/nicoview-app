@@ -1,5 +1,5 @@
 const test = require("ava");
-const Library = require("../app/js/library");
+const { Library } = require("../app/js/library");
 const { NicoJsonFile } = require("../app/js/nico-data-file");
 const { XMLDataConverter } = require("../app/js/xml-data-converter");
 
@@ -33,7 +33,7 @@ test.beforeEach(async t => {
             _db_type: "xml",
             video_id: "sm1",
             dirpath_id: 0,
-            is_economy: 0,
+            is_economy: false,
             last_play_date: -1,
             creation_date: 1,
             modification_date: 10,
@@ -43,7 +43,6 @@ test.beforeEach(async t => {
             video_name: "サンプル1",
             common_filename: "サンプル1 - [sm1]",
             video_type: "mp4",
-            yet_reading: 0,
             tags: ["tag1"],
         },
         {
@@ -54,7 +53,9 @@ test.beforeEach(async t => {
             common_filename: "sm2",
             video_type: "mp4",
             is_economy: true,
+            last_play_date: -1,
             creation_date: 2,
+            modification_date: 20,
             play_count: 20,
             pub_date: 200,
             time: 2000,
@@ -127,7 +128,9 @@ test("convert xml", async (t) => {
             video_type: "mp4",
             common_filename: "サンプル1 - [sm1]",
             is_economy: false,
+            last_play_date: -1,
             creation_date: 1,
+            modification_date: 10,
             play_count: 100,
             time: 10000,
             pub_date: 1000,
@@ -147,7 +150,7 @@ test("convert xml, not exist src xml file", async (t) => {
             _db_type: "xml",
             video_id: "sm1", 
             dirpath_id: 0,
-            is_economy: 0,
+            is_economy: false,
             last_play_date: -1,
             creation_date: 1,
             modification_date: 10,
@@ -157,7 +160,6 @@ test("convert xml, not exist src xml file", async (t) => {
             video_name: "サンプル1",
             common_filename: "サンプル1 - [sm1]",
             video_type: "mp4",
-            yet_reading: 0,
             tags: ["tag1"],
         }
     );
@@ -176,7 +178,9 @@ test("convert json", async (t) => {
             common_filename: "sm2",
             video_type: "mp4",
             is_economy: true,
+            last_play_date: -1,
             creation_date: 2,
+            modification_date: 20,
             play_count: 20,
             pub_date: 200,
             time: 2000,
@@ -199,7 +203,9 @@ test("convert json, not exist src xml file", async (t) => {
             common_filename: "sm2",
             video_type: "mp4",
             is_economy: true,
+            last_play_date: -1,
             creation_date: 2,
+            modification_date: 20,
             play_count: 20,
             pub_date: 200,
             time: 2000,
@@ -220,7 +226,7 @@ test("convert not exist db", async (t) => {
             _db_type: "xml",
             video_id: "sm1", 
             dirpath_id: 0,
-            is_economy: 0,
+            is_economy: false,
             last_play_date: -1,
             creation_date: 1,
             modification_date: 10,
@@ -230,7 +236,6 @@ test("convert not exist db", async (t) => {
             video_name: "サンプル1",
             common_filename: "サンプル1 - [sm1]",
             video_type: "mp4",
-            yet_reading: 0,
             tags: ["tag1"],
         }
     );
@@ -244,7 +249,9 @@ test("convert not exist db", async (t) => {
             common_filename: "sm2",
             video_type: "mp4",
             is_economy: true,
+            last_play_date: -1,
             creation_date: 2,
+            modification_date: 20,
             play_count: 20,
             pub_date: 200,
             time: 2000,

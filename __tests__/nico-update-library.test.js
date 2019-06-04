@@ -2,7 +2,7 @@ const test = require("ava");
 const path = require("path");
 const { TestData} = require("./helper/nico-mock");
 const { NicoUpdate } = require("../app/js/nico-update");
-const Library = require("../app/js/library");
+const { Library } = require("../app/js/library");
 
 /** @type {Library} */
 let library = null;

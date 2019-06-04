@@ -153,7 +153,7 @@
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const Library = require(`${app_base_dir}/js/library`);
+        const { Library } = require(`${app_base_dir}/js/library`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);

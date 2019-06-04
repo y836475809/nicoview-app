@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
-
+const { createDBItem } = require("./library");
 
 class DBConverter {
     /**
@@ -90,27 +90,26 @@ class DBConverter {
             const decoded_path = decodeURIComponent(uri);
             const common_filename = path.basename(decoded_path, path.extname(decoded_path));
             const video_type = path.extname(decoded_path).slice(1);
-
             const tags = this.tag_map.get(id);
-            return {
-                _db_type: "xml",
-                video_id: key,
-                //uri: uri,
-                dirpath_id: dirpath_id,
-                video_name: video_name,
-                common_filename: common_filename,
-                video_type: video_type,
-                is_economy: is_economy,
-                modification_date: modification_date,
-                creation_date: creation_date,
-                // thumb_url: thumb_url,
-                play_count: play_count,
-                time: time,
-                last_play_date: last_play_date,
-                yet_reading: yet_reading,
-                pub_date: pub_date,
-                tags: tags
-            };
+            
+            const item = createDBItem();
+            item._db_type = "xml";
+            item.dirpath_id = dirpath_id;
+            item.video_id = key;
+            item.video_name = video_name;
+            item.video_type = video_type;
+            item.common_filename = common_filename;
+            item.is_economy = is_economy !== 0;
+            item.modification_date = modification_date; //-1の場合ある
+            item.creation_date = creation_date;         //-1の場合ある
+            item.pub_date = pub_date;               //-1の場合ある
+            item.last_play_date = last_play_date;   //-1の場合ある
+            item.play_count = play_count;
+            item.time = time;
+            item.tags = tags;
+            item.is_deleted = false;
+            
+            return item;
         });
     }
 }

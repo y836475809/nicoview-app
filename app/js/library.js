@@ -3,6 +3,26 @@ const Datastore = require("nedb");
 const path = require("path");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
+const createDBItem = () => {
+    return {
+        _db_type: "",
+        dirpath_id: -1,
+        video_id: "",
+        video_name: "",
+        video_type: "",
+        common_filename: "",
+        is_economy: false,
+        modification_date: -1,
+        creation_date: 0,
+        pub_date: 0,
+        last_play_date: -1,
+        play_count: 0,
+        time: 0,
+        tags: [],
+        is_deleted: false
+    };
+};
+
 class Library {
     constructor(){
         this.nico_xml = new NicoXMLFile();
@@ -113,23 +133,24 @@ class Library {
         const dirpath = item.dirpath;
         const dirpath_id = await this._addDirPath(dirpath);
 
-        const cu_date = new Date().getTime();
-        const library_item = {
-            _db_type: item._db_type,
-            dirpath_id: dirpath_id,
-            video_id: item.video_id,        
-            video_name: item.video_name,
-            video_type: item.video_type,
-            common_filename: item.video_id,
-            is_economy: !item.max_quality,
-            creation_date: cu_date,
-            play_count: 0,
-            time: item.time,
-            pub_date: item.pub_date,
-            tags: item.tags,
-            is_deleted: item.is_deleted
-        };
-        await this._updateData(this.video_db, library_item, true);
+        const new_item = createDBItem();
+        new_item._db_type = item._db_type;
+        new_item.dirpath_id = dirpath_id;
+        new_item.video_id = item.video_id;
+        new_item.video_name = item.video_name;
+        new_item.video_type = item.video_type;
+        new_item.common_filename = item.video_id,
+        new_item.is_economy = item.is_economy;
+        // modification_date
+        new_item.creation_date = new Date().getTime();
+        new_item.pub_date = item.pub_date;
+        // last_play_date
+        // play_count
+        new_item.time = item.time;
+        new_item.tags = item.tags;
+        new_item.is_deleted = item.is_deleted;
+
+        await this._updateData(this.video_db, new_item, true);
     }
 
     async updateItem(item){
@@ -409,4 +430,7 @@ class Library {
     }
 }
 
-module.exports = Library;
+module.exports = {
+    createDBItem,
+    Library
+};

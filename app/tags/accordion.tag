@@ -82,6 +82,9 @@
         const Sortable = require("sortablejs");
         let sortable = null;
         
+        //TODO
+        const sidebar_obs = this.opts.obs;
+        
         const params = this.opts.params;
         const id_name = params.name;
         this.items = params.items.map(value=>{
@@ -160,6 +163,13 @@
             });
             target_elm.classList.add("selected"); 
         };
+
+        //TODO
+        if(sidebar_obs){
+            sidebar_obs.on("add-items", (items) => {
+                console.log("sidebar_obs add-items=", items);
+            });
+        }
 
         obs.on(`${id_name}-add-items`, (items) => {
             const new_items = items.map(value=>{

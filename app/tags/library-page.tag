@@ -8,15 +8,18 @@
     </style>
 
     <div class="library-sidebar">
-        <accordion params={acdn_search}></accordion>
+        <accordion params={acdn_search} obs={sidebar_obs}></accordion>
     </div>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir riot obs */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+
+        //TODO
+        this.sidebar_obs = this.opts.obs;
 
         const seach_file_path = SettingStore.getSystemFile("library-search.json");
 
@@ -166,6 +169,9 @@
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
         const fs = require("fs");
+
+        //TODO
+        const sidebar_obs = this.opts.obs; 
     
         let library = null;
         this.num_items = 0;
@@ -202,6 +208,11 @@
                 return;
             }          
             obs.trigger("on_add_search_item", param);
+
+            //TODO
+            sidebar_obs.trigger("add-items", [
+                { title: param, query: param }
+            ]);
         };
         
         obs.on("on_change_search_item", (param)=> {
@@ -403,19 +414,49 @@
 </library-content>
 
 <library-page>
+    <!-- TODO -->
     <style scoped>
         :scope {
             width: 100%;
             height: 100%;
+            --right-width: 200px;
+            display: flex;
+        }
+        .gutter {    
+            width: 4px;
+            border-left: 1px solid var(--control-border-color);
+            background-color: var(--control-color);
+        } 
+        .split.left{
+            background-color: var(--control-color);
+            width: var(--right-width);
+        }
+        .split.right{
+            background-color: var(--control-color);
+            width: calc(100% - var(--right-width));
+            height: 100%;
+            overflow-y: hidden;
         }
     </style>
-
+<!-- 
     <split-page-templete>
         <yield to="sidebar">
-            <library-sidebar></library-sidebar>
+            <library-sidebar mytitle={sidebar_obs}></library-sidebar>
         </yield>
         <yield to="main-content">
             <library-content></library-content>
         </yield>
-    </split-page-templete>
+    </split-page-templete> -->
+   
+    <div class="split left">
+        <library-sidebar obs={sidebar_obs}></library-sidebar>
+    </div>
+    <div class="gutter"></div>
+    <div class="split right">
+        <library-content obs={sidebar_obs}></library-content>
+    </div>
+
+    <script>
+        this.sidebar_obs = riot.observable();
+    </script>
 </library-page>

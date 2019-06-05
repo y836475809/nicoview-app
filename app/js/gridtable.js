@@ -188,6 +188,7 @@ class GridTable {
         items.forEach(item => {
             this.dataView.deleteItem(item.id);
         });
+        this.clearSelected();
         this.grid.invalidate();
         this.grid.render();
     }

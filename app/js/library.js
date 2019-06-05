@@ -193,6 +193,20 @@ class Library {
         });
     }
 
+    _createLibraryItem(video_item){
+        const dir_path = this.id_dirpath_map.get(video_item.dirpath_id);
+        return  {
+            thumb_img: this._getThumbImgPath(dir_path, video_item),
+            id: video_item.video_id,
+            name: video_item.video_name,
+            creation_date: video_item.creation_date,
+            pub_date: video_item.pub_date,
+            play_count: video_item.play_count,
+            play_time: video_item.time,
+            tags: video_item.tags?video_item.tags.join(" "):""
+        };
+    }
+
     getLibraryItem(video_id){
         return new Promise(async (resolve, reject) => {
             this.video_db.find({video_id: video_id}, async (err, docs) => { 
@@ -205,23 +219,13 @@ class Library {
                     return;
                 }
                 const value = docs[0];
-                const dir_path = this.id_dirpath_map.get(value.dirpath_id);
-                const data =  {
-                    thumb_img: this._getThumbImgPath(dir_path, value),
-                    id: video_id,
-                    name: value.video_name,
-                    creation_date: value.creation_date,
-                    pub_date: value.pub_date,
-                    play_count: value.play_count,
-                    play_time: value.time,
-                    tags: value.tags?value.tags.join(" "):""
-                };
-                resolve(data);
+                const item = this._createLibraryItem(value);
+                resolve(item);
             });
         });       
     }
 
-    getLibraryData(){
+    getLibraryItems(){
         return new Promise(async (resolve, reject) => {
             this.video_db.find({}, async (err, docs) => { 
                 if(err){
@@ -233,18 +237,7 @@ class Library {
                     return;
                 }
                 const data = await Promise.all(docs.map(async value=>{
-                    const video_id = value.video_id;
-                    const dir_path = this.id_dirpath_map.get(value.dirpath_id);
-                    return {
-                        thumb_img: this._getThumbImgPath(dir_path, value),
-                        id: video_id,
-                        name: value.video_name,
-                        creation_date: value.creation_date,
-                        pub_date: value.pub_date,
-                        play_count: value.play_count,
-                        play_time: value.time,
-                        tags: value.tags?value.tags.join(" "):""
-                    };
+                    return this._createLibraryItem(value);
                 }));
                 resolve(data);
             });

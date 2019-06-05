@@ -148,13 +148,13 @@ test("library get data", async (t) => {
     ];
 
     await library.setData(dirpath_list, video_list);
-    const library_data = await library.getLibraryData();
-    library_data.sort((a, b) => {
+    const library_items = await library.getLibraryItems();
+    library_items.sort((a, b) => {
         return a.id > b.id ? 1 : -1;
     });
 
     t.deepEqual(
-        library_data,[
+        library_items,[
             {
                 thumb_img: path.resolve("C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg"),
                 id: "sm1",
@@ -212,8 +212,8 @@ test("library add item", async (t) => {
     await library.addItem(item1);
     await library.addItem(item1);
     {
-        const data = await library.getLibraryData();
-        t.is(1, data.length);
+        const items = await library.getLibraryItems();
+        t.is(1, items.length);
     }
 
     const item2 ={
@@ -230,8 +230,8 @@ test("library add item", async (t) => {
     };
     await library.addItem(item2);
     {
-        const data = await library.getLibraryData();
-        t.is(1, data.length);
+        const items = await library.getLibraryItems();
+        t.is(1, items.length);
     }
     {
         const data = await library._getVideoInfo("sm1");
@@ -337,11 +337,11 @@ test("library update item error", async (t) => {
     };
     await library.updateItem(uitem);
 
-    const library_data = await library.getLibraryData();
-    t.is(library_data.length, 1);
-    const data = library_data[0];
-    t.is(data.id, "sm1");
-    t.is(data.name, "サンプル1");
+    const library_items = await library.getLibraryItems();
+    t.is(library_items.length, 1);
+    const item = library_items[0];
+    t.is(item.id, "sm1");
+    t.is(item.name, "サンプル1");
 });
 
 test("library getFieldValue", async (t) => {

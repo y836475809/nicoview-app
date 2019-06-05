@@ -218,8 +218,8 @@ test("convert json, not exist src xml file", async (t) => {
 test("convert not exist db", async (t) => {
     const cnv_data = new TestXMLDataConverter();
     await t.throwsAsync(cnv_data.convert(library, "sm10000"));
-    const data = await library.getLibraryData();
-    t.is(data.length, 2);
+    const items = await library.getLibraryItems();
+    t.is(items.length, 2);
     t.deepEqual(
         await getLibraryItem("sm1"),
         {

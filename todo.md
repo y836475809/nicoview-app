@@ -84,7 +84,7 @@
 - [ ] requireのパスでテンプレートリテラルを使用しているのを相対パスにする(補完等が効くように)
 - [ ] 検索結果のタグ表示を見やすくする
 - [x] GridTable.deleteItems内でGridTable.clearSelectedを呼んで削除時に選択解除する
-- [ ] GridTable.resizeFitContainerは高さ計算で$(window).height()としている、これを親要素にする
+- [x] GridTable.resizeFitContainerは高さ計算で$(window).height()としている、これを親要素にする
 - [ ] GridTableでデフォルトのカラムサイズを設定できるようにする
 - [ ] シークした後に再開する場合、ラグが起きないようにreadyState==4になってから再開する
 - [ ] アプリ設定

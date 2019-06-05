@@ -92,6 +92,9 @@
         :scope {
             width: 100%;
             height: 100%;
+            --description-height: 100px;
+            --control-height: 30px;
+            --margin: 5px;
         }
 
         .mylist-label {
@@ -107,7 +110,7 @@
         .add-mylist-button {
             margin-left: 10px;
             width: 30px;
-            height: 30px;
+            height: var(--control-height);
         }
         .add-mylist-button .fa-plus-square {
             font-size: 30px;
@@ -119,12 +122,19 @@
 
         .mylist-description {
             width: calc(100% - 10px);
-            height: 100px;
+            height: var(--description-height);
             white-space: pre-wrap;
             overflow-y: scroll;
             padding: 3px;
             border: 1px solid var(--control-border-color);
-            margin: 5px;
+            margin: var(--margin);
+        }
+
+        .mylist-grid-container {
+            width: 100%;
+            height: calc(100vh - var(--description-height) 
+                - var(--control-height) - var(--margin) * 2);
+            overflow: hidden;
         }
 
         .line-break {

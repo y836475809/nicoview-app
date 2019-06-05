@@ -1,13 +1,18 @@
 <comment-ng-setting>
     <style scoped>
+        :scope {
+            --control-height: 25px;
+        }
+
         .comment-ng-grid-container {
-            height: calc(100% - 25px);
+            width: 100%;
+            height: calc(100% - var(--control-height));
         }
 
         .delete-button {
             float: right;
             width: 60px;
-            height: 25px;
+            height: var(--control-height);
             border-radius: 2px;
             text-align: center;
             color: black;
@@ -79,17 +84,10 @@
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
-
-        //TODO
+        
         const resizeGridTable = () => {
             const container = this.root.querySelector(".comment-ng-grid-container");
-            const new_height = container.clientHeight;
-            const new_width = container.clientWidth;
-            const new_szie = {
-                height: new_height,
-                width: new_width
-            };
-            grid_table.resize(new_szie);
+            grid_table.resizeFitContainer(container);
         };
 
         const setup = (ng_items) => {

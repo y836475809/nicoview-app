@@ -3,6 +3,7 @@
         :scope {
             width: 100%;
             height: 100%;
+            --control-height: 36px;
             background-color: var(--control-color);
         }
 
@@ -18,8 +19,10 @@
 
         .download-control-container{
             display: flex;
+            width: 100%;
+            height: var(--control-height);
             padding: 3px;
-            background-color: var(--control-color);
+            background-color: var(--control-color);         
         }
         
         .download-control-container .schedule-container {
@@ -33,7 +36,10 @@
         }
 
         .download-grid-container {
+            width: 100%;
+            height: calc(100vh - var(--control-height));
             background-color: var(--control-color);
+            overflow: hidden;
         }
 
         .download-state-complete {

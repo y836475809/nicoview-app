@@ -125,6 +125,12 @@
             cursor: pointer; 
         } 
 
+        .library-grid-container {
+            width: 100%;
+            height: calc(100vh - var(--search-button-size) - 4px);
+            overflow: hidden;
+        }
+
         .library-grid-container .slick-cell.l2.r2 {
             white-space: normal;
         }

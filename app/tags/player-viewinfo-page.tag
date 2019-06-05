@@ -13,11 +13,13 @@
             height: 100%;
             overflow-x: hidden;
             overflow-y: hidden;
-            --row-height: 25px;
+            --controls-container-height: 30px;
             --toggle-icon-size: 15px;
             --toggle-icon-margin: 2px;
         }    
         .viewinfo-panel{
+            width: 100%;
+            height: 100%;
             padding: var(--panel-padding);
         }
 
@@ -112,9 +114,19 @@
             grid-column: 1 / 3; 
             background-color: var(--control-color);
         }   
+
+        .viewinfo-controls-container {
+            height: var(--controls-container-height);
+        }
         .comment-checkbox{
             height: 25px;
             vertical-align:middle;
+        }
+
+        .comment-grid-container {
+            width: 100%;
+            height: calc(100vh - var(--video-panel-height) - var(--user-panel-height) - var(--description-panel-height)
+                - var(--controls-container-height) - 4px);
         }
 
         .icon-contain{
@@ -189,7 +201,7 @@
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
         <div style="display: flex;">
-            <div>
+            <div class="viewinfo-controls-container">
                 <input class="comment-checkbox" type="checkbox" 
                     onclick={this.onclickSyncCommentCheck} /><label>同期</label>
             </div>
@@ -269,13 +281,7 @@
 
         const resizeCommentList = () => {
             const container = this.root.querySelector(".comment-grid-container");
-            const new_height = $(window).height() - container.offsetTop;
-            const new_width = container.clientWidth;
-            const new_szie = {
-                height: new_height,
-                width: new_width
-            };
-            grid_table.resize(new_szie);
+            grid_table.resizeFitContainer(container);
         };
 
         const updateSyncCommentCheckBox = () => {

@@ -120,7 +120,7 @@
             display: flex;
         }
         .search-cond-container {
-            flex-wrap: wrap;
+            overflow-x: hidden;
         }
 
         .search-cond-container .label {   
@@ -140,17 +140,9 @@
         }
 
         .search-sort-container i.fa-caret-up {
-            /* position :relative;
-            top:10%;
-            left:5%; */
-            /* position :relative; */
-
             font-size: 25px;
         }
         .search-sort-container i.fa-caret-down {
-            /* position :relative;
-            top:-10%;
-            left:5%; */
             font-size: 25px;
         }
         .search-cond-container .label:hover{
@@ -191,6 +183,12 @@
             opacity: 0.5;
             cursor: pointer; 
         } 
+
+        .search-grid-container {
+            width: 100%;
+            height: calc(100vh - 65px);
+            overflow: hidden;
+        }
 
         .line-break {
             white-space: normal;

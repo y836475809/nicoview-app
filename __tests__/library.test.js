@@ -98,7 +98,7 @@ test("library get path, info", async (t) => {
     await t.throwsAsync(library._getVideoInfo("sm000"));
 });
 
-test("library get data", async (t) => {
+test("library getLibraryItems", async (t) => {
     const library = new Library();
     await library.init(__dirname, true);
     const dirpath_list = [
@@ -117,6 +117,7 @@ test("library get data", async (t) => {
             pub_date: 2,
             play_count: 3,
             time: 4,
+            last_play_date: 5,
             tags: ["tag1 tag2"]
         },
         {
@@ -130,6 +131,7 @@ test("library get data", async (t) => {
             pub_date: 20,
             play_count: 30,
             time: 40,
+            last_play_date: 50,
             tags: ["tag10 tag20"]
         },
         {
@@ -143,6 +145,7 @@ test("library get data", async (t) => {
             pub_date: 200,
             play_count: 300,
             time: 400,
+            last_play_date: 500,
             tags: ["tag100 tag200"]
         }
     ];
@@ -163,6 +166,7 @@ test("library get data", async (t) => {
                 pub_date: 2,
                 play_count: 3,
                 play_time: 4,
+                last_play_date: 5,
                 tags: "tag1 tag2" 
             },
             {
@@ -173,6 +177,7 @@ test("library get data", async (t) => {
                 pub_date: 20,
                 play_count: 30,
                 play_time: 40,
+                last_play_date: 50,
                 tags: "tag10 tag20" 
             },
             {
@@ -183,10 +188,85 @@ test("library get data", async (t) => {
                 pub_date: 200,
                 play_count: 300,
                 play_time: 400,
+                last_play_date: 500,
                 tags: "tag100 tag200" 
             }
         ]
     );
+});
+
+test("library getLibraryItem", async (t) => {
+    const library = new Library();
+    await library.init(__dirname, true);
+    const dirpath_list = [
+        {  dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
+        {  dirpath_id: 2, dirpath: "file:///C:/data"},
+    ];
+    const video_list = [
+        {
+            _db_type:"xml", 
+            video_id: "sm1",
+            dirpath_id: 1,
+            video_name: "サンプル1",
+            common_filename: "サンプル1 - [sm1]",
+            video_type: "mp4",
+            creation_date: 1,
+            pub_date: 2,
+            play_count: 3,
+            time: 4,
+            last_play_date: 5,
+            tags: ["tag1 tag2"]
+        },
+        {
+            _db_type:"xml", 
+            video_id: "sm2",
+            dirpath_id: 2,
+            video_name: "サンプル2",
+            common_filename: "サンプル2 - [sm2]",
+            video_type: "mp4",
+            creation_date: 10,
+            pub_date: 20,
+            play_count: 30,
+            time: 40,
+            last_play_date: 50,
+            tags: ["tag10 tag20"]
+        }
+    ];
+
+    await library.setData(dirpath_list, video_list);
+
+    {
+        const item = await library.getLibraryItem("sm1");
+        t.deepEqual(item, {
+            thumb_img: path.resolve("C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg"),
+            id: "sm1",
+            name: "サンプル1",
+            creation_date: 1,
+            pub_date: 2,
+            play_count: 3,
+            play_time: 4,
+            last_play_date: 5,
+            tags: "tag1 tag2" 
+        });
+    }
+    {
+        const item = await library.getLibraryItem("sm2");
+        t.deepEqual(item, {
+            thumb_img: path.resolve("C:/data/サンプル2 - [sm2][ThumbImg].jpeg"),
+            id: "sm2",
+            name: "サンプル2",
+            creation_date: 10,
+            pub_date: 20,
+            play_count: 30,
+            play_time: 40,
+            last_play_date: 50,
+            tags: "tag10 tag20" 
+        });
+    }
+    {
+        const item = await library.getLibraryItem("sm1000");
+        t.is(item, null);
+    }
 });
 
 test("library add item", async (t) => {

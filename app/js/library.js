@@ -216,7 +216,7 @@ class Library {
                     return;
                 }
                 if(docs.length==0){
-                    resolve([]);
+                    resolve(null);
                     return;
                 }
                 const value = docs[0];

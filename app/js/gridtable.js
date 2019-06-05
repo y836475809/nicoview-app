@@ -12,6 +12,9 @@ const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
 };
 
 const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
+    if(Number.isFinite(value) && value < 0){
+        return "-";
+    }
     return time_format.toDate(value);
 };
 
@@ -39,7 +42,7 @@ class GridTable {
 
         this.columns = columns.map(val => {
             const id = val.id;
-            const key = id.match(/(_.*)$/gi);
+            const key = id.match(/(_[^_]+)$/gi);
             if(val.formatter === undefined 
                 && key != null
                 && formatterMap.has(key[0])){

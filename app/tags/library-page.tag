@@ -172,6 +172,7 @@
             {id: "pub_date", name: "投稿日", sortable: true},
             {id: "play_count", name: "再生回数", sortable: true},
             {id: "play_time", name: "時間", sortable: true},
+            {id: "last_play_date", name: "再生時刻", sortable: true},
             {id: "state", name: "state"}
         ];
         const options = {

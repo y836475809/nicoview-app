@@ -201,6 +201,7 @@ class Library {
             name: video_item.video_name,
             creation_date: video_item.creation_date,
             pub_date: video_item.pub_date,
+            last_play_date: video_item.last_play_date,
             play_count: video_item.play_count,
             play_time: video_item.time,
             tags: video_item.tags?video_item.tags.join(" "):""

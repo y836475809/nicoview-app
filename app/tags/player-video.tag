@@ -56,7 +56,12 @@
             }else{
                 video_elm.pause();
                 video_elm.currentTime = current;
-                video_elm.play();
+                const wait_timer = setInterval(() => {
+                    if (video_elm.paused && video_elm.readyState === 4) {
+                        video_elm.play();
+                        clearInterval(wait_timer);
+                    }       
+                }, 100);
             } 
         };
 

@@ -86,7 +86,7 @@
 - [x] GridTable.deleteItems内でGridTable.clearSelectedを呼んで削除時に選択解除する
 - [x] GridTable.resizeFitContainerは高さ計算で$(window).height()としている、これを親要素にする
 - [ ] GridTableでデフォルトのカラムサイズを設定できるようにする
-- [ ] シークした後に再開する場合、ラグが起きないようにreadyState==4になってから再開する
+- [x] シークした後に再開する場合、ラグが起きないようにreadyState==4になってから再開する
 - [ ] アプリ設定
   - [ ] コメント表示でduration,分割数等のパラメータを設定
   - [ ] コメント表示で1分間の最大数の設定

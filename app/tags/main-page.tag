@@ -243,7 +243,7 @@
         ipc_monitor.on(IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
             const item = args;
             obs.trigger("add-history-item", item);
-            obs.trigger("update-last-play-date", item);
+            obs.trigger("library-page:play", item);
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{

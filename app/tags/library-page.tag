@@ -307,7 +307,7 @@
             grid_table.updateItem(library_item, library_item.id);
         });  
 
-        obs.on("update-last-play-date", async (item) => { 
+        obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
             const library_item = await library.getLibraryItem(video_id);
             if(library_item===null){
@@ -315,9 +315,12 @@
             }
 
             const last_play_date = new Date().getTime();
-            library_item.last_play_date = last_play_date;   
+            const play_count = library_item.play_count + 1;
+            library_item.last_play_date = last_play_date; 
+            library_item.play_count = play_count;
             grid_table.updateItem(library_item, video_id);
             await library.setFieldValue(video_id, "last_play_date", last_play_date);
+            await library.setFieldValue(video_id, "play_count", play_count);
         });
 
         this.nico_update = null;

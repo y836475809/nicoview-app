@@ -172,7 +172,7 @@
             {id: "pub_date", name: "投稿日", sortable: true},
             {id: "play_count", name: "再生回数", sortable: true},
             {id: "play_time", name: "時間", sortable: true},
-            {id: "last_play_date", name: "再生時刻", sortable: true},
+            {id: "last_play_date", name: "最終再生日", sortable: true},
             {id: "state", name: "state"}
         ];
         const options = {
@@ -306,6 +306,19 @@
             const library_item = await library.getLibraryItem(item.video_id);
             grid_table.updateItem(library_item, library_item.id);
         });  
+
+        obs.on("update-last-play-date", async (item) => { 
+            const video_id = item.id;
+            const library_item = await library.getLibraryItem(video_id);
+            if(library_item===null){
+                return;
+            }
+
+            const last_play_date = new Date().getTime();
+            library_item.last_play_date = last_play_date;   
+            grid_table.updateItem(library_item, video_id);
+            await library.setFieldValue(video_id, "last_play_date", last_play_date);
+        });
 
         this.nico_update = null;
         obs.on("update-data", async (args) => { 

@@ -8,7 +8,12 @@
     </style>
 
     <div class="library-sidebar">
-        <accordion params={acdn_search} obs={sidebar_obs}></accordion>
+        <accordion 
+            title="ライブラリ検索" 
+            items={search_data.items}
+            expand={true} 
+            obs={obs}>
+        </accordion>
     </div>
 
     <script>
@@ -19,8 +24,11 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
         //TODO
-        this.sidebar_obs = this.opts.obs;
-
+        const obs_sidebar = this.opts.obs.sidebar;
+        const obs_accordion = riot.observable();
+        this.obs = {
+            accordion: obs_accordion
+        };
         const seach_file_path = SettingStore.getSystemFile("library-search.json");
 
         try {
@@ -41,44 +49,58 @@
             }
         };
 
-        const createMenu = (sender) => {
+        const createMenu = () => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs.trigger(`${sender}-delete-selected-items`);
+                        obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
-
-        this.acdn_search = {
-            title : "ライブラリ検索",
-            name: "search",
-            expand: true,
-            items: this.search_data.items,
-            oncontextmenu: ()=> {
-                const menu = createMenu("search");
-                menu.popup({window: remote.getCurrentWindow()});
-            }
-        };
-
-        obs.on(`${this.acdn_search.name}-dlbclick-item`, (item) => {
-            obs.trigger("on_change_search_item", item.query);
+        
+        obs_accordion.on("show-contextmenu", (e) => {
+            const context_menu = createMenu();
+            context_menu.popup({window: remote.getCurrentWindow()}); 
+        });
+        obs_sidebar.on("add-item", (query) => {
+            obs_accordion.trigger("add-items", [
+                { title: query, query: query }
+            ]);
         });
 
-        obs.on(`${this.acdn_search.name}-state-change`, (data) => {
+        // this.acdn_search = {
+        //     title : "ライブラリ検索",
+        //     name: "search",
+        //     expand: true,
+        //     items: this.search_data.items,
+        //     // oncontextmenu: ()=> {
+        //     //     const menu = createMenu();
+        //     //     menu.popup({window: remote.getCurrentWindow()});
+        //     // }
+        // };
+
+        obs_accordion.on("item-dlbclicked", (item) => {
+            obs_sidebar.trigger("on_change_search_item", item.query);
+        });
+
+        // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
+        //     save(data);
+        // });
+
+        obs_accordion.on("state-changed", (data) => {
+            console.log("lib state-changed");
             save(data);
         });
-        
-        obs.on("on_add_search_item", (query) => {
-            obs.trigger(`${this.acdn_search.name}-add-items`, 
-                [
-                    { title: query, query: query }
-                ]
-            );
-            obs.trigger(`${this.acdn_search.name}-change-expand`, true);
-        });
+        // obs.on("on_add_search_item", (query) => {
+        //     obs.trigger(`${this.acdn_search.name}-add-items`, 
+        //         [
+        //             { title: query, query: query }
+        //         ]
+        //     );
+        //     obs.trigger(`${this.acdn_search.name}-change-expand`, true);
+        // });
     </script>
 </library-sidebar>
 
@@ -207,19 +229,22 @@
             if(!param){
                 return;
             }          
-            obs.trigger("on_add_search_item", param);
+            // obs.trigger("on_add_search_item", param);
 
             //TODO
-            sidebar_obs.trigger("add-items", [
-                { title: param, query: param }
-            ]);
+            sidebar_obs.trigger("add-item", param);
         };
         
-        obs.on("on_change_search_item", (param)=> {
+        sidebar_obs.on("item-dlbclicked", (item) => {
             const search_elm = this.root.querySelector(".filter-input");
-            search_elm.value = param;
-            grid_table.filterData(param);
+            search_elm.value = item;
+            grid_table.filterData(item);         
         });
+        // obs.on("on_change_search_item", (param)=> {
+        //     const search_elm = this.root.querySelector(".filter-input");
+        //     search_elm.value = param;
+        //     grid_table.filterData(param);
+        // });
     
         const loadLibraryItems = (items)=>{
             grid_table.setData(items);
@@ -415,7 +440,7 @@
 
 <library-page>
     <!-- TODO -->
-    <style scoped>
+    <!-- <style scoped>
         :scope {
             width: 100%;
             height: 100%;
@@ -437,7 +462,7 @@
             height: 100%;
             overflow-y: hidden;
         }
-    </style>
+    </style> -->
 <!-- 
     <split-page-templete>
         <yield to="sidebar">
@@ -447,16 +472,19 @@
             <library-content></library-content>
         </yield>
     </split-page-templete> -->
-   
-    <div class="split left">
-        <library-sidebar obs={sidebar_obs}></library-sidebar>
+    <div class="split-page">
+        <div class="left">
+            <library-sidebar obs={obs}></library-sidebar>
+        </div>
+        <div class="gutter"></div>
+        <div class="right">
+            <library-content obs={obs}></library-content>
+        </div>
     </div>
-    <div class="gutter"></div>
-    <div class="split right">
-        <library-content obs={sidebar_obs}></library-content>
-    </div>
-
     <script>
-        this.sidebar_obs = riot.observable();
+        /* globals riot */
+        this.obs = {
+            sidebar: riot.observable()
+        };
     </script>
 </library-page>

@@ -60,7 +60,7 @@
         }
     </style>
 
-    <label class="acdn-menubar" onclick={this.onclickMenubar}>{this.opts.params.title}</label>
+    <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
     <div class="acdn-menu-container">
         <div class="toggle-menu">
             <ul class="acdn-list">
@@ -70,7 +70,8 @@
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
                     onmouseup={this.onmouseUp}>
-                    <i show={item.icon!==undefined} style="{item.icon.style}" class="center-hv icont-item {item.icon.name}"></i>
+                    <!-- <i show={item.icon!==undefined} style="{item.icon.style}" class="center-hv icont-item {item.icon.name}"></i> -->
+                    <i show={item.icon!==undefined} class="center-hv icont-item {item.icon.name} {item.icon.class_name}"></i>
                     {item.title}
                 </li>
             </ul>
@@ -78,20 +79,19 @@
     </div>
 
     <script>
-        /* globals obs */
         const Sortable = require("sortablejs");
         let sortable = null;
         
         //TODO
-        const sidebar_obs = this.opts.obs;
+        const obs_accordion = this.opts.obs.accordion;
         
-        const params = this.opts.params;
-        const id_name = params.name;
-        this.items = params.items.map(value=>{
+        // const params = this.opts.params;
+        // const id_name = params.name;
+        this.items = this.opts.items.map(value=>{
             if(!value.icon){
                 value.icon = {
                     name: "",
-                    style: ""
+                    class_name: ""
                 };
             }
             return value;
@@ -165,13 +165,7 @@
         };
 
         //TODO
-        if(sidebar_obs){
-            sidebar_obs.on("add-items", (items) => {
-                console.log("sidebar_obs add-items=", items);
-            });
-        }
-
-        obs.on(`${id_name}-add-items`, (items) => {
+        obs_accordion.on("add-items", (items) => {
             const new_items = items.map(value=>{
                 if(!value.icon){
                     value.icon = {
@@ -187,40 +181,84 @@
             }
             this.update();
 
-            obs.trigger(`${id_name}-state-change`, {
+            obs_accordion.trigger("state-changed", {
                 is_expand: isExpand(), 
                 items: getItems()
             });
         });
 
-        obs.on(`${id_name}-selected-item-indices`, (cb) => {
-            const sel_indices = getSelectedItemIndices();
-            cb(sel_indices);
-        });
+        // obs.on(`${id_name}-add-items`, (items) => {
+        //     const new_items = items.map(value=>{
+        //         if(!value.icon){
+        //             value.icon = {
+        //                 name: "",
+        //                 style: ""
+        //             };
+        //         }
+        //         return value;
+        //     });
+        //     Array.prototype.push.apply(this.items, new_items);
+        //     if(isExpand()){
+        //         chanegExpand(true);
+        //     }
+        //     this.update();
 
-        obs.on(`${id_name}-delete-selected-items`, () => {
+        //     obs.trigger(`${id_name}-state-change`, {
+        //         is_expand: isExpand(), 
+        //         items: getItems()
+        //     });
+        // });
+
+        // obs.on(`${id_name}-selected-item-indices`, (cb) => {
+        //     const sel_indices = getSelectedItemIndices();
+        //     cb(sel_indices);
+        // });
+
+        obs_accordion.on("delete-selected-items", () => {
             const sel_indices = getSelectedItemIndices();
             deleteItems(sel_indices);
             if(isExpand()){
                 chanegExpand(true);
             }
 
-            obs.trigger(`${id_name}-state-change`, {
+            obs_accordion.trigger("state-changed", {
                 is_expand: isExpand(), 
                 items: getItems()
             });
         });
 
-        obs.on(`${id_name}-get-data`, (cb) => {
+        // obs.on(`${id_name}-delete-selected-items`, () => {
+        //     const sel_indices = getSelectedItemIndices();
+        //     deleteItems(sel_indices);
+        //     if(isExpand()){
+        //         chanegExpand(true);
+        //     }
+
+        //     obs.trigger(`${id_name}-state-change`, {
+        //         is_expand: isExpand(), 
+        //         items: getItems()
+        //     });
+        // });
+
+        obs_accordion.on("get-items", (cb) => {
             cb({
                 is_expand: isExpand(), 
                 items: getItems()
             });
         });
+        // obs.on(`${id_name}-get-data`, (cb) => {
+        //     cb({
+        //         is_expand: isExpand(), 
+        //         items: getItems()
+        //     });
+        // });
 
-        obs.on(`${id_name}-change-expand`, (expand) => {
+        obs_accordion.on("change-expand", (expand) => {
             chanegExpand(expand);
         });
+        // obs.on(`${id_name}-change-expand`, (expand) => {
+        //     chanegExpand(expand);
+        // });
 
         this.onclickMenubar = (e) => {
             toggleExpand();
@@ -228,22 +266,25 @@
 
         this.onclickItem = (item, e) => {
             setSelected(e.target);
-            obs.trigger(`${id_name}:click-item`, item);
+            // obs.trigger(`${id_name}:click-item`, item);
+            obs_accordion.trigger("item-clicked", item);
         };
 
         this.ondblclickItem = (item, e) => {
             // const id = e.target.getAttribute("data-id");
             // const item = this.items[id];
-            obs.trigger(`${id_name}-dlbclick-item`, item);
+            // obs.trigger(`${id_name}-dlbclick-item`, item);
+            obs_accordion.trigger("item-dlbclicked", item);
         };
 
         this.onmouseUp= (e) => {
             setSelected(e.target);
-            if(params.oncontextmenu==undefined){
-                return;
-            }
+            // if(params.oncontextmenu==undefined){
+            //     return;
+            // }
             if(e.button===2){
-                params.oncontextmenu(e);
+                // params.oncontextmenu(e);
+                obs_accordion.trigger("show-contextmenu", e);
             }
         };
 
@@ -251,13 +292,17 @@
             const elm = this.root.querySelector(".acdn-list");
             sortable = Sortable.create(elm, {
                 onSort: (evt) => {
-                    obs.trigger(`${id_name}-state-change`, {
+                    // obs.trigger(`${id_name}-state-change`, {
+                    //     is_expand: isExpand(), 
+                    //     items: getItems()
+                    // });
+                    obs_accordion.trigger("state-changed", {
                         is_expand: isExpand(), 
                         items: getItems()
                     });
                 }
             });
-            chanegExpand(params.expand);
+            chanegExpand(this.opts.expand);
         });
     </script>
 </accordion>

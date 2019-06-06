@@ -128,6 +128,11 @@
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
 
+        //TODO
+        this.obses = {
+
+        }
+
         this.donwnload_item_num = 0;
 
         let template = [{

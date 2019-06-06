@@ -8,7 +8,13 @@
     </style>
 
     <div class="nico-mylist-sidebar">
-        <accordion params={acdn}></accordion>
+        <!-- <accordion params={acdn} obs={obs}></accordion> -->
+        <accordion 
+            title="マイリスト" 
+            items={mylist_data.items}
+            expand={true} 
+            obs={obs}>
+        </accordion>
     </div>
 
     <script>
@@ -17,6 +23,12 @@
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+
+        const obs_sidebar = this.opts.obs.sidebar;
+        const obs_accordion = riot.observable();
+        this.obs = {
+            accordion: obs_accordion
+        };
 
         const file_path = SettingStore.getSystemFile("mylist.json");
 
@@ -44,43 +56,52 @@
             }
         };
 
-        const createMenu = (sender) => {
+        const createMenu = () => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs.trigger(`${sender}:delete-selected-items`);
+                        obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
+        obs_accordion.on("show-contextmenu", (e) => {
+            const context_menu = createMenu();
+            context_menu.popup({window: remote.getCurrentWindow()}); 
+        });
 
-        this.acdn = {
-            title : "マイリスト",
-            name: "mylist-sidebar",
-            expand: true,
-            items: this.mylist_data.items,
-            oncontextmenu: ()=> {
-                const menu = createMenu("mylist-sidebar");
-                menu.popup({window: remote.getCurrentWindow()});
-            }
-        };
+        // this.acdn = {
+        //     title : "マイリスト",
+        //     name: "mylist-sidebar",
+        //     expand: true,
+        //     items: this.mylist_data.items,
+        //     oncontextmenu: ()=> {
+        //         const menu = createMenu("mylist-sidebar");
+        //         menu.popup({window: remote.getCurrentWindow()});
+        //     }
+        // };
 
-        obs.on(`${this.acdn.name}-state-change`, (data) => {
+        obs_accordion.on("item-dlbclicked", (item) => {
+            obs_sidebar.trigger("on_change_search_item", item);
+        });
+
+        obs_sidebar.on("state-changed", (data) => {
             save(data);
         });
         
-        obs.on(`${this.acdn.name}:add-item`, (args) => {
+        obs_sidebar.on("add-item", (args) => {
+        // obs.on(`${this.acdn.name}:add-item`, (args) => {
             const { title, id, creator, link } = args;
-            obs.trigger(`${this.acdn.name}-add-items`, 
+            obs_accordion.trigger("add-items", 
                 [
                     { title, id, creator, link }
                 ]
             );
-            obs.trigger(`${this.acdn.name}-change-expand`, true);
+            // obs.trigger(`${this.acdn.name}-change-expand`, true);
         });
 
-        obs.on(`${this.acdn.name}:has-item`, (args) => {
+        obs_sidebar.on("has-item", (args) => {
             const {id, cb} = args;
             cb(hasItem(id));
         });
@@ -160,7 +181,9 @@
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
-        const sidebar_name = "mylist-sidebar";
+        // const sidebar_name = "mylist-sidebar";
+
+        const sidebar_obs = this.opts.obs; 
 
         this.mylist_description = "";
 
@@ -180,7 +203,7 @@
                 const cb = (has) =>{
                     resolve(has);
                 };
-                obs.trigger(`${sidebar_name}:has-item`, {id, cb});
+                sidebar_obs.trigger("has-item", {id, cb});
             });
         };
 
@@ -300,7 +323,7 @@
             const id = mylist.id;
             const creator = mylist.creator;
             const link = mylist.link;   
-            obs.trigger("mylist-sidebar:add-item", { title, id, creator, link });
+            sidebar_obs.trigger("add-item", { title, id, creator, link });
             nico_mylist_store.save(id, nico_mylist.xml);
         };
 
@@ -328,7 +351,8 @@
             getImageCache();
         };
 
-        obs.on(`${sidebar_name}-dlbclick-item`, (item) => {
+        // obs.on(`${sidebar_name}-dlbclick-item`, (item) => {
+        sidebar_obs.on("item-dlbclicked", (item) => {
             is_local_item = true;
 
             const id = item.id;
@@ -354,19 +378,34 @@
 </mylist-content>
 
 <mylist-page>
-    <style scoped>
+    <!-- <style scoped>
         :scope {
             width: 100%;
             height: 100%;
         }
-    </style>      
+    </style>       -->
     
-    <split-page-templete>
+    <!-- <split-page-templete>
         <yield to="sidebar">
             <mylist-sidebar></mylist-sidebar>
         </yield>
         <yield to="main-content">
             <mylist-content></mylist-content>
         </yield>
-    </split-page-templete>
+    </split-page-templete> -->
+    <div class="split-page">
+        <div class="left">
+            <mylist-sidebar obs={obs}></mylist-sidebar>
+        </div>
+        <div class="gutter"></div>
+        <div class="right">
+            <mylist-content obs={obs}></mylist-content>
+        </div>
+    </div>    
+    <script>
+        /* globals riot */
+        this.obs = {
+            sidebar: riot.observable()
+        };
+    </script>
 </mylist-page>

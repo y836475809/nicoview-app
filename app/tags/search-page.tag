@@ -5,25 +5,41 @@
             height: 100%;
             background-color: var(--control-color);
         }
+        
+        .search-item {
+            color:royalblue;
+        }
     </style>
 
     <div class="nico-search-sidebar">
-        <accordion params={acdn_search}></accordion>
+        <!-- <accordion params={acdn_search} obs={obs}></accordion> -->
+        <accordion 
+            title="ニコニコ動画検索" 
+            items={nico_search_data.items}
+            expand={true} 
+            obs={obs}>
+        </accordion>
     </div>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir riot obs */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+
+        const obs_sidebar = this.opts.obs.sidebar;
+        const obs_accordion = riot.observable();
+        this.obs = {
+            accordion: obs_accordion
+        };
 
         const seach_file_path = SettingStore.getSystemFile("nico-search.json");
 
         const getIcon = (kind) => {
             return kind=="tag"? {
                 name: "fas fa-tag fa-lg",
-                style: "color:red;"
+                class_name: "search-item"
             } : undefined;  
         };
 
@@ -57,45 +73,59 @@
             }
         };
 
-        const createMenu = (sender) => {
+        const createMenu = () => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs.trigger(`${sender}-delete-selected-items`);
+                        obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        this.acdn_search = {
-            title : "ニコニコ動画検索",
-            name: "nico-search",
-            expand: true,
-            items: this.nico_search_data.items,
-            oncontextmenu: ()=> {
-                const menu = createMenu("nico-search");
-                menu.popup({window: remote.getCurrentWindow()});
-            }
-        };
-
-        obs.on(`${this.acdn_search.name}-dlbclick-item`, (item) => {
-            obs.trigger("on_change_nico_search_cond", item.cond);
+        obs_accordion.on("show-contextmenu", (e) => {
+            const context_menu = createMenu();
+            context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        obs.on(`${this.acdn_search.name}-state-change`, (data) => {
+        // this.acdn_search = {
+        //     title : "ニコニコ動画検索",
+        //     name: "nico-search",
+        //     expand: true,
+        //     items: this.nico_search_data.items,
+        //     oncontextmenu: ()=> {
+        //         const menu = createMenu("nico-search");
+        //         menu.popup({window: remote.getCurrentWindow()});
+        //     }
+        // };
+
+        obs_accordion.on("item-dlbclicked", (item) => {
+            obs_sidebar.trigger("tem-dlbclicked", item.cond);
+        });
+
+        // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
+        //     save(data);
+        // });
+        obs_accordion.on("state-changed", (data) => {
+            console.log("serach state-changed");
             save(data);
         });
-        
-        obs.on("on_add_nico_search_cond", (cond) => {
+        obs_sidebar.on("add-item", (cond) => {
             const icon = getIcon(cond.search_kind);
-            obs.trigger(`${this.acdn_search.name}-add-items`, 
-                [
-                    { title: cond.query, cond: cond, icon: icon }
-                ]
-            );
-            obs.trigger(`${this.acdn_search.name}-change-expand`, true);
+            obs_accordion.trigger("add-items", [
+                { title: cond.query, cond: cond, icon: icon }
+            ]);
         });
+        // obs.on("on_add_nico_search_cond", (cond) => {
+        //     const icon = getIcon(cond.search_kind);
+        //     obs.trigger(`${this.acdn_search.name}-add-items`, 
+        //         [
+        //             { title: cond.query, cond: cond, icon: icon }
+        //         ]
+        //     );
+        //     obs.trigger(`${this.acdn_search.name}-change-expand`, true);
+        // });
     </script>
 </search-sidebar>
 
@@ -246,6 +276,8 @@
         const {Menu, MenuItem, dialog} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
+
+        const sidebar_obs = this.opts.obs; 
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -469,11 +501,13 @@
                 search_kind: nico_search_params.search_kind,
                 page: 1
             };
-
-            obs.trigger("on_add_nico_search_cond", cond);
+            
+            // obs.trigger("on_add_nico_search_cond", cond);
+            sidebar_obs.trigger("add-item", cond);
         };
-
-        obs.on("on_change_nico_search_cond", (cond)=> {
+        sidebar_obs.on("item-dlbclicked", (item) => {
+        // obs.on("on_change_nico_search_cond", (cond)=> {
+            const cond = item.cond;
             const elm = this.root.querySelector(".search-query-container > .query-input");
             elm.value = cond.query;
             nico_search_params.cond(cond.search_kind);
@@ -601,19 +635,34 @@
 </search-content>
 
 <search-page>
-    <style scoped>
+    <!-- <style scoped>
         :scope {
             width: 100%;
             height: 100%;
         }
-    </style>      
+    </style>       -->
     
-    <split-page-templete>
+    <!-- <split-page-templete>
         <yield to="sidebar">
             <search-sidebar></search-sidebar>
         </yield>
         <yield to="main-content">
             <search-content></search-content>
         </yield>
-    </split-page-templete>
+    </split-page-templete> -->
+    <div class="split-page">
+        <div class="left">
+            <search-sidebar obs={obs}></search-sidebar>
+        </div>
+        <div class="gutter"></div>
+        <div class="right">
+            <search-content obs={obs}></search-content>
+        </div>
+    </div>
+    <script>
+        /* globals riot */
+        this.obs = {
+            sidebar: riot.observable()
+        };
+    </script>
 </search-page>

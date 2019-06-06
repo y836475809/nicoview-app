@@ -1,0 +1,21 @@
+.split-page {
+  width: 100%;
+  height: 100%;
+  --right-width: 200px;
+  display: flex;
+}
+.split-page > .gutter {    
+  width: 4px;
+  border-left: 1px solid var(--control-border-color);
+  background-color: var(--control-color);
+} 
+.split-page > .left{
+  background-color: var(--control-color);
+  width: var(--right-width);
+}
+.split-page > .right{
+  background-color: var(--control-color);
+  width: calc(100% - var(--right-width));
+  height: 100%;
+  overflow-y: hidden;
+}

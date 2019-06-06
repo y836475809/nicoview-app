@@ -101,26 +101,26 @@
         </label>
     </div>
     <div class="page-container library-page">
-        <library-page></library-page>
+        <library-page obs={obs}></library-page>
     </div>
     <div class="page-container search-page">
-        <search-page></search-page>
+        <search-page obs={obs}></search-page>
     </div>
     <div class="page-container mylist-page">
-        <mylist-page></mylist-page>
+        <mylist-page obs={obs}></mylist-page>
     </div>
     <div class="page-container download-page">
-        <download-page></download-page>
+        <download-page obs={obs}></download-page>
     </div>
     <div class="page-container history-page">
-        <play-history></play-history>
+        <play-history obs={obs}></play-history>
     </div>
     <div class="page-container setting-page">
-        <setting-page></setting-page>
+        <setting-page obs={obs}></setting-page>
     </div>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir riot */
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
@@ -129,9 +129,7 @@
         ipc_monitor.listenRemote();
 
         //TODO
-        this.obses = {
-
-        }
+        this.obs = this.opts.obs;
 
         this.donwnload_item_num = 0;
 
@@ -154,7 +152,7 @@
                             return;
                         }
                         const data_path = paths[0];
-                        obs.trigger("get-library-items-from-file", data_path);
+                        // obs.trigger("get-library-items-from-file", data_path);
                     }
                 }
             ]
@@ -190,7 +188,7 @@
 
             select_page("library");
 
-            obs.trigger("on_clear_search");
+            this.obs.trigger("on_clear_search");
         });
 
         obs.on("main-page:select-page", (page_name)=>{
@@ -204,7 +202,7 @@
 
         const PlayByVideoID = async(video_id) => {
             const data = await new Promise((resolve, reject) => {
-                obs.trigger("get-library-data-callback", {
+                this.obs.trigger("library-page:get-data-callback", {
                     video_ids:[video_id],
                     cb: (data_map) => {
                         if(data_map.has(video_id)){
@@ -218,7 +216,7 @@
             ipc_monitor.play({ video_id, data }); 
         };
 
-        obs.on("play-by-videoid", (video_id)=>{
+        this.obs.on("main-page:play-by-videoid", (video_id)=>{
             ipc_monitor.showPlayerSync();
             PlayByVideoID(video_id);            
         });     
@@ -236,7 +234,7 @@
 
         ipc_monitor.on(IPCMsg.LOAD_MYLIST, (event, args)=>{
             obs.trigger("main-page:select-page", "mylist");
-            obs.trigger("load-mylist", args);
+            obs.trigger("mylist-page:load-mylist", args);
         });
 
         ipc_monitor.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
@@ -247,14 +245,14 @@
 
         ipc_monitor.on(IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
             const item = args;
-            obs.trigger("add-history-item", item);
+            obs.trigger("history-page:add-item", item);
             obs.trigger("library-page:play", item);
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
             const video_id = args;
             console.log("main update video_id=", video_id);
-            obs.trigger("update-data", { 
+            obs.trigger("library-page:update-data", { 
                 video_id: video_id,
                 cb: (result)=>{
                     console.log("main update cb result=", result);
@@ -268,7 +266,7 @@
 
         ipc_monitor.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
             const video_id = args;
-            obs.trigger("cancel-update-data", video_id);
+            obs.trigger("library-page:cancel-update-data", video_id);
         });
 
         window.onbeforeunload = (e) => {

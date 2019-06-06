@@ -25,16 +25,16 @@
     </style>
 
     <div id="player-frame" class="split left">
-        <player-page ref="player_frame"></player-page>
+        <player-page obs={obs} ref="player_frame"></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
-        <player-viewinfo-page ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
+        <player-viewinfo-page obs={obs} ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
         </player-viewinfo-page>
     </div>
 
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
-    <comment-setting-dialog></comment-setting-dialog>
+    <comment-setting-dialog obs={obs}></comment-setting-dialog>
 
     <script>
         /* globals app_base_dir riot obs */
@@ -44,6 +44,8 @@
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
+
+        this.obs = this.opts.obs;
         
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
@@ -229,7 +231,7 @@
             }
         });
 
-        obs.on("play-by-videoid", (video_id) => {
+        obs.on("player-main-page:play-by-videoid", (video_id) => {
             ipc_monitor.playByID(video_id);
         });
 
@@ -237,7 +239,7 @@
             ipc_monitor.searchTag(args);
         });
 
-        obs.on("load-mylist", (args) => {
+        obs.on("player-main-page:load-mylist", (args) => {
             ipc_monitor.loadMylist(args);
         });
 

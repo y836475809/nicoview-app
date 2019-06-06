@@ -29,6 +29,8 @@
         /* globals app_base_dir obs */
         const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
         
+        const obs = this.opts.obs; 
+
         let video_elm = null;
         let play_data = null;
         let comment_tl = null;

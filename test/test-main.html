@@ -38,13 +38,13 @@
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
-    var obs = riot.observable(); // eslint-disable-line
+    const obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
 
     const ipc_monitor = new IPCMonitor();
     ipc_monitor.setPlayerPath(path.join(__dirname, "test-player.html"));
 
-    riot.mount("main-page");
+    riot.mount("main-page", obs);
 
     const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
         setupNicoDownloadNock } = require("./mock_server/nico-mock");

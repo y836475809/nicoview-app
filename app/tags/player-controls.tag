@@ -38,11 +38,13 @@
         <button disabled={this.play_disabled} class="center-hv" onclick={play}>
             <span class={this.button_class}></span></button>
     </div>
-    <player-seek ref="seek" class="seek"></player-seek>
-    <player-volume class="volume"></player-volume>
+    <player-seek obs={opts.obs} ref="seek" class="seek"></player-seek>
+    <player-volume obs={opts.obs} class="volume"></player-volume>
 
     <script>
         /* globals obs */
+        const obs = this.opts.obs; 
+
         const button_class_map = new Map([
             ["play", "fas fa-play"],
             ["pause", "fas fa-pause"],

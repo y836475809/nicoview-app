@@ -65,7 +65,7 @@
     <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const EventEmitter = require("events");
         const { remote } = require("electron");
         const { Menu, dialog } = remote;
@@ -73,6 +73,8 @@
         const { NicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
+
+        const obs = this.opts.obs; 
 
         const library_dir = SettingStore.getLibraryDir();
 
@@ -314,7 +316,7 @@
                         });
                         
                         obs.trigger("search-page:complete-download-ids", [item.video_id]);
-                        obs.trigger("add-library-item", item); 
+                        obs.trigger("library-page:add-item", item); 
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
@@ -376,7 +378,7 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    obs.trigger("play-by-videoid", data.id);
+                    obs.trigger("main-page:play-by-videoid", data.id);
                 });
             } catch (error) {
                 console.log("donwload item load error=", error);
@@ -396,7 +398,7 @@
             updateDonwloadScheduleLabel();
         });
 
-        obs.on("get-download-item-callback", (cb) => { 
+        obs.on("download-page:get-data-callback", (cb) => { 
             const id_set = grid_table_dl.getItemIDSet();
             cb(id_set);
         });

@@ -18,10 +18,12 @@
     </div>    
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const HistoryStore = require(`${app_base_dir}/js/history-store`);
+
+        const obs = this.opts.obs; 
 
         const history_file_path = SettingStore.getSystemFile("history.json");
         const history_store = new HistoryStore(history_file_path, 50);
@@ -61,7 +63,7 @@
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                obs.trigger("play-by-videoid", video_id);
+                obs.trigger("main-page:play-by-videoid", video_id);
             });
 
             resizeGridTable();
@@ -75,7 +77,7 @@
             }
         });
 
-        obs.on("add-history-item", (item)=> {
+        obs.on("history-page:add-item", (item)=> {
             history_store.add(item);
             grid_table.setData(history_store.getItems());
         });

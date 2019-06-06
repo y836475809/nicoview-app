@@ -36,19 +36,21 @@
     </style>
 
     <div id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
-        <player-tags></player-tags>
+        <player-tags obs={opts.obs}></player-tags>
     </div>
     <div id="player-video-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <div id="player-video">
-            <player-video></player-video>
+            <player-video obs={opts.obs}></player-video>
         </div>
     </div>
     <div id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
-        <player-controls></player-controls>
+        <player-controls obs={opts.obs}></player-controls>
     </div>
 
     <script>
         /* globals obs */
+        const obs = this.opts.obs; 
+
         let tags_height = 0;
         let controls_height = 0;
         this.video_size = null;

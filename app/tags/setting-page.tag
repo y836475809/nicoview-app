@@ -48,11 +48,13 @@
     <modal-dialog ref="message-dialog"></modal-dialog>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         
+        const obs = this.opts.obs; 
+
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);
         };
@@ -105,7 +107,7 @@
         };
 
         this.onclickRefreshLibrary = ()=>{
-            obs.trigger("refresh_library");
+            obs.trigger("library-page:refresh_library");
         };
 
         this.onclickImport = ()=>{
@@ -115,10 +117,12 @@
             }
 
             this.refs["message-dialog"].showModal("インポート中...");
-            obs.trigger("import-library-from-sqlite", db_file_path);
+
+            //TODO add callback
+            obs.trigger("library-page:import-library-from-sqlite", db_file_path);
         };
 
-        obs.on("import-library-from-sqlite-rep", (error) => { 
+        obs.on("setting-page:import-library-from-sqlite-rep", (error) => { 
             if(error){
                 dialog.showMessageBox(remote.getCurrentWindow(),{
                     type: "error",

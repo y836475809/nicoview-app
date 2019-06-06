@@ -51,8 +51,8 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
 
-    var obs = riot.observable(); // eslint-disable-line
-    riot.mount("player-main-page");
+    const obs = riot.observable(); // eslint-disable-line
+    riot.mount("player-main-page", obs);
       
     const reader = require(`${app_base_dir}/js/reader`);
 

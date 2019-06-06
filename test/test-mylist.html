@@ -27,9 +27,9 @@
     const { remote } = require("electron");
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var obs = riot.observable();    // eslint-disable-line
+    const obs = riot.observable();    // eslint-disable-line
 
-    riot.mount("mylist-page");
+    riot.mount("mylist-page", obs);
 
     const { NicoMylistMocks } = require("./mock_server/nico-mock");
     require("./mock_server/http-server");

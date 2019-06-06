@@ -17,22 +17,19 @@
             title="ニコニコ動画検索" 
             items={nico_search_data.items}
             expand={true} 
-            obs={obs}>
+            obs={obs_accordion}>
         </accordion>
     </div>
 
     <script>
-        /* globals app_base_dir riot obs */
+        /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        const obs_sidebar = this.opts.obs.sidebar;
-        const obs_accordion = riot.observable();
-        this.obs = {
-            accordion: obs_accordion
-        };
+        const obs = this.opts.obs; 
+        this.obs_accordion = riot.observable();
 
         const seach_file_path = SettingStore.getSystemFile("nico-search.json");
 
@@ -77,14 +74,14 @@
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs_accordion.trigger("delete-selected-items");
+                        this.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_accordion.on("show-contextmenu", (e) => {
             const context_menu = createMenu();
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
@@ -100,20 +97,20 @@
         //     }
         // };
 
-        obs_accordion.on("item-dlbclicked", (item) => {
-            obs_sidebar.trigger("tem-dlbclicked", item.cond);
+        this.obs_accordion.on("item-dlbclicked", (item) => {
+            obs.trigger("search-page:item-dlbclicked", item.cond);
         });
 
         // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
         //     save(data);
         // });
-        obs_accordion.on("state-changed", (data) => {
+        this.obs_accordion.on("state-changed", (data) => {
             console.log("serach state-changed");
             save(data);
         });
-        obs_sidebar.on("add-item", (cond) => {
+        obs.on("search-page:sidebar:add-item", (cond) => {
             const icon = getIcon(cond.search_kind);
-            obs_accordion.trigger("add-items", [
+            this.obs_accordion.trigger("add-items", [
                 { title: cond.query, cond: cond, icon: icon }
             ]);
         });
@@ -271,13 +268,13 @@
     <modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals app_base_dir riot obs */
+        /* globals app_base_dir */
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
 
-        const sidebar_obs = this.opts.obs; 
+        const obs = this.opts.obs; 
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -388,12 +385,12 @@
             }
 
             const download_id_set = await new Promise((resolve, reject) => {
-                obs.trigger("get-download-item-callback", (id_set)=>{
+                obs.trigger("download-page:get-data-callback", (id_set)=>{
                     resolve(id_set);
                 });
             });
 
-            obs.trigger("get-library-data-callback", { video_ids: video_ids, cb: (id_map)=>{
+            obs.trigger("library-page:get-data-callback", { video_ids: video_ids, cb: (id_map)=>{
                 const items = search_result.data.map(value => {
                     const saved = id_map.has(value.contentId);
                     const reg_download = download_id_set.has(value.contentId);
@@ -503,9 +500,9 @@
             };
             
             // obs.trigger("on_add_nico_search_cond", cond);
-            sidebar_obs.trigger("add-item", cond);
+            obs.trigger("search-page:sidebar:add-item", cond);
         };
-        sidebar_obs.on("item-dlbclicked", (item) => {
+        obs.on("search-page:item-dlbclicked", (item) => {
         // obs.on("on_change_nico_search_cond", (cond)=> {
             const cond = item.cond;
             const elm = this.root.querySelector(".search-query-container > .query-input");
@@ -618,7 +615,7 @@
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                obs.trigger("play-by-videoid", video_id);
+                obs.trigger("main-page:play-by-videoid", video_id);
             });
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
@@ -661,8 +658,6 @@
     </div>
     <script>
         /* globals riot */
-        this.obs = {
-            sidebar: riot.observable()
-        };
+        this.obs = this.opts.obs;
     </script>
 </search-page>

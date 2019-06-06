@@ -21,10 +21,10 @@
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var obs = riot.observable(); // eslint-disable-line
+    const obs = riot.observable(); // eslint-disable-line
 
     try {
-        riot.mount("setting-page");
+        riot.mount("setting-page", obs);
 
         obs.on("on_load_library", () => {
             console.log("on_load_library");

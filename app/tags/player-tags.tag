@@ -33,6 +33,8 @@
 
     <script>
         /* globals obs */
+        const obs = this.opts.obs; 
+        
         this.video_tags = [];
         
         this.onclickTag = (item, e) => {

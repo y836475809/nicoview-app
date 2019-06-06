@@ -293,7 +293,7 @@
             e.preventDefault(); 
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
-            obs.trigger("play-by-videoid", video_id);
+            obs.trigger("player-main-page:play-by-videoid", video_id);
             return false;
         };
 
@@ -301,7 +301,7 @@
             e.preventDefault(); 
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
-            obs.trigger("load-mylist", video_id);
+            obs.trigger("player-main-page:load-mylist", video_id);
             return false;
         };
 

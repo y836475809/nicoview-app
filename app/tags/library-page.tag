@@ -12,7 +12,7 @@
             title="ライブラリ検索" 
             items={search_data.items}
             expand={true} 
-            obs={obs}>
+            obs={obs_accordion}>
         </accordion>
     </div>
 
@@ -24,11 +24,11 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
         //TODO
-        const obs_sidebar = this.opts.obs.sidebar;
-        const obs_accordion = riot.observable();
-        this.obs = {
-            accordion: obs_accordion
-        };
+        // const obs_sidebar = this.opts.obs.sidebar;
+        const obs = this.opts.obs; 
+        // const obs_accordion = riot.observable();
+        this.obs_accordion = riot.observable();
+
         const seach_file_path = SettingStore.getSystemFile("library-search.json");
 
         try {
@@ -53,19 +53,20 @@
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs_accordion.trigger("delete-selected-items");
+                        this.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
         
-        obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_accordion.on("show-contextmenu", (e) => {
             const context_menu = createMenu();
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
-        obs_sidebar.on("add-item", (query) => {
-            obs_accordion.trigger("add-items", [
+
+        obs.on("library-page:sidebar:add-item", (query) => {
+            this.obs_accordion.trigger("add-items", [
                 { title: query, query: query }
             ]);
         });
@@ -81,15 +82,15 @@
         //     // }
         // };
 
-        obs_accordion.on("item-dlbclicked", (item) => {
-            obs_sidebar.trigger("on_change_search_item", item.query);
+        this.obs_accordion.on("item-dlbclicked", (item) => {
+            obs.trigger("library-page:item-dlbclicked", item.query);
         });
 
         // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
         //     save(data);
         // });
 
-        obs_accordion.on("state-changed", (data) => {
+        this.obs_accordion.on("state-changed", (data) => {
             console.log("lib state-changed");
             save(data);
         });
@@ -193,7 +194,7 @@
         const fs = require("fs");
 
         //TODO
-        const sidebar_obs = this.opts.obs; 
+        const obs = this.opts.obs; 
     
         let library = null;
         this.num_items = 0;
@@ -232,10 +233,10 @@
             // obs.trigger("on_add_search_item", param);
 
             //TODO
-            sidebar_obs.trigger("add-item", param);
+            obs.trigger("library-page:sidebar:add-item", param);
         };
         
-        sidebar_obs.on("item-dlbclicked", (item) => {
+        obs.on("library-page:item-dlbclicked", (item) => {
             const search_elm = this.root.querySelector(".filter-input");
             search_elm.value = item;
             grid_table.filterData(item);         
@@ -297,7 +298,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
-                obs.trigger("play-by-videoid", video_id);
+                obs.trigger("main-page:play-by-videoid", video_id);
             });
             
             grid_table.onContextMenu((e)=>{
@@ -316,7 +317,7 @@
             }
         });
     
-        obs.on("refresh_library", async () => {     
+        obs.on("library-page:refresh_library", async () => {     
             try {
                 library = new Library();
                 await library.init(SettingStore.getSystemDir());
@@ -327,7 +328,7 @@
             }
         });
     
-        obs.on("get-library-data-callback", async (args) => { 
+        obs.on("library-page:get-data-callback", async (args) => { 
             const { video_ids, cb } = args;
             const ret = new Map();
             for (let index = 0; index < video_ids.length; index++) {
@@ -342,7 +343,7 @@
             cb(ret);
         }); 
     
-        obs.on("add-library-item", async (item) => { 
+        obs.on("library-page:add-item", async (item) => { 
             //TODO
             await library.addItem(item);
             const library_item = await library.getLibraryItem(item.video_id);
@@ -366,7 +367,7 @@
         });
 
         this.nico_update = null;
-        obs.on("update-data", async (args) => { 
+        obs.on("library-page:update-data", async (args) => { 
             const { video_id, cb } = args;
             try {
                 const cnv_data = new XMLDataConverter();
@@ -384,7 +385,7 @@
             }
         });  
 
-        obs.on("cancel-update-data", (args) => { 
+        obs.on("library-page:cancel-update-data", (args) => { 
             if(this.nico_update){
                 this.nico_update.cancel();
             }
@@ -411,15 +412,15 @@
             await library.setData(dir_list, video_list);  
         };
     
-        obs.on("import-library-from-sqlite", async (sqlite_file_path) => { 
+        obs.on("library-page:import-library-from-sqlite", async (sqlite_file_path) => { 
             try {
                 await importDB(sqlite_file_path);
                 loadLibraryItems(await library.getLibraryItems());
-                obs.trigger("import-library-from-sqlite-rep", null);
+                obs.trigger("setting-page:import-library-from-sqlite-rep", null);
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
-                obs.trigger("import-library-from-sqlite-rep", error);
+                obs.trigger("setting-page:import-library-from-sqlite-rep", error);
             }
         });  
     
@@ -432,9 +433,9 @@
             resizeGridTable();
         });
     
-        obs.on("library_dt_search", (param)=> {
-            grid_table.filterData(param);
-        });
+        // obs.on("library_dt_search", (param)=> {
+        //     grid_table.filterData(param);
+        // });
     </script>
 </library-content>
 
@@ -483,8 +484,9 @@
     </div>
     <script>
         /* globals riot */
-        this.obs = {
-            sidebar: riot.observable()
-        };
+        this.obs = this.opts.obs;
+        // this.obs = {
+        //     sidebar: riot.observable()
+        // };
     </script>
 </library-page>

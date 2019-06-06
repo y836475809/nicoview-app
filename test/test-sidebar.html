@@ -28,15 +28,15 @@
     const {Menu} = remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    var obs = riot.observable(); // eslint-disable-line
-    riot.mount("accordion");
+    const obs = riot.observable(); // eslint-disable-line
+    riot.mount("accordion", obs);
     const p = console.log;
 
-    const createMenu = (sender) => {
+    const createMenu = () => {
         const nemu_templete = [
             { 
                 label: "delete", click() {
-                    obs.trigger(`${sender}-delete-selected-items`);
+                    obs.trigger("delete-selected-items");
                 }
             }
         ];
@@ -73,19 +73,20 @@
     };
 
     const onclickAddItem = () => {
-        obs.trigger(`${this.acdn1.id_name}-add-items`, 
+        obs.trigger("add-items", 
             [{ title: "name6", data: "data6" }]
         );
     };
 
+    const getItemFunc = (args) => {
+        p("data = ", args);
+    };
     const onclickgetData = () => {
-        obs.trigger(`${this.acdn1.name}-get-data`, (data)=>{
-            p("data = ", data);
-        });
+        obs.trigger("get-items", (getItemFunc));
     };
 
     const onclickdelselItems = () => {
-        obs.trigger(`${this.acdn1.id_name}-delete-selected-items`);
+        obs.trigger("delete-selected-items");
     };
 </script>
 

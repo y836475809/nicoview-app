@@ -13,22 +13,19 @@
             title="マイリスト" 
             items={mylist_data.items}
             expand={true} 
-            obs={obs}>
+            obs={obs_accordion}>
         </accordion>
     </div>
 
     <script>
-        /* globals app_base_dir obs riot */
+        /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        const obs_sidebar = this.opts.obs.sidebar;
-        const obs_accordion = riot.observable();
-        this.obs = {
-            accordion: obs_accordion
-        };
+        const obs = this.opts.obs; 
+        this.obs_accordion = riot.observable();
 
         const file_path = SettingStore.getSystemFile("mylist.json");
 
@@ -60,13 +57,13 @@
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        obs_accordion.trigger("delete-selected-items");
+                        this.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
-        obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_accordion.on("show-contextmenu", (e) => {
             const context_menu = createMenu();
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
@@ -82,18 +79,18 @@
         //     }
         // };
 
-        obs_accordion.on("item-dlbclicked", (item) => {
-            obs_sidebar.trigger("on_change_search_item", item);
+        this.obs_accordion.on("item-dlbclicked", (item) => {
+            obs.trigger("mylist-page:on_change_search_item", item);
         });
 
-        obs_sidebar.on("state-changed", (data) => {
+        this.obs_accordion.on("state-changed", (data) => {
             save(data);
         });
         
-        obs_sidebar.on("add-item", (args) => {
+        obs.on("mylist-page:sidebar:add-item", (args) => {
         // obs.on(`${this.acdn.name}:add-item`, (args) => {
             const { title, id, creator, link } = args;
-            obs_accordion.trigger("add-items", 
+            this.obs_accordion.trigger("add-items", 
                 [
                     { title, id, creator, link }
                 ]
@@ -101,7 +98,7 @@
             // obs.trigger(`${this.acdn.name}-change-expand`, true);
         });
 
-        obs_sidebar.on("has-item", (args) => {
+        obs.on("mylist-page:sidebar:has-item", (args) => {
             const {id, cb} = args;
             cb(hasItem(id));
         });
@@ -183,7 +180,7 @@
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
         // const sidebar_name = "mylist-sidebar";
 
-        const sidebar_obs = this.opts.obs; 
+        const obs = this.opts.obs; 
 
         this.mylist_description = "";
 
@@ -203,7 +200,7 @@
                 const cb = (has) =>{
                     resolve(has);
                 };
-                sidebar_obs.trigger("has-item", {id, cb});
+                obs.trigger("mylist-page:sidebar:has-item", {id, cb});
             });
         };
 
@@ -270,7 +267,7 @@
             grid_table.init(this.root.querySelector(".mylist-grid"));
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                obs.trigger("play-by-videoid", video_id);
+                obs.trigger("main-page:play-by-videoid", video_id);
             });
             
             resizeGridTable();
@@ -323,7 +320,7 @@
             const id = mylist.id;
             const creator = mylist.creator;
             const link = mylist.link;   
-            sidebar_obs.trigger("add-item", { title, id, creator, link });
+            obs.trigger("mylist-page:sidebar:add-item", { title, id, creator, link });
             nico_mylist_store.save(id, nico_mylist.xml);
         };
 
@@ -352,7 +349,7 @@
         };
 
         // obs.on(`${sidebar_name}-dlbclick-item`, (item) => {
-        sidebar_obs.on("item-dlbclicked", (item) => {
+        obs.on("mylist-page:item-dlbclicked", (item) => {
             is_local_item = true;
 
             const id = item.id;
@@ -362,7 +359,7 @@
             setMylist(mylist);
         });
 
-        obs.on("load-mylist", async(id)=> {
+        obs.on("mylist-page:load-mylist", async(id)=> {
             setMylistID(id);
             await updateMylist(id);
         });
@@ -404,8 +401,6 @@
     </div>    
     <script>
         /* globals riot */
-        this.obs = {
-            sidebar: riot.observable()
-        };
+        this.obs = this.opts.obs;
     </script>
 </mylist-page>

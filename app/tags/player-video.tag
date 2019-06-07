@@ -139,7 +139,7 @@
                 video_elm.pause();
             });
 
-            obs.on("player-video:seeked", (current) => {  
+            obs.on("player-video:seek", (current) => {  
                 seek(current); 
             });
 

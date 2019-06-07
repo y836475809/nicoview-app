@@ -40,7 +40,7 @@
         }   
     </style>
 
-    <dialog oncancel={this.oncancel}>
+    <dialog class="dialog-shadow" oncancel={this.oncancel}>
         <div class="container">
             <div class="center-hv">
                 <p class="message">{this.message}</p>

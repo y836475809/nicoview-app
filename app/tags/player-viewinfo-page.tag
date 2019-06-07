@@ -482,6 +482,11 @@
             grid_table.init(this.root.querySelector(".comment-grid"));
             grid_table.grid.registerPlugin(new Slick.AutoTooltips());
 
+            grid_table.onDblClick(async (e, data)=>{
+                const sec = data.vpos * 10 / 1000;
+                obs.trigger("player-video:seek", sec);
+            });
+
             const context_menu = createMenu();
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});

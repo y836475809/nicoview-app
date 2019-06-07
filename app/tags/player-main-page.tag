@@ -313,7 +313,7 @@
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
-        obs.on("delete-comment-ng", (args) => {
+        obs.on("player-main-page:delete-comment-ng", (args) => {
             comment_filter.deleteNG(args);
             try {
                 comment_filter.save();

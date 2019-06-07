@@ -76,7 +76,7 @@
         </div>
         <div class="panel-area">
             <div class="tab-panel">
-                <comment-ng-setting></comment-ng-setting>
+                <comment-ng-setting obs={this.opts.obs}></comment-ng-setting>
             </div>
             <div class="tab-panel">
                 <p>panel2</p>
@@ -88,7 +88,9 @@
     </dialog>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals riot */
+        const obs_dialog = this.opts.obs;
+
         const selectTab = (selected_index) => {
             Array.from(this.root.querySelectorAll(".tab-area > label"), 
                 (elm, index) => {
@@ -131,14 +133,14 @@
             dialog.close();
         };
 
-        obs.on("comment-setting-dialog:show", (args) => {
+        obs_dialog.on("comment-setting-dialog:show", (args) => {
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
 
             setup();
 
             const ng_items = args;
-            obs.trigger("comment-ng-setting:ng-items", ng_items);
+            obs_dialog.trigger("comment-ng-setting:ng-items", ng_items);
         });
     </script>
 </comment-setting-dialog>

@@ -36,10 +36,12 @@
     <button type="button" class="delete-button" onclick={this.onclickDelete}>Delete</button>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const { remote } = require("electron");
         const { Menu } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+
+        const obs_dialog = this.opts.obs;
 
         const columns = [
             { id: "title", name: "種類" },
@@ -69,7 +71,9 @@
                 return item.value;
             });
 
-            obs.trigger("delete-comment-ng", { ng_matching_texts, ng_user_ids });
+            obs_dialog.trigger("player-main-page:delete-comment-ng", { 
+                ng_matching_texts, ng_user_ids 
+            });
 
             grid_table.deleteItems(items);
         };
@@ -129,7 +133,7 @@
             deleteSelectedItems();
         };
 
-        obs.on("comment-ng-setting:ng-items", (args) => {
+        obs_dialog.on("comment-ng-setting:ng-items", (args) => {
             setup(args);
         });
     </script>

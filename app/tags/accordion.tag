@@ -82,8 +82,7 @@
         const Sortable = require("sortablejs");
         let sortable = null;
         
-        //TODO
-        const obs_accordion = this.opts.obs.accordion;
+        const obs_accordion = this.opts.obs;
         
         // const params = this.opts.params;
         // const id_name = params.name;
@@ -166,6 +165,7 @@
 
         //TODO
         obs_accordion.on("add-items", (items) => {
+            const pre_item_num = this.items.length;
             const new_items = items.map(value=>{
                 if(!value.icon){
                     value.icon = {
@@ -177,6 +177,9 @@
             });
             Array.prototype.push.apply(this.items, new_items);
             if(isExpand()){
+                chanegExpand(true);
+            }
+            if(pre_item_num===0){
                 chanegExpand(true);
             }
             this.update();

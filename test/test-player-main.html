@@ -52,7 +52,7 @@
     const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
 
     const obs = riot.observable(); // eslint-disable-line
-    riot.mount("player-main-page", obs);
+    riot.mount("player-main-page", {obs});
       
     const reader = require(`${app_base_dir}/js/reader`);
 
@@ -99,7 +99,8 @@
             },
         };
         
-        obs.trigger("request-send-video-data", {video_data, viewinfo, comments}); 
+        obs.trigger("player-main-page:test-play-by-data", 
+            {video_data, viewinfo, comments}); 
     };
     const onclickLoad2 = () => {
         let comments = [];
@@ -144,16 +145,17 @@
                 }
             }
         }; 
-        obs.trigger("on_change_viewinfo",{ viewinfo, comments });
+        obs.trigger("player-viewinfo-page:set-viewinfo-data",
+            { viewinfo, comments });
     };
 
     const onclickLoad3 = () => {
         const video_id = "sm33851481"; //"sm32951089";
-        obs.trigger("request-send-videoid", video_id); 
+        obs.trigger("player-main-page:test-play-by-videoid", video_id); 
     };
     const onclickLoad4 = () => {
         const video_id = "sm29316071";
-        obs.trigger("request-send-videoid", video_id); 
+        obs.trigger("player-main-page:test-play-by-videoid", video_id); 
     };
 </script>
 

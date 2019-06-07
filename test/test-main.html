@@ -44,7 +44,7 @@
     const ipc_monitor = new IPCMonitor();
     ipc_monitor.setPlayerPath(path.join(__dirname, "test-player.html"));
 
-    riot.mount("main-page", obs);
+    riot.mount("main-page", {obs});
 
     const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
         setupNicoDownloadNock } = require("./mock_server/nico-mock");

@@ -49,11 +49,11 @@
             }
         };
 
-        const createMenu = () => {
+        const createMenu = (self) => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        this.obs_accordion.trigger("delete-selected-items");
+                        self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
@@ -61,7 +61,7 @@
         };
         
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu();
+            const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
@@ -429,7 +429,7 @@
             grid_table.resizeFitContainer(container);
         };
     
-        obs.on("resizeEndEvent", (size)=> {
+        obs.on("window-resized", ()=> {
             resizeGridTable();
         });
     

@@ -80,7 +80,7 @@
             adjustPlayerVideoSize();
         });
 
-        obs.on("on_resize_window", (window_size) => { 
+        obs.on("player-page:window-resizing", () => { 
             adjustPlayerVideoSize();       
         });
 

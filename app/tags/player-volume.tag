@@ -62,7 +62,7 @@
 
             SettingStore.setValue(pref_volume_key, volume);
 
-            obs.trigger("on_change_volume", volume); 
+            obs.trigger("player-video:volume-changed", volume); 
         };
 
         this.on("mount", ()=> {
@@ -71,7 +71,7 @@
             const player_volume = SettingStore.getValue(pref_volume_key, 0.5);
             picker.style.left = player_volume * slider.clientWidth - 5 + "px";
             
-            obs.trigger("on_change_volume", player_volume); 
+            obs.trigger("player-video:volume-changed", player_volume); 
         });
     </script>
 </player-volume>

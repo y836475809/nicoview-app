@@ -54,7 +54,7 @@
             grid_table.resizeFitContainer(container);
         };
 
-        obs.on("resizeEndEvent", (size)=> {
+        obs.on("window-resized", ()=> {
             resizeGridTable();
         });
 

@@ -25,19 +25,19 @@
     </style>
 
     <div id="player-frame" class="split left">
-        <player-page obs={obs} ref="player_frame"></player-page>
+        <player-page obs={this.opts.obs} ref="player_frame"></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
-        <player-viewinfo-page obs={obs} ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
+        <player-viewinfo-page obs={this.opts.obs} ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
         </player-viewinfo-page>
     </div>
 
     <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
-    <comment-setting-dialog obs={obs}></comment-setting-dialog>
+    <comment-setting-dialog obs={this.opts.obs}></comment-setting-dialog>
 
     <script>
-        /* globals app_base_dir riot obs */
+        /* globals app_base_dir */
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
@@ -45,7 +45,7 @@
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
 
-        this.obs = this.opts.obs;
+        const obs = this.opts.obs;
         
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
@@ -83,8 +83,8 @@
         };
         this.mouseup = (e) => {
             if(gutter_move){
-                obs.trigger("reset_comment_timelime");
-                obs.trigger("on-resized-player-split");
+                obs.trigger("player-video:reset-comment-timelime");
+                obs.trigger("player-viewinfo-page:split-resized");
             }
             gutter = false;
             gutter_move = false;
@@ -148,13 +148,13 @@
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
-            obs.trigger("on_set_player_state", "play"); 
-            obs.trigger("receivedData", { 
+            obs.trigger("player-controls:set-state", "play"); 
+            obs.trigger("player-video:set-play-data", { 
                 video_data: video_data, 
                 comments: filtered_comments 
             });
-            obs.trigger("on_load_player_tags", thumb_info.tags);
-            obs.trigger("on_change_viewinfo", { 
+            obs.trigger("player-tag:set-tags", thumb_info.tags);
+            obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
                 comments: filtered_comments });   
             
@@ -235,7 +235,7 @@
             ipc_monitor.playByID(video_id);
         });
 
-        obs.on("search-tag", (args) => {
+        obs.on("player-main-page:search-tag", (args) => {
             ipc_monitor.searchTag(args);
         });
 
@@ -243,19 +243,19 @@
             ipc_monitor.loadMylist(args);
         });
 
-        obs.on("request-send-video-data", (arg) => {
+        obs.on("player-main-page:test-play-by-data", (arg) => {
             cancelPlay();
 
             const { video_data, viewinfo, comments } = arg;
             play_by_video_data(video_data, viewinfo, comments);
         });
-        obs.on("request-send-videoid", (video_id) => {
+        obs.on("player-main-page:test-play-by-videoid", (video_id) => {
             cancelPlay();
 
             play_by_video_id(video_id);
         });
 
-        obs.on("update-data", async(video_id) => {
+        obs.on("player-main-page:update-data", async(video_id) => {
             console.log("player main update video_id=", video_id);
             const prog_dialog = this.refs["nico-play-dialog"]; 
             prog_dialog.showModal("update...", ["cancel"], result=>{
@@ -273,11 +273,11 @@
             console.log("player main prog_dialog.close update video_id=", video_id);
         });
 
-        obs.on("add-download-item", (args) => {
+        obs.on("player-main-page:add-download-item", (args) => {
             ipc_monitor.addDonwloadItem(args);
         });
 
-        obs.on("add-comment-ng", (args) => {
+        obs.on("player-main-page:add-comment-ng", (args) => {
             comment_filter.addNG(args);
             try {
                 comment_filter.save();
@@ -291,7 +291,8 @@
                 if (a.vpos > b.vpos) return 1;
                 return 0;
             });
-            obs.trigger("update-comments", comments);
+            obs.trigger("player-video:update-comments", comments);
+            obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
         //TODO "add-comment-ng"
@@ -309,11 +310,12 @@
                 if (a.vpos > b.vpos) return 1;
                 return 0;
             });
-            obs.trigger("update-comments", comments);
+            obs.trigger("player-video:update-comments", comments);
+            obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
         //TODO "show-comment-setting-dialog"
-        obs.on("show-comment-setting-dialog", () => {
+        obs.on("player-main-page:show-comment-setting-dialog", () => {
             obs.trigger("comment-setting-dialog:show", comment_filter.getNG());
         });
 
@@ -335,7 +337,7 @@
             }
         });   
   
-        obs.on("load_meta_data", (video_size) => {
+        obs.on("player-main-page:metadata-loaded", (video_size) => {
             org_video_size =  video_size;
         });
 
@@ -343,20 +345,16 @@
         const timeout = 200;
         let timer;
         window.addEventListener("resize", () => {
-            const window_size = {
-                w: window.innerWidth, 
-                h: window.innerHeight 
-            };
             if(resize_begin===false){
                 resize_begin = true;
-                obs.trigger("on_resize_begin");
+                obs.trigger("player-video:resize-begin");
             }
-            obs.trigger("on_resize_window", window_size);
+            obs.trigger("player-page:window-resizing");
 
             clearTimeout(timer);
             timer = setTimeout(() => {
                 resize_begin = false;
-                obs.trigger("resizeEndEvent", window_size);    
+                obs.trigger("window-resized");    
             }, timeout);
         });
 

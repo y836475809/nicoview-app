@@ -29,7 +29,7 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const obs = riot.observable();    // eslint-disable-line
 
-    riot.mount("mylist-page", obs);
+    riot.mount("mylist-page", {obs});
 
     const { NicoMylistMocks } = require("./mock_server/nico-mock");
     require("./mock_server/http-server");
@@ -42,10 +42,7 @@
     window.addEventListener("resize", () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            obs.trigger("resizeEndEvent", {
-                width: window.innerWidth, 
-                height: window.innerHeight 
-            });
+            obs.trigger("window-resized");
         }, timeout);
     });
 </script>

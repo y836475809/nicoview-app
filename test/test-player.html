@@ -33,7 +33,7 @@
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
     const obs = riot.observable(); // eslint-disable-line
     
-    riot.mount("player-main-page", obs);
+    riot.mount("player-main-page", {obs});
 
     const { NicoVideoMocks } = require("./mock_server/nico-mock");
 

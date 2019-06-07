@@ -30,9 +30,9 @@
     /* globals riot */
     const {remote} = require("electron");
     var app_base_dir = remote.getGlobal("sharedObj").base_dir; // eslint-disable-line
-    const obs = riot.observable(); // eslint-disable-line
+    const obs = riot.observable();
     
-    riot.mount("player-main-page", obs);
+    riot.mount("player-main-page", {obs});
 </script>
 
 </html>

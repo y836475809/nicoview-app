@@ -70,11 +70,11 @@
             }
         };
 
-        const createMenu = () => {
+        const createMenu = (self) => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        this.obs_accordion.trigger("delete-selected-items");
+                        self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
@@ -82,7 +82,7 @@
         };
 
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu();
+            const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
@@ -504,7 +504,7 @@
         };
         obs.on("search-page:item-dlbclicked", (item) => {
         // obs.on("on_change_nico_search_cond", (cond)=> {
-            const cond = item.cond;
+            const cond = item;
             const elm = this.root.querySelector(".search-query-container > .query-input");
             elm.value = cond.query;
             nico_search_params.cond(cond.search_kind);
@@ -624,7 +624,7 @@
             resizeGridTable();
         });
 
-        obs.on("resizeEndEvent", (size)=>{
+        obs.on("window-resized", ()=>{
             resizeGridTable();
         });
         

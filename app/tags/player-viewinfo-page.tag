@@ -367,7 +367,7 @@
             }
             this.update();
 
-            obs.trigger("show-player-comment", comment_visible);
+            obs.trigger("player-video:change-comment-visible", comment_visible);
         };
 
         this.onclicAddDownload = (e) => {
@@ -377,16 +377,16 @@
                 name: this.title,
                 state: 0
             };
-            obs.trigger("add-download-item", item);
+            obs.trigger("player-main-page:add-download-item", item);
         };
 
         this.onclickUpdate = (e) => {
             console.log("player update video_id=", this.video_id);
-            obs.trigger("update-data", this.video_id);
+            obs.trigger("player-main-page:update-data", this.video_id);
         };
 
         this.onclickConfig = (e) => {
-            obs.trigger("show-comment-setting-dialog");
+            obs.trigger("player-main-page:show-comment-setting-dialog");
         };
 
         const setComments = (comments) => {
@@ -400,12 +400,12 @@
             grid_table.scrollToTop();
         };
 
-        obs.on("update-comments", (args)=> {
+        obs.on("player-viewinfo-page:update-comments", (args)=> {
             const comments = args;
             setComments(comments);
         });
 
-        obs.on("on_change_viewinfo", (args)=> {
+        obs.on("player-viewinfo-page:set-viewinfo-data", (args)=> {
             resizeCommentList();
 
             const { viewinfo, comments } = args;
@@ -443,7 +443,7 @@
             this.update();
         });
 
-        obs.on("seek_update", (current_sec)=> {
+        obs.on("player-viewinfo-page:seek-update", (current_sec)=> {
             if(!sync_comment_checked){
                 return;
             }
@@ -453,7 +453,7 @@
         });
 
         const triggerAddCommentNG = (args) => {
-            obs.trigger("add-comment-ng", args);
+            obs.trigger("player-main-page:add-comment-ng", args);
         };
 
         const createMenu = () => {
@@ -489,11 +489,11 @@
             resizeCommentList();
         });
         
-        obs.on("resizeEndEvent", (size)=> {
+        obs.on("window-resized", ()=> {
             resizeCommentList();
         });
 
-        obs.on("on-resized-player-split", ()=> {
+        obs.on("player-viewinfo-page:split-resized", ()=> {
             resizeCommentList();
         });
     </script>

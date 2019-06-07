@@ -39,13 +39,13 @@
         
         this.onclickTag = (item, e) => {
             const tag = item.name;
-            obs.trigger("search-tag", {
+            obs.trigger("player-main-page:search-tag", {
                 query: tag,
                 search_kind:"tag"
             });
         };
 
-        obs.on("on_load_player_tags", (video_tags) => {
+        obs.on("player-tag:set-tags", (video_tags) => {
             this.video_tags = video_tags;
             this.update();
         });

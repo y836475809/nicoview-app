@@ -78,7 +78,7 @@
             const current = per * this.duration;
             updateSeek(current);
 
-            obs.trigger("on_seeked", current);
+            obs.trigger("player-video:seeked", current);
         };
 
         this.redraw = ()=>{
@@ -105,14 +105,14 @@
             this.update();
         });
 
-        obs.on("seek_reload", (duration) => {
+        obs.on("player-seek:reload", (duration) => {
             this.duration = duration;
             updateSeek(0);
 
             this.update();
         });
 
-        obs.on("seek_update", (current) => {
+        obs.on("player-seek:seek-update", (current) => {
             updateSeek(current);
         });
     </script>

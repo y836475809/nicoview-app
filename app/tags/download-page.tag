@@ -403,7 +403,7 @@
             cb(id_set);
         });
 
-        obs.on("resizeEndEvent", (size)=> {
+        obs.on("window-resized", ()=> {
             resizeGridTable();
         });
     </script>

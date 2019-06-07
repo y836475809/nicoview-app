@@ -67,7 +67,7 @@
             } 
         };
 
-        obs.on("receivedData", (data) => {
+        obs.on("player-video:set-play-data", (data) => {
             play_data = data;
 
             const video_data = play_data.video_data;
@@ -87,13 +87,13 @@
                     width: event.target.videoWidth,
                     height: event.target.videoHeight
                 };
-                obs.trigger("load_meta_data", video_size);
-                obs.trigger("seek_reload", video_elm.duration);
+                obs.trigger("player-main-page:metadata-loaded", video_size);
+                obs.trigger("player-seek:reload", video_elm.duration);
             });
 
             video_elm.addEventListener("loadeddata", (event) => {
                 console.log("loadeddata event=", event);
-                obs.trigger("loaded_data");
+                obs.trigger("player-controls:loaded-data");
             });
             video_elm.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
@@ -110,7 +110,8 @@
 
             video_elm.addEventListener("timeupdate", () => {
                 const current = video_elm.currentTime;
-                obs.trigger("seek_update", current);
+                obs.trigger("player-seek:seek-update", current);
+                obs.trigger("player-viewinfo-page:seek_update", current);
             });
             video_elm.addEventListener("progress", function(){
                 console.log("addEventListener progressによるイベント発火");
@@ -141,28 +142,28 @@
                 video_elm.pause();
             });
 
-            obs.on("on_seeked", (current) => {  
+            obs.on("player-video:seeked", (current) => {  
                 seek(current); 
             });
 
-            obs.on("on_change_volume", (volume) => {
+            obs.on("player-video:volume-changed", (volume) => {
                 video_elm.volume = volume ;
             });
            
-            obs.on("on_resize_begin", () => {
+            obs.on("player-video:resize-begin", () => {
                 if(comment_tl){
                     comment_tl.pause();
                 }
             });
 
-            obs.on("resizeEndEvent", (wsize) => {
+            obs.on("window-resized", () => {
                 if(comment_tl){
                     createTimeLine(play_data.comments);
                     const current = video_elm.currentTime;
                     seek(current);
                 }
             });
-            obs.on("reset_comment_timelime", () => {
+            obs.on("player-video:reset-comment-timelime", () => {
                 if(comment_tl){
                     createTimeLine(play_data.comments);
                     const current = video_elm.currentTime;
@@ -170,7 +171,7 @@
                 }
             });
 
-            obs.on("show-player-comment", (visible) => {
+            obs.on("player-video:change-comment-visible", (visible) => {
                 if(visible){
                     comment_tl.enable = true;
                     const current = video_elm.currentTime;
@@ -185,7 +186,7 @@
                 }
             });
 
-            obs.on("update-comments", (args)=> {       
+            obs.on("player-video:update-comments", (args)=> {       
                 if(comment_tl){
                     const comments = args;
                     play_data.comments = comments;

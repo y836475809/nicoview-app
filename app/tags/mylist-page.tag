@@ -53,18 +53,18 @@
             }
         };
 
-        const createMenu = () => {
+        const createMenu = (self) => {
             const nemu_templete = [
                 { 
                     label: "delete", click() {
-                        this.obs_accordion.trigger("delete-selected-items");
+                        self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu();
+            const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
@@ -80,7 +80,7 @@
         // };
 
         this.obs_accordion.on("item-dlbclicked", (item) => {
-            obs.trigger("mylist-page:on_change_search_item", item);
+            obs.trigger("mylist-page:item-dlbclicked", item);
         });
 
         this.obs_accordion.on("state-changed", (data) => {
@@ -90,11 +90,9 @@
         obs.on("mylist-page:sidebar:add-item", (args) => {
         // obs.on(`${this.acdn.name}:add-item`, (args) => {
             const { title, id, creator, link } = args;
-            this.obs_accordion.trigger("add-items", 
-                [
-                    { title, id, creator, link }
-                ]
-            );
+            this.obs_accordion.trigger("add-items", [
+                { title, id, creator, link }
+            ]);
             // obs.trigger(`${this.acdn.name}-change-expand`, true);
         });
 
@@ -364,7 +362,7 @@
             await updateMylist(id);
         });
 
-        obs.on("resizeEndEvent", (size)=> {
+        obs.on("window-resized", ()=> {
             resizeGridTable();
         });
 

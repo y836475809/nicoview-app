@@ -185,17 +185,14 @@
         };
 
         this.on("mount", function () {
-
             select_page("library");
-
-            this.obs.trigger("on_clear_search");
         });
 
-        obs.on("main-page:select-page", (page_name)=>{
+        this.obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
         });
 
-        obs.on("main-page:download-item-num", (num)=>{
+        this.obs.on("main-page:download-item-num", (num)=>{
             this.donwnload_item_num = num;
             this.update();
         });
@@ -228,31 +225,31 @@
         });
 
         ipc_monitor.on(IPCMsg.SEARCH_TAG, (event, args)=>{
-            obs.trigger("main-page:select-page", "search");
-            obs.trigger("search-page:search-tag", args);
+            this.obs.trigger("main-page:select-page", "search");
+            this.obs.trigger("search-page:search-tag", args);
         });
 
         ipc_monitor.on(IPCMsg.LOAD_MYLIST, (event, args)=>{
-            obs.trigger("main-page:select-page", "mylist");
-            obs.trigger("mylist-page:load-mylist", args);
+            this.obs.trigger("main-page:select-page", "mylist");
+            this.obs.trigger("mylist-page:load-mylist", args);
         });
 
         ipc_monitor.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
-            obs.trigger("download-page:add-download-items", [item]);
-            obs.trigger("search-page:add-download-items", [item.id]);
+            this.obs.trigger("download-page:add-download-items", [item]);
+            this.obs.trigger("search-page:add-download-items", [item.id]);
         });
 
         ipc_monitor.on(IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
             const item = args;
-            obs.trigger("history-page:add-item", item);
-            obs.trigger("library-page:play", item);
+            this.obs.trigger("history-page:add-item", item);
+            this.obs.trigger("library-page:play", item);
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
             const video_id = args;
             console.log("main update video_id=", video_id);
-            obs.trigger("library-page:update-data", { 
+            this.obs.trigger("library-page:update-data", { 
                 video_id: video_id,
                 cb: (result)=>{
                     console.log("main update cb result=", result);
@@ -266,7 +263,7 @@
 
         ipc_monitor.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
             const video_id = args;
-            obs.trigger("library-page:cancel-update-data", video_id);
+            this.obs.trigger("library-page:cancel-update-data", video_id);
         });
 
         window.onbeforeunload = (e) => {
@@ -277,12 +274,7 @@
         window.addEventListener("resize", () => {
             clearTimeout(timer);
             timer = setTimeout(() => {
-                obs.trigger("resizeEndEvent", {
-                    w: this.root.offsetWidth, 
-                    h: this.root.offsetHeight,
-                    width: this.root.offsetWidth, 
-                    height: this.root.offsetHeight
-                });
+                this.obs.trigger("window-resized");
             }, timeout);
         });
     </script>

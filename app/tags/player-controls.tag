@@ -107,11 +107,11 @@
             this.play();
         });
 
-        obs.on("loaded_data", ()=> {
+        obs.on("player-controls:loaded-data", ()=> {
             setPlayEnable(true);
         });
         
-        obs.on("on_set_player_state", (state)=> {
+        obs.on("player-controls:set-state", (state)=> {
             updateState(state);
         });
 
@@ -119,7 +119,7 @@
             updateState("play");
             setPlayEnable(false);
 
-            obs.on("resizeEndEvent", (video_size) => { 
+            obs.on("window-resized", () => { 
                 this.refs.seek.redraw();
             });
         });

@@ -24,7 +24,7 @@
     const obs = riot.observable(); // eslint-disable-line
 
     try {
-        riot.mount("setting-page", obs);
+        riot.mount("setting-page", {obs});
 
         obs.on("on_load_library", () => {
             console.log("on_load_library");

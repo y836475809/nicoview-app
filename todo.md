@@ -74,7 +74,7 @@
 - [ ] mylistでサイドバーの項目を削除できるようにする
 - [ ] ライブラリのフィルタリングでクリア(全表示)ボタンを追加する
 - [ ] ロギングの追加
-- [ ] observableを子にoptsで渡すようにする
+- [x] observableを子にoptsで渡すようにする
 - [ ] videoの"playing"イベントのpauseと再開は削除してもOK?
 - [ ] timelineのclear時にtimeline.removeを入れておく
 - [ ] TweenMax.ticker.fpsでfpsの調整ができるようにする

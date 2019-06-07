@@ -12,7 +12,6 @@
 
         .page-input-container {
             display: flex;
-            margin: 0 10px 0 10px;
         }
         .page-input-container input {
             width: 50px;
@@ -25,18 +24,22 @@
             font-size: 20px;
         }
 
-        i[class^="fas fa-chevron"]:hover{
-            opacity: 0.5;
+        .navi {
+            width: 30px;
+            height: 30px;
+        }
+        .navi:hover {
+            background-color: lightgray;
             cursor: pointer;
         }
     </style>
 
-    <div class="center-hv" onclick={this.onclickBack}><i class="fas fa-chevron-left"></i></div>
-    <div class="page-input-container">
+    <div class="navi center-hv" onclick={this.onclickBack}><i class="fas fa-chevron-left"></i></div>
+    <div class="page-input-container center-hv">
         <input type="tel" value={this.current_page} onkeypress={this.onkeypress}/>
         <div class="label center-hv"> / {this.total_pages}</div>
     </div>
-    <div class="center-hv" onclick={this.onclickForward}><i class="fas fa-chevron-right"></i></div>
+    <div class="navi center-hv" onclick={this.onclickForward}><i class="fas fa-chevron-right"></i></div>
     <div class="label center-hv">ヒット件数: {this.total_count}</div>
 
     <script>

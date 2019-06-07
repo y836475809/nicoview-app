@@ -159,36 +159,28 @@
             width: 150px;
             height: 30px;
             font-size: 1.2em;
-            outline: 0;
         }
 
-        .search-query-container .search-button {
-            width: 30px;
-            height: 30px;
-            border-radius: 2px;
-            background-color: #7fbfff;
-        }
-        .search-query-container .fa-search {
-            font-size: 25px;
-        }
-        .search-query-container .add-search-cond-button {
-            margin-left: 10px;
+        .search-query-container > .search-button {
             width: 30px;
             height: 30px;
         }
-        .search-query-container .fa-plus-square {
-            font-size: 30px;
-            color: darkgray;
+        .search-query-container > .search-button > i  {
+            font-size: 24px;
         }
-        .search-query-container .search-button:hover,
-        .search-query-container .icon-button:hover { 
-            opacity: 0.5;
-            cursor: pointer; 
-        } 
+
+        .search-query-container > .add-search-cond-button {
+            margin-left: 30px;
+            width: 30px;
+            height: 30px;
+        }
+        .search-query-container > .add-search-cond-button > i {
+            font-size: 24px;
+        }
 
         .search-grid-container {
             width: 100%;
-            height: calc(100vh - 65px);
+            height: calc(100vh - 70px);
             overflow: hidden;
         }
 
@@ -228,11 +220,13 @@
             </label>
         </div>
         <div class="search-query-container">
-            <input class="query-input" type="search" onkeydown={this.onkeydownSearchInput}>
-            <span class="search-button center-hv" onclick={this.onclickSearch}>
-                <i class="icon-button fas fa-search" ></i></span>
-            <span class="add-search-cond-button center-hv" onclick={this.onclickAddNicoSearchCond}>
-                <i class="icon-button far fa-plus-square"></i></span>
+            <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
+            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="add-search-cond-button center-hv" title="検索条件に追加" onclick={onclickAddNicoSearchCond}>
+                <i class="fas fa-plus"></i>
+            </button>
         </div>      
     </div>
     <pagination ref="page" onmovepage={this.onmovePage}></pagination>
@@ -300,6 +294,10 @@
         };   
         const grid_table = new GridTable("search-grid", columns, options);
 
+        const getSearchInputElm = () => {
+            return this.root.querySelector(".search-query-container > .query-input");
+        };
+
         this.search = async () => {
             this.obs_modal_dialog.trigger("show", {
                 message: "検索中...",
@@ -323,6 +321,9 @@
             
             this.obs_modal_dialog.trigger("close");
             resizeGridTable(); //only first?
+
+            const elm = getSearchInputElm();
+            elm.focus();
         };
 
         this.onmovePage = async (page) => {
@@ -452,7 +453,7 @@
         };
 
         this.onclickSearch = (e) => {
-            const elm = this.root.querySelector(".search-query-container > .query-input");
+            const elm = getSearchInputElm();
             const query = elm.value;
             nico_search_params.query(query);
             this.search();
@@ -470,7 +471,7 @@
         };
 
         this.onclickAddNicoSearchCond = (e) => {
-            const elm = this.root.querySelector(".search-query-container > .query-input");
+            const elm = getSearchInputElm();
             const cond = {
                 query: elm.value,
                 sort_order: nico_search_params._sort_order,
@@ -483,7 +484,7 @@
         };
         obs.on("search-page:item-dlbclicked", (item) => {
             const cond = item;
-            const elm = this.root.querySelector(".search-query-container > .query-input");
+            const elm = getSearchInputElm();
             elm.value = cond.query;
             nico_search_params.cond(cond.search_kind);
             nico_search_params.query(cond.query);
@@ -500,7 +501,7 @@
         //TODO
         obs.on("search-page:search-tag", (args)=> {
             const { query, search_kind } = args;
-            const elm = this.root.querySelector(".search-query-container > .query-input");
+            const elm = getSearchInputElm();
             elm.value = query;
             nico_search_params.cond(search_kind);
             nico_search_params.query(query);

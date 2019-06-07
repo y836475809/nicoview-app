@@ -110,16 +110,12 @@
         }
 
         .add-mylist-button {
-            margin-left: 10px;
+            margin-left: 30px;
             width: 30px;
             height: var(--control-height);
         }
-        .add-mylist-button .fa-plus-square {
-            font-size: 30px;
-            color: black;
-        }
-        .add-mylist-button .fa-plus-square:hover {
-            color: darkgray;
+        .add-mylist-button > i {
+            font-size: 24px;
         }
 
         .mylist-description {
@@ -148,8 +144,9 @@
     <div style="display:flex;">
         <div class="mylist-label center-hv">mylist/</div><input class="mylist-input" type="text"/>
         <button class="update-button" onclick={onclickUpdateMylist}>更新</button>
-        <span class="add-mylist-button center-hv" onclick={onclickAddMylist}>
-            <i class="icon-button far fa-plus-square"></i></span>
+        <button class="add-mylist-button center-hv" title="マイリストに追加" onclick={onclickAddMylist}>
+            <i class="fas fa-plus"></i>
+        </button>
     </div>
     <div class="mylist-description">{this.mylist_description}</div>
     <div class="mylist-grid-container">

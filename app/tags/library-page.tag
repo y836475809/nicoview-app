@@ -104,24 +104,28 @@
             margin-right: 15px;
             margin-bottom: 4px;     
         }
-        .library-controls-container .filter-button { 
-            margin: auto;
-            width: var(--search-button-size);
-            height: var(--search-button-size);
-        }
+        
         .library-controls-container .filter-input {
             width: var(--search-input-width);
             height: var(--search-button-size);
         }
 
-        .library-controls-container .filter-button {
-            color: darkgray;
-            font-size: 30px;
+        .search-button {
+            width: var(--search-button-size);
+            height: var(--search-button-size);   
         }
-        .library-controls-container .filter-button > i:hover {
-            opacity: 0.5;
-            cursor: pointer; 
-        } 
+        .search-button > i {
+            font-size: 24px;
+        }
+
+        .filter-button {
+            width: var(--search-button-size);
+            height: var(--search-button-size);
+            margin-left: 30px;
+        }
+        .filter-button > i {
+            font-size: 24px;
+        }
 
         .library-grid-container {
             width: 100%;
@@ -143,9 +147,13 @@
     <div class="library-controls-container">
         <div class="item-info center-hv">項目数 {this.num_items}</div>
         <div class="search-container">
-            <input class="filter-input" type="search" onkeydown={onkeydownSearchInput} />
-            <span class="filter-button" onclick={onclickAdd}>
-                <i class="far fa-fw fa-plus-square center-hv"></i></span>
+            <input class="search-input" type="search" onkeydown={onkeydownSearchInput} />
+            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+                <i class="fas fa-search"></i>
+            </button>
+            <button class="filter-button center-hv" title="検索条件に追加" onclick={onclickAdd}>
+                <i class="fas fa-plus"></i>
+            </button>
         </div>
     </div>
     <div class="library-grid-container">
@@ -188,6 +196,12 @@
         };   
         const grid_table = new GridTable("library-grid", columns, options);
     
+        this.onclickSearch = (e) => {
+            const elm = this.root.querySelector(".search-container > .search-input");
+            const query = elm.value; 
+            grid_table.filterData(query); 
+        };
+
         this.onkeydownSearchInput = (e) => {
             if(e.keyCode===13){
                 const param = e.target.value;

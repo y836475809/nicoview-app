@@ -111,7 +111,7 @@
             video_elm.addEventListener("timeupdate", () => {
                 const current = video_elm.currentTime;
                 obs.trigger("player-seek:seek-update", current);
-                obs.trigger("player-viewinfo-page:seek_update", current);
+                obs.trigger("player-viewinfo-page:seek-update", current);
             });
             video_elm.addEventListener("progress", function(){
                 console.log("addEventListener progressによるイベント発火");

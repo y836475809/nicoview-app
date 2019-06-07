@@ -142,7 +142,7 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const play_by_video_data = (video_data, viewinfo, comments) => {  
+        const play_by_video_data = (video_data, viewinfo, comments) => {              
             comment_filter.setComments(comments);
             const filtered_comments = comment_filter.getComments();
 
@@ -212,6 +212,11 @@
                     is_local: false,
                     thumb_info:thumb_info,
                 };
+                comments.sort((a, b) => {
+                    if (a.vpos < b.vpos) return -1;
+                    if (a.vpos > b.vpos) return 1;
+                    return 0;
+                });
                 play_by_video_data(video_data, viewinfo, comments);
 
                 this.obs_modal_dialog.trigger("close");       

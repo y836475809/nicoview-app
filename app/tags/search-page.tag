@@ -308,8 +308,6 @@
                     this.onCancelSearch();
                 }
             });
-            //TODO
-            await new Promise(resolve => setTimeout(resolve, 100));
 
             grid_table.clearSelected();
             try {

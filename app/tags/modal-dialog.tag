@@ -62,6 +62,8 @@
             this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
             this.cb = cb;
 
+            this.update();
+
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
         });

@@ -184,8 +184,6 @@
                     nico_play.cancel();
                 }
             });
-            //TODO
-            await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
                 const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
@@ -280,8 +278,6 @@
                     ipc_monitor.cancelUpdateData(video_id);
                 }
             });
-            //TODO
-            await new Promise(resolve => setTimeout(resolve, 100));
 
             await new Promise((resolve, reject) => {
                 ipc_monitor.updateData(video_id);

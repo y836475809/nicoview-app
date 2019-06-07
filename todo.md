@@ -75,7 +75,6 @@
 - [ ] ライブラリのフィルタリングでクリア(全表示)ボタンを追加する
 - [ ] ロギングの追加
 - [x] observableを子にoptsで渡すようにする
-- [ ] videoの"playing"イベントのpauseと再開は削除してもOK?
 - [ ] timelineのclear時にtimeline.removeを入れておく
 - [ ] TweenMax.ticker.fpsでfpsの調整ができるようにする
 - [x] nedbのfindのオプションで「_data_type, _id: 0」とすればプロパティの削除が不要になる

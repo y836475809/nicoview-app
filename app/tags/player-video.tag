@@ -124,12 +124,9 @@
             }); 
             video_elm.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
-                //TODO
                 if(comment_tl){
                     const current = video_elm.currentTime;
-                    comment_tl.pause();
                     comment_tl.seek(current);
-                    comment_tl.play();
                 }
             });
             

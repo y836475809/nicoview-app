@@ -42,7 +42,6 @@
     <player-volume obs={opts.obs} class="volume"></player-volume>
 
     <script>
-        /* globals obs */
         const obs = this.opts.obs; 
 
         const button_class_map = new Map([

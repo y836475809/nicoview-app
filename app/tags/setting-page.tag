@@ -107,7 +107,7 @@
         };
 
         this.onclickRefreshLibrary = ()=>{
-            obs.trigger("library-page:refresh_library");
+            obs.trigger("library-page:refresh");
         };
 
         this.onclickImport = ()=>{

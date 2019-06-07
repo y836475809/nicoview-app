@@ -222,13 +222,15 @@
     </div>
     
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const { remote } = require("electron");
         const { Menu } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         require("slickgrid/plugins/slick.autotooltips");
         const time_format = require(`${app_base_dir}/js/time-format`);
         const SyncCommentScroll = require(`${app_base_dir}/js/sync-comment-scroll`);
+
+        const obs = this.opts.obs; 
 
         const row_height = 25;
 

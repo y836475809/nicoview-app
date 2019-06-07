@@ -12,7 +12,6 @@
     </style>
 
     <div class="nico-search-sidebar">
-        <!-- <accordion params={acdn_search} obs={obs}></accordion> -->
         <accordion 
             title="ニコニコ動画検索" 
             items={nico_search_data.items}
@@ -86,26 +85,11 @@
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        // this.acdn_search = {
-        //     title : "ニコニコ動画検索",
-        //     name: "nico-search",
-        //     expand: true,
-        //     items: this.nico_search_data.items,
-        //     oncontextmenu: ()=> {
-        //         const menu = createMenu("nico-search");
-        //         menu.popup({window: remote.getCurrentWindow()});
-        //     }
-        // };
-
         this.obs_accordion.on("item-dlbclicked", (item) => {
             obs.trigger("search-page:item-dlbclicked", item.cond);
         });
 
-        // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
-        //     save(data);
-        // });
         this.obs_accordion.on("state-changed", (data) => {
-            console.log("serach state-changed");
             save(data);
         });
         obs.on("search-page:sidebar:add-item", (cond) => {
@@ -114,15 +98,6 @@
                 { title: cond.query, cond: cond, icon: icon }
             ]);
         });
-        // obs.on("on_add_nico_search_cond", (cond) => {
-        //     const icon = getIcon(cond.search_kind);
-        //     obs.trigger(`${this.acdn_search.name}-add-items`, 
-        //         [
-        //             { title: cond.query, cond: cond, icon: icon }
-        //         ]
-        //     );
-        //     obs.trigger(`${this.acdn_search.name}-change-expand`, true);
-        // });
     </script>
 </search-sidebar>
 
@@ -499,11 +474,9 @@
                 page: 1
             };
             
-            // obs.trigger("on_add_nico_search_cond", cond);
             obs.trigger("search-page:sidebar:add-item", cond);
         };
         obs.on("search-page:item-dlbclicked", (item) => {
-        // obs.on("on_change_nico_search_cond", (cond)=> {
             const cond = item;
             const elm = this.root.querySelector(".search-query-container > .query-input");
             elm.value = cond.query;
@@ -632,21 +605,6 @@
 </search-content>
 
 <search-page>
-    <!-- <style scoped>
-        :scope {
-            width: 100%;
-            height: 100%;
-        }
-    </style>       -->
-    
-    <!-- <split-page-templete>
-        <yield to="sidebar">
-            <search-sidebar></search-sidebar>
-        </yield>
-        <yield to="main-content">
-            <search-content></search-content>
-        </yield>
-    </split-page-templete> -->
     <div class="split-page">
         <div class="left">
             <search-sidebar obs={obs}></search-sidebar>
@@ -657,7 +615,6 @@
         </div>
     </div>
     <script>
-        /* globals riot */
         this.obs = this.opts.obs;
     </script>
 </search-page>

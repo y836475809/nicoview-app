@@ -48,7 +48,6 @@
     </div>
 
     <script>
-        /* globals obs */
         const obs = this.opts.obs; 
 
         let tags_height = 0;

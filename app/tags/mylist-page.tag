@@ -8,7 +8,6 @@
     </style>
 
     <div class="nico-mylist-sidebar">
-        <!-- <accordion params={acdn} obs={obs}></accordion> -->
         <accordion 
             title="マイリスト" 
             items={mylist_data.items}
@@ -68,17 +67,6 @@
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        // this.acdn = {
-        //     title : "マイリスト",
-        //     name: "mylist-sidebar",
-        //     expand: true,
-        //     items: this.mylist_data.items,
-        //     oncontextmenu: ()=> {
-        //         const menu = createMenu("mylist-sidebar");
-        //         menu.popup({window: remote.getCurrentWindow()});
-        //     }
-        // };
-
         this.obs_accordion.on("item-dlbclicked", (item) => {
             obs.trigger("mylist-page:item-dlbclicked", item);
         });
@@ -88,12 +76,10 @@
         });
         
         obs.on("mylist-page:sidebar:add-item", (args) => {
-        // obs.on(`${this.acdn.name}:add-item`, (args) => {
             const { title, id, creator, link } = args;
             this.obs_accordion.trigger("add-items", [
                 { title, id, creator, link }
             ]);
-            // obs.trigger(`${this.acdn.name}-change-expand`, true);
         });
 
         obs.on("mylist-page:sidebar:has-item", (args) => {
@@ -171,12 +157,11 @@
     </div>
 
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
-        // const sidebar_name = "mylist-sidebar";
 
         const obs = this.opts.obs; 
 
@@ -346,7 +331,6 @@
             getImageCache();
         };
 
-        // obs.on(`${sidebar_name}-dlbclick-item`, (item) => {
         obs.on("mylist-page:item-dlbclicked", (item) => {
             is_local_item = true;
 
@@ -373,21 +357,6 @@
 </mylist-content>
 
 <mylist-page>
-    <!-- <style scoped>
-        :scope {
-            width: 100%;
-            height: 100%;
-        }
-    </style>       -->
-    
-    <!-- <split-page-templete>
-        <yield to="sidebar">
-            <mylist-sidebar></mylist-sidebar>
-        </yield>
-        <yield to="main-content">
-            <mylist-content></mylist-content>
-        </yield>
-    </split-page-templete> -->
     <div class="split-page">
         <div class="left">
             <mylist-sidebar obs={obs}></mylist-sidebar>
@@ -398,7 +367,6 @@
         </div>
     </div>    
     <script>
-        /* globals riot */
         this.obs = this.opts.obs;
     </script>
 </mylist-page>

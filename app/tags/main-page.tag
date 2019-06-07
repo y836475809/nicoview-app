@@ -120,15 +120,14 @@
     </div>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals app_base_dir */
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
-
-        //TODO
+        
         this.obs = this.opts.obs;
 
         this.donwnload_item_num = 0;

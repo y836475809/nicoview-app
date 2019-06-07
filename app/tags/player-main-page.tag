@@ -295,7 +295,6 @@
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
-        //TODO "add-comment-ng"
         obs.on("delete-comment-ng", (args) => {
             comment_filter.deleteNG(args);
             try {
@@ -314,7 +313,6 @@
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
-        //TODO "show-comment-setting-dialog"
         obs.on("player-main-page:show-comment-setting-dialog", () => {
             obs.trigger("comment-setting-dialog:show", comment_filter.getNG());
         });

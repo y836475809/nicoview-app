@@ -17,20 +17,16 @@
     </div>
 
     <script>
-        /* globals app_base_dir riot obs */
+        /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        //TODO
-        // const obs_sidebar = this.opts.obs.sidebar;
         const obs = this.opts.obs; 
-        // const obs_accordion = riot.observable();
         this.obs_accordion = riot.observable();
 
         const seach_file_path = SettingStore.getSystemFile("library-search.json");
-
         try {
             this.store = new JsonStore(seach_file_path);
             this.search_data = this.store.load();
@@ -71,37 +67,13 @@
             ]);
         });
 
-        // this.acdn_search = {
-        //     title : "ライブラリ検索",
-        //     name: "search",
-        //     expand: true,
-        //     items: this.search_data.items,
-        //     // oncontextmenu: ()=> {
-        //     //     const menu = createMenu();
-        //     //     menu.popup({window: remote.getCurrentWindow()});
-        //     // }
-        // };
-
         this.obs_accordion.on("item-dlbclicked", (item) => {
             obs.trigger("library-page:item-dlbclicked", item.query);
         });
 
-        // obs.on(`${this.acdn_search.name}-state-change`, (data) => {
-        //     save(data);
-        // });
-
         this.obs_accordion.on("state-changed", (data) => {
-            console.log("lib state-changed");
             save(data);
         });
-        // obs.on("on_add_search_item", (query) => {
-        //     obs.trigger(`${this.acdn_search.name}-add-items`, 
-        //         [
-        //             { title: query, query: query }
-        //         ]
-        //     );
-        //     obs.trigger(`${this.acdn_search.name}-change-expand`, true);
-        // });
     </script>
 </library-sidebar>
 
@@ -181,7 +153,7 @@
     </div>
     
     <script>
-        /* globals app_base_dir obs */
+        /* globals app_base_dir */
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
@@ -193,7 +165,6 @@
         const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
         const fs = require("fs");
 
-        //TODO
         const obs = this.opts.obs; 
     
         let library = null;
@@ -229,10 +200,7 @@
             const param = search_elm.value;
             if(!param){
                 return;
-            }          
-            // obs.trigger("on_add_search_item", param);
-
-            //TODO
+            }
             obs.trigger("library-page:sidebar:add-item", param);
         };
         
@@ -241,11 +209,6 @@
             search_elm.value = item;
             grid_table.filterData(item);         
         });
-        // obs.on("on_change_search_item", (param)=> {
-        //     const search_elm = this.root.querySelector(".filter-input");
-        //     search_elm.value = param;
-        //     grid_table.filterData(param);
-        // });
     
         const loadLibraryItems = (items)=>{
             grid_table.setData(items);
@@ -317,7 +280,7 @@
             }
         });
     
-        obs.on("library-page:refresh_library", async () => {     
+        obs.on("library-page:refresh", async () => {     
             try {
                 library = new Library();
                 await library.init(SettingStore.getSystemDir());
@@ -432,47 +395,10 @@
         obs.on("window-resized", ()=> {
             resizeGridTable();
         });
-    
-        // obs.on("library_dt_search", (param)=> {
-        //     grid_table.filterData(param);
-        // });
     </script>
 </library-content>
 
 <library-page>
-    <!-- TODO -->
-    <!-- <style scoped>
-        :scope {
-            width: 100%;
-            height: 100%;
-            --right-width: 200px;
-            display: flex;
-        }
-        .gutter {    
-            width: 4px;
-            border-left: 1px solid var(--control-border-color);
-            background-color: var(--control-color);
-        } 
-        .split.left{
-            background-color: var(--control-color);
-            width: var(--right-width);
-        }
-        .split.right{
-            background-color: var(--control-color);
-            width: calc(100% - var(--right-width));
-            height: 100%;
-            overflow-y: hidden;
-        }
-    </style> -->
-<!-- 
-    <split-page-templete>
-        <yield to="sidebar">
-            <library-sidebar mytitle={sidebar_obs}></library-sidebar>
-        </yield>
-        <yield to="main-content">
-            <library-content></library-content>
-        </yield>
-    </split-page-templete> -->
     <div class="split-page">
         <div class="left">
             <library-sidebar obs={obs}></library-sidebar>
@@ -483,10 +409,6 @@
         </div>
     </div>
     <script>
-        /* globals riot */
         this.obs = this.opts.obs;
-        // this.obs = {
-        //     sidebar: riot.observable()
-        // };
     </script>
 </library-page>

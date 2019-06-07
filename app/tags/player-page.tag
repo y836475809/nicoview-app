@@ -5,7 +5,7 @@
             margin: 0;
             width: 100%;
             height: 100%;
-            --tags-height: 50px;
+            --tags-height: 60px;
             --controls-height: 50px;
             grid-template-rows: var(--tags-height) 1fr var(--controls-height);
             grid-template-columns: 1fr 1fr;  

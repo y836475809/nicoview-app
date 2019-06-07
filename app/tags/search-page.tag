@@ -240,16 +240,17 @@
         <div class="search-grid"></div>
     </div>
 
-    <modal-dialog ref="search-dialog" oncancel={this.onCancelSearch}></modal-dialog>
+    <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
 
         const obs = this.opts.obs; 
+        this.obs_modal_dialog = riot.observable();
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -300,9 +301,15 @@
         const grid_table = new GridTable("search-grid", columns, options);
 
         this.search = async () => {
-            this.refs["search-dialog"].showModal("検索中...", ["cancel"], result=>{
-                this.onCancelSearch();
+            this.obs_modal_dialog.trigger("show", {
+                message: "検索中...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    this.onCancelSearch();
+                }
             });
+            //TODO
+            await new Promise(resolve => setTimeout(resolve, 100));
 
             grid_table.clearSelected();
             try {
@@ -315,8 +322,8 @@
                     message: error.message
                 });
             }
-
-            this.refs["search-dialog"].close();
+            
+            this.obs_modal_dialog.trigger("close");
             resizeGridTable(); //only first?
         };
 

@@ -53,7 +53,10 @@
     </dialog>
 
     <script>
-        this.showModal = (message, buttons, cb) => {
+        const obs_dialog = this.opts.obs;
+
+        obs_dialog.on("show", async (args) => {
+            const { message, buttons, cb } = args;
             this.message = message;
             this.showok = buttons===undefined ? false : buttons.includes("ok");
             this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
@@ -61,17 +64,17 @@
 
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
-        };
+        });
 
-        this.updateMessage = (message) =>{
+        obs_dialog.on("update-message", (message) => {
             this.message = message;
             this.update();
-        };
-        
-        this.close = () => {
+        });
+
+        obs_dialog.on("close", () => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();
-        };
+        });
 
         this.onclickButton = (result, e) =>{
             if(this.cb){

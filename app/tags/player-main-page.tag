@@ -33,11 +33,11 @@
         </player-viewinfo-page>
     </div>
 
-    <modal-dialog ref="nico-play-dialog" oncancel={this.onCancelSearch}></modal-dialog>
+    <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
     <comment-setting-dialog obs={this.opts.obs}></comment-setting-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu, MenuItem, dialog} = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
@@ -46,6 +46,7 @@
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
 
         const obs = this.opts.obs;
+        this.obs_modal_dialog = riot.observable();
         
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
@@ -174,15 +175,22 @@
         };
 
         const play_by_video_id = async (video_id) => {
-            const prog_dialog = this.refs["nico-play-dialog"];         
             nico_play = new NicoPlay();
-            prog_dialog.showModal("...", ["cancel"], result=>{
-                nico_play.cancel();
+
+            this.obs_modal_dialog.trigger("show", {
+                message: "...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    nico_play.cancel();
+                }
             });
+            //TODO
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             try {
                 const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id, (state)=>{
-                        prog_dialog.updateMessage(state);
+                        this.obs_modal_dialog.trigger("update-message", state);
                         console.log(state);
                     }, (error)=>{
                         if(error.cancel){
@@ -205,7 +213,8 @@
                     thumb_info:thumb_info,
                 };
                 play_by_video_data(video_data, viewinfo, comments);
-                prog_dialog.close();         
+
+                this.obs_modal_dialog.trigger("close");       
             } catch (error) {
                 console.log(error);
                 if(!error.cancel){
@@ -215,7 +224,8 @@
                         message: error.message
                     });
                 }
-                prog_dialog.close();                
+
+                this.obs_modal_dialog.trigger("close");
             }
         }; 
 
@@ -257,11 +267,17 @@
 
         obs.on("player-main-page:update-data", async(video_id) => {
             console.log("player main update video_id=", video_id);
-            const prog_dialog = this.refs["nico-play-dialog"]; 
-            prog_dialog.showModal("update...", ["cancel"], result=>{
-                console.log("player main cancel update video_id=", video_id);
-                ipc_monitor.cancelUpdateData(video_id);
+            this.obs_modal_dialog.trigger("show", {
+                message: "update...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    console.log("player main cancel update video_id=", video_id);
+                    ipc_monitor.cancelUpdateData(video_id);
+                }
             });
+            //TODO
+            await new Promise(resolve => setTimeout(resolve, 100));
+
             await new Promise((resolve, reject) => {
                 ipc_monitor.updateData(video_id);
                 ipc_monitor.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
@@ -269,7 +285,8 @@
                     resolve();   
                 });
             });
-            prog_dialog.close(); 
+            
+            this.obs_modal_dialog.trigger("close");
             console.log("player main prog_dialog.close update video_id=", video_id);
         });
 

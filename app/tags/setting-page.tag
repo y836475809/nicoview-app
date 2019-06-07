@@ -45,15 +45,16 @@
             <input type="button" value="Import" onclick={onclickImport}>
         </div>
     </div>
-    <modal-dialog ref="message-dialog"></modal-dialog>
+    <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals app_base_dir riot */
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         
         const obs = this.opts.obs; 
+        this.obs_msg_dialog = riot.observable();
 
         const setLibraryDirAtt = (value) => {
             document.getElementById("library-dir").setAttribute("value", value);
@@ -110,33 +111,41 @@
             obs.trigger("library-page:refresh");
         };
 
-        this.onclickImport = ()=>{
+        this.onclickImport = async ()=>{
             const db_file_path = selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
             }
 
-            this.refs["message-dialog"].showModal("インポート中...");
+            this.obs_msg_dialog.trigger("show", {
+                message: "インポート中...",
+            });
+            //TODO
+            await new Promise(resolve => setTimeout(resolve, 100));
 
-            //TODO add callback
-            obs.trigger("library-page:import-library-from-sqlite", db_file_path);
+            obs.trigger("library-page:import-library-from-sqlite", 
+                {
+                    file_path: db_file_path,
+                    cb:(error)=>{   
+                        if(error){
+                            console.log(error);
+                            dialog.showMessageBox(remote.getCurrentWindow(),{
+                                type: "error",
+                                buttons: ["OK"],
+                                message: error.message
+                            });
+                        }else{
+                            dialog.showMessageBox(remote.getCurrentWindow(),{
+                                type: "info",
+                                buttons: ["OK"],
+                                message: "Conversion complete"
+                            });
+                        }
+
+                        this.obs_msg_dialog.trigger("close");
+                    }
+                }
+            );
         };
-
-        obs.on("setting-page:import-library-from-sqlite-rep", (error) => { 
-            if(error){
-                dialog.showMessageBox(remote.getCurrentWindow(),{
-                    type: "error",
-                    buttons: ["OK"],
-                    message: error.message
-                });
-            }else{
-                dialog.showMessageBox(remote.getCurrentWindow(),{
-                    type: "info",
-                    buttons: ["OK"],
-                    message: "Conversion complete"
-                });
-            }
-            this.refs["message-dialog"].close();
-        });
     </script>
 </setting-page>

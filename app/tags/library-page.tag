@@ -355,35 +355,40 @@
         });
     
         const importDB = async (sqlite_file_path)=>{
-            const system_dir = SettingStore.getSystemDir();
-            try {
-                fs.statSync(system_dir);
-            } catch (error) {
-                if (error.code === "ENOENT") {
-                    fs.mkdirSync(system_dir);
+            return new Promise(async (resolve, reject) => {
+                const system_dir = SettingStore.getSystemDir();
+                try {
+                    fs.statSync(system_dir);
+                } catch (error) {
+                    if (error.code === "ENOENT") {
+                        fs.mkdirSync(system_dir);
+                    }
                 }
-            }
-    
-            const db_converter = new DBConverter();
-            db_converter.init(sqlite_file_path);
-            db_converter.read();
-            const dir_list = db_converter.get_dirpath();
-            const video_list = db_converter.get_video();
-    
-            library = new Library();
-            await library.init(SettingStore.getSystemDir());
-            await library.setData(dir_list, video_list);  
+        
+                const db_converter = new DBConverter();
+                db_converter.init(sqlite_file_path);
+                db_converter.read();
+                const dir_list = db_converter.get_dirpath();
+                const video_list = db_converter.get_video();
+        
+                library = new Library();
+                await library.init(SettingStore.getSystemDir());
+                await library.setData(dir_list, video_list);  
+
+                resolve();
+            });
         };
     
-        obs.on("library-page:import-library-from-sqlite", async (sqlite_file_path) => { 
+        obs.on("library-page:import-library-from-sqlite", async (args) => { 
+            const { file_path, cb } = args;
             try {
-                await importDB(sqlite_file_path);
+                await importDB(file_path);
                 loadLibraryItems(await library.getLibraryItems());
-                obs.trigger("setting-page:import-library-from-sqlite-rep", null);
+                cb(null);
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
-                obs.trigger("setting-page:import-library-from-sqlite-rep", error);
+                cb(error);
             }
         });  
     

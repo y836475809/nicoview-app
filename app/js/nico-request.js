@@ -1,8 +1,31 @@
 const request = require("request");
 
+const getFromHeaders = (headers, target_key)=> {
+    for (const key in headers) {
+        if (key.toLowerCase() == target_key.toLowerCase()) {
+            const value = headers[key];
+            if (value instanceof Array){
+                return value;
+            }else{
+                return [value];
+            }
+        }
+    }
+    throw new Error(`Can not get ${target_key} form headers`);
+};
+
 class NicoRequest {
     constructor(){
         this.canceled = false;
+    }
+
+    getCookie(headers, uri){
+        const cookie_jar = request.jar();
+        const cookie_headers = getFromHeaders(headers, "Set-Cookie");
+        cookie_headers.forEach(value=>{
+            cookie_jar.setCookie(value, uri);
+        });
+        return cookie_jar;
     }
 
     _cancel(){

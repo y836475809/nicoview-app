@@ -7,20 +7,6 @@ const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
 
 
-const getFromHeaders = (headers, target_key)=> {
-    for (const key in headers) {
-        if (key.toLowerCase() == target_key.toLowerCase()) {
-            const value = headers[key];
-            if (value instanceof Array){
-                return value;
-            }else{
-                return [value];
-            }
-        }
-    }
-    throw new Error(`Can not get ${target_key} form headers`);
-};
-
 class NicoWatch extends NicoRequest{
     constructor() { 
         super();
@@ -48,11 +34,8 @@ class NicoWatch extends NicoRequest{
                     reject(error);
                     return;
                 }
-                const cookie_jar = request.jar();
-                const cookie_headers = getFromHeaders(res.headers, "Set-Cookie");
-                cookie_headers.forEach(value=>{
-                    cookie_jar.setCookie(value, uri);
-                });
+
+                const cookie_jar = this.getCookie(res.headers, uri);
                 let $ = cheerio.load(body);
                 const data_json = $("#js-initial-watch-data").attr("data-api-data");
                 // const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
@@ -241,22 +224,11 @@ class NicoVideo extends NicoRequest {
             timeout: 5 * 1000
         };
         this.heart_beat_id = setInterval(() => {  
-            this.req_hb_post = request(options, (error, res, body) => {
+            this.req_hb_post = this._reuqest(options, (error, res, body)=>{
                 if(error){
                     this.stopHeartBeat();
                     on_error(error);
-                }else if(!this._validateStatus(res.statusCode)){
-                    this.stopHeartBeat();
-                    const message = `${res.statusCode}: ${options.uri}`;
-                    on_error(new Error(message)); 
                 }
-            }).on("abort", () => {
-                if(this.canceled){
-                    this.stopHeartBeat();
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    on_error(error);
-                } 
             });
 
             console.log("HeartBeat ", new Date());

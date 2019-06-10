@@ -64,6 +64,7 @@
                 video_elm.currentTime = current;
                 const wait_timer = setInterval(() => {
                     if (video_elm.paused && video_elm.readyState === 4) {
+                        comment_tl.seek(current);
                         video_elm.play();
                         clearInterval(wait_timer);
                     }       
@@ -129,8 +130,9 @@
             video_elm.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
                 if(comment_tl){
-                    const current = video_elm.currentTime;
-                    comment_tl.seek(current);
+                    // const current = video_elm.currentTime;
+                    // comment_tl.seek(current\);
+                    comment_tl.play();
                 }
             });
             

@@ -44,6 +44,18 @@ class SettingStore {
         return mylist_dir;
     }
 
+    static getCommentParams() {
+        return {
+            duration_sec: SettingStore.getValue("comment-duration-sec", 4),
+            fps: SettingStore.getValue("comment-fps", 60)
+        };
+    }
+    static setCommentParams(params) {
+        const { duration_sec, fps } = params;
+        SettingStore.setValue("comment-duration-sec", duration_sec);
+        SettingStore.setValue("comment-fps", fps);
+    }
+
     static getValue(key, default_value) {
         const value = localStorage.getItem(key);
         if(value == null){

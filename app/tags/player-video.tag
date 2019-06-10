@@ -28,8 +28,11 @@
     <script>
         /* globals app_base_dir */
         const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
-        
+        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+
         const obs = this.opts.obs; 
+
+        const comment_params = SettingStore.getCommentParams();
 
         let video_elm = null;
         let play_data = null;
@@ -37,7 +40,7 @@
 
         const createTimeLine = (comments)=>{
             const row_num = 12;
-            const duration_sec = 4;
+            const  { duration_sec, fps } = comment_params;
             const parent = this.root.querySelector("#player-video-screen");
 
             const nico_script = new NicoScript();
@@ -47,6 +50,7 @@
             }
             comment_tl = new CommentTimeLine(parent, duration_sec, row_num);
             comment_tl.create(nico_script.getApplied(comments));
+            comment_tl.setFPS(fps);
         };
 
         const seek = (current) => {
@@ -191,6 +195,31 @@
                     createTimeLine(play_data.comments);
                     const current = video_elm.currentTime;
                     seek(current);
+                }
+            });
+
+            obs.on("player-video:update-comment-display-params", (args)=> {  
+                const { duration_sec, fps } = args;     
+                if(comment_tl){
+                    if(comment_params.duration_sec != duration_sec){
+                        comment_params.duration_sec = duration_sec;
+                        comment_params.fps = fps;
+
+                        createTimeLine(play_data.comments);
+                        const current = video_elm.currentTime;
+                        seek(current);
+                        return;
+                    }
+                    if(comment_params.fps != fps){
+                        comment_params.duration_sec = duration_sec;
+                        comment_params.fps = fps;
+
+                        comment_tl.setFPS(fps);
+                        return;
+                    }
+                }else{
+                    comment_params.duration_sec = duration_sec;
+                    comment_params.fps = fps;
                 }
             });
         });

@@ -335,6 +335,10 @@
             obs.trigger("comment-setting-dialog:show", comment_filter.getNG());
         });
 
+        obs.on("player-main-page:update-comment-display-params", (args) => {
+            obs.trigger("player-video:update-comment-display-params", args);
+        });
+
         this.on("mount", () => {
             const vw = SettingStore.getValue(pref_infoview_width, 200);
             if(vw){

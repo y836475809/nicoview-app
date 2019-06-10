@@ -71,7 +71,7 @@
         <i class="close-button fas fa-times" onclick={this.onclickClose}></i>
         <div class="tab-area">
             <label onclick="{this.onclickSelect.bind(this,0)}">NG設定</label>
-            <label onclick="{this.onclickSelect.bind(this,1)}">tab2</label>
+            <label onclick="{this.onclickSelect.bind(this,1)}">コメント表示</label>
             <label onclick="{this.onclickSelect.bind(this,2)}">tab3</label>
         </div>
         <div class="panel-area">
@@ -79,7 +79,7 @@
                 <comment-ng-setting obs={this.opts.obs}></comment-ng-setting>
             </div>
             <div class="tab-panel">
-                <p>panel2</p>
+                <comment-display-setting obs={this.opts.obs}></comment-display-setting>
             </div>
             <div class="tab-panel">
                 <p>panel3</p>
@@ -88,7 +88,6 @@
     </dialog>
 
     <script>
-        /* globals riot */
         const obs_dialog = this.opts.obs;
 
         const selectTab = (selected_index) => {

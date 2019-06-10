@@ -224,6 +224,10 @@ class CommentTimeLine {
         this.enable = true;
     }
 
+    setFPS(fps){
+        TweenMax.ticker.fps(fps);
+    }
+
     /**
      * @param {Array} comments 
      */

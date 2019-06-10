@@ -196,6 +196,7 @@ class Library {
     _createLibraryItem(video_item){
         const dir_path = this.id_dirpath_map.get(video_item.dirpath_id);
         return  {
+            db_type: video_item._db_type,
             thumb_img: this._getThumbImgPath(dir_path, video_item),
             id: video_item.video_id,
             name: video_item.video_name,

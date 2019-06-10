@@ -137,7 +137,18 @@
             white-space: normal;
         }
 
-        .gridtable-thumbnail {
+        .thumbnail-wrap {
+            height: 135px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .thumbnail-S {
+            object-fit: contain;
+            width: 130px;
+            height: 100px;
+        }
+        .thumbnail-L {
             object-fit: contain;
             width: 180px;
             height: 135px;
@@ -178,8 +189,14 @@
         let library = null;
         this.num_items = 0;
     
+        const libraryImageFormatter = (row, cell, value, columnDef, dataContext)=> {
+            if(dataContext.db_type=="xml"){
+                return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
+            }
+            return `<img class="thumbnail-L" src="${value}"/>`;
+        };
         const columns = [
-            {id: "thumb_img", name: "image", width: 180},
+            {id: "thumb_img", name: "image", width: 180, formatter: libraryImageFormatter},
             {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
             {id: "creation_date", name: "作成日", sortable: true},

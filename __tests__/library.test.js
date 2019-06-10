@@ -159,6 +159,7 @@ test("library getLibraryItems", async (t) => {
     t.deepEqual(
         library_items,[
             {
+                db_type:"xml", 
                 thumb_img: path.resolve("C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg"),
                 id: "sm1",
                 name: "サンプル1",
@@ -170,6 +171,7 @@ test("library getLibraryItems", async (t) => {
                 tags: "tag1 tag2" 
             },
             {
+                db_type:"xml", 
                 thumb_img: path.resolve("C:/data/サンプル2 - [sm2][ThumbImg].jpeg"),
                 id: "sm2",
                 name: "サンプル2",
@@ -181,6 +183,7 @@ test("library getLibraryItems", async (t) => {
                 tags: "tag10 tag20" 
             },
             {
+                db_type:"json", 
                 thumb_img: path.resolve("C:/data/sm3[ThumbImg].jpeg"),
                 id: "sm3",
                 name: "サンプル3",
@@ -238,6 +241,7 @@ test("library getLibraryItem", async (t) => {
     {
         const item = await library.getLibraryItem("sm1");
         t.deepEqual(item, {
+            db_type:"xml", 
             thumb_img: path.resolve("C:/data/サンプル/サンプル1 - [sm1][ThumbImg].jpeg"),
             id: "sm1",
             name: "サンプル1",
@@ -252,6 +256,7 @@ test("library getLibraryItem", async (t) => {
     {
         const item = await library.getLibraryItem("sm2");
         t.deepEqual(item, {
+            db_type:"xml", 
             thumb_img: path.resolve("C:/data/サンプル2 - [sm2][ThumbImg].jpeg"),
             id: "sm2",
             name: "サンプル2",

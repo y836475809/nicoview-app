@@ -52,14 +52,22 @@ class Library {
      * 
      * @param {Array} dir_list
      * @param {Array} video_list
+     * @param {String} mode w:over write, a:append
      */
-    async setData(dir_list, video_list) {
-        await this._clear(this.video_db);
-        await this._setData(this.video_db, video_list);
-
+    async setData(dir_list, video_list, mode="w") {
         const n_dir_list = this._normalizeDirData(dir_list);
-        await this._clear(this.dir_db);
-        await this._setData(this.dir_db, n_dir_list);
+        if(mode=="w"){
+            await this._clear(this.video_db);
+            await this._setData(this.video_db, video_list);
+
+            await this._clear(this.dir_db);
+            await this._setData(this.dir_db, n_dir_list);
+        }else if(mode=="a"){
+            await this._addData(this.video_db, video_list, "video_id");
+            await this._addData(this.dir_db, n_dir_list, "dirpath_id");
+        }else{
+            throw new Error(`unkown mode: ${mode}`);
+        }
 
         await this._updateDirPathMap();
     }
@@ -274,6 +282,33 @@ class Library {
     _setData(db, data_list) {
         return new Promise((resolve, reject) => {
             db.insert(data_list, (err, new_doc) => {
+                if(err){
+                    reject(err);
+                    return;
+                }
+                resolve();
+            });
+        });
+    }
+
+    async _addData(db, data_list, id_name) {
+        const exist_items = await new Promise((resolve, reject) => {
+            db.find({}, {_id: 0}, (err, docs) => { 
+                if(err){
+                    reject(err);
+                    return;
+                }
+                resolve(docs);
+            });
+        });
+        const exist_ids = exist_items.map(item=>{
+            return item[id_name];
+        });
+        const new_data = data_list.filter(data=>{
+            return !exist_ids.includes(data[id_name]);
+        });
+        return new Promise((resolve, reject) => {
+            db.insert(new_data, (err, new_doc) => {
                 if(err){
                     reject(err);
                     return;

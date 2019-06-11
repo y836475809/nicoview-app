@@ -158,6 +158,9 @@
             <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
             </button>
+            <button class="clear-button center-hv" title="検索条件クリア" onclick={onclickClear}>
+                <i class="fas fa-ban"></i>
+            </button>
             <button class="add-button center-hv" title="検索条件に追加" onclick={onclickAdd}>
                 <i class="fas fa-plus"></i>
             </button>
@@ -223,6 +226,12 @@
                 const param = e.target.value;
                 grid_table.filterData(param);
             }
+        };
+
+        this.onclickClear = (e) => {
+            const search_elm = getSearchInputElm();
+            search_elm.value = "";
+            grid_table.filterData(""); 
         };
     
         this.onclickAdd = () => {

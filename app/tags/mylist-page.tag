@@ -152,15 +152,17 @@
     <div class="mylist-grid-container">
         <div class="mylist-grid"></div>
     </div>
+    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals app_base_dir riot */
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
 
         const obs = this.opts.obs; 
+        this.obs_modal_dialog = riot.observable();
 
         this.mylist_description = "";
 
@@ -288,7 +290,11 @@
                 const mylist = await nico_mylist.getMylist(mylist_id);
                 setMylist(mylist);    
             } catch (error) {
-                console.log(error);
+                if(error.cancel===true){
+                    console.log("cancel mylist");
+                }else{
+                    console.log(error);
+                }
             }
         };
 
@@ -313,13 +319,29 @@
             });
         };
 
+        const onCancelUpdate = () => {
+            if(nico_mylist){
+                nico_mylist.cancel();
+            }
+        };
+
         this.onclickUpdateMylist = async(e) => {  
+            this.obs_modal_dialog.trigger("show", {
+                message: "更新中...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    onCancelUpdate();
+                }
+            });
+            
             is_local_item = await hasLocalItem();
             const mylist_id = getMylistID();
             await updateMylist(mylist_id);
             if(is_local_item){
                 nico_mylist_store.save(mylist_id, nico_mylist.xml);
             }
+
+            this.obs_modal_dialog.trigger("close");
         };
 
         this.onclickAddMylist = (e) => {

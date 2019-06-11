@@ -63,7 +63,7 @@
     });
 
     const mylist_mock = new NicoMylistMocks();
-    mylist_mock.mylist();
+    mylist_mock.mylist({delay:2000});
 
     obs.on("on_error", (error)=> {
         console.error(error);

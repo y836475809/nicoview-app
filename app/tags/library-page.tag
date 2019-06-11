@@ -110,21 +110,17 @@
             height: var(--search-button-size);
         }
 
-        .search-button {
+        .search-container > button {
             width: var(--search-button-size);
-            height: var(--search-button-size);   
-        }
-        .search-button > i {
-            font-size: 24px;
+            height: var(--search-button-size);  
         }
 
-        .filter-button {
-            width: var(--search-button-size);
-            height: var(--search-button-size);
-            margin-left: 30px;
+        .search-container > button > i {
+            font-size: 20px;
         }
-        .filter-button > i {
-            font-size: 24px;
+
+        .add-button {
+            margin-left: 30px;
         }
 
         .library-grid-container {
@@ -162,7 +158,7 @@
             <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
             </button>
-            <button class="filter-button center-hv" title="検索条件に追加" onclick={onclickAdd}>
+            <button class="add-button center-hv" title="検索条件に追加" onclick={onclickAdd}>
                 <i class="fas fa-plus"></i>
             </button>
         </div>
@@ -213,8 +209,11 @@
         };   
         const grid_table = new GridTable("library-grid", columns, options);
     
+        const getSearchInputElm = () => {
+            return this.root.querySelector(".search-container > .search-input");
+        };
         this.onclickSearch = (e) => {
-            const elm = this.root.querySelector(".search-container > .search-input");
+            const elm = getSearchInputElm();
             const query = elm.value; 
             grid_table.filterData(query); 
         };
@@ -227,7 +226,7 @@
         };
     
         this.onclickAdd = () => {
-            const search_elm = this.root.querySelector(".filter-input");
+            const search_elm = getSearchInputElm();
             const param = search_elm.value;
             if(!param){
                 return;
@@ -236,7 +235,7 @@
         };
         
         obs.on("library-page:item-dlbclicked", (item) => {
-            const search_elm = this.root.querySelector(".filter-input");
+            const search_elm = getSearchInputElm();
             search_elm.value = item;
             grid_table.filterData(item);         
         });

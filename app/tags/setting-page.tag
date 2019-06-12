@@ -1,59 +1,76 @@
 <setting-page>
     <style scoped>
-        :scope {
-            margin: 0;
+        .setting-page{       
             width: 100%;
             height: 100%;
-        }
-
-        .setting-page{
-            width: 100%;
-            height: 100%;
+            padding: 5px;
             background-color: var(--control-color);
         }
-        .display-none{
-            display: none;
+
+        label, input[type='text'], button {
+            height: 25px;
         }
-        button, input, select, textarea {
-            font-family : inherit;
-            font-size   : 100%;
+
+        .input-button {
+            margin-left: 5px;
         }
-        .param{
+
+        .content {
+            margin-bottom: 5px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+        }
+
+        .section-label {
             display: block;
-            margin: 5px;
+            font-size: 1.2em;
         }
-        .group{
-            padding: 5px;
-        }
-        #library-dir{
+
+        .input-path{
             width: 300px;
         }
     </style>
 
     <div class="setting-page">
-        <div class="group">
-            <label class="param">Library dir</label>
-            <input id="library-dir" type="text" readonly>
-            <input type="button" value="Select" onclick={onclickSelectLibrarayPath}>
+        <div class="content">
+            <label class="section-label">設定保存フォルダ</label>
+            <input type="checkbox" checked={this.enable_setting_dir} onclick={this.onclickEnableSettingDirCheck} />
+                <label>設定保存フォルダを指定する</label>
+            <div style="display: flex;">
+                <input disabled={this.enable_setting_dir} class="input-path setting-dir-input" type="text" readonly>
+                <button disabled={this.enable_setting_dir} class="input-button" onclick="{onclickSelectSettingDir.bind(this,'setting-dir-input')}">フォルダ選択</button>
+            </div>
+            <button onclick={onclickOpenSettingDir}>フォルダを表示</button>
         </div>
-        <div class="group">
-            <label class="param">Refresh library</label>
-            <input type="button" value="Refresh" onclick={onclickRefreshLibrary}>
+        <div class="content">
+            <label class="section-label">動画の保存先</label>
+            <div style="display: flex;">
+                <input class="input-path download-dir-input" type="text" readonly>
+                <button class="input-button" onclick="{onclickSelectDownloadDir.bind(this,'download-dir-input')}">フォルダ選択</button>
+            </div>
         </div>
-        <div class="group">
-            <label class="param">Import db</label>
+        <div class="content">
+            <label class="section-label">Refresh library</label>
+            <button onclick={onclickRefreshLibrary}>Refresh</button>
+        </div>
+        <div class="content">
+            <label class="section-label">NNDD DBのインポート</label>
+            <label>インポート方法選択</label>
             <label each={item in import_db_mode_items} >
-                <input type="radio" name="import-db" value={item.mode}
+                <input  type="radio" name="import-db" value={item.mode}
                     onchange={onchangeImportDBMode.bind(this,item)}>{item.title}
             </label>
-            <button onclick={onclickImport}>インポートするDBを開く</button>
+            <div>
+                <button onclick={onclickImport}>DBを選択</button>
+            </div>
         </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
     <script>
         /* globals app_base_dir riot */
-        const { remote } = require("electron");
+        const { remote, shell } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         
@@ -61,19 +78,77 @@
         this.obs_msg_dialog = riot.observable();
 
         this.import_db_mode_items = [
-            {title:"差分を追加", mode:"a"},
-            {title:"上書き", mode:"w"},  
+            {title:"差分を追加する", mode:"a"},
+            {title:"上書きする", mode:"w"},  
         ];
+
+        // this.onclickSelectDir = (item, e) => {
+        //     const path = selectFolderDialog();
+        //     if(!path){
+        //         return;
+        //     }
+        //     const class_name = item;
+        //     const elm = this.root.querySelector(`.${class_name}`);
+        //     elm.value = path;
+        // };
+
+        const selectDir = (item) => {
+            const path = selectFolderDialog();
+            if(!path){
+                return null;
+            }
+
+            const class_name = item;
+            const elm = this.root.querySelector(`.${class_name}`);
+            elm.value = path;
+
+            return path;
+        };
+
+        this.onclickSelectSettingDir = (item, e) => {
+            const dir = selectDir(item);
+            if(dir!==null){
+                SettingStore.setSettingDir(dir);
+            }        
+        };
+
+        this.onclickSelectDownloadDir = (item, e) => {
+            const dir = selectDir(item);
+            if(dir!==null){
+                SettingStore.setValue("download-dir", dir);
+            }
+        };
+
+
+        this.onclickEnableSettingDirCheck = (e) => {
+            this.enable_setting_dir = e.target.checked;
+            SettingStore.setValue("enable-setting-dir", this.enable_setting_dir);
+            this.update();
+        };
+
+        this.onclickOpenSettingDir = (e) => {
+            const dir = SettingStore.getSettingDir();
+            shell.showItemInFolder(dir);
+        };
 
         this.onchangeImportDBMode = (item, e) => {
             SettingStore.setValue("import-db-mode", item.mode);
         };
 
-        const setLibraryDirAtt = (value) => {
-            document.getElementById("library-dir").setAttribute("value", value);
+        const setLibraryDirAtt = (value) => {          
+            const elm = this.root.querySelector(".download-dir-input");
+            elm.value = value;
+        };
+
+        const setInputValue = (selector, value) => {          
+            const elm = this.root.querySelector(selector);
+            elm.value = value;
         };
 
         this.on("mount", () => {
+            setInputValue("setting-dir-input", SettingStore.getSettingDir());
+            this.enable_setting_dir = SettingStore.getValue("enable-setting-dir", false);
+
             const path = SettingStore.getLibraryDir();
             if(!path){
                 setLibraryDirAtt("");

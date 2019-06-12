@@ -18,6 +18,24 @@ class SettingStore {
         return path.join(SettingStore.getSystemDir(), filename);
     }
 
+    static setSettingDir(value) {
+        SettingStore.setValue("setting-dir", value);
+    }
+
+    static getSettingDir() {
+        const use_user_data = SettingStore.getValue("enable-setting-dir", false);
+        if(use_user_data===true){
+            const dir = app.getPath("userData");
+            return path.join(dir, "setting");
+        }
+
+        const dir = SettingStore.getValue("setting-dir", null);
+        if(dir==null){
+            throw new Error("not set setting-dir");
+        }
+        return dir;
+    }
+
     static setLibraryDir(value) {
         SettingStore.setValue("library-dir", value);
 

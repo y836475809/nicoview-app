@@ -76,7 +76,7 @@
 
         const obs = this.opts.obs; 
 
-        const library_dir = SettingStore.getLibraryDir();
+        const download_dir = SettingStore.getDownloadDir();
 
         const donwload_schedule = {
             date: SettingStore.getValue("donwload-schedule-date", {hour:0, minute:0}),
@@ -297,7 +297,7 @@
                         break;
                     }
 
-                    nico_down = new NicoDownloader(video_id, library_dir);
+                    nico_down = new NicoDownloader(video_id, download_dir);
                     const result = await nico_down.download((progress)=>{
                         grid_table_dl.updateItem(video_id, {
                             progress: `${progress}`, 

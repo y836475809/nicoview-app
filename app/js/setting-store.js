@@ -3,37 +3,25 @@ const remote = require("electron").remote;
 const { FileUtil } = require("./file-utils");
 const app = remote.app;
 
+const setting_dir_name = "setting";
+
 class SettingStore {
-    static getSettingDirname(){
-        return "setting";
-    }
-
-    static getUserDataDir() {
-        return app.getPath("userData");
-    }
-
-    static getUserDataSettingDir() {
-        return path.join(app.getPath("userData"), SettingStore.getSettingDirname());
-    }
-
     static getSettingFilePath(filename) {
         return path.join(SettingStore.getSettingDir(), filename);
     }
 
-    static setSettingDir(value) {
-        SettingStore.setValue("setting-dir", value);
-    }
-
     static getSettingDir() {
-        const specify_setting_dir = SettingStore.getValue("specify-setting-dir", false);
-        const dirname = SettingStore.getSettingDirname();
+        const use_userdata = SettingStore.getValue("setting-use-userdata", true);
+        const userdata_dir = app.getPath("userData");
 
         let setting_dir = null;
-        if(specify_setting_dir===true){
-            const dir = SettingStore.getValue("setting-dir", app.getPath("userData"));
-            setting_dir = path.join(dir, dirname);
+        if(use_userdata===true){
+            setting_dir = path.join(userdata_dir, setting_dir_name);
         }else{
-            setting_dir = path.join(app.getPath("userData"), dirname);
+            setting_dir = SettingStore.getValue("setting-data-dir", "");
+            if(setting_dir==""){
+                setting_dir = path.join(userdata_dir, setting_dir_name);
+            }
         }
 
         FileUtil.mkDirp(setting_dir);
@@ -41,20 +29,18 @@ class SettingStore {
         return setting_dir;
     }
 
-    static setLibraryDir(value) {
-        SettingStore.setValue("library-dir", value);
-
-        const system_dir = path.join(value, "data");
-        SettingStore.setValue("system-dir", system_dir);
+    static setDownloadDir(dir) {
+        SettingStore.setValue("download-dir", dir);
     }
 
-    static getLibraryDir() {
-        if(localStorage.getItem("library-dir")==null){
-            const user_data_dir = app.getPath("userData");
-            const library_dir = path.join(user_data_dir, "library");
-            SettingStore.setValue("library-dir", library_dir);
+    static getDownloadDir() {
+        let dir = SettingStore.getValue("download-dir", "");
+        if(dir==""){
+            const user_data = app.getPath("userData");
+            dir = path.join(user_data, "download");
         }
-        return localStorage.getItem("library-dir");
+        FileUtil.mkDirp(dir);
+        return dir;
     }
 
     static getMylistDir() {
@@ -107,6 +93,48 @@ class SettingStore {
     }
 }
 
+class SettingDirConfig {
+    load(){
+        this.use_userdata = SettingStore.getValue("setting-use-userdata", true);
+        if(this.use_userdata===true){
+            this.dir = path.join(this._getUserData(), setting_dir_name);
+        }else{
+            this.dir = SettingStore.getValue("setting-data-dir", this._getUserData());
+        } 
+        FileUtil.mkDirp(this.dir);
+    }
+
+    save(){
+        SettingStore.setValue("setting-use-userdata", this.use_userdata);
+        SettingStore.setValue("setting-data-dir", this.dir);
+    }
+
+    _getUserData(){
+        return app.getPath("userData");
+    }
+ 
+    get enableUserData() {
+        return this.use_userdata;
+    }
+    set enableUserData(enable) {
+        this.use_userdata = enable;
+    }
+
+    getDir(use_userdata) {
+        if(use_userdata===true){
+            return path.join(this._getUserData(), setting_dir_name);
+        }else{
+            return this.dir;
+        }
+    }
+
+    setDir(dir) {
+        this.dir = path.join(dir, setting_dir_name);
+        FileUtil.mkDirp(this.dir);
+    }
+}
+
 module.exports = {
-    SettingStore: SettingStore
+    SettingStore,
+    SettingDirConfig
 };

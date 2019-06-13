@@ -92,7 +92,7 @@ class GridTableDownloadItem {
     }
 
     init(on_context_menu, on_dbl_click){
-        this.store = new DownloadItemStore(SettingStore.getSystemFile("download.json"));
+        this.store = new DownloadItemStore(SettingStore.getSettingFilePath("download.json"));
 
         this.grid_table.onContextMenu((e)=>{
             on_context_menu(e);

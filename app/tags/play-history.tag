@@ -25,7 +25,7 @@
 
         const obs = this.opts.obs; 
 
-        const history_file_path = SettingStore.getSystemFile("history.json");
+        const history_file_path = SettingStore.getSettingFilePath("history.json");
         const history_store = new HistoryStore(history_file_path, 50);
 
         const row_img_width = 130/2;

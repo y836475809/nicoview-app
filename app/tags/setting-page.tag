@@ -22,26 +22,50 @@
             border-radius: 5px;
         }
 
+        .component {
+            display: flex;
+            padding-bottom: 5px;
+        }
+
         .section-label {
             display: block;
-            font-size: 1.2em;
+            /* font-size: 1.2em; */
+        }
+
+        .setting-label {
+            width: 10em;
+            /* width: 150px; */
         }
 
         .input-path{
-            width: 300px;
+            /* width: 300px; */
+            width: 40vw;
         }
     </style>
 
     <div class="setting-page">
         <div class="content">
-            <label class="section-label">設定保存フォルダ</label>
-            <input type="checkbox" checked={this.enable_setting_dir} onclick={this.onclickEnableSettingDirCheck} />
-                <label>設定保存フォルダを指定する</label>
-            <div style="display: flex;">
-                <input disabled={this.enable_setting_dir} class="input-path setting-dir-input" type="text" readonly>
-                <button disabled={this.enable_setting_dir} class="input-button" onclick="{onclickSelectSettingDir.bind(this,'setting-dir-input')}">フォルダ選択</button>
+            <label class="section-label">設定保存場所(*再起動後に有効)</label>
+            <div class="component">
+                <label class="setting-label">
+                    <input type="radio" name="setting-radio" value="userata"
+                        checked={!specify_setting_dir}
+                        onchange={onchangeSetting}>UserDataに保存
+                </label>    
+                <input disabled={this.specify_setting_dir} class="input-path userdata-dir-input" type="text" readonly>
             </div>
-            <button onclick={onclickOpenSettingDir}>フォルダを表示</button>
+            <div class="component">
+                <label class="setting-label">
+                    <input type="radio" name="setting-radio" value="specify"
+                        checked={specify_setting_dir}
+                        onchange={onchangeSetting}>保存場所を指定
+                </label>
+                <div style="display: flex;">
+                    <input disabled={!this.specify_setting_dir} class="input-path setting-dir-input" type="text" readonly>
+                    <button disabled={!this.specify_setting_dir} class="input-button" onclick="{onclickSelectSettingDir.bind(this,'setting-dir-input')}">フォルダ選択</button>
+                </div>
+            </div>
+            <button onclick={onclickOpenSettingDir}>設定フォルダを開く</button>
         </div>
         <div class="content">
             <label class="section-label">動画の保存先</label>
@@ -56,13 +80,13 @@
         </div>
         <div class="content">
             <label class="section-label">NNDD DBのインポート</label>
-            <label>インポート方法選択</label>
+            <label>インポート方法</label>
             <label each={item in import_db_mode_items} >
                 <input  type="radio" name="import-db" value={item.mode}
                     onchange={onchangeImportDBMode.bind(this,item)}>{item.title}
             </label>
             <div>
-                <button onclick={onclickImport}>DBを選択</button>
+                <button onclick={onclickImport}>DB選択</button>
             </div>
         </div>
     </div>
@@ -70,9 +94,11 @@
 
     <script>
         /* globals app_base_dir riot */
+        const path = require("path");
         const { remote, shell } = require("electron");
         const { dialog } = require("electron").remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const { FileUtil } = require(`${app_base_dir}/js/file-utils`);
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
@@ -82,18 +108,18 @@
             {title:"上書きする", mode:"w"},  
         ];
 
-        // this.onclickSelectDir = (item, e) => {
-        //     const path = selectFolderDialog();
-        //     if(!path){
-        //         return;
-        //     }
-        //     const class_name = item;
-        //     const elm = this.root.querySelector(`.${class_name}`);
-        //     elm.value = path;
-        // };
+        this.onchangeSetting = (e) => {
+            if(e.target.value=="specify"){
+                this.specify_setting_dir = true;
+            }else{
+                this.specify_setting_dir = false;
+                const dir = SettingStore.getUserDataSettingDir();
+                FileUtil.mkDirp(dir);    
+            }
+        };
 
         const selectDir = (item) => {
-            const path = selectFolderDialog();
+            const path = FileUtil.selectFolderDialog();
             if(!path){
                 return null;
             }
@@ -108,27 +134,30 @@
         this.onclickSelectSettingDir = (item, e) => {
             const dir = selectDir(item);
             if(dir!==null){
-                SettingStore.setSettingDir(dir);
+                FileUtil.mkDirp(dir);
             }        
         };
 
         this.onclickSelectDownloadDir = (item, e) => {
             const dir = selectDir(item);
             if(dir!==null){
+                FileUtil.mkDirp(dir);
                 SettingStore.setValue("download-dir", dir);
             }
         };
 
-
-        this.onclickEnableSettingDirCheck = (e) => {
-            this.enable_setting_dir = e.target.checked;
-            SettingStore.setValue("enable-setting-dir", this.enable_setting_dir);
-            this.update();
-        };
-
         this.onclickOpenSettingDir = (e) => {
-            const dir = SettingStore.getSettingDir();
-            shell.showItemInFolder(dir);
+            const dirname = SettingStore.getSettingDirname();
+            let parentdir = null;
+            if(this.specify_setting_dir===true){
+                parentdir = getInputValue(".setting-dir-input");
+            }else{
+                parentdir = SettingStore.getUserDataSettingDir();
+            }
+            const dir = path.join(parentdir, dirname);
+            FileUtil.mkDirp(dir);
+
+            shell.openItem(dir);
         };
 
         this.onchangeImportDBMode = (item, e) => {
@@ -145,15 +174,22 @@
             elm.value = value;
         };
 
-        this.on("mount", () => {
-            setInputValue("setting-dir-input", SettingStore.getSettingDir());
-            this.enable_setting_dir = SettingStore.getValue("enable-setting-dir", false);
+        const getInputValue = (selector) => {          
+            const elm = this.root.querySelector(selector);
+            return elm.value;
+        };
 
-            const path = SettingStore.getLibraryDir();
-            if(!path){
+        this.on("mount", () => {
+            setInputValue(".setting-dir-input", path.dirname(SettingStore.getSettingDir()));
+            this.specify_setting_dir = SettingStore.getValue("specify-setting-dir", false);
+
+            setInputValue(".userdata-dir-input", SettingStore.getUserDataDir());
+
+            const library_path = SettingStore.getLibraryDir();
+            if(!library_path){
                 setLibraryDirAtt("");
             }else{
-                setLibraryDirAtt(path);
+                setLibraryDirAtt(library_path);
             } 
 
             const elms = this.root.querySelectorAll("input[name='import-db']");
@@ -172,36 +208,17 @@
             }
         });
 
-        const selectFileDialog = (name, extensions)=>{
-            const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-                properties: ["openFile"],
-                title: "Select",
-                defaultPath: ".",
-                filters: [
-                    {name: name, extensions: extensions}, 
-                    {name: "All", extensions: ["*"]},
-                ]
-            });
-            if(paths){
-                return paths[0];
-            }
-            return null;
-        };
+        window.onbeforeunload = (e) => {
+            SettingStore.setValue("specify-setting-dir", this.specify_setting_dir);
 
-        const selectFolderDialog = ()=>{
-            const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-                properties: ["openDirectory"],
-                title: "Select",
-                defaultPath: "."
-            });
-            if(paths){
-                return paths[0];
+            if(this.specify_setting_dir===true){
+                const dir = getInputValue(".setting-dir-input");
+                SettingStore.setSettingDir(dir);
             }
-            return null;
         };
 
         this.onclickSelectLibrarayPath = ()=>{
-            const path = selectFolderDialog();
+            const path = FileUtil.selectFolderDialog();
             if(!path){
                 return;
             }
@@ -218,7 +235,7 @@
             // const elms = this.root.querySelector("input[name='import-db']:checked");
             // console.log(elms.value);
             // return;
-            const db_file_path = selectFileDialog("Sqlite db", ["db"]);
+            const db_file_path = FileUtil.selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
             }

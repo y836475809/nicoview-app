@@ -30,7 +30,7 @@
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
 
-        const seach_file_path = SettingStore.getSystemFile("nico-search.json");
+        const seach_file_path = SettingStore.getSettingFilePath("nico-search.json");
 
         const getIcon = (kind) => {
             return kind=="tag"? {

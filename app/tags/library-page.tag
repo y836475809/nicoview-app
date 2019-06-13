@@ -26,7 +26,7 @@
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
 
-        const seach_file_path = SettingStore.getSystemFile("library-search.json");
+        const seach_file_path = SettingStore.getSettingFilePath("library-search.json");
         try {
             this.store = new JsonStore(seach_file_path);
             this.search_data = this.store.load();
@@ -311,7 +311,7 @@
             
             try {
                 library = new Library();
-                await library.init(SettingStore.getSystemDir());
+                await library.init(SettingStore.getSettingDir());
                 loadLibraryItems(await library.getLibraryItems());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
@@ -322,7 +322,7 @@
         obs.on("library-page:refresh", async () => {     
             try {
                 library = new Library();
-                await library.init(SettingStore.getSystemDir());
+                await library.init(SettingStore.getSettingDir());
                 loadLibraryItems(await library.getLibraryItems());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
@@ -395,7 +395,7 @@
     
         const importDB = async (sqlite_file_path)=>{
             return new Promise(async (resolve, reject) => {
-                const system_dir = SettingStore.getSystemDir();
+                const system_dir = SettingStore.getSettingDir();
                 try {
                     fs.statSync(system_dir);
                 } catch (error) {
@@ -411,7 +411,7 @@
                 const video_list = db_converter.get_video();
         
                 library = new Library();
-                await library.init(SettingStore.getSystemDir());
+                await library.init(SettingStore.getSettingDir());
                 await library.setData(dir_list, video_list);  
 
                 resolve();

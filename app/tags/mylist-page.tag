@@ -26,7 +26,7 @@
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
 
-        const file_path = SettingStore.getSystemFile("mylist.json");
+        const file_path = SettingStore.getSettingFilePath("mylist.json");
 
         try {
             this.store = new JsonStore(file_path);

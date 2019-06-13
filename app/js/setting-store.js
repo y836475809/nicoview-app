@@ -1,21 +1,23 @@
-const fs = require("fs");
 const path = require("path");
 const remote = require("electron").remote;
+const { FileUtil } = require("./file-utils");
 const app = remote.app;
 
 class SettingStore {
-    static getSystemDir() {
-        if(localStorage.getItem("system-dir")==null){
-            const user_data_dir = app.getPath("userData");
-            const library_dir = path.join(user_data_dir, "library");
-            const system_dir = path.join(library_dir, "data");
-            SettingStore.setValue("system-dir", system_dir);
-        }
-        return localStorage.getItem("system-dir");
+    static getSettingDirname(){
+        return "setting";
     }
 
-    static getSystemFile(filename) {
-        return path.join(SettingStore.getSystemDir(), filename);
+    static getUserDataDir() {
+        return app.getPath("userData");
+    }
+
+    static getUserDataSettingDir() {
+        return path.join(app.getPath("userData"), SettingStore.getSettingDirname());
+    }
+
+    static getSettingFilePath(filename) {
+        return path.join(SettingStore.getSettingDir(), filename);
     }
 
     static setSettingDir(value) {
@@ -23,17 +25,20 @@ class SettingStore {
     }
 
     static getSettingDir() {
-        const use_user_data = SettingStore.getValue("enable-setting-dir", false);
-        if(use_user_data===true){
-            const dir = app.getPath("userData");
-            return path.join(dir, "setting");
+        const specify_setting_dir = SettingStore.getValue("specify-setting-dir", false);
+        const dirname = SettingStore.getSettingDirname();
+
+        let setting_dir = null;
+        if(specify_setting_dir===true){
+            const dir = SettingStore.getValue("setting-dir", app.getPath("userData"));
+            setting_dir = path.join(dir, dirname);
+        }else{
+            setting_dir = path.join(app.getPath("userData"), dirname);
         }
 
-        const dir = SettingStore.getValue("setting-dir", null);
-        if(dir==null){
-            throw new Error("not set setting-dir");
-        }
-        return dir;
+        FileUtil.mkDirp(setting_dir);
+        
+        return setting_dir;
     }
 
     static setLibraryDir(value) {
@@ -53,12 +58,9 @@ class SettingStore {
     }
 
     static getMylistDir() {
-        const mylist_dir = path.join(SettingStore.getSystemDir(), "mylist");
-        try {
-            fs.statSync(mylist_dir);
-        } catch (error) {
-            fs.mkdirSync(mylist_dir);
-        }
+        const mylist_dir = path.join(SettingStore.getSettingDir(), "mylist");
+        FileUtil.mkDirp(mylist_dir);
+
         return mylist_dir;
     }
 

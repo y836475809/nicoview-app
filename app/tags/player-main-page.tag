@@ -51,7 +51,7 @@
         const ipc_monitor = new IPCMonitor();
         ipc_monitor.listenRemote();
 
-        const comment_filter = new CommentFilter(SettingStore.getSystemFile("nglist.json"));
+        const comment_filter = new CommentFilter(SettingStore.getSettingFilePath("nglist.json"));
 
         let nico_play = null;
 

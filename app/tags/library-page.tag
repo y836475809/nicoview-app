@@ -317,17 +317,6 @@
             }
         });
     
-        obs.on("library-page:refresh", async () => {     
-            try {
-                library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                loadLibraryItems(await library.getLibraryItems());
-            } catch (error) {
-                console.log("library.getLibraryItems error=", error);
-                loadLibraryItems([]);
-            }
-        });
-    
         obs.on("library-page:get-data-callback", async (args) => { 
             const { video_ids, cb } = args;
             const ret = new Map();

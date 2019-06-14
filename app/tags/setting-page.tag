@@ -78,10 +78,6 @@
             </div>
         </div>
         <div class="content">
-            <label class="section-label">Refresh library</label>
-            <button onclick={onclickRefreshLibrary}>Refresh</button>
-        </div>
-        <div class="content">
             <label class="section-label">NNDD DBのインポート</label>
             <label>インポート方法</label>
             <label each={item in import_db_mode_items} >
@@ -190,10 +186,6 @@
 
         window.onbeforeunload = (e) => {
             setting_dir_config.save();
-        };
-
-        this.onclickRefreshLibrary = ()=>{
-            obs.trigger("library-page:refresh");
         };
 
         const importNNDDDB = async (sqlite_file_path)=>{

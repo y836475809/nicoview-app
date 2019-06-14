@@ -99,6 +99,7 @@
         /* globals app_base_dir riot */
         const { remote, shell } = require("electron");
         const { dialog } = require("electron").remote;
+        const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
         const { FileUtil } = require(`${app_base_dir}/js/file-utils`);
         
@@ -195,10 +196,27 @@
             obs.trigger("library-page:refresh");
         };
 
+        const importNNDDDB = async (sqlite_file_path)=>{
+            return new Promise(async (resolve, reject) => {
+                try {
+                    const db_converter = new DBConverter();
+                    db_converter.init(sqlite_file_path);
+                    db_converter.read();
+                    const dir_list = db_converter.get_dirpath();
+                    const video_list = db_converter.get_video();
+                    resolve({dir_list, video_list});    
+                } catch (error) {
+                    reject(error);
+                }                
+            });
+        };
+
+        const getImportDBMode = () => {
+            const elm = this.root.querySelector("input[name='import-db']:checked");
+            return elm.value;
+        };
+
         this.onclickImport = async ()=>{
-            // const elms = this.root.querySelector("input[name='import-db']:checked");
-            // console.log(elms.value);
-            // return;
             const db_file_path = FileUtil.selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
@@ -210,29 +228,30 @@
             //TODO
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            obs.trigger("library-page:import-library-from-sqlite", 
-                {
-                    file_path: db_file_path,
-                    cb:(error)=>{   
-                        if(error){
-                            console.log(error);
-                            dialog.showMessageBox(remote.getCurrentWindow(),{
-                                type: "error",
-                                buttons: ["OK"],
-                                message: error.message
-                            });
-                        }else{
-                            dialog.showMessageBox(remote.getCurrentWindow(),{
-                                type: "info",
-                                buttons: ["OK"],
-                                message: "Conversion complete"
-                            });
-                        }
+            const {dir_list, video_list} = await importNNDDDB(db_file_path);
+            const mode = getImportDBMode();
 
-                        this.obs_msg_dialog.trigger("close");
+            obs.trigger("library-page:import-data", {
+                data: {dir_list, video_list, mode},
+                cb:(error)=>{   
+                    if(error){
+                        console.log(error);
+                        dialog.showMessageBox(remote.getCurrentWindow(),{
+                            type: "error",
+                            buttons: ["OK"],
+                            message: `インポート失敗: ${error.message}`
+                        });
+                    }else{
+                        dialog.showMessageBox(remote.getCurrentWindow(),{
+                            type: "info",
+                            buttons: ["OK"],
+                            message: "インポート完了"
+                        });
                     }
+
+                    this.obs_msg_dialog.trigger("close");
                 }
-            );
+            });
         };
     </script>
 </setting-page>

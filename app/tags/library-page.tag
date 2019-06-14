@@ -177,11 +177,9 @@
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { Library } = require(`${app_base_dir}/js/library`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
-        const fs = require("fs");
 
         const obs = this.opts.obs; 
     
@@ -393,43 +391,21 @@
             }
         });
     
-        const importDB = async (sqlite_file_path)=>{
-            return new Promise(async (resolve, reject) => {
-                const system_dir = SettingStore.getSettingDir();
-                try {
-                    fs.statSync(system_dir);
-                } catch (error) {
-                    if (error.code === "ENOENT") {
-                        fs.mkdirSync(system_dir);
-                    }
-                }
-        
-                const db_converter = new DBConverter();
-                db_converter.init(sqlite_file_path);
-                db_converter.read();
-                const dir_list = db_converter.get_dirpath();
-                const video_list = db_converter.get_video();
-        
+        obs.on("library-page:import-data", async (args) => { 
+            const { data, cb } = args;
+            const { dir_list, video_list, mode } = data; 
+            console.log("mode=", mode)
+            try {
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
-                await library.setData(dir_list, video_list);  
-
-                resolve();
-            });
-        };
-    
-        obs.on("library-page:import-library-from-sqlite", async (args) => { 
-            const { file_path, cb } = args;
-            try {
-                await importDB(file_path);
-                loadLibraryItems(await library.getLibraryItems());
+                await library.setData(dir_list, video_list, mode); 
+                loadLibraryItems(await library.getLibraryItems()); 
                 cb(null);
             } catch (error) {
-                console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
                 cb(error);
             }
-        });  
+        }); 
     
         const resizeGridTable = () => {
             const container = this.root.querySelector(".library-grid-container");

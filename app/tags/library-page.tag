@@ -394,7 +394,6 @@
         obs.on("library-page:import-data", async (args) => { 
             const { data, cb } = args;
             const { dir_list, video_list, mode } = data; 
-            console.log("mode=", mode)
             try {
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
@@ -402,7 +401,6 @@
                 loadLibraryItems(await library.getLibraryItems()); 
                 cb(null);
             } catch (error) {
-                loadLibraryItems([]);
                 cb(error);
             }
         }); 

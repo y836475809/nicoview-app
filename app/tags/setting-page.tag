@@ -228,30 +228,34 @@
             //TODO
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            const {dir_list, video_list} = await importNNDDDB(db_file_path);
-            const mode = getImportDBMode();
+            try {
+                const {dir_list, video_list} = await importNNDDDB(db_file_path);
+                const mode = getImportDBMode();
 
-            obs.trigger("library-page:import-data", {
-                data: {dir_list, video_list, mode},
-                cb:(error)=>{   
-                    if(error){
-                        console.log(error);
-                        dialog.showMessageBox(remote.getCurrentWindow(),{
-                            type: "error",
-                            buttons: ["OK"],
-                            message: `インポート失敗: ${error.message}`
-                        });
-                    }else{
-                        dialog.showMessageBox(remote.getCurrentWindow(),{
-                            type: "info",
-                            buttons: ["OK"],
-                            message: "インポート完了"
-                        });
+                obs.trigger("library-page:import-data", {
+                    data: {dir_list, video_list, mode},
+                    cb:(error)=>{   
+                        if(error){
+                            throw error;
+                        }else{
+                            dialog.showMessageBox(remote.getCurrentWindow(),{
+                                type: "info",
+                                buttons: ["OK"],
+                                message: "インポート完了"
+                            });
+                        } 
                     }
-
-                    this.obs_msg_dialog.trigger("close");
-                }
-            });
+                });
+            } catch (error) {
+                console.log(error);
+                dialog.showMessageBox(remote.getCurrentWindow(),{
+                    type: "error",
+                    buttons: ["OK"],
+                    message: `インポート失敗: ${error.message}`
+                });
+            }finally{
+                this.obs_msg_dialog.trigger("close");
+            }
         };
     </script>
 </setting-page>

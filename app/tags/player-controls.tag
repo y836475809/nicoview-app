@@ -91,13 +91,12 @@
             }
 
             if(isStop()){
-                obs.trigger("loadplaydata");
                 updateState("play");
             }else if(isPlay()){
-                obs.trigger("pause");
+                obs.trigger("player-video:pause");
                 updateState("pause");
             }else{
-                obs.trigger("play");
+                obs.trigger("player-video:play");
                 updateState("play");
             }
         };

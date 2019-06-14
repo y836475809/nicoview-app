@@ -136,11 +136,11 @@
                 }
             });
             
-            obs.on("play", () => {
+            obs.on("player-video:play", () => {
                 console.log("player.tag play");
                 video_elm.play();
             });
-            obs.on("pause", () => {
+            obs.on("player-video:pause", () => {
                 console.log("player.tag pause");
                 video_elm.pause();
             });

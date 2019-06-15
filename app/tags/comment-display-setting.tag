@@ -22,21 +22,21 @@
     </style>
 
     <div class="param-container">
-        <div class="param-label center-v">コメント表示時間(秒)</div>
+        <div class="param-label center-v">コメント表示時間</div>
         <div>
             <label each={item in duration_items} >
                 <input type="radio" name="duration" value={item} 
-                    onchange={onchangeDuration.bind(this,item)}>{item}
+                    onchange={onchangeDuration.bind(this,item)}>{item}秒
             </label>
         </div>
     </div>
     <div class="param-space"></div>
     <div class="param-container">
-        <div class="param-label center-v">コメントFPS</div>
+        <div class="param-label center-v">コメントfps</div>
         <div>
             <label each={item in fps_items} >
                 <input type="radio" name="fps" value={item} 
-                    onchange={onchangeFPS.bind(this,item)}>{item}
+                    onchange={onchangeFPS.bind(this,item)}>{item}fps
             </label>
         </div>
     </div>

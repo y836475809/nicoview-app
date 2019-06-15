@@ -347,8 +347,6 @@
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
-            const size = SettingStore.getValue(pref_size, { width: 854 ,height: 480 });
-            resizeVideo(size);
 
             try {
                 comment_filter.load();

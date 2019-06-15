@@ -1,13 +1,8 @@
-const electron = require("electron");
-const session = electron.session;
-// アプリケーションを操作するモジュール
-const { app } = electron;
-// ネイティブブラウザウィンドウを作成するモジュール
-const { BrowserWindow } = electron;
-
+const { session, dialog, app, BrowserWindow } = require("electron");;
 const fs = require("fs");
 const path = require("path");
 const { IPCMsg, IPCMonitor } = require("./js/ipc-monitor");
+const { WindowStateStore } = require("./js/window-state-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -24,6 +19,8 @@ let player_html_path = `file://${__dirname}/html/player.html`;
 const ipc_monitor = new IPCMonitor();
 ipc_monitor.listenMain();
 
+const window_store = new WindowStateStore(app.getPath("userData"));
+
 function createWindow() {
     global.sharedObj = {
         base_dir: __dirname
@@ -37,8 +34,11 @@ function createWindow() {
     }
 
     // ブラウザウィンドウの作成
-    win = new BrowserWindow({ width: 1000, height: 600 });
-
+    const state = window_store.getState("main", { width: 1000, height: 600 });
+    win = new BrowserWindow(state);
+    if (state.maximized) {
+        win.maximize();
+    }
     // アプリケーションのindex.htmlの読み込み
     win.loadURL(main_html_path);
 
@@ -46,6 +46,10 @@ function createWindow() {
         // DevToolsを開く
         win.webContents.openDevTools();
     }
+
+    win.on("close", (e) => {
+        window_store.setState("main", win);
+    });
 
     // ウィンドウが閉じられた時に発行される
     win.on("closed", () => {
@@ -55,6 +59,17 @@ function createWindow() {
             player_win.close();
         }
         win = null;
+
+        try {
+            window_store.save();
+        } catch (error) {
+            console.log(error);
+            dialog.showMessageBox({
+                type: "error",
+                buttons: ["OK"],
+                message: `ウインドウ状態の保存失敗: ${error.message}`
+            });
+        }
     });
 
     global.main_window = win;
@@ -63,6 +78,8 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", ()=>{
+    window_store.load();
+
     createWindow();
 
     ipc_monitor.on(IPCMsg.SHOW_PLAYER_SYNC, async (event, args) => {
@@ -118,13 +135,18 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
+        const state = window_store.getState("player", { width: 800, height: 600 });
+        player_win = new BrowserWindow(state);
+        if (state.maximized) {
+            player_win.maximize();
+        }
 
-        player_win = new BrowserWindow({ width: 800, height: 600 });
         player_win.webContents.on("did-finish-load", () => {
             if(is_debug_mode){
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
+                window_store.setState("player", player_win);
                 player_win = null;
             });
 

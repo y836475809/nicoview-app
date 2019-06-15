@@ -102,9 +102,6 @@
             });
             video_elm.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
-                if(comment_tl){
-                    comment_tl.play();
-                }
             });
             video_elm.addEventListener("pause", () => {
                 console.log("addEventListener pauseによるイベント発火");
@@ -129,10 +126,18 @@
             }); 
             video_elm.addEventListener("playing", () => {
                 console.log("addEventListener playingによるイベント発火");
-                if(comment_tl){
-                    // const current = video_elm.currentTime;
-                    // comment_tl.seek(current\);
-                    comment_tl.play();
+
+                if(comment_tl.paused===true){
+                    const pre_tiem = video_elm.currentTime;
+                    const wait_timer = setInterval(() => {
+                        const current = video_elm.currentTime;
+                        if(Math.abs(pre_tiem - current)>0){ 
+                            comment_tl.seek(current);
+                            comment_tl.play();
+
+                            clearInterval(wait_timer);
+                        }      
+                    }, 100);
                 }
             });
             

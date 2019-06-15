@@ -222,6 +222,12 @@ class CommentTimeLine {
         };
         this.timeLine = null;
         this.enable = true;
+
+        this._paused = true;
+    }
+
+    get paused(){
+        return this._paused;
     }
 
     setFPS(fps){
@@ -332,6 +338,8 @@ class CommentTimeLine {
             this.parent_elm.removeChild(elm);
         });
         this.timeLine = null;
+
+        this._paused = true;
     }
 
     play(){
@@ -339,6 +347,8 @@ class CommentTimeLine {
             return;
         }
         this.timeLine.play();
+
+        this._paused = false;
     }
 
     pause(){
@@ -346,6 +356,8 @@ class CommentTimeLine {
             return;
         }
         this.timeLine.pause();
+
+        this._paused = true;
     }
 
     seek(seek_sec){

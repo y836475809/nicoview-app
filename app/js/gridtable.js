@@ -22,11 +22,16 @@ const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
     return time_format.toPlayTime(value);
 };
 
+const numberFormatter = (row, cell, value, columnDef, dataContext)=> {
+    return value.toLocaleString();
+};
+
 
 const formatterMap = new Map([
     ["_img", imageFormatter],
     ["_date", dateFormatter],
     ["_time", timeFormatter],
+    ["_count", numberFormatter],
 ]);
 
 const splitBySpace = (search_string) => {

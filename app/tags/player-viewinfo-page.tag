@@ -176,13 +176,13 @@
                 <div class="label">投稿日</div>: {this.first_retrieve}
             </div>
             <div class="content">
-                <div class="label">再生</div>: {this.view_counter}
+                <div class="label">再生</div>: {this.view_counter.toLocaleString()}
             </div>
             <div class="content">
-                <div class="label">コメント</div>: {this.comment_counter}
+                <div class="label">コメント</div>: {this.comment_counter.toLocaleString()}
             </div>
             <div class="content">
-                <div class="label">マイリスト</div>: {this.mylist_counter}
+                <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
             </div>
             <i title={this.is_local?"local":""} data-state={String(this.is_local)} class="icon-islocal fas fa-book"></i>
             <i class="notice-deleted" if={this.is_deleted}>動画は削除されています</i>

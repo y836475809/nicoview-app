@@ -335,6 +335,22 @@
             nico_search.cancel();
         };
 
+        const createItem = (value, saved, reg_download) => {
+            return {
+                thumb_img: value.thumbnailUrl,
+                id: value.contentId,
+                name: value.title,
+                info: `ID:${value.contentId}<br>
+                        再生:${value.viewCounter.toLocaleString()}<br>
+                        コメント:${value.commentCounter.toLocaleString()}`,
+                play_time: value.lengthSeconds,
+                pub_date: value.startTime,
+                tags: value.tags,
+                saved: saved,
+                reg_download: reg_download,
+            };
+        };
+
         const setData = async (search_result) => {     
             const total_count = search_result.meta.totalCount;
             this.refs.page.setTotaCount(total_count);
@@ -349,17 +365,18 @@
 
             if(process.env.NODE_ENV == "SEARCH-PAGE-DEBUG"){
                 const items = search_result.data.map(value => {
-                    return {
-                        thumb_img: value.thumbnailUrl,
-                        id: value.contentId,
-                        name: value.title,
-                        info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
-                        play_time: value.lengthSeconds,
-                        pub_date: value.startTime,
-                        tags: value.tags,
-                        saved: false,
-                        reg_download: false,
-                    };
+                    return createItem(value, false, false);
+                    // return {
+                    //     thumb_img: value.thumbnailUrl,
+                    //     id: value.contentId,
+                    //     name: value.title,
+                    //     info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
+                    //     play_time: value.lengthSeconds,
+                    //     pub_date: value.startTime,
+                    //     tags: value.tags,
+                    //     saved: false,
+                    //     reg_download: false,
+                    // };
                 });
                 grid_table.setData(items);
                 grid_table.scrollToTop();
@@ -375,17 +392,18 @@
                 const items = search_result.data.map(value => {
                     const saved = id_map.has(value.contentId);
                     const reg_download = download_id_set.has(value.contentId);
-                    return {
-                        thumb_img: value.thumbnailUrl,
-                        id: value.contentId,
-                        name: value.title,
-                        info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
-                        play_time: value.lengthSeconds,
-                        pub_date: value.startTime,
-                        tags: value.tags,
-                        saved: saved,
-                        reg_download: reg_download,
-                    };
+                    return createItem(value, saved, reg_download);
+                    // return {
+                    //     thumb_img: value.thumbnailUrl,
+                    //     id: value.contentId,
+                    //     name: value.title,
+                    //     info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
+                    //     play_time: value.lengthSeconds,
+                    //     pub_date: value.startTime,
+                    //     tags: value.tags,
+                    //     saved: saved,
+                    //     reg_download: reg_download,
+                    // };
                 });
                 grid_table.setData(items);
                 grid_table.grid.scrollRowToTop(0); //TODO      

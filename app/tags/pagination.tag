@@ -40,7 +40,7 @@
         <div class="label center-hv"> / {this.total_pages}</div>
     </div>
     <div class="navi center-hv" onclick={this.onclickForward}><i class="fas fa-chevron-right"></i></div>
-    <div class="label center-hv">ヒット件数: {this.total_count}</div>
+    <div class="label center-hv">ヒット件数: {this.total_count.toLocaleString()}</div>
 
     <script>
         this.current_page = 1;

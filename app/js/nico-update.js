@@ -29,7 +29,7 @@ class NicoUpdate {
 
         const video_info = await this.library._getVideoInfo(this.video_id);
         const dir_path = await this.library._getDir(video_info.dirpath_id);
-        const cur_comments = await this._getCurrentComments(dir_path, video_info)
+        const cur_comments = await this._getCurrentComments(dir_path, video_info);
 
         const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
         await this._setDeleted(is_deleted);

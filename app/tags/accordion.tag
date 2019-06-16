@@ -12,10 +12,11 @@
             margin: 0;
             padding: 5px;
             line-height: 1;
-            color: #ffffff;
-            background: #7fbfff;
+            color: #111111;
+            background: #f4f4f4;
             cursor: pointer;
             font-size: 1.5em;
+            border-bottom: 1px solid lightgrey;
         }
 
         .acdn-list {
@@ -28,7 +29,7 @@
         .acdn-item {
             display: flex;
             height: 30px;
-            padding: 5px 0 5px 10px;
+            padding: 5px 0 5px 20px;
             transition: all 0.5s;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;
@@ -41,7 +42,8 @@
         }
 
         .acdn-item.selected {
-            background-color: #0f468d6b;
+            color: white;
+            background-color: #0f468d6b; 
         }
 
         .icont-item {

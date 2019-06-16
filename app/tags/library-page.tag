@@ -82,10 +82,8 @@
         :scope {
             width: 100%;
             height: 100%;
-            /* --right-width: 200px; */
-            /* --search-input-width: 200px; */
+            --search-input-width: 200px;
             --search-button-size: 30px;
-            /* display: flex; */
         }
 
         .library-controls-container,
@@ -93,19 +91,18 @@
             display: flex;
         }
         .library-controls-container .item-info{
+            width: 150px;
             height: 30px;
             vertical-align: middle;
             user-select: none;
+            padding-left: 5px;
         }
         .library-controls-container .search-container {
-            width: calc(var(--search-input-width) + var(--search-button-size) + 6px);
-            margin: 0;
             margin-left: auto;
-            margin-right: 15px;
-            margin-bottom: 4px;     
+            margin-bottom: 4px;
         }
         
-        .library-controls-container .filter-input {
+        .library-controls-container .search-input {
             width: var(--search-input-width);
             height: var(--search-button-size);
         }
@@ -152,7 +149,7 @@
     </style>
 
     <div class="library-controls-container">
-        <div class="item-info center-hv">項目数 {this.num_items}</div>
+        <div class="item-info center-v">項目数 {this.num_items.toLocaleString()}</div>
         <div class="search-container">
             <input class="search-input" type="search" onkeydown={onkeydownSearchInput} />
             <button class="search-button center-hv" title="検索" onclick={onclickSearch}>

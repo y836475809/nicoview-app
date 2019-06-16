@@ -45,6 +45,44 @@ class NicoUpdate {
 
         return true;
     }
+
+    //TODO
+    async updateThumbnail(){
+        if(!await this._isDBTypeJson()){
+            return false;
+        }
+
+        const video_info = await this.library._getVideoInfo(this.video_id);
+        const dir_path = await this.library._getDir(video_info.dirpath_id);
+
+        const { is_deleted, tags, thumbInfo } = await this._get(cur_comments);
+        await this._setDeleted(is_deleted);
+        await this._setTags(tags);
+
+        const nico_json = new NicoJsonFile();
+        nico_json.dirPath = dir_path;
+        nico_json.commonFilename = video_info.common_filename;
+        nico_json.videoType = video_info.video_type;
+
+        // await this._writeFile(nico_json.thumbImgPath, thumbInfo);
+
+        return true;
+    }  
+
+    //TODO
+    async _getThumbInfo(){
+        const watch_data = await this._getWatchData();
+        const api_data = watch_data.api_data;
+        const is_deleted = api_data.video.isDeleted;
+        const tags = api_data.tags;
+        if(is_deleted===true){
+            return { api_data, is_deleted: is_deleted, tags: tags, thumbInfo: null };
+        }
+
+        const thumbInfo = getThumbInfo(api_data);
+        return { api_data, is_deleted, tags, thumbInfo };
+    }
+
     /**
      * 
      * @param {Array} comments 

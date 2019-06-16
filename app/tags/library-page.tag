@@ -250,34 +250,47 @@
     
             this.update();
         };
-    
-        const menu = new Menu();
-        menu.append(new MenuItem({
-            label: "Play", click() {
-                const items = grid_table.getSelectedDatas();
-                console.log("lib context menu data=", items);
-            }
-        }));
-        menu.append(new MenuItem({ type: "separator" }));
-        menu.append(new MenuItem({
-            label: "Update", click() {
-                const cnv_data = new XMLDataConverter();
-                const items = grid_table.getSelectedDatas();
-                items.forEach(async item => {   
-                    grid_table.updateCell(item.id, "state", "更新中");
-                    try {
-                        await cnv_data.convert(library, item.id);
-                        const nico_update = new NicoUpdate(item.id, library);
-                        await nico_update.update();
-                        grid_table.updateCell(item.id, "state", "更新完了");
-                    } catch (error) {
-                        console.log(error);
-                        grid_table.updateCell(item.id, "state", "更新失敗");
-                    }
-                });
-            }
-        }));
+       
+        //TODO
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "再生", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }},
+                { label: "動画情報、コメント更新", click() {
+                    const cnv_data = new XMLDataConverter();
+                    const items = grid_table.getSelectedDatas();
+                    items.forEach(async item => {   
+                        grid_table.updateCell(item.id, "state", "更新中");
+                        try {
+                            await cnv_data.convert(library, item.id);
+                            const nico_update = new NicoUpdate(item.id, library);
+                            await nico_update.update();
+                            grid_table.updateCell(item.id, "state", "更新完了");
+                        } catch (error) {
+                            console.log(error);
+                            grid_table.updateCell(item.id, "state", "更新失敗");
+                        }
+                    });
+                }},
+                { label: "画像更新", click() {
+                    const items = grid_table.getSelectedDatas();
+                    items.forEach(async item => {   
+                        grid_table.updateCell(item.id, "state", "更新中");
+                        try {
 
+                            grid_table.updateCell(item.id, "state", "更新完了");
+                        } catch (error) {
+                            console.log(error);
+                            grid_table.updateCell(item.id, "state", "更新失敗");
+                        }
+                    });
+                }}
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
         this.on("mount", async () => {    
             grid_table.init(this.root.querySelector(".library-grid"));
     
@@ -298,8 +311,9 @@
                 obs.trigger("main-page:play-by-videoid", video_id);
             });
             
+            const context_menu = createMenu();
             grid_table.onContextMenu((e)=>{
-                menu.popup({window: remote.getCurrentWindow()});
+                context_menu.popup({window: remote.getCurrentWindow()});
             });
             
             resizeGridTable();

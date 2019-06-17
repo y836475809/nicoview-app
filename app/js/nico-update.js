@@ -1,5 +1,6 @@
 const fsPromises = require("fs").promises;
 const path = require("path");
+const request = require("request");
 const { NicoWatch, NicoComment, 
     getThumbInfo, filterComments } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
@@ -16,6 +17,9 @@ class NicoUpdate {
         this.library = library;
         this.nico_watch = null;
         this.nico_comment = null;
+        
+        //TODO
+        this.img_request = null;
     }
 
     /**
@@ -48,23 +52,24 @@ class NicoUpdate {
 
     //TODO
     async updateThumbnail(){
-        if(!await this._isDBTypeJson()){
-            return false;
-        }
-
+        // if(!await this._isDBTypeJson()){
+        //     return false;
+        // }
         const video_info = await this.library._getVideoInfo(this.video_id);
         const dir_path = await this.library._getDir(video_info.dirpath_id);
 
-        const { is_deleted, tags, thumbInfo } = await this._get(cur_comments);
+        const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
         await this._setDeleted(is_deleted);
-        await this._setTags(tags);
+        if(is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
 
         const nico_json = new NicoJsonFile();
         nico_json.dirPath = dir_path;
         nico_json.commonFilename = video_info.common_filename;
-        nico_json.videoType = video_info.video_type;
 
-        // await this._writeFile(nico_json.thumbImgPath, thumbInfo);
+        const thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
+        await this._writeBinary(nico_json.thumbImgPath, thumbImg);
 
         return true;
     }  
@@ -81,6 +86,40 @@ class NicoUpdate {
 
         const thumbInfo = getThumbInfo(api_data);
         return { api_data, is_deleted, tags, thumbInfo };
+    }
+
+    //TODO
+    _getThumbImg(url){
+        const validateStatus = (status) => {
+            return status >= 200 && status < 300;
+        };
+        
+        this.img_reuqest_canceled = false;
+
+        return new Promise(async (resolve, reject) => {
+            const options = {
+                method: "GET", 
+                uri: url, 
+                timeout: 5 * 1000,
+                encoding: null
+            };
+
+            this.img_request = request(options, (error, response, body)=>{
+                if(error){
+                    reject(error);
+                }else if(validateStatus(response.statusCode)){
+                    resolve(body);
+                } else {
+                    reject(new Error(`${response.statusCode}:${url}`));
+                }
+            }).on("abort", () => {
+                if(this.img_reuqest_canceled){
+                    const error = new Error("cancel");
+                    error.cancel = true;
+                    reject(error);
+                }
+            });
+        });
     }
 
     /**
@@ -136,6 +175,12 @@ class NicoUpdate {
         } 
         if(this.nico_comment){
             this.nico_comment.cancel();
+        }
+        
+        //TODO
+        if(this.img_request){
+            this.img_reuqest_canceled = true;
+            this.img_request.abort();
         }        
     }
 
@@ -143,6 +188,18 @@ class NicoUpdate {
         const tmp_path = path.join(path.dirname(file_path), "_update.tmp");
         try {
             await this._write(tmp_path, data);
+        } catch (error) {
+            await this._unlink(tmp_path);
+            throw error;
+        }     
+        await this._rename(tmp_path, file_path);
+    }
+
+    //TODO
+    async _writeBinary(file_path, data){
+        const tmp_path = path.join(path.dirname(file_path), "_update-bin.tmp");
+        try {
+            await fsPromises.writeFile(tmp_path, data, "binary");
         } catch (error) {
             await this._unlink(tmp_path);
             throw error;

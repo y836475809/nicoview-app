@@ -280,11 +280,15 @@
                     items.forEach(async item => {   
                         grid_table.updateCell(item.id, "state", "更新中");
                         try {
-
+                            //TODO
+                            const nico_update = new NicoUpdate(item.id, library);
+                            await nico_update.updateThumbnail();
+                            const img_src = item.thumb_img;
+                            grid_table.updateCell(item.id, "thumb_img", `${img_src}?${new Date().getTime()}`);
                             grid_table.updateCell(item.id, "state", "更新完了");
                         } catch (error) {
                             console.log(error);
-                            grid_table.updateCell(item.id, "state", "更新失敗");
+                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
                         }
                     });
                 }}

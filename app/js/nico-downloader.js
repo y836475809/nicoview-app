@@ -244,6 +244,7 @@ class NicoDownloader {
         return filterComments(comments);
     }
 
+    //TODO
     _getThumbImg(){
         const api_data = this.watch_data.api_data;
         const url = api_data.video.largeThumbnailURL;

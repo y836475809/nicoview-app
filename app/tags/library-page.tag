@@ -260,18 +260,20 @@
                     obs.trigger("main-page:play-by-videoid", video_id);
                 }},
                 { label: "動画情報、コメント更新", click() {
-                    const cnv_data = new XMLDataConverter();
+                    //TODO
+                    // const cnv_data = new XMLDataConverter();
                     const items = grid_table.getSelectedDatas();
                     items.forEach(async item => {   
                         grid_table.updateCell(item.id, "state", "更新中");
                         try {
-                            await cnv_data.convert(library, item.id);
+                            // await cnv_data.convert(library, item.id);
                             const nico_update = new NicoUpdate(item.id, library);
                             await nico_update.update();
+
                             grid_table.updateCell(item.id, "state", "更新完了");
                         } catch (error) {
                             console.log(error);
-                            grid_table.updateCell(item.id, "state", "更新失敗");
+                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
                         }
                     });
                 }},
@@ -374,10 +376,12 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, cb } = args;
             try {
-                const cnv_data = new XMLDataConverter();
-                await cnv_data.convert(library, video_id);
+                //TODO
+                // const cnv_data = new XMLDataConverter();
+                // await cnv_data.convert(library, video_id);
                 this.nico_update = new NicoUpdate(video_id, library);
                 await this.nico_update.update();
+
                 cb({ state:"ok", reason:null });
             } catch (error) {
                 console.log(error);

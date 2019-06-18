@@ -21,21 +21,34 @@ class NicoUpdate {
         this.nico_thumbnail = null;
     }
 
+    //TODO
     /**
      * 
      * @returns {boolean} true:update false:not update 
      */
     async update(){
-        if(!await this._isDBTypeJson()){
-            return false;
-        }
+        // if(!await this._isDBTypeJson()){
+        //     return false;
+        // }
 
         const video_info = await this.library._getVideoInfo(this.video_id);
+        if(video_info.is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
         const dir_path = await this.library._getDir(video_info.dirpath_id);
         const cur_comments = await this._getCurrentComments(dir_path, video_info);
 
-        const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
+        // const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
+        const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
         await this._setDeleted(is_deleted);
+
+        if(is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
+        const comments = await this._getComments(api_data, cur_comments);
+        // await this._setDeleted(is_deleted);
         await this._setTags(tags);
 
         const nico_json = new NicoJsonFile();
@@ -46,12 +59,19 @@ class NicoUpdate {
         await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
         await this._writeFile(nico_json.commentPath, comments);
 
+        //TODO
+        await this._setDBtype("json");
+
         return true;
     }
 
     //TODO
     async updateThumbnail(){
         const video_info = await this.library._getVideoInfo(this.video_id);
+        if(video_info.is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
         const dir_path = await this.library._getDir(video_info.dirpath_id);
 
         const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
@@ -125,6 +145,10 @@ class NicoUpdate {
      */
     async _setDeleted(is_deleted){
         await this.library.setFieldValue(this.video_id, "is_deleted", is_deleted);
+    }
+
+    async _setDBtype(db_type){
+        await this.library.setFieldValue(this.video_id, "_db_type", db_type);
     }
 
     async _setTags(tags){

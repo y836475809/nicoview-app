@@ -1,8 +1,7 @@
 const fsPromises = require("fs").promises;
 const path = require("path");
-const request = require("request");
 const { NicoWatch, NicoComment, 
-    getThumbInfo, filterComments } = require("./niconico");
+    getThumbInfo, filterComments, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 const { Library } = require("./library");
 
@@ -19,7 +18,7 @@ class NicoUpdate {
         this.nico_comment = null;
         
         //TODO
-        this.img_request = null;
+        this.nico_thumbnail = null;
     }
 
     /**
@@ -52,9 +51,6 @@ class NicoUpdate {
 
     //TODO
     async updateThumbnail(){
-        // if(!await this._isDBTypeJson()){
-        //     return false;
-        // }
         const video_info = await this.library._getVideoInfo(this.video_id);
         const dir_path = await this.library._getDir(video_info.dirpath_id);
 
@@ -88,38 +84,9 @@ class NicoUpdate {
         return { api_data, is_deleted, tags, thumbInfo };
     }
 
-    //TODO
-    _getThumbImg(url){
-        const validateStatus = (status) => {
-            return status >= 200 && status < 300;
-        };
-        
-        this.img_reuqest_canceled = false;
-
-        return new Promise(async (resolve, reject) => {
-            const options = {
-                method: "GET", 
-                uri: url, 
-                timeout: 5 * 1000,
-                encoding: null
-            };
-
-            this.img_request = request(options, (error, response, body)=>{
-                if(error){
-                    reject(error);
-                }else if(validateStatus(response.statusCode)){
-                    resolve(body);
-                } else {
-                    reject(new Error(`${response.statusCode}:${url}`));
-                }
-            }).on("abort", () => {
-                if(this.img_reuqest_canceled){
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    reject(error);
-                }
-            });
-        });
+    async _getThumbImg(url){
+        this.nico_thumbnail = new NicoThumbnail();
+        return await this.nico_thumbnail.getThumbImg(url);
     }
 
     /**

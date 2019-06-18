@@ -1,6 +1,4 @@
-// const { JSDOM } = require("jsdom");
 const cheerio = require("cheerio");
-const request = require("request");
 const { NicoRequest } = require("./nico-request");
 
 const nicovideo_url = "https://www.nicovideo.jp";
@@ -441,6 +439,36 @@ class NicoComment extends NicoRequest {
     }
 }
 
+class NicoThumbnail extends NicoRequest {
+    constructor() { 
+        super();
+        this.req = null;
+    }
+    cancel(){
+        if (this.req) {
+            this._cancel();
+            this.req.abort();
+        }
+    }  
+    getThumbImg(uri){
+        return new Promise((resolve, reject) => {
+            const options = {
+                method: "GET",
+                uri: uri, 
+                encoding: null,
+                timeout: 5 * 1000
+            };
+            this.req = this._reuqest(options, (error, res, body)=>{
+                if(error){
+                    reject(error);
+                    return;
+                }
+                resolve(body);
+            });  
+        });       
+    }
+}
+
 function getCookies(cookie_jar) {  
     const cookies = cookie_jar.getCookies(`${nicovideo_url}`);
     const cookie_jsons = cookies.map(value=>{
@@ -487,7 +515,7 @@ const filterComments = (comments) => {
             text:      chat.content
         };  
     });
-}
+};
 
 function getVideoType(smile_url){
     //"https://smile-cls30.sl.nicovideo.jp/smile?v=XXXXXXX.XXXXX" => flv
@@ -546,6 +574,7 @@ module.exports = {
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,
+    NicoThumbnail: NicoThumbnail,
     getCookies: getCookies,
     getThumbInfo: getThumbInfo,
     getVideoType: getVideoType,

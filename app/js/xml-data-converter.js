@@ -48,6 +48,12 @@ class XMLDataConverter {
         return true;
     }
 
+    async convertComment(nico_xml, nico_json){
+        const common_xml = await this._read(nico_xml.commentPath);
+        const owner_xml = await this._read(nico_xml.ownerCommentPath);
+        await this._write(nico_json.commentPath, this._convertComment(common_xml, owner_xml));
+    }
+
     async _need(db_type, nico_json){
         try {
             await this._stat(nico_json.thumbInfoPath);

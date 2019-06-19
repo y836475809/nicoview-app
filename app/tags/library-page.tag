@@ -259,6 +259,24 @@
                     const video_id = items[0].id;
                     obs.trigger("main-page:play-by-videoid", video_id);
                 }},
+                { label: "動画情報更新", click() {
+                    //TODO
+                    // const cnv_data = new XMLDataConverter();
+                    const items = grid_table.getSelectedDatas();
+                    items.forEach(async item => {   
+                        grid_table.updateCell(item.id, "state", "更新中");
+                        try {
+                            // await cnv_data.convert(library, item.id);
+                            const nico_update = new NicoUpdate(item.id, library);
+                            await nico_update.update();
+
+                            grid_table.updateCell(item.id, "state", "更新完了");
+                        } catch (error) {
+                            console.log(error);
+                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                        }
+                    });
+                }},
                 { label: "動画情報、コメント更新", click() {
                     //TODO
                     // const cnv_data = new XMLDataConverter();

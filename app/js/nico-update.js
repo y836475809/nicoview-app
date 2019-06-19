@@ -65,6 +65,33 @@ class NicoUpdate {
         return true;
     }
 
+    async updateThumbInfo(){
+        const video_info = await this.library._getVideoInfo(this.video_id);
+        if(video_info.is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
+        const dir_path = await this.library._getDir(video_info.dirpath_id);
+
+        const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
+        await this._setDeleted(is_deleted);
+        if(is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
+        const nico_json = new NicoJsonFile();
+        nico_json.dirPath = dir_path;
+        nico_json.commonFilename = video_info.common_filename;
+
+        //TODO
+        const cnv_data = new XMLDataConverter();
+        cnv_data.convertCommnet()
+
+        await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
+
+        return true;
+    } 
+
     //TODO
     async updateThumbnail(){
         const video_info = await this.library._getVideoInfo(this.video_id);

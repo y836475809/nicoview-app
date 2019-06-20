@@ -134,7 +134,7 @@ class NicoJsonFile extends NicoDataFile {
     }
 
     get thumbImgFilename(){
-        return `${this.common_filename}[ThumbImg].jpeg`;
+        return `${this.common_filename}[ThumbImg].L.jpeg`;
     }
 
     getComments() {

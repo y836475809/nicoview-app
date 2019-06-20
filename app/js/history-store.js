@@ -47,8 +47,10 @@ class HistoryStore{
             let item = this.history_items[index];
             item.play_date = Date.now();
             if(new_item.url != item.url){
-                item.thumb_img = new_item.image;
                 item.url = new_item.url;
+            }
+            if(new_item.image != item.thumb_img){
+                item.thumb_img = new_item.image;
             }
             this.history_items.sort((a, b) => {
                 if (a.play_date < b.play_date) return 1;

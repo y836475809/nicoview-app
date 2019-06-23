@@ -19,7 +19,8 @@ const createDBItem = () => {
         play_count: 0,
         time: 0,
         tags: [],
-        is_deleted: false
+        is_deleted: false,
+        thumbnail_size: "S",
     };
 };
 
@@ -157,6 +158,7 @@ class Library {
         new_item.time = item.time;
         new_item.tags = item.tags;
         new_item.is_deleted = item.is_deleted;
+        new_item.thumbnail_size = item.thumbnail_size;
 
         await this._updateData(this.video_db, new_item, true);
     }
@@ -419,12 +421,14 @@ class Library {
             this.nico_xml.dirPath = dir_path;
             this.nico_xml.commonFilename = video_info.common_filename;
             this.nico_xml.videoType = video_info.video_type;
+            this.nico_xml.thumbnailSize = video_info.thumbnail_size;
             return this.nico_xml;
         }
         if(db_type=="json"){
             this.nico_json.dirPath = dir_path;
             this.nico_json.commonFilename = video_info.common_filename;
             this.nico_json.videoType = video_info.video_type;
+            this.nico_json.thumbnailSize = video_info.thumbnail_size;
             return this.nico_json;
         }
 

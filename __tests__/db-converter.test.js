@@ -86,6 +86,7 @@ test("sqlite db item", (t) => {
         play_count:10,
         time: 100,
         tags: ["タグ1", "タグ2"],
-        is_deleted:false
+        is_deleted:false,
+        thumbnail_size: "S",
     });
 });

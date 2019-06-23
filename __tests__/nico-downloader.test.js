@@ -87,11 +87,12 @@ test("downloader dmc", async (t) => {
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
-        is_deleted: false
+        is_deleted: false,
+        thumbnail_size: "L",
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].L.jpeg"));
         t.is(data, "thumbnail");
     }
     {
@@ -164,11 +165,12 @@ test("downloader smile", async (t) => {
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
-        is_deleted: false
+        is_deleted: false,
+        thumbnail_size: "L",
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].L.jpeg"));
         t.is(data, "thumbnail");
     }
     {
@@ -241,7 +243,8 @@ test("downloader dmc low quality", async (t) => {
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
-        is_deleted: false
+        is_deleted: false,
+        thumbnail_size: "L",
     });     
 });
 
@@ -272,7 +275,8 @@ test("downloader smile low quality", async (t) => {
         time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
-        is_deleted: false
+        is_deleted: false,
+        thumbnail_size: "L",
     }); 
 });
 

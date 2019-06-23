@@ -175,7 +175,8 @@ class NicoDownloader {
 
 
             on_progress(DonwloadProgMsg.start_thumbimg);
-            const thumbImg_data = await this._getThumbImg();
+            const { thumbImg_data, thumbnail_size } = await this._getThumbImg();
+            this.nico_json.thumbnailSize = thumbnail_size;
 
             const tmp_video_path = this._getTmpVideoPath();
             const stream = this._createStream(tmp_video_path);
@@ -244,16 +245,32 @@ class NicoDownloader {
         return filterComments(comments);
     }
 
+    _getThumbnailData(api_data){
+        const video = api_data.video;
+        if(video.largeThumbnailURL!==null){
+            return { 
+                thumbnail_url: video.largeThumbnailURL, 
+                thumbnail_size: "L" 
+            };
+        }
+        
+        return { 
+            thumbnail_url: video.thumbnailURL, 
+            thumbnail_size: "S" 
+        };
+    }
+
     //TODO
     _getThumbImg(){
         const api_data = this.watch_data.api_data;
-        const url = api_data.video.largeThumbnailURL;
+        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
+
         this.img_reuqest_canceled = false;
 
         return new Promise(async (resolve, reject) => {
             const options = {
                 method: "GET", 
-                uri: url, 
+                uri: thumbnail_url, 
                 timeout: 5 * 1000,
                 encoding: null
             };
@@ -262,9 +279,9 @@ class NicoDownloader {
                 if(error){
                     reject(error);
                 }else if(validateStatus(response.statusCode)){
-                    resolve(body);
+                    resolve({ thumbImg_data: body, thumbnail_size: thumbnail_size });
                 } else {
-                    reject(new Error(`${response.statusCode}:${url}`));
+                    reject(new Error(`${response.statusCode}:${thumbnail_url}`));
                 }
             }).on("abort", () => {
                 if(this.img_reuqest_canceled){
@@ -319,6 +336,7 @@ class NicoDownloader {
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
+        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
         
         return {
             _db_type:"json", 
@@ -330,7 +348,8 @@ class NicoDownloader {
             time: api_data.video.duration,
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
             tags: tags,
-            is_deleted: is_deleted
+            is_deleted: is_deleted,
+            thumbnail_size: thumbnail_size,
         };      
     }
 

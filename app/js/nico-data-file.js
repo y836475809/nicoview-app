@@ -6,6 +6,14 @@ class NicoDataFile {
     set dirPath(dir_path){
         this.dir_path = dir_path;
     }
+    
+    set thumbnailSize(thumbnail_size){
+        this.thumbnail_size = thumbnail_size;
+    }
+    
+    get thumbnailSize(){
+        return this.thumbnail_size;
+    }
 
     get videoPath(){
         return path.join(this.dir_path, this.videoFilename);
@@ -134,7 +142,11 @@ class NicoJsonFile extends NicoDataFile {
     }
 
     get thumbImgFilename(){
-        return `${this.common_filename}[ThumbImg].L.jpeg`;
+        if(this.thumbnail_size=="L"){
+            return `${this.common_filename}[ThumbImg].L.jpeg`;
+        }else{
+            return `${this.common_filename}[ThumbImg].jpeg`;
+        }
     }
 
     getComments() {

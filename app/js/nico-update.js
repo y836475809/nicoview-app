@@ -27,181 +27,173 @@ class NicoUpdate {
      * 
      * @returns {boolean} true:update false:not update 
      */
-    // async update(){
-    //     // if(!await this._isDBTypeJson()){
-    //     //     return false;
-    //     // }
-
-    //     const video_info = await this.library._getVideoInfo(this.video_id);
-    //     if(video_info.is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
-
-    //     const dir_path = await this.library._getDir(video_info.dirpath_id);
-    //     const cur_comments = await this._getCurrentComments(dir_path, video_info);
-
-    //     // const { is_deleted, tags, thumbInfo, comments } = await this._get(cur_comments);
-    //     const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-    //     await this._setDeleted(is_deleted);
-
-    //     if(is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
-
-    //     const comments = await this._getComments(api_data, cur_comments);
-    //     // await this._setDeleted(is_deleted);
-    //     await this._setTags(tags);
-
-    //     const nico_json = new NicoJsonFile();
-    //     nico_json.dirPath = dir_path;
-    //     nico_json.commonFilename = video_info.common_filename;
-    //     nico_json.videoType = video_info.video_type;
-
-    //     await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-    //     await this._writeFile(nico_json.commentPath, comments);
-
-    //     //TODO        
-    //     if(!await this._isDBTypeJson()){
-    //         await this._setDBtype("json");
-    //     }
-
-    //     return true;
-    // }
-
     async update(){
-        const video_info = await this.library._getVideoInfo(this.video_id);
-        if(video_info.is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
-        }
+        // const video_info = await this.library._getVideoInfo(this.video_id);
+        // if(video_info.is_deleted===true){
+        //     throw new Error(`${this.video_id}は削除されています`);
+        // }
 
-        const dir_path = await this.library._getDir(video_info.dirpath_id);
+        // const dir_path = await this.library._getDir(video_info.dirpath_id);
 
-        const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-        await this._setDeleted(is_deleted);
-        if(is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
-        }
-        await this._setTags(tags);
+        // const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
 
-        const cur_comments = await this._getCurrentComments(dir_path, video_info);
-        const comments = await this._getComments(api_data, cur_comments);
+        // await this._setDeleted(is_deleted);
+        // if(is_deleted===true){
+        //     throw new Error(`${this.video_id}は削除されています`);
+        // }
+        // await this._setTags(tags);
 
-        const nico_json = new NicoJsonFile();
-        nico_json.dirPath = dir_path;
-        nico_json.commonFilename = video_info.common_filename;
+        // const cur_comments = await this._getCurrentComments(dir_path, video_info);
+        // const comments = await this._getComments(api_data, cur_comments);
+        
+        // const nico_json = new NicoJsonFile();
+        // nico_json.dirPath = dir_path;
+        // nico_json.commonFilename = video_info.common_filename;
+        // nico_json.thumbnailSize = "S";
 
-        await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-        await this._writeFile(nico_json.commentPath, comments);
+        // await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
+        // await this._writeFile(nico_json.commentPath, comments);
+
+        // if(!await this._isDBTypeJson()){
+        //     if(api_data.video.largeThumbnailURL!==null){
+        //         const thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
+        //         if(thumbImg!==null){                
+        //             nico_json.thumbnailSize = "L";
+        //             await this._writeBinary(nico_json.thumbImgPath, thumbImg);
+                    
+        //             await this._setThumbnailSize(nico_json.thumbnailSize);
+        //         }
+        //     }
+        //     await this._setDBtype("json");
+        // }
+        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const api_data = await this._getApiData();
+
+        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+
+        await this._updateThumbInfo(api_data, nico_json);
+        await this._updateComment(api_data, video_info, dir_path, nico_json);
+        await this._updateThumbnail(api_data, video_info.thumbnail_size, nico_xml, nico_json);
+
+        return true;
+    }
+
+    async updateThumbInfo(){
+        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const api_data = await this._getApiData();
+
+        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        // await this._setTags(api_data.tags);
+        await this._updateThumbInfo(api_data, nico_json);
+
+        // const thumbInfo = getThumbInfo(api_data);
+        // await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
 
         if(!await this._isDBTypeJson()){
+            const cnv_data = new XMLDataConverter();
+            cnv_data.convertComment(nico_xml, nico_json);
             await this._setDBtype("json");
+        }else if(!await this._existPath(nico_json.commentPath)){
+            const cnv_data = new XMLDataConverter();
+            cnv_data.convertComment(nico_xml, nico_json);    
         }
 
         return true;
     }
 
-    // async updateThumbInfo(){
-    //     const video_info = await this.library._getVideoInfo(this.video_id);
-    //     if(video_info.is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
+    async _updateThumbInfo(api_data, nico_json){
+        await this._setTags(api_data.tags);
 
-    //     const dir_path = await this.library._getDir(video_info.dirpath_id);
+        // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
 
-    //     const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-    //     await this._setDeleted(is_deleted);
-    //     if(is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
+        const thumbInfo = getThumbInfo(api_data);
+        await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
+    }
 
-    //     const nico_xml = new NicoXMLFile();
-    //     nico_xml.dirPath = dir_path;
-    //     nico_xml.commonFilename = video_info.common_filename;
+    async updateComment(){
+        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const api_data = await this._getApiData();
 
-    //     const nico_json = new NicoJsonFile();
-    //     nico_json.dirPath = dir_path;
-    //     nico_json.commonFilename = video_info.common_filename;
+        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
 
-    //     //TODO
-    //     await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
+        // const cur_comments = await this._getCurrentComments(dir_path, video_info);
+        // const comments = await this._getComments(api_data, cur_comments);
 
-    //     if(!await this._isDBTypeJson()){
-    //         const cnv_data = new XMLDataConverter();
-    //         cnv_data.convertComment(nico_xml, nico_json);
-    //         await this._setDBtype("json");
-    //     }
+        // await this._writeFile(nico_json.commentPath, comments);
+        await this._updateComment(api_data, video_info, dir_path, nico_json);
 
-    //     return true;
-    // } 
+        if(!await this._isDBTypeJson()){
+            await this._setTags(api_data.tags);
 
-    // async updateComment(){
-    //     const video_info = await this.library._getVideoInfo(this.video_id);
-    //     if(video_info.is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
+            const cnv_data = new XMLDataConverter();
+            cnv_data.convertThumbInfo(nico_xml, nico_json);
+            await this._setDBtype("json");
+        }else if(!await this._existPath(nico_json.thumbInfoPath)){
+            const cnv_data = new XMLDataConverter();
+            cnv_data.convertThumbInfo(nico_xml, nico_json);    
+        }
 
-    //     const dir_path = await this.library._getDir(video_info.dirpath_id);
+        return true;
+    }
+    
+    async _updateComment(api_data, video_info, dir_path, nico_json){
+        // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
 
-    //     const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-    //     await this._setDeleted(is_deleted);
-    //     if(is_deleted===true){
-    //         throw new Error(`${this.video_id}は削除されています`);
-    //     }
+        const cur_comments = await this._getCurrentComments(dir_path, video_info);
+        const comments = await this._getComments(api_data, cur_comments);
 
-    //     const nico_xml = new NicoXMLFile();
-    //     nico_xml.dirPath = dir_path;
-    //     nico_xml.commonFilename = video_info.common_filename;
-
-    //     const nico_json = new NicoJsonFile();
-    //     nico_json.dirPath = dir_path;
-    //     nico_json.commonFilename = video_info.common_filename;
-
-    //     //TODO
-    //     await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-
-    //     if(!await this._isDBTypeJson()){
-    //         const cnv_data = new XMLDataConverter();
-    //         cnv_data.convertComment(nico_xml, nico_json);
-    //         await this._setDBtype("json");
-    //     }
-
-    //     return true;
-    // } 
+        await this._writeFile(nico_json.commentPath, comments);
+    }
 
     //TODO
     async updateThumbnail(){
-        const video_info = await this.library._getVideoInfo(this.video_id);
-        if(video_info.is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
+        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const api_data = await this._getApiData();
+
+        // let thumbImg = null;
+        // if(video_info.thumbnail_size == "S"){
+        //     thumbImg = await this._getThumbImg(api_data.video.thumbnailURL);
+        // }
+        // if(video_info.thumbnail_size == "L"){
+        //     thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
+        // }
+
+        // if(thumbImg!==null){
+        //     const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        //     let img_path = null;
+        //     if(await this._isDBTypeJson()){
+        //         img_path = nico_json.thumbImgPath;
+        //     }else{
+        //         img_path = nico_xml.thumbImgPath;
+        //     }
+
+        //     await this._writeBinary(img_path, thumbImg);
+        // }
+        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        await this._updateThumbnail(api_data, video_info.thumbnail_size, nico_xml, nico_json);
+
+        return true;
+    }  
+
+    async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){
+        let thumbImg = null;
+        if(thumbnail_size == "S"){
+            thumbImg = await this._getThumbImg(api_data.video.thumbnailURL);
+        }
+        if(thumbnail_size == "L"){
+            thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
         }
 
-        const dir_path = await this.library._getDir(video_info.dirpath_id);
+        if(thumbImg!==null){
+            // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+            let img_path = null;
+            if(await this._isDBTypeJson()){
+                img_path = nico_json.thumbImgPath;
+            }else{
+                img_path = nico_xml.thumbImgPath;
+            }
 
-        const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-        await this._setDeleted(is_deleted);
-        if(is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
-        }
-
-        const nico_json = new NicoJsonFile();
-        nico_json.dirPath = dir_path;
-        nico_json.commonFilename = video_info.common_filename;
-        
-        const img_path = nico_json.thumbImgPath;
-        const thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
-        await this._writeBinary(img_path, thumbImg);
-
-        if(!await this._isDBTypeJson()){
-            const nico_xml = new NicoXMLFile();
-            nico_xml.dirPath = dir_path;
-            nico_xml.commonFilename = video_info.common_filename;
-
-            const cnv_data = new XMLDataConverter();
-            await cnv_data.convertComment(nico_xml, nico_json);
-
-            await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-
-            await this._setDBtype("json");
+            await this._writeBinary(img_path, thumbImg);
         }
 
         return true;
@@ -219,6 +211,45 @@ class NicoUpdate {
 
         const thumbInfo = getThumbInfo(api_data);
         return { api_data, is_deleted, tags, thumbInfo };
+    }
+
+    async _getApiData(){
+        const watch_data = await this._getWatchData();
+        const api_data = watch_data.api_data;
+        const is_deleted = api_data.video.isDeleted;
+        
+        await this._setDeleted(is_deleted);
+
+        if(is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+
+        return api_data;
+    }
+
+    async _getVideoInfo(){
+        const video_info = await this.library._getVideoInfo(this.video_id);
+        
+        if(video_info.is_deleted===true){
+            throw new Error(`${this.video_id}は削除されています`);
+        }
+        const dir_path = await this.library._getDir(video_info.dirpath_id);
+
+        return { video_info, dir_path };
+    }
+
+    async _getNicoFileData(video_info, dir_path){
+        const nico_xml = new NicoXMLFile();
+        nico_xml.dirPath = dir_path;
+        nico_xml.commonFilename = video_info.common_filename;
+        nico_xml.thumbnailSize = video_info.thumbnail_size;
+
+        const nico_json = new NicoJsonFile();
+        nico_json.dirPath = dir_path;
+        nico_json.commonFilename = video_info.common_filename;
+        nico_json.thumbnailSize = video_info.thumbnail_size;
+
+        return { nico_xml, nico_json };
     }
 
     async _getThumbImg(url){
@@ -268,6 +299,10 @@ class NicoUpdate {
         await this.library.setFieldValue(this.video_id, "_db_type", db_type);
     }
 
+    async _setThumbnailSize(thumbnail_size){
+        await this.library.setFieldValue(this.video_id, "thumbnail_size", thumbnail_size);
+    }
+
     async _setTags(tags){
         const tag_names = tags.map(value => {
             return value.name;
@@ -284,11 +319,8 @@ class NicoUpdate {
         if(this.nico_comment){
             this.nico_comment.cancel();
         }
-        
-        //TODO
-        if(this.img_request){
-            this.img_reuqest_canceled = true;
-            this.img_request.abort();
+        if(this.nico_thumbnail){
+            this.nico_thumbnail.cancel();
         }        
     }
 
@@ -326,6 +358,15 @@ class NicoUpdate {
     async _write(file_path, data){
         const json = JSON.stringify(data, null, "  ");
         await fsPromises.writeFile(file_path, json, "utf-8");
+    }
+
+    async _existPath(path){
+        try {
+            await fsPromises.stat(path);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 
     async _getWatchData(){

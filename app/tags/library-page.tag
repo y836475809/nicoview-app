@@ -176,7 +176,6 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
-        const { XMLDataConverter } = require(`${app_base_dir}/js/xml-data-converter`);
 
         const obs = this.opts.obs; 
     

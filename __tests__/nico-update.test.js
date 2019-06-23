@@ -1,4 +1,5 @@
 const test = require("ava");
+const nock = require("nock");
 const path = require("path");
 const { NicoMocks, TestData} = require("./helper/nico-mock");
 const { getThumbInfo, filterComments } = require("../app/js/niconico");
@@ -11,6 +12,8 @@ const cur_comment = filterComments(TestData.no_owner_comment);
 const nico_mocks = new NicoMocks();
 
 test.beforeEach(async t => {
+    nock.disableNetConnect();
+    
     library = new Library();
     await library.init(__dirname, true);
     const dirpath_list = [

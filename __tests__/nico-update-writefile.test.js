@@ -34,7 +34,7 @@ test.beforeEach(t => {
 
 test("writeFile sucess", async t => {
     const nico_update = new NicoUpdate(video_id);
-    await nico_update._writeFile(test_file_path, new_data);
+    await nico_update._writeFile(test_file_path, new_data, "json");
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.throws(()=>{fs.statSync(tmp_file_path);});
@@ -49,7 +49,7 @@ test("writeFile _write error", async t => {
         } 
     }
     const nico_update = new TestNicoUpdate(video_id);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data));
+    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.throws(()=>{fs.statSync(tmp_file_path);});
@@ -67,7 +67,7 @@ test("writeFile _unlink error", async t => {
         } 
     }
     const nico_update = new TestNicoUpdate(video_id);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data));
+    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.notThrows(()=>{fs.statSync(tmp_file_path);});
@@ -82,7 +82,7 @@ test("writeFile _rename error", async t => {
         } 
     }
     const nico_update = new TestNicoUpdate(video_id);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data));
+    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.notThrows(()=>{fs.statSync(tmp_file_path);});

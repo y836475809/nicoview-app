@@ -17,8 +17,6 @@ class NicoUpdate {
         this.library = library;
         this.nico_watch = null;
         this.nico_comment = null;
-        
-        //TODO
         this.nico_thumbnail = null;
     }
 
@@ -28,45 +26,7 @@ class NicoUpdate {
      * @returns {boolean} true:update false:not update 
      */
     async update(){
-        // const video_info = await this.library._getVideoInfo(this.video_id);
-        // if(video_info.is_deleted===true){
-        //     throw new Error(`${this.video_id}は削除されています`);
-        // }
-
-        // const dir_path = await this.library._getDir(video_info.dirpath_id);
-
-        // const { api_data, is_deleted, tags, thumbInfo } = await this._getThumbInfo();
-
-        // await this._setDeleted(is_deleted);
-        // if(is_deleted===true){
-        //     throw new Error(`${this.video_id}は削除されています`);
-        // }
-        // await this._setTags(tags);
-
-        // const cur_comments = await this._getCurrentComments(dir_path, video_info);
-        // const comments = await this._getComments(api_data, cur_comments);
-        
-        // const nico_json = new NicoJsonFile();
-        // nico_json.dirPath = dir_path;
-        // nico_json.commonFilename = video_info.common_filename;
-        // nico_json.thumbnailSize = "S";
-
-        // await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-        // await this._writeFile(nico_json.commentPath, comments);
-
-        // if(!await this._isDBTypeJson()){
-        //     if(api_data.video.largeThumbnailURL!==null){
-        //         const thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
-        //         if(thumbImg!==null){                
-        //             nico_json.thumbnailSize = "L";
-        //             await this._writeBinary(nico_json.thumbImgPath, thumbImg);
-                    
-        //             await this._setThumbnailSize(nico_json.thumbnailSize);
-        //         }
-        //     }
-        //     await this._setDBtype("json");
-        // }
-        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const { video_info, dir_path } = await this._getVideoInfo();
         const api_data = await this._getApiData();
 
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
@@ -79,23 +39,21 @@ class NicoUpdate {
     }
 
     async updateThumbInfo(){
-        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const { video_info, dir_path } = await this._getVideoInfo();
         const api_data = await this._getApiData();
-
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-        // await this._setTags(api_data.tags);
+
         await this._updateThumbInfo(api_data, nico_json);
 
-        // const thumbInfo = getThumbInfo(api_data);
-        // await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
-
         if(!await this._isDBTypeJson()){
-            const cnv_data = new XMLDataConverter();
-            cnv_data.convertComment(nico_xml, nico_json);
+            // const cnv_data = new XMLDataConverter();
+            // cnv_data.convertComment(nico_xml, nico_json);
+            this._convertComment(nico_xml, nico_json);
             await this._setDBtype("json");
         }else if(!await this._existPath(nico_json.commentPath)){
-            const cnv_data = new XMLDataConverter();
-            cnv_data.convertComment(nico_xml, nico_json);    
+            // const cnv_data = new XMLDataConverter();
+            // cnv_data.convertComment(nico_xml, nico_json);
+            this._convertComment(nico_xml, nico_json);    
         }
 
         return true;
@@ -104,71 +62,47 @@ class NicoUpdate {
     async _updateThumbInfo(api_data, nico_json){
         await this._setTags(api_data.tags);
 
-        // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-
         const thumbInfo = getThumbInfo(api_data);
-        await this._writeFile(nico_json.thumbInfoPath, thumbInfo);
+        await this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
     }
 
     async updateComment(){
-        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
-        const api_data = await this._getApiData();
-
+        const { video_info, dir_path } = await this._getVideoInfo(true);
+        const api_data = await this._getApiData(true);
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
 
-        // const cur_comments = await this._getCurrentComments(dir_path, video_info);
-        // const comments = await this._getComments(api_data, cur_comments);
-
-        // await this._writeFile(nico_json.commentPath, comments);
         await this._updateComment(api_data, video_info, dir_path, nico_json);
 
-        if(!await this._isDBTypeJson()){
+        if(!await this._isDBTypeJson()){  
+            // const cnv_data = new XMLDataConverter();
+            // cnv_data.convertThumbInfo(nico_xml, nico_json);
+            this._convertThumbInfo(nico_xml, nico_json);
             await this._setTags(api_data.tags);
-
-            const cnv_data = new XMLDataConverter();
-            cnv_data.convertThumbInfo(nico_xml, nico_json);
             await this._setDBtype("json");
         }else if(!await this._existPath(nico_json.thumbInfoPath)){
-            const cnv_data = new XMLDataConverter();
-            cnv_data.convertThumbInfo(nico_xml, nico_json);    
+            // const cnv_data = new XMLDataConverter();
+            // cnv_data.convertThumbInfo(nico_xml, nico_json);  
+            this._convertThumbInfo(nico_xml, nico_json);  
         }
 
         return true;
     }
     
     async _updateComment(api_data, video_info, dir_path, nico_json){
-        // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-
         const cur_comments = await this._getCurrentComments(dir_path, video_info);
-        const comments = await this._getComments(api_data, cur_comments);
-
-        await this._writeFile(nico_json.commentPath, comments);
+        const comments_diff = await this._getComments(api_data, cur_comments);
+        if(comments_diff.length===0){
+            return;
+        }
+        const new_comments = cur_comments.concat(filterComments(comments_diff));
+        await this._writeFile(nico_json.commentPath, new_comments, "json");
     }
 
     //TODO
     async updateThumbnail(){
-        const { video_info, dir_path } = await this._getVideoInfo(this.video_id);
+        const { video_info, dir_path } = await this._getVideoInfo();
         const api_data = await this._getApiData();
 
-        // let thumbImg = null;
-        // if(video_info.thumbnail_size == "S"){
-        //     thumbImg = await this._getThumbImg(api_data.video.thumbnailURL);
-        // }
-        // if(video_info.thumbnail_size == "L"){
-        //     thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
-        // }
-
-        // if(thumbImg!==null){
-        //     const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-        //     let img_path = null;
-        //     if(await this._isDBTypeJson()){
-        //         img_path = nico_json.thumbImgPath;
-        //     }else{
-        //         img_path = nico_xml.thumbImgPath;
-        //     }
-
-        //     await this._writeBinary(img_path, thumbImg);
-        // }
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
         await this._updateThumbnail(api_data, video_info.thumbnail_size, nico_xml, nico_json);
 
@@ -185,7 +119,6 @@ class NicoUpdate {
         }
 
         if(thumbImg!==null){
-            // const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
             let img_path = null;
             if(await this._isDBTypeJson()){
                 img_path = nico_json.thumbImgPath;
@@ -193,7 +126,8 @@ class NicoUpdate {
                 img_path = nico_xml.thumbImgPath;
             }
 
-            await this._writeBinary(img_path, thumbImg);
+            // await this._writeBinary(img_path, thumbImg);
+            await this._writeFile(img_path, thumbImg, "binary");
         }
 
         return true;
@@ -213,12 +147,16 @@ class NicoUpdate {
         return { api_data, is_deleted, tags, thumbInfo };
     }
 
-    async _getApiData(){
+    async _getApiData(ignore_deleted=false){
         const watch_data = await this._getWatchData();
         const api_data = watch_data.api_data;
         const is_deleted = api_data.video.isDeleted;
         
         await this._setDeleted(is_deleted);
+
+        if(ignore_deleted===true){
+            return api_data;
+        }
 
         if(is_deleted===true){
             throw new Error(`${this.video_id}は削除されています`);
@@ -227,14 +165,18 @@ class NicoUpdate {
         return api_data;
     }
 
-    async _getVideoInfo(){
+    async _getVideoInfo(ignore_deleted=false){
         const video_info = await this.library._getVideoInfo(this.video_id);
-        
+        const dir_path = await this.library._getDir(video_info.dirpath_id);
+
+        if(ignore_deleted===true){
+            return { video_info, dir_path };
+        }
+
         if(video_info.is_deleted===true){
             throw new Error(`${this.video_id}は削除されています`);
         }
-        const dir_path = await this.library._getDir(video_info.dirpath_id);
-
+        
         return { video_info, dir_path };
     }
 
@@ -257,22 +199,32 @@ class NicoUpdate {
         return await this.nico_thumbnail.getThumbImg(url);
     }
 
+    _convertComment(nico_xml, nico_json){
+        const cnv_data = new XMLDataConverter();
+        cnv_data.convertComment(nico_xml, nico_json); 
+    }
+
+    _convertThumbInfo(nico_xml, nico_json){
+        const cnv_data = new XMLDataConverter();
+        cnv_data.convertThumbInfo(nico_xml, nico_json);
+    }
+
     /**
      * 
      * @param {Array} comments 
      */
-    async _get(cur_comments){
-        const watch_data = await this._getWatchData();
-        const is_deleted = watch_data.api_data.video.isDeleted;
-        const tags = watch_data.api_data.tags;
-        if(is_deleted===true){
-            return { is_deleted: is_deleted, tags: tags, thumbInfo: null, comments: null };
-        }
+    // async _get(cur_comments){
+    //     const watch_data = await this._getWatchData();
+    //     const is_deleted = watch_data.api_data.video.isDeleted;
+    //     const tags = watch_data.api_data.tags;
+    //     if(is_deleted===true){
+    //         return { is_deleted: is_deleted, tags: tags, thumbInfo: null, comments: null };
+    //     }
 
-        const thumbInfo = getThumbInfo(watch_data.api_data);
-        const comments = await this._getComments(watch_data.api_data, cur_comments);
-        return { is_deleted, tags, thumbInfo, comments };
-    }
+    //     const thumbInfo = getThumbInfo(watch_data.api_data);
+    //     const comments = await this._getComments(watch_data.api_data, cur_comments);
+    //     return { is_deleted, tags, thumbInfo, comments };
+    // }
 
     async _getCurrentComments(dir_path, video_info){
         return await this.library._getComments(dir_path, video_info);
@@ -324,10 +276,10 @@ class NicoUpdate {
         }        
     }
 
-    async _writeFile(file_path, data){
+    async _writeFile(file_path, data, encoding){
         const tmp_path = path.join(path.dirname(file_path), "_update.tmp");
         try {
-            await this._write(tmp_path, data);
+            await this._write(tmp_path, data, encoding);
         } catch (error) {
             await this._unlink(tmp_path);
             throw error;
@@ -335,17 +287,17 @@ class NicoUpdate {
         await this._rename(tmp_path, file_path);
     }
 
-    //TODO
-    async _writeBinary(file_path, data){
-        const tmp_path = path.join(path.dirname(file_path), "_update-bin.tmp");
-        try {
-            await fsPromises.writeFile(tmp_path, data, "binary");
-        } catch (error) {
-            await this._unlink(tmp_path);
-            throw error;
-        }     
-        await this._rename(tmp_path, file_path);
-    }
+    // //TODO
+    // async _writeBinary(file_path, data){
+    //     const tmp_path = path.join(path.dirname(file_path), "_update-bin.tmp");
+    //     try {
+    //         await fsPromises.writeFile(tmp_path, data, "binary");
+    //     } catch (error) {
+    //         await this._unlink(tmp_path);
+    //         throw error;
+    //     }     
+    //     await this._rename(tmp_path, file_path);
+    // }
 
     async _unlink(file_path){
         await fsPromises.unlink(file_path);
@@ -355,9 +307,19 @@ class NicoUpdate {
         await fsPromises.rename(old_path, new_path);
     }
 
-    async _write(file_path, data){
-        const json = JSON.stringify(data, null, "  ");
-        await fsPromises.writeFile(file_path, json, "utf-8");
+    async _write(file_path, data, encoding){
+        if(encoding=="json"){
+            const json = JSON.stringify(data, null, "  ");
+            await fsPromises.writeFile(file_path, json, "utf-8");
+            return;
+        }
+
+        if(encoding=="binary"){
+            await fsPromises.writeFile(file_path, data, "binary");
+            return;
+        }
+
+        throw new Error(`${encoding} is unkown encoding`);
     }
 
     async _existPath(path){
@@ -379,7 +341,7 @@ class NicoUpdate {
         this.nico_comment = new NicoComment(api_data);
         const res_from = this._getMaxCommentNo(cur_comments) + 1;
         const comments_diff = await this.nico_comment.getCommentDiff(res_from);
-        return cur_comments.concat(filterComments(comments_diff));
+        return comments_diff;
     }
 
     /**

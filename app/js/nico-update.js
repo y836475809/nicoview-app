@@ -180,7 +180,7 @@ class NicoUpdate {
         return { video_info, dir_path };
     }
 
-    async _getNicoFileData(video_info, dir_path){
+    _getNicoFileData(video_info, dir_path){
         const nico_xml = new NicoXMLFile();
         nico_xml.dirPath = dir_path;
         nico_xml.commonFilename = video_info.common_filename;

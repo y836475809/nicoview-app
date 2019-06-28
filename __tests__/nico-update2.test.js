@@ -7,14 +7,9 @@ const { NicoUpdate } = require("../app/js/nico-update");
 const cur_comment = filterComments(TestData.no_owner_comment);
 
 class TestNicoUpdate extends NicoUpdate {
-    // constructor(video_id, is_deleted, thumb_size, dbtype, is_deleted_in_db){
     constructor(video_id){
         super(video_id, {});
-        this._is_deleted = false;
-        this._thumb_size = "S";
-        this._dbtype = "xml";
-        this._is_deleted_in_db = false;
-        this._exist_file = false;
+        this.setupTestParams();
 
         this.library._getVideoInfo = (video_id) => {
             return {
@@ -31,6 +26,19 @@ class TestNicoUpdate extends NicoUpdate {
         this.paths = [];
         this.data = [];
         this.log = [];
+    }
+
+    setupTestParams({
+        is_deleted_in_nico=false,
+        thumb_size="S",
+        dbtype="xml",
+        is_deleted_in_db=false,
+        file_exist=false}={}){
+        this._is_deleted_in_nico = is_deleted_in_nico;
+        this._thumb_size = thumb_size;
+        this._dbtype = dbtype;
+        this._is_deleted_in_db = is_deleted_in_db;
+        this._file_exist = file_exist;
     }
 
     _convertComment(nico_xml, nico_json){
@@ -66,7 +74,7 @@ class TestNicoUpdate extends NicoUpdate {
     }
     
     async _existPath(path){
-        return this._exist_file;
+        return this._file_exist;
     }
 
     async _getWatchData(){
@@ -76,7 +84,7 @@ class TestNicoUpdate extends NicoUpdate {
                     video_id: this.video_id,
                     title: "", 
                     description: "", 
-                    isDeleted: this._is_deleted,
+                    isDeleted: this._is_deleted_in_nico,
                     thumbnailURL:"",
                     largeThumbnailURL:"",
                     postedDateTime: 0, 
@@ -112,15 +120,14 @@ class TestNicoUpdate extends NicoUpdate {
     }
 }
 
-test.beforeEach(async t => {
-
+test.beforeEach(t => {
+    t.context.nico_update = new TestNicoUpdate(TestData.video_id);
 });
 
-test("updateThumbInfo, xml, not deleted", async(t) => {
-    const nico_update = new TestNicoUpdate(TestData.video_id);
+test("updateThumbInfo, db=xml, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
 
     t.truthy(await nico_update.updateThumbInfo());
-    t.falsy(nico_update._is_deleted);
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
         path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`)
@@ -132,4 +139,49 @@ test("updateThumbInfo, xml, not deleted", async(t) => {
         "_convertComment",
         "_setDBtype"
     ]);
+});
+
+test("updateThumbInfo, db=xml, deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({is_deleted_in_nico:true});
+
+    await t.throwsAsync(nico_update.updateThumbInfo());
+});
+
+test("updateThumbInfo, db=xml, not deleted in nico, deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({is_deleted_in_db:true});
+    
+    await t.throwsAsync(nico_update.updateThumbInfo());
+});
+
+test("updateThumbInfo, db=json, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json"});
+
+    t.truthy(await nico_update.updateThumbInfo());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_setTags",
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertComment"
+    ]);
+});
+
+test("updateThumbInfo, db=json, deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json", is_deleted_in_nico:true});
+
+    await t.throwsAsync(nico_update.updateThumbInfo());
+});
+
+test("updateThumbInfo, db=json, not deleted in nico, deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json", is_deleted_in_db:true});
+    
+    await t.throwsAsync(nico_update.updateThumbInfo());
 });

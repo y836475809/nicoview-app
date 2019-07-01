@@ -33,12 +33,14 @@ class TestNicoUpdate extends NicoUpdate {
         thumb_size="S",
         dbtype="xml",
         is_deleted_in_db=false,
-        file_exist=false}={}){
+        file_exist=false,
+        comments_diff=["cm1"]}={}){
         this._is_deleted_in_nico = is_deleted_in_nico;
         this._thumb_size = thumb_size;
         this._dbtype = dbtype;
         this._is_deleted_in_db = is_deleted_in_db;
         this._file_exist = file_exist;
+        this._comments_diff = comments_diff;
     }
 
     _convertComment(nico_xml, nico_json){
@@ -112,7 +114,7 @@ class TestNicoUpdate extends NicoUpdate {
     }
 
     async _getComments(api_data, cur_comments){
-        return [];
+        return this._comments_diff;
     }
 
     async _getThumbImg(url){
@@ -185,3 +187,123 @@ test("updateThumbInfo, db=json, not deleted in nico, deleted in db", async(t) =>
     
     await t.throwsAsync(nico_update.updateThumbInfo());
 });
+
+
+test("updateComment, db=xml, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.updateComment());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo",
+        "_setTags",
+        "_setDBtype"
+    ]);
+});
+
+test("updateComment, db=xml, comments_diff is empty, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({comments_diff:[]});
+
+    t.falsy(await nico_update.updateComment());
+    t.deepEqual(nico_update.log, []);
+});
+
+test("updateComment, db=xml, deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({is_deleted_in_nico:true});
+
+    t.truthy(await nico_update.updateComment());
+    t.truthy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo",
+        "_setTags",
+        "_setDBtype"
+    ]);
+});
+
+
+test("updateComment, db=xml, not deleted in nico, deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({is_deleted_in_db:true});
+
+    t.truthy(await nico_update.updateComment());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo",
+        "_setTags",
+        "_setDBtype"
+    ]);
+});
+
+test("updateComment, db=json, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json"});
+
+    t.truthy(await nico_update.updateComment());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo"
+    ]);
+});
+
+test("updateComment, db=json, comments_diff is empty, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json", comments_diff:[]});
+
+    t.falsy(await nico_update.updateComment());
+    t.deepEqual(nico_update.log, []);
+});
+
+test("updateComment, db=json, deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json", is_deleted_in_nico:true});
+
+    t.truthy(await nico_update.updateComment());
+    t.truthy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo"
+    ]);
+});
+
+test("updateComment, db=json, not deleted in nico, deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json", is_deleted_in_db:true});
+
+    t.truthy(await nico_update.updateComment());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo"
+    ]);
+});
+

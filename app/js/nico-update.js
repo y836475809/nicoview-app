@@ -71,8 +71,11 @@ class NicoUpdate {
         const api_data = await this._getApiData(true);
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
 
-        await this._updateComment(api_data, video_info, dir_path, nico_json);
-
+        const is_update = await this._updateComment(api_data, video_info, dir_path, nico_json);
+        if(!is_update){
+            return false;
+        }
+        
         if(!await this._isDBTypeJson()){  
             // const cnv_data = new XMLDataConverter();
             // cnv_data.convertThumbInfo(nico_xml, nico_json);
@@ -92,10 +95,11 @@ class NicoUpdate {
         const cur_comments = await this._getCurrentComments(dir_path, video_info);
         const comments_diff = await this._getComments(api_data, cur_comments);
         if(comments_diff.length===0){
-            return;
+            return false;
         }
         const new_comments = cur_comments.concat(filterComments(comments_diff));
         await this._writeFile(nico_json.commentPath, new_comments, "json");
+        return true;
     }
 
     //TODO

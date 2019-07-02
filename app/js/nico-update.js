@@ -33,7 +33,13 @@ class NicoUpdate {
 
         await this._updateThumbInfo(api_data, nico_json);
         await this._updateComment(api_data, video_info, dir_path, nico_json);
-        await this._updateThumbnail(api_data, nico_xml, nico_json);
+
+        const thumbnail_size = "L";
+        await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+
+        if(!await this._isDBTypeJson()){
+            await this._setDBtype("json");
+        }
 
         return true;
     }
@@ -107,30 +113,26 @@ class NicoUpdate {
         const { video_info, dir_path } = await this._getVideoInfo();
         const api_data = await this._getApiData();
 
-        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-        await this._updateThumbnail(api_data, nico_xml, nico_json);
-
-        return true;
-    }  
-
-    async _updateThumbnail(api_data, nico_xml, nico_json){
-        let thumb_url = null;
         let thumbnail_size = null;
-        let img_path = null;
-        
         if(await this._isDBTypeJson()){
             thumbnail_size = "L";
+        }else{
+            thumbnail_size = "S"; 
+        }
+
+        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        return await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+    }  
+
+    async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){
+        let thumb_url = null;
+        let img_path = null;
+        
+        if(thumbnail_size=="L"){
             thumb_url = api_data.video.largeThumbnailURL;
             nico_json.thumbnailSize = thumbnail_size;
             img_path = nico_json.thumbImgPath;
-            
-            if(thumb_url===null){
-                thumbnail_size = "S";
-                thumb_url = api_data.video.thumbnailURL;
-                img_path = nico_xml.thumbImgPath;
-            }
         }else{
-            thumbnail_size = "S";
             thumb_url = api_data.video.thumbnailURL;
             img_path = nico_xml.thumbImgPath;   
         }

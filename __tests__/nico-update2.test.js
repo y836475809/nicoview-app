@@ -69,6 +69,10 @@ class TestNicoUpdate extends NicoUpdate {
         this._is_deleted_in_db = is_deleted;
     }
 
+    async _setThumbnailSize(thumbnail_size){
+        this._thumb_size = thumbnail_size;
+    }
+
     async _writeFile(file_path, data, encoding){
         this.log.push("_writeFile");
         this.paths.push(file_path);
@@ -87,8 +91,8 @@ class TestNicoUpdate extends NicoUpdate {
                     title: "", 
                     description: "", 
                     isDeleted: this._is_deleted_in_nico,
-                    thumbnailURL:"",
-                    largeThumbnailURL:"",
+                    thumbnailURL:"url-S",
+                    largeThumbnailURL:"url-L",
                     postedDateTime: 0, 
                     movieType:"mp4",
                     viewCount: 0, 
@@ -118,6 +122,7 @@ class TestNicoUpdate extends NicoUpdate {
     }
 
     async _getThumbImg(url){
+        this.log.push(`_getThumbImg:${url}`);
         return this._img_data;
     }
 }
@@ -304,6 +309,40 @@ test("updateComment, db=json, not deleted in nico, deleted in db", async(t) => {
         "_writeFile",
         "_isDBTypeJson",
         "_convertThumbInfo"
+    ]);
+});
+
+
+test("updateThumbnail, db=xml, thumb_size=S, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.updateThumbnail());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.is(nico_update._thumb_size, "S");
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[ThumbImg].jpeg`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_isDBTypeJson",
+        "_getThumbImg:url-S",   
+        "_writeFile"
+    ]);
+});
+
+test("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not deleted in db", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({dbtype:"json"});
+
+    t.truthy(await nico_update.updateThumbnail());
+    t.falsy(nico_update._is_deleted_in_db);
+    t.is(nico_update._thumb_size, "L");
+    t.deepEqual(nico_update.paths, [
+        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+    ]);
+    t.deepEqual(nico_update.log, [
+        "_isDBTypeJson",
+        "_getThumbImg:url-L",
+        "_writeFile"
     ]);
 });
 

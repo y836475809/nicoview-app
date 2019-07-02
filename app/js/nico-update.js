@@ -33,7 +33,7 @@ class NicoUpdate {
 
         await this._updateThumbInfo(api_data, nico_json);
         await this._updateComment(api_data, video_info, dir_path, nico_json);
-        await this._updateThumbnail(api_data, video_info.thumbnail_size, nico_xml, nico_json);
+        await this._updateThumbnail(api_data, nico_xml, nico_json);
 
         return true;
     }
@@ -108,31 +108,45 @@ class NicoUpdate {
         const api_data = await this._getApiData();
 
         const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-        await this._updateThumbnail(api_data, video_info.thumbnail_size, nico_xml, nico_json);
+        await this._updateThumbnail(api_data, nico_xml, nico_json);
 
         return true;
     }  
 
-    async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){
-        let thumbImg = null;
-        if(thumbnail_size == "S"){
-            thumbImg = await this._getThumbImg(api_data.video.thumbnailURL);
-        }
-        if(thumbnail_size == "L"){
-            thumbImg = await this._getThumbImg(api_data.video.largeThumbnailURL);
-        }
-
-        if(thumbImg!==null){
-            let img_path = null;
-            if(await this._isDBTypeJson()){
-                img_path = nico_json.thumbImgPath;
-            }else{
+    async _updateThumbnail(api_data, nico_xml, nico_json){
+        let thumb_url = null;
+        let thumbnail_size = null;
+        let img_path = null;
+        
+        if(await this._isDBTypeJson()){
+            thumbnail_size = "L";
+            thumb_url = api_data.video.largeThumbnailURL;
+            nico_json.thumbnailSize = thumbnail_size;
+            img_path = nico_json.thumbImgPath;
+            
+            if(thumb_url===null){
+                thumbnail_size = "S";
+                thumb_url = api_data.video.thumbnailURL;
                 img_path = nico_xml.thumbImgPath;
             }
-
-            // await this._writeBinary(img_path, thumbImg);
-            await this._writeFile(img_path, thumbImg, "binary");
+        }else{
+            thumbnail_size = "S";
+            thumb_url = api_data.video.thumbnailURL;
+            img_path = nico_xml.thumbImgPath;   
         }
+
+        if(thumb_url===null){
+            return false;
+        }
+
+        const thumbImg = await this._getThumbImg(thumb_url);
+        if(thumbImg===null){
+            return false;
+        }
+
+        await this._writeFile(img_path, thumbImg, "binary");
+
+        await this._setThumbnailSize(thumbnail_size);
 
         return true;
     }  

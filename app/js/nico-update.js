@@ -373,6 +373,27 @@ class NicoUpdate {
             return comment.no;
         }));
     }
+
+    //TODO
+    _validateApiData(){
+
+    }
+
+    //TODO
+    _validateComment(){
+
+    }
+
+    //TODO
+    _validateThumbnail(bytes){
+        if(bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[bytes.length-2] === 0xff && bytes[bytes.length-1] === 0xd9) {
+            return true;
+        } else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+            return true;
+        }
+
+        return false;
+    }
 }
 
 module.exports = {

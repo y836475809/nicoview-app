@@ -392,7 +392,6 @@ class NicoUpdate {
     }
 
     _validateThumbnail(bytes){
-        console.log("_validateThumbnail bytes=", bytes)
         if (!(bytes instanceof Uint8Array)){
             return false;
         }

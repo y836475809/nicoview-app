@@ -102,7 +102,7 @@ class TestNicoUpdate extends NicoUpdate {
         return [];
     }
     async _getComments(api_data, cur_comments){
-        return [];
+        return [{}];
     }
     async _getThumbImg(url){
         return "jpeg";
@@ -110,8 +110,9 @@ class TestNicoUpdate extends NicoUpdate {
     async _writeFile(file_path, data){
         this.paths.push(file_path);
     }
-    async _writeBinary(file_path, data){
-        this.paths.push(file_path);
+
+    _validateThumbnail(bytes){
+        return true;
     }
 }
 
@@ -124,7 +125,7 @@ class TestNicoUpdateTags extends NicoUpdate {
         return { cookie_jar: null, api_data: this.data_api_data };
     }
     async _getComments(api_data, cur_comments){
-        return [];
+        return [{}];
     }
     async _getCurrentComments(dir_path, video_info){
         return [];
@@ -134,7 +135,9 @@ class TestNicoUpdateTags extends NicoUpdate {
     }
     async _writeFile(file_path, data){
     }
-    async _writeBinary(file_path, data){
+
+    _validateThumbnail(bytes){
+        return true;
     }
 }
 
@@ -147,7 +150,8 @@ test("update thumbinfo, comment if dbtype is json", async t => {
     t.is(await library.getFieldValue(video_id, "thumbnail_size"), "L");
     t.deepEqual(nico_update.paths, [
         path.normalize("/data/sm1[ThumbInfo].json"),
-        path.normalize("/data/sm1[Comment].json")
+        path.normalize("/data/sm1[Comment].json"),
+        path.normalize("/data/sm1[ThumbImg].L.jpeg")
     ]);
 });
 

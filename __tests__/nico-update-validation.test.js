@@ -2,31 +2,34 @@ const test = require("ava");
 const fsPromises = require("fs").promises;
 const { NicoUpdate } = require("../app/js/nico-update");
 
-const api_data = {
-    video:{
-        video_id: "",
-        title: "", 
-        description: "", 
-        isDeleted: false,
-        thumbnailURL:"url-S",
-        largeThumbnailURL:"url-L",
-        postedDateTime: 0, 
-        movieType:"mp4",
-        viewCount: 0, 
-        mylistCount: 0 
-    },
-    thread: {
-        commentCount: 0
-    },
-    tags:[],
-    owner: {
-        id: "", 
-        nickname: "",
-        iconURL: "",
+const test_watch_data = {
+    api_data:{
+        cookie_jar: {},
+        video:{
+            video_id: "",
+            title: "", 
+            description: "", 
+            isDeleted: false,
+            thumbnailURL:"url-S",
+            largeThumbnailURL:"url-L",
+            postedDateTime: 0, 
+            movieType:"mp4",
+            viewCount: 0, 
+            mylistCount: 0 
+        },
+        thread: {
+            commentCount: 0
+        },
+        tags:[],
+        owner: {
+            id: "", 
+            nickname: "",
+            iconURL: "",
+        }
     }
 };
 
-const comments = [
+const test_comments = [
     {
         "ping": {
             "content": "rs:0"
@@ -67,18 +70,6 @@ const comments = [
         }
     },
     {
-        "chat": {
-            "thread": "1234567890",
-            "fork": 1,
-            "no": 2,
-            "vpos": 200,
-            "date": 1360996778,
-            "premium": 1,
-            "mail": "shita green small",
-            "content": "owner comment2"
-        }
-    },
-    {
         "ping": {
             "content": "pf:0"
         }
@@ -102,13 +93,6 @@ const comments = [
         "leaf": {
             "thread": "1234567890",
             "count": 303
-        }
-    },
-    {
-        "leaf": {
-            "thread": "1234567890",
-            "leaf": 1,
-            "count": 152
         }
     },
     {
@@ -136,19 +120,6 @@ const comments = [
         }
     },
     {
-        "chat": {
-            "thread": "1234567890",
-            "no": 17,
-            "vpos": 400,
-            "leaf": 11,
-            "date": 1359607224,
-            "anonymity": 1,
-            "user_id": "hijklnm",
-            "mail": "184",
-            "content": "comment4"
-        }
-    },
-    {
         "ping": {
             "content": "pf:2"
         }
@@ -160,6 +131,86 @@ const comments = [
     }
 ];
 
+class TestNicoUpdate extends NicoUpdate {
+    constructor(){
+        super("sm100", {});
+        this.setupTestParams();
+
+        this.library._getVideoInfo = (video_id) => {
+            return {
+                common_filename: video_id,
+                thumbnail_size: "S",
+                is_deleted: false,
+            };
+        };
+        this.library._getDir = (dirpath_id) => {
+            return "/data/";
+        };
+
+        this.log = [];
+    }
+
+    setupTestParams({
+        watch_data=test_watch_data,
+        comments_diff=test_comments,
+        img_data=new Uint8Array([0xff, 0xd8, 0xff, 0xd9])}={}){
+        this._watch_data = watch_data;
+        this._img_data = img_data;
+        this._comments_diff = comments_diff;
+    }
+
+    _convertComment(nico_xml, nico_json){
+        this.log.push("_convertComment");
+    }
+    _convertThumbInfo(nico_xml, nico_json){
+        this.log.push("_convertThumbInfo");
+    }
+    async _isDBTypeJson(){
+        this.log.push("_isDBTypeJson");
+        return false;
+    }
+    async _setDBtype(db_type){
+        this.log.push("_setDBtype");
+    }
+    async _isDeleted(){
+        return false;
+    }
+    async _setTags(tags){
+        this.log.push("_setTags");
+    }
+    async _setDeleted(is_deleted){}
+    async _setThumbnailSize(thumbnail_size){
+        this.log.push("_setThumbnailSize");
+    }
+    async _writeFile(file_path, data, encoding){
+        this.log.push("_writeFile");
+    }
+    async _existPath(path){
+        return false;
+    }
+
+    async _getWatchData(){
+        this.log.push("_getWatchData");
+        return this._watch_data;
+    }
+    async _getComments(api_data, cur_comments){
+        this.log.push("_getComments");
+        return this._comments_diff;
+    }
+
+    async _getThumbImg(url){
+        this.log.push("_getThumbImg");
+        return this._img_data;
+    }
+    async _getCurrentComments(dir_path, video_info){
+        return [];
+    }
+}
+
+test.beforeEach(t => {
+    t.context.nico_update = new TestNicoUpdate();
+});
+
 test.before(async t => {
     t.context.image ={
         jpeg:await fsPromises.readFile(`${__dirname}/data/sample1.jpeg`),
@@ -167,20 +218,20 @@ test.before(async t => {
     };
 });
 
-test("validate api_data", t => {
+test("validate watch_data", t => {
     const nico_update = new NicoUpdate();
     
-    t.truthy(nico_update._validateApiData(api_data));
+    t.truthy(nico_update._validateWatchData(test_watch_data));
 
-    t.falsy(nico_update._validateApiData({}));
-    t.falsy(nico_update._validateApiData(null));
-    t.falsy(nico_update._validateApiData("not find 404"));
+    t.falsy(nico_update._validateWatchData({}));
+    t.falsy(nico_update._validateWatchData(null));
+    t.falsy(nico_update._validateWatchData("not find 404"));
 });
 
 test("validate comments", t => {
     const nico_update = new NicoUpdate();
     
-    t.truthy(nico_update._validateComment(comments));
+    t.truthy(nico_update._validateComment(test_comments));
     t.truthy(nico_update._validateComment([]));
     t.truthy(nico_update._validateComment([{},{}]));
     
@@ -201,4 +252,165 @@ test("validate thumbnail", t => {
     t.falsy(nico_update._validateThumbnail("not find 404"));
     t.falsy(nico_update._validateThumbnail([]));
     t.falsy(nico_update._validateThumbnail([0xff]));
+});
+
+
+test("updateThumbInfo correct watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.updateThumbInfo());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_setTags",
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertComment",
+        "_setDBtype"
+    ]);
+});
+
+test("updateThumbInfo invalid watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({watch_data:"not find"});
+
+    await t.throwsAsync(nico_update.updateThumbInfo());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData"
+    ]);
+});
+
+
+test("updateComment correct watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.updateComment());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_getComments",
+        "_writeFile",
+        "_isDBTypeJson",
+        "_convertThumbInfo",
+        "_setTags",
+        "_setDBtype"
+    ]);
+});
+
+test("updateComment invalid watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({watch_data:"not find"});
+
+    await t.throwsAsync(nico_update.updateComment());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData"
+    ]);
+});
+
+test("updateComment invalid comment diff", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({comments_diff:"not find"});
+
+    await t.throwsAsync(nico_update.updateComment());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_getComments",
+    ]);
+});
+
+
+test("updateThumbnail correct watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.updateThumbnail());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_isDBTypeJson",
+        "_getThumbImg",
+        "_writeFile",
+        "_setThumbnailSize"
+    ]);
+});
+
+test("updateThumbnail invalid watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({watch_data:"not find"});
+
+    await t.throwsAsync(nico_update.updateThumbnail());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData"
+    ]);
+});
+
+test("updateThumbnail invalid image", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({img_data:"not find"});
+
+    await t.throwsAsync(nico_update.updateThumbnail());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_isDBTypeJson",
+        "_getThumbImg",
+    ]);
+});
+
+
+test("update correct data", async(t) => {
+    const nico_update = t.context.nico_update;
+
+    t.truthy(await nico_update.update());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_setTags",
+        "_writeFile",
+
+        "_getComments",
+        "_writeFile",
+
+        "_getThumbImg",
+        "_writeFile",
+        "_setThumbnailSize",
+        
+        "_isDBTypeJson",
+        "_setDBtype"
+    ]);
+});
+
+test("update invalid watch_data", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({watch_data:"not find"});
+
+    await t.throwsAsync(nico_update.update());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData"
+    ]);
+});
+
+test("update invalid comment diff", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({comments_diff:"not find"});
+
+    await t.throwsAsync(nico_update.update());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_setTags",
+        "_writeFile",
+
+        "_getComments",
+    ]);
+});
+
+test("update invalid image", async(t) => {
+    const nico_update = t.context.nico_update;
+    nico_update.setupTestParams({img_data:"not find"});
+
+    await t.throwsAsync(nico_update.update());
+    t.deepEqual(nico_update.log, [
+        "_getWatchData",
+        "_setTags",
+        "_writeFile",
+
+        "_getComments",
+        "_writeFile",
+
+        "_getThumbImg",
+    ]);
 });

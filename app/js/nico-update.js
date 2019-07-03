@@ -103,6 +103,11 @@ class NicoUpdate {
         if(comments_diff.length===0){
             return false;
         }
+
+        if(!this._validateComment(comments_diff)){
+            throw new Error(`${this.video_id}の差分コメントが正しくないデータです`);
+        }
+
         const new_comments = cur_comments.concat(filterComments(comments_diff));
         await this._writeFile(nico_json.commentPath, new_comments, "json");
         return true;
@@ -142,8 +147,9 @@ class NicoUpdate {
         }
 
         const thumbImg = await this._getThumbImg(thumb_url);
-        if(thumbImg===null){
-            return false;
+        
+        if(!this._validateThumbnail(thumbImg)){
+            throw new Error(`${this.video_id}のサムネイルが正しくないデータです`);
         }
 
         await this._writeFile(img_path, thumbImg, "binary");
@@ -169,6 +175,11 @@ class NicoUpdate {
 
     async _getApiData(ignore_deleted=false){
         const watch_data = await this._getWatchData();
+
+        if(!this._validateWatchData(watch_data)){
+            throw new Error(`${this.video_id}のwatch dataが正しくないデータです`);
+        }
+
         const api_data = watch_data.api_data;
         const is_deleted = api_data.video.isDeleted;
         
@@ -380,7 +391,12 @@ class NicoUpdate {
     }
 
     //TODO
-    _validateApiData(api_data){
+    _validateWatchData(watch_data){
+        if(this._typeOf(watch_data)!="object"){
+            return false;
+        }
+
+        const api_data = watch_data.api_data;
         if(this._typeOf(api_data)!="object"){
             return false;
         }

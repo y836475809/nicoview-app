@@ -1,53 +1,7 @@
-// const fs = require("fs");
 const fsPromises = require("fs").promises;
-// const util = require("util");
-// const path = require("path");
 const reader = require("./reader");
-const { createDBItem, Library } = require("./library");
-const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 class XMLDataConverter {
-    /**
-     * 
-     * @param {Library} library 
-     * @param {*} video_id 
-     */
-    async convert(library, video_id){
-        const video_info = await library._getVideoInfo(video_id);
-        const dir_path = await library._getDir(video_info.dirpath_id);
-        const cnv_item = this._convertItem(video_info);
-
-        const nico_xml = new NicoXMLFile();
-        nico_xml.dirPath = dir_path;
-        nico_xml.commonFilename = cnv_item.common_filename;
-        nico_xml.videoType = video_info.video_type;
-
-        const nico_json = new NicoJsonFile();
-        nico_json.dirPath = dir_path;
-        nico_json.commonFilename = cnv_item.common_filename;
-        nico_json.videoType = video_info.video_type;
-
-        const need_cnv = await this._need(video_info._db_type, nico_json);
-        if(need_cnv===false){
-            return false;
-        }
-
-        try {
-            const thumbinfo_xml = await this._read(nico_xml.thumbInfoPath);
-            await this._write(nico_json.thumbInfoPath, this._convertThumbinfo(thumbinfo_xml));
-
-            const common_xml = await this._read(nico_xml.commentPath);
-            const owner_xml = await this._read(nico_xml.ownerCommentPath);
-            await this._write(nico_json.commentPath, this._convertComment(common_xml, owner_xml));
-
-        } catch (error) {
-            throw error;
-        }
-        await library.updateItem(cnv_item);
-
-        return true;
-    }
-
     async convertThumbInfo(nico_xml, nico_json){
         const thumbinfo_xml = await this._read(nico_xml.thumbInfoPath);
         await this._write(nico_json.thumbInfoPath, this._convertThumbinfo(thumbinfo_xml));
@@ -57,35 +11,6 @@ class XMLDataConverter {
         const common_xml = await this._read(nico_xml.commentPath);
         const owner_xml = await this._read(nico_xml.ownerCommentPath);
         await this._write(nico_json.commentPath, this._convertComment(common_xml, owner_xml));
-    }
-
-    async _need(db_type, nico_json){
-        try {
-            await this._stat(nico_json.thumbInfoPath);
-            await this._stat(nico_json.commentPath);
-        } catch (error) {
-            return true;
-        }
-
-        if(db_type == "xml"){
-            return true;
-        }
-        if(db_type == "json"){
-            return false;
-        }
-
-        throw new Error(`${db_type} is unkown`);
-    }
-
-    async _stat(file_path){
-        await fsPromises.stat(file_path);
-    }
-
-    _convertItem(item){
-        const cnv_item = createDBItem();
-        Object.assign(cnv_item, item);
-        cnv_item._db_type = "json";
-        return cnv_item;
     }
 
     async _read(file_path){

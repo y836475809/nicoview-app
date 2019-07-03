@@ -20,7 +20,6 @@ class NicoUpdate {
         this.nico_thumbnail = null;
     }
 
-    //TODO
     /**
      * 
      * @returns {boolean} true:update false:not update 
@@ -52,13 +51,9 @@ class NicoUpdate {
         await this._updateThumbInfo(api_data, nico_json);
 
         if(!await this._isDBTypeJson()){
-            // const cnv_data = new XMLDataConverter();
-            // cnv_data.convertComment(nico_xml, nico_json);
             this._convertComment(nico_xml, nico_json);
             await this._setDBtype("json");
         }else if(!await this._existPath(nico_json.commentPath)){
-            // const cnv_data = new XMLDataConverter();
-            // cnv_data.convertComment(nico_xml, nico_json);
             this._convertComment(nico_xml, nico_json);    
         }
 
@@ -83,14 +78,10 @@ class NicoUpdate {
         }
         
         if(!await this._isDBTypeJson()){  
-            // const cnv_data = new XMLDataConverter();
-            // cnv_data.convertThumbInfo(nico_xml, nico_json);
             this._convertThumbInfo(nico_xml, nico_json);
             await this._setTags(api_data.tags);
             await this._setDBtype("json");
-        }else if(!await this._existPath(nico_json.thumbInfoPath)){
-            // const cnv_data = new XMLDataConverter();
-            // cnv_data.convertThumbInfo(nico_xml, nico_json);  
+        }else if(!await this._existPath(nico_json.thumbInfoPath)){ 
             this._convertThumbInfo(nico_xml, nico_json);  
         }
 
@@ -113,7 +104,6 @@ class NicoUpdate {
         return true;
     }
 
-    //TODO
     async updateThumbnail(){
         const { video_info, dir_path } = await this._getVideoInfo();
         const api_data = await this._getApiData();
@@ -159,7 +149,6 @@ class NicoUpdate {
         return true;
     }  
 
-    //TODO
     async _getThumbInfo(){
         const watch_data = await this._getWatchData();
         const api_data = watch_data.api_data;
@@ -240,23 +229,6 @@ class NicoUpdate {
         cnv_data.convertThumbInfo(nico_xml, nico_json);
     }
 
-    /**
-     * 
-     * @param {Array} comments 
-     */
-    // async _get(cur_comments){
-    //     const watch_data = await this._getWatchData();
-    //     const is_deleted = watch_data.api_data.video.isDeleted;
-    //     const tags = watch_data.api_data.tags;
-    //     if(is_deleted===true){
-    //         return { is_deleted: is_deleted, tags: tags, thumbInfo: null, comments: null };
-    //     }
-
-    //     const thumbInfo = getThumbInfo(watch_data.api_data);
-    //     const comments = await this._getComments(watch_data.api_data, cur_comments);
-    //     return { is_deleted, tags, thumbInfo, comments };
-    // }
-
     async _getCurrentComments(dir_path, video_info){
         return await this.library._getComments(dir_path, video_info);
     }
@@ -318,18 +290,6 @@ class NicoUpdate {
         await this._rename(tmp_path, file_path);
     }
 
-    // //TODO
-    // async _writeBinary(file_path, data){
-    //     const tmp_path = path.join(path.dirname(file_path), "_update-bin.tmp");
-    //     try {
-    //         await fsPromises.writeFile(tmp_path, data, "binary");
-    //     } catch (error) {
-    //         await this._unlink(tmp_path);
-    //         throw error;
-    //     }     
-    //     await this._rename(tmp_path, file_path);
-    // }
-
     async _unlink(file_path){
         await fsPromises.unlink(file_path);
     }
@@ -390,7 +350,6 @@ class NicoUpdate {
         return toString.call(obj).slice(8, -1).toLowerCase();
     }
 
-    //TODO
     _validateWatchData(watch_data){
         if(this._typeOf(watch_data)!="object"){
             return false;
@@ -418,7 +377,6 @@ class NicoUpdate {
         return true;
     }
 
-    //TODO
     _validateComment(comments){
         if (!Array.isArray(comments)){
             return false;
@@ -433,8 +391,8 @@ class NicoUpdate {
         return true;
     }
 
-    //TODO
     _validateThumbnail(bytes){
+        console.log("_validateThumbnail bytes=", bytes)
         if (!(bytes instanceof Uint8Array)){
             return false;
         }

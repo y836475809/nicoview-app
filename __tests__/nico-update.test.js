@@ -1,7 +1,7 @@
 const test = require("ava");
 const nock = require("nock");
 const path = require("path");
-const { NicoMocks, TestData} = require("./helper/nico-mock");
+const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
 const { getThumbInfo, filterComments } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 const { Library } = require("../app/js/library");
@@ -9,7 +9,7 @@ const { Library } = require("../app/js/library");
 /** @type {Library} */
 let library = null;
 const cur_comment = filterComments(TestData.no_owner_comment);
-const nico_mocks = new NicoMocks();
+const nico_mocks = new NicoDownLoadMocks();
 
 test.beforeEach(async t => {
     nock.disableNetConnect();
@@ -47,29 +47,43 @@ class TestNicoUpdate extends NicoUpdate {
         this.paths.push(file_path);
         this.data.push(data);
     }
+
+    _validateThumbnail(bytes){
+        return true;
+    }
 }
+
+const byteToString = (byte) => {
+    return String.fromCharCode.apply("", new Uint16Array(byte));
+};
 
 test("update", async(t) => {
     nico_mocks.watch();
     nico_mocks.comment();
+    nico_mocks.thumbnail();
 
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
 
     t.truthy(await nico_update.update());
     t.falsy(await library.getFieldValue(TestData.video_id, "is_deleted"));
+    t.is(await library.getFieldValue(TestData.video_id, "_db_type"), "json");
+    t.is(await library.getFieldValue(TestData.video_id, "thumbnail_size"), "L");
     t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
-    t.is(nico_update.data[1].length,4);
+    t.is(nico_update.data[1].length,2);
+    t.is(byteToString(nico_update.data[2]), "thumbnail");
     t.deepEqual(nico_update.paths, [
         path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${TestData.video_id}[Comment].json`),
+        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
     ]);
 });
 
 test("update cancel", async(t) => {
     t.plan(2);
 
-    nico_mocks.watch(3000);
+    nico_mocks.watch({delay:3000});
     nico_mocks.comment();
+    nico_mocks.thumbnail();
 
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
 
@@ -87,8 +101,9 @@ test("update cancel", async(t) => {
 test("update timetout", async (t) => {
     t.plan(4);
 
-    nico_mocks.watch(6000);
+    nico_mocks.watch({delay:6000});
     nico_mocks.comment();
+    nico_mocks.thumbnail();
         
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
     try {
@@ -104,8 +119,9 @@ test("update timetout", async (t) => {
 test("update 404", async t => {
     t.plan(4);
 
-    nico_mocks.watch(1, 404);
+    nico_mocks.watch({code:404});
     nico_mocks.comment();
+    nico_mocks.thumbnail();
 
     const nico_update = new TestNicoUpdate(TestData.video_id, library);
     try {

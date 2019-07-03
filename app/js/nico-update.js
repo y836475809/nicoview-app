@@ -373,19 +373,60 @@ class NicoUpdate {
             return comment.no;
         }));
     }
-
-    //TODO
-    _validateApiData(){
-
+ 
+    _typeOf(obj) {
+        const toString = Object.prototype.toString;
+        return toString.call(obj).slice(8, -1).toLowerCase();
     }
 
     //TODO
-    _validateComment(){
+    _validateApiData(api_data){
+        if(this._typeOf(api_data)!="object"){
+            return false;
+        }
 
+        const video = api_data.video;
+        if(this._typeOf(video)!="object"){
+            return false;
+        } 
+
+        const thread = api_data.thread;
+        if(this._typeOf(thread)!="object"){
+            return false;
+        }   
+        
+        const owner = api_data.owner;
+        if(this._typeOf(owner)!="object"){
+            return false;
+        }   
+        return true;
+    }
+
+    //TODO
+    _validateComment(comments){
+        if (!Array.isArray(comments)){
+            return false;
+        }
+
+        if(comments.length>0){
+            if(this._typeOf(comments[0])!="object"){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //TODO
     _validateThumbnail(bytes){
+        if (!(bytes instanceof Uint8Array)){
+            return false;
+        }
+
+        if(bytes.length<4){
+            return false;
+        }
+
         if(bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[bytes.length-2] === 0xff && bytes[bytes.length-1] === 0xd9) {
             return true;
         } else if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {

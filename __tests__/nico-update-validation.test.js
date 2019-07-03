@@ -1,4 +1,5 @@
 const test = require("ava");
+const fsPromises = require("fs").promises;
 const { NicoUpdate } = require("../app/js/nico-update");
 
 const api_data = {
@@ -25,7 +26,7 @@ const api_data = {
     }
 };
 
-const commnets = [
+const comments = [
     {
         "ping": {
             "content": "rs:0"
@@ -159,7 +160,45 @@ const commnets = [
     }
 ];
 
-test("validate apidata", async(t) => {
-    const nico_update = new NicoUpdate();
+test.before(async t => {
+    t.context.image ={
+        jpeg:await fsPromises.readFile(`${__dirname}/data/sample1.jpeg`),
+        png:await fsPromises.readFile(`${__dirname}/data/sample2.png`)
+    };
+});
 
+test("validate api_data", t => {
+    const nico_update = new NicoUpdate();
+    
+    t.truthy(nico_update._validateApiData(api_data));
+
+    t.falsy(nico_update._validateApiData({}));
+    t.falsy(nico_update._validateApiData(null));
+    t.falsy(nico_update._validateApiData("not find 404"));
+});
+
+test("validate comments", t => {
+    const nico_update = new NicoUpdate();
+    
+    t.truthy(nico_update._validateComment(comments));
+    t.truthy(nico_update._validateComment([]));
+    t.truthy(nico_update._validateComment([{},{}]));
+    
+    t.falsy(nico_update._validateComment(["error"]));
+    t.falsy(nico_update._validateComment({}));
+    t.falsy(nico_update._validateComment(null));
+    t.falsy(nico_update._validateComment("not find 404"));
+});
+
+test("validate thumbnail", t => {
+    const nico_update = new NicoUpdate();
+    
+    const { jpeg, png } = t.context.image;
+    t.truthy(nico_update._validateThumbnail(jpeg));
+    t.truthy(nico_update._validateThumbnail(png));
+
+    t.falsy(nico_update._validateThumbnail(null));
+    t.falsy(nico_update._validateThumbnail("not find 404"));
+    t.falsy(nico_update._validateThumbnail([]));
+    t.falsy(nico_update._validateThumbnail([0xff]));
 });

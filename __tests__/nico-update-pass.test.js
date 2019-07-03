@@ -1,10 +1,8 @@
 const test = require("ava");
 const path = require("path");
-const { TestData} = require("./helper/nico-mock");
-const { getThumbInfo, filterComments } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
-const cur_comment = filterComments(TestData.no_owner_comment);
+const test_video_id = "sm100";
 
 class TestNicoUpdate extends NicoUpdate {
     constructor(video_id){
@@ -22,7 +20,7 @@ class TestNicoUpdate extends NicoUpdate {
             return "/data/";
         };
 
-        this._img_data = "image";
+        this._img_data = new Uint8Array([0xff, 0xd8, 0xff, 0xd9]);
         this.paths = [];
         this.data = [];
         this.log = [];
@@ -35,7 +33,7 @@ class TestNicoUpdate extends NicoUpdate {
         dbtype="xml",
         is_deleted_in_db=false,
         file_exist=false,
-        comments_diff=["cm1"]}={}){
+        comments_diff=[{}]}={}){
         this._is_deleted_in_nico = is_deleted_in_nico;
         this._thumb_size = thumb_size;
         this._large_thumb_url = large_thumb_url;
@@ -131,7 +129,7 @@ class TestNicoUpdate extends NicoUpdate {
 }
 
 test.beforeEach(t => {
-    t.context.nico_update = new TestNicoUpdate(TestData.video_id);
+    t.context.nico_update = new TestNicoUpdate(test_video_id);
 });
 
 test("updateThumbInfo, db=xml, not deleted in nico, not deleted in db", async(t) => {
@@ -140,7 +138,7 @@ test("updateThumbInfo, db=xml, not deleted in nico, not deleted in db", async(t)
     t.truthy(await nico_update.updateThumbInfo());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`)
+        path.normalize(`/data/${test_video_id}[ThumbInfo].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_setTags",
@@ -172,7 +170,7 @@ test("updateThumbInfo, db=json, not deleted in nico, not deleted in db", async(t
     t.truthy(await nico_update.updateThumbInfo());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`)
+        path.normalize(`/data/${test_video_id}[ThumbInfo].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_setTags",
@@ -203,7 +201,7 @@ test("updateComment, db=xml, not deleted in nico, not deleted in db", async(t) =
     t.truthy(await nico_update.updateComment());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -229,7 +227,7 @@ test("updateComment, db=xml, deleted in nico, not deleted in db", async(t) => {
     t.truthy(await nico_update.updateComment());
     t.truthy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -248,7 +246,7 @@ test("updateComment, db=xml, not deleted in nico, deleted in db", async(t) => {
     t.truthy(await nico_update.updateComment());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -266,7 +264,7 @@ test("updateComment, db=json, not deleted in nico, not deleted in db", async(t) 
     t.truthy(await nico_update.updateComment());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -290,7 +288,7 @@ test("updateComment, db=json, deleted in nico, not deleted in db", async(t) => {
     t.truthy(await nico_update.updateComment());
     t.truthy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -306,7 +304,7 @@ test("updateComment, db=json, not deleted in nico, deleted in db", async(t) => {
     t.truthy(await nico_update.updateComment());
     t.falsy(nico_update._is_deleted_in_db);
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[Comment].json`)
+        path.normalize(`/data/${test_video_id}[Comment].json`)
     ]);
     t.deepEqual(nico_update.log, [
         "_writeFile",
@@ -323,7 +321,7 @@ test("updateThumbnail, db=xml, thumb_size=S, not deleted in nico, not deleted in
     t.falsy(nico_update._is_deleted_in_db);
     t.is(nico_update._thumb_size, "S");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].jpeg`)
+        path.normalize(`/data/${test_video_id}[ThumbImg].jpeg`)
     ]);
     t.deepEqual(nico_update.log, [
         "_isDBTypeJson",
@@ -341,7 +339,7 @@ test("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not deleted i
     t.falsy(nico_update._is_deleted_in_db);
     t.is(nico_update._thumb_size, "L");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+        path.normalize(`/data/${test_video_id}[ThumbImg].L.jpeg`)
     ]);
     t.deepEqual(nico_update.log, [
         "_isDBTypeJson",
@@ -359,7 +357,7 @@ test("updateThumbnail, db=json, thumb_size=L, not deleted in nico, not deleted i
     t.falsy(nico_update._is_deleted_in_db);
     t.is(nico_update._thumb_size, "L");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+        path.normalize(`/data/${test_video_id}[ThumbImg].L.jpeg`)
     ]);
     t.deepEqual(nico_update.log, [
         "_isDBTypeJson",
@@ -404,9 +402,9 @@ test("update, db=xml, not deleted in nico, not deleted in db", async(t) => {
     t.falsy(nico_update._is_deleted_in_db);
     t.is(nico_update._thumb_size, "L");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),
-        path.normalize(`/data/${TestData.video_id}[Comment].json`),
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+        path.normalize(`/data/${test_video_id}[ThumbInfo].json`),
+        path.normalize(`/data/${test_video_id}[Comment].json`),
+        path.normalize(`/data/${test_video_id}[ThumbImg].L.jpeg`)
     ]);
     t.deepEqual(nico_update.log, [
         "_setTags",
@@ -428,9 +426,9 @@ test("update, db=json, not deleted in nico, not deleted in db", async(t) => {
     t.falsy(nico_update._is_deleted_in_db);
     t.is(nico_update._thumb_size, "L");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),
-        path.normalize(`/data/${TestData.video_id}[Comment].json`),
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+        path.normalize(`/data/${test_video_id}[ThumbInfo].json`),
+        path.normalize(`/data/${test_video_id}[Comment].json`),
+        path.normalize(`/data/${test_video_id}[ThumbImg].L.jpeg`)
     ]);
     t.deepEqual(nico_update.log, [
         "_setTags",

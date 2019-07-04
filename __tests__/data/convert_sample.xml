@@ -1,0 +1,9 @@
+<packet>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <leaf thread="1505300000" count="10"/>
+  <leaf thread="1505300000" leaf="1" count="2"/>
+  <leaf thread="1505300000" leaf="2" count="1"/>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <chat thread="1505300000" no="1" vpos="400" date="0" date_usec="0" premium="1" anonymity="1" user_id="AAA" mail="naka medium 184">AAAテスト</chat>
+  <chat thread="1505300000" no="2" vpos="300" date="1" date_usec="0" premium="1" anonymity="1" user_id="BBB" mail="184">BBBあ</chat>
+</packet>

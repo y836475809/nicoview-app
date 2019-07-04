@@ -166,7 +166,8 @@
     <div class="library-grid-container">
         <div class="library-grid"></div>
     </div>
-    
+    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
+
     <script>
         /* globals app_base_dir */
         const {remote} = require("electron");
@@ -178,7 +179,8 @@
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
 
         const obs = this.opts.obs; 
-    
+        this.obs_modal_dialog = riot.observable();
+
         let library = null;
         this.num_items = 0;
     
@@ -249,6 +251,53 @@
     
             this.update();
         };
+
+        const wait = async (msec) => {
+            await new Promise(resolve => setTimeout(resolve, msec)); 
+        };
+
+        //TODO
+        const updateNicoData = (func) => {
+            let nico_update = null;
+            this.obs_modal_dialog.trigger("show", {
+                message: "...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    if(nico_update){
+                        nico_update.cancel();
+                    }
+                }
+            });   
+            try {
+                const items = grid_table.getSelectedDatas();
+                items.forEach(async (item, index) => {   
+                    this.obs_modal_dialog.trigger("update-message", `更新中 ${index+1}/${items.length}`);
+
+                    grid_table.updateCell(item.id, "state", "更新中");
+                    try {
+                        nico_update = new NicoUpdate(item.id, library);
+                        // await nico_update.updateComment();
+                        await func(nico_update);
+
+                        grid_table.updateCell(item.id, "state", "更新完了");
+                    } catch (error) {
+                        console.log(error);
+                        if(error.cancel===true){   
+                            grid_table.updateCell(item.id, "state", "更新キャンセル");
+                            throw error;
+                        }else{
+                            this.obs_modal_dialog.trigger("update-message", `更新失敗 ${index+1}/${items.length}`);
+                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                        }
+                    }
+                    wait(1000);
+                });                
+            } catch (error) {
+                this.obs_modal_dialog.trigger("update-message", "更新キャンセル");
+            }
+
+            this.obs_modal_dialog.trigger("close");
+        };
        
         //TODO
         const createMenu = () => {
@@ -258,59 +307,65 @@
                     const video_id = items[0].id;
                     obs.trigger("main-page:play-by-videoid", video_id);
                 }},
-                { label: "動画情報更新", click() {
+                { label: "コメント更新", click() {
                     //TODO
-                    // const cnv_data = new XMLDataConverter();
-                    const items = grid_table.getSelectedDatas();
-                    items.forEach(async item => {   
-                        grid_table.updateCell(item.id, "state", "更新中");
-                        try {
-                            // await cnv_data.convert(library, item.id);
-                            const nico_update = new NicoUpdate(item.id, library);
-                            await nico_update.update();
+                    // const items = grid_table.getSelectedDatas();
+                    // items.forEach(async item => {   
+                    //     grid_table.updateCell(item.id, "state", "更新中");
+                    //     try {
+                    //         const nico_update = new NicoUpdate(item.id, library);
+                    //         await nico_update.updateComment();
 
-                            grid_table.updateCell(item.id, "state", "更新完了");
-                        } catch (error) {
-                            console.log(error);
-                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
-                        }
-                    });
-                }},
-                { label: "動画情報、コメント更新", click() {
-                    //TODO
-                    // const cnv_data = new XMLDataConverter();
-                    const items = grid_table.getSelectedDatas();
-                    items.forEach(async item => {   
-                        grid_table.updateCell(item.id, "state", "更新中");
-                        try {
-                            // await cnv_data.convert(library, item.id);
-                            const nico_update = new NicoUpdate(item.id, library);
-                            await nico_update.update();
+                    //         grid_table.updateCell(item.id, "state", "更新完了");
+                    //     } catch (error) {
+                    //         console.log(error);
+                    //         grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                    //     }
+                    // });
 
-                            grid_table.updateCell(item.id, "state", "更新完了");
-                        } catch (error) {
-                            console.log(error);
-                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
-                        }
+                    updateNicoData(async (nico_update)=>{
+                        await nico_update.updateComment();
                     });
                 }},
                 { label: "画像更新", click() {
-                    const items = grid_table.getSelectedDatas();
-                    items.forEach(async item => {   
-                        grid_table.updateCell(item.id, "state", "更新中");
-                        try {
-                            //TODO
-                            const nico_update = new NicoUpdate(item.id, library);
-                            await nico_update.updateThumbnail();
-                            const img_src = item.thumb_img;
-                            grid_table.updateCell(item.id, "thumb_img", `${img_src}?${new Date().getTime()}`);
-                            grid_table.updateCell(item.id, "state", "更新完了");
-                        } catch (error) {
-                            console.log(error);
-                            grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
-                        }
+                    // const items = grid_table.getSelectedDatas();
+                    // items.forEach(async item => {   
+                    //     grid_table.updateCell(item.id, "state", "更新中");
+                    //     try {
+                    //         //TODO
+                    //         const nico_update = new NicoUpdate(item.id, library);
+                    //         await nico_update.updateThumbnail();
+                    //         const img_src = item.thumb_img;
+                    //         grid_table.updateCell(item.id, "thumb_img", `${img_src}?${new Date().getTime()}`);
+                    //         grid_table.updateCell(item.id, "state", "更新完了");
+                    //     } catch (error) {
+                    //         console.log(error);
+                    //         grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                    //     }
+                    // });
+                    updateNicoData(async (nico_update)=>{
+                        await nico_update.updateThumbnail();
                     });
-                }}
+                }},
+                { label: "動画以外を更新", click() {
+                    //TODO
+                    // const items = grid_table.getSelectedDatas();
+                    // items.forEach(async item => {   
+                    //     grid_table.updateCell(item.id, "state", "更新中");
+                    //     try {
+                    //         const nico_update = new NicoUpdate(item.id, library);
+                    //         await nico_update.update();
+
+                    //         grid_table.updateCell(item.id, "state", "更新完了");
+                    //     } catch (error) {
+                    //         console.log(error);
+                    //         grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                    //     }
+                    // });
+                    updateNicoData(async (nico_update)=>{
+                        await nico_update.update();
+                    });
+                }},
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };

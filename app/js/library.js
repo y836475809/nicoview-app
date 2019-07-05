@@ -215,7 +215,8 @@ class Library {
             last_play_date: video_item.last_play_date,
             play_count: video_item.play_count,
             play_time: video_item.time,
-            tags: video_item.tags?video_item.tags.join(" "):""
+            tags: video_item.tags?video_item.tags.join(" "):"",
+            thumbnail_size: video_item.thumbnail_size
         };
     }
 

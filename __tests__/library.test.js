@@ -192,7 +192,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 1,
             video_name: "サンプル1",
             common_filename: "サンプル1 - [sm1]",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "S"
         },
         {
             _db_type:"xml", 
@@ -200,7 +201,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル2",
             common_filename: "サンプル2 - [sm2]",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "S"
         },
         {
             _db_type:"json", 
@@ -208,7 +210,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル3",
             common_filename: "sm3",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "L"
         }
     ];
 
@@ -221,7 +224,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 1,
             video_name: "サンプル1",
             common_filename: "サンプル1 - [sm1]",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "S"
         }
     );
     t.deepEqual(
@@ -232,7 +236,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル2",
             common_filename: "サンプル2 - [sm2]",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "S"
         }
     );
     t.deepEqual(
@@ -243,7 +248,8 @@ test("library get path, info", async (t) => {
             dirpath_id: 2,
             video_name: "サンプル3",
             common_filename: "sm3",
-            video_type: "mp4"
+            video_type: "mp4",
+            thumbnail_size: "L"
         }
     );
 
@@ -266,7 +272,7 @@ test("library get path, info", async (t) => {
         t.is(datafile.thumbInfoPath, path.resolve("C:/data/sm3[ThumbInfo].json"));
         t.is(datafile.videoPath, path.resolve("C:/data/sm3.mp4"));
         t.is(datafile.commentPath, path.resolve("C:/data/sm3[Comment].json"));
-        t.is(datafile.thumbImgPath, path.resolve("C:/data/sm3[ThumbImg].jpeg"));
+        t.is(datafile.thumbImgPath, path.resolve("C:/data/sm3[ThumbImg].L.jpeg"));
         t.is(library._getVideoType(video_info), "mp4");
     }
 
@@ -294,7 +300,8 @@ test("library getLibraryItems", async (t) => {
             play_count: 3,
             time: 4,
             last_play_date: 5,
-            tags: ["tag1 tag2"]
+            tags: ["tag1 tag2"],
+            thumbnail_size: "S"
         },
         {
             _db_type:"xml", 
@@ -308,7 +315,8 @@ test("library getLibraryItems", async (t) => {
             play_count: 30,
             time: 40,
             last_play_date: 50,
-            tags: ["tag10 tag20"]
+            tags: ["tag10 tag20"],
+            thumbnail_size: "S"
         },
         {
             _db_type:"json", 
@@ -322,7 +330,8 @@ test("library getLibraryItems", async (t) => {
             play_count: 300,
             time: 400,
             last_play_date: 500,
-            tags: ["tag100 tag200"]
+            tags: ["tag100 tag200"],
+            thumbnail_size: "L"
         }
     ];
 
@@ -344,7 +353,8 @@ test("library getLibraryItems", async (t) => {
                 play_count: 3,
                 play_time: 4,
                 last_play_date: 5,
-                tags: "tag1 tag2" 
+                tags: "tag1 tag2",
+                thumbnail_size: "S"
             },
             {
                 db_type:"xml", 
@@ -356,11 +366,12 @@ test("library getLibraryItems", async (t) => {
                 play_count: 30,
                 play_time: 40,
                 last_play_date: 50,
-                tags: "tag10 tag20" 
+                tags: "tag10 tag20",
+                thumbnail_size: "S"
             },
             {
                 db_type:"json", 
-                thumb_img: path.resolve("C:/data/sm3[ThumbImg].jpeg"),
+                thumb_img: path.resolve("C:/data/sm3[ThumbImg].L.jpeg"),
                 id: "sm3",
                 name: "サンプル3",
                 creation_date: 100,
@@ -368,7 +379,8 @@ test("library getLibraryItems", async (t) => {
                 play_count: 300,
                 play_time: 400,
                 last_play_date: 500,
-                tags: "tag100 tag200" 
+                tags: "tag100 tag200",
+                thumbnail_size: "L" 
             }
         ]
     );
@@ -394,7 +406,8 @@ test("library getLibraryItem", async (t) => {
             play_count: 3,
             time: 4,
             last_play_date: 5,
-            tags: ["tag1 tag2"]
+            tags: ["tag1 tag2"],
+            thumbnail_size: "S"
         },
         {
             _db_type:"xml", 
@@ -408,7 +421,8 @@ test("library getLibraryItem", async (t) => {
             play_count: 30,
             time: 40,
             last_play_date: 50,
-            tags: ["tag10 tag20"]
+            tags: ["tag10 tag20"],
+            thumbnail_size: "S"
         }
     ];
 
@@ -426,7 +440,8 @@ test("library getLibraryItem", async (t) => {
             play_count: 3,
             play_time: 4,
             last_play_date: 5,
-            tags: "tag1 tag2" 
+            tags: "tag1 tag2",
+            thumbnail_size: "S"
         });
     }
     {
@@ -441,7 +456,8 @@ test("library getLibraryItem", async (t) => {
             play_count: 30,
             play_time: 40,
             last_play_date: 50,
-            tags: "tag10 tag20" 
+            tags: "tag10 tag20",
+            thumbnail_size: "S"
         });
     }
     {
@@ -468,7 +484,8 @@ test("library add item", async (t) => {
         is_economy: false,
         time: 0,
         pub_date: 0,
-        tags: ["tag1"]
+        tags: ["tag1"],
+        thumbnail_size: "S"
     };
     await library.addItem(item1);
     const items = await library.getLibraryItems();
@@ -485,6 +502,7 @@ test("library add item", async (t) => {
     t.is(data.time, 0);
     t.is(data.pub_date, 0);
     t.deepEqual(data.tags, ["tag1"]);
+    t.is(data.thumbnail_size, "S");
 });
 
 test("library add same item", async (t) => {
@@ -505,7 +523,8 @@ test("library add same item", async (t) => {
         is_economy: false,
         time: 0,
         pub_date: 0,
-        tags: []
+        tags: [],
+        thumbnail_size: "S"
     };
     await library.addItem(item1);
     await library.addItem(item1);
@@ -524,6 +543,7 @@ test("library add same item", async (t) => {
     t.is(data.time, 0);
     t.is(data.pub_date, 0);
     t.deepEqual(data.tags, []);
+    t.is(data.thumbnail_size, "S");
 });
 
 test("library add same id item", async (t) => {
@@ -544,7 +564,8 @@ test("library add same id item", async (t) => {
         is_economy: false,
         time: 0,
         pub_date: 0,
-        tags: []
+        tags: [],
+        thumbnail_size: "L"
     };
     await library.addItem(item1);
 
@@ -558,7 +579,8 @@ test("library add same id item", async (t) => {
         is_economy: false,
         time: 0,
         pub_date: 0,
-        tags: ["tag1"]
+        tags: ["tag1"],
+        thumbnail_size: "L"
     };
     await library.addItem(item2);
 
@@ -576,6 +598,7 @@ test("library add same id item", async (t) => {
     t.is(data.time, 0);
     t.is(data.pub_date, 0);
     t.deepEqual(data.tags, ["tag1"]);
+    t.is(data.thumbnail_size, "L");
 });
 
 test("library update item", async (t) => {

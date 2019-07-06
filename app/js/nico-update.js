@@ -1,18 +1,21 @@
 const fsPromises = require("fs").promises;
 const path = require("path");
+const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
     getThumbInfo, filterComments, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile } = require("./nico-data-file");
 const { XMLDataConverter } = require("./xml-data-converter");
 const { Library } = require("./library");
 
-class NicoUpdate {
+class NicoUpdate extends EventEmitter {
     /**
      * 
      * @param {String} video_id 
      * @param {Library} library 
      */
     constructor(video_id, library){
+        super();
+
         this.video_id = video_id;
         this.library = library;
         this.nico_watch = null;
@@ -145,6 +148,8 @@ class NicoUpdate {
         await this._writeFile(img_path, thumbImg, "binary");
 
         await this._setThumbnailSize(thumbnail_size);
+
+        this.emit("updated-thumbnail", thumbnail_size, img_path); 
 
         return true;
     }  

@@ -185,7 +185,7 @@
         this.num_items = 0;
     
         const libraryImageFormatter = (row, cell, value, columnDef, dataContext)=> {
-            if(dataContext.db_type=="xml"){
+            if(dataContext.thumbnail_size=="S"){
                 return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
             }
             return `<img class="thumbnail-L" src="${value}"/>`;
@@ -285,6 +285,10 @@
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
                         nico_update = new NicoUpdate(item.id, library);
+                        nico_update.on("updated-thumbnail", (thumbnail_size, img_src) => {
+                            grid_table.updateCell(item.id, "thumbnail_size", thumbnail_size);
+                            grid_table.updateCell(item.id, "thumb_img", `${img_src}?${new Date().getTime()}`);
+                        });
                         await func(nico_update);
 
                         grid_table.updateCell(item.id, "state", "更新完了");

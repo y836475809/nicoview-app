@@ -95,12 +95,6 @@
             height: var(--user-thumbnail-size); 
             line-height: var(--user-thumbnail-size); 
         }
-        .description-toggle{
-            display: block;
-            width: var(--toggle-icon-size);
-            height: var(--toggle-icon-size);
-            margin: var(--toggle-icon-margin) var(--toggle-icon-margin) var(--toggle-icon-margin) auto;
-        }
         .description-content {
             padding: 2px;
             width: 100%;
@@ -136,6 +130,10 @@
                 - var(--controls-container-height) - 4px);
         }
 
+        .icon-panel {
+            height: var(--user-icon-panel-height);
+            display: flex;
+        }
         .icon-contain{
             display: flex;
             margin-left: auto;
@@ -196,22 +194,20 @@
         </div>
     </div>
     <div class="viewinfo-description-panel">   
-            <!-- TODO -->
-            <div style="display: flex; height: 30px;">
-                <div class="icon-contain">
-                    <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
-                        <i title="download" class="fas fa-download"></i>
-                    </span>
-                    <span class="icon-button center-hv" onclick={this.onclickUpdate}>
-                        <i title="update" class="fas fa-sync-alt"></i>
-                    </span>
-                </div>         
-            </div>
+        <div class="icon-panel">
+            <div class="icon-contain">
+                <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
+                    <i title="download" class="fas fa-download"></i>
+                </span>
+                <span class="icon-button center-hv" onclick={this.onclickUpdate}>
+                    <i title="update" class="fas fa-sync-alt"></i>
+                </span>
+            </div>         
+        </div>
         <div class="description-container {this.description_container_class}">
-            <div style="display: flex;">
+            <div style="display: flex;" title="max-min" ondblclick={this.onclickExtDescription}>
                 <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
                 <div class="description-user-name">投稿者: {this.user_nickname}</div>
-                <div class="description-toggle fas fa-exchange-alt" onclick={this.onclickExtDescription}></div>   
             </div>
             <hr>
             <div class="description-content {this.description_content_class}"></div>
@@ -353,10 +349,12 @@
             if(class_name=="description-container-extend"){
                 const parent_elm = this.root.querySelector(".viewinfo-description-panel");
                 const elm = this.root.querySelector(".description-container");
+                const css_style = getComputedStyle(this.root);
+                const panel_height = parseInt(css_style.getPropertyValue("--user-icon-panel-height"));
                 
                 const container_width = elm.clientWidth; 
                 const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
-                elm.style.top = parent_elm.offsetTop + "px";
+                elm.style.top = parent_elm.offsetTop + panel_height + "px";
                 elm.style.left = left + "px";
             }
         };

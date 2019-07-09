@@ -4,10 +4,14 @@
             display: grid;
             --panel-padding: 4px;
             --video-panel-height: 120px;
+            --user-icon-panel-height: 30px;
             --user-panel-height: 30px;
             --user-thumbnail-size: 50px;
             --description-panel-height: 100px;
-            grid-template-rows: var(--video-panel-height) calc(var(--user-panel-height) + var(--description-panel-height)) 1fr;
+            grid-template-rows: 
+                var(--video-panel-height) 
+                calc(var(--user-icon-panel-height) + var(--user-panel-height) + var(--description-panel-height)) 
+                1fr;
             grid-template-columns: 1fr 1fr;  
             width: 100%;
             height: 100%;
@@ -44,7 +48,7 @@
         .viewinfo-description-panel{
             grid-row: 2 / 3;
             grid-column: 1 / 3; 
-            border: 1px solid var(--control-border-color);
+            /* border: 1px solid var(--control-border-color); */
             border-radius: 2px;
             margin-right:  5px;
         } 
@@ -62,7 +66,9 @@
         }
         .description-container-normal {
             width: 100%;
-            height: 100%;
+            /* height: 100%; */
+            height: calc(100% - var(--user-icon-panel-height));
+            border: 1px solid var(--control-border-color);
         }
         .description-container-extend {
             position: absolute;
@@ -125,7 +131,8 @@
 
         .comment-grid-container {
             width: 100%;
-            height: calc(100vh - var(--video-panel-height) - var(--user-panel-height) - var(--description-panel-height)
+            height: calc(100vh - var(--video-panel-height)
+                - var(--user-icon-panel-height) - var(--user-panel-height) - var(--description-panel-height)
                 - var(--controls-container-height) - 4px);
         }
 
@@ -189,6 +196,17 @@
         </div>
     </div>
     <div class="viewinfo-description-panel">   
+            <!-- TODO -->
+            <div style="display: flex; height: 30px;">
+                <div class="icon-contain">
+                    <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
+                        <i title="download" class="fas fa-download"></i>
+                    </span>
+                    <span class="icon-button center-hv" onclick={this.onclickUpdate}>
+                        <i title="update" class="fas fa-sync-alt"></i>
+                    </span>
+                </div>         
+            </div>
         <div class="description-container {this.description_container_class}">
             <div style="display: flex;">
                 <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
@@ -208,8 +226,6 @@
             <div class="icon-contain">
                 <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
                         <i title="comment" class={this.toggle_comment_class}></i></span>
-                <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
-                        <i title="download" class="fas fa-download"></i></span>
                 <span class="icon-button center-hv" onclick={this.onclickUpdate}>
                     <i title="update" class="fas fa-sync-alt"></i></span>
                 <span class="icon-button center-hv" onclick={this.onclickConfig}>

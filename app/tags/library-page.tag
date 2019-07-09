@@ -420,13 +420,16 @@
 
         this.nico_update = null;
         obs.on("library-page:update-data", async (args) => { 
-            const { video_id, cb } = args;
+            const { video_id, update_target, cb } = args;
             try {
                 //TODO
-                // const cnv_data = new XMLDataConverter();
-                // await cnv_data.convert(library, video_id);
                 this.nico_update = new NicoUpdate(video_id, library);
-                await this.nico_update.update();
+                
+                if(update_target=="thumbinfo"){
+                    await this.nico_update.updateThumbInfo();
+                }else if(update_target=="comment"){
+                    await this.nico_update.updateComment();
+                }
 
                 cb({ state:"ok", reason:null });
             } catch (error) {

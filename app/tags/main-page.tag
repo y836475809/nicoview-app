@@ -246,10 +246,11 @@
         });
 
         ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
-            const video_id = args;
+            const { video_id, update_target } = args;
             console.log("main update video_id=", video_id);
             this.obs.trigger("library-page:update-data", { 
                 video_id: video_id,
+                update_target: update_target,
                 cb: (result)=>{
                     console.log("main update cb result=", result);
                     if(result.state == "ok"){

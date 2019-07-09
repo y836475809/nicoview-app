@@ -199,8 +199,8 @@
                 <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
                     <i title="download" class="fas fa-download"></i>
                 </span>
-                <span class="icon-button center-hv" onclick={this.onclickUpdate}>
-                    <i title="update" class="fas fa-sync-alt"></i>
+                <span class="icon-button center-hv" onclick={this.onclickUpdateThumbInfo}>
+                    <i title="動画情報更新" class="fas fa-sync-alt"></i>
                 </span>
             </div>         
         </div>
@@ -222,8 +222,8 @@
             <div class="icon-contain">
                 <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
                         <i title="comment" class={this.toggle_comment_class}></i></span>
-                <span class="icon-button center-hv" onclick={this.onclickUpdate}>
-                    <i title="update" class="fas fa-sync-alt"></i></span>
+                <span class="icon-button center-hv" onclick={this.onclickUpdateComment}>
+                    <i title="コメント更新" class="fas fa-sync-alt"></i></span>
                 <span class="icon-button center-hv" onclick={this.onclickConfig}>
                     <i title="設定" class="fas fa-cog"></i></span>
             </div>
@@ -396,9 +396,15 @@
             obs.trigger("player-main-page:add-download-item", item);
         };
 
-        this.onclickUpdate = (e) => {
+        //TODO
+        this.onclickUpdateThumbInfo = (e) => {
+            obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
+        };
+
+        //TODO
+        this.onclickUpdateComment = (e) => {
             console.log("player update video_id=", this.video_id);
-            obs.trigger("player-main-page:update-data", this.video_id);
+            obs.trigger("player-main-page:update-data", this.video_id, "comment");
         };
 
         this.onclickConfig = (e) => {

@@ -268,7 +268,8 @@
             play_by_video_id(video_id);
         });
 
-        obs.on("player-main-page:update-data", async(video_id) => {
+        //TODO
+        obs.on("player-main-page:update-data", async(video_id, update_target) => {
             console.log("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {
                 message: "update...",
@@ -280,7 +281,7 @@
             });
 
             await new Promise((resolve, reject) => {
-                ipc_monitor.updateData(video_id);
+                ipc_monitor.updateData({video_id, update_target});
                 ipc_monitor.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     console.log("return-update-data result=", args);
                     resolve();   

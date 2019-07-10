@@ -168,7 +168,15 @@ class NicoUpdate extends EventEmitter {
     }
 
     async _getApiData(ignore_deleted=false){
-        const watch_data = await this._getWatchData();
+        let watch_data = null;
+        try {
+            watch_data = await this._getWatchData();
+        } catch (error) {
+            if(/404:/.test(error.message)){
+                await this._setDeleted(true);
+            }
+            throw error;
+        }        
 
         if(!this._validateWatchData(watch_data)){
             throw new Error(`${this.video_id}のwatch dataが正しくないデータです`);

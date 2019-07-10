@@ -436,9 +436,11 @@
                 console.log(error);
                 if(error.cancel===true){
                     cb({ state:"cancel", reason:null });
+                }else if(/404:/.test(error.message)){
+                    cb({ state:"404", reason:error });
                 }else{
                     cb({ state:"error", reason:error });
-                }     
+                }
             }
         });  
 

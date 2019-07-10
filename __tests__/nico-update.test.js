@@ -117,7 +117,7 @@ test("update timetout", async (t) => {
 });
 
 test("update 404", async t => {
-    t.plan(4);
+    t.plan(5);
 
     nico_mocks.watch({code:404});
     nico_mocks.comment();
@@ -130,6 +130,8 @@ test("update 404", async t => {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
         t.regex(error.message, /404:/);
+
+        t.truthy(await library.getFieldValue(TestData.video_id, "is_deleted"));
         t.deepEqual(nico_update.paths, []);
     }
 });

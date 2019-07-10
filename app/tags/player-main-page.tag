@@ -283,7 +283,20 @@
             await new Promise((resolve, reject) => {
                 ipc_monitor.updateData({video_id, update_target});
                 ipc_monitor.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
-                    console.log("return-update-data result=", args);
+                    const { video_id, data } = args;
+                    const { video_data, viewinfo, comments } = data;
+
+                    comment_filter.setComments(comments);
+                    const filtered_comments = comment_filter.getComments();
+
+                    obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
+                    obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
+                        viewinfo: viewinfo, 
+                        comments: filtered_comments 
+                    });   
+
+                    obs.trigger("player-video:update-comments", filtered_comments);
+                    
                     resolve();   
                 });
             });

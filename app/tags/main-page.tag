@@ -253,10 +253,19 @@
                 update_target: update_target,
                 cb: (result)=>{
                     console.log("main update cb result=", result);
-                    if(result.state == "ok"){
-                        PlayByVideoID(video_id);
+                    if(result.state == "ok" || result.state == "404"){
+                        this.obs.trigger("library-page:get-data-callback", {
+                            video_ids:[video_id],
+                            cb: (data_map) => {
+                                if(data_map.has(video_id)){
+                                    ipc_monitor.returnUpdateData({
+                                        video_id: video_id,
+                                        data:data_map.get(video_id)
+                                    });
+                                }
+                            }
+                        });  
                     }
-                    ipc_monitor.returnUpdateData(result);
                 }
             });
         });

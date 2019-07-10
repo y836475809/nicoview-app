@@ -185,10 +185,10 @@
         this.num_items = 0;
     
         const libraryImageFormatter = (row, cell, value, columnDef, dataContext)=> {
-            if(dataContext.thumbnail_size=="S"){
-                return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
+            if(dataContext.thumbnail_size=="L"){
+                return `<img class="thumbnail-L" src="${value}"/>`;
             }
-            return `<img class="thumbnail-L" src="${value}"/>`;
+            return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
         };
         const columns = [
             {id: "thumb_img", name: "image", width: 180, formatter: libraryImageFormatter},

@@ -140,6 +140,7 @@
         }
         .icon-button{
             font-size: 20px;
+            height: 30px;
             width: 30px;
         }
         .icon-button:hover{
@@ -196,12 +197,16 @@
     <div class="viewinfo-description-panel">   
         <div class="icon-panel">
             <div class="icon-contain">
-                <span class="icon-button center-hv" data-state={String(!this.is_deleted)} onclick={this.onclicAddDownload}>
-                    <i title="download" class="fas fa-download"></i>
-                </span>
-                <span class="icon-button center-hv" onclick={this.onclickUpdateThumbInfo}>
-                    <i title="動画情報更新" class="fas fa-sync-alt"></i>
-                </span>
+                <div title="ダウンロード登録" class="center-hv">
+                    <span class="icon-button center-hv" data-state={String(this.enableDonwload())} onclick={this.onclicAddDownload}>
+                        <i class="fas fa-download"></i>
+                    </span>
+                </div>
+                <div title="動画情報更新" class="center-hv">
+                    <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateThumbInfo}>
+                        <i class="fas fa-sync-alt"></i>
+                    </span>
+                </div>
             </div>         
         </div>
         <div class="description-container {this.description_container_class}">
@@ -222,8 +227,11 @@
             <div class="icon-contain">
                 <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
                         <i title="comment" class={this.toggle_comment_class}></i></span>
-                <span class="icon-button center-hv" onclick={this.onclickUpdateComment}>
-                    <i title="コメント更新" class="fas fa-sync-alt"></i></span>
+                <div title="コメント更新" class="center-hv">
+                    <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateComment}>
+                        <i class="fas fa-sync-alt"></i>
+                    </span>
+                </div>
                 <span class="icon-button center-hv" onclick={this.onclickConfig}>
                     <i title="設定" class="fas fa-cog"></i></span>
             </div>
@@ -246,7 +254,7 @@
 
         const row_height = 25;
 
-        this.is_deleted = false;
+        this.is_deleted = true;
         this.is_local = false;
 
         this.video_thumbnail_url = "";
@@ -262,6 +270,13 @@
 
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
+
+        this.enableDonwload = () => {
+            return this.is_deleted === false && this.is_local === false;
+        };
+        this.enableUpdateData = () => {
+            return this.is_deleted === false && this.is_local === true;
+        };
 
         const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
             return time_format.toPlayTime(value * 10 / 1000);

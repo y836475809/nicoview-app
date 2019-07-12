@@ -97,11 +97,11 @@ class SettingDirConfig {
     load(){
         this.use_userdata = SettingStore.getValue("setting-use-userdata", true);
         if(this.use_userdata===true){
-            this.dir = path.join(this._getUserData(), setting_dir_name);
+            this.dir = this._getUserData();
         }else{
             this.dir = SettingStore.getValue("setting-data-dir", this._getUserData());
         } 
-        FileUtil.mkDirp(this.dir);
+        FileUtil.mkDirp(this._getFullpath());
     }
 
     save(){
@@ -113,6 +113,10 @@ class SettingDirConfig {
         return app.getPath("userData");
     }
  
+    _getFullpath(){
+        return path.join(this.dir, setting_dir_name);
+    }
+
     get enableUserData() {
         return this.use_userdata;
     }
@@ -124,13 +128,21 @@ class SettingDirConfig {
         if(use_userdata===true){
             return path.join(this._getUserData(), setting_dir_name);
         }else{
+            return this._getFullpath();
+        }
+    }
+
+    getParentDir(use_userdata) {
+        if(use_userdata===true){
+            return this._getUserData();
+        }else{
             return this.dir;
         }
     }
 
     setDir(dir) {
-        this.dir = path.join(dir, setting_dir_name);
-        FileUtil.mkDirp(this.dir);
+        this.dir = dir;
+        FileUtil.mkDirp(this._getFullpath());
     }
 }
 

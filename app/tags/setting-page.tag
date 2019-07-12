@@ -124,7 +124,7 @@
             const dir = FileUtil.selectFolderDialog();
             if(dir!==null){
                 setting_dir_config.setDir(dir);
-                setInputValue(`.${item}`, setting_dir_config.getDir(false));
+                setInputValue(`.${item}`, dir);
             }        
         };
 
@@ -161,8 +161,8 @@
         this.on("mount", () => {
             setting_dir_config.load();
 
-            setInputValue(".userdata-dir-input", setting_dir_config.getDir(true));
-            setInputValue(".setting-dir-input", setting_dir_config.getDir(false));  
+            setInputValue(".userdata-dir-input", setting_dir_config.getParentDir(true));
+            setInputValue(".setting-dir-input", setting_dir_config.getParentDir(false));  
             this.enable_user_data = setting_dir_config.enableUserData;
 
             const download_dir = SettingStore.getDownloadDir();

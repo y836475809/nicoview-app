@@ -18,9 +18,11 @@ class SettingStore {
         if(use_userdata===true){
             setting_dir = path.join(userdata_dir, setting_dir_name);
         }else{
-            setting_dir = SettingStore.getValue("setting-data-dir", "");
-            if(setting_dir==""){
+            const parent_dir = SettingStore.getValue("setting-data-dir", "");
+            if(parent_dir==""){
                 setting_dir = path.join(userdata_dir, setting_dir_name);
+            }else{
+                setting_dir = path.join(parent_dir, setting_dir_name);
             }
         }
 

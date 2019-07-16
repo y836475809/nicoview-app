@@ -151,15 +151,6 @@
             pointer-events: none;
             opacity: 0.2;
         }
-        .icon-islocal{
-            font-size: 20px;
-        }
-        .icon-islocal[data-state="true"]{
-            color: green;
-        }
-        .icon-islocal[data-state="false"]{
-            opacity: 0.2;
-        }
 
         .video-info > .content {
             display: flex
@@ -167,7 +158,8 @@
         .video-info > .content > .label {
             min-width: calc(5em + 3px);
         }
-        .video-info > .notice-deleted {
+        .notice-deleted {
+            margin-left: 5px;
             color: red;
         }
     </style>
@@ -190,8 +182,9 @@
             <div class="content">
                 <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
             </div>
-            <i title={this.is_local?"local":""} data-state={String(this.is_local)} class="icon-islocal fas fa-book"></i>
-            <i class="notice-deleted" if={this.is_deleted}>動画は削除されています</i>
+            <div class="content">
+                <div class="label">状態</div>: {this.videoStateLocal()}<div class="notice-deleted">{this.videoStateDeleted()}</div>
+            </div>
         </div>
     </div>
     <div class="viewinfo-description-panel">   
@@ -276,6 +269,21 @@
         };
         this.enableUpdateData = () => {
             return this.is_deleted === false && this.is_local === true;
+        };
+
+        this.videoStateLocal = () => {
+            if(this.is_local === true){
+                return "ローカル";
+            }else{
+                return "オンライン";
+            }
+        };
+        this.videoStateDeleted = () => {
+            if(this.is_deleted === true){
+                return "削除済み";
+            }else{
+                return "";
+            }
         };
 
         const timeFormatter = (row, cell, value, columnDef, dataContext)=> {

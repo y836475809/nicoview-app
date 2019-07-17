@@ -192,14 +192,18 @@
         .state-content {
             display: inline-block;
             border-radius: 2px;
-            padding: 3px;
+            padding: 3px 10px 3px 10px;
             margin-right: 5px;        
+            margin-bottom: 5px;
         }
         .state-saved {
             background-color: #7fbfff;
         }
         .state-reg-download {
             background-color: hotpink;
+        }
+        .label-tag {
+            background-color: lightpink
         }
     </style>
 
@@ -279,6 +283,17 @@
         const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
             return `<div class="line-break">${value}</div>`;
         };
+        const tagsFormatter = (row, cell, value, columnDef, dataContext)=> {
+            if(!value){
+                return "";
+            }
+
+            let content = "";
+            value.split(" ").forEach(tag => {
+                content += `<div class='state-content label-tag'>${tag}</div>`;
+            });
+            return `<div class='line-break'>${content}</div>`;
+        };
 
         const columns = [
             {id: "thumb_img", name: "image", width: 130},
@@ -286,7 +301,7 @@
             {id: "info", name: "info", formatter:htmlFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},
-            {id: "tags", name: "タグ", formatter:lineBreakFormatter},
+            {id: "tags", name: "タグ", formatter:tagsFormatter},
         ];
         const options = {
             rowHeight: 100,

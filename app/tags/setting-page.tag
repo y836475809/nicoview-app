@@ -50,21 +50,21 @@
         <div class="content">
             <label class="section-label">設定保存場所(*再起動後に有効)</label>
             <div class="component">
-                <label class="setting-label">
+                <label class="setting-label" title={this.setting_path_desc}>
                     <input type="radio" name="setting-radio" value="userdata"
                         checked={enable_user_data}
                         onchange={onchangeSetting}>UserDataに保存
                 </label>    
-                <input disabled={!enable_user_data} class="input-path userdata-dir-input" type="text" readonly>
+                <input disabled={!enable_user_data} class="input-path userdata-dir-input" type="text" readonly title={this.setting_path_desc}>
             </div>
             <div class="component">
-                <label class="setting-label">
+                <label class="setting-label" title={this.setting_path_desc}>
                     <input type="radio" name="setting-radio" value="specify"
                         checked={!enable_user_data}
                         onchange={onchangeSetting}>保存場所を指定
                 </label>
                 <div style="display: flex;">
-                    <input disabled={enable_user_data} class="input-path setting-dir-input" type="text" readonly>
+                    <input disabled={enable_user_data} class="input-path setting-dir-input" type="text" readonly title={this.setting_path_desc}>
                     <button disabled={enable_user_data} class="input-button" onclick="{onclickSelectSettingDir.bind(this,'setting-dir-input')}">フォルダ選択</button>
                 </div>
             </div>
@@ -98,6 +98,8 @@
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
         const { FileUtil } = require(`${app_base_dir}/js/file-utils`);
+
+        this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();

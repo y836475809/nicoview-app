@@ -7,17 +7,19 @@ const no_script_comments =  [
     { user_id: "a", text: "text2", mail:"184" }
 ];
 
-const default_comments = [
-    { user_id: "owner", text: "@デフォルト", mail:"red big" },
-    { user_id: "owner", text: "text1", mail:"184" },
-    { user_id: "owner", text: "text2", mail:"green 184" },
-    { user_id: "owner", text: "text3", mail:"small 184" },
-    { user_id: "owner", text: "text4", mail:"green small 184" },
-    { user_id: "a", text: "text5", mail:"184" },
-    { user_id: "a", text: "text6", mail:"green 184" },
-    { user_id: "a", text: "text7", mail:"small 184" },
-    { user_id: "a", text: "text8", mail:"green small 184" },
-];
+const getScriptComments = (sc_text, sc_mail) => {
+    return [
+        { user_id: "owner", text: sc_text, mail:sc_mail },
+        { user_id: "owner", text: "text1", mail:"184" },
+        { user_id: "owner", text: "text2", mail:"green 184" },
+        { user_id: "owner", text: "text3", mail:"small 184" },
+        { user_id: "owner", text: "text4", mail:"green small 184" },
+        { user_id: "a", text: "text5", mail:"184" },
+        { user_id: "a", text: "text6", mail:"green 184" },
+        { user_id: "a", text: "text7", mail:"small 184" },
+        { user_id: "a", text: "text8", mail:"green small 184" },
+    ];
+};
 
 test("no script", t => {
     const nico_script = new NicoScript();
@@ -27,6 +29,23 @@ test("no script", t => {
 
 test("default script", t => {
     const nico_script = new NicoScript();
+    const default_comments = getScriptComments("@デフォルト", "red big");
+    const comments = nico_script.getApplied(default_comments);
+    t.deepEqual(comments, [
+        { user_id: "owner", text: "text1", mail:"184 red big" },
+        { user_id: "owner", text: "text2", mail:"green 184 big" },
+        { user_id: "owner", text: "text3", mail:"small 184 red" },
+        { user_id: "owner", text: "text4", mail:"green small 184" },
+        { user_id: "a", text: "text5", mail:"184 red big" },
+        { user_id: "a", text: "text6", mail:"green 184 big" },
+        { user_id: "a", text: "text7", mail:"small 184 red" },
+        { user_id: "a", text: "text8", mail:"green small 184" },
+    ]);
+});
+
+test("default script 全角", t => {
+    const nico_script = new NicoScript();
+    const default_comments = getScriptComments("＠デフォルト", "red big");
     const comments = nico_script.getApplied(default_comments);
     t.deepEqual(comments, [
         { user_id: "owner", text: "text1", mail:"184 red big" },

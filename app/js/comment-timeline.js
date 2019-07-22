@@ -5,7 +5,7 @@ const FixedComment = require("./fixed-comment");
 class NicoScript {
     constructor(){
         const scripts = [
-            "@デフォルト",
+            "[@＠]デフォルト",
             "@置換",
             "@逆",
             "@コメント禁止",
@@ -55,7 +55,7 @@ class NicoScript {
      */
     _applyDefault(script_comments, normal_comments){
         const f = script_comments.find(comment => {
-            return /@デフォルト/ig.test(comment.text);
+            return /[@＠]デフォルト/ig.test(comment.text);
         });
         if(f===undefined){
             return normal_comments;

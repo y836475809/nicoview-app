@@ -2,7 +2,7 @@ const test = require("ava");
 const { NicoScript } = require("../app/js/comment-timeline");
 
 
-const normal_comments =  [
+const no_script_comments =  [
     { user_id: "a", text: "text1", mail:"184" },
     { user_id: "a", text: "text2", mail:"184" }
 ];
@@ -19,10 +19,10 @@ const default_comments = [
     { user_id: "a", text: "text8", mail:"green small 184" },
 ];
 
-test("not exist script", t => {
+test("no script", t => {
     const nico_script = new NicoScript();
-    const comments = nico_script.getApplied(normal_comments);
-    t.deepEqual(comments, normal_comments);  
+    const comments = nico_script.getApplied(no_script_comments);
+    t.deepEqual(comments, no_script_comments);  
 });
 
 test("default script", t => {

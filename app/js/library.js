@@ -2,6 +2,7 @@
 const Datastore = require("nedb");
 const path = require("path");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
+const { FileUtils } = require("./file-utils");
 
 const createDBItem = () => {
     return {
@@ -98,7 +99,7 @@ class Library {
      * @returns {Number} new_dirpath_id
      */
     async _addDirPath(dirpath){
-        const n_dirpath = this._normalizePath(dirpath);
+        const n_dirpath = FileUtils.normalizePath(dirpath);
         if(this.dirpath_id_map.has(n_dirpath)){
             return this.dirpath_id_map.get(n_dirpath);
         }
@@ -350,14 +351,10 @@ class Library {
      */
     _normalizeDirData(dir_list){
         return dir_list.map(value=>{
-            const npath = this._normalizePath(value.dirpath);
+            const npath = FileUtils.normalizePath(value.dirpath);
             value.dirpath = npath;
             return value;
         });
-    }
-
-    _normalizePath(dirpath){
-        return dirpath.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "");
     }
 
     _getDir(dirpath_id) {

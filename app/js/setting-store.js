@@ -1,6 +1,7 @@
 const path = require("path");
 const remote = require("electron").remote;
-const { FileUtil } = require("./file-utils");
+const { FileUtils } = require("./file-utils");
+
 const app = remote.app;
 
 const setting_dir_name = "setting";
@@ -26,7 +27,7 @@ class SettingStore {
             }
         }
 
-        FileUtil.mkDirp(setting_dir);
+        FileUtils.mkDirp(setting_dir);
         
         return setting_dir;
     }
@@ -41,13 +42,13 @@ class SettingStore {
             const user_data = app.getPath("userData");
             dir = path.join(user_data, "download");
         }
-        FileUtil.mkDirp(dir);
+        FileUtils.mkDirp(dir);
         return dir;
     }
 
     static getMylistDir() {
         const mylist_dir = path.join(SettingStore.getSettingDir(), "mylist");
-        FileUtil.mkDirp(mylist_dir);
+        FileUtils.mkDirp(mylist_dir);
 
         return mylist_dir;
     }
@@ -103,7 +104,7 @@ class SettingDirConfig {
         }else{
             this.dir = SettingStore.getValue("setting-data-dir", this._getUserData());
         } 
-        FileUtil.mkDirp(this._getFullpath());
+        FileUtils.mkDirp(this._getFullpath());
     }
 
     save(){
@@ -144,7 +145,7 @@ class SettingDirConfig {
 
     setDir(dir) {
         this.dir = dir;
-        FileUtil.mkDirp(this._getFullpath());
+        FileUtils.mkDirp(this._getFullpath());
     }
 }
 

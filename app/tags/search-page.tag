@@ -243,9 +243,10 @@
     <script>
         /* globals app_base_dir riot */
         const {remote} = require("electron");
-        const {Menu, MenuItem, dialog} = remote;
+        const { Menu, MenuItem } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
+        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -325,13 +326,9 @@
             grid_table.clearSelected();
             try {
                 const search_result = await nico_search.search(nico_search_params);
-                setData(search_result);            
+                setData(search_result);         
             } catch (error) {
-                dialog.showMessageBox(remote.getCurrentWindow(),{
-                    type: "error",
-                    buttons: ["OK"],
-                    message: error.message
-                });
+                showMessageBox("error", error.message);
             }
             
             this.obs_modal_dialog.trigger("close");

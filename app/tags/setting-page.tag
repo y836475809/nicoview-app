@@ -93,11 +93,11 @@
 
     <script>
         /* globals app_base_dir riot */
-        const { remote, shell } = require("electron");
-        const { dialog } = require("electron").remote;
+        const { shell } = require("electron");
         const DBConverter = require(`${app_base_dir}/js/db-converter`);
         const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
-        const { FileUtil } = require(`${app_base_dir}/js/file-utils`);
+        const { selectFileDialog, selectFolderDialog, showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { FileUtils } = require(`${app_base_dir}/js/file-utils`);
 
         this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
         
@@ -123,7 +123,7 @@
         };
 
         this.onclickSelectSettingDir = (item, e) => {
-            const dir = FileUtil.selectFolderDialog();
+            const dir = selectFolderDialog();
             if(dir!==null){
                 setting_dir_config.setDir(dir);
                 setInputValue(`.${item}`, dir);
@@ -131,17 +131,17 @@
         };
 
         this.onclickSelectDownloadDir = (item, e) => {
-            const dir = FileUtil.selectFolderDialog();
+            const dir = selectFolderDialog();
             if(dir!==null){
                 setInputValue(`.${item}`, dir);
                 SettingStore.setValue("download-dir", dir);
-                FileUtil.mkDirp(dir);
+                FileUtils.mkDirp(dir);
             }
         };
 
         this.onclickOpenDir = (e) => {
             const dir = setting_dir_config.getDir(this.enable_user_data);
-            FileUtil.mkDirp(dir);
+            FileUtils.mkDirp(dir);
 
             shell.openItem(dir);
         };
@@ -211,7 +211,7 @@
         };
 
         this.onclickImport = async ()=>{
-            const db_file_path = FileUtil.selectFileDialog("Sqlite db", ["db"]);
+            const db_file_path = selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
             }
@@ -232,21 +232,13 @@
                         if(error){
                             throw error;
                         }else{
-                            dialog.showMessageBox(remote.getCurrentWindow(),{
-                                type: "info",
-                                buttons: ["OK"],
-                                message: "インポート完了"
-                            });
+                            showMessageBox("info", "インポート完了");
                         } 
                     }
                 });
             } catch (error) {
                 console.log(error);
-                dialog.showMessageBox(remote.getCurrentWindow(),{
-                    type: "error",
-                    buttons: ["OK"],
-                    message: `インポート失敗: ${error.message}`
-                });
+                showMessageBox("error", `インポート失敗: ${error.message}`);
             }finally{
                 this.obs_msg_dialog.trigger("close");
             }

@@ -68,11 +68,12 @@
         /* globals app_base_dir */
         const EventEmitter = require("events");
         const { remote } = require("electron");
-        const { Menu, dialog } = remote;
+        const { Menu } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
+        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
 
         const obs = this.opts.obs; 
 
@@ -350,11 +351,7 @@
                 }
             } catch (error) {
                 console.log(error);
-                dialog.showMessageBox(remote.getCurrentWindow(),{
-                    type: "error",
-                    buttons: ["OK"],
-                    message: error.message
-                });
+                showMessageBox("error", error.message);
             } finally {
                 event_em.emit("donwload-end");
             }    

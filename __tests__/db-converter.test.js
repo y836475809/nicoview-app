@@ -1,4 +1,5 @@
 const test = require("ava");
+const path = require("path");
 const DBConverter = require("../app/js/db-converter");
 
 const db_file_path = `${__dirname}/data/sample.db`;
@@ -10,8 +11,8 @@ test("sqlite db dirpath", (t) => {
     const dirpath_list = db.get_dirpath();
     t.deepEqual(dirpath_list, 
         [
-            { dirpath_id: 1, dirpath: "file:///C:/data/サンプル" },
-            { dirpath_id: 2, dirpath: "file:///C:/data" }
+            { dirpath_id: 1, dirpath: `C:${path.sep}data${path.sep}サンプル` },
+            { dirpath_id: 2, dirpath: `C:${path.sep}data` }
         ]
     );    
 });

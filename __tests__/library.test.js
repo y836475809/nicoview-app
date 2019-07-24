@@ -53,7 +53,7 @@ test("library import db overwrite", async (t) => {
         }
     );
 
-    t.is(await library._getDir(2), "C:/data");
+    t.is(await library._getDir(2), `C:${path.sep}data`);
 });
 
 test("library import db append", async (t) => {
@@ -118,8 +118,8 @@ test("library import db append", async (t) => {
         }
     );
 
-    t.is(await library._getDir(1), "C:/data/サンプル");
-    t.is(await library._getDir(2), "C:/data");
+    t.is(await library._getDir(1), `C:${path.sep}data${path.sep}サンプル`);
+    t.is(await library._getDir(2), `C:${path.sep}data`);
 });
 
 test("library import db append exist id", async (t) => {
@@ -173,7 +173,7 @@ test("library import db append exist id", async (t) => {
         }
     );
 
-    t.is(await library._getDir(1), "C:/data/サンプル");
+    t.is(await library._getDir(1), `C:${path.sep}data${path.sep}サンプル`);
 });
 
 
@@ -253,8 +253,8 @@ test("library get path, info", async (t) => {
         }
     );
 
-    t.is(await library._getDir(1), "C:/data/サンプル");
-    t.is(await library._getDir(2), "C:/data");
+    t.is(await library._getDir(1), `C:${path.sep}data${path.sep}サンプル`);
+    t.is(await library._getDir(2), `C:${path.sep}data`);
 
     const dir = "C:/data";
     {

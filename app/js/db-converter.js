@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
 const { createDBItem } = require("./library");
+const { FileUtils } = require("./file-utils");
 
 class DBConverter {
     /**
@@ -34,7 +35,7 @@ class DBConverter {
         const values = res[0].values;
         this.dirpath_list = values.map(value=>{
             const dirpath_id = value[0];
-            const dirpath = decodeURIComponent(value[1]);
+            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
             return { dirpath_id, dirpath };
         });
     }

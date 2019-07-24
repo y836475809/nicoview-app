@@ -39,11 +39,12 @@
     <script>
         /* globals app_base_dir riot */
         const {remote} = require("electron");
-        const {Menu, MenuItem, dialog} = remote;
+        const { Menu, MenuItem } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
+        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -221,11 +222,7 @@
             } catch (error) {
                 console.log(error);
                 if(!error.cancel){
-                    dialog.showMessageBox(remote.getCurrentWindow(),{
-                        type: "error",
-                        buttons: ["OK"],
-                        message: error.message
-                    });
+                    showMessageBox("error", error.message);
                 }
 
                 this.obs_modal_dialog.trigger("close");

@@ -48,7 +48,7 @@
         const createMenu = (self) => {
             const nemu_templete = [
                 { 
-                    label: "delete", click() {
+                    label: "削除", click() {
                         self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
@@ -191,7 +191,7 @@
             return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
         };
         const columns = [
-            {id: "thumb_img", name: "image", width: 180, formatter: libraryImageFormatter},
+            {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
             {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
             {id: "creation_date", name: "作成日", sortable: true},
@@ -199,7 +199,7 @@
             {id: "play_count", name: "再生回数", sortable: true},
             {id: "play_time", name: "時間", sortable: true},
             {id: "last_play_date", name: "最終再生日", sortable: true},
-            {id: "state", name: "state"}
+            {id: "state", name: "状況"}
         ];
         const options = {
             rowHeight: 135,

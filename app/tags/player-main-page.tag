@@ -131,15 +131,24 @@
                     }
                 },
             ]
-        },
-        {
-            label: "Tools",
-            submenu: [
-                { role: "reload" },
-                { role: "forcereload" },
-                { role: "toggledevtools" },
-            ]
         }];
+        if(process.env.NODE_ENV == "DEBUG"){
+            template.push({
+                label: "ツール",
+                submenu: [
+                    { role: "reload" },
+                    { role: "forcereload" },
+                    { role: "toggledevtools" },
+                ]
+            });
+        }else{
+            template.push({
+                label: "ツール",
+                submenu: [
+                    { role: "toggledevtools" },
+                ]
+            });
+        }
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 

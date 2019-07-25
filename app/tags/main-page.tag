@@ -132,38 +132,24 @@
 
         this.donwnload_item_num = 0;
 
-        let template = [{
-            label: "File",
-            submenu: [
-                {
-                    label: "Load",
-                    click: () => {
-                        const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
-                            properties: ["openFile"],
-                            title: "Select",
-                            defaultPath: ".",
-                            filters: [
-                                {name: "library db", extensions: ["db"]}, 
-                                {name: "All", extensions: ["*"]},
-                            ]
-                        });
-                        if(!paths){
-                            return;
-                        }
-                        const data_path = paths[0];
-                        // obs.trigger("get-library-items-from-file", data_path);
-                    }
-                }
-            ]
-        },
-        {
-            label: "Tools",
-            submenu: [
-                { role: "reload" },
-                { role: "forcereload" },
-                { role: "toggledevtools" },
-            ]
-        }];
+        let template = [];
+        if(process.env.NODE_ENV == "DEBUG"){
+            template.push({
+                label: "ツール",
+                submenu: [
+                    { role: "reload" },
+                    { role: "forcereload" },
+                    { role: "toggledevtools" },
+                ]
+            });
+        }else{
+            template.push({
+                label: "ツール",
+                submenu: [
+                    { role: "toggledevtools" },
+                ]
+            });
+        }
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 

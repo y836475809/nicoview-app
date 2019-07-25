@@ -184,6 +184,16 @@
             }
         };
 
+        const play_msg_map = new Map([
+            ["startWatch", "watch取得開始"],
+            ["finishWatch", "watch取得完了"],
+            ["startComment", "コメント取得開始"],
+            ["finishComment", "コメント取得完了"],
+            ["startPlayVideo", "再生開始"],
+            ["startPlaySmile", "smile再生開始"],
+            ["startHeartBeat", "HeartBeat開始"],
+        ]);
+
         const play_by_video_id = async (video_id) => {
             nico_play = new NicoPlay();
 
@@ -196,17 +206,20 @@
             });
 
             try {
+                nico_play.on("changeState", (state)=>{
+                    console.log(state);
+                    const msg = play_msg_map.get(state);
+                    this.obs_modal_dialog.trigger("update-message", msg);
+                });
+                nico_play.on("cancelHeartBeat", ()=>{
+                    console.log("hb canceled");
+                });
+                nico_play.on("errorHeartBeat", (error)=>{
+                    throw error;
+                });
+
                 const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
-                    await nico_play.play(video_id, (state)=>{
-                        this.obs_modal_dialog.trigger("update-message", state);
-                        console.log(state);
-                    }, (error)=>{
-                        if(error.cancel){
-                            console.log("hb canceled");
-                        }else{
-                            throw error;
-                        }
-                    });
+                    await nico_play.play(video_id);
                 const ret = ipc_monitor.setCookieSync(nico_cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);

@@ -8,7 +8,7 @@ const { DownloadItemStore } = require("./download-item-store");
 class GridTableDownloadItem {
     constructor(parent_elm, state_formatter){
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130, behavior: "selectAndMove"},
+            {id: "thumb_img", name: "サムネイル", height:100, width: 130, behavior: "selectAndMove"},
             {id: "id", name: "id", behavior: "selectAndMove"},
             {id: "name", name: "名前", behavior: "selectAndMove"},
             {id: "state", name: "状態", behavior: "selectAndMove", formatter:state_formatter}

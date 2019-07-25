@@ -55,7 +55,7 @@
         const createMenu = (self) => {
             const nemu_templete = [
                 { 
-                    label: "delete", click() {
+                    label: "削除", click() {
                         self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
@@ -233,7 +233,7 @@
         };
         const columns = [
             {id: "no", name: "#"},
-            {id: "thumb_img", name: "image", width: 130, formatter:imageCacheFormatter},
+            {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
             {id: "description", name: "説明", formatter:BRFormatter},
             {id: "date", name: "投稿日"},

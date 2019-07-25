@@ -107,7 +107,7 @@
         };
 
         let template = [{
-            label: "View",
+            label: "表示",
             submenu: [
                 {
                     label: "x1",
@@ -123,7 +123,7 @@
                     }
                 },
                 {
-                    label: "orgnal size",
+                    label: "元のサイズ",
                     click: () => {
                         if(org_video_size){
                             resizeVideo(org_video_size);
@@ -200,7 +200,7 @@
                     });
                 const ret = ipc_monitor.setCookieSync(nico_cookies);
                 if(ret!="ok"){
-                    throw new Error(`error: fault set nicohistory ${video_id}`);
+                    throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 
                 const video_data = {
                     src: video_url,
@@ -269,7 +269,7 @@
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             console.log("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {
-                message: "update...",
+                message: "更新中...",
                 buttons: ["cancel"],
                 cb: result=>{
                     console.log("player main cancel update video_id=", video_id);

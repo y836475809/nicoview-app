@@ -190,7 +190,7 @@
     <div class="viewinfo-description-panel">   
         <div class="icon-panel">
             <div class="icon-contain">
-                <div title="ダウンロード登録" class="center-hv">
+                <div title="ダウンロードに追加" class="center-hv">
                     <span class="icon-button center-hv" data-state={String(this.enableDonwload())} onclick={this.onclicAddDownload}>
                         <i class="fas fa-download"></i>
                     </span>
@@ -203,7 +203,7 @@
             </div>         
         </div>
         <div class="description-container {this.description_container_class}">
-            <div style="display: flex;" title="max-min" ondblclick={this.onclickExtDescription}>
+            <div style="display: flex;" title="ダブルクリックで拡大、縮小" ondblclick={this.onclickExtDescription}>
                 <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
                 <div class="description-user-name">投稿者: {this.user_nickname}</div>
             </div>
@@ -219,7 +219,7 @@
             </div>
             <div class="icon-contain">
                 <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
-                        <i title="comment" class={this.toggle_comment_class}></i></span>
+                        <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i></span>
                 <div title="コメント更新" class="center-hv">
                     <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateComment}>
                         <i class="fas fa-sync-alt"></i>

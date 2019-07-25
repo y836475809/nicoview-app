@@ -72,7 +72,7 @@
         const createMenu = (self) => {
             const nemu_templete = [
                 { 
-                    label: "delete", click() {
+                    label: "削除", click() {
                         self.obs_accordion.trigger("delete-selected-items");
                     }
                 }
@@ -297,9 +297,9 @@
         };
 
         const columns = [
-            {id: "thumb_img", name: "image", width: 130},
+            {id: "thumb_img", name: "サムネイル", width: 130},
             {id: "name", name: "名前", formatter:lineBreakFormatter},
-            {id: "info", name: "info", formatter:htmlFormatter},
+            {id: "info", name: "情報", formatter:htmlFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},
             {id: "tags", name: "タグ", formatter:tagsFormatter},
@@ -594,7 +594,7 @@
                 { label: "bookmark", click() {
                     //TODO
                 }},
-                { label: "download", click() {
+                { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas();
                     obs.trigger("download-page:add-download-items", items);
                     const video_ids = items.map(value => {
@@ -602,7 +602,7 @@
                     });
                     setDownloadTag(video_ids);
                 }},
-                { label: "delete download", click() {
+                { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_ids = items.map(value => {
                         return value.id;

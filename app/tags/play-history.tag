@@ -32,7 +32,7 @@
         const row_hight = 100/2;
 
         const columns = [
-            {id: "thumb_img", name: "image", height:100, width: 130},
+            {id: "thumb_img", name: "サムネイル", height:100, width: 130},
             {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
             {id: "play_date", name: "再生日", sortable: true},

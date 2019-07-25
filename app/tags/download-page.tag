@@ -8,7 +8,7 @@
         }
 
         .download-button { 
-            width: 100px;
+            width: 80px;
             height: 30px;
             margin-right: 5px;
         }
@@ -56,7 +56,8 @@
         <button class="download-button clear" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container">
             <div class="label center-hv">{this.download_schedule_label}</div>
-            <button class="download-button" disabled={this.dl_disabled} onclick={onclickScheduleDialog}>schedule</button>
+            <button class="download-button" disabled={this.dl_disabled} title="ダウンロードの定期実行日時を設定する" 
+                onclick={onclickScheduleDialog}>設定</button>
         </div>
     </div>
     <div class="download-grid-container">
@@ -233,7 +234,7 @@
 
         const createMenu = () => {
             const nemu_templete = [
-                { label: "delete", click() {
+                { label: "削除", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
                     deleteDownloadItems(deleted_ids);
                     obs.trigger("search-page:delete-download-ids", deleted_ids);

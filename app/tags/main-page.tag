@@ -80,12 +80,12 @@
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
-            <span title="Mylist" class="button center-hv"><span class="fas fa-list"></span></span> 
+            <span title="マイリスト" class="button center-hv"><span class="fas fa-list"></span></span> 
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
             <div>
-            <span title="download" class="button download-badge center-hv">
+            <span title="ダウンロード" class="button download-badge center-hv">
                 <span class="fas fa-download"></span>
                 <span class="item-num">{this.donwnload_item_num}</span>
             </span> 

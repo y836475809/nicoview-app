@@ -274,10 +274,10 @@
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
             let content = `<div>${value}</div>`;
             if(dataContext.saved){
-                content += "<div class='state-content state-saved'>Local</div>";
+                content += "<div class='state-content state-saved'>ローカル</div>";
             }
             if(dataContext.reg_download){
-                content += "<div class='state-content state-reg-download'>download</div>";
+                content += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
             }
             return content;
         };

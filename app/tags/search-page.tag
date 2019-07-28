@@ -363,6 +363,20 @@
             };
         };
 
+        const createEmptyItem = () => {
+            return {
+                thumb_img: "",
+                id: "",
+                name: "",
+                info: "",
+                play_time: -1,
+                pub_date: -1,
+                tags: "",
+                saved: false,
+                reg_download: false,
+            };
+        };
+
         const setData = async (search_result) => {     
             const total_count = search_result.meta.totalCount;
             this.refs.page.setTotaCount(total_count);
@@ -417,6 +431,7 @@
                     //     reg_download: reg_download,
                     // };
                 });
+                items.push(createEmptyItem());
                 grid_table.setData(items);
                 grid_table.grid.scrollRowToTop(0); //TODO      
             }});
@@ -595,7 +610,9 @@
                     //TODO
                 }},
                 { label: "ダウンロードに追加", click() {
-                    const items = grid_table.getSelectedDatas();
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
+                    });
                     obs.trigger("download-page:add-download-items", items);
                     const video_ids = items.map(value => {
                         return value.id;
@@ -603,7 +620,9 @@
                     setDownloadTag(video_ids);
                 }},
                 { label: "ダウンロードから削除", click() {
-                    const items = grid_table.getSelectedDatas();
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
+                    });
                     const video_ids = items.map(value => {
                         return value.id;
                     });
@@ -624,7 +643,9 @@
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                obs.trigger("main-page:play-by-videoid", video_id);
+                if(video_id){
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }
             });
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});

@@ -8,17 +8,23 @@ const time_format = require("./time-format");
 /* globals $ */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
+    if(!value){
+        return "";
+    }
     return `<img class="gridtable-thumbnail" src="${value}"/>`;
 };
 
 const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
     if(Number.isFinite(value) && value < 0){
-        return "-";
+        return "";
     }
     return time_format.toDate(value);
 };
 
 const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
+    if(Number.isFinite(value) && value < 0){
+        return "";
+    }
     return time_format.toPlayTime(value);
 };
 

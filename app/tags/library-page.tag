@@ -15,7 +15,7 @@
             title="ライブラリ検索" 
             items={search_data.items}
             expand={true} 
-            obs={obs_accordion}>
+            obs={obs_search}>
         </accordion>
         <accordion 
             title="ブックマーク" 
@@ -32,14 +32,17 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
+        const self = this;
+
         const obs = this.opts.obs; 
-        this.obs_accordion = riot.observable();
+        this.obs_search = riot.observable();
         this.obs_bookmark = riot.observable();
 
         const seach_file_path = SettingStore.getSettingFilePath("library-search.json");
         try {
-            this.store = new JsonStore(seach_file_path);
-            this.search_data = this.store.load();
+            this.search_store = new JsonStore(seach_file_path);
+            this.search_data = this.search_store.load();
+            
         } catch (error) {
             this.search_data = {
                 is_expand: false, 
@@ -68,45 +71,37 @@
             };
         }
 
-        const save = (data) => {
-            try {
-                this.store.save(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        const createMenu = (self) => {
-            const nemu_templete = [
-                { 
-                    label: "削除", click() {
-                        self.obs_accordion.trigger("delete-selected-items");
-                    }
+        const search_context_menu = Menu.buildFromTemplate([
+            { 
+                label: "削除", click() {
+                    self.obs_search.trigger("delete-selected-items");
                 }
-            ];
-            return Menu.buildFromTemplate(nemu_templete);
-        };
+            }
+        ]);
         
-        this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu(this);
-            context_menu.popup({window: remote.getCurrentWindow()}); 
+        this.obs_search.on("show-contextmenu", (e) => {
+            search_context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        obs.on("library-page:sidebar:add-item", (query) => {
-            this.obs_accordion.trigger("add-items", [
+        obs.on("library-page:sidebar:add-search-item", (query) => {
+            this.obs_search.trigger("add-items", [
                 { title: query, query: query }
             ]);
         });
 
-        this.obs_accordion.on("item-dlbclicked", (item) => {
-            obs.trigger("library-page:item-dlbclicked", item.query);
+        this.obs_search.on("item-dlbclicked", (item) => {
+            obs.trigger("library-page:search-item-dlbclicked", item.query);
         });
 
-        this.obs_accordion.on("state-changed", (data) => {
-            save(data);
+        this.obs_search.on("state-changed", (data) => {
+            try {
+                this.search_store.save(data);
+            } catch (error) {
+                console.log(error);
+            }
         });
 
-        obs.on("library-page:sidebar:boolmark:add-item", (item) => {
+        obs.on("library-page:sidebar:add-bookmark-item", (item) => {
             this.obs_bookmark.trigger("add-items", [
                 { 
                     title: item.title, 
@@ -117,7 +112,7 @@
         });
 
         this.obs_bookmark.on("item-dlbclicked", (item) => {
-            obs.trigger("library-page:bookmark:item-dlbclicked", item);
+            obs.trigger("library-page:bookmark-item-dlbclicked", item);
         });
 
         this.obs_bookmark.on("state-changed", (data) => {
@@ -129,7 +124,6 @@
             }
         });
 
-        const self = this;
         const bookmark_context_memu = Menu.buildFromTemplate([
             { 
                 label: "再生", click() {
@@ -325,16 +319,16 @@
             if(!param){
                 return;
             }
-            obs.trigger("library-page:sidebar:add-item", param);
+            obs.trigger("library-page:sidebar:add-search-item", param);
         };
         
-        obs.on("library-page:item-dlbclicked", (item) => {
+        obs.on("library-page:search-item-dlbclicked", (item) => {
             const search_elm = getSearchInputElm();
             search_elm.value = item;
             grid_table.filterData(item);         
         });
 
-        obs.on("library-page:bookmark:item-dlbclicked", (item) => {
+        obs.on("library-page:bookmark-item-dlbclicked", (item) => {
             const video_id = item.video_id;
             obs.trigger("main-page:play-by-videoid", video_id);        
         });
@@ -414,7 +408,7 @@
                 { label: "ブックマークに追加", click() {
                     const items = grid_table.getSelectedDatas();
                     const item = items[0];
-                    obs.trigger("library-page:sidebar:boolmark:add-item", {
+                    obs.trigger("library-page:sidebar:add-bookmark-item", {
                         title:item.name,
                         video_id:item.id
                     });

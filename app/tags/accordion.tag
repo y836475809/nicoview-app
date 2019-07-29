@@ -86,15 +86,7 @@
         const menu_item_h = 30;
         const obs_accordion = this.opts.obs;
         
-        this.items = this.opts.items.map(value=>{
-            if(!value.icon){
-                value.icon = {
-                    name: "",
-                    class_name: ""
-                };
-            }
-            return value;
-        });
+        this.items = this.opts.items;
 
         const getMenuElm = () => {
             return this.root.querySelector(".toggle-menu");
@@ -123,8 +115,7 @@
         const getItems = () => {
             const order = sortable.toArray();
             return order.map(value => {
-                delete this.items[value].icon;
-                return this.items[value];
+                return Object.create(this.items[value]);
             });
         };
 
@@ -145,7 +136,7 @@
 
             const cp_items = order.map(value=>{
                 const index = parseInt(value);
-                return Object.assign({}, this.items[index]);
+                return Object.create(this.items[index]);
             });
             this.items = cp_items.filter((value, index)=>{
                 return !indices.includes(index);
@@ -163,16 +154,7 @@
 
         obs_accordion.on("add-items", (items) => {
             const pre_item_num = this.items.length;
-            const new_items = items.map(value=>{
-                if(!value.icon){
-                    value.icon = {
-                        name: "",
-                        style: ""
-                    };
-                }
-                return value;
-            });
-            Array.prototype.push.apply(this.items, new_items);
+            Array.prototype.push.apply(this.items, items);
             if(isExpand()){
                 chanegExpand(true);
             }
@@ -195,13 +177,6 @@
             }
 
             obs_accordion.trigger("state-changed", {
-                is_expand: isExpand(), 
-                items: getItems()
-            });
-        });
-
-        obs_accordion.on("get-items", (cb) => {
-            cb({
                 is_expand: isExpand(), 
                 items: getItems()
             });

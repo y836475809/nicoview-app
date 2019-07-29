@@ -5,6 +5,9 @@
             height: 100%;
             background-color: var(--control-color);
         }
+        .bookmark-item {
+            color:royalblue;
+        }
     </style>
 
     <div class="library-sidebar">
@@ -44,10 +47,20 @@
             };
         }
 
+        const getBookmarkIcon = () => {
+            return {
+                name: "fas fa-bookmark fa-lg",
+                class_name: "bookmark-item"
+            };
+        };
+
         const bookmark_file_path = SettingStore.getSettingFilePath("library-bookmark.json");
         try {
             this.bookmark_store = new JsonStore(bookmark_file_path);
             this.bookmark_data = this.bookmark_store.load();
+            this.bookmark_data.items.forEach(value => {
+                value.icon = getBookmarkIcon();
+            });
         } catch (error) {
             this.bookmark_data = {
                 is_expand: false, 
@@ -92,11 +105,14 @@
         this.obs_accordion.on("state-changed", (data) => {
             save(data);
         });
-            
-        //TODO add icon?
+
         obs.on("library-page:sidebar:boolmark:add-item", (item) => {
             this.obs_bookmark.trigger("add-items", [
-                { title: item.title, video_id: item.video_id }
+                { 
+                    title: item.title, 
+                    video_id: item.video_id,
+                    icon: getBookmarkIcon()
+                }
             ]);
         });
 
@@ -127,7 +143,7 @@
                 }
             },
             { 
-                label: "ここにスクロール", click() {
+                label: "この項目へスクロール", click() {
                     self.obs_bookmark.trigger("get-selected-items", (items)=>{
                         if(items.length==0){
                             return;

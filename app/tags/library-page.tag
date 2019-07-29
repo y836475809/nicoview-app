@@ -14,6 +14,12 @@
             expand={true} 
             obs={obs_accordion}>
         </accordion>
+        <accordion 
+            title="ブックマーク" 
+            items={bookmark_data.items}
+            expand={true} 
+            obs={obs_bookmark}>
+        </accordion>
     </div>
 
     <script>
@@ -25,6 +31,7 @@
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
+        this.obs_bookmark = riot.observable();
 
         const seach_file_path = SettingStore.getSettingFilePath("library-search.json");
         try {
@@ -32,6 +39,17 @@
             this.search_data = this.store.load();
         } catch (error) {
             this.search_data = {
+                is_expand: false, 
+                items: []
+            };
+        }
+
+        const bookmark_file_path = SettingStore.getSettingFilePath("library-bookmark.json");
+        try {
+            this.bookmark_store = new JsonStore(bookmark_file_path);
+            this.bookmark_data = this.bookmark_store.load();
+        } catch (error) {
+            this.bookmark_data = {
                 is_expand: false, 
                 items: []
             };
@@ -74,6 +92,61 @@
         this.obs_accordion.on("state-changed", (data) => {
             save(data);
         });
+            
+        //TODO add icon?
+        obs.on("library-page:sidebar:boolmark:add-item", (item) => {
+            this.obs_bookmark.trigger("add-items", [
+                { title: item.title, video_id: item.video_id }
+            ]);
+        });
+
+        this.obs_bookmark.on("item-dlbclicked", (item) => {
+            obs.trigger("library-page:bookmark:item-dlbclicked", item);
+        });
+
+        this.obs_bookmark.on("state-changed", (data) => {
+            try {
+                this.bookmark_store.save(data);
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        const self = this;
+        const bookmark_context_memu = Menu.buildFromTemplate([
+            { 
+                label: "再生", click() {
+                    self.obs_bookmark.trigger("get-selected-items", (items)=>{
+                        if(items.length==0){
+                            return;
+                        }
+                        const video_id = items[0].video_id;
+                        obs.trigger("main-page:play-by-videoid", video_id);
+                    });
+                }
+            },
+            { 
+                label: "ここにスクロール", click() {
+                    self.obs_bookmark.trigger("get-selected-items", (items)=>{
+                        if(items.length==0){
+                            return;
+                        }
+                        const video_id = items[0].video_id;
+                        obs.trigger("library-page:scrollto", video_id);
+                    });
+                }
+            },
+            { 
+                label: "削除", click() {
+                    self.obs_bookmark.trigger("delete-selected-items");
+                }
+            },
+        ]);
+
+        this.obs_bookmark.on("show-contextmenu", (e) => {
+            bookmark_context_memu.popup({window: remote.getCurrentWindow()}); 
+        }); 
     </script>
 </library-sidebar>
 
@@ -244,6 +317,11 @@
             search_elm.value = item;
             grid_table.filterData(item);         
         });
+
+        obs.on("library-page:bookmark:item-dlbclicked", (item) => {
+            const video_id = item.video_id;
+            obs.trigger("main-page:play-by-videoid", video_id);        
+        });
     
         const loadLibraryItems = (items)=>{
             grid_table.setData(items);
@@ -317,6 +395,14 @@
         //TODO
         const createMenu = () => {
             const nemu_templete = [
+                { label: "ブックマークに追加", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const item = items[0];
+                    obs.trigger("library-page:sidebar:boolmark:add-item", {
+                        title:item.name,
+                        video_id:item.id
+                    });
+                }},
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -416,6 +502,14 @@
             grid_table.updateItem(library_item, video_id);
             await library.setFieldValue(video_id, "last_play_date", last_play_date);
             await library.setFieldValue(video_id, "play_count", play_count);
+        });
+
+        obs.on("library-page:scrollto", async (video_id) => { 
+            const rows = grid_table.getRowsByIds([video_id]);
+            if(rows.length > 0){
+                grid_table.scrollRow(rows[0], true);
+                grid_table.setSelectedRows(rows);
+            }
         });
 
         this.nico_update = null;

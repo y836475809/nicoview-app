@@ -156,8 +156,17 @@ class GridTable {
         return datas;
     }
 
+    //TODO gridtable-downloaditem.js
+    setSelectedRows(rows){
+        this.grid.setSelectedRows(rows);
+    }
+
     clearSelected(){
         this.grid.setSelectedRows([]);
+    }
+
+    getRowsByIds(ids){   
+        return this.dataView.mapIdsToRows(ids);
     }
 
     resize(new_size){
@@ -176,8 +185,8 @@ class GridTable {
         this.resize(new_szie);
     }
 
-    scrollRow(row){
-        this.grid.scrollRowIntoView(row, false);
+    scrollRow(row, dopaging=false){
+        this.grid.scrollRowIntoView(row, dopaging);
     }
 
     setData(data){

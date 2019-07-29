@@ -52,7 +52,7 @@
 
         .acdn-menu-container {
             width: 100%;
-            height: calc(100vh - var(--menubar-height) - 5px);
+            /* height: calc(50vh - var(--menubar-height) - 5px); */
             overflow: auto;
         }
 
@@ -123,6 +123,7 @@
         const getItems = () => {
             const order = sortable.toArray();
             return order.map(value => {
+                delete this.items[value].icon;
                 return this.items[value];
             });
         };
@@ -204,6 +205,20 @@
                 is_expand: isExpand(), 
                 items: getItems()
             });
+        });
+
+        obs_accordion.on("get-selected-items", (cb) => {
+            const indices = getSelectedItemIndices();
+            const items = getItems();
+            const selected_items = items.filter((item, index) => {
+                return indices.includes(index);
+            });
+            cb(selected_items);
+        });
+        
+        obs_accordion.on("get-selected-indices", (cb) => {
+            const indices = getSelectedItemIndices();
+            cb(indices);
         });
 
         obs_accordion.on("change-expand", (expand) => {

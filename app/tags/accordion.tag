@@ -72,7 +72,7 @@
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
                     onmouseup={this.onmouseUp}>
-                    <i show={item.icon!==undefined} class="center-hv icont-item {item.icon.name} {item.icon.class_name}"></i>
+                    <i show={item.icon!==undefined} class="center-hv icont-item {getIconClass(item)}"></i>
                     {item.title}
                 </li>
             </ul>
@@ -87,6 +87,13 @@
         const obs_accordion = this.opts.obs;
         
         this.items = this.opts.items;
+
+        this.getIconClass = (item) => {
+            if(item.icon!==undefined && item.icon.name!==undefined && item.icon.class_name!==undefined){
+                return `${item.icon.name} ${item.icon.class_name}`;
+            }
+            return "";
+        };
 
         const getMenuElm = () => {
             return this.root.querySelector(".toggle-menu");
@@ -115,7 +122,9 @@
         const getItems = () => {
             const order = sortable.toArray();
             return order.map(value => {
-                return Object.create(this.items[value]);
+                const item = Object.assign({}, this.items[value]);
+                delete item.icon;
+                return item;
             });
         };
 
@@ -136,7 +145,7 @@
 
             const cp_items = order.map(value=>{
                 const index = parseInt(value);
-                return Object.create(this.items[index]);
+                return Object.assign({}, this.items[index]);
             });
             this.items = cp_items.filter((value, index)=>{
                 return !indices.includes(index);

@@ -12,6 +12,7 @@
 .split-page > .left{
   background-color: var(--control-color);
   width: var(--right-width);
+  overflow: auto;
 }
 .split-page > .right{
   background-color: var(--control-color);

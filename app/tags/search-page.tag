@@ -18,6 +18,12 @@
             expand={true} 
             obs={obs_accordion}>
         </accordion>
+        <accordion 
+            title="ブックマーク" 
+            items={bookmark_data.items}
+            expand={true} 
+            obs={obs_bookmark}>
+        </accordion>
     </div>
 
     <script>
@@ -29,6 +35,7 @@
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
+        this.obs_bookmark = riot.observable();
 
         const seach_file_path = SettingStore.getSettingFilePath("nico-search.json");
 
@@ -98,6 +105,86 @@
                 { title: cond.query, cond: cond, icon: icon }
             ]);
         });
+
+        //TODO
+        const getBookmarkIcon = () => {
+            return {
+                name: "fas fa-bookmark fa-lg",
+                class_name: "bookmark-item"
+            };
+        };        
+        const bookmark_file_path = SettingStore.getSettingFilePath("nico-search-bookmark.json");
+        try {
+            this.bookmark_store = new JsonStore(bookmark_file_path);
+            this.bookmark_data = this.bookmark_store.load();
+            this.bookmark_data.items.forEach(value => {
+                value.icon = getBookmarkIcon();
+            });
+        } catch (error) {
+            this.bookmark_data = {
+                is_expand: false, 
+                // items: []
+                items: [
+                    { title: "test", type: "video", video_id: "sm20" },
+                    { title: "page1", type: "page", cond: "sm20" }
+                ]
+            };
+        }
+        const bookmark_context_memu = Menu.buildFromTemplate([
+            { 
+                label: "再生", click() {
+                    self.obs_bookmark.trigger("get-selected-items", (items)=>{
+                        if(items.length==0){
+                            return;
+                        }
+                        const video_id = items[0].video_id;
+                        obs.trigger("main-page:play-by-videoid", video_id);
+                    });
+                },
+                enabled: (() => { return false; })()
+            },
+            { 
+                label: "この項目へスクロール", click() {
+                    self.obs_bookmark.trigger("get-selected-items", (items)=>{
+                        if(items.length==0){
+                            return;
+                        }
+                        const video_id = items[0].video_id;
+                        obs.trigger("library-page:scrollto", video_id);
+                    });
+                }
+            },
+            { 
+                label: "削除", click() {
+                    self.obs_bookmark.trigger("delete-selected-items");
+                }
+            },
+        ]);
+        obs.on("search-page:sidebar:add-bookmark-item", (item) => {
+            this.obs_bookmark.trigger("add-items", [
+                { 
+                    title: item.title, 
+                    video_id: item.video_id,
+                    icon: getBookmarkIcon()
+                }
+            ]);
+        });
+
+        this.obs_bookmark.on("item-dlbclicked", (item) => {
+            obs.trigger("search-page:bookmark-item-dlbclicked", item);
+        });
+
+        this.obs_bookmark.on("state-changed", (data) => {
+            try {
+                this.bookmark_store.save(data);
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+        this.obs_bookmark.on("show-contextmenu", (e) => {
+            bookmark_context_memu.popup({window: remote.getCurrentWindow()}); 
+        }); 
     </script>
 </search-sidebar>
 
@@ -606,8 +693,26 @@
 
         const createMenu = () => {
             const nemu_templete = [
-                { label: "bookmark", click() {
+                { label: "動画をブックマーク", click() {
                     //TODO
+                    obs.trigger("search-page:sidebar:add-bookmark-item", {
+                        //title:item.name,
+                        //video_id:item.id
+                    });
+                }},
+                { label: "ページをブックマーク", click() {
+                    //TODO
+                    const cond = {
+                        query: nico_search_params._query,
+                        sort_order: nico_search_params._sort_order,
+                        sort_name: nico_search_params._sort_name,
+                        search_kind: nico_search_params.search_kind,
+                        page: nico_search_params._page
+                    };
+                    obs.trigger("search-page:sidebar:add-bookmark-page", {
+                        //title:item.name,
+                        //video_id:item.id
+                    });
                 }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {

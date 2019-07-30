@@ -405,7 +405,7 @@
         //TODO
         const createMenu = () => {
             const nemu_templete = [
-                { label: "ブックマークに追加", click() {
+                { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const item = items[0];
                     obs.trigger("library-page:sidebar:add-bookmark-item", {

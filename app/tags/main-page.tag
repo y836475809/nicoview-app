@@ -68,6 +68,29 @@
             background-color: red;
             text-align: center;
         }
+
+        /* TODO */
+        .sidebar {
+            position: fixed;
+            right: -110px;
+            width: 100px;
+            height: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+        .sibutton {
+            position: relative;
+            top: 70px;
+            left: -30px;
+            display: block;
+            width: 30px;
+            height: 70px;
+            color: #FFF;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            text-decoration: none;
+            line-height: 70px;
+        }
     </style>
     <div class="main-group-buttons">
         <label class="label">
@@ -99,6 +122,17 @@
             <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
             <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
         </label>
+        
+        <!-- TODO -->
+        <aside class="sidebar">
+                <div class="sibutton open" onclick={onclickSideBar}>
+                    </div>
+            <div>
+                test
+            </div>
+
+        </aside>
+
     </div>
     <div class="page-container library-page">
         <library-page obs={obs}></library-page>
@@ -131,6 +165,25 @@
         this.obs = this.opts.obs;
 
         this.donwnload_item_num = 0;
+
+        // TODO
+        this.onclickSideBar = (e) => {
+            const duration = 500;
+            const $sidebar = $('.sidebar');
+
+            e.target.classList.toggle("close");
+            e.target.classList.remove("open");
+            if(e.target.classList.contains("close")){
+                $sidebar.stop().animate({
+                    right: '0'
+                }, duration, 'linear');
+            }else{
+                $sidebar.stop().animate({
+                    right: '-110px'
+                }, duration, 'linear');
+                e.target.classList.add("open");
+            }
+        };
 
         let template = [];
         if(process.env.NODE_ENV == "DEBUG"){

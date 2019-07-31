@@ -72,6 +72,7 @@
         /* TODO */
         .sidebar {
             position: fixed;
+            /* top: 100px; */
             right: -110px;
             width: 100px;
             height: auto;
@@ -125,12 +126,11 @@
         
         <!-- TODO -->
         <aside class="sidebar">
-                <div class="sibutton open" onclick={onclickSideBar}>
-                    </div>
+            <div class="sibutton open" onclick={onclickSideBar}>
+                </div>
             <div>
-                test
+                <bookmark-page obs={obs}></bookmark-page>
             </div>
-
         </aside>
 
     </div>

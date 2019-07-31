@@ -47,6 +47,11 @@
         this.total_pages = 0;
         this.total_count = 0;
 
+        this.setCurrentPage = (page) => {
+            this.current_page = page;
+            this.update();
+        };
+
         this.setTotalPages = (pages) => {
             this.total_pages = pages;
             this.update();

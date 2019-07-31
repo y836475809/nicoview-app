@@ -620,7 +620,7 @@
             elm.value = cond.query;
             nico_search_params.cond(cond.search_kind);
             nico_search_params.query(cond.query);
-            nico_search_params.page(cond.page);
+            nico_search_params.page(cond.page); //TODO move last?
             nico_search_params.sortTarget(cond.sort_name);
             nico_search_params.sortOder(cond.sort_order);
 
@@ -642,6 +642,23 @@
 
             this.search();
             this.refs.page.resetPage();
+        });
+
+        //TODO
+        obs.on("search-page:search", (args)=> {
+            const { query, sort_order, sort_name, search_kind, page } = args;
+            const elm = getSearchInputElm();
+            elm.value = query;
+            nico_search_params.cond(search_kind);
+            nico_search_params.query(query);
+            nico_search_params.sortTarget(sort_name);
+            nico_search_params.sortOder(sort_order);
+            nico_search_params.page(page);
+            
+            setSearchCondState(sort_name, sort_order, search_kind);
+            this.refs.page.setCurrentPage(page);
+
+            this.search();
         });
 
         obs.on("search-page:delete-download-ids", (ids)=> {

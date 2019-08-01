@@ -44,6 +44,11 @@
         .bookmark-item {
             color:royalblue;
         }
+        .acdn-menu-container {
+            width: 100%;
+            height: calc(100% - var(--menubar-height) - 5px);
+            overflow: auto;
+        }
     </style>    
 
     <aside class="sidebar dialog-shadow close">

@@ -334,6 +334,7 @@
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -716,31 +717,12 @@
                         return value.id!="";
                     });
                     const bk_items = items.map(item => {
-                        return {
-                            title: item.name,
-                            type:"video",
-                            data: {
-                                video_id:item.id,
-                                saved: item.saved
-                            }
-                        };
+                        return BookMark.createVideoItem(item.name, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }},
                 { label: "ページをブックマーク", click() {
-                    //TODO
-                    const cond = {
-                        query: nico_search_params._query,
-                        sort_order: nico_search_params._sort_order,
-                        sort_name: nico_search_params._sort_name,
-                        search_kind: nico_search_params.search_kind,
-                        page: nico_search_params._page
-                    };
-                    const bk_item = {
-                        title: `検索: ${cond.query}, ページ: ${cond.page}`,
-                        type:"search",
-                        data: cond
-                    };
+                    const bk_item = BookMark.createSearchItem(nico_search_params);
                     obs.trigger("bookmark-page:add-items", [bk_item]);
                 }},
                 { label: "ダウンロードに追加", click() {

@@ -283,6 +283,22 @@ class Library {
         };
     }
 
+    existItem(video_id){
+        return new Promise((resolve, reject) => {
+            this.video_db.count({video_id: video_id}, (err, count) => { 
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(count>0){
+                    resolve(true);
+                }else{
+                    resolve(false);
+                }
+            });
+        }); 
+    }
+
     _setData(db, data_list) {
         return new Promise((resolve, reject) => {
             db.insert(data_list, (err, new_doc) => {

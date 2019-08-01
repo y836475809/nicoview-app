@@ -260,6 +260,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -405,20 +406,6 @@
         //TODO
         const createMenu = () => {
             const nemu_templete = [
-                { label: "ブックマーク", click() {
-                    const items = grid_table.getSelectedDatas();
-                    const bk_items = items.map(item => {
-                        return {
-                            title:item.name,
-                            type:"video",
-                            data: {
-                                video_id:item.id,
-                                saved: true
-                            }
-                        };
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
-                }},
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -442,6 +429,13 @@
                         await nico_update.update();
                     });
                 }},
+                { label: "ブックマーク", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const bk_items = items.map(item => {
+                        return BookMark.createVideoItem(item.name, item.id);
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }}
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
@@ -495,6 +489,16 @@
                 }            
             }
             cb(ret);
+        }); 
+
+        obs.on("library-page:exist-data-callback", async (args) => { 
+            const { video_id, cb } = args;
+            try {
+                const exist = await library.existItem(video_id); 
+                cb(exist);
+            } catch (error) {
+                console.log("Error: library-page:exist-data-callback error=", error);
+            } 
         }); 
     
         obs.on("library-page:add-item", async (item) => { 

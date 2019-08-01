@@ -1,14 +1,15 @@
 <bookmark-page>
     <style scoped>
+        :scope {
+            --page-width: 250px;
+        }
         .sidebar {
             position: fixed;
             top: 0px;
-            right: -110px;
-            width: 100px;
+            right: calc(-1 * var(--page-width));
+            width: var(--page-width);
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
             z-index: 10;
-
             transition-property: all;
             transition-duration: 300ms;
             transition-delay: 0s;
@@ -35,7 +36,7 @@
             background-color: var(--control-color);
         }
         .open {
-            transform: translateX(-110px);
+            transform: translateX(calc(-1 * var(--page-width)));
         }
         .close {
             transform: translateX(0px);
@@ -45,7 +46,7 @@
         }
     </style>    
 
-    <aside class="sidebar close">
+    <aside class="sidebar dialog-shadow close">
         <div class="sibutton" onclick={onclickSideBar}></div>
         <accordion class="content"
             title="ブックマーク" 
@@ -54,13 +55,14 @@
             obs={obs_bookmark}>
         </accordion>
     </aside>
-    
+
     <script>
         /* globals app_base_dir riot */
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const self = this;
 
@@ -90,11 +92,12 @@
             this.bookmark_data.items.forEach(value => {
                 value.icon = getBookmarkIcon();
             });
-        } catch (error) {
+        } catch (error) { 
             this.bookmark_data = {
                 is_expand: false, 
                 items: []
             };
+            console.log(error);
         }
         this.obs_bookmark.on("state-changed", (data) => {
             try {
@@ -119,18 +122,17 @@
             }
 
             const item = items[0];
-            if(type == "play"){
-                if(item.type == "video"){
-                    return true;
-                } 
-            }
-            if(type == "go-to-library"){
-                if(item.type == "video" && item.data.saved === true){
-                    return true;
-                } 
-            }
 
-            if(type == "go-to-search" && item.type == "search"){
+            if(type == "play" && BookMark.isVideo(item)){
+                return true;
+            }
+            if(type == "go-to-library" && BookMark.isVideo(item)){
+                return true;
+            }
+            if(type == "go-to-search" && BookMark.isSearch(item)){
+                return true;
+            }
+            if(type == "delete"){
                 return true;
             }
 
@@ -156,13 +158,16 @@
                     if(items.length==0){
                         return;
                     }
-                    self.obs_bookmark.trigger("get-selected-items", (items)=>{
-                        if(items.length==0){
-                            return;
+
+                    const video_id = items[0].data.video_id;
+                    obs.trigger("library-page:exist-data-callback", { 
+                        video_id: video_id, 
+                        cb: (exist)=>{
+                            if(exist===true){
+                                obs.trigger("main-page:select-page", "library");
+                                obs.trigger("library-page:scrollto", video_id);     
+                            }
                         }
-                        const video_id = items[0].data.video_id;
-                        obs.trigger("main-page:select-page", "library");
-                        obs.trigger("library-page:scrollto", video_id);
                     });
                 }
             },
@@ -179,8 +184,9 @@
                 }
             },
             { 
+                id: "delete",
                 label: "削除", click() {
-                    self.obs_search.trigger("delete-selected-items");
+                    self.obs_bookmark.trigger("delete-selected-items");
                 }
             }
         ]);
@@ -193,8 +199,25 @@
             });
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
+
+        this.obs_bookmark.on("item-dlbclicked", (item) => {  
+            if(BookMark.isVideo(item)){
+                const video_id = item.data.video_id;
+                obs.trigger("main-page:play-by-videoid", video_id);
+                return;
+            }
+            if(BookMark.isSearch(item)){
+                const cond = item.data;
+                obs.trigger("main-page:select-page", "search");
+                obs.trigger("search-page:search", cond);
+                return;
+            }
+        });
         
         obs.on("bookmark-page:add-items", items => {
+            items.forEach(item => {
+                item.icon = getBookmarkIcon();
+            });
             this.obs_bookmark.trigger("add-items", items);
         });
 

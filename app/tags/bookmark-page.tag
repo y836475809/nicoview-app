@@ -1,27 +1,56 @@
 <bookmark-page>
     <style scoped>
-        :scope {
+        .sidebar {
+            position: fixed;
+            top: 0px;
+            right: -110px;
+            width: 100px;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+
+            transition-property: all;
+            transition-duration: 300ms;
+            transition-delay: 0s;
+            transition-timing-function: linear;
+        }
+        .sibutton {
+            position: relative;
+            top: 70px;
+            left: -30px;
+            display: block;
+            width: 30px;
+            height: 70px;
+            color: #FFF;
+            background-color: rgba(0, 0, 0, 0.5);
+            text-align: center;
+            text-decoration: none;
+            line-height: 70px;
+        }
+        .content {
             position: absolute;
             top: 0px;
             width: 100%;
             height: 100%;
             background-color: var(--control-color);
         }
-        .bookmark-sidebar {
-            width: 100%;
-            height: 100%;
-            background-color: var(--control-color);
+        .open {
+            transform: translateX(-110px);
+        }
+        .close {
+            transform: translateX(0px);
         }
     </style>    
 
-    <!-- <div class="bookmark-sidebar"> -->
-        <accordion 
+    <aside class="sidebar close">
+        <div class="sibutton" onclick={onclickSideBar}></div>
+        <accordion class="content"
             title="ブックマーク" 
             items={bookmark_data.items}
             expand={true} 
             obs={obs_bookmark}>
         </accordion>
-    <!-- </div> -->
+    </aside>
     
     <script>
         /* globals app_base_dir riot */
@@ -34,6 +63,16 @@
 
         const obs = this.opts.obs; 
         this.obs_bookmark = riot.observable();
+
+        this.onclickSideBar = (e) => {
+            const elm = this.root.querySelector(".sidebar");
+            elm.classList.toggle("close");
+            elm.classList.remove("open");
+            if(!elm.classList.contains("close")){
+                elm.classList.add("open");
+            }
+        };
+
         const getBookmarkIcon = () => {
             return {
                 name: "fas fa-bookmark fa-lg",
@@ -52,33 +91,6 @@
             this.bookmark_data = {
                 is_expand: false, 
                 items: []
-                // items: [{
-                //     title: "sm20", 
-                //     type:"video",
-                //     data:{
-                //         video_id:"sm20",
-                //         saved: true
-                //     }
-                // },
-                // {
-                //     title: "sm30", 
-                //     type:"video",
-                //     data:{
-                //         video_id:"sm30",
-                //         saved: false
-                //     }
-                // },
-                // {
-                //     title: "page1", 
-                //     type:"search",
-                //     data:{
-                //         query: "testpage",
-                //         sort_order: "-",
-                //         sort_name: "startTime",
-                //         search_kind: "tag",
-                //         page: 5
-                //     }
-                // }]
             };
         }
 
@@ -171,14 +183,5 @@
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        obs.on("bookmark-page:sidebar:add-item", (item) => {
-            this.obs_bookmark.trigger("add-items", [
-                { 
-                    title: item.title, 
-                    video_id: item.video_id,
-                    icon: getBookmarkIcon()
-                }
-            ]);
-        });
     </script>
 </bookmark-page>

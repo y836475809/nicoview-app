@@ -40,6 +40,9 @@
         .close {
             transform: translateX(0px);
         }
+        .bookmark-item {
+            color:royalblue;
+        }
     </style>    
 
     <aside class="sidebar close">
@@ -93,6 +96,14 @@
                 items: []
             };
         }
+        this.obs_bookmark.on("state-changed", (data) => {
+            try {
+                this.bookmark_store.save(data);
+                console.log(data);
+            } catch (error) {
+                console.log(error);
+            }
+        });
 
         const getSelectedItems = async () => {
             return await new Promise((resolve, reject) => {
@@ -181,6 +192,10 @@
                 menu.enabled =  getMenuEnable(id, items);
             });
             context_menu.popup({window: remote.getCurrentWindow()}); 
+        });
+        
+        obs.on("bookmark-page:add-items", items => {
+            this.obs_bookmark.trigger("add-items", items);
         });
 
     </script>

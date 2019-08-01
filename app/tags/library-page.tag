@@ -407,11 +407,17 @@
             const nemu_templete = [
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    const item = items[0];
-                    obs.trigger("library-page:sidebar:add-bookmark-item", {
-                        title:item.name,
-                        video_id:item.id
+                    const bk_items = items.map(item => {
+                        return {
+                            title:item.name,
+                            type:"video",
+                            data: {
+                                video_id:item.id,
+                                saved: true
+                            }
+                        };
                     });
+                    obs.trigger("bookmark-page:add-items", bk_items);
                 }},
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();

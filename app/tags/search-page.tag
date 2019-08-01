@@ -712,10 +712,20 @@
             const nemu_templete = [
                 { label: "動画をブックマーク", click() {
                     //TODO
-                    obs.trigger("search-page:sidebar:add-bookmark-item", {
-                        //title:item.name,
-                        //video_id:item.id
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
                     });
+                    const bk_items = items.map(item => {
+                        return {
+                            title: item.name,
+                            type:"video",
+                            data: {
+                                video_id:item.id,
+                                saved: item.saved
+                            }
+                        };
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
                 }},
                 { label: "ページをブックマーク", click() {
                     //TODO
@@ -726,10 +736,12 @@
                         search_kind: nico_search_params.search_kind,
                         page: nico_search_params._page
                     };
-                    obs.trigger("search-page:sidebar:add-bookmark-page", {
-                        //title:item.name,
-                        //video_id:item.id
-                    });
+                    const bk_item = {
+                        title: `検索: ${cond.query}, ページ: ${cond.page}`,
+                        type:"search",
+                        data: cond
+                    };
+                    obs.trigger("bookmark-page:add-items", [bk_item]);
                 }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {

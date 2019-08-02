@@ -60,10 +60,25 @@
             overflow: hidden;
             transition: all 0.5s;
         }
+
+        /* TODO */
+        .query-input {
+            width: calc(100% - 30px);
+        }     
+        .search-container {
+            display: flex;
+        }
     </style>
 
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
     <div class="acdn-menu-container">
+        <!-- TODO -->
+        <div class="search-container">            
+            <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
+            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
         <div class="toggle-menu">
             <ul class="acdn-list">
                 <li class="acdn-item" each={ item,i in this.items }

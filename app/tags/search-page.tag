@@ -711,20 +711,6 @@
 
         const createMenu = () => {
             const nemu_templete = [
-                { label: "動画をブックマーク", click() {
-                    //TODO
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
-                    const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.name, item.id);
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
-                }},
-                { label: "ページをブックマーク", click() {
-                    const bk_item = BookMark.createSearchItem(nico_search_params);
-                    obs.trigger("bookmark-page:add-items", [bk_item]);
-                }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
@@ -749,6 +735,20 @@
                         grid_table.dataView.updateItem(value.id, item);
                     });
                     grid_table.grid.render();
+                }},
+                { label: "動画をブックマーク", click() {
+                    //TODO
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
+                    });
+                    const bk_items = items.map(item => {
+                        return BookMark.createVideoItem(item.name, item.id);
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }},
+                { label: "ページをブックマーク", click() {
+                    const bk_item = BookMark.createSearchItem(nico_search_params);
+                    obs.trigger("bookmark-page:add-items", [bk_item]);
                 }},
             ];
             return Menu.buildFromTemplate(nemu_templete);

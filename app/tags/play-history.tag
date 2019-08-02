@@ -19,9 +19,12 @@
 
     <script>
         /* globals app_base_dir */
+        const { remote } = require("electron");
+        const { Menu } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const HistoryStore = require(`${app_base_dir}/js/history-store`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
 
@@ -54,6 +57,24 @@
             grid_table.resizeFitContainer(container);
         };
 
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "再生", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }},
+                { label: "ブックマーク", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const bk_items = items.map(item => {
+                        return BookMark.createVideoItem(item.name, item.id);
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }}
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
         obs.on("window-resized", ()=> {
             resizeGridTable();
         });
@@ -65,6 +86,11 @@
                 const video_id = data.id;
                 obs.trigger("main-page:play-by-videoid", video_id);
             });
+
+            const context_menu = createMenu();
+            grid_table.onContextMenu((e)=>{
+                context_menu.popup({window: remote.getCurrentWindow()});
+            });           
 
             resizeGridTable();
 

@@ -156,10 +156,13 @@
 
     <script>
         /* globals app_base_dir riot */
+        const {remote} = require("electron");
+        const { Menu } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -245,6 +248,25 @@
             _saveColumnWidth: true,
         };    
         const grid_table = new GridTable("mylist-grid", columns, options);
+
+        const createMenu = () => {
+            const nemu_templete = [
+                { label: "再生", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }},
+                { label: "ブックマーク", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const bk_items = items.map(item => {
+                        return BookMark.createVideoItem(item.title, item.id);
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }}
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".mylist-grid"));
             grid_table.onDblClick((e, data)=>{
@@ -252,6 +274,11 @@
                 obs.trigger("main-page:play-by-videoid", video_id);
             });
             
+            const context_menu = createMenu();
+            grid_table.onContextMenu((e)=>{
+                context_menu.popup({window: remote.getCurrentWindow()});
+            });
+
             resizeGridTable();
             try {
                 image_cache.load();

@@ -75,6 +75,7 @@
         const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
 
@@ -239,6 +240,13 @@
                     deleteDownloadItems(deleted_ids);
                     obs.trigger("search-page:delete-download-ids", deleted_ids);
                 }},
+                { label: "ブックマーク", click() {
+                    const items = grid_table_dl.grid_table.getSelectedDatas();
+                    const bk_items = items.map(item => {
+                        return BookMark.createVideoItem(item.name, item.id);
+                    });
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }}
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };

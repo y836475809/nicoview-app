@@ -2,6 +2,8 @@
     <style scoped>
         :scope {
             --page-width: 250px;
+            --button-width: 30px;
+            --button-height: 70px;
         }
         .sidebar {
             position: fixed;
@@ -15,18 +17,19 @@
             transition-delay: 0s;
             transition-timing-function: linear;
         }
-        .sibutton {
+        .sidebar > .button {
             position: relative;
-            top: 70px;
-            left: -30px;
             display: block;
-            width: 30px;
-            height: 70px;
-            color: #FFF;
+            top: calc(50% - var(--button-height));
+            left: calc(-1 * var(--button-width));   
+            width: var(--button-width);
+            height: var(--button-height);
+            color: white;
             background-color: rgba(0, 0, 0, 0.5);
             text-align: center;
             text-decoration: none;
-            line-height: 70px;
+            line-height: var(--button-height);
+            border-radius: 5px 0px 0px 5px;
         }
         .content {
             position: absolute;
@@ -52,7 +55,7 @@
     </style>    
 
     <aside class="sidebar dialog-shadow close">
-        <div class="sibutton" onclick={onclickSideBar}></div>
+        <div class="button {sb_button_icon}" title="ブックマーク" onclick={onclickSideBar}></div>
         <accordion class="content"
             title="ブックマーク" 
             items={bookmark_data.items}
@@ -74,12 +77,17 @@
         const obs = this.opts.obs; 
         this.obs_bookmark = riot.observable();
 
+        this.sb_button_icon = "fas fa-chevron-left";
+
         this.onclickSideBar = (e) => {
             const elm = this.root.querySelector(".sidebar");
             elm.classList.toggle("close");
             elm.classList.remove("open");
             if(!elm.classList.contains("close")){
                 elm.classList.add("open");
+                this.sb_button_icon = "fas fa-chevron-right";
+            }else{
+                this.sb_button_icon = "fas fa-chevron-left";
             }
         };
 

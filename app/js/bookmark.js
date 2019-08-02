@@ -33,7 +33,7 @@ class BookMark {
             page: nico_search_params._page
         };
         return {
-            title: `検索: ${cond.query}, ページ: ${cond.page}`,
+            title: `検索: ${cond.query}, ページ${cond.page}`,
             type: BookMarkType.SEARCH,
             data: cond
         };

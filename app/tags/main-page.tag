@@ -41,12 +41,12 @@
             height: 50px;
         }
 
-        .main-group-buttons .fa-book, 
-        .main-group-buttons .fa-search,
-        .main-group-buttons .fa-download,  
-        .main-group-buttons .fa-history, 
-        .main-group-buttons .fa-cog,
-        .main-group-buttons .fa-list {
+        .main-group-buttons > .label .fa-book, 
+        .main-group-buttons > .label .fa-search,
+        .main-group-buttons > .label .fa-download,  
+        .main-group-buttons > .label .fa-history, 
+        .main-group-buttons > .label .fa-cog,
+        .main-group-buttons > .label .fa-list {
             font-size: 30px;
             color: lightgrey;
         }

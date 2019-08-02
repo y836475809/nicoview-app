@@ -91,9 +91,13 @@
             }
         };
 
-        const getBookmarkIcon = () => {
+        const getBookmarkIcon = (item) => {
+            let name = "fas fa-bookmark fa-lg fa-fw";
+            if(BookMark.isSearch(item)){
+                name = "fas fa-search fa-lg fa-fw";
+            }
             return {
-                name: "fas fa-bookmark fa-lg",
+                name: name,
                 class_name: "bookmark-item"
             };
         };
@@ -103,7 +107,7 @@
             this.bookmark_store = new JsonStore(bookmark_file_path);
             this.bookmark_data = this.bookmark_store.load();
             this.bookmark_data.items.forEach(value => {
-                value.icon = getBookmarkIcon();
+                value.icon = getBookmarkIcon(value);
             });
         } catch (error) { 
             this.bookmark_data = {
@@ -229,7 +233,7 @@
         
         obs.on("bookmark-page:add-items", items => {
             items.forEach(item => {
-                item.icon = getBookmarkIcon();
+                item.icon = getBookmarkIcon(item);
             });
             this.obs_bookmark.trigger("add-items", items);
         });

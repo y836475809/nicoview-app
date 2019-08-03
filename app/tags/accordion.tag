@@ -63,7 +63,12 @@
 
         /* TODO */
         .query-input {
-            width: calc(100% - 30px);
+            height: 30px;
+            width: calc(100% - 4px);
+            margin: 0 2px 0 2px;
+            padding: 2px;
+            border: solid 1px #ccc;
+            border-radius: 2px;
         }     
         .search-container {
             display: flex;
@@ -71,12 +76,8 @@
     </style>
 
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
-    <div class="search-container">            
-        <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
-        <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
-            <i class="fas fa-search"></i>
-        </button>
-    </div>
+    <input class="query-input" type="search" placeholder="検索" 
+        onkeydown={onkeydownSearchInput}>
     <div class="acdn-menu-container">
         <div class="toggle-menu">
             <ul class="acdn-list">
@@ -135,10 +136,6 @@
                 const query = getInputValue();
                 filter(query);
             }
-        }
-        this.onclickSearch = (e) => {
-            const query = getInputValue();
-            filter(query);
         };
 
         this.getIconClass = (item) => {

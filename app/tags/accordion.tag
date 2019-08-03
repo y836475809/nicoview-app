@@ -20,6 +20,8 @@
         }
 
         .acdn-list {
+            display: table;
+            width: 100%;
             margin: 0;
             padding: 0;
             background: #f4f4f4;
@@ -60,8 +62,7 @@
             overflow: hidden;
             transition-duration: 300ms;
         }
-
-        /* TODO */
+        
         .query-input {
             height: 30px;
             width: calc(100% - 4px);

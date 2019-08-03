@@ -58,7 +58,7 @@
 
         .toggle-menu {
             overflow: hidden;
-            transition: all 0.5s;
+            transition-duration: 300ms;
         }
 
         /* TODO */
@@ -71,17 +71,16 @@
     </style>
 
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
+    <div class="search-container">            
+        <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
+        <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+            <i class="fas fa-search"></i>
+        </button>
+    </div>
     <div class="acdn-menu-container">
-        <!-- TODO -->
-        <div class="search-container">            
-            <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
-            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
-                <i class="fas fa-search"></i>
-            </button>
-        </div>
         <div class="toggle-menu">
             <ul class="acdn-list">
-                <li class="acdn-item" each={ item,i in this.items }
+                <li class="acdn-item" each={ item,i in this.filtered_items }
                     title={item.title}
                     data-id={i}
                     onclick={this.onclickItem.bind(this,item)} 
@@ -102,6 +101,39 @@
         const obs_accordion = this.opts.obs;
         
         this.items = this.opts.items;
+        this.filtered_items = JSON.parse(JSON.stringify(this.items));
+
+        const getInputValue = () => {
+            const elm = this.root.querySelector(".query-input");
+            return elm.value.toLowerCase();
+        };
+
+        const filter = (query) => {
+            const items = JSON.parse(JSON.stringify(this.items));
+            const dofilter = query!="";
+            if(dofilter){
+                this.filtered_items = items.filter(item => {
+                    return item.title.toLowerCase().includes(query);
+                });
+            }else{     
+                this.filtered_items = items;
+            }
+
+            this.update();
+            chanegExpand(true);
+            sortable.option("disabled", dofilter);
+        };
+
+        this.onkeydownSearchInput = (e) => {
+            if(e.code == "Enter"){
+                const query = getInputValue();
+                filter(query);
+            }
+        }
+        this.onclickSearch = (e) => {
+            const query = getInputValue();
+            filter(query);
+        };
 
         this.getIconClass = (item) => {
             if(item.icon!==undefined && item.icon.name!==undefined && item.icon.class_name!==undefined){
@@ -117,7 +149,7 @@
         const chanegExpand = (is_expand) => {
             const elm = getMenuElm();
             if(is_expand){
-                const _clientH = this.items.length * menu_item_h;
+                const _clientH = this.filtered_items.length * menu_item_h + 30;
                 elm.style.height = _clientH + "px";
             }else{
                 elm.style.height = "0px";

@@ -80,9 +80,10 @@
     <div class="acdn-menu-container">
         <div class="toggle-menu">
             <ul class="acdn-list">
-                <li class="acdn-item" each={ item,i in this.filtered_items }
+                <li show={item.visible} class="acdn-item" each={ item,i in this.items }
                     title={item.title}
                     data-id={i}
+                    data-itemid={item.id}
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
                     onmouseup={this.onmouseUp}>
@@ -100,8 +101,12 @@
         const menu_item_h = 30;
         const obs_accordion = this.opts.obs;
         
-        this.items = this.opts.items;
-        this.filtered_items = JSON.parse(JSON.stringify(this.items));
+        this.items = this.opts.items.map((value, index) => {
+            const item = Object.assign({}, value);
+            item.id = index;
+            item.visible = true;
+            return item;
+        });
 
         const getInputValue = () => {
             const elm = this.root.querySelector(".query-input");
@@ -109,14 +114,15 @@
         };
 
         const filter = (query) => {
-            const items = JSON.parse(JSON.stringify(this.items));
             const dofilter = query!="";
             if(dofilter){
-                this.filtered_items = items.filter(item => {
-                    return item.title.toLowerCase().includes(query);
+                this.items.forEach(item=>{
+                    item.visible = item.title.toLowerCase().includes(query);
                 });
             }else{     
-                this.filtered_items = items;
+                this.items.forEach(item=>{
+                    item.visible = true;
+                });
             }
 
             this.update();
@@ -149,7 +155,10 @@
         const chanegExpand = (is_expand) => {
             const elm = getMenuElm();
             if(is_expand){
-                const _clientH = this.filtered_items.length * menu_item_h + 30;
+                const length = this.items.filter(item=>{
+                    return item.visible === true;
+                }).length;
+                const _clientH = length * menu_item_h + 30;
                 elm.style.height = _clientH + "px";
             }else{
                 elm.style.height = "0px";
@@ -171,32 +180,28 @@
             return order.map(value => {
                 const item = Object.assign({}, this.items[value]);
                 delete item.icon;
+                delete item.id;
+                delete item.visible;
                 return item;
             });
         };
 
-        const getSelectedItemIndices = () => {
-            const sel_indices = [];
+        const getSelectedItemIds = () => {
+            const Ids = [];
             const elms = this.root.querySelectorAll(".acdn-item");
-            elms.forEach((elm, index) => {
+            elms.forEach((elm) => {
                 if(elm.classList.contains("selected")){
-                    sel_indices.push(index);
+                    Ids.push(parseInt(elm.dataset.itemid));
                 }
             });
-            return sel_indices;
+            return Ids;
         };
 
-        const deleteItems = (/** @type {Array} */ indices) => {
-            /** @type {Array} */
-            const order = sortable.toArray();
+        const deleteItems = (/** @type {Array} */ ids) => {            
+            this.items = this.items.filter((value)=>{
+                return !ids.includes(value.id);
+            });
 
-            const cp_items = order.map(value=>{
-                const index = parseInt(value);
-                return Object.assign({}, this.items[index]);
-            });
-            this.items = cp_items.filter((value, index)=>{
-                return !indices.includes(index);
-            });
             this.update();
         };
 
@@ -208,9 +213,23 @@
             target_elm.classList.add("selected"); 
         };
 
+        const cnvItems = (items) => {
+            const ids = this.items.map(item => {
+                return item.id;
+            });
+            const max_id = Math.max(...ids);
+            return items.map((item, index) => {
+                item.id = max_id + index + 1;
+                item.visible = true;
+                return item;
+            });
+        };
+
         obs_accordion.on("add-items", (items) => {
             const pre_item_num = this.items.length;
-            Array.prototype.push.apply(this.items, items);
+            
+            const new_items = cnvItems(items);
+            Array.prototype.push.apply(this.items, new_items);
             if(isExpand()){
                 chanegExpand(true);
             }
@@ -226,8 +245,8 @@
         });
 
         obs_accordion.on("delete-selected-items", () => {
-            const sel_indices = getSelectedItemIndices();
-            deleteItems(sel_indices);
+            const sel_ids = getSelectedItemIds();
+            deleteItems(sel_ids);
             if(isExpand()){
                 chanegExpand(true);
             }
@@ -239,17 +258,16 @@
         });
 
         obs_accordion.on("get-selected-items", (cb) => {
-            const indices = getSelectedItemIndices();
-            const items = getItems();
-            const selected_items = items.filter((item, index) => {
-                return indices.includes(index);
+            const ids = getSelectedItemIds();
+            const selected_items = this.items.filter(item => {
+                return ids.includes(item.id);
+            }).map(value=>{
+                const item = Object.assign({}, value);
+                delete item.icon;
+                delete item.id;
+                return item;
             });
             cb(selected_items);
-        });
-        
-        obs_accordion.on("get-selected-indices", (cb) => {
-            const indices = getSelectedItemIndices();
-            cb(indices);
         });
 
         obs_accordion.on("change-expand", (expand) => {

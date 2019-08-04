@@ -28,13 +28,12 @@
             display: none; 
         }
         .main-group-buttons input[type=radio]:checked + .button{
-            background: #2C7CFF;
+            border-left: 3px solid #2C7CFF;
         }
         .main-group-buttons .button {
             margin: 2px;
             text-align: center;
             box-sizing: border-box;
-            border-radius: 2px;
         }
         .main-group-buttons .label .button{
             width: 50px;
@@ -84,12 +83,10 @@
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
-            <div>
             <span title="ダウンロード" class="button download-badge center-hv">
                 <span class="fas fa-download"></span>
                 <span class="item-num">{this.donwnload_item_num}</span>
             </span> 
-            </div>
         </label>
         <label class="label">
             <input type="radio" name="page_select" class="history-radio" onclick="{this.onclickPageSelect.bind(this,'history')}"> 

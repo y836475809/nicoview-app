@@ -143,6 +143,11 @@
                     }, 100);
                 }
             });
+
+            video_elm.addEventListener("ended", () => {
+                console.log("addEventListener endedによるイベント発火");
+                obs.trigger("player-controls:set-state", "pause"); 
+            });
             
             obs.on("player-video:play", () => {
                 console.log("player.tag play");

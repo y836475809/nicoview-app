@@ -16,7 +16,8 @@ const IPCMsg =  Object.freeze({
 
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",
-    CANCEL_UPDATE_DATA: "ipc-cancel-update-data"
+    CANCEL_UPDATE_DATA: "ipc-cancel-update-data",
+    ADD_BOOKMARK: "ipc-add-bookmark"
 });
 
 
@@ -68,6 +69,11 @@ class IPCMonitor extends EventEmitter {
     cancelUpdateData(args){
         const win = remote.getGlobal ("main_window");
         win.webContents.send(IPCMsg.CANCEL_UPDATE_DATA, args);
+    }
+
+    addBookmark(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.ADD_BOOKMARK, args);
     }
 
     showPlayerSync(args) {
@@ -131,6 +137,10 @@ class IPCMonitor extends EventEmitter {
 
         ipcRenderer.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args) => {
             this.emit(IPCMsg.CANCEL_UPDATE_DATA, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.ADD_BOOKMARK, (event, args) => {
+            this.emit(IPCMsg.ADD_BOOKMARK, event, args); 
         });
     }
 }

@@ -20,15 +20,18 @@
         }
     </style>
 
-    <div id="player-video-screen" onmousedown={mousedown}>
+    <div id="player-video-screen" onmousedown={mousedown} onmouseup={oncontextmenu}>
         <video ref="player_video" id="player" autoplay preload="metadata">
         </video>
     </div>
 
     <script>
         /* globals app_base_dir */
+        const { remote } = require("electron");
+        const { Menu } = remote;
         const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
 
         const obs = this.opts.obs; 
 
@@ -230,5 +233,27 @@
                 }
             });
         });
+
+        const createMenu = () => {
+            const nemu_templete = [
+                { 
+                    label: "ブックマーク", click() {
+                        const { video_id, title } = play_data.video_data;
+                        const bk_item = BookMark.createVideoItem(title, video_id);
+                        obs.trigger("player-main-page:add-bookmark", bk_item);
+                    }
+                }
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+        const context_menu = createMenu();
+        this.oncontextmenu= (e) => {
+            if(e.button===2){
+                context_menu.items.forEach(menu => {
+                    menu.enabled = play_data !== null;
+                });
+                context_menu.popup({window: remote.getCurrentWindow()});
+            }
+        };
     </script>
 </player-video>

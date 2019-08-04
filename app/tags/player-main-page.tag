@@ -161,7 +161,12 @@
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
-                video_data: video_data, 
+                video_data: {
+                    video_id: video.video_id,
+                    title: video.title,
+                    src: video_data.src, 
+                    type: video_data.type
+                },
                 comments: filtered_comments 
             });
             obs.trigger("player-tag:set-tags", thumb_info.tags);
@@ -388,8 +393,8 @@
             }
         });   
   
-        obs.on("player-main-page:metadata-loaded", (video_size) => {
-            org_video_size =  video_size;
+        obs.on("player-main-page:add-bookmark", (args) => {
+            ipc_monitor.addBookmark(args);
         });
 
         let resize_begin = false;

@@ -262,6 +262,11 @@
             this.obs.trigger("library-page:cancel-update-data", video_id);
         });
 
+        ipc_monitor.on(IPCMsg.ADD_BOOKMARK, (event, args)=>{
+            const bk_item = args;
+            this.obs.trigger("bookmark-page:add-items", [bk_item]);
+        });
+
         window.onbeforeunload = (e) => {
         };
 

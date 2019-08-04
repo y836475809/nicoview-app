@@ -51,6 +51,7 @@
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
+    process.env.NODE_ENV = "DEBUG";
 
     const obs = riot.observable(); // eslint-disable-line
     riot.mount("player-main-page", {obs});

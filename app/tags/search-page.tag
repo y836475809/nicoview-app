@@ -624,6 +624,20 @@
 
         const createMenu = () => {
             const nemu_templete = [
+                { label: "再生", click() {
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
+                    });
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }},
+                { label: "オンラインで再生", click() {
+                    const items = grid_table.getSelectedDatas().filter(value => {
+                        return value.id!="";
+                    });
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";

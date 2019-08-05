@@ -322,6 +322,11 @@
                     const video_id = items[0].id;
                     obs.trigger("main-page:play-by-videoid", video_id);
                 }},
+                { label: "オンラインで再生", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                }},
                 { label: "コメント更新", click() {
                     const items = grid_table.getSelectedDatas();
                     updateNicoData(items, async (nico_update)=>{

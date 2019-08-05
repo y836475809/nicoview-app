@@ -169,6 +169,14 @@
                 }
             },
             { 
+                id: "play",
+                label: "オンラインで再生", async click() {
+                    const items = await getSelectedItems();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                }
+            },
+            { 
                 id: "go-to-library",
                 label: "ライブラリの項目へ移動", click: async () => {
                     const items = await getSelectedItems();

@@ -235,6 +235,16 @@
 
         const createMenu = () => {
             const nemu_templete = [
+                { label: "再生", click() {
+                    const items = grid_table_dl.grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid", video_id);
+                }},
+                { label: "オンラインで再生", click() {
+                    const items = grid_table_dl.grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                }},
                 { label: "削除", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
                     deleteDownloadItems(deleted_ids);
@@ -380,7 +390,6 @@
             
             const context_menu = createMenu();
             try {
-
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{

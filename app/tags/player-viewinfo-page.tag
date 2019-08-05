@@ -183,7 +183,7 @@
                 <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
             </div>
             <div class="content">
-                <div class="label">状態</div>: {this.videoStateLocal()}<div class="notice-deleted">{this.videoStateDeleted()}</div>
+                <div class="label">状態</div>: {this.videoStateOnline()} {this.videoStateLocal()}<div class="notice-deleted">{this.videoStateDeleted()}</div>
             </div>
         </div>
     </div>
@@ -248,7 +248,8 @@
         const row_height = 25;
 
         this.is_deleted = true;
-        this.is_local = false;
+        this.is_online = false;
+        this.is_saved = false;
 
         this.video_thumbnail_url = "";
         this.title =  "-";
@@ -265,17 +266,24 @@
         let sync_comment_checked = this.opts.sync_comment_checked;
 
         this.enableDonwload = () => {
-            return this.is_deleted === false && this.is_local === false;
+            return this.is_deleted === false && this.is_saved === false;
         };
         this.enableUpdateData = () => {
-            return this.is_deleted === false && this.is_local === true;
+            return this.is_deleted === false && this.is_saved === true;
         };
 
-        this.videoStateLocal = () => {
-            if(this.is_local === true){
-                return "ローカル";
-            }else{
+        this.videoStateOnline = () => {
+            if(this.is_online === true){
                 return "オンライン";
+            }else{
+                return "ローカル";
+            }
+        };
+        this.videoStateLocal = () => {
+            if(this.is_saved === true){
+                return "保存済み";
+            }else{
+                return "-";
             }
         };
         this.videoStateDeleted = () => {
@@ -471,15 +479,19 @@
         obs.on("player-viewinfo-page:set-viewinfo-data", (args)=> {
             resizeCommentList();
 
-            const { viewinfo, comments } = args;
+            const { viewinfo, comments, state } = args;
 
             this.is_deleted = viewinfo.is_deleted;
-            this.is_local = viewinfo.is_local;
+            this.is_online = state.is_online;
+            this.is_saved = state.is_saved;
             if(this.is_deleted===undefined){
                 this.is_deleted = false;
             }
-            if(this.is_local===undefined){
-                this.is_local = false;
+            if(this.is_online===undefined){
+                this.is_online = false;
+            }
+            if(this.is_saved===undefined){
+                this.is_saved = false;
             }
 
             const thumb_info = viewinfo.thumb_info;

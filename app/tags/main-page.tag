@@ -180,36 +180,49 @@
             this.update();
         });
 
-        const PlayByVideoID = async(video_id) => {
-            const data = await new Promise((resolve, reject) => {
-                this.obs.trigger("library-page:get-data-callback", {
-                    video_ids:[video_id],
-                    cb: (data_map) => {
-                        if(data_map.has(video_id)){
-                            resolve(data_map.get(video_id));
-                        }else{
-                            resolve(null);
-                        }
-                    }
-                });
-            });
-            ipc_monitor.play({ video_id, data }); 
-        };
-
-        this.obs.on("main-page:play-by-videoid", (video_id)=>{
+        this.obs.on("main-page:play-by-videoid", (args)=>{
             ipc_monitor.showPlayerSync();
-            PlayByVideoID(video_id);            
+
+            const video_id = args; 
+            ipc_monitor.play({
+                video_id: video_id,
+                is_online: false
+            }); 
         }); 
         
-        this.obs.on("main-page:play-by-videoid-online", (video_id)=>{
-            ipc_monitor.showPlayerSync();
-            ipc_monitor.play({ video_id: video_id, data: null });            
+        this.obs.on("main-page:play-by-videoid-online", (args)=>{
+            ipc_monitor.showPlayerSync();    
+
+            const video_id = args; 
+            ipc_monitor.play({
+                video_id: video_id,
+                is_online: true
+            }); 
         });  
 
         ipc_monitor.on(IPCMsg.PLAY_BY_ID, (event, args) => {
             ipc_monitor.showPlayerSync();
+
+            const video_id = args; 
+            ipc_monitor.play({
+                video_id: video_id,
+                force_online: false
+            });   
+        });
+
+        ipc_monitor.on(IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id = args;
-            PlayByVideoID(video_id);   
+            this.obs.trigger("library-page:get-data-callback", {
+                video_ids:[video_id],
+                cb: (data_map) => {
+                    if(data_map.has(video_id)){
+                        const data = data_map.get(video_id);
+                        ipc_monitor.getPlayDataReply(data);
+                    }else{
+                        ipc_monitor.getPlayDataReply(null);
+                    }
+                }
+            });
         });
 
         ipc_monitor.on(IPCMsg.SEARCH_TAG, (event, args)=>{

@@ -152,7 +152,7 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const play_by_video_data = (video_data, viewinfo, comments) => {              
+        const play_by_video_data = (video_data, viewinfo, comments, state) => {              
             comment_filter.setComments(comments);
             const filtered_comments = comment_filter.getComments();
 
@@ -172,7 +172,9 @@
             obs.trigger("player-tag:set-tags", thumb_info.tags);
             obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
-                comments: filtered_comments });   
+                comments: filtered_comments,
+                state: state
+            });   
             
             const history_item = {
                 id: video.video_id, 
@@ -199,7 +201,7 @@
             ["startHeartBeat", "HeartBeat開始"],
         ]);
 
-        const play_by_video_id = async (video_id) => {
+        const play_by_video_id = async (video_id, state) => {
             nico_play = new NicoPlay();
 
             this.obs_modal_dialog.trigger("show", {
@@ -243,7 +245,7 @@
                     if (a.vpos > b.vpos) return 1;
                     return 0;
                 });
-                play_by_video_data(video_data, viewinfo, comments);
+                play_by_video_data(video_data, viewinfo, comments, state);
 
                 this.obs_modal_dialog.trigger("close");       
             } catch (error) {
@@ -259,21 +261,60 @@
         ipc_monitor.on(IPCMsg.PLAY, (event, args) => {
             cancelPlay();
 
-            const { video_id, data } = args;
-            if(data==null){
-                play_by_video_id(video_id);
-            }else{
-                const { video_data, viewinfo, comments } = data;
-                play_by_video_data(video_data, viewinfo, comments);
-            }
+            const { video_id, is_online } = args;
+            ipc_monitor.getPlayData(video_id);
+            ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
+                const data = args;
+                if(is_online===true){
+                    const state = { 
+                        is_online: true,
+                        is_saved: data !== null
+                    };
+                    play_by_video_id(video_id, state);
+                }else{
+                    const state = { 
+                        is_online: data === null,
+                        is_saved: data !== null
+                    };
+                    if(state.is_saved===true){
+                        const { video_data, viewinfo, comments } = data;
+                        play_by_video_data(video_data, viewinfo, comments, state);
+                    }else{
+                        play_by_video_id(video_id, state);
+                    }
+                }
+            });
         });
 
-        obs.on("player-main-page:play-by-videoid", (video_id) => {
-            ipc_monitor.playByID(video_id);
+        obs.on("player-main-page:play-by-videoid", async (args) => {
+            const video_id = args;
+            ipc_monitor.getPlayData(video_id);
+            ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
+                const data = args;
+                const state = { 
+                    is_online: data === null,
+                    is_saved: data !== null
+                };
+                if(state.is_saved===true){
+                    const { video_data, viewinfo, comments } = data;
+                    play_by_video_data(video_data, viewinfo, comments, state);
+                }else{
+                    play_by_video_id(video_id, state);
+                }
+            });
         });
 
-        obs.on("player-main-page:play-by-videoid-online", (video_id) => {
-            play_by_video_id(video_id);
+        obs.on("player-main-page:play-by-videoid-online", (args) => {
+            const video_id = args;
+            ipc_monitor.getPlayData(video_id);
+            ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
+                const data = args;
+                const state = { 
+                    is_online: true,
+                    is_saved: data !== null
+                };
+                play_by_video_id(video_id, state);
+            });
         });
 
         obs.on("player-main-page:search-tag", (args) => {

@@ -4,6 +4,8 @@ const { remote, ipcRenderer, ipcMain } = require("electron");
 const IPCMsg =  Object.freeze({   
     PLAY_BY_ID: "ipc-play-by-id",
     PLAY: "ipc-play",
+    GET_PLAY_DATA: "ipc-get-play-data",
+    GET_PLAY_DATA_REPLY: "ipc-get-play-data-reply",
     
     SHOW_PLAYER_SYNC: "ipc-show-player",
     SET_COOKIE_SYNC: "ipc-set-cookie",
@@ -34,6 +36,16 @@ class IPCMonitor extends EventEmitter {
     play(args){
         const win = remote.getGlobal ("player_window");
         win.webContents.send(IPCMsg.PLAY, args);
+    }
+
+    getPlayData(args){
+        const win = remote.getGlobal ("main_window");
+        win.webContents.send(IPCMsg.GET_PLAY_DATA, args);
+    }
+
+    getPlayDataReply(args){
+        const win = remote.getGlobal ("player_window");
+        win.webContents.send(IPCMsg.GET_PLAY_DATA_REPLY, args);
     }
 
     searchTag(args){
@@ -109,6 +121,13 @@ class IPCMonitor extends EventEmitter {
         
         ipcRenderer.on(IPCMsg.PLAY, (event, args) => {
             this.emit(IPCMsg.PLAY, event, args); 
+        });
+
+        ipcRenderer.on(IPCMsg.GET_PLAY_DATA, (event, args) => {
+            this.emit(IPCMsg.GET_PLAY_DATA, event, args); 
+        });
+        ipcRenderer.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
+            this.emit(IPCMsg.GET_PLAY_DATA_REPLY, event, args); 
         });
 
         ipcRenderer.on(IPCMsg.SEARCH_TAG, (event, args) => {

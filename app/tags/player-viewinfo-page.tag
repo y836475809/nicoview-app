@@ -326,11 +326,28 @@
             ch_elm.checked = sync_comment_checked;
         };
 
+        const createWatchLinkMenu = (video_id) => {
+            const nemu_templete = [
+                { label: "再生", click() {
+                    obs.trigger("player-main-page:play-by-videoid", video_id);
+                }},
+                { label: "オンラインで再生", click() {
+                    obs.trigger("player-main-page:play-by-videoid-online", video_id);
+                }},
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
         const watchLinkClick = (e) => {
             e.preventDefault(); 
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
-            obs.trigger("player-main-page:play-by-videoid", video_id);
+            if(e.button === 2){
+                createWatchLinkMenu(video_id).popup({window: remote.getCurrentWindow()}); 
+            }else{
+                obs.trigger("player-main-page:play-by-videoid", video_id);
+            }
+            
             return false;
         };
 
@@ -353,6 +370,7 @@
                 a_tags.forEach(value=>{
                     if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
                         value.onclick = watchLinkClick;
+                        value.onmouseup = watchLinkClick;
                     }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
                         value.onclick = mylistLinkClick;
                     }else{

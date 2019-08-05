@@ -272,6 +272,10 @@
             ipc_monitor.playByID(video_id);
         });
 
+        obs.on("player-main-page:play-by-videoid-online", (video_id) => {
+            play_by_video_id(video_id);
+        });
+
         obs.on("player-main-page:search-tag", (args) => {
             ipc_monitor.searchTag(args);
         });

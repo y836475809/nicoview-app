@@ -482,8 +482,12 @@
             const { viewinfo, comments, state } = args;
 
             this.is_deleted = viewinfo.is_deleted;
-            this.is_online = state.is_online;
-            this.is_saved = state.is_saved;
+
+            if(state){
+                this.is_online = state.is_online;
+                this.is_saved = state.is_saved;
+            }
+            
             if(this.is_deleted===undefined){
                 this.is_deleted = false;
             }

@@ -203,15 +203,23 @@
         });  
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
-            const video_id = args;
+            const { video_id, is_online } = args;
             this.obs.trigger("library-page:get-data-callback", {
                 video_ids:[video_id],
                 cb: (data_map) => {
                     if(data_map.has(video_id)){
                         const data = data_map.get(video_id);
-                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, data);
+                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
+                            video_id,
+                            is_online,
+                            data
+                        });
                     }else{
-                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, null);
+                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
+                            video_id:video_id,
+                            is_online:is_online,
+                            data:null
+                        });
                     }
                 }
             });
@@ -238,30 +246,36 @@
             this.obs.trigger("history-page:add-item", item);
             this.obs.trigger("library-page:play", item);
         });
-
-        ipc_monitor.on(ipc_monitor.IPCMsg.UPDATE_DATA, (event, args)=>{
+       
+        ipc_monitor.on(ipc_monitor.IPCMsg.UPDATE_DATA, async (event, args)=>{
             const { video_id, update_target } = args;
             console.log("main update video_id=", video_id);
-            this.obs.trigger("library-page:update-data", { 
-                video_id: video_id,
-                update_target: update_target,
-                cb: (result)=>{
-                    console.log("main update cb result=", result);
-                    if(result.state == "ok" || result.state == "404"){
-                        this.obs.trigger("library-page:get-data-callback", {
-                            video_ids:[video_id],
-                            cb: (data_map) => {
-                                if(data_map.has(video_id)){
-                                    ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
-                                        video_id: video_id,
-                                        data:data_map.get(video_id)
-                                    });
-                                }
-                            }
-                        });  
+
+            const result = await new Promise((resolve, reject) => {
+                this.obs.trigger("library-page:update-data", { 
+                    video_id: video_id,
+                    update_target: update_target,
+                    cb: (result)=>{
+                        resolve(result);
                     }
-                }
+                });
             });
+
+            if(result.state == "ok" || result.state == "404"){
+                const data = await new Promise((resolve, reject) => {
+                    this.obs.trigger("library-page:get-data-callback", {
+                        video_ids:[video_id],
+                        cb: (data_map) => {
+                            if(data_map.has(video_id)){
+                                resolve(data_map.get(video_id));
+                            }
+                        }
+                    });  
+                });
+                ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
+                    video_id, data
+                });
+            }
         });
 
         ipc_monitor.on(ipc_monitor.IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{

@@ -260,6 +260,7 @@
             }
         }; 
 
+        //onceでできる？
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
             const { video_id, data, is_online } = args;
             const state = { 
@@ -340,7 +341,10 @@
 
             await new Promise((resolve, reject) => {
                 ipc_render.sendMain(ipc_render.IPCMsg.UPDATE_DATA, { video_id, update_target });
-                ipc_monitor.on(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
+
+                //TODO
+                // ipc_monitor.on(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
+                ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_id, data } = args;
                     const { video_data, viewinfo, comments } = data;
 

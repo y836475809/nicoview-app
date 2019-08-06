@@ -33,7 +33,7 @@
 <script>
     /* globals riot */
     const path = require("path");
-    const { IPCMonitor } = require("../app/js/ipc-monitor");
+    const { IPCMain } = require("../app/js/ipc-monitor");
     const { remote } = require("electron");
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
@@ -41,8 +41,8 @@
     const obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
 
-    const ipc_monitor = new IPCMonitor();
-    ipc_monitor.setPlayerPath(path.join(__dirname, "test-player.html"));
+    const ipc_main = new IPCMain();
+    ipc_main.send(ipc_main.IPCMsg.SET_PLAYER_PATH, path.join(__dirname, "test-player.html"));
 
     riot.mount("main-page", {obs});
 

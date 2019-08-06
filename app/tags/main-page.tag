@@ -122,10 +122,7 @@
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
-        // const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        // const ipc_monitor = new IPCMonitor();
-        // ipc_monitor.listenRemote();
         const ipc_monitor = new IPCRenderMonitor();
         ipc_monitor.listen();
         const ipc_render = new IPCRender();
@@ -186,40 +183,24 @@
         });
 
         this.obs.on("main-page:play-by-videoid", (args)=>{
-            // ipc_monitor.showPlayerSync();
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
             const video_id = args; 
-            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
-            // ipc_monitor.play({
+            ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
                 is_online: false
             }); 
         }); 
         
         this.obs.on("main-page:play-by-videoid-online", (args)=>{
-            // ipc_monitor.showPlayerSync();
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
             const video_id = args; 
-            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
-            // ipc_monitor.play({
+            ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
                 is_online: true
             }); 
         });  
-
-        ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_ID, (event, args) => {
-            // ipc_monitor.showPlayerSync();
-            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
-
-            const video_id = args; 
-            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
-            // ipc_monitor.play({
-                video_id: video_id,
-                force_online: false
-            });   
-        });
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id = args;
@@ -228,11 +209,9 @@
                 cb: (data_map) => {
                     if(data_map.has(video_id)){
                         const data = data_map.get(video_id);
-                        // ipc_monitor.getPlayDataReply(data);
-                        ipc_render.sendPlayer(ipc_render.GET_PLAY_DATA_REPLY, data);
+                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, data);
                     }else{
-                        // ipc_monitor.getPlayDataReply(null);
-                        ipc_render.sendPlayer(ipc_render.GET_PLAY_DATA_REPLY, null);
+                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, null);
                     }
                 }
             });
@@ -273,8 +252,7 @@
                             video_ids:[video_id],
                             cb: (data_map) => {
                                 if(data_map.has(video_id)){
-                                    ipc_render.sendPlayer(ipc_render.RETURN_UPDATE_DATA, {
-                                    // ipc_monitor.returnUpdateData({
+                                    ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
                                         video_id: video_id,
                                         data:data_map.get(video_id)
                                     });

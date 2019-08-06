@@ -17,9 +17,6 @@ let is_debug_mode = false;
 
 let player_html_path = `file://${__dirname}/html/player.html`;
 
-// const ipc_monitor = new IPCMonitor();
-// ipc_monitor.listenMain();
-
 const ipc_monitor = new IPCMainMonitor();
 ipc_monitor.listen();
 
@@ -86,14 +83,12 @@ app.on("ready", ()=>{
 
     createWindow();
 
-    // ipc_monitor.on(IPCMsg.SHOW_PLAYER_SYNC, async (event, args) => {
     ipc_monitor.on(ipc_monitor.IPCMsg.SHOW_PLAYER_SYNC, async (event, args) => {
         await createPlayerWindow();
         player_win.show();
         event.returnValue = true;
     });
 
-    // ipc_monitor.on(IPCMsg.SET_COOKIE_SYNC, async (event, args) => {
     ipc_monitor.on(ipc_monitor.IPCMsg.SET_COOKIE_SYNC, async (event, args) => {
         const cookies = args;
         const ps = cookies.map(cookie=>{
@@ -115,9 +110,6 @@ app.on("ready", ()=>{
         }
     });
 
-    // ipc_monitor.on(IPCMsg.SET_PLAYER_PATH, (event, args) => {
-    //     player_html_path = args;
-    // });
     ipc_monitor.on(ipc_monitor.IPCMsg.SET_PLAYER_PATH, (event, args) => {
         player_html_path = args;
     });

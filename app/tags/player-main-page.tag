@@ -42,7 +42,7 @@
         const { Menu, MenuItem } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
-        const { IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
+        const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
 
@@ -52,6 +52,7 @@
         const ipc_monitor = new IPCRenderMonitor();
         ipc_monitor.listen();
         const ipc_render = new IPCRender();
+        const ipc_main = new IPCMain();
 
         const comment_filter = new CommentFilter(SettingStore.getSettingFilePath("nglist.json"));
 
@@ -183,7 +184,6 @@
                 name: video.title, 
                 url: video_data.src
             };
-            // ipc_monitor.addPlayHistory(history_item);    
             ipc_render.sendMain(ipc_render.IPCMsg.ADD_PLAY_HISTORY, history_item);
         }; 
 
@@ -229,7 +229,7 @@
 
                 const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = ipc_monitor.setCookieSync(nico_cookies);
+                const ret = ipc_main.sendSync(ipc_main.IPCMsg.SET_COOKIE_SYNC,  nico_cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 
@@ -260,14 +260,12 @@
             }
         }; 
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.PLAY, (event, args) => {
+        ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
             cancelPlay();
 
             const { video_id, is_online } = args;
             ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
             ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
-            // ipc_monitor.getPlayData(video_id);
-            // ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
                 const data = args;
                 if(is_online===true){
                     const state = { 
@@ -294,8 +292,6 @@
             const video_id = args;
             ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
             ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
-            // ipc_monitor.getPlayData(video_id);
-            // ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
                 const data = args;
                 const state = { 
                     is_online: data === null,
@@ -314,8 +310,6 @@
             const video_id = args;
             ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
             ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
-            // ipc_monitor.getPlayData(video_id);
-            // ipc_monitor.on(IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
                 const data = args;
                 const state = { 
                     is_online: true,
@@ -326,12 +320,10 @@
         });
 
         obs.on("player-main-page:search-tag", (args) => {
-            // ipc_monitor.searchTag(args);
             ipc_render.sendMain(ipc_render.IPCMsg.SEARCH_TAG, args);
         });
 
         obs.on("player-main-page:load-mylist", (args) => {
-            // ipc_monitor.loadMylist(args);
             ipc_render.sendMain(ipc_render.IPCMsg.LOAD_MYLIST, args);
         });
 
@@ -355,7 +347,6 @@
                 buttons: ["cancel"],
                 cb: result=>{
                     console.log("player main cancel update video_id=", video_id);
-                    // ipc_monitor.cancelUpdateData(video_id);
                     ipc_render.sendMain(ipc_render.IPCMsg.CANCEL_UPDATE_DATA, video_id);
                 }
             });
@@ -363,8 +354,6 @@
             await new Promise((resolve, reject) => {
                 ipc_render.sendMain(ipc_render.IPCMsg.UPDATE_DATA, update_target);
                 ipc_monitor.on(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
-                // ipc_monitor.updateData({video_id, update_target});
-                // ipc_monitor.on(IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_id, data } = args;
                     const { video_data, viewinfo, comments } = data;
 
@@ -388,7 +377,6 @@
         });
 
         obs.on("player-main-page:add-download-item", (args) => {
-            // ipc_monitor.addDonwloadItem(args);
             ipc_render.sendMain(ipc_render.IPCMsg.ADD_DOWNLOAD_ITEM, args);
         });
 
@@ -453,7 +441,6 @@
         });   
   
         obs.on("player-main-page:add-bookmark", (args) => {
-            // ipc_monitor.addBookmark(args);
             ipc_render.sendMain(ipc_render.IPCMsg.ADD_BOOKMARK, args);
         });
 

@@ -122,10 +122,15 @@
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
-        const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const ipc_monitor = new IPCMonitor();
-        ipc_monitor.listenRemote();
-        
+        // const { IPCMsg, IPCMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
+        const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
+        // const ipc_monitor = new IPCMonitor();
+        // ipc_monitor.listenRemote();
+        const ipc_monitor = new IPCRenderMonitor();
+        ipc_monitor.listen();
+        const ipc_render = new IPCRender();
+        const ipc_main = new IPCMain();
+
         this.obs = this.opts.obs;
 
         this.donwnload_item_num = 0;
@@ -181,73 +186,81 @@
         });
 
         this.obs.on("main-page:play-by-videoid", (args)=>{
-            ipc_monitor.showPlayerSync();
+            // ipc_monitor.showPlayerSync();
+            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
             const video_id = args; 
-            ipc_monitor.play({
+            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
+            // ipc_monitor.play({
                 video_id: video_id,
                 is_online: false
             }); 
         }); 
         
         this.obs.on("main-page:play-by-videoid-online", (args)=>{
-            ipc_monitor.showPlayerSync();    
+            // ipc_monitor.showPlayerSync();
+            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
             const video_id = args; 
-            ipc_monitor.play({
+            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
+            // ipc_monitor.play({
                 video_id: video_id,
                 is_online: true
             }); 
         });  
 
-        ipc_monitor.on(IPCMsg.PLAY_BY_ID, (event, args) => {
-            ipc_monitor.showPlayerSync();
+        ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_ID, (event, args) => {
+            // ipc_monitor.showPlayerSync();
+            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
             const video_id = args; 
-            ipc_monitor.play({
+            ipc_render.sendMain(ipc_render.IPCMsg.PLAY, {
+            // ipc_monitor.play({
                 video_id: video_id,
                 force_online: false
             });   
         });
 
-        ipc_monitor.on(IPCMsg.GET_PLAY_DATA, async (event, args) => {
+        ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id = args;
             this.obs.trigger("library-page:get-data-callback", {
                 video_ids:[video_id],
                 cb: (data_map) => {
                     if(data_map.has(video_id)){
                         const data = data_map.get(video_id);
-                        ipc_monitor.getPlayDataReply(data);
+                        // ipc_monitor.getPlayDataReply(data);
+                        ipc_render.sendPlayer(ipc_render.GET_PLAY_DATA_REPLY, data);
                     }else{
-                        ipc_monitor.getPlayDataReply(null);
+                        // ipc_monitor.getPlayDataReply(null);
+                        ipc_render.sendPlayer(ipc_render.GET_PLAY_DATA_REPLY, null);
                     }
                 }
             });
         });
 
-        ipc_monitor.on(IPCMsg.SEARCH_TAG, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.SEARCH_TAG, (event, args)=>{
             this.obs.trigger("main-page:select-page", "search");
             this.obs.trigger("search-page:search-tag", args);
         });
 
-        ipc_monitor.on(IPCMsg.LOAD_MYLIST, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.LOAD_MYLIST, (event, args)=>{
             this.obs.trigger("main-page:select-page", "mylist");
             this.obs.trigger("mylist-page:load-mylist", args);
         });
 
-        ipc_monitor.on(IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
             this.obs.trigger("search-page:add-download-items", [item.id]);
         });
 
-        ipc_monitor.on(IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
             const item = args;
             this.obs.trigger("history-page:add-item", item);
             this.obs.trigger("library-page:play", item);
         });
 
-        ipc_monitor.on(IPCMsg.UPDATE_DATA, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.UPDATE_DATA, (event, args)=>{
             const { video_id, update_target } = args;
             console.log("main update video_id=", video_id);
             this.obs.trigger("library-page:update-data", { 
@@ -260,7 +273,8 @@
                             video_ids:[video_id],
                             cb: (data_map) => {
                                 if(data_map.has(video_id)){
-                                    ipc_monitor.returnUpdateData({
+                                    ipc_render.sendPlayer(ipc_render.RETURN_UPDATE_DATA, {
+                                    // ipc_monitor.returnUpdateData({
                                         video_id: video_id,
                                         data:data_map.get(video_id)
                                     });
@@ -272,12 +286,12 @@
             });
         });
 
-        ipc_monitor.on(IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
             const video_id = args;
             this.obs.trigger("library-page:cancel-update-data", video_id);
         });
 
-        ipc_monitor.on(IPCMsg.ADD_BOOKMARK, (event, args)=>{
+        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_BOOKMARK, (event, args)=>{
             const bk_item = args;
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });

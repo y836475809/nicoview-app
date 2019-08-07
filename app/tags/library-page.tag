@@ -206,23 +206,30 @@
         const getSearchInputElm = () => {
             return this.root.querySelector(".search-container > .search-input");
         };
+
+        const filterItems = (query) => {
+            grid_table.filterData(query); 
+            grid_table.scrollToTop();
+            grid_table.clearSelected();
+        };
+
         this.onclickSearch = (e) => {
             const elm = getSearchInputElm();
             const query = elm.value; 
-            grid_table.filterData(query); 
+            filterItems(query);
         };
 
         this.onkeydownSearchInput = (e) => {
             if(e.keyCode===13){
                 const param = e.target.value;
-                grid_table.filterData(param);
+                filterItems(param);
             }
         };
 
         this.onclickClear = (e) => {
             const search_elm = getSearchInputElm();
             search_elm.value = "";
-            grid_table.filterData(""); 
+            filterItems(""); 
         };
     
         this.onclickAdd = () => {
@@ -236,8 +243,8 @@
         
         obs.on("library-page:search-item-dlbclicked", (item) => {
             const search_elm = getSearchInputElm();
-            search_elm.value = item;
-            grid_table.filterData(item);         
+            search_elm.value = item;   
+            filterItems(item);      
         });
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {

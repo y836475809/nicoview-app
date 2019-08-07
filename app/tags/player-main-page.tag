@@ -340,14 +340,13 @@
             });
 
             await new Promise((resolve, reject) => {
-                ipc_render.sendMain(ipc_render.IPCMsg.UPDATE_DATA, { video_id, update_target });
-
+                ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
                 //TODO
                 // ipc_monitor.on(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_id, data } = args;
                     const { video_data, viewinfo, comments } = data;
-
+                    
                     comment_filter.setComments(comments);
                     const filtered_comments = comment_filter.getComments();
 
@@ -361,6 +360,8 @@
                     
                     resolve();   
                 });
+
+                ipc_render.sendMain(ipc_render.IPCMsg.UPDATE_DATA, { video_id, update_target });
             });
             
             this.obs_modal_dialog.trigger("close");

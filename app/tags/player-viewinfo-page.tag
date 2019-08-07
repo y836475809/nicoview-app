@@ -3,7 +3,7 @@
         :scope {
             display: grid;
             --panel-padding: 4px;
-            --video-panel-height: 120px;
+            --video-panel-height: 100px;
             --user-icon-panel-height: 30px;
             --user-panel-height: 30px;
             --user-thumbnail-size: 50px;
@@ -42,7 +42,6 @@
             user-select: none;
             margin-left: 5px;
             white-space: nowrap;
-            overflow-x: hidden;
         }
         
         .viewinfo-description-panel{
@@ -159,7 +158,7 @@
             min-width: calc(5em + 3px);
         }
         .notice-deleted {
-            margin-left: 5px;
+            font-weight: bold;
             color: red;
         }
     </style>
@@ -169,7 +168,6 @@
             <img src={this.video_thumbnail_url} class="video-thumbnail">
         </div>
         <div class="video-info">
-            <div>{this.title}</div>
             <div class="content">
                 <div class="label">投稿日</div>: {this.first_retrieve}
             </div>
@@ -183,7 +181,10 @@
                 <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
             </div>
             <div class="content">
-                <div class="label">状態</div>: {this.videoStateOnline()} {this.videoStateLocal()}<div class="notice-deleted">{this.videoStateDeleted()}</div>
+                {this.videoStateOnline()} {this.videoStateLocal()}
+            </div>
+            <div class="content">
+                <div class="notice-deleted">{this.videoStateDeleted()}</div>
             </div>
         </div>
     </div>
@@ -247,7 +248,7 @@
 
         const row_height = 25;
 
-        this.is_deleted = true;
+        this.is_deleted = false;
         this.is_online = false;
         this.is_saved = false;
 
@@ -274,21 +275,21 @@
 
         this.videoStateOnline = () => {
             if(this.is_online === true){
-                return "オンライン";
+                return "オンライン再生";
             }else{
-                return "ローカル";
+                return "ローカル再生";
             }
         };
         this.videoStateLocal = () => {
             if(this.is_saved === true){
                 return "保存済み";
             }else{
-                return "-";
+                return "";
             }
         };
         this.videoStateDeleted = () => {
             if(this.is_deleted === true){
-                return "削除済み";
+                return "削除されています";
             }else{
                 return "";
             }

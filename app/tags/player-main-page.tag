@@ -315,13 +315,7 @@
             const { video_data, viewinfo, comments } = arg;
             play_by_video_data(video_data, viewinfo, comments);
         });
-        obs.on("player-main-page:test-play-by-videoid", (video_id) => {
-            cancelPlay();
 
-            play_by_video_id(video_id);
-        });
-
-        //TODO
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             console.log("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {
@@ -335,8 +329,6 @@
 
             await new Promise((resolve, reject) => {
                 ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
-                //TODO
-                // ipc_monitor.on(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_id, data } = args;
                     const { video_data, viewinfo, comments } = data;

@@ -24,8 +24,6 @@
     <div class="test-button">
         <button type="button" onclick="onclickLoad();">load</button>
         <button type="button" onclick="onclickLoad2();">load comment</button>
-        <button type="button" onclick="onclickLoad3();">watch dmc</button>
-        <button type="button" onclick="onclickLoad4();">watch smile</button>
     </div>    
     <player-main-page ref="pvi" class="test-player-main-page"></player-main-page>
 </body>
@@ -147,15 +145,6 @@
         }; 
         obs.trigger("player-viewinfo-page:set-viewinfo-data",
             { viewinfo, comments });
-    };
-
-    const onclickLoad3 = () => {
-        const video_id = "sm33851481"; //"sm32951089";
-        obs.trigger("player-main-page:test-play-by-videoid", video_id); 
-    };
-    const onclickLoad4 = () => {
-        const video_id = "sm29316071";
-        obs.trigger("player-main-page:test-play-by-videoid", video_id); 
     };
 </script>
 

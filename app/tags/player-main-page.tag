@@ -260,51 +260,46 @@
             }
         }; 
 
-        //onceでできる？
-        ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
-            const { video_id, data, is_online } = args;
-            const state = { 
-                is_online: is_online,
-                is_saved: data !== null
-            };
+        const playNiconico = (video_id, is_online) => {
+            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
 
-            //play online
-            if(state.is_online===true || state.is_saved===false){
-                play_by_video_id(video_id, state);
-            }else{
-                const { video_data, viewinfo, comments } = data;
-                play_by_video_data(video_data, viewinfo, comments, state);
-            }
-        });
+            ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
+                const { video_id, data } = args;
+                const state = { 
+                    is_online: is_online,
+                    is_saved: data !== null
+                };
+
+                //play online
+                if(state.is_online===true || state.is_saved===false){
+                    play_by_video_id(video_id, state);
+                }else{
+                    const { video_data, viewinfo, comments } = data;
+                    play_by_video_data(video_data, viewinfo, comments, state);
+                }
+            });
+            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
+        }; 
 
         ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
             const { video_id, is_online } = args;
 
             cancelPlay();
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, {
-                video_id,
-                is_online
-            });
+            playNiconico(video_id, is_online);
         });
 
         obs.on("player-main-page:play-by-videoid", async (args) => {
             const video_id = args;
             const is_online = false;
 
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA,  {
-                video_id,
-                is_online
-            });
+            playNiconico(video_id, is_online);
         });
 
         obs.on("player-main-page:play-by-videoid-online", (args) => {
             const video_id = args;
             const is_online = true;
 
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA,  {
-                video_id,
-                is_online
-            });
+            playNiconico(video_id, is_online);
         });
 
         obs.on("player-main-page:search-tag", (args) => {
@@ -346,7 +341,7 @@
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_id, data } = args;
                     const { video_data, viewinfo, comments } = data;
-                    
+
                     comment_filter.setComments(comments);
                     const filtered_comments = comment_filter.getComments();
 

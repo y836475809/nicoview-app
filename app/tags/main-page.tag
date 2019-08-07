@@ -203,7 +203,7 @@
         });  
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
-            const { video_id, is_online } = args;
+            const video_id  = args;
             this.obs.trigger("library-page:get-data-callback", {
                 video_ids:[video_id],
                 cb: (data_map) => {
@@ -211,13 +211,11 @@
                         const data = data_map.get(video_id);
                         ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
                             video_id,
-                            is_online,
                             data
                         });
                     }else{
                         ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
                             video_id:video_id,
-                            is_online:is_online,
                             data:null
                         });
                     }

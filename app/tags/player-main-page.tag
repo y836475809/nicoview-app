@@ -265,12 +265,12 @@
             ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
                 const { video_id, data } = args;
                 const state = { 
-                    is_online: is_online,
+                    is_online: data === null?true:is_online,
                     is_saved: data !== null
                 };
 
                 //play online
-                if(state.is_online===true || state.is_saved===false){
+                if(state.is_online===true){
                     play_by_video_id(video_id, state);
                 }else{
                     const { video_data, viewinfo, comments } = data;

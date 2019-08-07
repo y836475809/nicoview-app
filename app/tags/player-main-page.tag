@@ -239,7 +239,6 @@
                 };
                 const viewinfo = {
                     is_deleted: is_deleted,
-                    is_local: false,
                     thumb_info:thumb_info,
                 };
                 comments.sort((a, b) => {

@@ -275,7 +275,6 @@ class Library {
             },
             viewinfo: {
                 is_deleted: is_deleted,
-                is_local: true,
                 thumb_info:thumb_info,
                 
             },

@@ -143,7 +143,7 @@
     </style>
 
     <div class="library-controls-container">
-        <div class="item-info center-v">項目数 {this.num_items.toLocaleString()}</div>
+        <div class="item-info center-v">項目数 {this.num_filtered_items.toLocaleString()}/{this.num_items.toLocaleString()}</div>
         <div class="search-container">
             <input class="search-input" type="search" onkeydown={onkeydownSearchInput} />
             <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
@@ -178,6 +178,7 @@
 
         let library = null;
         this.num_items = 0;
+        this.num_filtered_items = 0;
     
         const libraryImageFormatter = (row, cell, value, columnDef, dataContext)=> {
             if(dataContext.thumbnail_size=="L"){
@@ -211,6 +212,8 @@
             grid_table.filterData(query); 
             grid_table.scrollToTop();
             grid_table.clearSelected();
+
+            this.num_filtered_items = grid_table.dataView.getLength();
         };
 
         this.onclickSearch = (e) => {
@@ -255,6 +258,7 @@
         const loadLibraryItems = (items)=>{
             grid_table.setData(items);
             this.num_items = items.length;
+            this.num_filtered_items = this.num_items;
     
             this.update();
         };

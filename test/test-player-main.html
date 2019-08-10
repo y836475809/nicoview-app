@@ -10,22 +10,36 @@
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
 
     <style type="text/css">
-        .test-button{
+        .debug-btn1{
+            position: absolute;
+            width: 100px;
             height: 25px;
-        }
-        .test-player-main-page{
-            height: calc(100% - 25px);
+            top: 0px;
+            z-index: 10;
+        } 
+        .debug-btn2{
+            position: absolute;
+            width: 100px;
+            height: 25px;
+            top: 0px;
+            left: 100px;
+            z-index: 10;
+        }           
+        .debug-player-main-page{
+            position: absolute;
+            top: 0px;
+            width: 100vw;
         }
     </style>
 
 </head>
 
 <body>
-    <div class="test-button">
-        <button type="button" onclick="onclickLoad();">load</button>
-        <button type="button" onclick="onclickLoad2();">load comment</button>
+    <div>
+        <button class="debug-btn1" type="button" onclick="onclickLoad();">load</button>
+        <button class="debug-btn2" type="button" onclick="onclickLoad2();">load comment</button>
     </div>    
-    <player-main-page ref="pvi" class="test-player-main-page"></player-main-page>
+    <player-main-page ref="pvi" class="debug-player-main-page"></player-main-page>
 </body>
 
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
@@ -97,9 +111,12 @@
                 }
             },
         };
-        
+        const state = {
+            is_online: false,
+            is_saved: true
+        };
         obs.trigger("player-main-page:test-play-by-data", 
-            {video_data, viewinfo, comments}); 
+            {video_data, viewinfo, comments, state}); 
     };
     const onclickLoad2 = () => {
         let comments = [];
@@ -142,9 +159,13 @@
                     iconURL: `${test_dir}/data/user_icon.jpg` //50x50
                 }
             }
-        }; 
+        };         
+        const state = {
+            is_online: true,
+            is_saved: false
+        };
         obs.trigger("player-viewinfo-page:set-viewinfo-data",
-            { viewinfo, comments });
+            { viewinfo, comments, state });
     };
 </script>
 

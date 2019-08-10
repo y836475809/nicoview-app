@@ -141,6 +141,7 @@
             font-size: 20px;
             height: 30px;
             width: 30px;
+            margin-left: 5px;
         }
         .icon-button:hover{
             cursor: pointer;
@@ -160,6 +161,17 @@
         .notice-deleted {
             font-weight: bold;
             color: red;
+        }
+
+        .icon-layer1{
+            left: -5px;
+        }
+
+        .icon-layer2{
+            position: relative;
+            left: 25%;
+            top: 25%;
+            font-size: 0.6em;
         }
     </style>
     
@@ -192,9 +204,12 @@
         <div class="icon-panel">
             <div class="icon-contain">
                 <div title="動画情報更新" class="center-hv">
-                    <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateThumbInfo}>
-                        <i class="fas fa-sync-alt"></i>
-                    </span>
+                    <span class="icon-button center-hv fa-stack" 
+                        data-state={String(this.enableUpdateData())} 
+                        onclick={this.onclickUpdateThumbInfo}>
+                        <i class="icon-layer1 fas fa-info fa-stack-1x"></i>
+                        <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
+                      </span>
                 </div>
             </div>         
         </div>
@@ -213,12 +228,16 @@
                 <input class="comment-checkbox" type="checkbox" 
                     onclick={this.onclickSyncCommentCheck} /><label>同期</label>
             </div>
+            <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
+                <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i>
+            </span>
             <div class="icon-contain">
-                <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
-                        <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i></span>
                 <div title="コメント更新" class="center-hv">
-                    <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateComment}>
-                        <i class="fas fa-sync-alt"></i>
+                    <span class="icon-button center-hv fa-stack" 
+                        data-state={String(this.enableUpdateData())} 
+                        onclick={this.onclickUpdateComment}>
+                        <i class="icon-layer1 far fa-comment-dots fa-stack-1x"></i>
+                        <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
                     </span>
                 </div>
                 <span class="icon-button center-hv" onclick={this.onclickConfig}>

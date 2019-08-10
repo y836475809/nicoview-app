@@ -108,32 +108,34 @@
             window.resizeTo(new_width, new_height);
         };
 
-        let template = [{
-            label: "表示",
-            submenu: [
-                {
-                    label: "x1",
-                    click: () => {
-                        resizeVideo(this.player_default_size);
-                    }
-                },
-                {
-                    label: "x1.5",
-                    click: () => {
-                        const size = this.player_default_size;
-                        resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
-                    }
-                },
-                {
-                    label: "元のサイズ",
-                    click: () => {
-                        if(org_video_size){
-                            resizeVideo(org_video_size);
+        let template = [
+            {
+                label: "表示",
+                submenu: [
+                    {
+                        label: "標準サイズ",
+                        click: () => {
+                            resizeVideo(this.player_default_size);
                         }
-                    }
-                },
-            ]
-        }];
+                    },
+                    {
+                        label: "標準サイズx1.5",
+                        click: () => {
+                            const size = this.player_default_size;
+                            resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
+                        }
+                    },
+                    {
+                        label: "動画のサイズ",
+                        click: () => {
+                            if(org_video_size){
+                                resizeVideo(org_video_size);
+                            }
+                        }
+                    },
+                ]
+            }           
+        ];
         if(process.env.NODE_ENV == "DEBUG"){
             template.push({
                 label: "ツール",
@@ -296,6 +298,10 @@
             const is_online = true;
 
             playNiconico(video_id, is_online);
+        });
+
+        obs.on("player-main-page:metadata-loaded", (args) => {
+            org_video_size = args;
         });
 
         obs.on("player-main-page:search-tag", (args) => {

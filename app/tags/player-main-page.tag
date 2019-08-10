@@ -163,13 +163,10 @@
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
-                video_data: {
-                    video_id: video.video_id,
-                    title: video.title,
-                    src: video_data.src, 
-                    type: video_data.type
-                },
-                comments: filtered_comments 
+                video_data: video_data,
+                viewinfo: viewinfo,
+                comments: filtered_comments,
+                state: state
             });
             obs.trigger("player-tag:set-tags", thumb_info.tags);
             obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
@@ -312,8 +309,8 @@
         obs.on("player-main-page:test-play-by-data", (arg) => {
             cancelPlay();
 
-            const { video_data, viewinfo, comments } = arg;
-            play_by_video_data(video_data, viewinfo, comments);
+            const { video_data, viewinfo, comments, state } = arg;
+            play_by_video_data(video_data, viewinfo, comments, state);
         });
 
         obs.on("player-main-page:update-data", async(video_id, update_target) => {

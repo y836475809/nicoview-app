@@ -239,15 +239,46 @@
             });
         });
 
+        const getMenuEnable = (menu_id, data) => {
+            if(!data) {
+                return false;
+            }
+
+            if(menu_id=="add-bookmark"){
+                return true;
+            }
+            
+            const { state } = data;
+            if(menu_id=="add-download" && state.is_saved===false){
+                return true;
+            }
+
+            return false;
+        };
+
         const createMenu = () => {
             const nemu_templete = [
                 { 
+                    id: "add-bookmark",
                     label: "ブックマーク", click() {
-                        const { video_id, title } = play_data.video_data;
+                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
                         const bk_item = BookMark.createVideoItem(title, video_id);
                         obs.trigger("player-main-page:add-bookmark", bk_item);
                     }
-                }
+                },
+                { 
+                    id: "add-download",
+                    label: "ダウンロードに追加", click() {
+                        const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
+                        const item = {
+                            thumb_img: thumbnailURL,
+                            id: video_id,
+                            name: title,
+                            state: 0
+                        };
+                        obs.trigger("player-main-page:add-download-item", item);
+                    }
+                },               
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
@@ -255,7 +286,8 @@
         this.oncontextmenu= (e) => {
             if(e.button===2){
                 context_menu.items.forEach(menu => {
-                    menu.enabled = play_data !== null;
+                    const id = menu.id;
+                    menu.enabled = getMenuEnable(id, play_data); //play_data !== null;
                 });
                 context_menu.popup({window: remote.getCurrentWindow()});
             }

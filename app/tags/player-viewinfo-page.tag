@@ -191,11 +191,6 @@
     <div class="viewinfo-description-panel">   
         <div class="icon-panel">
             <div class="icon-contain">
-                <div title="ダウンロードに追加" class="center-hv">
-                    <span class="icon-button center-hv" data-state={String(this.enableDonwload())} onclick={this.onclicAddDownload}>
-                        <i class="fas fa-download"></i>
-                    </span>
-                </div>
                 <div title="動画情報更新" class="center-hv">
                     <span class="icon-button center-hv" data-state={String(this.enableUpdateData())} onclick={this.onclickUpdateThumbInfo}>
                         <i class="fas fa-sync-alt"></i>

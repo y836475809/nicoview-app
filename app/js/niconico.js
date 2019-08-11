@@ -5,6 +5,10 @@ const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
 
 
+const getNicoURL = (video_id) => {
+    return `${nicovideo_url}/watch/${video_id}`;
+};
+
 class NicoWatch extends NicoRequest{
     constructor() { 
         super();
@@ -578,5 +582,6 @@ module.exports = {
     getCookies: getCookies,
     getThumbInfo: getThumbInfo,
     getVideoType: getVideoType,
-    filterComments: filterComments
+    filterComments: filterComments,
+    getNicoURL
 };

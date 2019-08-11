@@ -27,11 +27,12 @@
 
     <script>
         /* globals app_base_dir */
-        const { remote } = require("electron");
+        const { remote, clipboard } = require("electron");
         const { Menu } = remote;
         const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { getNicoURL } = require(`${app_base_dir}/js/niconico`);
 
         const obs = this.opts.obs; 
 
@@ -243,17 +244,13 @@
             if(!data) {
                 return false;
             }
-
-            if(menu_id=="add-bookmark"){
-                return true;
-            }
             
             const { state } = data;
-            if(menu_id=="add-download" && state.is_saved===false){
-                return true;
+            if(menu_id=="add-download" && state.is_saved===true){
+                return false;
             }
 
-            return false;
+            return true;
         };
 
         const createMenu = () => {
@@ -278,7 +275,15 @@
                         };
                         obs.trigger("player-main-page:add-download-item", item);
                     }
-                },               
+                },   
+                { 
+                    id: "copy-url",
+                    label: "urlをコピー", click() {
+                        const { video_id } = play_data.viewinfo.thumb_info.video;
+                        const url = getNicoURL(video_id);
+                        clipboard.writeText(url);
+                    }
+                },             
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };

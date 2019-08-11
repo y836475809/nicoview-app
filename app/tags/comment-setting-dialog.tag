@@ -90,6 +90,11 @@
     <script>
         const obs_dialog = this.opts.obs;
 
+        const tab_map = new Map([
+            ["comment-ng", 0],
+            ["comment-display", 1]
+        ]);
+
         const selectTab = (selected_index) => {
             Array.from(this.root.querySelectorAll(".tab-area > label"), 
                 (elm, index) => {
@@ -112,7 +117,7 @@
                 });
         };
 
-        const setup = () => {
+        const setup = (selected_tab) => {
             const panel_area = this.root.querySelector(".panel-area");
             Array.from(this.root.querySelectorAll(".panel-area > .tab-panel"), 
                 (elm) => {
@@ -120,7 +125,7 @@
                     elm.style.height = panel_area.clientHeight + "px"; 
                 });
 
-            selectTab(0);
+            selectTab(tab_map.get(selected_tab));
         };
 
         this.onclickSelect = (index, e)=>{
@@ -133,12 +138,13 @@
         };
 
         obs_dialog.on("comment-setting-dialog:show", (args) => {
+            const { ng_items, selected_tab } = args;
+
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
 
-            setup();
+            setup(selected_tab);
 
-            const ng_items = args;
             obs_dialog.trigger("comment-ng-setting:ng-items", ng_items);
         });
     </script>

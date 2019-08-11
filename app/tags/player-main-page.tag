@@ -134,6 +134,29 @@
                         }
                     },
                 ]
+            },
+            {
+                label: "設定",
+                submenu: [
+                    {
+                        label: "NG設定",
+                        click: () => {
+                            obs.trigger("comment-setting-dialog:show", {
+                                ng_items : comment_filter.getNG(),
+                                selected_tab: "comment-ng"
+                            });
+                        }
+                    },
+                    {
+                        label: "コメント表示",
+                        click: () => {
+                            obs.trigger("comment-setting-dialog:show", {
+                                ng_items : comment_filter.getNG(),
+                                selected_tab: "comment-display"
+                            });
+                        }
+                    }
+                ]
             }           
         ];
         if(process.env.NODE_ENV == "DEBUG"){
@@ -395,10 +418,6 @@
             });
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
-        });
-
-        obs.on("player-main-page:show-comment-setting-dialog", () => {
-            obs.trigger("comment-setting-dialog:show", comment_filter.getNG());
         });
 
         obs.on("player-main-page:update-comment-display-params", (args) => {

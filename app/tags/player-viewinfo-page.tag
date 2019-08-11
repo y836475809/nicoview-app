@@ -240,8 +240,6 @@
                         <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
                     </span>
                 </div>
-                <span class="icon-button center-hv" onclick={this.onclickConfig}>
-                    <i title="設定" class="fas fa-cog"></i></span>
             </div>
         </div>
         <div class="comment-grid-container">
@@ -469,10 +467,6 @@
         this.onclickUpdateComment = (e) => {
             console.log("player update video_id=", this.video_id);
             obs.trigger("player-main-page:update-data", this.video_id, "comment");
-        };
-
-        this.onclickConfig = (e) => {
-            obs.trigger("player-main-page:show-comment-setting-dialog");
         };
 
         const setComments = (comments) => {

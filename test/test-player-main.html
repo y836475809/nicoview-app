@@ -24,7 +24,15 @@
             top: 0px;
             left: 100px;
             z-index: 10;
-        }           
+        }  
+        .debug-btn3{
+            position: absolute;
+            width: 100px;
+            height: 25px;
+            top: 0px;
+            left: 200px;
+            z-index: 10;
+        }          
         .debug-player-main-page{
             position: absolute;
             top: 0px;
@@ -38,6 +46,7 @@
     <div>
         <button class="debug-btn1" type="button" onclick="onclickLoad();">load</button>
         <button class="debug-btn2" type="button" onclick="onclickLoad2();">load comment</button>
+        <button class="debug-btn3" type="button" onclick="onclickLoad3();">online sm20</button>
     </div>    
     <player-main-page ref="pvi" class="debug-player-main-page"></player-main-page>
 </body>
@@ -64,6 +73,18 @@
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
     process.env.NODE_ENV = "DEBUG";
+
+    const { NicoVideoMocks } = require("./mock_server/nico-mock");
+    const video_mocks = [];
+    const video_ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];
+    video_ids.forEach(video_id => {
+        const video_mock = new NicoVideoMocks(video_id);
+        video_mock.watch();
+        video_mock.comment();
+        video_mock.dmc_session();
+        video_mock.dmc_hb();
+        video_mocks.push(video_mock);
+    });
 
     const obs = riot.observable(); // eslint-disable-line
     riot.mount("player-main-page", {obs});
@@ -166,6 +187,9 @@
         };
         obs.trigger("player-viewinfo-page:set-viewinfo-data",
             { viewinfo, comments, state });
+    };
+    const onclickLoad3 = () => {
+        obs.trigger("player-main-page:play-by-videoid-online", "sm20"); 
     };
 </script>
 

@@ -321,7 +321,16 @@
             const video_id = args;
             const is_online = true;
 
-            playNiconico(video_id, is_online);
+            if(process.env.NODE_ENV == "DEBUG"){
+                const state = {
+                    is_online: true,
+                    is_saved: false
+                };
+                cancelPlay();
+                play_by_video_id(video_id, state);   
+            }else{
+                playNiconico(video_id, is_online);
+            }
         });
 
         obs.on("player-main-page:metadata-loaded", (args) => {

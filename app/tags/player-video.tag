@@ -283,7 +283,23 @@
                         const url = getNicoURL(video_id);
                         clipboard.writeText(url);
                     }
-                },             
+                },
+                { 
+                    type: "separator" 
+                },
+                { 
+                    id: "reload",
+                    label: "再読み込み", click() {
+                        const { viewinfo, state } = play_data;
+                        const { video_id } = viewinfo.thumb_info.video;
+
+                        if(state.is_online===true){
+                            obs.trigger("player-main-page:play-by-videoid-online", video_id);
+                        }else{
+                            obs.trigger("player-main-page:play-by-videoid", video_id);
+                        }
+                    }
+                },
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };

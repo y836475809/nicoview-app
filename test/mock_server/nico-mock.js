@@ -38,6 +38,7 @@ class NicoVideoMocks {
         this.watch_nock
             .get(`/watch/${this.video_id}`)
             .delay(delay)
+            .times(Infinity)
             .reply(code, body, headers);
     }
     
@@ -46,6 +47,7 @@ class NicoVideoMocks {
         this.comment_nock
             .post("/api.json/")
             .delay(delay)
+            .times(Infinity)
             .reply((uri, reqbody)=>{
                 const data = reqbody;
                 if(data.length===0){
@@ -67,6 +69,7 @@ class NicoVideoMocks {
             .post("/api/sessions")
             .query({ _format: "json" })   
             .delay(delay)
+            .times(Infinity)
             .reply((uri, reqbody)=>{
                 const recipe_id = reqbody.session.recipe_id;
                 const video_id = recipe_id.replace("nicovideo-", "");

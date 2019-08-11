@@ -282,6 +282,8 @@
         }; 
 
         const playNiconico = (video_id, is_online) => {
+            cancelPlay();
+            
             ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
 
             ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, (event, args) => {
@@ -305,7 +307,6 @@
         ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
             const { video_id, is_online } = args;
 
-            cancelPlay();
             playNiconico(video_id, is_online);
         });
 

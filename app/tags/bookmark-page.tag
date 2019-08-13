@@ -175,7 +175,7 @@
                 label: "オンラインで再生", async click() {
                     const items = await getSelectedItems();
                     const { video_id, time } = items[0].data;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
+                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id, time);
                 }
             },
             { 

@@ -2,6 +2,8 @@
     <style scoped>
         :scope { 
             position: relative;
+            --video-id-form-width: 300px;
+            --video-id-form-height: 30px;
         }
         #player-video-screen {
             width: 100%;
@@ -18,11 +20,54 @@
             /* border: 1px solid #FF6600; */
             text-shadow: 1px 1px 0px black, 1px 1px 0px black;
         }
+
+        .video-id-form-none {
+            display: none;
+        }
+        .video-id-form {
+            display: flex;
+            position: fixed;
+            width: var(--video-id-form-width);
+            height: var(--video-id-form-height);
+            left: calc(50% - var(--video-id-form-width));
+            top: calc(50% - var(--video-id-form-height));
+            background-color: rgba(209, 203, 203);
+            border-radius: 2px;
+            z-index: 10;
+        }
+        .video-id-form .label {
+            width: 20px;
+            margin: 5px;    
+            user-select: none;
+        }
+        .video-id-form input {
+            width: calc(var(--video-id-form-width) 
+                        - 20px - 50px - 20px);
+            margin: 3px;
+        }
+        .video-id-form .play-button {
+            width: 50px;
+            margin: 2px 0 2px 0;      
+        }
+        .video-id-form .close-button {
+            width: 20px;
+            margin: 2px;   
+            cursor: pointer;   
+            user-select: none;
+        }
     </style>
 
     <div id="player-video-screen" onmousedown={mousedown} onmouseup={oncontextmenu}>
         <video ref="player_video" id="player" autoplay preload="metadata">
         </video>
+        <div class="{video_id_form_display}">
+            <div class="video-id-form">
+                <div class="label center-hv">ID</div>
+                <input type="text" onkeydown={onkeydownPlayByVideoID}>
+                <button class="play-button" onclick={onclickPlayByVideoID}>再生</button>
+                <div class="close-button center-hv" title="閉じる" onclick={onclickCloseVideoIDForm}>x</div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -241,6 +286,10 @@
         });
 
         const getMenuEnable = (menu_id, data) => {
+            if(menu_id == "show-video-id-form"){
+                return true;
+            }
+
             if(!data) {
                 return false;
             }
@@ -253,6 +302,7 @@
             return true;
         };
 
+        const self = this;
         const createMenu = () => {
             const nemu_templete = [
                 { 
@@ -285,6 +335,12 @@
                     }
                 },
                 { 
+                    id: "show-video-id-form",
+                    label: "IDを指定して再生", click() {
+                        showVideoIDForm(self);
+                    }
+                },               
+                { 
                     type: "separator" 
                 },
                 { 
@@ -312,6 +368,26 @@
                 });
                 context_menu.popup({window: remote.getCurrentWindow()});
             }
+        };
+        this.video_id_form_display = "video-id-form-none";
+        const playByVideoID = () => {
+            const elm = this.root.querySelector(".video-id-form input");
+            const video_id = elm.value;
+            obs.trigger("player-main-page:play-by-videoid", video_id); 
+        }
+        this.onkeydownPlayByVideoID = (e) => {
+            if(e.code == "Enter"){
+                playByVideoID();
+            }
+        }
+        this.onclickPlayByVideoID = (e) => {
+            playByVideoID();
+        };
+        this.onclickCloseVideoIDForm = (e) => {
+            this.video_id_form_display = "video-id-form-none";
+        };
+        const showVideoIDForm = (self) => {
+            self.video_id_form_display = "";
         };
     </script>
 </player-video>

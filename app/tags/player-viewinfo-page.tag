@@ -378,8 +378,8 @@
         const mylistLinkClick = (e) => {
             e.preventDefault(); 
             const paths = e.target.href.split("/");
-            const video_id = paths.pop();
-            obs.trigger("player-main-page:load-mylist", video_id);
+            const mylist_id = paths.pop();
+            obs.trigger("player-main-page:load-mylist", mylist_id);
             return false;
         };
 

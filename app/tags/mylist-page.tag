@@ -38,9 +38,9 @@
             };
         }
 
-        const hasItem = (id) => {
+        const hasItem = (mylist_id) => {
             return this.mylist_data.items.some(value=>{
-                return value.id == id;
+                return value.mylist_id == mylist_id;
             });
         };
 
@@ -76,15 +76,15 @@
         });
         
         obs.on("mylist-page:sidebar:add-item", (args) => {
-            const { title, id, creator, link } = args;
+            const { title, mylist_id, creator, link } = args;
             this.obs_accordion.trigger("add-items", [
-                { title, id, creator, link }
+                { title, mylist_id, creator, link }
             ]);
         });
 
         obs.on("mylist-page:sidebar:has-item", (args) => {
-            const {id, cb} = args;
-            cb(hasItem(id));
+            const {mylist_id, cb} = args;
+            cb(hasItem(mylist_id));
         });
     </script>
 </mylist-sidebar>
@@ -183,12 +183,12 @@
         let is_local_item = false;
 
         const hasLocalItem = () => {
-            const id = getMylistID();
+            const mylist_id = getMylistID();
             return new Promise( (resolve, reject) => {
                 const cb = (has) =>{
                     resolve(has);
                 };
-                obs.trigger("mylist-page:sidebar:has-item", {id, cb});
+                obs.trigger("mylist-page:sidebar:has-item", {mylist_id, cb});
             });
         };
 
@@ -338,11 +338,17 @@
                 return;
             }
             const title = `[${mylist.creator}] ${mylist.title}`;
-            const id = mylist.id;
+            const mylist_id = mylist.mylist_id;
             const creator = mylist.creator;
             const link = mylist.link;   
-            obs.trigger("mylist-page:sidebar:add-item", { title, id, creator, link });
-            nico_mylist_store.save(id, nico_mylist.xml);
+            const item = {
+                title,
+                mylist_id,
+                creator,
+                link
+            };
+            obs.trigger("mylist-page:sidebar:add-item", item);
+            nico_mylist_store.save(mylist_id, nico_mylist.xml);
         };
 
         const getImageCache = () => {
@@ -388,16 +394,16 @@
         obs.on("mylist-page:item-dlbclicked", (item) => {
             is_local_item = true;
 
-            const id = item.id;
-            const mylist = nico_mylist_store.load(id);
+            const mylist_id = item.mylist_id;
+            const mylist = nico_mylist_store.load(mylist_id);
 
-            setMylistID(id);
+            setMylistID(mylist_id);
             setMylist(mylist);
         });
 
-        obs.on("mylist-page:load-mylist", async(id)=> {
-            setMylistID(id);
-            await updateMylist(id);
+        obs.on("mylist-page:load-mylist", async(mylist_id)=> {
+            setMylistID(mylist_id);
+            await updateMylist(mylist_id);
         });
 
         obs.on("window-resized", ()=> {

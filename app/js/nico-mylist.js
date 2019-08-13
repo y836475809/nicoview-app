@@ -78,12 +78,12 @@ class NicoMylistReader {
         $("channel > item").each((i, el) => {
             const item = $(el);
             const link = item.find("link").text();
-            const id = link.match(/[^/]+$/)[0];
+            const video_id = link.match(/[^/]+$/)[0];
             const description = this._parseCDATA(item.find("description").text());
             items.push( {
                 no: i+1,
                 title: item.find("title").text(),
-                id: id,
+                id: video_id,
                 link: link,
                 description: description.memo,
                 thumb_img: description.thumbnail_src,
@@ -96,7 +96,7 @@ class NicoMylistReader {
 
         const mylist = {
             title: title,
-            id: mylist_id,
+            mylist_id: mylist_id,
             link: link,
             creator: creator,
             description: description,
@@ -123,7 +123,7 @@ class NicoMylistReader {
 
     _isCorrect(mylist){
         return mylist.title 
-        && mylist.id 
+        && mylist.mylist_id 
         && mylist.link 
         && mylist.creator
         && mylist.items.every(item => {

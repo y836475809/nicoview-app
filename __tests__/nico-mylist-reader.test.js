@@ -13,7 +13,7 @@ test("nico mylist parse xml", t => {
 
     t.deepEqual(mylist, {
         title: "マイリスト1",
-        id:"00000000",
+        mylist_id:"00000000",
         link: "http://www.nicovideo.jp/mylist/00000000",
         description: "説明\r\n動画マイリスト",
         creator: "user1",
@@ -73,7 +73,7 @@ test("nico mylist result is correct", t => {
 
     t.truthy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -89,7 +89,7 @@ test("nico mylist result is correct", t => {
 
     t.truthy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -98,7 +98,7 @@ test("nico mylist result is correct", t => {
 
     t.truthy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "",
         creator: "--",
@@ -111,7 +111,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -120,7 +120,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"",
+        mylist_id:"",
         link: "--",
         description: "--",
         creator: "--",
@@ -129,7 +129,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "",
         description: "--",
         creator: "--",
@@ -138,7 +138,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "",
         description: "--",
         creator: "",
@@ -147,7 +147,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -163,7 +163,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -179,7 +179,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -196,7 +196,7 @@ test("nico mylist result is incorrect", t => {
     
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -211,7 +211,7 @@ test("nico mylist result is incorrect", t => {
         
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -226,7 +226,7 @@ test("nico mylist result is incorrect", t => {
    
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",
@@ -241,7 +241,7 @@ test("nico mylist result is incorrect", t => {
 
     t.falsy(mrd._isCorrect({
         title: "--",
-        id:"--",
+        mylist_id:"--",
         link: "--",
         description: "--",
         creator: "--",

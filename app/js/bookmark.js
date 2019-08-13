@@ -9,13 +9,15 @@ class BookMark {
      * 
      * @param {String} title 
      * @param {String} video_id 
+     * @param {Number} time 
      */
-    static createVideoItem(title, video_id){
+    static createVideoItem(title, video_id, time=0){
         return {
             title: title,
             type: BookMarkType.VIDEO,
             data: {
-                video_id: video_id
+                video_id,
+                time
             }
         };
     }

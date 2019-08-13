@@ -255,8 +255,11 @@
         require("slickgrid/plugins/slick.autotooltips");
         const time_format = require(`${app_base_dir}/js/time-format`);
         const SyncCommentScroll = require(`${app_base_dir}/js/sync-comment-scroll`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
+
+        const obs_trigger = new obsTrigger(obs);
 
         const row_height = 25;
 
@@ -350,10 +353,10 @@
         const createWatchLinkMenu = (video_id) => {
             const nemu_templete = [
                 { label: "再生", click() {
-                    obs.trigger("player-main-page:play-by-videoid", video_id);
+                    obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                 }},
                 { label: "オンラインで再生", click() {
-                    obs.trigger("player-main-page:play-by-videoid-online", video_id);
+                    obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                 }},
             ];
             return Menu.buildFromTemplate(nemu_templete);
@@ -366,7 +369,7 @@
             if(e.button === 2){
                 createWatchLinkMenu(video_id).popup({window: remote.getCurrentWindow()}); 
             }else{
-                obs.trigger("player-main-page:play-by-videoid", video_id);
+                obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
             }
             
             return false;

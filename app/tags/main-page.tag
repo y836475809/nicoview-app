@@ -185,9 +185,10 @@
         this.obs.on("main-page:play-by-videoid", (args)=>{
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
-            const video_id = args; 
+            const { video_id, time } = args; 
             ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
+                time: time,
                 is_online: false
             }); 
         }); 
@@ -195,9 +196,10 @@
         this.obs.on("main-page:play-by-videoid-online", (args)=>{
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
-            const video_id = args; 
+            const { video_id, time } = args; 
             ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
+                time: time,
                 is_online: true
             }); 
         });  

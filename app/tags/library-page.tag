@@ -172,9 +172,12 @@
         const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+
+        const obs_trigger = new obsTrigger(obs);
 
         let library = null;
         this.num_items = 0;
@@ -252,7 +255,7 @@
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {
             const video_id = item.video_id;
-            obs.trigger("main-page:play-by-videoid", video_id);        
+            obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id);        
         });
     
         const loadLibraryItems = (items)=>{
@@ -331,12 +334,12 @@
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid", video_id);
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "コメント更新", click() {
                     const items = grid_table.getSelectedDatas();
@@ -383,7 +386,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
-                obs.trigger("main-page:play-by-videoid", video_id);
+                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
             });
             
             const context_menu = createMenu();

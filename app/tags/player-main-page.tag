@@ -281,7 +281,7 @@
             }
         }; 
 
-        const playNiconico = (video_id, is_online) => {
+        const playNiconico = (video_id, is_online, time=0) => {
             cancelPlay();
             
             ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
@@ -290,7 +290,8 @@
                 const { video_id, data } = args;
                 const state = { 
                     is_online: data === null?true:is_online,
-                    is_saved: data !== null
+                    is_saved: data !== null,
+                    time: time
                 };
 
                 //play online
@@ -305,9 +306,9 @@
         }; 
 
         ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
-            const { video_id, is_online } = args;
+            const { video_id, time, is_online } = args;
 
-            playNiconico(video_id, is_online);
+            playNiconico(video_id, is_online, time);
         });
 
         obs.on("player-main-page:play-by-videoid", async (args) => {

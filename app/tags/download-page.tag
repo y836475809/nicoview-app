@@ -76,8 +76,11 @@
         const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
+
+        const obs_trigger = new obsTrigger(obs);
 
         const download_dir = SettingStore.getDownloadDir();
 
@@ -238,12 +241,12 @@
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid", video_id);
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "削除", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
@@ -393,7 +396,7 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    obs.trigger("main-page:play-by-videoid", data.id);
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, data.id); 
                 });
             } catch (error) {
                 console.log("donwload item load error=", error);

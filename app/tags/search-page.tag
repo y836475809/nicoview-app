@@ -248,9 +248,12 @@
         const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+
+        const obs_trigger = new obsTrigger(obs);
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },
@@ -629,14 +632,14 @@
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid", video_id);
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
@@ -687,7 +690,7 @@
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 if(video_id){
-                    obs.trigger("main-page:play-by-videoid", video_id);
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }
             });
             grid_table.onContextMenu((e)=>{

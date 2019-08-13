@@ -78,8 +78,11 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { getNicoURL } = require(`${app_base_dir}/js/niconico`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
+
+        const obs_trigger = new obsTrigger(obs);
 
         const comment_params = SettingStore.getCommentParams();
 
@@ -121,6 +124,10 @@
             } 
         };
 
+        const getCurrentTime = () => {
+            return video_elm.currentTime;
+        };
+
         obs.on("player-video:set-play-data", (data) => {
             play_data = data;
 
@@ -148,6 +155,11 @@
             video_elm.addEventListener("loadeddata", (event) => {
                 console.log("loadeddata event=", event);
                 obs.trigger("player-controls:loaded-data");
+
+                const { time } = play_data.state;
+                if(time>0){
+                    seek(time);
+                }
             });
             video_elm.addEventListener("play", () => {
                 console.log("addEventListener playによるイベント発火");
@@ -314,6 +326,15 @@
                     }
                 },
                 { 
+                    id: "add-bookmark-time",
+                    label: "ブックマーク(時間)", click() {
+                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
+                        const current_time = getCurrentTime();
+                        const bk_item = BookMark.createVideoItem(title, video_id, current_time);
+                        obs.trigger("player-main-page:add-bookmark", bk_item);
+                    }
+                },
+                { 
                     id: "add-download",
                     label: "ダウンロードに追加", click() {
                         const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
@@ -350,9 +371,9 @@
                         const { video_id } = viewinfo.thumb_info.video;
 
                         if(state.is_online===true){
-                            obs.trigger("player-main-page:play-by-videoid-online", video_id);
+                            obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                         }else{
-                            obs.trigger("player-main-page:play-by-videoid", video_id);
+                            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                         }
                     }
                 },
@@ -373,7 +394,7 @@
         const playByVideoID = () => {
             const elm = this.root.querySelector(".video-id-form input");
             const video_id = elm.value;
-            obs.trigger("player-main-page:play-by-videoid", video_id); 
+            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
         }
         this.onkeydownPlayByVideoID = (e) => {
             if(e.code == "Enter"){

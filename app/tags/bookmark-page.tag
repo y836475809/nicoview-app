@@ -71,12 +71,14 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { toPlayTime } = require(`${app_base_dir}/js/time-format`);
 
         const self = this;
 
         const obs = this.opts.obs; 
+        const obs_trigger = new obsTrigger(obs);
         this.obs_bookmark = riot.observable();
-
         this.sb_button_icon = "fas fa-chevron-left";
 
         this.onclickSideBar = (e) => {
@@ -164,16 +166,16 @@
                     if(items.length==0){
                         return;
                     }
-                    const video_id = items[0].data.video_id;
-                    obs.trigger("main-page:play-by-videoid", video_id);
+                    const { video_id, time } = items[0].data;
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
                 }
             },
             { 
                 id: "play",
                 label: "オンラインで再生", async click() {
                     const items = await getSelectedItems();
-                    const video_id = items[0].id;
-                    obs.trigger("main-page:play-by-videoid-online", video_id);
+                    const { video_id, time } = items[0].data;
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
                 }
             },
             { 
@@ -227,8 +229,8 @@
 
         this.obs_bookmark.on("item-dlbclicked", (item) => {  
             if(BookMark.isVideo(item)){
-                const video_id = item.data.video_id;
-                obs.trigger("main-page:play-by-videoid", video_id);
+                const { video_id, time } = item.data;
+                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
                 return;
             }
             if(BookMark.isSearch(item)){
@@ -241,6 +243,10 @@
         
         obs.on("bookmark-page:add-items", items => {
             items.forEach(item => {
+                const time = item.data.time;
+                if(time>0){
+                    item.title = `${item.title} ${toPlayTime(time)}`;
+                }
                 item.icon = getBookmarkIcon(item);
             });
             this.obs_bookmark.trigger("add-items", items);

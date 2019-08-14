@@ -37,12 +37,16 @@
         const row_img_width = 130/2;
         const row_hight = 100/2;
 
+        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
+            const video_id = dataContext.id;
+            return `ID: ${video_id}`;
+        };
+
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130},
-            {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
+            {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
             {id: "play_date", name: "再生日", sortable: true},
-            {id: "play_time", name: "時間", sortable: true},
             {id: "url", name: "url", sortable: true}
         ];
         const options = {

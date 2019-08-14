@@ -247,8 +247,17 @@
             return `<div class="line-break">${value}</div>`;
         };
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
-            let result = value.replace(/\r?\n/g, "<br>");
-            result = `<div>${result}</div>`;
+            const result = value.replace(/\r?\n/g, "<br>");
+            return `<div>${result}</div>`;
+        };
+        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
+            const video_id = dataContext.id;
+            const view_count = dataContext.view_count;
+            const comment_count = dataContext.comment_count;
+
+            let result = `<div>ID:${video_id}<br>
+                            再生:${view_count.toLocaleString()}<br>
+                            コメント:${comment_count.toLocaleString()}</div>`;
             if(dataContext.saved){
                 result += "<div class='state-content state-saved'>ローカル</div>";
             }
@@ -261,9 +270,9 @@
             {id: "no", name: "#"},
             {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
+            {id: "info", name: "情報", formatter:infoFormatter},
             {id: "description", name: "説明", formatter:htmlFormatter},
             {id: "date", name: "投稿日"},
-            {id: "comment_count", name: "再生回数"},
             {id: "length", name: "時間"}
         ];
         const options = {

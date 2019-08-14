@@ -189,10 +189,14 @@
             }
             return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
         };
+        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
+            const video_id = dataContext.id;
+            return `ID: ${video_id}`;
+        };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "id", name: "id",sortable: true},
             {id: "name", name: "名前", sortable: true},
+            {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},
             {id: "play_count", name: "再生回数", sortable: true},

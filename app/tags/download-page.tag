@@ -217,6 +217,12 @@
             grid_table_dl.addItems(items, donwload_state.wait);
 
             onChangeDownloadItem();
+
+            const video_ids = items.map(item=>{
+                return item.id;
+            });
+
+            obs.trigger("search-page:add-download-video-ids", video_ids);
         };
 
         const deleteDownloadItems = (video_ids) => {
@@ -228,6 +234,8 @@
             grid_table_dl.deleteItems(video_ids); 
 
             onChangeDownloadItem();
+
+            obs.trigger("search-page:delete-download-video-ids", video_ids);
         };
 
         const clearDownloadItems = (state) => {
@@ -251,7 +259,6 @@
                 { label: "削除", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
                     deleteDownloadItems(deleted_ids);
-                    obs.trigger("search-page:delete-download-ids", deleted_ids);
                 }},
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();

@@ -612,7 +612,7 @@
             grid_table.resizeFitContainer(container);
         };
 
-        obs.on("search-page:add-download-items", (video_ids)=> {
+        obs.on("search-page:add-download-video-ids", (video_ids)=> {
             setDownloadTag(video_ids);
         });
 
@@ -624,6 +624,15 @@
             });
             grid_table.grid.render();
         };
+
+        obs.on("search-page:delete-download-video-ids", (video_ids)=> {
+            video_ids.forEach(video_id => {       
+                const item = grid_table.dataView.getItemById(video_id);
+                item.reg_download = false;
+                grid_table.dataView.updateItem(video_id, item);
+            });
+            grid_table.grid.render();
+        });
 
         const createMenu = () => {
             const nemu_templete = [
@@ -646,10 +655,6 @@
                         return value.id!="";
                     });
                     obs.trigger("download-page:add-download-items", items);
-                    const video_ids = items.map(value => {
-                        return value.id;
-                    });
-                    setDownloadTag(video_ids);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
@@ -659,12 +664,6 @@
                         return value.id;
                     });
                     obs.trigger("download-page:delete-download-items", video_ids);
-                    items.forEach(value => {       
-                        const item = grid_table.dataView.getItemById(value.id);
-                        item.reg_download = false;
-                        grid_table.dataView.updateItem(value.id, item);
-                    });
-                    grid_table.grid.render();
                 }},
                 { label: "動画をブックマーク", click() {
                     //TODO

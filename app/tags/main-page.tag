@@ -238,7 +238,6 @@
         ipc_monitor.on(ipc_monitor.IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
-            this.obs.trigger("search-page:add-download-items", [item.id]);
         });
 
         ipc_monitor.on(ipc_monitor.IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{

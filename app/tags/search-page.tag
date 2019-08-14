@@ -619,8 +619,10 @@
         const setDownloadTag = (video_ids) => {
             video_ids.forEach(video_id => {
                 const item = grid_table.dataView.getItemById(video_id);
-                item.reg_download = true;
-                grid_table.dataView.updateItem(video_id, item);
+                if(item){
+                    item.reg_download = true;
+                    grid_table.dataView.updateItem(video_id, item);
+                }
             });
             grid_table.grid.render();
         };
@@ -628,8 +630,10 @@
         obs.on("search-page:delete-download-video-ids", (video_ids)=> {
             video_ids.forEach(video_id => {       
                 const item = grid_table.dataView.getItemById(video_id);
-                item.reg_download = false;
-                grid_table.dataView.updateItem(video_id, item);
+                if(item){
+                    item.reg_download = false;
+                    grid_table.dataView.updateItem(video_id, item);
+                }
             });
             grid_table.grid.render();
         });

@@ -139,6 +139,19 @@
             white-space: normal;
             word-wrap: break-word;
         }
+        .state-content {
+            display: inline-block;
+            border-radius: 2px;
+            padding: 3px 10px 3px 10px;
+            margin-right: 5px;        
+            margin-bottom: 5px;
+        }
+        .state-saved {
+            background-color: #7fbfff;
+        }
+        .state-reg-download {
+            background-color: hotpink;
+        }
     </style>      
 
     <div style="display:flex;">
@@ -233,15 +246,22 @@
         const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
             return `<div class="line-break">${value}</div>`;
         };
-        const BRFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const result = value.replace(/\r?\n/g, "<br>");
-            return `<div>${result}</div>`;
+        const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
+            let result = value.replace(/\r?\n/g, "<br>");
+            result = `<div>${result}</div>`;
+            if(dataContext.saved){
+                result += "<div class='state-content state-saved'>ローカル</div>";
+            }
+            if(dataContext.reg_download){
+                result += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
+            }
+            return result;
         };
         const columns = [
             {id: "no", name: "#"},
             {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:lineBreakFormatter},
-            {id: "description", name: "説明", formatter:BRFormatter},
+            {id: "description", name: "説明", formatter:htmlFormatter},
             {id: "date", name: "投稿日"},
             {id: "comment_count", name: "再生回数"},
             {id: "length", name: "時間"}
@@ -263,6 +283,24 @@
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
                     obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                }},
+                { label: "ダウンロードに追加", click() {
+                    const items = grid_table.getSelectedDatas().map(value => {
+                        return {
+                            thumb_img: value.thumb_img,
+                            id: value.id,
+                            name: value.name,
+                            state: 0
+                        };
+                    });
+                    obs.trigger("download-page:add-download-items", items);
+                }},
+                { label: "ダウンロードから削除", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_ids = items.map(value => {
+                        return value.id;
+                    });
+                    obs.trigger("download-page:delete-download-items", video_ids);
                 }},
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
@@ -315,8 +353,31 @@
             this.update();
 
             const items = mylist.items;
-            grid_table.setData(items);
-            grid_table.scrollToTop();
+            setData(items);
+        };
+
+        const setData = async (mylist_items) => {
+            const video_ids = mylist_items.map(value => {
+                return value.id;
+            });
+
+            const download_id_set = await new Promise((resolve, reject) => {
+                obs.trigger("download-page:get-data-callback", (id_set)=>{
+                    resolve(id_set);
+                });
+            });
+
+            obs.trigger("library-page:get-data-callback", { video_ids: video_ids, cb: (id_map)=>{
+                const items = mylist_items.map(value => {
+                    const saved = id_map.has(value.id);
+                    const reg_download = download_id_set.has(value.id);
+                    value.saved = saved;
+                    value.reg_download = reg_download;
+                    return value;
+                });
+                grid_table.setData(items);
+                grid_table.scrollToTop();   
+            }});
         };
 
         const updateMylist = async(mylist_id) => {
@@ -404,6 +465,29 @@
         obs.on("mylist-page:load-mylist", async(mylist_id)=> {
             setMylistID(mylist_id);
             await updateMylist(mylist_id);
+        });
+
+        obs.on("mylist-page:add-download-video-ids", (video_ids)=> {
+            video_ids.forEach(video_id => {
+                const item = grid_table.dataView.getItemById(video_id);
+                item.reg_download = true;
+                grid_table.dataView.updateItem(video_id, item);
+            });
+            grid_table.grid.render();
+        });
+
+        obs.on("mylist-page:delete-download-video-ids", (video_ids)=> {
+            if(grid_table.dataView.getLength()===0){
+                return;
+            }
+            video_ids.forEach(video_id => {
+                const item = grid_table.dataView.getItemById(video_id);
+                if(item!==undefined){
+                    item.reg_download = false;
+                    grid_table.dataView.updateItem(video_id, item);
+                }
+            });
+            grid_table.grid.render();
         });
 
         obs.on("window-resized", ()=> {

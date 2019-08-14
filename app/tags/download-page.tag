@@ -223,6 +223,7 @@
             });
 
             obs.trigger("search-page:add-download-video-ids", video_ids);
+            obs.trigger("mylist-page:add-download-video-ids", video_ids);
         };
 
         const deleteDownloadItems = (video_ids) => {
@@ -236,6 +237,7 @@
             onChangeDownloadItem();
 
             obs.trigger("search-page:delete-download-video-ids", video_ids);
+            obs.trigger("mylist-page:delete-download-video-ids", video_ids);
         };
 
         const clearDownloadItems = (state) => {

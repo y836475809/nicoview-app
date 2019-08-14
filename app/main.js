@@ -36,6 +36,9 @@ function createWindow() {
 
     // ブラウザウィンドウの作成
     const state = window_store.getState("main", { width: 1000, height: 600 });
+    state.webPreferences =  {
+        nodeIntegration: true
+    };
     win = new BrowserWindow(state);
     if (state.maximized) {
         win.maximize();
@@ -137,6 +140,9 @@ const createPlayerWindow = () => {
             return;
         }
         const state = window_store.getState("player", { width: 800, height: 600 });
+        state.webPreferences =  {
+            nodeIntegration: true
+        };
         player_win = new BrowserWindow(state);
         if (state.maximized) {
             player_win.maximize();

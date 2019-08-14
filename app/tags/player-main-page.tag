@@ -4,6 +4,7 @@
             display: flex;
             height: 100%;
             --right-width: 300px;
+            overflow: hidden;
         }
     
         .gutter {

@@ -134,24 +134,6 @@
                 - var(--control-height) - var(--margin) * 2);
             overflow: hidden;
         }
-
-        .line-break {
-            white-space: normal;
-            word-wrap: break-word;
-        }
-        .state-content {
-            display: inline-block;
-            border-radius: 2px;
-            padding: 3px 10px 3px 10px;
-            margin-right: 5px;        
-            margin-bottom: 5px;
-        }
-        .state-saved {
-            background-color: #7fbfff;
-        }
-        .state-reg-download {
-            background-color: hotpink;
-        }
     </style>      
 
     <div style="display:flex;">

@@ -183,25 +183,7 @@
             height: calc(100vh - 70px);
             overflow: hidden;
         }
-
-        .line-break {
-            white-space: normal;
-            word-wrap: break-word;
-        }
-
-        .state-content {
-            display: inline-block;
-            border-radius: 2px;
-            padding: 3px 10px 3px 10px;
-            margin-right: 5px;        
-            margin-bottom: 5px;
-        }
-        .state-saved {
-            background-color: #7fbfff;
-        }
-        .state-reg-download {
-            background-color: hotpink;
-        }
+        
         .label-tag {
             background-color: lightpink
         }

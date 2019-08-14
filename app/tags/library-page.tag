@@ -425,6 +425,19 @@
             cb(ret);
         }); 
 
+        obs.on("library-page:get-video-ids-callback", async (args) => { 
+            const { video_ids, cb } = args;
+            const ret = new Set();
+
+            const video_id_set = library.getVideoIDSet();
+            video_ids.forEach(video_id => {
+                if(video_id_set.has(video_id)===true){
+                    ret.add(video_id);
+                }
+            });
+            cb(ret);
+        });
+
         obs.on("library-page:exist-data-callback", async (args) => { 
             const { video_id, cb } = args;
             try {

@@ -358,15 +358,14 @@
                 });
             });
 
-            obs.trigger("library-page:get-data-callback", { video_ids: video_ids, cb: (id_map)=>{
-                const items = mylist_items.map(value => {
-                    const saved = id_map.has(value.id);
+            obs.trigger("library-page:get-video-ids-callback", { video_ids: video_ids, cb: (video_id_set)=>{
+                mylist_items.forEach(value=>{
+                    const saved = video_id_set.has(value.id);
                     const reg_download = download_id_set.has(value.id);
                     value.saved = saved;
                     value.reg_download = reg_download;
-                    return value;
                 });
-                grid_table.setData(items);
+                grid_table.setData(mylist_items);
                 grid_table.scrollToTop();   
             }});
         };

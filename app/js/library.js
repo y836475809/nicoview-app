@@ -48,6 +48,7 @@ class Library {
         });
 
         await this._updateDirPathMap();
+        await this._updateVideoIDSet();
     }
 
     /**
@@ -72,6 +73,7 @@ class Library {
         }
 
         await this._updateDirPathMap();
+        await this._updateVideoIDSet();
     }
 
     async _updateDirPathMap(){
@@ -91,6 +93,30 @@ class Library {
         this.id_dirpath_map.forEach((value, key) => {
             this.dirpath_id_map.set(value, key);
         });
+    }
+
+    async _updateVideoIDSet(){
+        this._video_id_set = new Set();
+        await new Promise(async (resolve, reject) => {
+            this.video_db.find({}, (error, docs) => {
+                if(error){
+                    reject(error);
+                    return;
+                }
+                docs.map(doc=>{
+                    this._video_id_set.add(doc.video_id);
+                });
+                resolve();
+            });
+        });
+    }
+
+    _addVideoIDSet(video_id){
+        this._video_id_set.add(video_id);
+    }
+
+    getVideoIDSet(){
+        return this._video_id_set;
     }
 
     /**
@@ -162,6 +188,8 @@ class Library {
         new_item.thumbnail_size = item.thumbnail_size;
 
         await this._updateData(this.video_db, new_item, true);
+
+        this._addVideoIDSet(new_item.video_id);
     }
 
     async updateItem(item){

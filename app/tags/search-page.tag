@@ -400,22 +400,11 @@
                 });
             });
 
-            obs.trigger("library-page:get-data-callback", { video_ids: video_ids, cb: (id_map)=>{
+            obs.trigger("library-page:get-video-ids-callback", { video_ids: video_ids, cb: (video_id_set)=>{
                 const items = search_result.data.map(value => {
-                    const saved = id_map.has(value.contentId);
+                    const saved = video_id_set.has(value.contentId);
                     const reg_download = download_id_set.has(value.contentId);
                     return createItem(value, saved, reg_download);
-                    // return {
-                    //     thumb_img: value.thumbnailUrl,
-                    //     id: value.contentId,
-                    //     name: value.title,
-                    //     info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
-                    //     play_time: value.lengthSeconds,
-                    //     pub_date: value.startTime,
-                    //     tags: value.tags,
-                    //     saved: saved,
-                    //     reg_download: reg_download,
-                    // };
                 });
                 items.push(createEmptyItem());
                 grid_table.setData(items);

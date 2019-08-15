@@ -1,38 +1,38 @@
 <open-video-form>
     <style scoped>
         :scope {
-            --video-id-form-width: 300px;
-            --video-id-form-height: 30px;
+            --form-width: 300px;
+            --form-height: 30px;
         }
-        .video-id-form-none {
+        .open-form-none {
             display: none;
         }
-        .video-id-form {
+        .open-form {
             display: flex;
             position: fixed;
-            width: var(--video-id-form-width);
-            height: var(--video-id-form-height);
-            left: calc(50% - var(--video-id-form-width));
-            top: calc(50% - var(--video-id-form-height));
+            width: var(--form-width);
+            height: var(--form-height);
+            left: calc(50% - var(--form-width));
+            top: calc(50% - var(--form-height));
             background-color: rgba(209, 203, 203);
             border-radius: 2px;
             z-index: 10;
         }
-        .video-id-form .label {
+        .open-form .label {
             width: 20px;
             margin: 5px;    
             user-select: none;
         }
-        .video-id-form input {
-            width: calc(var(--video-id-form-width) 
+        .open-form input {
+            width: calc(var(--form-width) 
                         - 20px - 50px - 20px);
             margin: 3px;
         }
-        .video-id-form .play-button {
+        .open-form .play-button {
             width: 50px;
             margin: 2px 0 2px 0;      
         }
-        .video-id-form .close-button {
+        .open-form .close-button {
             width: 20px;
             margin: 2px;   
             cursor: pointer;   
@@ -41,7 +41,7 @@
     </style>
 
     <div class="{video_id_form_display}">
-        <div class="video-id-form">
+        <div class="open-form">
             <div class="label center-hv">ID</div>
             <input type="text" onkeydown={onkeydownPlay}>
             <button class="play-button" onclick={onclickPlay}>再生</button>
@@ -57,10 +57,10 @@
 
         const obs_trigger = new obsTrigger(obs);
 
-        this.video_id_form_display = "video-id-form-none";
+        this.video_id_form_display = "open-form-none";
 
         const playByVideoID = () => {
-            const elm = this.root.querySelector(".video-id-form input");
+            const elm = this.root.querySelector(".open-form input");
             const video_id = elm.value;
             obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
         }
@@ -76,7 +76,7 @@
         };
 
         this.onclickClose = (e) => {
-            this.video_id_form_display = "video-id-form-none";
+            this.video_id_form_display = "open-form-none";
         };
 
         obs.on("open-video-form:show", () => {

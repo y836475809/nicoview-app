@@ -46,6 +46,7 @@
     <div id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <player-controls obs={opts.obs}></player-controls>
     </div>
+    <open-video-form obs={opts.obs}></open-video-form>
 
     <script>
         const obs = this.opts.obs; 

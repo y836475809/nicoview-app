@@ -2,8 +2,6 @@
     <style scoped>
         :scope { 
             position: relative;
-            --video-id-form-width: 300px;
-            --video-id-form-height: 30px;
         }
         #player-video-screen {
             width: 100%;
@@ -20,69 +18,19 @@
             /* border: 1px solid #FF6600; */
             text-shadow: 1px 1px 0px black, 1px 1px 0px black;
         }
-
-        .video-id-form-none {
-            display: none;
-        }
-        .video-id-form {
-            display: flex;
-            position: fixed;
-            width: var(--video-id-form-width);
-            height: var(--video-id-form-height);
-            left: calc(50% - var(--video-id-form-width));
-            top: calc(50% - var(--video-id-form-height));
-            background-color: rgba(209, 203, 203);
-            border-radius: 2px;
-            z-index: 10;
-        }
-        .video-id-form .label {
-            width: 20px;
-            margin: 5px;    
-            user-select: none;
-        }
-        .video-id-form input {
-            width: calc(var(--video-id-form-width) 
-                        - 20px - 50px - 20px);
-            margin: 3px;
-        }
-        .video-id-form .play-button {
-            width: 50px;
-            margin: 2px 0 2px 0;      
-        }
-        .video-id-form .close-button {
-            width: 20px;
-            margin: 2px;   
-            cursor: pointer;   
-            user-select: none;
-        }
     </style>
 
     <div id="player-video-screen" onmousedown={mousedown} onmouseup={oncontextmenu}>
         <video ref="player_video" id="player" autoplay preload="metadata">
         </video>
-        <div class="{video_id_form_display}">
-            <div class="video-id-form">
-                <div class="label center-hv">ID</div>
-                <input type="text" onkeydown={onkeydownPlayByVideoID}>
-                <button class="play-button" onclick={onclickPlayByVideoID}>再生</button>
-                <div class="close-button center-hv" title="閉じる" onclick={onclickCloseVideoIDForm}>x</div>
-            </div>
-        </div>
     </div>
 
     <script>
         /* globals app_base_dir */
-        const { remote, clipboard } = require("electron");
-        const { Menu } = remote;
         const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { getNicoURL } = require(`${app_base_dir}/js/niconico`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
 
         const obs = this.opts.obs; 
-
-        const obs_trigger = new obsTrigger(obs);
 
         const comment_params = SettingStore.getCommentParams();
 
@@ -122,10 +70,6 @@
                     }       
                 }, 100);
             } 
-        };
-
-        const getCurrentTime = () => {
-            return video_elm.currentTime;
         };
 
         obs.on("player-video:set-play-data", (data) => {
@@ -297,118 +241,12 @@
             });
         });
 
-        const getMenuEnable = (menu_id, data) => {
-            if(menu_id == "show-video-id-form"){
-                return true;
-            }
+        obs.on("player-video:get-current-time-callback", (cb) => { 
+            cb(video_elm.currentTime);
+        });
 
-            if(!data) {
-                return false;
-            }
-            
-            const { state } = data;
-            if(menu_id=="add-download" && state.is_saved===true){
-                return false;
-            }
-
-            return true;
-        };
-
-        const self = this;
-        const createMenu = () => {
-            const nemu_templete = [
-                { 
-                    id: "add-bookmark",
-                    label: "ブックマーク", click() {
-                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
-                        const bk_item = BookMark.createVideoItem(title, video_id);
-                        obs.trigger("player-main-page:add-bookmark", bk_item);
-                    }
-                },
-                { 
-                    id: "add-bookmark-time",
-                    label: "ブックマーク(時間)", click() {
-                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
-                        const current_time = getCurrentTime();
-                        const bk_item = BookMark.createVideoItem(title, video_id, current_time);
-                        obs.trigger("player-main-page:add-bookmark", bk_item);
-                    }
-                },
-                { 
-                    id: "add-download",
-                    label: "ダウンロードに追加", click() {
-                        const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
-                        const item = {
-                            thumb_img: thumbnailURL,
-                            id: video_id,
-                            name: title,
-                            state: 0
-                        };
-                        obs.trigger("player-main-page:add-download-item", item);
-                    }
-                },   
-                { 
-                    id: "copy-url",
-                    label: "urlをコピー", click() {
-                        const { video_id } = play_data.viewinfo.thumb_info.video;
-                        const url = getNicoURL(video_id);
-                        clipboard.writeText(url);
-                    }
-                },
-                { 
-                    id: "show-video-id-form",
-                    label: "IDを指定して再生", click() {
-                        showVideoIDForm(self);
-                    }
-                },               
-                { 
-                    type: "separator" 
-                },
-                { 
-                    id: "reload",
-                    label: "再読み込み", click() {
-                        const { viewinfo, state } = play_data;
-                        const { video_id } = viewinfo.thumb_info.video;
-
-                        if(state.is_online===true){
-                            obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
-                        }else{
-                            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
-                        }
-                    }
-                },
-            ];
-            return Menu.buildFromTemplate(nemu_templete);
-        };
-        const context_menu = createMenu();
-        this.oncontextmenu= (e) => {
-            if(e.button===2){
-                context_menu.items.forEach(menu => {
-                    const id = menu.id;
-                    menu.enabled = getMenuEnable(id, play_data); //play_data !== null;
-                });
-                context_menu.popup({window: remote.getCurrentWindow()});
-            }
-        };
-        this.video_id_form_display = "video-id-form-none";
-        const playByVideoID = () => {
-            const elm = this.root.querySelector(".video-id-form input");
-            const video_id = elm.value;
-            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
-        }
-        this.onkeydownPlayByVideoID = (e) => {
-            if(e.code == "Enter"){
-                playByVideoID();
-            }
-        }
-        this.onclickPlayByVideoID = (e) => {
-            playByVideoID();
-        };
-        this.onclickCloseVideoIDForm = (e) => {
-            this.video_id_form_display = "video-id-form-none";
-        };
-        const showVideoIDForm = (self) => {
-            self.video_id_form_display = "";
-        };
+        obs.on("player-video:get-play-data-callback", (cb) => { 
+            cb(play_data);
+        });
     </script>
 </player-video>

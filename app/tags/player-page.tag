@@ -38,7 +38,9 @@
     <div id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
         <player-tags obs={opts.obs}></player-tags>
     </div>
-    <div id="player-video-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+    <div id="player-video-content" tabIndex="-1" 
+        onkeyup={this.onkeyupTogglePlay}
+        onmouseup={oncontextmenu}>
         <div id="player-video">
             <player-video obs={opts.obs}></player-video>
         </div>
@@ -49,11 +51,22 @@
     <open-video-form obs={opts.obs}></open-video-form>
 
     <script>
+        /* globals app_base_dir */
+        const { remote, clipboard } = require("electron");
+        const { Menu } = remote;
+        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
+        const { getNicoURL } = require(`${app_base_dir}/js/niconico`);       
+        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        
         const obs = this.opts.obs; 
+
+        const obs_trigger = new obsTrigger(obs);
 
         let tags_height = 0;
         let controls_height = 0;
         this.video_size = null;
+
+        let play_data = null;
 
         const adjustPlayerVideoSize = () => {
             const ch = this.root.clientHeight;
@@ -71,6 +84,109 @@
             return parseInt(css_style.getPropertyValue("--controls-height"));
         };
 
+        const getPlayData = async () => {
+            return await new Promise((resolve, reject) => {
+                obs.trigger("player-video:get-play-data-callback", (play_data)=>{
+                    resolve(play_data);
+                });
+            });
+        };
+
+        const getMenuEnable = (menu_id, data) => {
+            if(menu_id == "show-open-video-form"){
+                return true;
+            }
+
+            if(!data) {
+                return false;
+            }
+            
+            const { state } = data;
+            if(menu_id=="add-download" && state.is_saved===true){
+                return false;
+            }
+
+            return true;
+        };
+
+        const createMenu = () => {
+            const nemu_templete = [
+                { 
+                    id: "add-bookmark",
+                    label: "ブックマーク", click() {
+                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
+                        const bk_item = BookMark.createVideoItem(title, video_id);
+                        obs.trigger("player-main-page:add-bookmark", bk_item);
+                    }
+                },
+                { 
+                    id: "add-bookmark-time",
+                    label: "ブックマーク(時間)", click() {
+                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
+                        obs.trigger("player-video:get-current-time-callback", (current_time)=>{
+                            const bk_item = BookMark.createVideoItem(title, video_id, current_time);
+                            obs.trigger("player-main-page:add-bookmark", bk_item);                            
+                        });
+                    }
+                },
+                { 
+                    id: "add-download",
+                    label: "ダウンロードに追加", click() {
+                        const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
+                        const item = {
+                            thumb_img: thumbnailURL,
+                            id: video_id,
+                            name: title,
+                            state: 0
+                        };
+                        obs.trigger("player-main-page:add-download-item", item);
+                    }
+                },   
+                { 
+                    id: "copy-url",
+                    label: "urlをコピー", click() {
+                        const { video_id } = play_data.viewinfo.thumb_info.video;
+                        const url = getNicoURL(video_id);
+                        clipboard.writeText(url);
+                    }
+                },
+                { 
+                    id: "show-open-video-form",
+                    label: "IDを指定して再生", click() {
+                        obs.trigger("open-video-form:show");
+                    }
+                },               
+                { 
+                    type: "separator" 
+                },
+                { 
+                    id: "reload",
+                    label: "再読み込み", click() {
+                        const { viewinfo, state } = play_data;
+                        const { video_id } = viewinfo.thumb_info.video;
+
+                        if(state.is_online===true){
+                            obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+                        }else{
+                            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+                        }
+                    }
+                },
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+    
+        const context_menu = createMenu();
+        this.oncontextmenu = async (e) => {
+            if(e.button===2){
+                play_data = await getPlayData();
+                context_menu.items.forEach(menu => {
+                    const id = menu.id;
+                    menu.enabled = getMenuEnable(id, play_data); //play_data !== null;
+                });
+                context_menu.popup({window: remote.getCurrentWindow()});
+            }
+        };
 
         this.on("mount", () => {
             const css_style = getComputedStyle(this.root);

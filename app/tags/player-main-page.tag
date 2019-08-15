@@ -313,25 +313,26 @@
         });
 
         obs.on("player-main-page:play-by-videoid", async (args) => {
-            const video_id = args;
+            const { video_id, time } = args;
             const is_online = false;
 
-            playNiconico(video_id, is_online);
+            playNiconico(video_id, is_online, time);
         });
 
         obs.on("player-main-page:play-by-videoid-online", (args) => {
-            const video_id = args;
+            const { video_id, time } = args;
             const is_online = true;
 
             if(process.env.NODE_ENV == "DEBUG"){
                 const state = {
                     is_online: true,
-                    is_saved: false
+                    is_saved: false,
+                    time: time
                 };
                 cancelPlay();
                 play_by_video_id(video_id, state);   
             }else{
-                playNiconico(video_id, is_online);
+                playNiconico(video_id, is_online, time);
             }
         });
 

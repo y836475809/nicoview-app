@@ -1,7 +1,7 @@
 
 const MSG =  Object.freeze({   
     MAIN_PLAY: "main-page:play-by-videoid",
-    PLAYER_PLAY: "player-page:play-by-videoid"
+    PLAYER_PLAY: "player-main-page:play-by-videoid"
 });
 
 class obsTrigger {

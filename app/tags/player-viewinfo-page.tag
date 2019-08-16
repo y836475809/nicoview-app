@@ -219,7 +219,7 @@
                 <div class="description-user-name">投稿者: {this.user_nickname}</div>
             </div>
             <hr>
-            <div class="description-content {this.description_content_class}"></div>
+            <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
         </div>
     </div>
     <div class="viewinfo-panel viewinfo-comments-panel">
@@ -249,7 +249,7 @@
     
     <script>
         /* globals app_base_dir */
-        const { remote } = require("electron");
+        const { remote, clipboard } = require("electron");
         const { Menu } = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         require("slickgrid/plugins/slick.autotooltips");
@@ -364,6 +364,7 @@
 
         const watchLinkClick = (e) => {
             e.preventDefault(); 
+            e.stopPropagation();
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
             if(e.button === 2){
@@ -377,6 +378,7 @@
 
         const mylistLinkClick = (e) => {
             e.preventDefault(); 
+            e.stopPropagation();
             const paths = e.target.href.split("/");
             const mylist_id = paths.pop();
             obs.trigger("player-main-page:load-mylist", mylist_id);
@@ -433,6 +435,55 @@
                 }
                 setDescriptionContainerClass("description-container-extend");
             }
+        };
+
+        const popupDescriptionMenu = (type, text) => {
+            let menu_template = null;
+            if(type=="watch"){
+                const video_id = text;
+                menu_template = createWatchLinkMenu(video_id);
+            }
+            if(type=="mylist"){
+                const mylist_id = text;
+                const menu_templete = [
+                    { label: "mylistを開く", click() {
+                        obs.trigger("player-main-page:load-mylist", mylist_id);
+                    }}
+                ];
+                menu_template = Menu.buildFromTemplate(menu_templete);
+            }
+            if(type=="text"){
+                const menu_templete = [
+                    { label: "コピー", click() {
+                        clipboard.writeText(text);
+                    }}
+                ];
+                menu_template = Menu.buildFromTemplate(menu_templete);    
+            }   
+            menu_template.popup({window: remote.getCurrentWindow()});
+        };
+        this.oncontextmenu_description = (e) => {
+            if(e.button !== 2){
+                return;
+            }
+            
+            const text = document.getSelection().toString();
+            if(text==""){
+                return;
+            }
+
+            if(/^sm\d+/.test(text)){
+                const video_id = text.match(/sm\d+/)[0];
+                popupDescriptionMenu("watch", video_id);
+                return;
+            }
+            if(/^mylist\/\d+/.test(text)){
+                const mylist_id = text.match(/\d+/)[0]; 
+                popupDescriptionMenu("mylist", mylist_id);
+                return;
+            }
+
+            popupDescriptionMenu("text", text);
         };
 
         this.toggle_comment_class = "far fa-comment-dots";

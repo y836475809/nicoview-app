@@ -81,6 +81,10 @@
 
         obs.on("open-video-form:show", () => {
             this.video_id_form_display = "";
+            this.update();
+
+            const elm = this.root.querySelector(".open-form input");
+            elm.focus();
         });
 
     </script>    

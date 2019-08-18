@@ -56,7 +56,7 @@ function createWindow() {
     });
 
     // ウィンドウが閉じられた時に発行される
-    win.on("closed", () => {
+    win.on("closed", async () => {
         // ウィンドウオブジェクトを参照から外す。
         // もし何個かウィンドウがあるならば、配列として持っておいて、対応するウィンドウのオブジェクトを消去するべき。
         if (player_win !== null) {
@@ -68,7 +68,7 @@ function createWindow() {
             window_store.save();
         } catch (error) {
             console.log(error);
-            dialog.showMessageBox({
+            await dialog.showMessageBox({
                 type: "error",
                 buttons: ["OK"],
                 message: `ウインドウ状態の保存失敗: ${error.message}`

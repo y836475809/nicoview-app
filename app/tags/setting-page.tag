@@ -122,16 +122,16 @@
             setting_dir_config.enableUserData = this.enable_user_data;
         };
 
-        this.onclickSelectSettingDir = (item, e) => {
-            const dir = selectFolderDialog();
+        this.onclickSelectSettingDir = async (item, e) => {
+            const dir = await selectFolderDialog();
             if(dir!==null){
                 setting_dir_config.setDir(dir);
                 setInputValue(`.${item}`, dir);
             }        
         };
 
-        this.onclickSelectDownloadDir = (item, e) => {
-            const dir = selectFolderDialog();
+        this.onclickSelectDownloadDir = async (item, e) => {
+            const dir = await selectFolderDialog();
             if(dir!==null){
                 setInputValue(`.${item}`, dir);
                 SettingStore.setValue("download-dir", dir);
@@ -211,7 +211,7 @@
         };
 
         this.onclickImport = async ()=>{
-            const db_file_path = selectFileDialog("Sqlite db", ["db"]);
+            const db_file_path = await selectFileDialog("Sqlite db", ["db"]);
             if(!db_file_path){
                 return;
             }
@@ -228,17 +228,17 @@
 
                 obs.trigger("library-page:import-data", {
                     data: {dir_list, video_list, mode},
-                    cb:(error)=>{   
+                    cb:async (error)=>{   
                         if(error){
                             throw error;
                         }else{
-                            showMessageBox("info", "インポート完了");
+                            await showMessageBox("info", "インポート完了");
                         } 
                     }
                 });
             } catch (error) {
                 console.log(error);
-                showMessageBox("error", `インポート失敗: ${error.message}`);
+                await showMessageBox("error", `インポート失敗: ${error.message}`);
             }finally{
                 this.obs_msg_dialog.trigger("close");
             }

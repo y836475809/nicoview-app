@@ -312,9 +312,9 @@
             grid_table.clearSelected();
             try {
                 const search_result = await nico_search.search(nico_search_params);
-                setData(search_result);         
+                setData(search_result);
             } catch (error) {
-                showMessageBox("error", error.message);
+                await showMessageBox("error", error.message);
             }
             
             this.obs_modal_dialog.trigger("close");

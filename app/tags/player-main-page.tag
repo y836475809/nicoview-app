@@ -275,7 +275,7 @@
             } catch (error) {
                 console.log(error);
                 if(!error.cancel){
-                    showMessageBox("error", error.message);
+                    await showMessageBox("error", error.message);
                 }
 
                 this.obs_modal_dialog.trigger("close");

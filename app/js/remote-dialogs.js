@@ -1,8 +1,8 @@
 const { remote } = require("electron");
 const { dialog } = require("electron").remote;
 
-const selectFileDialog = (name, extensions)=>{
-    const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
+const selectFileDialog = async (name, extensions)=>{
+    const paths = await dialog.showOpenDialog(remote.getCurrentWindow(), {
         properties: ["openFile"],
         title: "ファイルを選択",
         defaultPath: ".",
@@ -17,8 +17,8 @@ const selectFileDialog = (name, extensions)=>{
     return null;
 };
 
-const selectFolderDialog = ()=>{
-    const paths = dialog.showOpenDialog(remote.getCurrentWindow(), {
+const selectFolderDialog = async ()=>{
+    const paths = await dialog.showOpenDialog(remote.getCurrentWindow(), {
         properties: ["openDirectory"],
         title: "フォルダを選択",
         defaultPath: "."
@@ -29,8 +29,8 @@ const selectFolderDialog = ()=>{
     return null;
 };
 
-const showMessageBox = (type, message) => {
-    dialog.showMessageBox(remote.getCurrentWindow(), {
+const showMessageBox = async (type, message) => {
+    await dialog.showMessageBox(remote.getCurrentWindow(), {
         type: type,
         buttons: ["OK"],
         message: message

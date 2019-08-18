@@ -4,13 +4,16 @@
   "description": "",
   "main": "app/main.js",
   "scripts": {
+    "test-main": "electron . test-main.html",
+    "test-main-player": "electron . test-player-main.html",
+    "main": "electron .",
     "test": "ava -v -s  __tests__/*.test.js"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
     "ava": "^1.1.0",
-    "electron": "^4.0.5",
+    "electron": "^4.2.9",
     "nock": "^10.0.4",
     "sinon": "^7.3.1"
   },

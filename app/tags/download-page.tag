@@ -382,7 +382,7 @@
                 }
             } catch (error) {
                 console.log(error);
-                showMessageBox("error", error.message);
+                await showMessageBox("error", error.message);
             } finally {
                 event_em.emit("donwload-end");
             }    

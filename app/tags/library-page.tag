@@ -173,6 +173,8 @@
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { ConvertMP4 } = require(`${app_base_dir}/js/video-converter`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -331,7 +333,70 @@
 
             this.obs_modal_dialog.trigger("close");
         };
-       
+
+        const convertVideo = async (self, video_id) => {
+            let cancel_err = null;
+
+            try {
+                const isWin = /^win/.test(process.platform);
+
+                const library_data = await library.getPlayData(video_id);
+                const { video_data }  = library_data;
+                const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
+
+                const cnv_mp4 = new ConvertMP4();
+
+                let canceled = false;
+
+                if(isWin){
+                    self.obs_modal_dialog.trigger("show", {
+                        message: "mp4に変換中...",
+                        buttons: ["cancel"],
+                        cb: async (result)=>{
+                            canceled = true;
+                            try {
+                                await cnv_mp4.cancel();
+                            } catch (error) {
+                                cancel_err = error;
+                            } 
+                        }
+                    });
+                }else{
+                    self.obs_modal_dialog.trigger("show", {
+                        message: "mp4に変換中..."
+                    });   
+                }
+
+                await cnv_mp4.convert(ffmpeg_path, video_data.src);
+                
+                if(cancel_err!==null){
+                    await showMessageBox("error", `キャンセル失敗: ${cancel_err.message}`);
+                }else if(canceled===true){
+                    await showMessageBox("info", "キャンセルされました");
+                }else{
+                    await showMessageBox("info", "変換完了");
+                }     
+            } catch (error) {
+                console.log(error);
+                await showMessageBox("error", `変換失敗: ${error.message}`);
+            }finally{
+                self.obs_modal_dialog.trigger("close");      
+            }
+        };
+
+        const createConvertMenu = (self) => {
+            const nemu_templete = [
+                { label: "mp4に変換", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    (async()=>{
+                        await convertVideo(self, video_id);
+                    })();
+                }}
+            ];;
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
         //TODO
         const createMenu = () => {
             const nemu_templete = [
@@ -393,9 +458,16 @@
                 obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
             });
             
+            const converter_context_menu = createConvertMenu(this);
             const context_menu = createMenu();
             grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
+                const items = grid_table.getSelectedDatas();
+                const video_type = items[0].video_type;
+                if(video_type=="mp4"){
+                    context_menu.popup({window: remote.getCurrentWindow()});
+                }else{
+                    converter_context_menu.popup({window: remote.getCurrentWindow()});
+                }
             });
             
             resizeGridTable();

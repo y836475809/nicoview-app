@@ -354,7 +354,8 @@ test("library getLibraryItems", async (t) => {
                 play_time: 4,
                 last_play_date: 5,
                 tags: "tag1 tag2",
-                thumbnail_size: "S"
+                thumbnail_size: "S",
+                video_type: "mp4",
             },
             {
                 db_type:"xml", 
@@ -367,7 +368,8 @@ test("library getLibraryItems", async (t) => {
                 play_time: 40,
                 last_play_date: 50,
                 tags: "tag10 tag20",
-                thumbnail_size: "S"
+                thumbnail_size: "S",
+                video_type: "mp4",
             },
             {
                 db_type:"json", 
@@ -380,7 +382,8 @@ test("library getLibraryItems", async (t) => {
                 play_time: 400,
                 last_play_date: 500,
                 tags: "tag100 tag200",
-                thumbnail_size: "L" 
+                thumbnail_size: "L",
+                video_type: "mp4",
             }
         ]
     );
@@ -441,7 +444,8 @@ test("library getLibraryItem", async (t) => {
             play_time: 4,
             last_play_date: 5,
             tags: "tag1 tag2",
-            thumbnail_size: "S"
+            thumbnail_size: "S",
+            video_type: "mp4",
         });
     }
     {
@@ -457,7 +461,8 @@ test("library getLibraryItem", async (t) => {
             play_time: 40,
             last_play_date: 50,
             tags: "tag10 tag20",
-            thumbnail_size: "S"
+            thumbnail_size: "S",
+            video_type: "mp4",
         });
     }
     {

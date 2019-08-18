@@ -88,6 +88,15 @@
                 <button onclick={onclickImport}>DB選択</button>
             </div>
         </div>
+        <div class="content">
+            <label class="section-label" title={this.ffmpeg_path_desc}>ffmpeg実行ファイルのパス</label>
+            <div style="display: flex;">
+                <input class="input-path ffmpeg-path-input" type="text" readonly title={this.ffmpeg_path_desc}>
+                <button class="input-button" onclick="{onclickSelectffmpegPath.bind(this,'ffmpeg-path-input')}" title={this.ffmpeg_path_desc}>
+                    ファイル選択
+                </button>
+            </div>
+        </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
@@ -100,6 +109,7 @@
         const { FileUtils } = require(`${app_base_dir}/js/file-utils`);
 
         this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
+        this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
@@ -150,6 +160,15 @@
             SettingStore.setValue("import-db-mode", item.mode);
         };
 
+        this.onclickSelectffmpegPath = async (item, e) => {
+            const file_path = await selectFileDialog("ffmpeg", ["*"]);
+            if(!file_path){
+                return;
+            }
+            setInputValue(`.${item}`, file_path);
+            SettingStore.setValue("ffmpeg-path", file_path);
+        };
+
         const setInputValue = (selector, value) => {          
             const elm = this.root.querySelector(selector);
             elm.value = value;
@@ -184,6 +203,9 @@
                 elms[0].checked = true;
                 SettingStore.setValue("import-db-mode", "a");
             }
+
+            const ffmpeg_file_path = SettingStore.getValue("ffmpeg-path", "");
+            setInputValue(".ffmpeg-path-input", ffmpeg_file_path);
         });
 
         window.onbeforeunload = (e) => {

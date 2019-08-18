@@ -42,8 +42,10 @@
 - [ ] playerで再生で+1sec, -1secの移動
 - [ ] playerでシーク上にマウスホバーで時間ポップアップ表示
 - [ ] 再生が動画最後までいって終了したらhbは止める？
-- [ ] flvの再生
-- [ ] swfの再生
+- [x] ライブラリページのコンテキストメニューからライブラリのflv, swfをmp4に変換する
+- [ ] ライブラリページの項目のダブルクリックでflv, swfをmp4に変換する
+- [ ] ライブラリのflv, swfをmp4に変換の進行状況をライブラリページの項目に表示する
+- [ ] ライブラリのflv, swfをmp4に変換した際、ライブラリdbの「video type」を「mp4」に更新する
 - [ ] electron-builderのコマンドは「electron-builder --win --x64」
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
 - [ ] histroty,searchでのデータの型チェックが必要

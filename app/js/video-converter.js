@@ -16,7 +16,11 @@ class ConvertMP4 {
         try {
             fs.statSync(ffmpeg_path);
         } catch (error) {
-            throw new Error(`${ffmpeg_path}が見つかりません\n設定ページでffmpegのパスを指定してください`);
+            let param = ffmpeg_path;
+            if(!param){
+                param = "ffmpegのパス";
+            }
+            throw new Error(`${param}が見つかりません\n設定ページでffmpegのパスを指定してください`);
         }
         
         // const cmd = `"${ffmpeg_path}" -y -i "${src_video_file_path}" -vcodec libx265 "${dist_video_file_path}"`;

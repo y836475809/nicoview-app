@@ -26,7 +26,7 @@ class ConvertMP4 {
         // const cmd = `"${ffmpeg_path}" -y -i "${src_video_file_path}" -vcodec libx265 "${dist_video_file_path}"`;
         return new Promise(async (resolve, reject) => {
             this.pocess = spawn(`"${ffmpeg_path}"`, 
-                ["-y", "-i", `"${src_video_file_path}"`, "-vcodec", "libx265", `"${dist_video_file_path}"`],
+                ["-y", "-i", `"${src_video_file_path}"`, "-vcodec", "h264", `"${dist_video_file_path}"`],
                 { shell:true });
 
             this.pocess.on("error", (error)=>{

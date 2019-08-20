@@ -362,9 +362,14 @@
                 updateState("変換中");
 
                 await cnv_mp4.convert(ffmpeg_path, video_data.src);
+               
+                await library.setFieldValue(video_id, "video_type", "mp4");
+                const updated_item = await library.getLibraryItem(video_id);
+                grid_table.updateItem(updated_item, video_id);
 
                 await showMessageBox("info", "変換完了");
-                updateState("変換完了");      
+                updateState("変換完了");  
+
             } catch (error) {
                 console.log(error);
 

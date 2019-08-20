@@ -10,6 +10,12 @@ class ConvertMP4 extends EventEmitter {
 
         this._cancel = false;
         this._canceled = false;
+
+        this.isWin = /^win/.test(process.platform);
+    }
+
+    get canCencel(){
+        return this.isWin;
     }
 
     convert(ffmpeg_path, src_video_file_path){
@@ -66,14 +72,17 @@ class ConvertMP4 extends EventEmitter {
             return;
         }
 
+        if(this.canCencel===false){
+            this.emit("cancel_error", new Error("中断はwinowsのみ有効"));
+            return;
+        }
+
         this._cancel = true;
         this._canceled = false;
 
         const cancel_proc = spawn("taskkill", ["/PID", `${this.pocess.pid}`, "/T", "/F"]);
         
         cancel_proc.on("error", (error)=>{
-            console.log("cancel error=", error);
-
             this._cancel = false;
             this.emit("cancel_error", error);
         });

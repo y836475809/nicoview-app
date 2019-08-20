@@ -335,49 +335,45 @@
         };
 
         const convertVideo = async (self, video_id) => {
-            grid_table.updateCell(video_id, "state", "変換開始");
+            const updateState = (state) => {
+                grid_table.updateCell(video_id, "state", state);
+            };
 
             try {
-                const isWin = /^win/.test(process.platform);
-
                 const library_data = await library.getPlayData(video_id);
                 const { video_data }  = library_data;
                 const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
 
                 const cnv_mp4 = new ConvertMP4();
 
-                if(isWin){
-                    self.obs_modal_dialog.trigger("show", {
-                        message: "mp4に変換中...",
-                        buttons: ["cancel"],
-                        cb: (result)=>{
-                            cnv_mp4.cancel();
-                        }
-                    });
-                }else{
-                    self.obs_modal_dialog.trigger("show", {
-                        message: "mp4に変換中..."
-                    });   
-                }
-                grid_table.updateCell(video_id, "state", "変換中");
+                self.obs_modal_dialog.trigger("show", {
+                    message: "mp4に変換中...",
+                    buttons: ["cancel"],
+                    cb: (result)=>{
+                        cnv_mp4.cancel();
+                    }
+                });
 
                 cnv_mp4.on("cancel_error", async error=>{
-                    await showMessageBox("error", `キャンセル失敗: ${error.message}`);
+                    console.log(error);
+                    await showMessageBox("error", `中断失敗: ${error.message}`);
                 });
+
+                updateState("変換中");
 
                 await cnv_mp4.convert(ffmpeg_path, video_data.src);
 
                 await showMessageBox("info", "変換完了");
-                grid_table.updateCell(video_id, "state", "変換完了");      
+                updateState("変換完了");      
             } catch (error) {
                 console.log(error);
 
                 if(error.cancel === true){
-                    await showMessageBox("info", "キャンセルされました");
-                    grid_table.updateCell(video_id, "state", "変換キャンセル");
+                    await showMessageBox("info", "変換中断");
+                    updateState("変換中断");   
                 }else{
                     await showMessageBox("error", `変換失敗: ${error.message}`);
-                    grid_table.updateCell(video_id, "state", "変換失敗");
+                    updateState("変換失敗");   
                 }
             }finally{
                 self.obs_modal_dialog.trigger("close");      

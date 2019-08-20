@@ -37,8 +37,17 @@ const showMessageBox = async (type, message) => {
     });
 };
 
+const showOKCancelBox = async (type, message) => {
+    return await dialog.showMessageBox(remote.getCurrentWindow(), {
+        type: type,
+        buttons: ["OK", "Cancel"],
+        message: message
+    });
+};
+
 module.exports = {
     selectFileDialog,
     selectFolderDialog,
     showMessageBox,
+    showOKCancelBox
 };

@@ -173,7 +173,7 @@
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
-        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { ConvertMP4 } = require(`${app_base_dir}/js/video-converter`);
 
         const obs = this.opts.obs; 
@@ -335,7 +335,7 @@
         };
 
         const convertVideo = async (self, video_id) => {
-            let cancel_err = null;
+            grid_table.updateCell(video_id, "state", "変換開始");
 
             try {
                 const isWin = /^win/.test(process.platform);
@@ -346,19 +346,12 @@
 
                 const cnv_mp4 = new ConvertMP4();
 
-                let canceled = false;
-
                 if(isWin){
                     self.obs_modal_dialog.trigger("show", {
                         message: "mp4に変換中...",
                         buttons: ["cancel"],
-                        cb: async (result)=>{
-                            canceled = true;
-                            try {
-                                await cnv_mp4.cancel();
-                            } catch (error) {
-                                cancel_err = error;
-                            } 
+                        cb: (result)=>{
+                            cnv_mp4.cancel();
                         }
                     });
                 }else{
@@ -366,19 +359,26 @@
                         message: "mp4に変換中..."
                     });   
                 }
+                grid_table.updateCell(video_id, "state", "変換中");
+
+                cnv_mp4.on("cancel_error", async error=>{
+                    await showMessageBox("error", `キャンセル失敗: ${error.message}`);
+                });
 
                 await cnv_mp4.convert(ffmpeg_path, video_data.src);
-                
-                if(cancel_err!==null){
-                    await showMessageBox("error", `キャンセル失敗: ${cancel_err.message}`);
-                }else if(canceled===true){
-                    await showMessageBox("info", "キャンセルされました");
-                }else{
-                    await showMessageBox("info", "変換完了");
-                }     
+
+                await showMessageBox("info", "変換完了");
+                grid_table.updateCell(video_id, "state", "変換完了");      
             } catch (error) {
                 console.log(error);
-                await showMessageBox("error", `変換失敗: ${error.message}`);
+
+                if(error.cancel === true){
+                    await showMessageBox("info", "キャンセルされました");
+                    grid_table.updateCell(video_id, "state", "変換キャンセル");
+                }else{
+                    await showMessageBox("error", `変換失敗: ${error.message}`);
+                    grid_table.updateCell(video_id, "state", "変換失敗");
+                }
             }finally{
                 self.obs_modal_dialog.trigger("close");      
             }
@@ -455,7 +455,17 @@
             grid_table.onDblClick(async (e, data)=>{
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
-                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                const video_type = data.video_type;
+                if(video_type=="mp4"){
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                }else{
+                    const result = await showOKCancelBox("info", 
+                        `動画が${video_type}のため再生できません\nmp4に変換しますか?`);
+                    if(result!==0){
+                        return;
+                    }
+                    await convertVideo(this, video_id);
+                }
             });
             
             const converter_context_menu = createConvertMenu(this);

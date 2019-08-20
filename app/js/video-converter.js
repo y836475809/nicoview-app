@@ -1,10 +1,15 @@
-const { exec, spawn } = require("child_process");
+const EventEmitter = require("events");
+const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
-class ConvertMP4 {
+class ConvertMP4 extends EventEmitter {
     constructor(){
+        super();
         this.pocess = null;
+
+        this._cancel = false;
+        this._canceled = false;
     }
 
     convert(ffmpeg_path, src_video_file_path){
@@ -22,6 +27,9 @@ class ConvertMP4 {
             }
             throw new Error(`${param}が見つかりません\n設定ページでffmpegのパスを指定してください`);
         }
+
+        this._cancel = false;
+        this._canceled = false;
         
         // const cmd = `"${ffmpeg_path}" -y -i "${src_video_file_path}" -vcodec libx265 "${dist_video_file_path}"`;
         return new Promise(async (resolve, reject) => {
@@ -32,8 +40,23 @@ class ConvertMP4 {
             this.pocess.on("error", (error)=>{
                 reject(error);
             });
-            this.pocess.on("close", (code) => {
-                resolve();                
+
+            this.pocess.on("close", async (code) => {
+                if(this._cancel===false){
+                    resolve();
+                    return;
+                }
+
+                for (let index = 0; index < 10; index++) {
+                    await new Promise(resolve => setTimeout(resolve, 100)); 
+                    if(this._canceled===true){
+                        break;
+                    }
+                }  
+
+                const error = new Error("cancel"); 
+                error.cancel = true;
+                reject(error);         
             });
         });
     }
@@ -43,15 +66,19 @@ class ConvertMP4 {
             return;
         }
 
-        return new Promise((resolve, reject) => {
-            const cmd = `taskkill /PID ${this.pocess.pid} /T /F`;
-            exec(cmd, (error, stdout, stderr) => {
-                if(error) {
-                    reject(error);
-                }else{
-                    resolve();
-                }
-            });
+        this._cancel = true;
+        this._canceled = false;
+
+        const cancel_proc = spawn("taskkill", ["/PID", `${this.pocess.pid}`, "/T", "/F"]);
+        
+        cancel_proc.on("error", (error)=>{
+            console.log("cancel error=", error);
+
+            this._cancel = false;
+            this.emit("cancel_error", error);
+        });
+        cancel_proc.on("close", async (code) => {
+            this._canceled = true;
         });
     }
 }

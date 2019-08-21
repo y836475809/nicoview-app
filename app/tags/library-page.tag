@@ -193,7 +193,11 @@
         };
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
-            return `ID: ${video_id}`;
+            const video_type = dataContext.video_type;
+            return `<div>
+                ID: ${video_id}<br>
+                動画形式: ${video_type}<br>
+                </div>`;
         };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},

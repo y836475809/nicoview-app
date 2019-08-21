@@ -159,6 +159,8 @@
         const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { needConvertVideo } = require(`${app_base_dir}/js/library-obs`);
+        const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -304,16 +306,47 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
 
+        const createConvertVideoMenu = () => {
+            const nemu_templete = [
+                { label: "mp4に変換", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    obs.trigger("library-page:convert-video", video_id); 
+                }}
+            ];
+            return Menu.buildFromTemplate(nemu_templete);
+        };
+
+        // TODO
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".mylist-grid"));
-            grid_table.onDblClick((e, data)=>{
+            grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
-                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+
+                if(await needConvertVideo(obs, video_id)===true){
+                    const result = await showOKCancelBox("info", 
+                        "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
+                    if(result!==0){
+                        return;
+                    }        
+                    obs.trigger("library-page:convert-video", video_id);
+                }else{
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                }
             });
             
+            // TODO
             const context_menu = createMenu();
-            grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
+            const context_menu_cnv_video = createConvertVideoMenu();
+            grid_table.onContextMenu(async (e)=>{
+                const items = grid_table.getSelectedDatas();
+                const video_id = items[0].id;
+
+                if(await needConvertVideo(obs, video_id)===true){
+                    context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
+                }else{
+                    context_menu.popup({window: remote.getCurrentWindow()});
+                }
             });
 
             resizeGridTable();

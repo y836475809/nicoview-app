@@ -47,6 +47,8 @@
 - [x] ライブラリのflv, swfをmp4に変換の進行状況をライブラリページの項目に表示する
 - [x] ライブラリのflv, swfをmp4に変換した際、ライブラリdbの「video type」を「mp4」に更新する
 - [x] ライブラリページの動画の情報に「動画形式」を追加する
+- [x] mylistページのコンテキストメニューからライブラリのflv, swfをmp4に変換する
+- [x] mylistページの項目のダブルクリックでflv, swfをmp4に変換する
 - [ ] 再生した動画がmp4以外(未対応)の場合、プレイヤーでメッセージを出して再生中止する
 - [ ] electron-builderのコマンドは「electron-builder --win --x64」
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない

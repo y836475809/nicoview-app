@@ -512,6 +512,20 @@
             cb(ret);
         }); 
 
+        obs.on("library-page:get-item-callback", async (args) => { 
+            const { video_id, cb } = args;
+            try {
+                cb(await library.getLibraryItem(video_id));
+            } catch (error) {
+                cb(null);
+            }             
+        }); 
+
+        obs.on("library-page:convert-video", async (args) => { 
+            const video_id = args;
+            await convertVideo(this, video_id);          
+        }); 
+
         obs.on("library-page:get-video-ids-callback", async (args) => { 
             const { video_ids, cb } = args;
             const ret = new Set();

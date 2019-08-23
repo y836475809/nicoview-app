@@ -18,6 +18,7 @@
     <main-page></main-page>
 </body>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script src="../node_modules/riotx/dist/riotx.min.js"></script>
 <script type="riot/tag" src="../app/tags/main-page.tag"></script>
 <script type="riot/tag" src="../app/tags/accordion.tag"></script>
 <script type="riot/tag" src="../app/tags/pagination.tag"></script>
@@ -31,7 +32,7 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script type="riot/tag" src="../app/tags/bookmark-page.tag"></script>
 <script>
-    /* globals riot */
+    /* globals riot riotx */
     const path = require("path");
     const { IPCMain } = require("../app/js/ipc-monitor");
     const { remote } = require("electron");
@@ -75,6 +76,83 @@
             value.closeStream();
         });
     });
+
+    const store = new riotx.Store({
+        state: {
+            is_expand: true,
+            items: [
+                {
+                    title: "test",
+                    type: "video",
+                    data: {
+                        video_id: "sm20"
+                    }
+                },
+                {
+                    title: "サンプル1",
+                    type: "video",
+                    data: {
+                        video_id: "sm1"
+                    }
+                },
+            ]
+        },
+
+        actions: {
+            updateData: (context, data) => {
+                return Promise
+                    .resolve()
+                    .then(() => {
+                        console.log("actions updateData=", data);
+                        context.commit("updateData", data);
+                    });
+            },
+            addList: (context, bk) => {
+                return Promise
+                    .resolve()
+                    .then(() => {
+                        context.commit("addList", bk);
+                    });
+            },
+            deleteList: (context, index) => {
+                return Promise
+                    .resolve()
+                    .then(() => {
+                        context.commit("deleteList", index);
+                    });
+            }
+        },
+
+        mutations: {
+            updateData: (context, data) => {
+                // const text = context.state.text;
+                console.log("mutations updateData=", data);
+                context.state.items = data.items;
+                return ["changed"];
+            },
+            addList: (context, bk) => {
+                // const text = context.state.text;
+                context.state.items.push(bk);
+                return ["changed"];
+            },
+            deleteList: (context, index) => {
+                const del_index = index.index;
+                const newArray = context.state.items.filter((n, index) => {
+                    return del_index !== index;
+                });
+                context.state.items = newArray;
+                return ["changed"];
+            }
+        },
+
+        getters: {
+            state: (context) => {
+                return context.state;
+            }
+        }
+    });
+
+    riotx.add(store);
 </script>
 
 </html>

@@ -104,23 +104,37 @@
             };
         };
 
+        // const bookmark_file_path = SettingStore.getSettingFilePath("bookmark.json");
+        // try {
+        //     this.bookmark_store = new JsonStore(bookmark_file_path);
+        //     this.bookmark_data = this.bookmark_store.load();
+        //     this.bookmark_data.items.forEach(value => {
+        //         value.icon = getBookmarkIcon(value);
+        //     });
+        // } catch (error) { 
+        //     this.bookmark_data = {
+        //         is_expand: false, 
+        //         items: []
+        //     };
+        //     console.log(error);
+        // }
         const bookmark_file_path = SettingStore.getSettingFilePath("bookmark.json");
-        try {
-            this.bookmark_store = new JsonStore(bookmark_file_path);
-            this.bookmark_data = this.bookmark_store.load();
-            this.bookmark_data.items.forEach(value => {
-                value.icon = getBookmarkIcon(value);
-            });
-        } catch (error) { 
-            this.bookmark_data = {
-                is_expand: false, 
-                items: []
-            };
-            console.log(error);
-        }
+        this.bookmark_store = new JsonStore(bookmark_file_path);
+        
+        const store = this.riotx.get();
+        this.bookmark_data = store.getter("state");
+
+        store.change("changed", (state, store) => {
+            // this.bookmark_data = state;
+            // this.update();
+            this.bookmark_store.save(state);
+        });
+
         this.obs_bookmark.on("state-changed", (data) => {
             try {
-                this.bookmark_store.save(data);
+                store.action("updateData", data);
+
+                // this.bookmark_store.save(data);
                 console.log(data);
             } catch (error) {
                 console.log(error);

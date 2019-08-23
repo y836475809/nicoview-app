@@ -6,6 +6,7 @@
   "scripts": {
     "test-main": "electron . test-main.html",
     "test-main-player": "electron . test-player-main.html",
+    "test-riotx": "electron . riotx/index.html",
     "main": "electron .",
     "test": "ava -v -s  __tests__/*.test.js"
   },

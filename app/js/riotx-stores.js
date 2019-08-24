@@ -57,9 +57,9 @@ const createStore = (store_name) => {
         },
     
         mutations: {
-            setselectedData: (context, obj) => {
+            setSelectedData: (context, obj) => {
                 context.state.selected_items = obj.selected_items;
-                return ["ss"];
+                return ["selected"];
             },
             loadData:  (context, obj) => {
                 context.state.items = obj.items;

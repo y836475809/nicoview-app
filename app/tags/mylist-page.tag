@@ -10,9 +10,9 @@
     <div class="nico-mylist-sidebar">
         <accordion 
             title="マイリスト" 
-            items={mylist_data.items}
             expand={true} 
-            obs={obs_accordion}>
+            obs={obs_accordion}
+            storname={storname}>
         </accordion>
     </div>
 
@@ -25,61 +25,58 @@
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
+        this.storname = "mylist";
+        const store = this.riotx.get(this.storname);
 
-        const file_path = SettingStore.getSettingFilePath("mylist.json");
-
-        try {
-            this.store = new JsonStore(file_path);
-            this.mylist_data = this.store.load();
-        } catch (error) {
-            this.mylist_data = {
-                is_expand: true, 
-                items: []
-            };
-        }
+        this.on("mount", () => {
+            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+            try {
+                this.json_store = new JsonStore(file_path);
+                const items = this.json_store.load();
+                store.commit("loadData", {items});
+            } catch (error) { 
+                const items = [];
+                store.commit("loadData", {items});
+                console.log(error);
+            }
+        });
+        
+        store.change("changed", (state, store) => {
+            this.json_store.save(state.items);
+        });
 
         const hasItem = (mylist_id) => {
-            return this.mylist_data.items.some(value=>{
+            const items = store.getter("state").items;
+            return items.some(value=>{
                 return value.mylist_id == mylist_id;
             });
         };
 
-        const save = (data) => {
-            try {
-                this.store.save(data);
-            } catch (error) {
-                console.log(error);
-            }
-        };
-
-        const createMenu = (self) => {
+        const createMenu = () => {
             const nemu_templete = [
                 { 
                     label: "削除", click() {
-                        self.obs_accordion.trigger("delete-selected-items");
+                        store.action("deleteList");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu(this);
+            const context_menu = createMenu();
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
         this.obs_accordion.on("item-dlbclicked", (item) => {
             obs.trigger("mylist-page:item-dlbclicked", item);
         });
-
-        this.obs_accordion.on("state-changed", (data) => {
-            save(data);
-        });
         
         obs.on("mylist-page:sidebar:add-item", (args) => {
             const { title, mylist_id, creator, link } = args;
-            this.obs_accordion.trigger("add-items", [
+            const items = [
                 { title, mylist_id, creator, link }
-            ]);
+            ];
+            store.action("addList", {items});
         });
 
         obs.on("mylist-page:sidebar:has-item", (args) => {

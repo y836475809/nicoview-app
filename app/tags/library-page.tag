@@ -10,9 +10,9 @@
     <div class="library-sidebar">
         <accordion 
             title="ライブラリ検索" 
-            items={search_data.items}
             expand={true} 
-            obs={obs_search}>
+            obs={obs_search}
+            storname={storname}>
         </accordion>
     </div>
 
@@ -23,26 +23,32 @@
         const JsonStore = require(`${app_base_dir}/js/json-store`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
 
-        const self = this;
-
         const obs = this.opts.obs; 
         this.obs_search = riot.observable();
+        this.storname = "library-search";
+        const store = this.riotx.get(this.storname);
 
-        const seach_file_path = SettingStore.getSettingFilePath("library-search.json");
-        try {
-            this.search_store = new JsonStore(seach_file_path);
-            this.search_data = this.search_store.load();     
-        } catch (error) {
-            this.search_data = {
-                is_expand: false, 
-                items: []
-            };
-        }
+        this.on("mount", () => {
+            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+            try {
+                this.json_store = new JsonStore(file_path);
+                const items = this.json_store.load();
+                store.commit("loadData", {items});
+            } catch (error) { 
+                const items = [];
+                store.commit("loadData", {items});
+                console.log(error);
+            }
+        });
+
+        store.change("changed", (state, store) => {
+            this.json_store.save(state.items);
+        });
 
         const search_context_menu = Menu.buildFromTemplate([
             { 
                 label: "削除", click() {
-                    self.obs_search.trigger("delete-selected-items");
+                    store.action("deleteList");
                 }
             }
         ]);
@@ -52,21 +58,14 @@
         });
 
         obs.on("library-page:sidebar:add-search-item", (query) => {
-            this.obs_search.trigger("add-items", [
+            const items = [
                 { title: query, query: query }
-            ]);
+            ];
+            store.action("addList", {items});
         });
 
         this.obs_search.on("item-dlbclicked", (item) => {
             obs.trigger("library-page:search-item-dlbclicked", item.query);
-        });
-
-        this.obs_search.on("state-changed", (data) => {
-            try {
-                this.search_store.save(data);
-            } catch (error) {
-                console.log(error);
-            }
         });
     </script>
 </library-sidebar>

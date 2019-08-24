@@ -58,9 +58,9 @@
         <div class="button {sb_button_icon}" title="ブックマーク" onclick={onclickSideBar}></div>
         <accordion class="content"
             title="ブックマーク" 
-            items={bookmark_data.items}
             expand={true} 
-            obs={obs_bookmark}>
+            obs={obs_bookmark}
+            storname={storname}>
         </accordion>
     </aside>
 
@@ -72,14 +72,30 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
-        const { toPlayTime } = require(`${app_base_dir}/js/time-format`);
-
-        const self = this;
 
         const obs = this.opts.obs; 
         const obs_trigger = new obsTrigger(obs);
         this.obs_bookmark = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
+        this.storname = "bookmark";
+        const store = this.riotx.get(this.storname);
+
+        this.on("mount", () => {
+            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+            try {
+                this.json_store = new JsonStore(file_path);
+                const items = this.json_store.load();
+                store.commit("loadData", {items});
+            } catch (error) { 
+                const items = [];
+                store.commit("loadData", {items});
+                console.log(error);
+            }
+        });
+
+        store.change("changed", (state, store) => {
+            this.json_store.save(state.items);
+        });
 
         this.onclickSideBar = (e) => {
             const elm = this.root.querySelector(".sidebar");
@@ -91,62 +107,6 @@
             }else{
                 this.sb_button_icon = "fas fa-chevron-left";
             }
-        };
-
-        const getBookmarkIcon = (item) => {
-            let name = "fas fa-bookmark fa-lg fa-fw";
-            if(BookMark.isSearch(item)){
-                name = "fas fa-search fa-lg fa-fw";
-            }
-            return {
-                name: name,
-                class_name: "bookmark-item"
-            };
-        };
-
-        // const bookmark_file_path = SettingStore.getSettingFilePath("bookmark.json");
-        // try {
-        //     this.bookmark_store = new JsonStore(bookmark_file_path);
-        //     this.bookmark_data = this.bookmark_store.load();
-        //     this.bookmark_data.items.forEach(value => {
-        //         value.icon = getBookmarkIcon(value);
-        //     });
-        // } catch (error) { 
-        //     this.bookmark_data = {
-        //         is_expand: false, 
-        //         items: []
-        //     };
-        //     console.log(error);
-        // }
-        const bookmark_file_path = SettingStore.getSettingFilePath("bookmark.json");
-        this.bookmark_store = new JsonStore(bookmark_file_path);
-        
-        const store = this.riotx.get();
-        this.bookmark_data = store.getter("state");
-
-        store.change("changed", (state, store) => {
-            // this.bookmark_data = state;
-            // this.update();
-            this.bookmark_store.save(state);
-        });
-
-        this.obs_bookmark.on("state-changed", (data) => {
-            try {
-                store.action("updateData", data);
-
-                // this.bookmark_store.save(data);
-                console.log(data);
-            } catch (error) {
-                console.log(error);
-            }
-        });
-
-        const getSelectedItems = async () => {
-            return await new Promise((resolve, reject) => {
-                self.obs_bookmark.trigger("get-selected-items", (items)=>{
-                    resolve(items);
-                });
-            });
         };
 
         const getMenuEnable = (type, items) => {
@@ -172,68 +132,67 @@
             return false;
         };
 
-        const context_menu = Menu.buildFromTemplate([
-            { 
-                id: "play",
-                label: "再生", click: async () => {
-                    const items = await getSelectedItems();
-                    if(items.length==0){
-                        return;
-                    }
-                    const { video_id, time } = items[0].data;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
-                }
-            },
-            { 
-                id: "play",
-                label: "オンラインで再生", async click() {
-                    const items = await getSelectedItems();
-                    const { video_id, time } = items[0].data;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id, time);
-                }
-            },
-            { 
-                id: "go-to-library",
-                label: "ライブラリの項目へ移動", click: async () => {
-                    const items = await getSelectedItems();
-                    if(items.length==0){
-                        return;
-                    }
-
-                    const video_id = items[0].data.video_id;
-                    obs.trigger("library-page:exist-data-callback", { 
-                        video_id: video_id, 
-                        cb: (exist)=>{
-                            if(exist===true){
-                                obs.trigger("main-page:select-page", "library");
-                                obs.trigger("library-page:scrollto", video_id);     
-                            }
+        const createMenu = (items) => {
+            return Menu.buildFromTemplate([
+                { 
+                    id: "play",
+                    label: "再生", click() {
+                        if(items.length==0){
+                            return;
                         }
-                    });
-                }
-            },
-            { 
-                id: "go-to-search",
-                label: "ニコニコ検索のページへ移動", click: async () => {
-                    const items = await getSelectedItems();
-                    if(items.length==0){
-                        return;
+                        const { video_id, time } = items[0].data;
+                        obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
                     }
-                    const cond = items[0].data;
-                    obs.trigger("main-page:select-page", "search");
-                    obs.trigger("search-page:search", cond);
+                },
+                { 
+                    id: "play",
+                    label: "オンラインで再生", click() {
+                        const { video_id, time } = items[0].data;
+                        obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id, time);
+                    }
+                },
+                { 
+                    id: "go-to-library",
+                    label: "ライブラリの項目へ移動", click() {
+                        if(items.length==0){
+                            return;
+                        }
+
+                        const video_id = items[0].data.video_id;
+                        obs.trigger("library-page:exist-data-callback", { 
+                            video_id: video_id, 
+                            cb: (exist)=>{
+                                if(exist===true){
+                                    obs.trigger("main-page:select-page", "library");
+                                    obs.trigger("library-page:scrollto", video_id);     
+                                }
+                            }
+                        });
+                    }
+                },
+                { 
+                    id: "go-to-search",
+                    label: "ニコニコ検索のページへ移動", click() {
+                        if(items.length==0){
+                            return;
+                        }
+                        const cond = items[0].data;
+                        obs.trigger("main-page:select-page", "search");
+                        obs.trigger("search-page:search", cond);
+                    }
+                },
+                { 
+                    id: "delete",
+                    label: "削除", click() {
+                        store.action("deleteList");
+                    }
                 }
-            },
-            { 
-                id: "delete",
-                label: "削除", click() {
-                    self.obs_bookmark.trigger("delete-selected-items");
-                }
-            }
-        ]);
+            ]);
+        };
         
         this.obs_bookmark.on("show-contextmenu", async (e) => {
-            const items = await getSelectedItems();
+            const items = store.getter("state").selected_items;
+            const context_menu = createMenu(items);
             context_menu.items.forEach(menu => {
                 const id = menu.id;
                 menu.enabled =  getMenuEnable(id, items);
@@ -256,15 +215,7 @@
         });
         
         obs.on("bookmark-page:add-items", items => {
-            items.forEach(item => {
-                const time = item.data.time;
-                if(time>0){
-                    item.title = `${item.title} ${toPlayTime(time)}`;
-                }
-                item.icon = getBookmarkIcon(item);
-            });
-            this.obs_bookmark.trigger("add-items", items);
+            store.action("addList", {items});
         });
-
     </script>
 </bookmark-page>

@@ -14,9 +14,9 @@
     <div class="nico-search-sidebar">
         <accordion 
             title="ニコニコ動画検索" 
-            items={nico_search_data.items}
             expand={true} 
-            obs={obs_accordion}>
+            obs={obs_accordion}
+            storname={storname}>
         </accordion>
     </div>
 
@@ -29,51 +29,31 @@
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
-
-        const seach_file_path = SettingStore.getSettingFilePath("nico-search.json");
-
-        const getIcon = (kind) => {
-            return kind=="tag"? {
-                name: "fas fa-tag fa-lg",
-                class_name: "search-item"
-            } : undefined;  
-        };
-
-        try {
-            this.store = new JsonStore(seach_file_path);
-            const { is_expand, items } = this.store.load();
-            this.nico_search_data = {
-                is_expand: is_expand,
-                items: items.map(value=>{
-                    value.icon = getIcon(value.cond.search_kind);
-                    return value;
-                })
-            };
-        } catch (error) {
-            this.nico_search_data = {
-                is_expand: false, 
-                items: []
-            };
-        }
-
-        const save = (data) => {
-            const copied_data = JSON.parse(JSON.stringify(data));
-            copied_data.items.forEach(value=>{
-                delete value.icon;
-                delete value.cond.page;
-            });
+        this.storname = "nico-search";
+        const store = this.riotx.get(this.storname);
+    
+        this.on("mount", () => {
+            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
             try {
-                this.store.save(copied_data);
-            } catch (error) {
+                this.json_store = new JsonStore(file_path);
+                const items = this.json_store.load();
+                store.commit("loadData", {items});
+            } catch (error) { 
+                const items = [];
+                store.commit("loadData", {items});
                 console.log(error);
             }
-        };
+        });
 
-        const createMenu = (self) => {
+        store.change("changed", (state, store) => {
+            this.json_store.save(state.items);
+        });
+
+        const createMenu = () => {
             const nemu_templete = [
                 { 
                     label: "削除", click() {
-                        self.obs_accordion.trigger("delete-selected-items");
+                        store.action("deleteList");
                     }
                 }
             ];
@@ -81,7 +61,7 @@
         };
 
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu(this);
+            const context_menu = createMenu();
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
@@ -89,14 +69,11 @@
             obs.trigger("search-page:item-dlbclicked", item.cond);
         });
 
-        this.obs_accordion.on("state-changed", (data) => {
-            save(data);
-        });
         obs.on("search-page:sidebar:add-item", (cond) => {
-            const icon = getIcon(cond.search_kind);
-            this.obs_accordion.trigger("add-items", [
-                { title: cond.query, cond: cond, icon: icon }
-            ]);
+            const items = [
+                { title: cond.query, cond: cond }
+            ];
+            store.action("addList", {items});
         });
     </script>
 </search-sidebar>

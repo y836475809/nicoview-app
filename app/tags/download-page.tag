@@ -81,6 +81,7 @@
         const obs = this.opts.obs; 
 
         const obs_trigger = new obsTrigger(obs);
+        const app_store = this.riotx.get("app");
 
         const download_dir = SettingStore.getDownloadDir();
 
@@ -222,8 +223,8 @@
                 return item.id;
             });
 
-            obs.trigger("search-page:add-download-video-ids", video_ids);
-            obs.trigger("mylist-page:add-download-video-ids", video_ids);
+            app_store.commit("updateDownloadItem", 
+                {video_id_set:grid_table_dl.getItemIDSet()});  
         };
 
         const deleteDownloadItems = (video_ids) => {
@@ -236,14 +237,17 @@
 
             onChangeDownloadItem();
 
-            obs.trigger("search-page:delete-download-video-ids", video_ids);
-            obs.trigger("mylist-page:delete-download-video-ids", video_ids);
+            app_store.commit("updateDownloadItem", 
+                {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const clearDownloadItems = (state) => {
             grid_table_dl.clearItems(state);
 
             onChangeDownloadItem();
+
+            app_store.commit("updateDownloadItem", 
+                {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const createMenu = () => {
@@ -412,6 +416,8 @@
             }
 
             onChangeDownloadItem();
+            app_store.commit("updateDownloadItem", 
+                {video_id_set:grid_table_dl.getItemIDSet()});
 
             resizeGridTable();
 
@@ -423,11 +429,6 @@
             }
 
             updateDonwloadScheduleLabel();
-        });
-
-        obs.on("download-page:get-data-callback", (cb) => { 
-            const id_set = grid_table_dl.getItemIDSet();
-            cb(id_set);
         });
 
         obs.on("window-resized", ()=> {

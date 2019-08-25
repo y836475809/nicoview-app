@@ -117,11 +117,48 @@ const createStore = (store_name) => {
     });
 };
 
+const app_store = new riotx.Store({
+    name: "app",
+    state: {
+        download_video_id_set:[],
+        library:null,
+    },
+    mutations: {
+        updateLibrary: (context, obj) => {
+            context.state.library = obj.library;
+            return ["changed"];
+        },
+        updateDownloadItem: (context, obj) => {
+            context.state.download_video_id_set = obj.video_id_set;
+            return ["donwload_item_changed"];
+        },
+    },
+
+    getters: {
+        state: (context) => {
+            return context.state;
+        },
+        playdata:  async (context, obj) => {
+            const video_id = obj.video_id;
+            return await context.state.library.getPlayData(video_id);
+        },
+        libraryVideoIDSet:  (context) => {
+            return context.state.library.getVideoIDSet();
+        },
+        existlibraryItem:  (context, obj) => {
+            const video_id = obj.video_id;
+            const id_set = context.state.library.getVideoIDSet();
+            return id_set.has(video_id);
+        },
+    }
+});
+
 const stores = [
     createStore("bookmark"),
     createStore("nico-search"),
     createStore("library-search"),
     createStore("mylist"),
+    app_store,
 ];
 
 module.exports = {

@@ -129,6 +129,7 @@
         const ipc_main = new IPCMain();
 
         this.obs = this.opts.obs;
+        const app_store = this.riotx.get("app");
 
         this.donwnload_item_num = 0;
 
@@ -206,23 +207,12 @@
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id  = args;
-            this.obs.trigger("library-page:get-data-callback", {
-                video_ids:[video_id],
-                cb: (data_map) => {
-                    if(data_map.has(video_id)){
-                        const data = data_map.get(video_id);
-                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
-                            video_id,
-                            data
-                        });
-                    }else{
-                        ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
-                            video_id:video_id,
-                            data:null
-                        });
-                    }
-                }
-            });
+            const data = await app_store.getter("playdata", {video_id});
+
+            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
+                video_id,
+                data
+            });  
         });
 
         ipc_monitor.on(ipc_monitor.IPCMsg.SEARCH_TAG, (event, args)=>{
@@ -261,16 +251,7 @@
             });
 
             if(result.state == "ok" || result.state == "404"){
-                const data = await new Promise((resolve, reject) => {
-                    this.obs.trigger("library-page:get-data-callback", {
-                        video_ids:[video_id],
-                        cb: (data_map) => {
-                            if(data_map.has(video_id)){
-                                resolve(data_map.get(video_id));
-                            }
-                        }
-                    });  
-                });
+                const data = await app_store.getter("playdata", {video_id})
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
                     video_id, data
                 });

@@ -211,6 +211,17 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        const app_store = this.riotx.get("app");
+
+        app_store.change("donwload_item_changed", (state, store) => {
+            const video_id_set = store.getter("state").download_video_id_set;
+            const items = grid_table.dataView.getItems();
+            items.forEach(item => {
+                const video_id = item.id;
+                item.reg_download = video_id_set.has(video_id);
+                grid_table.dataView.updateItem(video_id, item);
+            });
+        });
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -371,22 +382,16 @@
                 grid_table.scrollToTop();
             }
 
-            const download_id_set = await new Promise((resolve, reject) => {
-                obs.trigger("download-page:get-data-callback", (id_set)=>{
-                    resolve(id_set);
-                });
+            const download_id_set = app_store.getter("state").download_video_id_set;
+            const video_id_set = app_store.getter("libraryVideoIDSet");
+            const items = search_result.data.map(value => {
+                const saved = video_id_set.has(value.contentId);
+                const reg_download = download_id_set.has(value.contentId);
+                return createItem(value, saved, reg_download);
             });
-
-            obs.trigger("library-page:get-video-ids-callback", { video_ids: video_ids, cb: (video_id_set)=>{
-                const items = search_result.data.map(value => {
-                    const saved = video_id_set.has(value.contentId);
-                    const reg_download = download_id_set.has(value.contentId);
-                    return createItem(value, saved, reg_download);
-                });
-                items.push(createEmptyItem());
-                grid_table.setData(items);
-                grid_table.grid.scrollRowToTop(0); //TODO      
-            }});
+            items.push(createEmptyItem());
+            grid_table.setData(items);
+            grid_table.scrollToTop();  
         };
 
         //TODO
@@ -526,20 +531,6 @@
             this.search();
         });
 
-        obs.on("search-page:delete-download-ids", (ids)=> {
-            if(grid_table.dataView.getLength()===0){
-                return;
-            }
-            ids.forEach(id => {
-                const item = grid_table.dataView.getItemById(id);
-                if(item!==undefined){
-                    item.reg_download = false;
-                    grid_table.dataView.updateItem(id, item);
-                }
-            });
-            grid_table.grid.render();
-        });
-
         obs.on("search-page:complete-download-ids", (ids)=> {
             if(grid_table.dataView.getLength()===0){
                 return;
@@ -559,32 +550,6 @@
             const container = this.root.querySelector(".search-grid-container");
             grid_table.resizeFitContainer(container);
         };
-
-        obs.on("search-page:add-download-video-ids", (video_ids)=> {
-            setDownloadTag(video_ids);
-        });
-
-        const setDownloadTag = (video_ids) => {
-            video_ids.forEach(video_id => {
-                const item = grid_table.dataView.getItemById(video_id);
-                if(item){
-                    item.reg_download = true;
-                    grid_table.dataView.updateItem(video_id, item);
-                }
-            });
-            grid_table.grid.render();
-        };
-
-        obs.on("search-page:delete-download-video-ids", (video_ids)=> {
-            video_ids.forEach(video_id => {       
-                const item = grid_table.dataView.getItemById(video_id);
-                if(item){
-                    item.reg_download = false;
-                    grid_table.dataView.updateItem(video_id, item);
-                }
-            });
-            grid_table.grid.render();
-        });
 
         const createMenu = () => {
             const nemu_templete = [

@@ -177,6 +177,7 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        const app_store = this.riotx.get("app");
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -490,26 +491,14 @@
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
                 loadLibraryItems(await library.getLibraryItems());
+
+                app_store.commit("updateLibrary", {library});
+
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
             }
         });
-    
-        obs.on("library-page:get-data-callback", async (args) => { 
-            const { video_ids, cb } = args;
-            const ret = new Map();
-            for (let index = 0; index < video_ids.length; index++) {
-                const id = video_ids[index];
-                try {
-                    const library_data = await library.getPlayData(id); 
-                    ret.set(id, library_data);
-                } catch (error) {
-                    //pass
-                }            
-            }
-            cb(ret);
-        }); 
 
         obs.on("library-page:get-item-callback", async (args) => { 
             const { video_id, cb } = args;
@@ -523,29 +512,6 @@
         obs.on("library-page:convert-video", async (args) => { 
             const video_id = args;
             await convertVideo(this, video_id);          
-        }); 
-
-        obs.on("library-page:get-video-ids-callback", async (args) => { 
-            const { video_ids, cb } = args;
-            const ret = new Set();
-
-            const video_id_set = library.getVideoIDSet();
-            video_ids.forEach(video_id => {
-                if(video_id_set.has(video_id)===true){
-                    ret.add(video_id);
-                }
-            });
-            cb(ret);
-        });
-
-        obs.on("library-page:exist-data-callback", async (args) => { 
-            const { video_id, cb } = args;
-            try {
-                const exist = await library.existItem(video_id); 
-                cb(exist);
-            } catch (error) {
-                console.log("Error: library-page:exist-data-callback error=", error);
-            } 
         }); 
     
         obs.on("library-page:add-item", async (item) => { 

@@ -79,6 +79,7 @@
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
         const store = this.riotx.get(this.storname);
+        const app_store = this.riotx.get("app");
 
         this.on("mount", () => {
             const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
@@ -159,15 +160,11 @@
                         }
 
                         const video_id = items[0].data.video_id;
-                        obs.trigger("library-page:exist-data-callback", { 
-                            video_id: video_id, 
-                            cb: (exist)=>{
-                                if(exist===true){
-                                    obs.trigger("main-page:select-page", "library");
-                                    obs.trigger("library-page:scrollto", video_id);     
-                                }
-                            }
-                        });
+                        const exist = app_store.getter("existlibraryItem", {video_id});
+                        if(exist===true){
+                            obs.trigger("main-page:select-page", "library");
+                            obs.trigger("library-page:scrollto", video_id);     
+                        } 
                     }
                 },
                 { 

@@ -161,6 +161,17 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        const app_store = this.riotx.get("app");
+
+        app_store.change("donwload_item_changed", (state, store) => {
+            const video_id_set = store.getter("state").download_video_id_set;
+            const items = grid_table.dataView.getItems();
+            items.forEach(item => {
+                const video_id = item.id;
+                item.reg_download = video_id_set.has(video_id);
+                grid_table.dataView.updateItem(video_id, item);
+            });
+        });  
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -382,22 +393,16 @@
                 return value.id;
             });
 
-            const download_id_set = await new Promise((resolve, reject) => {
-                obs.trigger("download-page:get-data-callback", (id_set)=>{
-                    resolve(id_set);
-                });
+            const download_id_set = app_store.getter("state").download_video_id_set;
+            const video_id_set = app_store.getter("libraryVideoIDSet");
+            mylist_items.forEach(value=>{
+                const saved = video_id_set.has(value.id);
+                const reg_download = download_id_set.has(value.id);
+                value.saved = saved;
+                value.reg_download = reg_download;
             });
-
-            obs.trigger("library-page:get-video-ids-callback", { video_ids: video_ids, cb: (video_id_set)=>{
-                mylist_items.forEach(value=>{
-                    const saved = video_id_set.has(value.id);
-                    const reg_download = download_id_set.has(value.id);
-                    value.saved = saved;
-                    value.reg_download = reg_download;
-                });
-                grid_table.setData(mylist_items);
-                grid_table.scrollToTop();   
-            }});
+            grid_table.setData(mylist_items);
+            grid_table.scrollToTop();   
         };
 
         const updateMylist = async(mylist_id) => {
@@ -485,29 +490,6 @@
         obs.on("mylist-page:load-mylist", async(mylist_id)=> {
             setMylistID(mylist_id);
             await updateMylist(mylist_id);
-        });
-
-        obs.on("mylist-page:add-download-video-ids", (video_ids)=> {
-            video_ids.forEach(video_id => {
-                const item = grid_table.dataView.getItemById(video_id);
-                item.reg_download = true;
-                grid_table.dataView.updateItem(video_id, item);
-            });
-            grid_table.grid.render();
-        });
-
-        obs.on("mylist-page:delete-download-video-ids", (video_ids)=> {
-            if(grid_table.dataView.getLength()===0){
-                return;
-            }
-            video_ids.forEach(video_id => {
-                const item = grid_table.dataView.getItemById(video_id);
-                if(item!==undefined){
-                    item.reg_download = false;
-                    grid_table.dataView.updateItem(video_id, item);
-                }
-            });
-            grid_table.grid.render();
         });
 
         obs.on("window-resized", ()=> {

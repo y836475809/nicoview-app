@@ -214,11 +214,15 @@
         const app_store = this.riotx.get("app");
 
         app_store.change("donwload_item_changed", (state, store) => {
-            const video_id_set = store.getter("state").download_video_id_set;
+            const { reg_video_id_set } = store.getter("download");
+            const video_id_set = app_store.getter("libraryVideoIDSet");
+            console.log("##se video_id_set=", video_id_set)
             const items = grid_table.dataView.getItems();
             items.forEach(item => {
                 const video_id = item.id;
-                item.reg_download = video_id_set.has(video_id);
+                item.saved = video_id_set.has(video_id);
+                console.log(`video_id = ${video_id}, item.saved = ${item.saved}`)
+                item.reg_download = reg_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
         });
@@ -359,9 +363,9 @@
             }else{
                 this.refs.page.setTotalPages(Math.ceil((search_offset+search_limit)/search_limit))
             }
-            const video_ids = search_result.data.map(value => {
-                return value.contentId;
-            });
+            // const video_ids = search_result.data.map(value => {
+            //     return value.contentId;
+            // });
 
             if(process.env.NODE_ENV == "SEARCH-PAGE-DEBUG"){
                 const items = search_result.data.map(value => {
@@ -382,11 +386,12 @@
                 grid_table.scrollToTop();
             }
 
-            const download_id_set = app_store.getter("state").download_video_id_set;
+            // const download_id_set = app_store.getter("state").download_video_id_set;
+            const { reg_video_id_set } = app_store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
             const items = search_result.data.map(value => {
                 const saved = video_id_set.has(value.contentId);
-                const reg_download = download_id_set.has(value.contentId);
+                const reg_download = reg_video_id_set.has(value.contentId);
                 return createItem(value, saved, reg_download);
             });
             items.push(createEmptyItem());
@@ -531,20 +536,20 @@
             this.search();
         });
 
-        obs.on("search-page:complete-download-ids", (ids)=> {
-            if(grid_table.dataView.getLength()===0){
-                return;
-            }
-            ids.forEach(id => {
-                const item = grid_table.dataView.getItemById(id);
-                if(item!==undefined){
-                    item.saved = true;
-                    item.reg_download = false;
-                    grid_table.dataView.updateItem(id, item);
-                }
-            });
-            grid_table.grid.render();
-        });
+        // obs.on("search-page:complete-download-ids", (ids)=> {
+        //     if(grid_table.dataView.getLength()===0){
+        //         return;
+        //     }
+        //     ids.forEach(id => {
+        //         const item = grid_table.dataView.getItemById(id);
+        //         if(item!==undefined){
+        //             item.saved = true;
+        //             item.reg_download = false;
+        //             grid_table.dataView.updateItem(id, item);
+        //         }
+        //     });
+        //     grid_table.grid.render();
+        // });
 
         const resizeGridTable = () => {
             const container = this.root.querySelector(".search-grid-container");

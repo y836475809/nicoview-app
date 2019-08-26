@@ -506,10 +506,14 @@
         }); 
     
         obs.on("library-page:add-item", async (item) => { 
+            const video_id = item.video_id;
             //TODO
-            await library.addItem(item);
-            const library_item = await library.getLibraryItem(item.video_id);
-            grid_table.updateItem(library_item, library_item.id);
+            // await library.addItem(item);
+            // const library_item = await library.getLibraryItem(item.video_id);
+            // await app_store.commit("addLibraryItem", {item});
+            const library_item = await app_store.getter("libraryItem", {video_id});
+           
+            grid_table.updateItem(library_item, video_id);
         });  
 
         obs.on("library-page:play", async (item) => { 

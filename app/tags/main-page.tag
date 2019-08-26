@@ -131,6 +131,12 @@
         this.obs = this.opts.obs;
         const app_store = this.riotx.get("app");
 
+        app_store.change("donwload_item_changed", (state, store) => {
+            const { not_comp_video_id_set } = store.getter("download");
+            this.donwnload_item_num = not_comp_video_id_set.size;
+            this.update();
+        });
+
         this.donwnload_item_num = 0;
 
         let template = [];
@@ -178,10 +184,10 @@
             select_page(page_name);
         });
 
-        this.obs.on("main-page:download-item-num", (num)=>{
-            this.donwnload_item_num = num;
-            this.update();
-        });
+        // this.obs.on("main-page:download-item-num", (num)=>{
+        //     this.donwnload_item_num = num;
+        //     this.update();
+        // });
 
         this.obs.on("main-page:play-by-videoid", (args)=>{
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);

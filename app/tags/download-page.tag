@@ -205,13 +205,37 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
-        const onChangeDownloadItem = () => {
-            const items = grid_table_dl.filterItems([
+        const onChangeDownloadItem = (item) => {
+
+            // obs.trigger("main-page:download-item-num", items.length);
+
+            const not_cmp_video_id_set = new Set();
+            grid_table_dl.filterItems([
                 donwload_state.wait,
                 donwload_state.downloading,
                 donwload_state.error,
-            ]);
-            obs.trigger("main-page:download-item-num", items.length);
+            ]).forEach(item => {
+                not_cmp_video_id_set.add(item.id);
+            });
+
+            // const cmp_video_id_set = new Set();
+            // grid_table_dl.filterItems([
+            //     donwload_state.complete,
+            // ]).forEach(item => {
+            //     cmp_video_id_set.add(item.id);
+            // });
+
+            const download = {
+                reg_video_id_set: grid_table_dl.getItemIDSet(),
+                not_comp_video_id_set: not_cmp_video_id_set,
+                item:item?item:null
+                // comp_video_id_set: cmp_video_id_set
+            };
+            // (async ()=>{
+            //     await app_store.commit("updateDownloadItem", {download});
+            // })();
+            // app_store.commit("updateDownloadItem", {download});
+            app_store.action("updateDownloadItem", {download});
         };
 
         const addDownloadItems = (items) => {
@@ -219,12 +243,12 @@
 
             onChangeDownloadItem();
 
-            const video_ids = items.map(item=>{
-                return item.id;
-            });
+            // const video_ids = items.map(item=>{
+            //     return item.id;
+            // });
 
-            app_store.commit("updateDownloadItem", 
-                {video_id_set:grid_table_dl.getItemIDSet()});  
+            // app_store.commit("updateDownloadItem", 
+            //     {video_id_set:grid_table_dl.getItemIDSet()});  
         };
 
         const deleteDownloadItems = (video_ids) => {
@@ -237,8 +261,8 @@
 
             onChangeDownloadItem();
 
-            app_store.commit("updateDownloadItem", 
-                {video_id_set:grid_table_dl.getItemIDSet()});
+            // app_store.commit("updateDownloadItem", 
+            //     {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const clearDownloadItems = (state) => {
@@ -246,8 +270,8 @@
 
             onChangeDownloadItem();
 
-            app_store.commit("updateDownloadItem", 
-                {video_id_set:grid_table_dl.getItemIDSet()});
+            // app_store.commit("updateDownloadItem", 
+            //     {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const createMenu = () => {
@@ -351,7 +375,9 @@
                             thumb_img: thumb_img
                         });
                         
-                        obs.trigger("search-page:complete-download-ids", [item.video_id]);
+                        // obs.trigger("search-page:complete-download-ids", [item.video_id]);
+                        // await app_store.commit("addLibraryItem", {item});
+                        onChangeDownloadItem(item);
                         obs.trigger("library-page:add-item", item); 
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
@@ -416,8 +442,8 @@
             }
 
             onChangeDownloadItem();
-            app_store.commit("updateDownloadItem", 
-                {video_id_set:grid_table_dl.getItemIDSet()});
+            // app_store.commit("updateDownloadItem", 
+            //     {video_id_set:grid_table_dl.getItemIDSet()});
 
             resizeGridTable();
 

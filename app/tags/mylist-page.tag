@@ -164,11 +164,15 @@
         const app_store = this.riotx.get("app");
 
         app_store.change("donwload_item_changed", (state, store) => {
-            const video_id_set = store.getter("state").download_video_id_set;
+            // const video_id_set = store.getter("state").download_video_id_set;
+            const { reg_video_id_set } = store.getter("download");
+            const video_id_set = app_store.getter("libraryVideoIDSet");
+            console.log("##my video_id_set=", video_id_set)
             const items = grid_table.dataView.getItems();
             items.forEach(item => {
                 const video_id = item.id;
-                item.reg_download = video_id_set.has(video_id);
+                item.saved = video_id_set.has(video_id);
+                item.reg_download = reg_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
         });  
@@ -389,15 +393,16 @@
         };
 
         const setData = async (mylist_items) => {
-            const video_ids = mylist_items.map(value => {
-                return value.id;
-            });
+            // const video_ids = mylist_items.map(value => {
+            //     return value.id;
+            // });
 
-            const download_id_set = app_store.getter("state").download_video_id_set;
+            // const download_id_set = app_store.getter("state").download_video_id_set;
+            const { reg_video_id_set } = app_store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
             mylist_items.forEach(value=>{
                 const saved = video_id_set.has(value.id);
-                const reg_download = download_id_set.has(value.id);
+                const reg_download = reg_video_id_set.has(value.id);
                 value.saved = saved;
                 value.reg_download = reg_download;
             });

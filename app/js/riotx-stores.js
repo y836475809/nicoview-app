@@ -145,6 +145,10 @@ const app_store = new riotx.Store({
         libraryVideoIDSet:  (context) => {
             return context.state.library.getVideoIDSet();
         },
+        libraryItem: async (context, obj) => {
+            const video_id = obj.video_id;
+            return await context.state.library.getLibraryItem(video_id);
+        },
         existlibraryItem:  (context, obj) => {
             const video_id = obj.video_id;
             const id_set = context.state.library.getVideoIDSet();

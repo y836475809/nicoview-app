@@ -3,6 +3,19 @@ const { spawn } = require("child_process");
 const path = require("path");
 const fs = require("fs");
 
+const needConvertVideo = (value) => {
+    let video_type = "";
+    if(typeof value == "string"){
+        video_type = value;
+    }else if(value===null){
+        return false;
+    }else{
+        video_type = value.video_type;
+    }
+
+    return /mp4/.test(video_type)!==true;
+};
+
 class ConvertMP4 extends EventEmitter {
     constructor(){
         super();
@@ -94,4 +107,5 @@ class ConvertMP4 extends EventEmitter {
 
 module.exports = {
     ConvertMP4,
+    needConvertVideo,
 };

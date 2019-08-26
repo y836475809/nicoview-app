@@ -173,7 +173,7 @@
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
         const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { ConvertMP4 } = require(`${app_base_dir}/js/video-converter`);
+        const { ConvertMP4, needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -461,15 +461,15 @@
                 console.log("onDblClick data=", data);
                 const video_id = data.id;
                 const video_type = data.video_type;
-                if(video_type=="mp4"){
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
-                }else{
+                if(needConvertVideo(video_type)){
                     const result = await showOKCancelBox("info", 
                         `動画が${video_type}のため再生できません\nmp4に変換しますか?`);
                     if(result!==0){
                         return;
                     }
                     await convertVideo(this, video_id);
+                }else{
+                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
                 }
             });
             
@@ -499,15 +499,6 @@
                 loadLibraryItems([]);
             }
         });
-
-        obs.on("library-page:get-item-callback", async (args) => { 
-            const { video_id, cb } = args;
-            try {
-                cb(await library.getLibraryItem(video_id));
-            } catch (error) {
-                cb(null);
-            }             
-        }); 
 
         obs.on("library-page:convert-video", async (args) => { 
             const video_id = args;

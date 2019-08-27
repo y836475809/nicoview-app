@@ -125,29 +125,18 @@ const app_store = new riotx.Store({
             reg_video_id_set: null,
             not_comp_video_id_set: null,
             // comp_video_id_set: null,
-            item:null,
+            // item:null,
         },
         library:null,
     },
     actions: {
         updateDownloadItem: (context, obj) => {
             // context.state.download = obj.download;
-            const item = obj.download.item;
-            if(item){
-                return Promise
-                    .resolve()
-                    .then(async () => {
-                        await context.state.library.addItem(item);
-                        context.commit("updateDownloadItem", obj.download);
-                    });
-            }else{
-                return Promise
+            return Promise
                 .resolve()
                 .then(() => {
-                    context.commit("updateDownloadItem", obj.download);
+                    context.commit("updateDownloadItem", obj);
                 });
-
-            }
         },
     },
     mutations: {
@@ -155,13 +144,13 @@ const app_store = new riotx.Store({
             context.state.library = obj.library;
             return ["nn-changed"];
         },
-        addLibraryItem: async (context, obj) => {
-            const item = obj.item;
-            await context.state.library.addItem(item);
-            return ["library-changed"];
-        },
+        // addLibraryItem: async (context, obj) => {
+        //     const item = obj.item;
+        //     await context.state.library.addItem(item);
+        //     return ["library-changed"];
+        // },
         updateDownloadItem: (context, obj) => {
-            context.state.download = obj;
+            context.state.download = obj.download;
             // const item = obj.download.item;
             return ["donwload_item_changed"];
             // if(item){

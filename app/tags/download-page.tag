@@ -205,7 +205,7 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
-        const onChangeDownloadItem = (item) => {
+        const onChangeDownloadItem = () => {
 
             // obs.trigger("main-page:download-item-num", items.length);
 
@@ -228,7 +228,7 @@
             const download = {
                 reg_video_id_set: grid_table_dl.getItemIDSet(),
                 not_comp_video_id_set: not_cmp_video_id_set,
-                item:item?item:null
+                // item:item?item:null
                 // comp_video_id_set: cmp_video_id_set
             };
             // (async ()=>{
@@ -375,9 +375,8 @@
                             thumb_img: thumb_img
                         });
                         
-                        // obs.trigger("search-page:complete-download-ids", [item.video_id]);
-                        // await app_store.commit("addLibraryItem", {item});
-                        onChangeDownloadItem(item);
+                        // TODO
+                        await app_store.getter("state").library.addItem(item);
                         obs.trigger("library-page:add-item", item); 
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {

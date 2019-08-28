@@ -213,15 +213,14 @@
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
 
-        app_store.change("donwload_item_changed", (state, store) => {
+        app_store.change("donwloadItemChanged", (state, store) => {
             const { reg_video_id_set } = store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
-            console.log("##se video_id_set=", video_id_set)
             const items = grid_table.dataView.getItems();
+
             items.forEach(item => {
                 const video_id = item.id;
                 item.saved = video_id_set.has(video_id);
-                console.log(`video_id = ${video_id}, item.saved = ${item.saved}`)
                 item.reg_download = reg_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
@@ -386,7 +385,6 @@
                 grid_table.scrollToTop();
             }
 
-            // const download_id_set = app_store.getter("state").download_video_id_set;
             const { reg_video_id_set } = app_store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
             const items = search_result.data.map(value => {

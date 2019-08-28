@@ -180,15 +180,12 @@
         const app_store = this.riotx.get("app");
 
         // TODO
-        app_store.change("nnchangedaddItemTest", (state, store) => {
+        app_store.change("downloded", async (state, store) => {
             const { item } = store.getter("download");
             const video_id = item.video_id;
 
-            // TODO
-            (async()=>{
-                const library_item = await app_store.getter("libraryItem", {video_id});
-                grid_table.updateItem(library_item, video_id);
-            })();
+            const library_item = await app_store.getter("libraryItem", {video_id});
+            grid_table.updateItem(library_item, video_id);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -515,18 +512,7 @@
         obs.on("library-page:convert-video", async (args) => { 
             const video_id = args;
             await convertVideo(this, video_id);          
-        }); 
-    
-        obs.on("library-page:add-item", async (item) => { 
-            const video_id = item.video_id;
-            //TODO
-            // await library.addItem(item);
-            // const library_item = await library.getLibraryItem(item.video_id);
-            // await app_store.commit("addLibraryItem", {item});
-            const library_item = await app_store.getter("libraryItem", {video_id});
-           
-            grid_table.updateItem(library_item, video_id);
-        });  
+        });   
 
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;

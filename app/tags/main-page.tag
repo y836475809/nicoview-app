@@ -131,7 +131,7 @@
         this.obs = this.opts.obs;
         const app_store = this.riotx.get("app");
 
-        app_store.change("donwload_item_changed", (state, store) => {
+        app_store.change("donwloadItemChanged", (state, store) => {
             const { not_comp_video_id_set } = store.getter("download");
             this.donwnload_item_num = not_comp_video_id_set.size;
             this.update();

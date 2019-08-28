@@ -211,9 +211,6 @@
 
         // TODO
         const onChangeDownloadItem = (item) => {
-
-            // obs.trigger("main-page:download-item-num", items.length);
-
             const not_cmp_video_id_set = new Set();
             grid_table_dl.filterItems([
                 donwload_state.wait,
@@ -223,41 +220,18 @@
                 not_cmp_video_id_set.add(item.id);
             });
 
-            // const cmp_video_id_set = new Set();
-            // grid_table_dl.filterItems([
-            //     donwload_state.complete,
-            // ]).forEach(item => {
-            //     cmp_video_id_set.add(item.id);
-            // });
-
             const download = {
                 reg_video_id_set: grid_table_dl.getItemIDSet(),
                 not_comp_video_id_set: not_cmp_video_id_set,
                 item:item
-                // comp_video_id_set: cmp_video_id_set
             };
-            // (async ()=>{
-            //     await app_store.commit("updateDownloadItem", {download});
-            // })();
-            // app_store.commit("updateDownloadItem", {download});
-            if(item){
-                app_store.action("addItem", {download});
-            }else{
-                app_store.action("updateDownloadItem", {download});
-            }
+            app_store.action("updateDownloadItem", {download});
         };
 
         const addDownloadItems = (items) => {
             grid_table_dl.addItems(items, donwload_state.wait);
 
-            onChangeDownloadItem();
-
-            // const video_ids = items.map(item=>{
-            //     return item.id;
-            // });
-
-            // app_store.commit("updateDownloadItem", 
-            //     {video_id_set:grid_table_dl.getItemIDSet()});  
+            onChangeDownloadItem(); 
         };
 
         const deleteDownloadItems = (video_ids) => {
@@ -269,18 +243,12 @@
             grid_table_dl.deleteItems(video_ids); 
 
             onChangeDownloadItem();
-
-            // app_store.commit("updateDownloadItem", 
-            //     {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const clearDownloadItems = (state) => {
             grid_table_dl.clearItems(state);
 
             onChangeDownloadItem();
-
-            // app_store.commit("updateDownloadItem", 
-            //     {video_id_set:grid_table_dl.getItemIDSet()});
         };
 
         const createMenu = () => {
@@ -375,18 +343,13 @@
                     });
 
                     if(result.type==NicoDownloader.ResultType.complete){
-                        const item = nico_down.getDownloadedItem();
-
+                        // const item = nico_down.getDownloadedItem();
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
                             state: donwload_state.complete,
                             thumb_img: thumb_img
                         });
-                        
-                        // TODO
-                        // await app_store.getter("state").library.addItem(item);
-                        // obs.trigger("library-page:add-item", item); 
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
@@ -456,8 +419,6 @@
             }
 
             onChangeDownloadItem();
-            // app_store.commit("updateDownloadItem", 
-            //     {video_id_set:grid_table_dl.getItemIDSet()});
 
             resizeGridTable();
 

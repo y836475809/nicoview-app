@@ -163,12 +163,11 @@
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
 
-        app_store.change("donwload_item_changed", (state, store) => {
-            // const video_id_set = store.getter("state").download_video_id_set;
+        app_store.change("donwloadItemChanged", (state, store) => {
             const { reg_video_id_set } = store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
-            console.log("##my video_id_set=", video_id_set)
             const items = grid_table.dataView.getItems();
+
             items.forEach(item => {
                 const video_id = item.id;
                 item.saved = video_id_set.has(video_id);
@@ -393,11 +392,6 @@
         };
 
         const setData = async (mylist_items) => {
-            // const video_ids = mylist_items.map(value => {
-            //     return value.id;
-            // });
-
-            // const download_id_set = app_store.getter("state").download_video_id_set;
             const { reg_video_id_set } = app_store.getter("download");
             const video_id_set = app_store.getter("libraryVideoIDSet");
             mylist_items.forEach(value=>{

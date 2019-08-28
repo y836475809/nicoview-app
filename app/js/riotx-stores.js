@@ -120,28 +120,23 @@ const createStore = (store_name) => {
 const app_store = new riotx.Store({
     name: "app",
     state: {
-        // download_video_id_set:[],
         download: {
             reg_video_id_set: null,
             not_comp_video_id_set: null,
-            // comp_video_id_set: null,
             item:null,
         },
         library:null,
     },
     actions: {
-        addItem: (context, obj) => {
-            context.getter("state").library.addItem(obj.download.item).then(()=>{
-                context.commit("addItem", obj);
-            });
-        },
         updateDownloadItem: (context, obj) => {
-            if(obj.download.item){
-                context.getter("state").library.addItem(obj.download.item).then(()=>{
-                    context.commit("addItem", obj);
+            const item = obj.download.item;
+            if(item){
+                context.getter("state").library.addItem(item).then(()=>{
+                    context.commit("updateDownloadItem", obj);
+                    context.commit("addDownlodedItem", obj);
+                    
                 });
             }else{
-                // context.state.download = obj.download;
                 return Promise
                     .resolve()
                     .then(() => {
@@ -151,17 +146,16 @@ const app_store = new riotx.Store({
         },
     },
     mutations: {
-        addItem: (context, obj) => {
+        addDownlodedItem: (context, obj) => {
             context.state.download = obj.download;
-            return ["donwload_item_changed",  "nnchangedaddItemTest"];
+            return ["downloded"];
         },
         updateLibrary: (context, obj) => {
             context.state.library = obj.library;
-            return ["nn-changed"];
         },
         updateDownloadItem: (context, obj) => {
             context.state.download = obj.download;
-            return ["donwload_item_changed"];
+            return ["donwloadItemChanged"];
         },
     },
 

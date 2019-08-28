@@ -498,7 +498,7 @@ const setupNicoDownloadNock = (target_nock, {
     comment_delay=1, comment_code=200, 
     thumbnail_delay=1, thumbnail_code=200, 
     hb_delay=1, hb_code=200, 
-    video_delay=1, video_code=200,,
+    video_delay=1, video_code=200,
     donwload_speed=20}={}) => {
 
     target_nock.watch({ delay:watch_delay, code:watch_code });

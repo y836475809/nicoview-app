@@ -179,15 +179,6 @@
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
 
-        // TODO
-        app_store.change("downloded", async (state, store) => {
-            const { item } = store.getter("download");
-            const video_id = item.video_id;
-
-            const library_item = await app_store.getter("libraryItem", {video_id});
-            grid_table.updateItem(library_item, video_id);
-        });
-
         const obs_trigger = new obsTrigger(obs);
 
         let library = null;
@@ -513,6 +504,20 @@
             const video_id = args;
             await convertVideo(this, video_id);          
         });   
+
+        obs.on("library-page:add-item", async (item) => { 
+            const video_id = item.video_id;
+            
+            await new Promise((resolve, reject) => {
+                app_store.action("addLibraryItem", {item});
+                app_store.change("libraryItemChanged", async (state, store) => {
+                    const library_item = await store.getter("libraryItem", {video_id});
+                    grid_table.updateItem(library_item, video_id);
+                    resolve();
+                });
+            });
+            app_store.action("updateDownloadItem");
+        });  
 
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;

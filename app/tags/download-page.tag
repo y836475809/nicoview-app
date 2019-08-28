@@ -210,7 +210,7 @@
         };
 
         // TODO
-        const onChangeDownloadItem = (item) => {
+        const onChangeDownloadItem = () => {
             const not_cmp_video_id_set = new Set();
             grid_table_dl.filterItems([
                 donwload_state.wait,
@@ -223,7 +223,6 @@
             const download = {
                 reg_video_id_set: grid_table_dl.getItemIDSet(),
                 not_comp_video_id_set: not_cmp_video_id_set,
-                item:item
             };
             app_store.action("updateDownloadItem", {download});
         };
@@ -343,7 +342,9 @@
                     });
 
                     if(result.type==NicoDownloader.ResultType.complete){
-                        // const item = nico_down.getDownloadedItem();
+                        const item = nico_down.getDownloadedItem();
+                        obs.trigger("library-page:add-item", item); 
+
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
@@ -370,13 +371,7 @@
 
                     grid_table_dl.save();
                
-                    // TODO
-                    if(result.type==NicoDownloader.ResultType.complete){
-                        const item = nico_down.getDownloadedItem();
-                        onChangeDownloadItem(item);
-                    }else{
-                        onChangeDownloadItem();
-                    }
+                    onChangeDownloadItem();
 
                     if(cancel_donwload){
                         break;

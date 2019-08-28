@@ -295,7 +295,7 @@ class NicoDownLoadMocks {
         }
     }
 
-    dmc_video({delay=1, code=200} = {}){
+    dmc_video({delay=1, code=200, donwload_speed=20} = {}){
         const file_path = `${__dirname}/data/${this.video_id}.mp4`;
         const stat = fs.statSync(file_path);
         const headers = {
@@ -309,13 +309,14 @@ class NicoDownLoadMocks {
             .times(Infinity)
             //.replyWithFile(code, file_path, headers);  
             .reply(code, (uri, requestBody) => {
-                const sbuf = Math.floor(stat.size/(1638000));
+                const b_szie = 1638000/donwload_speed;
+                const sbuf = Math.floor(stat.size/b_szie);
                 this.video_fs = fs.createReadStream(file_path, { highWaterMark: sbuf });
                 return this.video_fs;
             },headers);
     }
 
-    smile_video({delay=1, code=200, quality=""} = {}){
+    smile_video({delay=1, code=200, quality="", donwload_speed=20} = {}){
         const id = this.video_id.replace("sm", "");
         const file_path = `${__dirname}/data/${this.video_id}.mp4`;
         const stat = fs.statSync(file_path);
@@ -330,7 +331,8 @@ class NicoDownLoadMocks {
             .delay(delay)
             .times(Infinity)
             .reply(code, (uri, requestBody) => {
-                const sbuf = Math.floor(stat.size/(1638000));
+                const b_szie = 1638000/donwload_speed;
+                const sbuf = Math.floor(stat.size/b_szie);
                 this.video_fs = fs.createReadStream(file_path, { highWaterMark: sbuf });
                 return this.video_fs;
             },headers);
@@ -496,15 +498,16 @@ const setupNicoDownloadNock = (target_nock, {
     comment_delay=1, comment_code=200, 
     thumbnail_delay=1, thumbnail_code=200, 
     hb_delay=1, hb_code=200, 
-    video_delay=1, video_code=200}={}) => {
+    video_delay=1, video_code=200,,
+    donwload_speed=20}={}) => {
 
     target_nock.watch({ delay:watch_delay, code:watch_code });
     target_nock.dmc_session({delay:dmc_session_delay, code:dmc_session_code });
     target_nock.comment({ delay:comment_delay, code:comment_code });
     target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
     target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
-    target_nock.dmc_video({ delay:video_delay, code:video_code });  
-    target_nock.smile_video({ delay:video_delay, code:video_code });  
+    target_nock.dmc_video({ delay:video_delay, code:video_code, donwload_speed:donwload_speed });  
+    target_nock.smile_video({ delay:video_delay, code:video_code, donwload_speed:donwload_speed });  
 };
 
 module.exports = {

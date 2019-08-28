@@ -125,45 +125,43 @@ const app_store = new riotx.Store({
             reg_video_id_set: null,
             not_comp_video_id_set: null,
             // comp_video_id_set: null,
-            // item:null,
+            item:null,
         },
         library:null,
     },
     actions: {
+        addItem: (context, obj) => {
+            context.getter("state").library.addItem(obj.download.item).then(()=>{
+                context.commit("addItem", obj);
+            });
+        },
         updateDownloadItem: (context, obj) => {
-            // context.state.download = obj.download;
-            return Promise
-                .resolve()
-                .then(() => {
-                    context.commit("updateDownloadItem", obj);
+            if(obj.download.item){
+                context.getter("state").library.addItem(obj.download.item).then(()=>{
+                    context.commit("addItem", obj);
                 });
+            }else{
+                // context.state.download = obj.download;
+                return Promise
+                    .resolve()
+                    .then(() => {
+                        context.commit("updateDownloadItem", obj);
+                    });
+            }
         },
     },
     mutations: {
+        addItem: (context, obj) => {
+            context.state.download = obj.download;
+            return ["donwload_item_changed",  "nnchangedaddItemTest"];
+        },
         updateLibrary: (context, obj) => {
             context.state.library = obj.library;
             return ["nn-changed"];
         },
-        // addLibraryItem: async (context, obj) => {
-        //     const item = obj.item;
-        //     await context.state.library.addItem(item);
-        //     return ["library-changed"];
-        // },
         updateDownloadItem: (context, obj) => {
             context.state.download = obj.download;
-            // const item = obj.download.item;
             return ["donwload_item_changed"];
-            // if(item){
-            //     (async ()=>{
-            //         console.log("updateDownloadItem item=", item);
-            //         await context.state.library.addItem(item);
-            //         console.log("updateDownloadItem item2=", item);
-            //         return ["donwload_item_changed"];
-            //     })();
-            // }else{
-            // // context.state.rest_download_num = obj.rest_download_num;
-            // return ["donwload_item_changed"];
-            // }
         },
     },
 

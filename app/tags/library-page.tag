@@ -179,6 +179,18 @@
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
 
+        // TODO
+        app_store.change("nnchangedaddItemTest", (state, store) => {
+            const { item } = store.getter("download");
+            const video_id = item.video_id;
+
+            // TODO
+            (async()=>{
+                const library_item = await app_store.getter("libraryItem", {video_id});
+                grid_table.updateItem(library_item, video_id);
+            })();
+        });
+
         const obs_trigger = new obsTrigger(obs);
 
         let library = null;

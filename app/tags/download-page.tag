@@ -103,7 +103,11 @@
             this.update();
         };
 
-        const wait_time = 10;
+        let wait_time = 10;
+        if(process.env.NODE_ENV == "DEBUG"){
+            wait_time = 1;
+        }
+
         const donwload_state = Object.freeze({
             wait: 0,
             downloading: 1,
@@ -205,7 +209,8 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
-        const onChangeDownloadItem = () => {
+        // TODO
+        const onChangeDownloadItem = (item) => {
 
             // obs.trigger("main-page:download-item-num", items.length);
 
@@ -228,14 +233,18 @@
             const download = {
                 reg_video_id_set: grid_table_dl.getItemIDSet(),
                 not_comp_video_id_set: not_cmp_video_id_set,
-                // item:item?item:null
+                item:item
                 // comp_video_id_set: cmp_video_id_set
             };
             // (async ()=>{
             //     await app_store.commit("updateDownloadItem", {download});
             // })();
             // app_store.commit("updateDownloadItem", {download});
-            app_store.action("updateDownloadItem", {download});
+            if(item){
+                app_store.action("addItem", {download});
+            }else{
+                app_store.action("updateDownloadItem", {download});
+            }
         };
 
         const addDownloadItems = (items) => {
@@ -376,8 +385,8 @@
                         });
                         
                         // TODO
-                        await app_store.getter("state").library.addItem(item);
-                        obs.trigger("library-page:add-item", item); 
+                        // await app_store.getter("state").library.addItem(item);
+                        // obs.trigger("library-page:add-item", item); 
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
@@ -397,8 +406,14 @@
                     }
 
                     grid_table_dl.save();
-
-                    onChangeDownloadItem();
+               
+                    // TODO
+                    if(result.type==NicoDownloader.ResultType.complete){
+                        const item = nico_down.getDownloadedItem();
+                        onChangeDownloadItem(item);
+                    }else{
+                        onChangeDownloadItem();
+                    }
 
                     if(cancel_donwload){
                         break;

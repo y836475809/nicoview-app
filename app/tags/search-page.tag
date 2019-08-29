@@ -225,6 +225,10 @@
                 grid_table.dataView.updateItem(video_id, item);
             });
         });
+        app_store.getter("state").ev.on("libraryItemChanged", async args => {
+            const video_id = args;
+            console.log('search data', video_id);
+        });
 
         const obs_trigger = new obsTrigger(obs);
 

@@ -117,6 +117,9 @@ const createStore = (store_name) => {
     });
 };
 
+const EventEmitter = require("events").EventEmitter;
+const ev = new EventEmitter();
+
 const app_store = new riotx.Store({
     name: "app",
     state: {
@@ -125,6 +128,7 @@ const app_store = new riotx.Store({
             not_comp_video_id_set: null,
         },
         library:null,
+        ev: ev,
     },
     actions: {
         addLibraryItem: (context, obj) => {
@@ -143,6 +147,8 @@ const app_store = new riotx.Store({
     },
     mutations: {
         addLibraryItem: (context, obj) => {
+            const item = obj.item;
+            ev.emit("libraryItemChanged", item.video_id);
             return ["libraryItemChanged"]; 
         },
         updateLibrary: (context, obj) => {
@@ -184,6 +190,19 @@ const app_store = new riotx.Store({
         },
     }
 });
+
+class test {
+    constructor(store){
+        this.state = store.state;
+        this.actions = store.actions;
+    }
+
+    action(name, args, e){
+        const fn = this.actions[name];
+        fn(this.state, args);
+        ev.emit(e.name, args);
+    }
+}
 
 const stores = [
     createStore("bookmark"),

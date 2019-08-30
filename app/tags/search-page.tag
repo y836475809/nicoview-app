@@ -212,6 +212,7 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
+        const test_app_store = store_mng.get("app");
 
         app_store.change("donwloadItemChanged", (state, store) => {
             const { reg_video_id_set } = store.getter("download");
@@ -228,6 +229,11 @@
         app_store.getter("state").ev.on("libraryItemChanged", async args => {
             const video_id = args;
             console.log('search data', video_id);
+        });
+
+        test_app_store.state.ev.on("test-libraryItemChanged", async args => {
+            const video_id = args;
+            console.log('test-search data', video_id);
         });
 
         const obs_trigger = new obsTrigger(obs);

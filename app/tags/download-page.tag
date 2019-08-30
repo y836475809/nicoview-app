@@ -82,6 +82,7 @@
 
         const obs_trigger = new obsTrigger(obs);
         const app_store = this.riotx.get("app");
+        const test_app_store = store_mng.get("app");
 
         const download_dir = SettingStore.getDownloadDir();
 
@@ -344,7 +345,8 @@
                     if(result.type==NicoDownloader.ResultType.complete){
                         const item = nico_down.getDownloadedItem();
                         obs.trigger("library-page:add-item", item); 
-
+                        test_app_store.action("addLibraryItem", item);
+                        
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 

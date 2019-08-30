@@ -194,15 +194,48 @@ const app_store = new riotx.Store({
 class test {
     constructor(store){
         this.state = store.state;
+        this.name = store.name;
         this.actions = store.actions;
+        this.state.ev = new EventEmitter();
     }
 
-    action(name, args, e){
+    action(name, args){
         const fn = this.actions[name];
         fn(this.state, args);
-        ev.emit(e.name, args);
+        // ev.emit(e.name, args);
     }
 }
+
+const test_app_store = new test({
+    name: "app",
+    state:{
+        library:null,
+    },
+    actions: {
+        addLibraryItem: async (state, item) => {
+            // const item = obj.item;
+            await state.library.addItem(item);
+            state.ev.emit("test-libraryItemChanged", item.video_id);
+            // return ["libraryItemChanged"]; 
+        },
+    }
+});
+
+class StoreMng {
+    constructor(){
+        this.stores = {};
+    }
+    add(store){
+        this.stores[store.name] = store;
+    }
+
+    get(name){
+        return this.stores[name];
+    }
+}
+
+const store_mng = new StoreMng();
+store_mng.add(test_app_store);
 
 const stores = [
     createStore("bookmark"),
@@ -213,5 +246,6 @@ const stores = [
 ];
 
 module.exports = {
-    stores
+    stores,
+    store_mng
 };

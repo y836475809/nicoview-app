@@ -231,8 +231,8 @@
             console.log('search data', video_id);
         });
 
-        test_app_store.state.ev.on("test-libraryItemChanged", async args => {
-            const video_id = args;
+        test_app_store.change("test-libraryItemChanged", async video_id => {
+            // const video_id = args;
             console.log('test-search data', video_id);
         });
 

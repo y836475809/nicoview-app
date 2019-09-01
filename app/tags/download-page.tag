@@ -345,7 +345,7 @@
                     if(result.type==NicoDownloader.ResultType.complete){
                         const item = nico_down.getDownloadedItem();
                         obs.trigger("library-page:add-item", item); 
-                        test_app_store.action("addLibraryItem", item);
+                        test_app_store.commit("addLibraryItem", item);
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {

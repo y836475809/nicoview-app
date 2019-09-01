@@ -191,46 +191,92 @@ const app_store = new riotx.Store({
     }
 });
 
-class test {
+class MyStore {
     constructor(store){
-        this.state = store.state;
         this.name = store.name;
-        this.actions = store.actions;
-        this.state.ev = new EventEmitter();
+        this._state = store.state;
+        this._actions = store.actions;
+        this._mutations = store.mutations;
+        this._getters = store.getters;
+        this._emiter = new EventEmitter();
     }
 
-    action(name, args){
-        const fn = this.actions[name];
-        fn(this.state, args);
-        // ev.emit(e.name, args);
+    action(name, ...args){
+        const fn = this._actions[name];
+
+        const context = {
+            getter: (name, ...args) => {
+                return this.getter(name, ...args);
+            },
+            commit: (name, ...args) => {
+                this.commit(name, ...args);
+            }
+        };
+        return Promise
+            .resolve()
+            .then(() => {
+                fn(context, ...args);
+            });
+    }
+
+    commit(name, ...args){
+        const fn = this._mutations[name];
+
+        const context = {
+            getter: (name, ...args) => {
+                return this.getter(name, ...args);
+            },
+            state: this._state
+        };
+
+        const evnets = fn(context, ...args);
+        evnets.forEach(ev => {
+            this._emiter.emit(...ev);
+        });
+    }
+
+    getter(name, ...args){
+        const fn = this._getters[name];
+
+        const context = {
+            state: this._state
+        };
+        return fn(context, ...args);
+    }
+
+    change(name, ...args){
+        this._emiter.on(name, ...args);
     }
 }
 
-const test_app_store = new test({
+const test_app_store = new MyStore({
     name: "app",
     state:{
         library:null,
     },
     actions: {
-        addLibraryItem: async (state, item) => {
-            // const item = obj.item;
-            await state.library.addItem(item);
-            state.ev.emit("test-libraryItemChanged", item.video_id);
-            // return ["libraryItemChanged"]; 
+        addLibraryItem: async (context, item) => {
+            await context.state.library.addItem(item);
+            context.commit(item.video_id);
         },
+    },
+    mutations: {
+        addLibraryItem : (context, video_id) => {
+            return ["test-libraryItemChanged", video_id];
+        }
     }
 });
 
 class StoreMng {
     constructor(){
-        this.stores = {};
+        this._stores = {};
     }
     add(store){
-        this.stores[store.name] = store;
+        this._stores[store.name] = store;
     }
 
     get(name){
-        return this.stores[name];
+        return this._stores[name];
     }
 }
 
@@ -247,5 +293,6 @@ const stores = [
 
 module.exports = {
     stores,
+    MyStore,
     store_mng
 };

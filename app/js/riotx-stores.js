@@ -191,7 +191,7 @@ const app_store = new riotx.Store({
     }
 });
 
-class MyStore {
+class Store {
     constructor(store){
         this.name = store.name;
         this._state = store.state;
@@ -249,7 +249,79 @@ class MyStore {
     }
 }
 
-const test_app_store = new MyStore({
+class libraryItemConverter {
+    constructor(){
+        this.nico_xml = new NicoXMLFile();
+        this.nico_json = new NicoJsonFile();
+    }
+    _createLibraryItem(id_dirpath_map, video_item){
+        const dir_path = id_dirpath_map.get(video_item.dirpath_id);
+        return  {
+            db_type: video_item._db_type,
+            thumb_img: this._getThumbImgPath(dir_path, video_item),
+            id: video_item.video_id,
+            name: video_item.video_name,
+            creation_date: video_item.creation_date,
+            pub_date: video_item.pub_date,
+            last_play_date: video_item.last_play_date,
+            play_count: video_item.play_count,
+            play_time: video_item.time,
+            tags: video_item.tags?video_item.tags.join(" "):"",
+            thumbnail_size: video_item.thumbnail_size,
+            video_type: video_item.video_type
+        };
+    }
+    _getDataFileInst(dir_path, video_info){
+        const db_type = video_info._db_type;
+        if(db_type=="xml"){
+            this.nico_xml.dirPath = dir_path;
+            this.nico_xml.commonFilename = video_info.common_filename;
+            this.nico_xml.videoType = video_info.video_type;
+            this.nico_xml.thumbnailSize = video_info.thumbnail_size;
+            return this.nico_xml;
+        }
+        if(db_type=="json"){
+            this.nico_json.dirPath = dir_path;
+            this.nico_json.commonFilename = video_info.common_filename;
+            this.nico_json.videoType = video_info.video_type;
+            this.nico_json.thumbnailSize = video_info.thumbnail_size;
+            return this.nico_json;
+        }
+
+        throw new Error(`${db_type} is unkown`);
+    }
+    
+    _getVideoPath(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.videoPath;
+    }
+
+    _getThumbImgPath(dir_path, video_info){
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.thumbImgPath;
+    }
+
+    _getComments(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.getComments();
+    }
+
+    _getThumbInfo(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        const thumb_info = datafile.getThumbInfo();
+        const thumb_img_path = this._getThumbImgPath(dir_path, video_info);
+        thumb_info.video.thumbnailURL = thumb_img_path;
+        thumb_info.video.largeThumbnailURL = thumb_img_path;
+        return thumb_info;
+    }
+
+    _getVideoType(video_info){
+        return video_info.video_type;
+    }
+
+}
+
+const test_app_store = new Store({
     name: "app",
     state:{
         library:null,
@@ -261,13 +333,22 @@ const test_app_store = new MyStore({
         },
     },
     mutations: {
+        initLibrary: (context, library) => {
+            context.state.library = library;
+            return ["libraryInitialized"];
+        },
         addLibraryItem : (context, video_id) => {
             return ["test-libraryItemChanged", video_id];
+        }
+    },
+    gettsers: {
+        getLibraryItems: (context) => {
+
         }
     }
 });
 
-class StoreMng {
+class StoreX {
     constructor(){
         this._stores = {};
     }
@@ -280,8 +361,8 @@ class StoreMng {
     }
 }
 
-const store_mng = new StoreMng();
-store_mng.add(test_app_store);
+const storex = new StoreX();
+storex.add(test_app_store);
 
 const stores = [
     createStore("bookmark"),
@@ -293,6 +374,6 @@ const stores = [
 
 module.exports = {
     stores,
-    MyStore,
-    store_mng
+    Store,
+    storex
 };

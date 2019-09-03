@@ -1,7 +1,7 @@
 const test = require("ava");
-const { MyStore, store_mng } = require("../app/js/riotx-stores");
+const { Store, storex } = require("../app/js/riotx-stores");
 
-const test_store = new MyStore({
+const test_store = new Store({
     name: "app",
     state:{
         id:null,

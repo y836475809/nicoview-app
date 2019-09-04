@@ -1,6 +1,7 @@
 const riotx = require("riotx");
 const { BookMark } = require("./bookmark");
 const { toPlayTime } = require("./time-format");
+const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
 
 const getIcon = (store_name, item) => {
     if (store_name == "bookmark") {
@@ -271,6 +272,38 @@ class libraryItemConverter {
             video_type: video_item.video_type
         };
     }
+
+    async getlibraryItems(library){
+        const items = await library.getItems();
+        const id_dirpath_map = library.id_dirpath_map;
+        return items.map(item => {
+            return this._createLibraryItem(id_dirpath_map, item);
+        });   
+    }
+    async getPlayItem(library, video_id){
+        const item = await library.getItem(video_id);
+        const dir_path = await library._getDir(item.dirpath_id);
+        const is_deleted = await library.getFieldValue(video_id, "is_deleted");
+
+        const video_path = this._getVideoPath(dir_path, item);
+        const video_type = this._getVideoType(item);
+        const comments = this._getComments(dir_path, item);
+        const thumb_info = this._getThumbInfo(dir_path, item);
+
+        return {
+            video_data: {
+                src: video_path,
+                type: `video/${video_type}`,
+            },
+            viewinfo: {
+                is_deleted: is_deleted,
+                thumb_info:thumb_info,
+                
+            },
+            comments: comments
+        };   
+    }
+
     _getDataFileInst(dir_path, video_info){
         const db_type = video_info._db_type;
         if(db_type=="xml"){
@@ -321,6 +354,8 @@ class libraryItemConverter {
 
 }
 
+const cv = new libraryItemConverter();
+
 const test_app_store = new Store({
     name: "app",
     state:{
@@ -341,9 +376,13 @@ const test_app_store = new Store({
             return ["test-libraryItemChanged", video_id];
         }
     },
-    gettsers: {
-        getLibraryItems: (context) => {
-
+    getters: {
+        playData: async (context, video_id) => {
+            const library = context.state.library;
+            return await cv.getPlayItem(library, video_id);
+        },
+        libraryItems: async (context) => {
+            return await cv.getlibraryItems(context.state.library)
         }
     }
 });

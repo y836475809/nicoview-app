@@ -287,6 +287,38 @@ class Library {
         });
     }
 
+    getItems(){
+        return new Promise(async (resolve, reject) => {
+            this.video_db.find({}, async (err, docs) => { 
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(docs.length==0){
+                    resolve([]);
+                    return;
+                }
+                resolve(docs);
+            });
+        });
+    }
+
+    getItem(video_id) {
+        return new Promise((resolve, reject) => {
+            this.video_db.find({video_id: video_id}, {_id: 0}, (err, docs) => {   
+                if(err){
+                    reject(err);
+                    return;
+                }
+                if(docs.length==0){
+                    reject(new Error(`not find video_info, id=${video_id}`));
+                    return;
+                }
+                resolve(docs[0]);
+            });
+        });
+    }
+
     async getPlayData(video_id){
         const video_info = await this._getVideoInfo(video_id);
         const dir_path = await this._getDir(video_info.dirpath_id);

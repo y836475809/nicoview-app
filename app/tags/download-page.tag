@@ -82,7 +82,7 @@
 
         const obs_trigger = new obsTrigger(obs);
         const app_store = this.riotx.get("app");
-        const test_app_store = store_mng.get("app");
+        const test_app_store = storex.get("app");
 
         const download_dir = SettingStore.getDownloadDir();
 

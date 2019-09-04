@@ -130,6 +130,7 @@
 
         this.obs = this.opts.obs;
         const app_store = this.riotx.get("app");
+        const test_app_store = storex.get("app");
 
         app_store.change("donwloadItemChanged", (state, store) => {
             const { not_comp_video_id_set } = store.getter("download");
@@ -213,8 +214,8 @@
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id  = args;
-            const data = await app_store.getter("playdata", {video_id});
-
+            // const data = await app_store.getter("playdata", {video_id});
+            const data = await test_app_store.getter("playData", video_id);
             ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
                 video_id,
                 data

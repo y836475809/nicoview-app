@@ -212,7 +212,7 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
-        const test_app_store = store_mng.get("app");
+        const test_app_store = storex.get("app");
 
         app_store.change("donwloadItemChanged", (state, store) => {
             const { reg_video_id_set } = store.getter("download");

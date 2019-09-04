@@ -178,7 +178,7 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const app_store = this.riotx.get("app");
-        const test_app_store = store_mng.get("app");
+        const test_app_store = storex.get("app");
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -491,11 +491,12 @@
             try {
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
-                loadLibraryItems(await library.getLibraryItems());
+                // loadLibraryItems(await library.getLibraryItems());
 
                 app_store.commit("updateLibrary", {library});
-                test_app_store.state.library = library;
+                test_app_store.commit("initLibrary", library);
 
+                loadLibraryItems(await test_app_store.getter("libraryItems"));
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);

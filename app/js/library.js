@@ -165,31 +165,38 @@ class Library {
      * @param {Number} item.pub_date
      * @param {Array} item.tags
      */
-    async addItem(item){
-        const dirpath = item.dirpath;
+    // async addItem(item){
+    //     const dirpath = item.dirpath;
+    //     const dirpath_id = await this._addDirPath(dirpath);
+
+    //     const new_item = createDBItem();
+    //     new_item._db_type = item._db_type;
+    //     new_item.dirpath_id = dirpath_id;
+    //     new_item.video_id = item.video_id;
+    //     new_item.video_name = item.video_name;
+    //     new_item.video_type = item.video_type;
+    //     new_item.common_filename = item.video_id,
+    //     new_item.is_economy = item.is_economy;
+    //     // modification_date
+    //     new_item.creation_date = new Date().getTime();
+    //     new_item.pub_date = item.pub_date;
+    //     // last_play_date
+    //     // play_count
+    //     new_item.time = item.time;
+    //     new_item.tags = item.tags;
+    //     new_item.is_deleted = item.is_deleted;
+    //     new_item.thumbnail_size = item.thumbnail_size;
+
+    //     await this._updateData(this.video_db, new_item, true);
+
+    //     this._addVideoIDSet(new_item.video_id);
+    // }
+
+    async addItem(dirpath, item){
         const dirpath_id = await this._addDirPath(dirpath);
-
-        const new_item = createDBItem();
-        new_item._db_type = item._db_type;
-        new_item.dirpath_id = dirpath_id;
-        new_item.video_id = item.video_id;
-        new_item.video_name = item.video_name;
-        new_item.video_type = item.video_type;
-        new_item.common_filename = item.video_id,
-        new_item.is_economy = item.is_economy;
-        // modification_date
-        new_item.creation_date = new Date().getTime();
-        new_item.pub_date = item.pub_date;
-        // last_play_date
-        // play_count
-        new_item.time = item.time;
-        new_item.tags = item.tags;
-        new_item.is_deleted = item.is_deleted;
-        new_item.thumbnail_size = item.thumbnail_size;
-
-        await this._updateData(this.video_db, new_item, true);
-
-        this._addVideoIDSet(new_item.video_id);
+        item.dirpath_id = dirpath_id;
+        await this._updateData(this.video_db, item, true);
+        this._addVideoIDSet(item.video_id);  
     }
 
     async updateItem(item){

@@ -180,6 +180,15 @@
         const app_store = this.riotx.get("app");
         const test_app_store = storex.get("app");
 
+        test_app_store.change("libraryItemAdded", async video_id => {
+            // const video_id = args;
+            console.log('data：', video_id);
+
+            const library_item = await app_store.getter("libraryItem", {video_id});
+            grid_table.updateItem(library_item, video_id);
+            // app_store.action("updateDownloadItem");
+        });
+
         const obs_trigger = new obsTrigger(obs);
 
         let library = null;
@@ -508,14 +517,14 @@
             await convertVideo(this, video_id);          
         });   
 
-        app_store.getter("state").ev.on("libraryItemChanged", async args => {
-            const video_id = args;
-            console.log('data：', video_id);
+        // app_store.getter("state").ev.on("libraryItemChanged", async args => {
+        //     const video_id = args;
+        //     console.log('data：', video_id);
 
-            const library_item = await app_store.getter("libraryItem", {video_id});
-            grid_table.updateItem(library_item, video_id);
-            app_store.action("updateDownloadItem");
-        });
+        //     const library_item = await app_store.getter("libraryItem", {video_id});
+        //     grid_table.updateItem(library_item, video_id);
+        //     app_store.action("updateDownloadItem");
+        // });
 
         obs.on("library-page:add-item", async (item) => { 
             const video_id = item.video_id;

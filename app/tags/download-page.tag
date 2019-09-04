@@ -212,20 +212,35 @@
 
         // TODO
         const onChangeDownloadItem = () => {
-            const not_cmp_video_id_set = new Set();
+            // const not_cmp_video_id_set = new Set();
+            // grid_table_dl.filterItems([
+            //     donwload_state.wait,
+            //     donwload_state.downloading,
+            //     donwload_state.error,
+            // ]).forEach(item => {
+            //     not_cmp_video_id_set.add(item.id);
+            // });
+
+            // const download = {
+            //     reg_video_id_set: grid_table_dl.getItemIDSet(),
+            //     not_comp_video_id_set: not_cmp_video_id_set,
+            // };
+            // app_store.action("updateDownloadItem", {download});
+
+            const download_Items = [];
             grid_table_dl.filterItems([
                 donwload_state.wait,
                 donwload_state.downloading,
                 donwload_state.error,
             ]).forEach(item => {
-                not_cmp_video_id_set.add(item.id);
+                download_Items.push({video_id: item.id, state:"incomplete"});
             });
-
-            const download = {
-                reg_video_id_set: grid_table_dl.getItemIDSet(),
-                not_comp_video_id_set: not_cmp_video_id_set,
-            };
-            app_store.action("updateDownloadItem", {download});
+            grid_table_dl.filterItems([
+                donwload_state.complete
+            ]).forEach(item => {
+                download_Items.push({video_id: item.id, state:"complete"});
+            });
+            test_app_store.action("updateDownloadItem", download_Items);
         };
 
         const addDownloadItems = (items) => {
@@ -344,8 +359,8 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const item = nico_down.getDownloadedItem();
-                        obs.trigger("library-page:add-item", item); 
-                        test_app_store.commit("addLibraryItem", item);
+                        // obs.trigger("library-page:add-item", item); 
+                        test_app_store.action("addDownloadedItem", item);
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {

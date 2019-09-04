@@ -255,6 +255,27 @@ class libraryItemConverter {
         this.nico_xml = new NicoXMLFile();
         this.nico_json = new NicoJsonFile();
     }
+    createDBItem() {
+        return {
+            _db_type: "",
+            dirpath_id: -1,
+            video_id: "",
+            video_name: "",
+            video_type: "",
+            common_filename: "",
+            is_economy: false,
+            modification_date: -1,
+            creation_date: 0,
+            pub_date: 0,
+            last_play_date: -1,
+            play_count: 0,
+            time: 0,
+            tags: [],
+            is_deleted: false,
+            thumbnail_size: "S",
+        };
+    }
+
     _createLibraryItem(id_dirpath_map, video_item){
         const dir_path = id_dirpath_map.get(video_item.dirpath_id);
         return  {
@@ -366,14 +387,48 @@ const test_app_store = new Store({
             await context.state.library.addItem(item);
             context.commit(item.video_id);
         },
+        addDownloadedItem: (context, d_item) => {
+            const dirpath = d_item.dirpath;
+            const item = cv.createDBItem();
+            item._db_type = d_item._db_type;
+            item.video_id = d_item.video_id;
+            item.video_name = d_item.video_name;
+            item.video_type = d_item.video_type;
+            item.common_filename = d_item.video_id,
+            item.is_economy = d_item.is_economy;
+            item.creation_date = new Date().getTime();
+            item.pub_date = d_item.pub_date;
+            item.time = d_item.time;
+            item.tags = d_item.tags;
+            item.is_deleted = d_item.is_deleted;
+            item.thumbnail_size = d_item.thumbnail_size;
+            context.state.library.addItem(dirpath, item).then(()=>{
+                context.commit("addDownloadedItem", item.video_id);
+            });
+        },
     },
     mutations: {
         initLibrary: (context, library) => {
             context.state.library = library;
             return ["libraryInitialized"];
         },
-        addLibraryItem : (context, video_id) => {
-            return ["test-libraryItemChanged", video_id];
+        addDownloadedItem : (context, video_id) => {
+            // const dirpath = d_item.dirpath;
+            // const item = cv.createDBItem();
+            // item._db_type = d_item._db_type;
+            // item.video_id = d_item.video_id;
+            // item.video_name = d_item.video_name;
+            // item.video_type = d_item.video_type;
+            // item.common_filename = d_item.video_id,
+            // item.is_economy = d_item.is_economy;
+            // item.creation_date = new Date().getTime();
+            // item.pub_date = d_item.pub_date;
+            // item.time = d_item.time;
+            // item.tags = d_item.tags;
+            // item.is_deleted = d_item.is_deleted;
+            // item.thumbnail_size = d_item.thumbnail_size;
+            // await context.state.library.addItem(dirpath, item);
+            return ["libraryItemAdded", video_id];
         }
     },
     getters: {

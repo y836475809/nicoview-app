@@ -81,7 +81,6 @@
         const obs = this.opts.obs; 
 
         const obs_trigger = new obsTrigger(obs);
-        const app_store = this.riotx.get("app");
         const test_app_store = storex.get("app");
 
         const download_dir = SettingStore.getDownloadDir();
@@ -212,21 +211,6 @@
 
         // TODO
         const onChangeDownloadItem = () => {
-            // const not_cmp_video_id_set = new Set();
-            // grid_table_dl.filterItems([
-            //     donwload_state.wait,
-            //     donwload_state.downloading,
-            //     donwload_state.error,
-            // ]).forEach(item => {
-            //     not_cmp_video_id_set.add(item.id);
-            // });
-
-            // const download = {
-            //     reg_video_id_set: grid_table_dl.getItemIDSet(),
-            //     not_comp_video_id_set: not_cmp_video_id_set,
-            // };
-            // app_store.action("updateDownloadItem", {download});
-
             const download_Items = [];
             grid_table_dl.filterItems([
                 donwload_state.wait,

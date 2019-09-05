@@ -129,12 +129,11 @@
         const ipc_main = new IPCMain();
 
         this.obs = this.opts.obs;
-        const app_store = this.riotx.get("app");
         const test_app_store = storex.get("app");
 
-        app_store.change("donwloadItemChanged", (state, store) => {
-            const { not_comp_video_id_set } = store.getter("download");
-            this.donwnload_item_num = not_comp_video_id_set.size;
+        test_app_store.change("downloadItemChanged", () => {
+            const id_set = test_app_store.getter("downloadIncompleteItemSet");
+            this.donwnload_item_num = id_set.size;
             this.update();
         });
 
@@ -185,11 +184,6 @@
             select_page(page_name);
         });
 
-        // this.obs.on("main-page:download-item-num", (num)=>{
-        //     this.donwnload_item_num = num;
-        //     this.update();
-        // });
-
         this.obs.on("main-page:play-by-videoid", (args)=>{
             ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
 
@@ -214,7 +208,6 @@
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id  = args;
-            // const data = await app_store.getter("playdata", {video_id});
             const data = await test_app_store.getter("playData", video_id);
             ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
                 video_id,
@@ -258,7 +251,7 @@
             });
 
             if(result.state == "ok" || result.state == "404"){
-                const data = await app_store.getter("playdata", {video_id})
+                const data = await test_app_store.getter("playData", video_id);
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
                     video_id, data
                 });

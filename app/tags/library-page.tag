@@ -177,16 +177,11 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const app_store = this.riotx.get("app");
         const test_app_store = storex.get("app");
 
         test_app_store.change("libraryItemAdded", async video_id => {
-            // const video_id = args;
-            console.log('data：', video_id);
-
-            const library_item = await app_store.getter("libraryItem", {video_id});
-            grid_table.updateItem(library_item, video_id);
-            // app_store.action("updateDownloadItem");
+            const item = await test_app_store.getter("libraryItem", video_id);
+            grid_table.updateItem(item, video_id);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -500,11 +495,7 @@
             try {
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
-                // loadLibraryItems(await library.getLibraryItems());
-
-                app_store.commit("updateLibrary", {library});
                 test_app_store.commit("initLibrary", library);
-
                 loadLibraryItems(await test_app_store.getter("libraryItems"));
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
@@ -516,29 +507,6 @@
             const video_id = args;
             await convertVideo(this, video_id);          
         });   
-
-        // app_store.getter("state").ev.on("libraryItemChanged", async args => {
-        //     const video_id = args;
-        //     console.log('data：', video_id);
-
-        //     const library_item = await app_store.getter("libraryItem", {video_id});
-        //     grid_table.updateItem(library_item, video_id);
-        //     app_store.action("updateDownloadItem");
-        // });
-
-        obs.on("library-page:add-item", async (item) => { 
-            const video_id = item.video_id;
-            app_store.action("addLibraryItem", {item});
-            // await new Promise((resolve, reject) => {
-            //     app_store.action("addLibraryItem", {item});
-            //     app_store.change("libraryItemChanged", async (state, store) => {
-            //         const library_item = await store.getter("libraryItem", {video_id});
-            //         grid_table.updateItem(library_item, video_id);
-            //         resolve();
-            //     });
-            // });
-            // app_store.action("updateDownloadItem");
-        });  
 
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;

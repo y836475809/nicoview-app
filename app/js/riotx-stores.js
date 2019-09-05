@@ -301,6 +301,11 @@ class libraryItemConverter {
             return this._createLibraryItem(id_dirpath_map, item);
         });   
     }
+    
+    async getlibraryItem(library, item){
+        const id_dirpath_map = library.id_dirpath_map;
+        return this._createLibraryItem(id_dirpath_map, item);
+    }
     async getPlayItem(library, video_id){
         const item = await library.getItem(video_id);
         const dir_path = await library._getDir(item.dirpath_id);
@@ -381,6 +386,7 @@ const test_app_store = new Store({
     name: "app",
     state:{
         library:null,
+        download_Items:[]
     },
     actions: {
         addLibraryItem: async (context, item) => {
@@ -402,42 +408,67 @@ const test_app_store = new Store({
             item.tags = d_item.tags;
             item.is_deleted = d_item.is_deleted;
             item.thumbnail_size = d_item.thumbnail_size;
-            context.state.library.addItem(dirpath, item).then(()=>{
+            context.getter("library").addItem(dirpath, item).then(()=>{
                 context.commit("addDownloadedItem", item.video_id);
             });
         },
+        updateDownloadItem: (context, download_Items) => {
+            context.commit("updateDownloadItem", download_Items);
+        }
     },
     mutations: {
         initLibrary: (context, library) => {
             context.state.library = library;
-            return ["libraryInitialized"];
+            return [["libraryInitialized"]];
         },
         addDownloadedItem : (context, video_id) => {
-            // const dirpath = d_item.dirpath;
-            // const item = cv.createDBItem();
-            // item._db_type = d_item._db_type;
-            // item.video_id = d_item.video_id;
-            // item.video_name = d_item.video_name;
-            // item.video_type = d_item.video_type;
-            // item.common_filename = d_item.video_id,
-            // item.is_economy = d_item.is_economy;
-            // item.creation_date = new Date().getTime();
-            // item.pub_date = d_item.pub_date;
-            // item.time = d_item.time;
-            // item.tags = d_item.tags;
-            // item.is_deleted = d_item.is_deleted;
-            // item.thumbnail_size = d_item.thumbnail_size;
-            // await context.state.library.addItem(dirpath, item);
-            return ["libraryItemAdded", video_id];
+            return [["libraryItemAdded", video_id]];
+        },
+        updateDownloadItem: (context, download_Items) => {
+            context.state.download_Items = download_Items;
+            return [["downloadItemChanged"]];
         }
     },
     getters: {
+        library: (context) => {
+            return context.state.library;
+        },
         playData: async (context, video_id) => {
             const library = context.state.library;
             return await cv.getPlayItem(library, video_id);
         },
         libraryItems: async (context) => {
-            return await cv.getlibraryItems(context.state.library)
+            return await cv.getlibraryItems(context.state.library);
+        },
+        libraryItem: async (context, video_id) => {
+            const item = await context.state.library.getItem(video_id);
+            return cv.getlibraryItem(context.state.library, item);
+        },
+        existlibraryItem:  (context, video_id) => {
+            const id_set = context.state.library.getVideoIDSet();
+            return id_set.has(video_id);
+        },
+        libraryVideoIDSet:  (context) => {
+            if(!context.state.library){
+                return new Set();
+            }
+            return context.state.library.getVideoIDSet();
+        },
+        downloadItemSet : (context) => {
+            const id_set = new Set();
+            context.state.download_Items.forEach(item => {
+                id_set.add(item.video_id);
+            });
+            return id_set;
+        },
+        downloadIncompleteItemSet : (context) => {
+            const id_set = new Set();
+            context.state.download_Items.forEach(item => {
+                if(item.state=="incomplete"){
+                    id_set.add(item.video_id);
+                }
+            });
+            return id_set;
         }
     }
 });

@@ -161,20 +161,26 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const app_store = this.riotx.get("app");
-
-        app_store.change("donwloadItemChanged", (state, store) => {
-            const { reg_video_id_set } = store.getter("download");
-            const video_id_set = app_store.getter("libraryVideoIDSet");
+        const test_app_store = storex.get("app");
+ 
+        test_app_store.change("downloadItemChanged", () => {
+            const download_video_id_set = test_app_store.getter("downloadItemSet");
+            const video_id_set = test_app_store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
                 const video_id = item.id;
                 item.saved = video_id_set.has(video_id);
-                item.reg_download = reg_video_id_set.has(video_id);
+                item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
-        });  
+        });
+        test_app_store.change("libraryItemAdded", async video_id => {
+            const item = grid_table.dataView.getItemById(video_id);
+            item.saved = true;
+            grid_table.dataView.updateItem(video_id, item);
+        });
+ 
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -334,7 +340,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await app_store.getter("libraryItem", {video_id}))===true){
+                if(needConvertVideo(await test_app_store.getter("libraryItem", video_id))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -353,7 +359,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await app_store.getter("libraryItem", {video_id}))===true){
+                if(needConvertVideo(await test_app_store.getter("libraryItem", video_id))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -392,11 +398,12 @@
         };
 
         const setData = async (mylist_items) => {
-            const { reg_video_id_set } = app_store.getter("download");
-            const video_id_set = app_store.getter("libraryVideoIDSet");
+            const download_video_id_set = test_app_store.getter("downloadItemSet");
+            const video_id_set = test_app_store.getter("libraryVideoIDSet");
+
             mylist_items.forEach(value=>{
                 const saved = video_id_set.has(value.id);
-                const reg_download = reg_video_id_set.has(value.id);
+                const reg_download = download_video_id_set.has(value.id);
                 value.saved = saved;
                 value.reg_download = reg_download;
             });

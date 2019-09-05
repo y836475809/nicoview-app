@@ -211,29 +211,24 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const app_store = this.riotx.get("app");
         const test_app_store = storex.get("app");
 
-        app_store.change("donwloadItemChanged", (state, store) => {
-            const { reg_video_id_set } = store.getter("download");
-            const video_id_set = app_store.getter("libraryVideoIDSet");
+        test_app_store.change("downloadItemChanged", () => {
+            const download_video_id_set = test_app_store.getter("downloadItemSet");
+            const video_id_set = test_app_store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
                 const video_id = item.id;
                 item.saved = video_id_set.has(video_id);
-                item.reg_download = reg_video_id_set.has(video_id);
+                item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
         });
-        app_store.getter("state").ev.on("libraryItemChanged", async args => {
-            const video_id = args;
-            console.log('search data', video_id);
-        });
-
         test_app_store.change("libraryItemAdded", async video_id => {
-            // const video_id = args;
-            console.log('test-search data', video_id);
+            const item = grid_table.dataView.getItemById(video_id);
+            item.saved = true;
+            grid_table.dataView.updateItem(video_id, item);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -379,27 +374,16 @@
             if(process.env.NODE_ENV == "SEARCH-PAGE-DEBUG"){
                 const items = search_result.data.map(value => {
                     return createItem(value, false, false);
-                    // return {
-                    //     thumb_img: value.thumbnailUrl,
-                    //     id: value.contentId,
-                    //     name: value.title,
-                    //     info: `ID:${value.contentId}<br>再生:${value.viewCounter}<br>コメント:${value.commentCounter}`,
-                    //     play_time: value.lengthSeconds,
-                    //     pub_date: value.startTime,
-                    //     tags: value.tags,
-                    //     saved: false,
-                    //     reg_download: false,
-                    // };
                 });
                 grid_table.setData(items);
                 grid_table.scrollToTop();
             }
 
-            const { reg_video_id_set } = app_store.getter("download");
-            const video_id_set = app_store.getter("libraryVideoIDSet");
+            const donwload_video_id_set = test_app_store.getter("downloadItemSet");
+            const video_id_set = test_app_store.getter("libraryVideoIDSet");
             const items = search_result.data.map(value => {
                 const saved = video_id_set.has(value.contentId);
-                const reg_download = reg_video_id_set.has(value.contentId);
+                const reg_download = donwload_video_id_set.has(value.contentId);
                 return createItem(value, saved, reg_download);
             });
             items.push(createEmptyItem());
@@ -543,21 +527,6 @@
 
             this.search();
         });
-
-        // obs.on("search-page:complete-download-ids", (ids)=> {
-        //     if(grid_table.dataView.getLength()===0){
-        //         return;
-        //     }
-        //     ids.forEach(id => {
-        //         const item = grid_table.dataView.getItemById(id);
-        //         if(item!==undefined){
-        //             item.saved = true;
-        //             item.reg_download = false;
-        //             grid_table.dataView.updateItem(id, item);
-        //         }
-        //     });
-        //     grid_table.grid.render();
-        // });
 
         const resizeGridTable = () => {
             const container = this.root.querySelector(".search-grid-container");

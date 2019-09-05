@@ -107,12 +107,14 @@
         const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
         const { selectFileDialog, selectFolderDialog, showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { FileUtils } = require(`${app_base_dir}/js/file-utils`);
+        const { Library } = require(`${app_base_dir}/js/library`);
 
         this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
+        const test_app_store = storex.get("app");
 
         const setting_dir_config = new SettingDirConfig();
 
@@ -248,16 +250,11 @@
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
                 const mode = getImportDBMode();
 
-                obs.trigger("library-page:import-data", {
-                    data: {dir_list, video_list, mode},
-                    cb:async (error)=>{   
-                        if(error){
-                            throw error;
-                        }else{
-                            await showMessageBox("info", "インポート完了");
-                        } 
-                    }
-                });
+                const library = new Library();
+                await library.init(SettingStore.getSettingDir());
+                await library.setData(dir_list, video_list, mode); 
+                test_app_store.commit("initLibrary", library);
+                await showMessageBox("info", "インポート完了");
             } catch (error) {
                 console.log(error);
                 await showMessageBox("error", `インポート失敗: ${error.message}`);

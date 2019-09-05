@@ -184,6 +184,10 @@
             grid_table.updateItem(item, video_id);
         });
 
+        test_app_store.change("libraryInitialized", async () => {
+            loadLibraryItems(await test_app_store.getter("libraryItems"));
+        });
+
         const obs_trigger = new obsTrigger(obs);
 
         let library = null;
@@ -496,7 +500,6 @@
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
                 test_app_store.commit("initLibrary", library);
-                loadLibraryItems(await test_app_store.getter("libraryItems"));
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -563,20 +566,6 @@
                 this.nico_update.cancel();
             }
         });
-    
-        obs.on("library-page:import-data", async (args) => { 
-            const { data, cb } = args;
-            const { dir_list, video_list, mode } = data; 
-            try {
-                library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                await library.setData(dir_list, video_list, mode); 
-                loadLibraryItems(await library.getLibraryItems()); 
-                cb(null);
-            } catch (error) {
-                cb(error);
-            }
-        }); 
     
         const resizeGridTable = () => {
             const container = this.root.querySelector(".library-grid-container");

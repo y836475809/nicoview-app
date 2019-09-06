@@ -18,7 +18,6 @@
     <main-page></main-page>
 </body>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
-<script src="../node_modules/riotx/dist/riotx.min.js"></script>
 <script type="riot/tag" src="../app/tags/main-page.tag"></script>
 <script type="riot/tag" src="../app/tags/accordion.tag"></script>
 <script type="riot/tag" src="../app/tags/pagination.tag"></script>
@@ -36,7 +35,7 @@
     const path = require("path");
     const { IPCMain } = require("../app/js/ipc-monitor");
     const { remote } = require("electron");
-    const { stores, storex } = require("../app/js/riotx-stores");
+    const { storex } = require("../app/js/riotx-stores");
     
     var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
     var app_base_dir = shared_obj.base_dir; // eslint-disable-line
@@ -76,10 +75,6 @@
         video_fs.forEach(value => {
             value.closeStream();
         });
-    });
-
-    stores.forEach(store=>{
-        riotx.add(store);
     });
 </script>
 

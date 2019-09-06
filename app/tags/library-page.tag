@@ -26,7 +26,7 @@
         const obs = this.opts.obs; 
         this.obs_search = riot.observable();
         this.storname = "library-search";
-        const store = this.riotx.get(this.storname);
+        const store = storex.get(this.storname);
 
         this.on("mount", () => {
             const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);

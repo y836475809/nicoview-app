@@ -101,7 +101,7 @@
         const menu_item_h = 30;
         const obs_accordion = this.opts.obs;
 
-        const store = this.riotx.get(this.opts.storname);
+        const store = storex.get(this.opts.storname);
 
         store.change("loaded", (state, store) => {
             this.item_attr_map = store.getter("attmap");

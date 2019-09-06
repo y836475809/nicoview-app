@@ -78,7 +78,7 @@
         this.obs_bookmark = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
-        const store = this.riotx.get(this.storname);
+        const store = storex.get(this.storname);
         const test_app_store = storex.get("app");
 
         this.on("mount", () => {

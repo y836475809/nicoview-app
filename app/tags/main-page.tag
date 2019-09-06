@@ -129,9 +129,9 @@
         const ipc_main = new IPCMain();
 
         this.obs = this.opts.obs;
-        const test_app_store = storex.get("app");
+        const main_store = storex.get("main");
 
-        test_app_store.change("downloadItemChanged", (state, store) => {
+        main_store.change("downloadItemChanged", (state, store) => {
             const id_set = store.getter("downloadIncompleteItemSet");
             this.donwnload_item_num = id_set.size;
             this.update();
@@ -208,7 +208,7 @@
 
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
             const video_id  = args;
-            const data = await test_app_store.getter("playData", video_id);
+            const data = await main_store.getter("playData", video_id);
             ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
                 video_id,
                 data
@@ -251,7 +251,7 @@
             });
 
             if(result.state == "ok" || result.state == "404"){
-                const data = await test_app_store.getter("playData", video_id);
+                const data = await main_store.getter("playData", video_id);
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
                     video_id, data
                 });

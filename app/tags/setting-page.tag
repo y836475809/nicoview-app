@@ -114,7 +114,7 @@
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
-        const test_app_store = storex.get("app");
+        const main_store = storex.get("main");
 
         const setting_dir_config = new SettingDirConfig();
 
@@ -253,7 +253,7 @@
                 const library = new Library();
                 await library.init(SettingStore.getSettingDir());
                 await library.setData(dir_list, video_list, mode); 
-                test_app_store.commit("initLibrary", library);
+                main_store.commit("initLibrary", library);
                 await showMessageBox("info", "インポート完了");
             } catch (error) {
                 console.log(error);

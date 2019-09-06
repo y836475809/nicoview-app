@@ -214,8 +214,8 @@ class libraryItemConverter {
 
 const cv = new libraryItemConverter();
 
-const test_app_store = new Store({
-    name: "app",
+const main_store = new Store({
+    name: "main",
     state:{
         library:null,
         download_Items:[]
@@ -412,7 +412,7 @@ class StoreX {
 }
 
 const storex = new StoreX();
-storex.add(test_app_store);
+storex.add(main_store);
 storex.add(createAccStore("bookmark"));
 storex.add(createAccStore("nico-search"));
 storex.add(createAccStore("library-search"));

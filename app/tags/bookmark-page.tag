@@ -79,7 +79,7 @@
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
         const store = storex.get(this.storname);
-        const test_app_store = storex.get("app");
+        const main_store = storex.get("main");
 
         this.on("mount", () => {
             const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
@@ -160,7 +160,7 @@
                         }
 
                         const video_id = items[0].data.video_id;
-                        const exist = test_app_store.getter("existlibraryItem", video_id);
+                        const exist = main_store.getter("existlibraryItem", video_id);
                         if(exist===true){
                             obs.trigger("main-page:select-page", "library");
                             obs.trigger("library-page:scrollto", video_id);     

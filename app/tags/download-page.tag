@@ -81,7 +81,7 @@
         const obs = this.opts.obs; 
 
         const obs_trigger = new obsTrigger(obs);
-        const test_app_store = storex.get("app");
+        const main_store = storex.get("main");
 
         const download_dir = SettingStore.getDownloadDir();
 
@@ -224,7 +224,7 @@
             ]).forEach(item => {
                 download_Items.push({video_id: item.id, state:"complete"});
             });
-            test_app_store.action("updateDownloadItem", download_Items);
+            main_store.action("updateDownloadItem", download_Items);
         };
 
         const addDownloadItems = (items) => {
@@ -344,7 +344,7 @@
                     if(result.type==NicoDownloader.ResultType.complete){
                         const item = nico_down.getDownloadedItem();
                         // obs.trigger("library-page:add-item", item); 
-                        test_app_store.action("addDownloadedItem", item);
+                        main_store.action("addDownloadedItem", item);
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {

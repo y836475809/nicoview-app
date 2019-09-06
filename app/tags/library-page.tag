@@ -177,14 +177,14 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const test_app_store = storex.get("app");
+        const main_store = storex.get("main");
 
-        test_app_store.change("libraryItemAdded", async (state, store, video_id) => {
+        main_store.change("libraryItemAdded", async (state, store, video_id) => {
             const item = await store.getter("libraryItem", video_id);
             grid_table.updateItem(item, video_id);
         });
 
-        test_app_store.change("libraryInitialized", async (state, store) => {
+        main_store.change("libraryInitialized", async (state, store) => {
             loadLibraryItems(await store.getter("libraryItems"));
         });
 
@@ -499,7 +499,7 @@
             try {
                 library = new Library();
                 await library.init(SettingStore.getSettingDir());
-                test_app_store.commit("initLibrary", library);
+                main_store.commit("initLibrary", library);
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);

@@ -179,13 +179,13 @@
         this.obs_modal_dialog = riot.observable();
         const test_app_store = storex.get("app");
 
-        test_app_store.change("libraryItemAdded", async video_id => {
-            const item = await test_app_store.getter("libraryItem", video_id);
+        test_app_store.change("libraryItemAdded", async (state, store, video_id) => {
+            const item = await store.getter("libraryItem", video_id);
             grid_table.updateItem(item, video_id);
         });
 
-        test_app_store.change("libraryInitialized", async () => {
-            loadLibraryItems(await test_app_store.getter("libraryItems"));
+        test_app_store.change("libraryInitialized", async (state, store) => {
+            loadLibraryItems(await store.getter("libraryItems"));
         });
 
         const obs_trigger = new obsTrigger(obs);

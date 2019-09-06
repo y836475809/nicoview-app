@@ -232,7 +232,8 @@ class Store {
 
         const evnets = fn(context, ...args);
         evnets.forEach(ev => {
-            this._emiter.emit(...ev);
+            const [name, ...args] = ev;
+            this._emiter.emit(...[name, this._state, this, ...args]);
         });
     }
 

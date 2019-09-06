@@ -163,9 +163,9 @@
         this.obs_modal_dialog = riot.observable();
         const test_app_store = storex.get("app");
  
-        test_app_store.change("downloadItemChanged", () => {
-            const download_video_id_set = test_app_store.getter("downloadItemSet");
-            const video_id_set = test_app_store.getter("libraryVideoIDSet");
+        test_app_store.change("downloadItemChanged", (state, store) => {
+            const download_video_id_set = store.getter("downloadItemSet");
+            const video_id_set = store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
@@ -175,7 +175,7 @@
                 grid_table.dataView.updateItem(video_id, item);
             });
         });
-        test_app_store.change("libraryItemAdded", async video_id => {
+        test_app_store.change("libraryItemAdded", async (state, store, video_id) => {
             const item = grid_table.dataView.getItemById(video_id);
             item.saved = true;
             grid_table.dataView.updateItem(video_id, item);

@@ -131,8 +131,8 @@
         this.obs = this.opts.obs;
         const test_app_store = storex.get("app");
 
-        test_app_store.change("downloadItemChanged", () => {
-            const id_set = test_app_store.getter("downloadIncompleteItemSet");
+        test_app_store.change("downloadItemChanged", (state, store) => {
+            const id_set = store.getter("downloadIncompleteItemSet");
             this.donwnload_item_num = id_set.size;
             this.update();
         });

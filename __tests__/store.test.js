@@ -22,7 +22,7 @@ const test_store = new Store({
 });
 
 test.cb("store", (t) => {
-    test_store.change("itemChanged", (video_id, item) => {
+    test_store.change("itemChanged", (state, store, video_id, item) => {
         t.is(video_id, "sm10");
         t.deepEqual(item, {id:"sm10", name:"test10"});
         t.end();

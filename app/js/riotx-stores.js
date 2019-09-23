@@ -305,7 +305,7 @@ const main_store = new Store({
     }
 });
 
-const createAccStore = (store_name) => {
+const createAcordionStore = (store_name) => {
     return new Store({
         name: store_name,
         state: {
@@ -413,10 +413,10 @@ class StoreX {
 
 const storex = new StoreX();
 storex.add(main_store);
-storex.add(createAccStore("bookmark"));
-storex.add(createAccStore("nico-search"));
-storex.add(createAccStore("library-search"));
-storex.add(createAccStore("mylist"));
+storex.add(createAcordionStore("bookmark"));
+storex.add(createAcordionStore("nico-search"));
+storex.add(createAcordionStore("library-search"));
+storex.add(createAcordionStore("mylist"));
 
 module.exports = {
     Store,

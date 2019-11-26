@@ -154,44 +154,19 @@ class Library {
 
     /**
      * 
+     * @param {String} video file dirpath
      * @param {object} item 
      * @param {String} item._db_type
      * @param {String} item.dirpath
      * @param {String} item.video_id
      * @param {String} item.video_name
      * @param {String} item.video_type
-     * @param {boolean} item.max_quality
+     * @param {boolean} item.is_economy
      * @param {Number} item.time
      * @param {Number} item.pub_date
      * @param {Array} item.tags
+     * @param {String} item.thumbnail_size
      */
-    // async addItem(item){
-    //     const dirpath = item.dirpath;
-    //     const dirpath_id = await this._addDirPath(dirpath);
-
-    //     const new_item = createDBItem();
-    //     new_item._db_type = item._db_type;
-    //     new_item.dirpath_id = dirpath_id;
-    //     new_item.video_id = item.video_id;
-    //     new_item.video_name = item.video_name;
-    //     new_item.video_type = item.video_type;
-    //     new_item.common_filename = item.video_id,
-    //     new_item.is_economy = item.is_economy;
-    //     // modification_date
-    //     new_item.creation_date = new Date().getTime();
-    //     new_item.pub_date = item.pub_date;
-    //     // last_play_date
-    //     // play_count
-    //     new_item.time = item.time;
-    //     new_item.tags = item.tags;
-    //     new_item.is_deleted = item.is_deleted;
-    //     new_item.thumbnail_size = item.thumbnail_size;
-
-    //     await this._updateData(this.video_db, new_item, true);
-
-    //     this._addVideoIDSet(new_item.video_id);
-    // }
-
     async addItem(dirpath, item){
         const dirpath_id = await this._addDirPath(dirpath);
         item.dirpath_id = dirpath_id;

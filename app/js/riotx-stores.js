@@ -44,11 +44,18 @@ class Store {
                 this.commit(name, ...args);
             }
         };
-        return Promise
-            .resolve()
-            .then(() => {
-                fn(context, ...args);
+
+        if(this._isAsync(fn)){
+            return fn(context, ...args);
+        }else{    
+            return new Promise((resolve, reject) => {
+                try {
+                    resolve(fn(context, ...args));
+                } catch (error) {
+                    reject(error);
+                }
             });
+        }
     }
 
     commit(name, ...args){
@@ -79,6 +86,10 @@ class Store {
 
     change(name, ...args){
         this._emiter.on(name, ...args);
+    }
+
+    _isAsync(func) {
+        return func.constructor.name === "AsyncFunction";
     }
 }
 
@@ -221,10 +232,6 @@ const main_store = new Store({
         download_Items:[]
     },
     actions: {
-        addLibraryItem: async (context, item) => {
-            await context.state.library.addItem(item);
-            context.commit(item.video_id);
-        },
         addDownloadedItem: (context, d_item) => {
             const dirpath = d_item.dirpath;
             const item = cv.createDBItem();
@@ -246,7 +253,20 @@ const main_store = new Store({
         },
         updateDownloadItem: (context, download_Items) => {
             context.commit("updateDownloadItem", download_Items);
-        }
+        },
+        getLibraryItem: async (context, video_id) => {
+            const library = context.getter("library");
+            const item = await library.getItem(video_id);
+            return cv.getlibraryItem(library, item);
+        },
+        getLibraryItems: async (context) => {
+            const library = context.getter("library");
+            return await cv.getlibraryItems(library);
+        },
+        getPlayData: async (context, video_id) => {
+            const library = context.getter("library");
+            return await cv.getPlayItem(library, video_id);
+        },
     },
     mutations: {
         initLibrary: (context, library) => {
@@ -264,17 +284,6 @@ const main_store = new Store({
     getters: {
         library: (context) => {
             return context.state.library;
-        },
-        playData: async (context, video_id) => {
-            const library = context.state.library;
-            return await cv.getPlayItem(library, video_id);
-        },
-        libraryItems: async (context) => {
-            return await cv.getlibraryItems(context.state.library);
-        },
-        libraryItem: async (context, video_id) => {
-            const item = await context.state.library.getItem(video_id);
-            return cv.getlibraryItem(context.state.library, item);
         },
         existlibraryItem:  (context, video_id) => {
             const id_set = context.state.library.getVideoIDSet();

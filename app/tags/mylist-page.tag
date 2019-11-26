@@ -340,7 +340,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await main_store.getter("libraryItem", video_id))===true){
+                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -359,7 +359,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await main_store.getter("libraryItem", video_id))===true){
+                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});

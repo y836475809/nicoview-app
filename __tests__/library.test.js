@@ -492,7 +492,7 @@ test("library add item", async (t) => {
         tags: ["tag1"],
         thumbnail_size: "S"
     };
-    await library.addItem(item1);
+    await library.addItem(item1.dirpath, item1);
     const items = await library.getLibraryItems();
     t.is(1, items.length);
 
@@ -531,8 +531,8 @@ test("library add same item", async (t) => {
         tags: [],
         thumbnail_size: "S"
     };
-    await library.addItem(item1);
-    await library.addItem(item1);
+    await library.addItem(item1.dirpath, item1);
+    await library.addItem(item1.dirpath, item1);
 
     const items = await library.getLibraryItems();
     t.is(1, items.length);
@@ -572,7 +572,7 @@ test("library add same id item", async (t) => {
         tags: [],
         thumbnail_size: "L"
     };
-    await library.addItem(item1);
+    await library.addItem(item1.dirpath, item1);
 
     const item2 ={
         _db_type:"json", 
@@ -587,7 +587,7 @@ test("library add same id item", async (t) => {
         tags: ["tag1"],
         thumbnail_size: "L"
     };
-    await library.addItem(item2);
+    await library.addItem(item2.dirpath, item2);
 
     const items = await library.getLibraryItems();
     t.is(1, items.length);

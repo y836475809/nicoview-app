@@ -180,12 +180,12 @@
         const main_store = storex.get("main");
 
         main_store.change("libraryItemAdded", async (state, store, video_id) => {
-            const item = await store.getter("libraryItem", video_id);
+            const item = await store.action("getLibraryItem", video_id);
             grid_table.updateItem(item, video_id);
         });
 
         main_store.change("libraryInitialized", async (state, store) => {
-            loadLibraryItems(await store.getter("libraryItems"));
+            loadLibraryItems(await store.action("getLibraryItems"));
         });
 
         const obs_trigger = new obsTrigger(obs);

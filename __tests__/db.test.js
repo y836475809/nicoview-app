@@ -1,4 +1,6 @@
 const test = require("ava");
+const fs = require("fs").promises;
+const path = require("path");
 
 const pp = (key, ary) => {
     const output = ary.map(value=>{
@@ -30,20 +32,51 @@ const rr = (id_name, ary) =>{
 };
 
 class testDB {
-    constructor(){
+    constructor(work_dir){
+        this.work_dir = work_dir;
+        this.p_map = new Map();
+        this.v_map = new Map();
+        this.uu = [];
 
+        this.db_path = path.join(this.work_dir, "db.json");
+        this.log_path = path.join(this.work_dir, "db.log");
     }
 
-    setData(path_list, video_list){
-        this.p_map = rr("path_id", path_list);
-        this.v_map = rr("video_id", video_list);
+    async load(){
+        const jsonString = await fs.readFile(this.db_path, "utf-8");
+        const obj = JSON.parse(jsonString);
+        const r_map = new Map(obj);
+        this.p_map = rr("path_id", r_map.get("path"));
+        this.v_map = rr("video_id", r_map.get("library"));  
+        
+        if(this.existfile(this.log_path)){
+            const logstr = await fs.readFile(this.log_path, "utf-8");
+            this.uu = JSON.parse(logstr);
+            this._rest(this.p_map, this.v_map, this.uu);
+            await this.save();
+        }else{
+            this.uu = [];
+        }
+    }
+
+    existfile(file_path){
+        try {
+            fs.stat(file_path);
+            return true;
+        } catch (error) {
+            return false;
+        }  
+    }
+
+    setData(path_data_list, video_data_list){
+        this.p_map = rr("path_id", path_data_list);
+        this.v_map = rr("video_id", video_data_list);
         this.uu = [];
     }
 
     addPath(path){
-        const normalized_path = FileUtils.normalizePath(path);
         for (let [k, v] of this.p_map) {
-            if (v === normalized_path) { 
+            if (v == path) { 
                 return k; 
             }
         }  
@@ -51,11 +84,11 @@ class testDB {
         const max_id = 10000;
         for (let index = 0; index < max_id; index++) {
             if(!this.p_map.has(index)){
-                this.p_map.set(index, normalized_path);
+                this.p_map.set(index, path);
                 this.uu.push({
                     "target":"path",
                     "type":"add",
-                    "value":{"path_id":index,"value":normalized_path}
+                    "value":{"path_id":index,"value":path}
                 });
                 return index;
             } 
@@ -64,36 +97,98 @@ class testDB {
         throw new Error("maximum id value has been exceeded");
     }
 
-    getItem(video_id){
-        if(!this.v_map.has(video_id)){
-            return null;
-        }   
+    exist(video_id){
+        return this.v_map.has(video_id);
+    }
+
+    find(video_id){
+        if(video_id===undefined){
+            return Array.from(this.v_map.values()); 
+        }
         
-        return this.v_map.get(video_id);
+        if(!this.v_map.has(video_id)){
+            return [];
+        }   
+        return [this.v_map.get(video_id)];
     }
 
-    getItems(){        
-        return Array.from(this.v_map.values());
-    }
-
-    addItem(path, item){
+    insert(path, data){
         const path_id = this.addPath(path);
-        item.path_id = path_id;
-        this.v_map.set(item.video_id, item);
+        data.path_id = path_id;
+        this.v_map.set(data.video_id, data);
         this.uu.push({
             "target":"library",
-            "type":"add",
-            "value":{"video_id":item.video_id,"value":item}
+            "type":"insert",
+            "value":{"video_id":data.video_id,"value":data}
         });
     }
 
-    updateItem(video_id, items){
+    update(video_id, props){
         if(!this.v_map.has(video_id)){
             throw new Error(`not has ${video_id}`);
         }
 
         this.v_map.set(video_id, 
-            Object.assign(this.v_map.get(video_id), items));
+            Object.assign(this.v_map.get(video_id), props));
+    }
+
+    async save(){
+        const lmap = new Map();
+        lmap.set("path", Array.from( this.p_map.values() ));
+        lmap.set("library", Array.from( this.v_map.values() ));
+
+        const o_items = [];
+        lmap.forEach((value, key)=>{
+            o_items.push(pp(key, value));
+        });
+
+        const jsonString = `[${o_items.join(",\n")}]`;
+        await this._writeFile(this.db_path , jsonString);
+
+        await this._deletelog();
+
+    }
+
+    async _writeFile(file_path, data){
+        const tmp_path = path.join(path.dirname(file_path), "_db.tmp");
+        await fs.writeFile(tmp_path, data, "utf-8");    
+        await fs.rename(tmp_path, file_path);
+    }
+
+    _log(obj){
+        this.uu.push(obj); 
+        
+    }
+
+    async _deletelog(){
+        await fs.unlink(this.log_path);
+    } 
+
+    async _writelog(){
+        const uu_str = pp_ary(this.uu);
+        await fs.writeFile(this.log_path, uu_str);
+    }
+
+    _rest(p_map, v_map, uu){
+        uu.forEach(item=>{
+            if(item.target=="path"){
+                const value = item.value;
+                if(item.type=="add"){
+                    p_map.set(value.path_id, value);
+                }
+            }
+            if(item.target=="library"){
+                const value = item.value;
+                if(item.type=="add"){
+                    v_map.set(value.video_id, value);
+                }
+                if(item.type=="update"){
+                    // Object.assign(target, source);
+                    v_map.set(value.video_id, 
+                        Object.assign(v_map.get(value.video_id), value));
+                }
+            }
+        }); 
     }
 }
 

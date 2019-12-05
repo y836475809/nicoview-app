@@ -167,7 +167,7 @@ class testDB {
             return;
         }
 
-        const tmp_path = path.join(path.dirname(file_path), "~db.tmp");
+        const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
         await fs.writeFile(tmp_path, data, "utf-8");    
         await fs.rename(tmp_path, file_path);
     }

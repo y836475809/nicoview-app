@@ -34,7 +34,7 @@ const rr = (id_name, ary) =>{
 class testDB {
     constructor({filename=path.resolve("./db.json"), autonum=10, memory_only=false} = {}){
         const dir = path.dirname(filename);
-        this.autonum = autonum;
+        this.autonum = autonum<10?10:autonum;
         this.memory_only = memory_only;
         this.db_path = filename;
         this.log_path = path.join(dir, 
@@ -45,7 +45,7 @@ class testDB {
     init(){
         this.p_map = new Map();
         this.v_map = new Map();
-        this.cmd_logs = [];
+        this.cmd_log_count = 0;
     }
 
     setPathData(data_list){
@@ -57,23 +57,22 @@ class testDB {
     }
 
     async load(){
-        if(await this.existfile(this.db_path)===true){ 
-            const jsonString = await fs.readFile(this.db_path, "utf-8");
+        if(await this._existFile(this.db_path)){ 
+            const jsonString = await this._readFile(this.db_path);
             const obj = JSON.parse(jsonString);
             const r_map = new Map(obj);            
             this.setPathData(r_map.get("path"));
-            this.setVideoData(r_map.get("library"));
+            this.setVideoData(r_map.get("video"));
         }
         
-        if(await this.existfile(this.log_path)===true){
-            const logstr = await fs.readFile(this.log_path, "utf-8");
-            this.cmd_logs = JSON.parse(logstr);
-            this._applyCmdLog();
+        if(await this._existFile(this.log_path)){
+            const cmd_logs = this._readlog(this.log_path);
+            this._applyCmdLog(cmd_logs);
             await this.save();
         }
     }
 
-    async existfile(file_path){
+    async _existFile(file_path){
         try {
             await fs.stat(file_path);
             return true;
@@ -110,25 +109,25 @@ class testDB {
     }
 
     find(video_id){
-        if(video_id===undefined){
-            return Array.from(this.v_map.values()); 
-        }
-        
         if(!this.v_map.has(video_id)){
-            return [];
+            return null;
         }   
-        return [this.v_map.get(video_id)];
+        return this.v_map.get(video_id);
     }
 
-    async insert(path, data){
+    findAll(){
+        return Array.from(this.v_map.values()); 
+    }
+
+    async insert(path, video_data){
         const path_id = await this.addPath(path);
-        data.path_id = path_id;
-        this.v_map.set(data.video_id, data);
+        video_data.path_id = path_id;
+        this.v_map.set(video_data.video_id, video_data);
 
         await this._log({
-            "target":"library",
+            "target":"video",
             "type":"insert",
-            "value":{"id":data.video_id,"data":data}
+            "value":{"id":video_data.video_id,"data":video_data}
         });
     }
 
@@ -141,70 +140,107 @@ class testDB {
             Object.assign(this.v_map.get(video_id), props));
 
         await this._log({
-            "target":"library",
+            "target":"video",
             "type":"update",
             "value":{"id":video_id,"data":props}
         });
     }
 
     async save(){
-        const lmap = new Map();
-        lmap.set("path", Array.from( this.p_map.values() ));
-        lmap.set("library", Array.from( this.v_map.values() ));
-
-        const o_items = [];
-        lmap.forEach((value, key)=>{
-            o_items.push(pp(key, value));
+        const items = [];
+        Array.from(this.p_map.values()).forEach(value=>{
+            items.push(pp("path", value));
+        });
+        Array.from(this.v_map.values()).forEach(value=>{
+            items.push(pp("video", value));
         });
 
-        const jsonString = `[${o_items.join(",\n")}]`;
-        await this._writeFile(this.db_path , jsonString);
+        const jsonString = `[${items.join(",\n")}]`;
+        await this._safeWriteFile(this.db_path , jsonString);
         await this._deletelog();
     }
 
-    async _writeFile(file_path, data){
+    async _safeWriteFile(file_path, data){
         if(this.memory_only){
             return;
         }
 
         const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
-        await fs.writeFile(tmp_path, data, "utf-8");    
-        await fs.rename(tmp_path, file_path);
+        await this._writeFile(tmp_path, data, "utf-8");    
+        await this._rename(tmp_path, file_path);
     }
 
     async _log(cmd){
-        this.cmd_logs.push(cmd); 
-        if(this.cmd_logs.length >= this.autonum){
+        this.cmd_log_count++;
+
+        if(this.cmd_log_count >= this.autonum){
             await this.save();
-            this.cmd_logs = [];
+            this.cmd_log_count = 0;
+            return;
         }
-        await this._writelog();
+
+        await this._writelog(cmd);
     }
 
     async _deletelog(){
         if(this.memory_only){
             return;
         }
-        await fs.unlink(this.log_path);
+        await this._unlink(this.log_path);
     } 
 
-    async _writelog(){
+    async _writelog(cmd){
         if(this.memory_only){
             return;
         }
-        const uu_str = pp_ary(this.cmd_logs);
-        await fs.writeFile(this.log_path, uu_str);
+        const data = JSON.stringify(cmd, null, 0);
+        await this._appendFile(this.log_path, data, "utf-8");
     }
 
-    _applyCmdLog(){
-        this.cmd_logs.forEach(item=>{
+    async _readlog(log_path){
+        if(!this._existFile(log_path)){
+            return [];
+        }
+
+        const str = await this._readFile(log_path);
+        const lines = str.split(/\r\n|\n/);
+        const cmds = lines.filter(line=>{
+            return line.length > 0;
+        }).map(line=>{
+            return JSON.parse(line);
+        });
+        return cmds;
+    }
+
+    async _readFile(file_path){
+        return await fs.readFile(file_path, "utf-8");
+    }
+    async _appendFile(file_path, data){
+        await fs.appendFile(file_path, data, "utf-8");
+    }
+    async _unlink(file_path){
+        return await fs.unlink(file_path);
+    }
+    async _writeFile(file_path, data){
+        await fs.writeFile(file_path, data, "utf-8");    
+    }
+    async _rename(old_path, new_path){
+        await fs.rename(old_path, new_path);
+    }
+
+    /**
+     * 
+     * @param {Array} cmd_logs 
+     */
+    _applyCmdLog(cmd_logs){
+        cmd_logs.forEach(item=>{
             if(item.target=="path"){
                 const value = item.value;
                 if(item.type=="insert"){
                     this.p_map.set(value.id, value);
                 }
             }
-            if(item.target=="library"){
+            if(item.target=="video"){
                 const value = item.value;
                 if(item.type=="insert"){
                     this.v_map.set(value.id, value);

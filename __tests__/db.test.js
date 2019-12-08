@@ -10,52 +10,52 @@ const pp = (key, ary) => {
     return `["${key}", [\n${output}\n]]`;
 };
 
-const pp_ary = (ary) => {
-    const output = ary.map(value=>{
-        return JSON.stringify(value, null, 0);
-    }).join(",\n");
-
-    return `[\n${output}\n]`;
-};
-
 /**
  * 
- * @param {String} id_name 
+ * @param {String} name 
  * @param {Array} ary 
  */
-const rr = (id_name, ary) =>{
+const rr = (name, ary) =>{
     const map = new Map();
     ary.forEach(value=>{
-        map.set(value[id_name], value);
+        map.set(value[name], value);
     });
     return map;
 };
 
 class testDB {
-    constructor({filename=path.resolve("./db.json"), autonum=10, memory_only=false} = {}){
-        const dir = path.dirname(filename);
+    constructor({filename="./db.json", memory_only=false, autonum=10}={}){  
         this.autonum = autonum<10?10:autonum;
         this.memory_only = memory_only;
-        this.db_path = filename;
-        this.log_path = path.join(dir, 
-            `${path.basename(this.db_path, path.extname(this.db_path))}.log`);
-        this.init();
-    }
 
-    init(){
-        this.tables(["path", "video"]);
+        const fullpath = path.resolve(filename);
+        this.db_path = fullpath;
+        this.log_path = this._getLogFilePath(fullpath);
+
+        // this.init();
+        this.db_map = new Map();
         this.cmd_log_count = 0;
     }
 
-    /**
-     * 
-     * @param {Array<String>} names 
-     */
-    tables(names){
-        this.db_map = new Map();
+    // init(){
+    //     // this.db_map = new Map();
+    //     // ["path", "video"].forEach(name => {
+    //     //     this.db_map.set(name, new Map());
+    //     // });
+    //     this.cmd_log_count = 0;
+    // }
+
+    createTable(names){
+        this.db_map.clear();
         names.forEach(name => {
             this.db_map.set(name, new Map());
         });
+    }
+
+    _getLogFilePath(db_file_path){
+        const dir = path.dirname(db_file_path);
+        const ext = path.extname(db_file_path);
+        return path.join(dir, `${path.basename(db_file_path, ext)}.log`);
     }
 
     async load(){
@@ -84,76 +84,56 @@ class testDB {
         }  
     }
 
-    async addPath(path){
-        const path_map = this.db_map.get("path");
-
-        for (let [k, v] of path_map) {
-            if (v.path == path) { 
-                return k; 
-            }
-        }  
-
-        const max_id = 10000;
-        for (let index = 0; index < max_id; index++) {
-            if(!path_map.has(index)){
-                path_map.set(index, {"id":index, "path": path});
-                await this._log({
-                    "target":"path",
-                    "type":"insert",
-                    "value":{"id":index,"data":path}
-                });
-                return index;
-            } 
+    exist(name, id){
+        if(!this.db_map.has(name)){
+            return false;
         }
-
-        throw new Error("maximum id value has been exceeded");
+        return this.db_map.get(name).has(id);
     }
 
-    exist(video_id){
-        const video_map = this.db_map.get("video");
-        return video_map.has(video_id);
-    }
-
-    find(video_id){
-        const video_map = this.db_map.get("video");
-        if(!video_map.has(video_id)){
+    find(name, id){
+        if(!this.db_map.has(name)){
+            return null;
+        }
+        const map = this.db_map.get(name);
+        if(!map.has(id)){
             return null;
         }   
-        return video_map.get(video_id);
+        return map.get(id);
     }
 
-    findAll(){
-        const video_map = this.db_map.get("video");
-        return Array.from(video_map.values()); 
+    findAll(name){
+        if(!this.db_map.has(name)){
+            return [];
+        }
+        const map = this.db_map.get(name);
+        return Array.from(map.values()); 
     }
 
-    async insert(path, video_data){
-        const path_id = await this.addPath(path);
-        video_data.path_id = path_id;
-
-        const video_map = this.db_map.get("video");
-        video_map.set(video_data.id, video_data);
+    async insert(name, data){
+        const map = this.db_map.get(name);
+        map.set(data.id, data);
         
         await this._log({
-            "target":"video",
-            "type":"insert",
-            "value":{"id":video_data.id,"data":video_data}
+            target:name,
+            type:"insert",
+            value:{id:data.id,data:data}
         });
     }
 
-    async update(video_id, props){
-        const video_map = this.db_map.get("video");
-        if(!video_map.has(video_id)){
-            throw new Error(`not has ${video_id}`);
+    async update(name, id, props){
+        const map = this.db_map.get(name);
+        if(!map.has(id)){
+            throw new Error(`${name} not has ${id}`);
         }
 
-        video_map.set(video_id, 
-            Object.assign(video_map.get(video_id), props));
+        map.set(id, 
+            Object.assign(map.get(id), props));
 
         await this._log({
-            "target":"video",
-            "type":"update",
-            "value":{"id":video_id,"data":props}
+            target:name,
+            type:"update",
+            value:{id:id, data:props}
         });
     }
 
@@ -203,7 +183,7 @@ class testDB {
             return;
         }
         const data = JSON.stringify(cmd, null, 0);
-        await this._appendFile(this.log_path, `${data}\n`, "utf-8");
+        await this._appendFile(this.log_path, `${data}\n`);
     }
 
     async _readlog(log_path){
@@ -243,48 +223,147 @@ class testDB {
      */
     _applyCmdLog(cmd_logs){
         cmd_logs.forEach(item=>{
-            if(item.target=="path"){
-                const path_map = this.db_map.get("path");
-                const value = item.value;
-                if(item.type=="insert"){
-                    path_map.set(value.id, value);
-                }
+            const target = item.target;
+            if(!this.db_map.has(target)){
+                return;
             }
-            if(item.target=="video"){
-                const video_map = this.db_map.get("video");
-                const value = item.value;
-                if(item.type=="insert"){
-                    video_map.set(value.id, value);
+
+            const data_map = this.db_map.get(target);
+            const value = item.value;
+            if(item.type=="insert"){
+                data_map.set(value.id, value);
+            }
+
+            if(item.type=="update"){
+                if(!data_map.has(value.id)){
+                    return;
                 }
-                if(item.type=="update"){
-                    if(!video_map.has(value.id)){
-                        return;
-                    }
-                    video_map.set(value.id, 
-                        Object.assign(video_map.get(value.id), value.data));
-                }
+                data_map.set(value.id, 
+                    Object.assign(data_map.get(value.id), value.data));
             }
         }); 
     }
 }
 
+class kk {
+    constructor({db_file_path="./db.json", memory_only=false, autonum=10}={}){
+        this._db = new testDB(db_file_path, {memory_only:memory_only, autonum:autonum});
+        this._db.createTable(["path, video"]);
+    }
+
+    async load(){
+        await this._db.load();
+    }
+
+    exist(video_id){
+        return this._db.exist("vieo", video_id);
+    }
+
+    find(video_id){ 
+        const video_items = this._db.find("video", video_id);
+        const path = this._db.find("path", video_items.path_id);
+        video_items.path = path;
+        // Object.assign(vieo_item, {path: path});
+        return video_items;
+    }
+
+    findAll(){
+        const video_items = this._db.findAll("video");
+        video_items.forEach(item=>{
+            const path = this._db.find("path", item.path_id);
+            video_items.path = path;
+        });
+        return video_items;
+        // return this._db.findAll("video");
+    }
+
+    async insert(path, video_data){
+        const path_id = this._getPathID(path);
+        video_data.path_id = path_id;
+
+        await this._db.insert("path", {"id":path_id,"data":path});
+        await this._db.insert("video", video_data);
+    }
+
+    async update(video_id, props){
+        await this._db.update("video", video_id, props);
+    }
+
+    async _getPathID(path){
+        const path_map = this._db.db_map.get("path");
+
+        for (let [k, v] of path_map) {
+            if (v.path == path) { 
+                return k; 
+            }
+        }  
+
+        const max_id = 10000;
+        for (let index = 0; index < max_id; index++) {
+            if(!path_map.has(index)){
+                return index;
+            } 
+        }
+
+        throw new Error("maximum id value has been exceeded");
+    }
+
+}
+
+test("db non", async t => {
+    const db = new testDB({memory_only:true});
+
+    t.falsy(db.exist("sm1"));
+    t.is(db.find("sm1"), null);
+    t.deepEqual(db.findAll(), []);
+});
+
 test("db1", async t => {
-    const db = new testDB();
-    db.init();
-    await db.load();
-    await db.insert("c:/data", 
-        {"id":"sm1","path_id":-1,"is_economy":false,"time":100,"tags":["タグ1"]});
-    await db.insert("c:/data", 
-        {"id":"sm2","path_id":-1,"is_economy":false,"time":100,"tags":["タグ1"]});
-    await db.insert("c:/data/test", 
-        {"id":"sm3","path_id":-1,"is_economy":false,"time":100,"tags":["タグ1"]});
+    const db = new testDB({memory_only:true});
+    db.createTable(["p", "v"]);
 
-    console.log( db.find("sm2"));
-    console.log( db.find("sm3"));
-    await db.update("sm3", {"is_economy":true,"time":200,"tags":["タグ1","tag2"]});
-    console.log("update=", db.find("sm3"));
+    const p_list = [
+        {id:"1", data: "n1-data1"},
+        {id:"2", data: "n1-data2"}
+    ];
+    const v_list = [
+        {id:"sm1", num:1, bool:false, ary:["tag1"]},
+        {id:"sm2", num:2, bool:true, ary:["tag1","tag2"]}
+    ];   
 
-    await db.save();
+    await db.insert("p", p_list[0]);
+    await db.insert("p", p_list[1]);
+
+    await db.insert("v", v_list[0]);
+    await db.insert("v", v_list[1]);
+
+    t.truthy(db.exist("p", "1"));
+    t.truthy(db.exist("p", "2"));
+    t.falsy(db.exist("p", "3"));
+
+    t.truthy(db.exist("v", "sm1"));
+    t.truthy(db.exist("v", "sm2"));
+    t.falsy(db.exist("v", "sm3"));
+
+    t.falsy(db.exist("non", "1"));
+
+    t.deepEqual(db.find("p", "1"), p_list[0]);
+    t.deepEqual(db.find("p", "2"), p_list[1]);
+    t.deepEqual(db.findAll("p"), p_list);
+
+    t.deepEqual(db.find("v", "sm1"), v_list[0]);
+    t.deepEqual(db.find("v", "sm2"), v_list[1]);
+    t.deepEqual(db.findAll("v"), v_list);
+
+    await db.update("v", "sm1", {bool:true, ary:["tag1", "tag2", "tag3"]});
+    t.deepEqual(db.find("v", "sm1"), {id:"sm1", num:1, bool:true, ary:["tag1", "tag2", "tag3"]});
+
+    t.deepEqual(db.findAll("v"), 
+        [
+            {id:"sm1", num:1, bool:true, ary:["tag1", "tag2", "tag3"]},
+            v_list[1]
+        ]);
+    
 });
 
 test.skip("db", t => {

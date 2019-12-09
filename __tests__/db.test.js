@@ -310,6 +310,55 @@ class kk {
 
 }
 
+class testDB2 extends testDB {
+    constructor(){
+        super();
+        this.test_log = [];
+    }
+
+    async _readFile(file_path){
+        if(file_path.match(/db\.json/)){
+            const data = 
+                `[["path", [
+                {"id":0,"data":"c:/data"}
+                ]],
+                ["video", [
+                {"id":"sm1","data":{"id":"sm1","path_id":0,"tags":["tag1"]}},
+                ]]]`;
+            return data;
+        }
+    }
+
+    async _existFile(file_path){
+        if(file_path.match(/db\.json/)){
+            return true;
+        }
+        return false; 
+    }
+
+    async _appendFile(file_path, data){
+        const fname = path.basename(file_path);
+        this.test_log[`append ${fname}`];
+    }
+    async _unlink(file_path){
+        const fname = path.basename(file_path);
+        this.test_log[`unlink ${fname}`];
+        // await fs.unlink(file_path);
+    }
+    async _writeFile(file_path, data){
+        const fname = path.basename(file_path);
+        this.test_log[`writeFile ${fname}`];
+        // await fs.writeFile(file_path, data, "utf-8");    
+    }
+    async _rename(old_path, new_path){
+        const old_fname = path.basename(old_path);
+        const new_fname = path.basename(new_path);
+        this.test_log[`writeFile ${old_fname} ${new_fname}`];
+        // await fs.rename(old_path, new_path);
+    }
+} 
+
+
 test("db non", async t => {
     const db = new testDB({memory_only:true});
 
@@ -364,6 +413,14 @@ test("db1", async t => {
             v_list[1]
         ]);
     
+});
+
+test("db2", async t => {
+    const filename = path.join(__dirname, "test.join");
+    const db = new testDB({filename:filename});
+
+    t.is(db.db_path, filename);
+    t.is(db.log_path, path.join(__dirname, "test.log"));
 });
 
 test.skip("db", t => {

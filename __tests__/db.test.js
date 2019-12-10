@@ -24,10 +24,8 @@ const rr = (name, ary) =>{
 };
 
 class testDB {
-    constructor({filename="./db.json", memory_only=false, autonum=10}={}){  
-        this.autonum = autonum<10?10:autonum;
-        this.memory_only = memory_only;
-
+    constructor({filename="./db.json", autonum=10}={}){  
+        this.autonum = autonum;
         const fullpath = path.resolve(filename);
         this.db_path = fullpath;
         this.log_path = this._getLogFilePath(fullpath);
@@ -147,13 +145,10 @@ class testDB {
         const jsonString = `[${items.join(",\n")}]`;
         await this._safeWriteFile(this.db_path , jsonString);
         await this._deletelog();
+        this.cmd_log_count = 0;
     }
 
     async _safeWriteFile(file_path, data){
-        if(this.memory_only){
-            return;
-        }
-
         const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
         await this._writeFile(tmp_path, data, "utf-8");    
         await this._rename(tmp_path, file_path);
@@ -161,27 +156,19 @@ class testDB {
 
     async _log(cmd){
         this.cmd_log_count++;
+        await this._writelog(cmd);
 
         if(this.cmd_log_count >= this.autonum){
-            await this.save();
-            this.cmd_log_count = 0;
+            await this.save();      
             return;
         }
-
-        await this._writelog(cmd);
     }
 
     async _deletelog(){
-        if(this.memory_only){
-            return;
-        }
         await this._unlink(this.log_path);
     } 
 
     async _writelog(cmd){
-        if(this.memory_only){
-            return;
-        }
         const data = JSON.stringify(cmd, null, 0);
         await this._appendFile(this.log_path, `${data}\n`);
     }
@@ -194,9 +181,9 @@ class testDB {
         const str = await this._readFile(log_path);
         const lines = str.split(/\r\n|\n/);
         const cmds = lines.filter(line=>{
-            return line.length > 0;
+            return line.trim().length > 0;
         }).map(line=>{
-            return JSON.parse(line);
+            return JSON.parse(line.trim());
         });
         return cmds;
     }
@@ -231,7 +218,7 @@ class testDB {
             const data_map = this.db_map.get(target);
             const value = item.value;
             if(item.type=="insert"){
-                data_map.set(value.id, value);
+                data_map.set(value.id, value.data);
             }
 
             if(item.type=="update"){
@@ -246,8 +233,8 @@ class testDB {
 }
 
 class kk {
-    constructor({db_file_path="./db.json", memory_only=false, autonum=10}={}){
-        this._db = new testDB(db_file_path, {memory_only:memory_only, autonum:autonum});
+    constructor({db_file_path="./db.json", autonum=10}={}){
+        this._db = new testDB({filename:db_file_path, autonum:autonum});
         this._db.createTable(["path, video"]);
     }
 
@@ -311,21 +298,30 @@ class kk {
 }
 
 class testDB2 extends testDB {
-    constructor(){
-        super();
+    constructor(exist_log=false){
+        super({autonum:2});
         this.test_log = [];
+        this.exist_log = exist_log;
     }
 
     async _readFile(file_path){
         if(file_path.match(/db\.json/)){
             const data = 
                 `[["path", [
-                {"id":0,"data":"c:/data"}
+                {"id":"0","data":"c:/data"}
                 ]],
                 ["video", [
-                {"id":"sm1","data":{"id":"sm1","path_id":0,"tags":["tag1"]}},
+                {"id":"sm1","path_id":"0","tags":["tag1"]}
                 ]]]`;
             return data;
+        }
+
+        if(file_path.match(/db\.log/)){
+            return `
+            {"target":"path","type":"insert","value":{"id":"1","data":{"id":"1","data":"c:/data1"}}}
+            {"target":"video","type":"insert","value":{"id":"sm2","data":{"id":"sm2","path_id":"1","tags":["tag2"]}}}
+            {"target":"video","type":"update","value":{"id":"sm1","data":{"tags":["tag1","tag2","tag3"]}}}
+            `;
         }
     }
 
@@ -333,34 +329,34 @@ class testDB2 extends testDB {
         if(file_path.match(/db\.json/)){
             return true;
         }
-        return false; 
+        if(file_path.match(/db\.log/)){
+            return this.exist_log;
+        }
+        return false;
     }
 
     async _appendFile(file_path, data){
         const fname = path.basename(file_path);
-        this.test_log[`append ${fname}`];
+        this.test_log.push(`append ${fname}`);
     }
     async _unlink(file_path){
         const fname = path.basename(file_path);
-        this.test_log[`unlink ${fname}`];
-        // await fs.unlink(file_path);
+        this.test_log.push(`unlink ${fname}`);
     }
     async _writeFile(file_path, data){
         const fname = path.basename(file_path);
-        this.test_log[`writeFile ${fname}`];
-        // await fs.writeFile(file_path, data, "utf-8");    
+        this.test_log.push(`writeFile ${fname}`);   
     }
     async _rename(old_path, new_path){
         const old_fname = path.basename(old_path);
         const new_fname = path.basename(new_path);
-        this.test_log[`writeFile ${old_fname} ${new_fname}`];
-        // await fs.rename(old_path, new_path);
+        this.test_log.push(`rename ${old_fname} ${new_fname}`);
     }
 } 
 
 
 test("db non", async t => {
-    const db = new testDB({memory_only:true});
+    const db = new testDB();
 
     t.falsy(db.exist("sm1"));
     t.is(db.find("sm1"), null);
@@ -368,7 +364,7 @@ test("db non", async t => {
 });
 
 test("db1", async t => {
-    const db = new testDB({memory_only:true});
+    const db = new testDB();
     db.createTable(["p", "v"]);
 
     const p_list = [
@@ -421,6 +417,61 @@ test("db2", async t => {
 
     t.is(db.db_path, filename);
     t.is(db.log_path, path.join(__dirname, "test.log"));
+});
+
+test("db3", async t => {
+    const db_fname = "db.json";
+    const db_tmp_fname = "~db.json";
+    const log_fname = "db.log";
+
+    const db = new testDB2();
+    await db.load();
+
+    await db.insert("path", {id:1, data:1});
+    await db.insert("path", {id:1, data:1});
+    await db.update("video", "sm1", {path_id:1});
+    await db.save();
+
+    t.deepEqual(db.test_log, [
+        `append ${log_fname}`,
+        `append ${log_fname}`,
+
+        `writeFile ${db_tmp_fname}`,
+        `rename ${db_tmp_fname} ${db_fname}`,
+        `unlink ${log_fname}`,
+
+        `append ${log_fname}`,
+
+        `writeFile ${db_tmp_fname}`,
+        `rename ${db_tmp_fname} ${db_fname}`,
+        `unlink ${log_fname}`,
+    ]);
+});
+
+test("db4", async t => {
+    const db_fname = "db.json";
+    const db_tmp_fname = "~db.json";
+    const log_fname = "db.log";
+
+    const exist_log = true;
+    const db = new testDB2(exist_log);
+    await db.load();
+
+    t.deepEqual(db.findAll("path"), [
+        {id:"0",data:"c:/data"},
+        {id:"1",data:"c:/data1"}
+    ]);
+
+    t.deepEqual(db.findAll("video"), [
+        {id:"sm1",path_id:"0",tags:["tag1","tag2","tag3"]},
+        {id:"sm2",path_id:"1",tags:["tag2"]},
+    ]);
+
+    t.deepEqual(db.test_log, [
+        `writeFile ${db_tmp_fname}`,
+        `rename ${db_tmp_fname} ${db_fname}`,
+        `unlink ${log_fname}`,
+    ]);
 });
 
 test.skip("db", t => {

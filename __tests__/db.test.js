@@ -2,27 +2,6 @@ const test = require("ava");
 const fs = require("fs").promises;
 const path = require("path");
 
-const pp = (key, ary) => {
-    const output = ary.map(value=>{
-        return JSON.stringify(value, null, 0);
-    }).join(",\n");
-
-    return `["${key}", [\n${output}\n]]`;
-};
-
-/**
- * 
- * @param {String} name 
- * @param {Array} ary 
- */
-const rr = (name, ary) =>{
-    const map = new Map();
-    ary.forEach(value=>{
-        map.set(value[name], value);
-    });
-    return map;
-};
-
 class testDB {
     constructor({filename="./db.json", autonum=10, use_log=true}={}){  
         this.autonum = autonum;
@@ -36,13 +15,11 @@ class testDB {
         this.cmd_log_count = 0;
     }
 
-    // init(){
-    //     // this.db_map = new Map();
-    //     // ["path", "video"].forEach(name => {
-    //     //     this.db_map.set(name, new Map());
-    //     // });
-    //     this.cmd_log_count = 0;
-    // }
+    _getLogFilePath(db_file_path){
+        const dir = path.dirname(db_file_path);
+        const ext = path.extname(db_file_path);
+        return path.join(dir, `${path.basename(db_file_path, ext)}.log`);
+    }
 
     createTable(names){
         this.db_map.clear();
@@ -51,19 +28,13 @@ class testDB {
         });
     }
 
-    _getLogFilePath(db_file_path){
-        const dir = path.dirname(db_file_path);
-        const ext = path.extname(db_file_path);
-        return path.join(dir, `${path.basename(db_file_path, ext)}.log`);
-    }
-
     async load(){
         if(await this._existFile(this.db_path)){ 
             const jsonString = await this._readFile(this.db_path);
             const obj = JSON.parse(jsonString);
             const r_map = new Map(obj);  
             r_map.forEach((value, key)=>{
-                this.db_map.set(key, rr("id", value));
+                this.db_map.set(key, this._convertMap("id", value));
             }); 
         }
         
@@ -73,15 +44,19 @@ class testDB {
             await this.save();
         }
     }
-
-    async _existFile(file_path){
-        try {
-            await fs.stat(file_path);
-            return true;
-        } catch (error) {
-            return false;
-        }  
-    }
+        
+    /**
+     * 
+     * @param {String} name 
+     * @param {Array} ary 
+     */
+    _convertMap(name, ary){
+        const map = new Map();
+        ary.forEach(value=>{
+            map.set(value[name], value);
+        });
+        return map;
+    };
 
     exist(name, id){
         if(!this.db_map.has(name)){
@@ -140,13 +115,30 @@ class testDB {
         const items = [];
         this.db_map.forEach((value, key)=>{
             const ary = Array.from(value.values());
-            items.push(pp(key, ary));
+            items.push(this._convertString(key, ary));
         }); 
 
         const jsonString = `[${items.join(",\n")}]`;
         await this._safeWriteFile(this.db_path , jsonString);
         await this._deletelog();
         this.cmd_log_count = 0;
+    }
+
+    _convertString(key, ary){
+        const output = ary.map(value=>{
+            return JSON.stringify(value, null, 0);
+        }).join(",\n");
+    
+        return `["${key}", [\n${output}\n]]`;
+    };
+
+    async _existFile(file_path){
+        try {
+            await fs.stat(file_path);
+            return true;
+        } catch (error) {
+            return false;
+        }  
     }
 
     async _safeWriteFile(file_path, data){
@@ -519,88 +511,4 @@ test("db log", async t => {
         {id:"sm1", path_id:"0", path:"c:/data", tags:["tag1","tag2","tag3"]},
         {id:"sm2", path_id:"1", path:"c:/data1", tags:["tag2"]},
     ]);
-});
-
-test.skip("db", t => {
-    const map = new Map();
-    map.set("path", [
-        {"path_id":1,"path":"C:\\dev\\test\\data1"},
-        {"path_id":0,"path":"C:/dev/test/data2"}
-    ]);
-    map.set("library", [
-        {"video_id":"sm1","path_id":0,"is_economy":false,"time":100,"tags":["タグ1"]},
-        {"video_id":"sm2","path_id":1,"is_economy":false,"time":200,"tags":["タグ1","タグ2"]}
-    ]);
-
-
-    const o_items = [];
-    map.forEach((value, key)=>{
-        o_items.push(pp(key, value));
-    });
-    const jsonString = `[${o_items.join(",\n")}]`;
-    // const jsonString = JSON.stringify([...map]);
-    console.log(jsonString);
-
-
-    const items = JSON.parse(jsonString);
-    const r_map = new Map(items);
-    const p_map = rr("path_id", r_map.get("path"));
-    const v_map = rr("video_id", r_map.get("library"));
-    console.log("p_map=", p_map);
-    console.log("v_map=", v_map);
-    console.log("[0].tags=", r_map.get("library")[0].tags);
-    console.log("[1].tags=", r_map.get("library")[1].tags);
-
-    const lmap = new Map();
-    lmap.set("path", Array.from( p_map.values() ));
-    lmap.set("library", Array.from( v_map.values() ));
-    console.log("lmap=", lmap);
-
-    const uu = [
-        {
-            "target":"path",
-            "type":"add",
-            "value":{"path_id":2,"path":"C:\\dev\\test\\data3"}
-        },
-        {
-            "target":"library",
-            "type":"add",
-            "value":{
-                "video_id":"sm3","path_id":0,"is_economy":false,"time":300,"tags":["タグ3"],
-            }
-        }, 
-        {
-            "target":"library",
-            "type":"update",
-            "value":{
-                "video_id":"sm1","is_economy":true,"time":300,"tags":[],
-            }
-        },  
-    ];
-    const uu_str = pp_ary(uu);
-    console.log("uu_str=", uu_str);
-    const uu_res = JSON.parse(uu_str);
-    console.log("uu_res=", uu_res);
-
-    uu.forEach(item=>{
-        if(item.target=="path"){
-            const value = item.value;
-            if(item.type=="add"){
-                p_map.set(value.path_id, value);
-            }
-        }
-        if(item.target=="library"){
-            const value = item.value;
-            if(item.type=="add"){
-                v_map.set(value.video_id, value);
-            }
-            if(item.type=="update"){
-                // Object.assign(target, source);
-                v_map.set(value.video_id, 
-                    Object.assign(v_map.get(value.video_id), value));
-            }
-        }
-    });
-    console.log("p_map2=", p_map);
-    console.log("v_map2=", v_map);
 });

@@ -239,8 +239,9 @@ class testDB {
 
 class kk {
     constructor({db_file_path="./db.json", autonum=10}={}){
-        this._db = this._createDB({filename:db_file_path, autonum:autonum});
-        this._db.createTable(["path, video"]);
+        // this._db = this._createDB({filename:db_file_path, autonum:autonum});
+        // this._db.createTable(["path, video"]);
+        this.params = {filename:db_file_path, autonum:autonum};
     }
 
     _createDB(params){
@@ -248,6 +249,8 @@ class kk {
     }
 
     async load(){
+        this._db = this._createDB(this.params);
+        this._db.createTable(["path, video"]);
         await this._db.load();
     }
 
@@ -266,8 +269,8 @@ class kk {
     findAll(){
         const video_items = this._db.findAll("video");
         video_items.forEach(item=>{
-            const path = this._db.find("path", item.path_id);
-            video_items.path = path;
+            const path_item = this._db.find("path", item.path_id);
+            item.path = path_item.path;
         });
         return video_items;
         // return this._db.findAll("video");
@@ -505,6 +508,17 @@ test("db path", async t => {
 
     await db.insert("c:/data1", {id:"sm4"});
     t.deepEqual(db.find("sm4"), {id:"sm4",path_id:"1", path:"c:/data1"});
+});
+
+test("db log", async t => {
+    const exist_log = true;
+    const db = new testDB3(exist_log);
+    await db.load();
+
+    t.deepEqual(db.findAll(), [
+        {id:"sm1", path_id:"0", path:"c:/data", tags:["tag1","tag2","tag3"]},
+        {id:"sm2", path_id:"1", path:"c:/data1", tags:["tag2"]},
+    ]);
 });
 
 test.skip("db", t => {

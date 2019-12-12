@@ -25,6 +25,10 @@ class MapDB {
         });
     }
 
+    setData(name, data_list){
+        this.db_map.set(name, this._convertMap("id", data_list));
+    }
+
     async load() {
         if (await this._existFile(this.db_path)) {
             const jsonString = await this._readFile(this.db_path);
@@ -229,6 +233,7 @@ class MapDB {
 class LibraryDB {
     constructor({ db_file_path = "./db.json", autonum = 10 } = {}) {
         this.params = { filename: db_file_path, autonum: autonum };
+        this._db = this._createDB(this.params);
     }
 
     _createDB(params) {
@@ -237,8 +242,15 @@ class LibraryDB {
 
     async load() {
         this._db = this._createDB(this.params);
-        this._db.createTable(["path, video"]);
+        this._db.createTable(["path", "video"]);
         await this._db.load();
+    }
+
+    setPathData(data_list){
+        this._db.setData("path", data_list);
+    }
+    setVideoData(data_list){
+        this._db.setData("video", data_list);
     }
 
     exist(video_id) {

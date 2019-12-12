@@ -216,3 +216,19 @@ test("db log", async t => {
         {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 });
+
+test("db setdata", async t => {
+    const db = new testLibraryDB();
+    db.setPathData([        
+        {id:"0",dirpath:"c:/data"},
+        {id:"1",dirpath:"c:/data1"}
+    ]);
+    db.setVideoData([
+        {id:"sm1",dirpath_id:"0",tags:["tag1"]},
+        {id:"sm2",dirpath_id:"1",tags:["tag2"]}
+    ]);
+    t.deepEqual(db.findAll(), [
+        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
+        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
+    ]);
+});

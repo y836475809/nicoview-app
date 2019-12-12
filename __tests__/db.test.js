@@ -15,18 +15,18 @@ class testMapDB extends MapDB {
         if(file_path.match(/db\.json/)){
             const data = 
                 `[["path", [
-                {"id":"0","path":"c:/data"}
+                {"id":"0","dirpath":"c:/data"}
                 ]],
                 ["video", [
-                {"id":"sm1","path_id":"0","tags":["tag1"]}
+                {"id":"sm1","dirpath_id":"0","tags":["tag1"]}
                 ]]]`;
             return data;
         }
 
         if(file_path.match(/db\.log/)){
             return `
-            {"target":"path","type":"insert","value":{"id":"1","data":{"id":"1","path":"c:/data1"}}}
-            {"target":"video","type":"insert","value":{"id":"sm2","data":{"id":"sm2","path_id":"1","tags":["tag2"]}}}
+            {"target":"path","type":"insert","value":{"id":"1","data":{"id":"1","dirpath":"c:/data1"}}}
+            {"target":"video","type":"insert","value":{"id":"sm2","data":{"id":"sm2","dirpath_id":"1","tags":["tag2"]}}}
             {"target":"video","type":"update","value":{"id":"sm1","data":{"tags":["tag1","tag2","tag3"]}}}
             `;
         }
@@ -86,8 +86,8 @@ test("db1", async t => {
     db.createTable(["p", "v"]);
 
     const p_list = [
-        {id:"1", path: "n1-data1"},
-        {id:"2", path: "n1-data2"}
+        {id:"1", dirpath: "n1-data1"},
+        {id:"2", dirpath: "n1-data2"}
     ];
     const v_list = [
         {id:"sm1", num:1, bool:false, ary:["tag1"]},
@@ -145,9 +145,9 @@ test("db3", async t => {
     const db = new testMapDB();
     await db.load();
 
-    await db.insert("path", {id:1, path:1});
-    await db.insert("path", {id:1, path:1});
-    await db.update("video", "sm1", {path_id:1});
+    await db.insert("path", {id:1, dirpath:1});
+    await db.insert("path", {id:1, dirpath:1});
+    await db.update("video", "sm1", {dirpath_id:1});
     await db.save();
 
     t.deepEqual(db.test_log, [
@@ -176,13 +176,13 @@ test("db4", async t => {
     await db.load();
 
     t.deepEqual(db.findAll("path"), [
-        {id:"0",path:"c:/data"},
-        {id:"1",path:"c:/data1"}
+        {id:"0",dirpath:"c:/data"},
+        {id:"1",dirpath:"c:/data1"}
     ]);
 
     t.deepEqual(db.findAll("video"), [
-        {id:"sm1",path_id:"0",tags:["tag1","tag2","tag3"]},
-        {id:"sm2",path_id:"1",tags:["tag2"]},
+        {id:"sm1",dirpath_id:"0",tags:["tag1","tag2","tag3"]},
+        {id:"sm2",dirpath_id:"1",tags:["tag2"]},
     ]);
 
     t.deepEqual(db.test_log, [
@@ -197,13 +197,13 @@ test("db path", async t => {
     await db.load();
 
     await db.insert("c:/data", {id:"sm2"});
-    t.deepEqual(db.find("sm2"), {id:"sm2",path_id:"0", path:"c:/data"});
+    t.deepEqual(db.find("sm2"), {id:"sm2",dirpath_id:"0", dirpath:"c:/data"});
 
     await db.insert("c:/data1", {id:"sm3"});
-    t.deepEqual(db.find("sm3"), {id:"sm3",path_id:"1", path:"c:/data1"});
+    t.deepEqual(db.find("sm3"), {id:"sm3",dirpath_id:"1", dirpath:"c:/data1"});
 
     await db.insert("c:/data1", {id:"sm4"});
-    t.deepEqual(db.find("sm4"), {id:"sm4",path_id:"1", path:"c:/data1"});
+    t.deepEqual(db.find("sm4"), {id:"sm4",dirpath_id:"1", dirpath:"c:/data1"});
 });
 
 test("db log", async t => {
@@ -212,7 +212,7 @@ test("db log", async t => {
     await db.load();
 
     t.deepEqual(db.findAll(), [
-        {id:"sm1", path_id:"0", path:"c:/data", tags:["tag1","tag2","tag3"]},
-        {id:"sm2", path_id:"1", path:"c:/data1", tags:["tag2"]},
+        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1","tag2","tag3"]},
+        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 });

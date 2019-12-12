@@ -247,25 +247,25 @@ class LibraryDB {
 
     find(video_id) {
         const video_item = this._db.find("video", video_id);
-        const path_item = this._db.find("path", video_item.path_id);
-        video_item.path = path_item.path;
+        const path_item = this._db.find("path", video_item.dirpath_id);
+        video_item.dirpath = path_item.dirpath;
         return video_item;
     }
 
     findAll() {
         const video_items = this._db.findAll("video");
         video_items.forEach(item => {
-            const path_item = this._db.find("path", item.path_id);
-            item.path = path_item.path;
+            const path_item = this._db.find("path", item.dirpath_id);
+            item.dirpath = path_item.dirpath;
         });
         return video_items;
     }
 
-    async insert(path, video_data) {
-        const path_id = await this._getPathID(path);
-        video_data.path_id = path_id;
+    async insert(dirpath, video_data) {
+        const dirpath_id = await this._getPathID(dirpath);
+        video_data.dirpath_id = dirpath_id;
 
-        await this._db.insert("path", { "id": path_id, "path": path });
+        await this._db.insert("path", { "id": dirpath_id, "dirpath": dirpath });
         await this._db.insert("video", video_data);
     }
 
@@ -273,10 +273,10 @@ class LibraryDB {
         await this._db.update("video", video_id, props);
     }
 
-    async _getPathID(path) {
+    async _getPathID(dirpath) {
         const path_map = this._db.db_map.get("path");
         for (let [k, v] of path_map) {
-            if (v.path == path) {
+            if (v.dirpath == dirpath) {
                 return k;
             }
         }

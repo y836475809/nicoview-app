@@ -113,6 +113,59 @@ class DBConverter {
             return item;
         });
     }
+
+    // TODO test
+    _read_dirpath2() {
+        let res = this.db.exec("SELECT * FROM file");
+        const values = res[0].values;
+        this.dirpath_list = values.map(value=>{
+            const id = value[0];
+            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
+            return { id, dirpath };
+        });
+    }
+    
+    // TODO test
+    _read_video2() {
+        let res = this.db.exec("SELECT * FROM nnddvideo");
+        const values = res[0].values;
+        this.video_list = values.map(value=>{
+            const id = value[0];
+            const key = value[1];
+            const uri = value[2];
+            const dirpath_id = value[3];
+            const video_name = value[4];
+            const is_economy = value[5] !== 0;
+            const modification_date = value[6];
+            const creation_date = value[7];
+            const thumb_url = value[8];
+            const play_count = value[9];
+            const time = value[10];
+            const last_play_date = value[11];
+            const yet_reading = value[12];
+            const pub_date = value[13];
+
+            const decoded_path = decodeURIComponent(uri);
+            const common_filename = path.basename(decoded_path, path.extname(decoded_path));
+            const video_type = path.extname(decoded_path).slice(1);
+            const tags = this.tag_map.get(id);
+            
+            const data_type = "xml";
+            const is_deleted = false;
+            const thumbnail_size = "S";
+
+            const item = {
+                data_type,
+                video_name, video_type,
+                dirpath_id, common_filename, thumbnail_size,
+                modification_date, creation_date, pub_date, last_play_date,
+                play_count, time, tags, is_economy, is_deleted
+            };
+            item.id = key;
+            
+            return item;
+        });
+    }
 }
 
 module.exports = DBConverter;

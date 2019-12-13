@@ -232,3 +232,28 @@ test("db setdata", async t => {
         {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 });
+
+test("db deepcopy", async t => {
+    const db = new LibraryDB();
+
+    db.setPathData([        
+        {id:"0",dirpath:"c:/data"},
+        {id:"1",dirpath:"c:/data1"}
+    ]);
+    db.setVideoData([
+        {id:"sm1",dirpath_id:"0",tags:["tag1"]},
+        {id:"sm2",dirpath_id:"1",tags:["tag2"]}
+    ]);
+    t.deepEqual(db.findAll(), [
+        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
+        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
+    ]);
+
+    const path_map = db._db.db_map.get("path");
+    t.deepEqual(path_map.get("0"), {id:"0",dirpath:"c:/data"});
+    t.deepEqual(path_map.get("1"), {id:"1",dirpath:"c:/data1"});
+
+    const video_map = db._db.db_map.get("video");
+    t.deepEqual(video_map.get("sm1"), {id:"sm1", dirpath_id:"0", tags:["tag1"]});
+    t.deepEqual(video_map.get("sm2"), {id:"sm2", dirpath_id:"1", tags:["tag2"]});
+});

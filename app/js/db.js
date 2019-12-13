@@ -74,7 +74,7 @@ class MapDB {
         if (!map.has(id)) {
             return null;
         }
-        return map.get(id);
+        return this._deepCopy(map.get(id));
     }
 
     findAll(name) {
@@ -82,7 +82,7 @@ class MapDB {
             return [];
         }
         const map = this.db_map.get(name);
-        return Array.from(map.values());
+        return this._deepCopy(Array.from(map.values()));
     }
 
     async insert(name, data) {
@@ -123,6 +123,31 @@ class MapDB {
         await this._safeWriteFile(this.db_path, jsonString);
         await this._deletelog();
         this.cmd_log_count = 0;
+    }
+
+    _deepCopy(obj){
+        if ( typeof obj === "boolean" || typeof obj === "number" 
+        || typeof obj === "string" || obj === null ) {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            const ret = [];
+            obj.forEach(value => { 
+                ret.push(this._deepCopy(value)); 
+            });
+            return ret;
+        }
+        
+        if (typeof obj === "object") {
+            const ret = {};
+            Object.keys(obj).forEach(key => {
+                ret[key] = this._deepCopy(obj[key]);
+            });
+            return ret;
+        }
+
+        return null;
     }
 
     _convertString(key, ary) {
@@ -193,7 +218,9 @@ class MapDB {
         await fs.appendFile(file_path, data, "utf-8");
     }
     async _unlink(file_path) {
-        return await fs.unlink(file_path);
+        if (await this._existFile(this.log_path)) {
+            await fs.unlink(file_path);
+        }
     }
     async _writeFile(file_path, data) {
         await fs.writeFile(file_path, data, "utf-8");
@@ -244,6 +271,10 @@ class LibraryDB {
         this._db = this._createDB(this.params);
         this._db.createTable(["path", "video"]);
         await this._db.load();
+    }
+
+    async save(){
+        await this._db.save();
     }
 
     setPathData(data_list){

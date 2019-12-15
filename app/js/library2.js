@@ -1,10 +1,70 @@
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
+const { LibraryDB } = require(".//db");
+
+
+class cn {
+    
+    _getDataFileInst(dir_path, video_info){
+        const db_type = video_info._db_type;
+        if(db_type=="xml"){
+            this.nico_xml.dirPath = dir_path;
+            this.nico_xml.commonFilename = video_info.common_filename;
+            this.nico_xml.videoType = video_info.video_type;
+            this.nico_xml.thumbnailSize = video_info.thumbnail_size;
+            return this.nico_xml;
+        }
+        if(db_type=="json"){
+            this.nico_json.dirPath = dir_path;
+            this.nico_json.commonFilename = video_info.common_filename;
+            this.nico_json.videoType = video_info.video_type;
+            this.nico_json.thumbnailSize = video_info.thumbnail_size;
+            return this.nico_json;
+        }
+
+        throw new Error(`${db_type} is unkown`);
+    }
+    
+    _getVideoPath(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.videoPath;
+    }
+
+    _getThumbImgPath(dir_path, video_info){
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.thumbImgPath;
+    }
+
+    _getComments(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        return datafile.getComments();
+    }
+
+    _getThumbInfo(dir_path, video_info) {
+        const datafile = this._getDataFileInst(dir_path, video_info);
+        const thumb_info = datafile.getThumbInfo();
+        const thumb_img_path = this._getThumbImgPath(dir_path, video_info);
+        thumb_info.video.thumbnailURL = thumb_img_path;
+        thumb_info.video.largeThumbnailURL = thumb_img_path;
+        return thumb_info;
+    }
+
+    _getVideoType(video_info){
+        return video_info.video_type;
+    }
+}
 
 class Library {
     constructor(){
         this.nico_xml = new NicoXMLFile();
         this.nico_json = new NicoJsonFile();
+        
     }
+
+    async load(file_path){
+        this.db = new LibraryDB({db_file_path: file_path});
+        await this.db.load();
+    }
+
     createDBItem() {
         return {
             _db_type: "",
@@ -44,17 +104,13 @@ class Library {
         };
     }
 
-    async getlibraryItems(library){
-        const items = await library.getItems();
-        const id_dirpath_map = library.id_dirpath_map;
-        return items.map(item => {
-            return this._createLibraryItem(id_dirpath_map, item);
-        });   
+    getItems(){
+        return this.db.findAll();
     }
     
-    async getlibraryItem(library, item){
-        const id_dirpath_map = library.id_dirpath_map;
-        return this._createLibraryItem(id_dirpath_map, item);
+    getItem(video_id){
+        const item = this.db.find(video_id);
+        
     }
     async getPlayItem(library, video_id){
         const item = await library.getItem(video_id);

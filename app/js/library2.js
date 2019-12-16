@@ -1,117 +1,73 @@
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
-const { LibraryDB } = require(".//db");
+const { LibraryDB } = require("./db");
 
+
+const pc = (obj) => {
+    const props = Object.keys(obj);
+    const lib = [
+        "id", "data_type", 
+        "thumb_img", "video_name", "video_type",
+        "creation_date", "pub_date", "last_play_date", 
+        "play_count", "play_time", "tags", "thumbnail_size"];
+    
+    for (const prop in lib) {
+        if (!props.includes(prop)) {
+            return false;
+        }
+    }
+    return true;
+};
 
 class cn {
-    
-    _getDataFileInst(dir_path, video_info){
-        const db_type = video_info._db_type;
-        if(db_type=="xml"){
-            this.nico_xml.dirPath = dir_path;
-            this.nico_xml.commonFilename = video_info.common_filename;
-            this.nico_xml.videoType = video_info.video_type;
-            this.nico_xml.thumbnailSize = video_info.thumbnail_size;
-            return this.nico_xml;
+    constructor(video_item){
+        this.nico_data = this._getData(video_item);
+    }
+
+    _getData(video_item){
+        const data_type = video_item.data_type;
+        const dirpath = video_item.dirpath;
+        let nico_data = null;
+
+        if(data_type=="xml"){
+            nico_data = new NicoXMLFile();
+        } else if(data_type=="json"){
+            nico_data = new NicoJsonFile();
+        }else{
+            throw new Error(`${data_type} is unkown`);
         }
-        if(db_type=="json"){
-            this.nico_json.dirPath = dir_path;
-            this.nico_json.commonFilename = video_info.common_filename;
-            this.nico_json.videoType = video_info.video_type;
-            this.nico_json.thumbnailSize = video_info.thumbnail_size;
-            return this.nico_json;
-        }
 
-        throw new Error(`${db_type} is unkown`);
-    }
-    
-    _getVideoPath(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.videoPath;
+        nico_data.dirPath = dirpath;
+        nico_data.commonFilename = data_type.common_filename;
+        nico_data.videoType = data_type.video_type;
+        nico_data.thumbnailSize = data_type.thumbnail_size;
+        return nico_data;
     }
 
-    _getThumbImgPath(dir_path, video_info){
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.thumbImgPath;
+    getVideoPath() {
+        return this.nico_data.videoPath;
     }
 
-    _getComments(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.getComments();
+    getVideoType(){
+        return this.nico_data.videoType;
     }
 
-    _getThumbInfo(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        const thumb_info = datafile.getThumbInfo();
-        const thumb_img_path = this._getThumbImgPath(dir_path, video_info);
+    getThumbImgPath(){
+        return this.nico_data.thumbImgPath;
+    }
+
+    getComments() {
+        return this.nico_data.getComments();
+    }
+
+    getThumbInfo() {
+        const thumb_info = this.nico_data.getThumbInfo();
+        const thumb_img_path = this.getThumbImgPath();
         thumb_info.video.thumbnailURL = thumb_img_path;
         thumb_info.video.largeThumbnailURL = thumb_img_path;
         return thumb_info;
     }
 
-    _getVideoType(video_info){
-        return video_info.video_type;
-    }
-}
-
-class Library {
-    constructor(){
-        this.nico_xml = new NicoXMLFile();
-        this.nico_json = new NicoJsonFile();
-        
-    }
-
-    async load(file_path){
-        this.db = new LibraryDB({db_file_path: file_path});
-        await this.db.load();
-    }
-
-    createDBItem() {
-        return {
-            _db_type: "",
-            dirpath_id: -1,
-            video_id: "",
-            video_name: "",
-            video_type: "",
-            common_filename: "",
-            is_economy: false,
-            modification_date: -1,
-            creation_date: 0,
-            pub_date: 0,
-            last_play_date: -1,
-            play_count: 0,
-            time: 0,
-            tags: [],
-            is_deleted: false,
-            thumbnail_size: "S",
-        };
-    }
-
-    _createLibraryItem(id_dirpath_map, video_item){
-        const dir_path = id_dirpath_map.get(video_item.dirpath_id);
-        return  {
-            db_type: video_item._db_type,
-            thumb_img: this._getThumbImgPath(dir_path, video_item),
-            id: video_item.video_id,
-            name: video_item.video_name,
-            creation_date: video_item.creation_date,
-            pub_date: video_item.pub_date,
-            last_play_date: video_item.last_play_date,
-            play_count: video_item.play_count,
-            play_time: video_item.time,
-            tags: video_item.tags?video_item.tags.join(" "):"",
-            thumbnail_size: video_item.thumbnail_size,
-            video_type: video_item.video_type
-        };
-    }
-
-    getItems(){
-        return this.db.findAll();
-    }
-    
-    getItem(video_id){
-        const item = this.db.find(video_id);
-        
-    }
+    //TODO
     async getPlayItem(library, video_id){
         const item = await library.getItem(video_id);
         const dir_path = await library._getDir(item.dirpath_id);
@@ -135,53 +91,63 @@ class Library {
             comments: comments
         };   
     }
-
-    _getDataFileInst(dir_path, video_info){
-        const db_type = video_info._db_type;
-        if(db_type=="xml"){
-            this.nico_xml.dirPath = dir_path;
-            this.nico_xml.commonFilename = video_info.common_filename;
-            this.nico_xml.videoType = video_info.video_type;
-            this.nico_xml.thumbnailSize = video_info.thumbnail_size;
-            return this.nico_xml;
-        }
-        if(db_type=="json"){
-            this.nico_json.dirPath = dir_path;
-            this.nico_json.commonFilename = video_info.common_filename;
-            this.nico_json.videoType = video_info.video_type;
-            this.nico_json.thumbnailSize = video_info.thumbnail_size;
-            return this.nico_json;
-        }
-
-        throw new Error(`${db_type} is unkown`);
-    }
-    
-    _getVideoPath(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.videoPath;
-    }
-
-    _getThumbImgPath(dir_path, video_info){
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.thumbImgPath;
-    }
-
-    _getComments(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        return datafile.getComments();
-    }
-
-    _getThumbInfo(dir_path, video_info) {
-        const datafile = this._getDataFileInst(dir_path, video_info);
-        const thumb_info = datafile.getThumbInfo();
-        const thumb_img_path = this._getThumbImgPath(dir_path, video_info);
-        thumb_info.video.thumbnailURL = thumb_img_path;
-        thumb_info.video.largeThumbnailURL = thumb_img_path;
-        return thumb_info;
-    }
-
-    _getVideoType(video_info){
-        return video_info.video_type;
-    }
-
 }
+
+// class Library {
+//     constructor(){
+//         this.nico_xml = new NicoXMLFile();
+//         this.nico_json = new NicoJsonFile();  
+//     }
+
+//     async load(file_path){
+//         this.db = new LibraryDB({db_file_path: file_path});
+//         await this.db.load();
+//     }
+
+//     createDBItem() {
+//         return {
+//             _db_type: "",
+//             dirpath_id: -1,
+//             video_id: "",
+//             video_name: "",
+//             video_type: "",
+//             common_filename: "",
+//             is_economy: false,
+//             modification_date: -1,
+//             creation_date: 0,
+//             pub_date: 0,
+//             last_play_date: -1,
+//             play_count: 0,
+//             time: 0,
+//             tags: [],
+//             is_deleted: false,
+//             thumbnail_size: "S",
+//         };
+//     }
+
+//     _createLibraryItem(id_dirpath_map, video_item){
+//         const dir_path = id_dirpath_map.get(video_item.dirpath_id);
+//         return  {
+//             db_type: video_item._db_type,
+//             thumb_img: this._getThumbImgPath(dir_path, video_item),
+//             id: video_item.video_id,
+//             name: video_item.video_name,
+//             creation_date: video_item.creation_date,
+//             pub_date: video_item.pub_date,
+//             last_play_date: video_item.last_play_date,
+//             play_count: video_item.play_count,
+//             play_time: video_item.time,
+//             tags: video_item.tags?video_item.tags.join(" "):"",
+//             thumbnail_size: video_item.thumbnail_size,
+//             video_type: video_item.video_type
+//         };
+//     }
+
+//     getItems(){
+//         return this.db.findAll();
+//     }
+    
+//     getItem(video_id){
+//         const item = this.db.find(video_id); 
+//     }
+// }

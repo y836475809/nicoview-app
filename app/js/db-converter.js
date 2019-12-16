@@ -159,9 +159,10 @@ class DBConverter {
                 video_name, video_type,
                 dirpath_id, common_filename, thumbnail_size,
                 modification_date, creation_date, pub_date, last_play_date,
-                play_count, time, tags, is_economy, is_deleted
+                play_count, tags, is_economy, is_deleted
             };
             item.id = key;
+            item.play_time = time;
             
             return item;
         });

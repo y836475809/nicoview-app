@@ -19,6 +19,11 @@ class NicoDataFile {
         return path.join(this.dir_path, this.videoFilename);
     }
 
+    // TODO
+    get videoType(){
+        return this.ideo_type;
+    }
+
     get commentPath(){
         return path.join(this.dir_path, this.commentFilename);
     }

@@ -174,6 +174,7 @@
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
         const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { ConvertMP4, needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
+        const { VideoInfo } = require(`${app_base_dir}/js/library2`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -186,6 +187,18 @@
 
         main_store.change("libraryInitialized", async (state, store) => {
             loadLibraryItems(await store.action("getLibraryItems"));
+        });
+
+        // TODO 
+        main_store.change("libraryInitialized2", async (state, store) => {
+            const items = await store.action("getLibrary2Items");
+            const library_items = items.map(value=>{
+                const video_info = new VideoInfo(value);
+                value.thumb_img = video_info.getThumbImgPath();
+                value.tags = value.tags ? value.tags.join(" ") : "";
+                return value;
+            })
+            loadLibraryItems(library_items);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -210,7 +223,8 @@
         };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "name", name: "名前", sortable: true},
+            // {id: "name", name: "名前", sortable: true},
+            {id: "video_name", name: "名前", sortable: true},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},
@@ -497,9 +511,12 @@
             resizeGridTable();
             
             try {
-                library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                main_store.commit("initLibrary", library);
+                // library = new Library();
+                // await library.init(SettingStore.getSettingDir());
+                // main_store.commit("initLibrary", library);
+
+                // TODO
+                await main_store.action("loadLibrary2", SettingStore.getSettingDir());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);

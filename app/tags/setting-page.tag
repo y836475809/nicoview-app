@@ -219,7 +219,9 @@
                 try {
                     const db_converter = new DBConverter();
                     db_converter.init(sqlite_file_path);
-                    db_converter.read();
+                    // db_converter.read();
+                    // TODO
+                    db_converter.read2();
                     const dir_list = db_converter.get_dirpath();
                     const video_list = db_converter.get_video();
                     resolve({dir_list, video_list});    
@@ -248,12 +250,18 @@
 
             try {
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                const mode = getImportDBMode();
+                // const mode = getImportDBMode();
 
-                const library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                await library.setData(dir_list, video_list, mode); 
-                main_store.commit("initLibrary", library);
+                // const library = new Library();
+                // await library.init(SettingStore.getSettingDir());
+                // await library.setData(dir_list, video_list, mode); 
+                // main_store.commit("initLibrary", library);
+
+                // TODO
+                main_store.commit("setLibrary2Data", 
+                    SettingStore.getSettingDir(),
+                    dir_list, video_list);
+
                 await showMessageBox("info", "インポート完了");
             } catch (error) {
                 console.log(error);

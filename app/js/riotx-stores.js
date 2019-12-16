@@ -1,7 +1,9 @@
 const EventEmitter = require("events").EventEmitter;
+const path = require("path");
 const { BookMark } = require("./bookmark");
 const { toPlayTime } = require("./time-format");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
+const { LibraryDB } = require("./db");
 
 const getIcon = (store_name, item) => {
     if (store_name == "bookmark") {
@@ -229,6 +231,7 @@ const main_store = new Store({
     name: "main",
     state:{
         library:null,
+        library2:null,
         download_Items:[]
     },
     actions: {
@@ -263,6 +266,17 @@ const main_store = new Store({
             const library = context.getter("library");
             return await cv.getlibraryItems(library);
         },
+        // TODO
+        getLibrary2Items: (context) => {
+            const library = context.getter("library2");
+            return library.findAll();
+        },
+        // TODO
+        loadLibrary2: async (context, dir) => {
+            const library = new LibraryDB(path.join(dir, "library.json"));
+            await library.load();
+            context.commit("setLibrary2", library);
+        },
         getPlayData: async (context, video_id) => {
             const library = context.getter("library");
             return await cv.getPlayItem(library, video_id);
@@ -272,6 +286,19 @@ const main_store = new Store({
         initLibrary: (context, library) => {
             context.state.library = library;
             return [["libraryInitialized"]];
+        },
+        // TODO
+        setLibrary2Data: (context, dir, path_data_list, video_data_list) => {
+            const library = new LibraryDB(path.join(dir, "library.json"));
+            library.setPathData(path_data_list);
+            library.setVideoData(video_data_list);
+            context.state.library2 = library;
+            return [["libraryInitialized2"]];
+        },
+        // TODO
+        setLibrary2: (context, library) => {
+            context.state.library2 = library;
+            return [["libraryInitialized2"]];
         },
         addDownloadedItem : (context, video_id) => {
             return [["libraryItemAdded", video_id]];
@@ -284,6 +311,10 @@ const main_store = new Store({
     getters: {
         library: (context) => {
             return context.state.library;
+        },
+        // TODO
+        library2: (context) => {
+            return context.state.library2;
         },
         existlibraryItem:  (context, video_id) => {
             const id_set = context.state.library.getVideoIDSet();

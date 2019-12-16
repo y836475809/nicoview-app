@@ -1,5 +1,5 @@
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
-const { LibraryDB } = require("./db");
+// const { LibraryDB } = require("./db");
 
 
 const pc = (obj) => {
@@ -18,16 +18,15 @@ const pc = (obj) => {
     return true;
 };
 
-class cn {
+class VideoInfo {
     constructor(video_item){
         this.nico_data = this._getData(video_item);
     }
 
     _getData(video_item){
-        const data_type = video_item.data_type;
-        const dirpath = video_item.dirpath;
         let nico_data = null;
 
+        const data_type = video_item.data_type;
         if(data_type=="xml"){
             nico_data = new NicoXMLFile();
         } else if(data_type=="json"){
@@ -36,10 +35,11 @@ class cn {
             throw new Error(`${data_type} is unkown`);
         }
 
-        nico_data.dirPath = dirpath;
-        nico_data.commonFilename = data_type.common_filename;
-        nico_data.videoType = data_type.video_type;
-        nico_data.thumbnailSize = data_type.thumbnail_size;
+        nico_data.dirPath = video_item.dirpath;
+        nico_data.commonFilename = video_item.common_filename;
+        nico_data.videoType = video_item.video_type;
+        nico_data.thumbnailSize = video_item.thumbnail_size;
+        nico_data.is_deleted = video_item.is_deleted;
         return nico_data;
     }
 
@@ -67,14 +67,18 @@ class cn {
         return thumb_info;
     }
 
+    getIsDeleted() {
+        return this.nico_data.is_deleted;
+    }
+
     //TODO
     async getPlayItem(library, video_id){
         const item = await library.getItem(video_id);
         const dir_path = await library._getDir(item.dirpath_id);
         const is_deleted = await library.getFieldValue(video_id, "is_deleted");
 
-        const video_path = this._getVideoPath(dir_path, item);
-        const video_type = this._getVideoType(item);
+        const video_path = this.getVideoPath();
+        const video_type = this.getVideoType();
         const comments = this._getComments(dir_path, item);
         const thumb_info = this._getThumbInfo(dir_path, item);
 
@@ -93,61 +97,6 @@ class cn {
     }
 }
 
-// class Library {
-//     constructor(){
-//         this.nico_xml = new NicoXMLFile();
-//         this.nico_json = new NicoJsonFile();  
-//     }
-
-//     async load(file_path){
-//         this.db = new LibraryDB({db_file_path: file_path});
-//         await this.db.load();
-//     }
-
-//     createDBItem() {
-//         return {
-//             _db_type: "",
-//             dirpath_id: -1,
-//             video_id: "",
-//             video_name: "",
-//             video_type: "",
-//             common_filename: "",
-//             is_economy: false,
-//             modification_date: -1,
-//             creation_date: 0,
-//             pub_date: 0,
-//             last_play_date: -1,
-//             play_count: 0,
-//             time: 0,
-//             tags: [],
-//             is_deleted: false,
-//             thumbnail_size: "S",
-//         };
-//     }
-
-//     _createLibraryItem(id_dirpath_map, video_item){
-//         const dir_path = id_dirpath_map.get(video_item.dirpath_id);
-//         return  {
-//             db_type: video_item._db_type,
-//             thumb_img: this._getThumbImgPath(dir_path, video_item),
-//             id: video_item.video_id,
-//             name: video_item.video_name,
-//             creation_date: video_item.creation_date,
-//             pub_date: video_item.pub_date,
-//             last_play_date: video_item.last_play_date,
-//             play_count: video_item.play_count,
-//             play_time: video_item.time,
-//             tags: video_item.tags?video_item.tags.join(" "):"",
-//             thumbnail_size: video_item.thumbnail_size,
-//             video_type: video_item.video_type
-//         };
-//     }
-
-//     getItems(){
-//         return this.db.findAll();
-//     }
-    
-//     getItem(video_id){
-//         const item = this.db.find(video_id); 
-//     }
-// }
+module.exports = {
+    VideoInfo,
+};

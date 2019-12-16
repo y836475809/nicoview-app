@@ -29,6 +29,14 @@ class DBConverter {
         this._read_video();
     }
 
+    // TODO
+    read2() {
+        this._read_dirpath2();
+        this._read_tag_string();
+        this._read_tag();
+        this._read_video2();
+    }
+
     _read_dirpath() {
         // this.dirpath_map = new Map();
         let res = this.db.exec("SELECT * FROM file");

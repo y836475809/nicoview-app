@@ -215,6 +215,15 @@
             });  
         });
 
+        // TODO
+        ipc_monitor.on(ipc_monitor.IPCMsg.GET_VIDEO_ITEM, async (event, args) => {
+            const video_id  = args;
+            const video_item = await main_store.action("getLibrary2Item", video_id);
+            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_VIDEO_ITEM_REPLY, {
+                video_item
+            });  
+        });
+
         ipc_monitor.on(ipc_monitor.IPCMsg.SEARCH_TAG, (event, args)=>{
             this.obs.trigger("main-page:select-page", "search");
             this.obs.trigger("search-page:search-tag", args);

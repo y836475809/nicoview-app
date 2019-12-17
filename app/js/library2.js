@@ -70,31 +70,6 @@ class VideoInfo {
     getIsDeleted() {
         return this.nico_data.is_deleted;
     }
-
-    //TODO
-    async getPlayItem(library, video_id){
-        const item = await library.getItem(video_id);
-        const dir_path = await library._getDir(item.dirpath_id);
-        const is_deleted = await library.getFieldValue(video_id, "is_deleted");
-
-        const video_path = this.getVideoPath();
-        const video_type = this.getVideoType();
-        const comments = this._getComments(dir_path, item);
-        const thumb_info = this._getThumbInfo(dir_path, item);
-
-        return {
-            video_data: {
-                src: video_path,
-                type: `video/${video_type}`,
-            },
-            viewinfo: {
-                is_deleted: is_deleted,
-                thumb_info:thumb_info,
-                
-            },
-            comments: comments
-        };   
-    }
 }
 
 module.exports = {

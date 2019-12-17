@@ -21,7 +21,12 @@ class NicoDataFile {
 
     // TODO
     get videoType(){
-        return this.ideo_type;
+        return this.video_type;
+    }
+
+    // TODO
+    set videoType(video_type){
+        this.video_type = video_type;
     }
 
     get commentPath(){
@@ -40,10 +45,6 @@ class NicoDataFile {
 class NicoXMLFile extends NicoDataFile {
     set commonFilename(name){
         this.common_filename = name;
-    }
-
-    set videoType(video_type){
-        this.video_type = video_type;
     }
 
     get videoFilename(){
@@ -128,10 +129,6 @@ class NicoXMLFile extends NicoDataFile {
 class NicoJsonFile extends NicoDataFile {   
     set commonFilename(name){
         this.common_filename = name;
-    }
-
-    set videoType(video_type){
-        this.video_type = video_type;
     }
 
     get videoFilename(){

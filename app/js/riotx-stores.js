@@ -267,13 +267,19 @@ const main_store = new Store({
             return await cv.getlibraryItems(library);
         },
         // TODO
+        getLibrary2Item: (context, video_id) => {
+            const library = context.getter("library2");
+            return library.find(video_id);
+        },
+        // TODO
         getLibrary2Items: (context) => {
             const library = context.getter("library2");
             return library.findAll();
         },
         // TODO
         loadLibrary2: async (context, dir) => {
-            const library = new LibraryDB(path.join(dir, "library.json"));
+            const library = new LibraryDB(
+                {filename : path.join(dir, "library.json")});
             await library.load();
             context.commit("setLibrary2", library);
         },
@@ -289,7 +295,8 @@ const main_store = new Store({
         },
         // TODO
         setLibrary2Data: (context, dir, path_data_list, video_data_list) => {
-            const library = new LibraryDB(path.join(dir, "library.json"));
+            const library = new LibraryDB(
+                {filename : path.join(dir, "library.json")});
             library.setPathData(path_data_list);
             library.setVideoData(video_data_list);
             context.state.library2 = library;

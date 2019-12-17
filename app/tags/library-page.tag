@@ -197,7 +197,7 @@
                 value.thumb_img = video_info.getThumbImgPath();
                 value.tags = value.tags ? value.tags.join(" ") : "";
                 return value;
-            })
+            });
             loadLibraryItems(library_items);
         });
 
@@ -528,6 +528,7 @@
             await convertVideo(this, video_id);          
         });   
 
+        // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
             const library_item = await library.getLibraryItem(video_id);

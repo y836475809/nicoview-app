@@ -258,8 +258,8 @@ class MapDB {
 }
 
 class LibraryDB {
-    constructor({ db_file_path = "./db.json", autonum = 10 } = {}) {
-        this.params = { filename: db_file_path, autonum: autonum };
+    constructor({ filename = "./db.json", autonum = 10 } = {}) {
+        this.params = { filename: filename, autonum: autonum };
         this._db = this._createDB(this.params);
     }
 

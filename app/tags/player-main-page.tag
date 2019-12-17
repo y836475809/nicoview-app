@@ -46,6 +46,7 @@
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { VideoInfo } = require(`${app_base_dir}/js/library2`);
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -287,16 +288,45 @@
             }
         }; 
 
+        // const playNiconico = (video_id, is_online, time=0) => {
+        //     cancelPlay();
+            
+        //     ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
+
+        //     ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, async (event, args) => {
+        //         const { video_id, data } = args;
+        //         const state = { 
+        //             is_online: data === null?true:is_online,
+        //             is_saved: data !== null,
+        //             time: time
+        //         };
+        //         try {
+        //             //play online
+        //             if(state.is_online===true){
+        //                 play_by_video_id(video_id, state);
+        //             }else{
+        //                 const { video_data, viewinfo, comments } = data;
+        //                 play_by_video_data(video_data, viewinfo, comments, state);
+        //             }                   
+        //         } catch (error) {
+        //             await showMessageBox("error", error.message);
+        //         }
+
+        //     });
+        //     ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
+        // }; 
+
+        // TODO
         const playNiconico = (video_id, is_online, time=0) => {
             cancelPlay();
             
-            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
+            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY);
 
-            ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, async (event, args) => {
-                const { video_id, data } = args;
+            ipc_monitor.once(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY, async (event, args) => {
+                const { video_item } = args;
                 const state = { 
-                    is_online: data === null?true:is_online,
-                    is_saved: data !== null,
+                    is_online: video_item === null?true:is_online,
+                    is_saved: video_item !== null,
                     time: time
                 };
                 try {
@@ -304,7 +334,18 @@
                     if(state.is_online===true){
                         play_by_video_id(video_id, state);
                     }else{
-                        const { video_data, viewinfo, comments } = data;
+                        const vide_info = new VideoInfo(video_item);
+
+                        const video_data = {
+                            src: vide_info.getVideoPath(),
+                            type: `video/${vide_info.getVideoType()}`,
+                        };
+                        const viewinfo = {
+                            is_deleted: vide_info.getIsDeleted(),
+                            thumb_info: vide_info.getThumbInfo()      
+                        };      
+                        const comments = vide_info.getComments();
+                        // const { video_data, viewinfo, comments } = data;
                         play_by_video_data(video_data, viewinfo, comments, state);
                     }                   
                 } catch (error) {
@@ -312,7 +353,7 @@
                 }
 
             });
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
+            ipc_render.sendMain(ipc_render.IPCMsg.GET_VIDEO_ITEM, video_id);
         }; 
 
         ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {

@@ -258,7 +258,7 @@
                 // main_store.commit("initLibrary", library);
 
                 // TODO
-                main_store.commit("setLibrary2Data", 
+                await main_store.action("setLibrary2Data", 
                     SettingStore.getSettingDir(),
                     dir_list, video_list);
 

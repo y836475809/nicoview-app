@@ -294,6 +294,17 @@ const main_store = new Store({
             const library = context.getter("library2");
             await library.save();
         },
+        // TODO
+        setLibrary2Data: async (context, dir, path_data_list, video_data_list) => {
+            const library = new LibraryDB(
+                {filename : path.join(dir, "library.json")});
+            library.setPathData(path_data_list);
+            library.setVideoData(video_data_list);
+            await library.save();
+
+            // context.state.library2 = library;
+            context.commit("setLibrary2", library);
+        },
         getPlayData: async (context, video_id) => {
             const library = context.getter("library");
             return await cv.getPlayItem(library, video_id);
@@ -303,15 +314,6 @@ const main_store = new Store({
         initLibrary: (context, library) => {
             context.state.library = library;
             return [["libraryInitialized"]];
-        },
-        // TODO
-        setLibrary2Data: (context, dir, path_data_list, video_data_list) => {
-            const library = new LibraryDB(
-                {filename : path.join(dir, "library.json")});
-            library.setPathData(path_data_list);
-            library.setVideoData(video_data_list);
-            context.state.library2 = library;
-            return [["libraryInitialized2"]];
         },
         // TODO
         setLibrary2: (context, library) => {

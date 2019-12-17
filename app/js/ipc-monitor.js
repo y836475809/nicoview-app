@@ -17,7 +17,9 @@ const IPCRenderMsg =  Object.freeze({
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",
     CANCEL_UPDATE_DATA: "ipc-cancel-update-data",
-    ADD_BOOKMARK: "ipc-add-bookmark"
+    ADD_BOOKMARK: "ipc-add-bookmark",
+
+    APP_CLOSE: "ipc-app-close",
 });
 
 class IPCRender extends EventEmitter {
@@ -61,6 +63,7 @@ const IPCMainMsg =  Object.freeze({
     SHOW_PLAYER_SYNC: "ipc-show-player",
     SET_COOKIE_SYNC: "ipc-set-cookie",
     SET_PLAYER_PATH: "ipc-set-player-path",
+    APP_CLOSE: "ipc-app-close",
 });
 
 class IPCMain extends EventEmitter {

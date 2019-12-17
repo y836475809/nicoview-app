@@ -122,6 +122,7 @@
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
+        const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const ipc_monitor = new IPCRenderMonitor();
         ipc_monitor.listen();
@@ -279,6 +280,25 @@
 
         window.onbeforeunload = (e) => {
         };
+        
+        // TODO
+        ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
+            try {
+                await main_store.action("saveLibrary2");
+            } catch (error) {
+                const result = await showOKCancelBox("error", 
+                    `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`);
+                if(result!==0){
+                    return;
+                }
+            }
+
+            const result = await showOKCancelBox("info", "終了しますか?");
+            if(result!==0){
+                return;
+            }
+            ipc_main.send(ipc_main.IPCMsg.APP_CLOSE);
+        });
 
         const timeout = 200;
         let timer;

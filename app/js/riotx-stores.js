@@ -283,6 +283,17 @@ const main_store = new Store({
             await library.load();
             context.commit("setLibrary2", library);
         },
+        // TODO
+        updareLibrary2: async (context, video_id, props) => {
+            const library = context.getter("library2");
+            await library.update(video_id, props);
+            context.commit("updateLibraryItem", video_id);
+        },
+        // TODO
+        saveLibrary2: async (context) => {
+            const library = context.getter("library2");
+            await library.save();
+        },
         getPlayData: async (context, video_id) => {
             const library = context.getter("library");
             return await cv.getPlayItem(library, video_id);
@@ -306,6 +317,10 @@ const main_store = new Store({
         setLibrary2: (context, library) => {
             context.state.library2 = library;
             return [["libraryInitialized2"]];
+        },
+        // TODO
+        updateLibraryItem: (context, video_id) => {
+            return [["libraryItemUpdated", video_id]];
         },
         addDownloadedItem : (context, video_id) => {
             return [["libraryItemAdded", video_id]];

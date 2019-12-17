@@ -200,6 +200,16 @@
             });
             loadLibraryItems(library_items);
         });
+        // TODO 
+        main_store.change("libraryItemUpdated", async (state, store, video_id) => {
+            console.log("libraryItemUpdated video_id=", video_id);
+
+            const item = await store.action("getLibrary2Item", video_id);
+            const video_info = new VideoInfo(item);
+            item.thumb_img = video_info.getThumbImgPath();
+            item.tags = item.tags ? item.tags.join(" ") : "";
+            grid_table.updateItem(item, video_id);
+        });
 
         const obs_trigger = new obsTrigger(obs);
 
@@ -531,18 +541,17 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const library_item = await library.getLibraryItem(video_id);
-            if(library_item===null){
+            const video_item = await main_store.action("getLibrary2Item", video_id);
+            if(video_item===null){
                 return;
             }
-
-            const last_play_date = new Date().getTime();
-            const play_count = library_item.play_count + 1;
-            library_item.last_play_date = last_play_date; 
-            library_item.play_count = play_count;
-            grid_table.updateItem(library_item, video_id);
-            await library.setFieldValue(video_id, "last_play_date", last_play_date);
-            await library.setFieldValue(video_id, "play_count", play_count);
+           
+            const props = { 
+                last_play_date : new Date().getTime(),
+                play_count : video_item.play_count + 1
+            };
+            console.log("updareLibrary2 video_id=", video_id, ", props=", props);
+            main_store.action("updareLibrary2",  video_id, props);
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 

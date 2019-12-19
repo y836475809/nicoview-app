@@ -3,46 +3,21 @@ const nock = require("nock");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
 const { getThumbInfo, filterComments } = require("../app/js/niconico");
-const { NicoUpdate } = require("../app/js/nico-update");
-const { Library } = require("../app/js/library");
+const { NicoUpdate2 } = require("../app/js/nico-update");
 
-/** @type {Library} */
-let library = null;
 const cur_comment = filterComments(TestData.no_owner_comment);
 const nico_mocks = new NicoDownLoadMocks();
 
-test.beforeEach(async t => {
-    nock.disableNetConnect();
-    
-    library = new Library();
-    await library.init(__dirname, true);
-    const dirpath_list = [
-        { dirpath_id: 1, dirpath: "/data/" }
-    ];
-    const video_list = [
-        {
-            _db_type:"json", 
-            video_id: TestData.video_id,
-            dirpath_id: 1,
-            video_name: "サンプル12345678",
-            common_filename: TestData.video_id,
-            video_type: "mp4",
-            is_deleted: false,
-            tags:[]
-        }
-    ];
-    await library.setData(dirpath_list, video_list);
-});
-
-class TestNicoUpdate extends NicoUpdate {
-    constructor(video_id, library){
-        super(video_id, library);
+class TestNicoUpdate extends NicoUpdate2 {
+    constructor(video_item){
+        super(video_item);
         this.paths = [];
         this.data = [];
     }
-    async _getCurrentComments(dir_path, video_info){
+    _getCurrentComments(){
         return cur_comment;
     }
+
     async _writeFile(file_path, data){
         this.paths.push(file_path);
         this.data.push(data);
@@ -57,17 +32,35 @@ const byteToString = (byte) => {
     return String.fromCharCode.apply("", new Uint16Array(byte));
 };
 
+test.beforeEach(async t => {
+    nock.disableNetConnect();
+
+    const video_item = {
+        data_type:"json", 
+        id: TestData.video_id,
+        dirpath_id: 1,
+        dirpath: "/data/",
+        video_name: "サンプル12345678",
+        common_filename: TestData.video_id,
+        video_type: "mp4",
+        is_deleted: false,
+        tags:[]
+    };
+    t.context.nico_update = new TestNicoUpdate(video_item);
+});
+
 test("update", async(t) => {
     nico_mocks.watch();
     nico_mocks.comment();
     nico_mocks.thumbnail();
 
-    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    const nico_update = t.context.nico_update;
+    await nico_update.update();
 
-    t.truthy(await nico_update.update());
-    t.falsy(await library.getFieldValue(TestData.video_id, "is_deleted"));
-    t.is(await library.getFieldValue(TestData.video_id, "_db_type"), "json");
-    t.is(await library.getFieldValue(TestData.video_id, "thumbnail_size"), "L");
+    const video_item = nico_update.video_item;
+    t.falsy(video_item.is_deleted);
+    t.is(video_item.data_type, "json");
+    t.is(video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
     t.is(nico_update.data[1].length,2);
     t.is(byteToString(nico_update.data[2]), "thumbnail");
@@ -85,7 +78,7 @@ test("update cancel", async(t) => {
     nico_mocks.comment();
     nico_mocks.thumbnail();
 
-    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    const nico_update = t.context.nico_update;
 
     setTimeout(()=>{
         nico_update.cancel();
@@ -105,7 +98,7 @@ test("update timetout", async (t) => {
     nico_mocks.comment();
     nico_mocks.thumbnail();
         
-    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    const nico_update = t.context.nico_update;
     try {
         await nico_update.update();
     } catch (error) {
@@ -123,7 +116,7 @@ test("update 404", async t => {
     nico_mocks.comment();
     nico_mocks.thumbnail();
 
-    const nico_update = new TestNicoUpdate(TestData.video_id, library);
+    const nico_update = t.context.nico_update;
     try {
         await nico_update.update();
     } catch (error) {
@@ -131,7 +124,8 @@ test("update 404", async t => {
         t.is(error.name, "Error");
         t.regex(error.message, /404:/);
 
-        t.truthy(await library.getFieldValue(TestData.video_id, "is_deleted"));
+        const video_item = nico_update.video_item;
+        t.truthy(video_item.is_deleted);
         t.deepEqual(nico_update.paths, []);
     }
 });

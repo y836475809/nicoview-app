@@ -520,7 +520,7 @@ class NicoUpdate2 extends EventEmitter {
         }
 
         if(!this._validateComment(comments_diff)){
-            throw new Error(`${this.video_id}の差分コメントが正しくないデータです`);
+            throw new Error(`${this.video_item.id}の差分コメントが正しくないデータです`);
         }
 
         const new_comments = cur_comments.concat(filterComments(comments_diff));
@@ -566,7 +566,7 @@ class NicoUpdate2 extends EventEmitter {
         const thumbImg = await this._getThumbImg(thumb_url);
         
         if(!this._validateThumbnail(thumbImg)){
-            throw new Error(`${this.video_id}のサムネイルが正しくないデータです`);
+            throw new Error(`${this.video_item.id}のサムネイルが正しくないデータです`);
         }
 
         await this._writeFile(img_path, thumbImg, "binary");
@@ -601,7 +601,7 @@ class NicoUpdate2 extends EventEmitter {
         }        
 
         if(!this._validateWatchData(watch_data)){
-            throw new Error(`${this.video_id}のwatch dataが正しくないデータです`);
+            throw new Error(`${this.video_item.id}のwatch dataが正しくないデータです`);
         }
 
         const api_data = watch_data.api_data;
@@ -614,7 +614,7 @@ class NicoUpdate2 extends EventEmitter {
         }
 
         if(is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
+            throw new Error(`${this.video_item.id}は削除されています`);
         }
 
         return api_data;
@@ -626,7 +626,7 @@ class NicoUpdate2 extends EventEmitter {
         }
 
         if(this.video_item.is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
+            throw new Error(`${this.video_item.id}は削除されています`);
         }
     }
 
@@ -750,7 +750,7 @@ class NicoUpdate2 extends EventEmitter {
 
     async _getWatchData(){
         this.nico_watch = new NicoWatch();
-        const watch_data = await this.nico_watch.watch(this.video_id);
+        const watch_data = await this.nico_watch.watch(this.video_item.id);
         return watch_data;
     }
 
@@ -837,5 +837,6 @@ class NicoUpdate2 extends EventEmitter {
 }
 
 module.exports = {
-    NicoUpdate
+    NicoUpdate,
+    NicoUpdate2
 };

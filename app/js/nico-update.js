@@ -498,7 +498,7 @@ class NicoUpdate2 extends EventEmitter {
 
         const is_update = await this._updateComment(api_data, nico_json);
         if(!is_update){
-            return false;
+            return;
         }
         
         if(!this._isDataTypeJson()){  
@@ -541,8 +541,10 @@ class NicoUpdate2 extends EventEmitter {
         }
 
         const { nico_xml, nico_json } = this._getNicoFileData();
-        await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
-
+        const is_update = await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+        if(!is_update){
+            return;
+        }
         this.emit("updated", this.video_item); 
     }  
 

@@ -2,94 +2,55 @@ const test = require("ava");
 const nock = require("nock");
 const path = require("path");
 const { TestData} = require("./helper/nico-mock");
-const { NicoUpdate } = require("../app/js/nico-update");
-const { Library } = require("../app/js/library");
-
-/** @type {Library} */
-let library = null;
+const { NicoUpdate2 } = require("../app/js/nico-update");
 
 test.beforeEach(async t => {
     nock.disableNetConnect();
 
-    library = new Library();
-    await library.init(__dirname, true);
-    const dirpath_list = [
-        { dirpath_id: 1, dirpath: "/data/" }
-    ];
-    const video_list = [
-        {
-            _db_type:"json", 
-            video_id: "sm1",
+    const video_item_map = {};
+    [1, 2, 3, 4, 5, 6].map(value => {
+        return {
+            data_type: "json", 
+            id: `sm${value}`,
             dirpath_id: 1,
-            video_name: "サンプル1",
-            common_filename: "sm1",
+            dirpath: "/data/",
+            video_name: `サンプル${value}`,
+            common_filename: `sm${value}`,
             video_type: "mp4",
             is_deleted: false,
             tags: [],
             thumbnail_size: "L"
-        },
-        {
-            _db_type:"json", 
-            video_id: "sm2",
-            dirpath_id: 1,
-            video_name: "サンプル2",
-            common_filename: "sm2",
-            video_type: "mp4",
-            is_deleted: true,
-            tags: [],
-            thumbnail_size: "L"
-        },
-        {
-            _db_type:"xml", 
-            video_id: "sm3",
-            dirpath_id: 1,
-            video_name: "サンプル3",
-            common_filename: "サンプル3 - [sm3]",
-            video_type: "mp4",
-            is_deleted: false,
-            tags: [],
-            thumbnail_size: "S"
-        },
-        {
-            _db_type:"xml", 
-            video_id: "sm4",
-            dirpath_id: 1,
-            video_name: "サンプル4",
-            common_filename: "サンプル4 - [sm4]",
-            video_type: "mp4",
-            is_deleted: true,
-            tags: [],
-            thumbnail_size: "S"
-        },
-        {
-            _db_type:"json", 
-            video_id: "sm5",
-            dirpath_id: 1,
-            video_name: "サンプル5",
-            common_filename: "sm5",
-            video_type: "mp4",
-            is_deleted: false,
-            tags: ["tag1"],
-            thumbnail_size: "L"
-        },
-        {
-            _db_type:"json", 
-            video_id: "sm6",
-            dirpath_id: 1,
-            video_name: "サンプル6",
-            common_filename: "sm6",
-            video_type: "mp4",
-            is_deleted: false,
-            tags: ["tag1", "tag2", "tag3"],
-            thumbnail_size: "L"
-        },
-    ];
-    await library.setData(dirpath_list, video_list);
+        };
+    }).forEach(video_item => {
+        video_item_map[video_item.id] = video_item;
+    });
+
+    Object.assign(video_item_map["sm2"], {
+        is_deleted: true
+    });
+    Object.assign(video_item_map["sm3"], {
+        data_type :"xml",
+        common_filename : "サンプル3 - [sm3]",
+        thumbnail_size: "S"
+    });
+    Object.assign(video_item_map["sm4"], {
+        data_type :"xml",
+        common_filename : "サンプル4 - [sm4]",
+        is_deleted: true,
+        thumbnail_size: "S"
+    });
+    Object.assign(video_item_map["sm5"], {
+        tags: ["tag1"]
+    });
+    Object.assign(video_item_map["sm6"], {
+        tags: ["tag1", "tag2", "tag3"],
+    });
+    t.context.video_item_map = video_item_map;
 });
 
-class TestNicoUpdate extends NicoUpdate {
-    constructor(video_id, library, nico_video_deleted){
-        super(video_id, library);
+class TestNicoUpdate extends NicoUpdate2 {
+    constructor(video_item, nico_video_deleted){
+        super(video_item);
         this.nico_video_deleted = nico_video_deleted;
         this.paths = [];
         this.data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
@@ -98,7 +59,7 @@ class TestNicoUpdate extends NicoUpdate {
     async _getWatchData(){
         return { cookie_jar: null, api_data: this.data_api_data };
     }
-    async _getCurrentComments(dir_path, video_info){
+    _getCurrentComments(){
         return [];
     }
     async _getComments(api_data, cur_comments){
@@ -110,15 +71,14 @@ class TestNicoUpdate extends NicoUpdate {
     async _writeFile(file_path, data){
         this.paths.push(file_path);
     }
-
     _validateThumbnail(bytes){
         return true;
     }
 }
 
-class TestNicoUpdateTags extends NicoUpdate {
-    constructor(video_id, library){
-        super(video_id, library);
+class TestNicoUpdateTags extends NicoUpdate2 {
+    constructor(video_item){
+        super(video_item);
         this.data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
     }
     async _getWatchData(){
@@ -127,7 +87,7 @@ class TestNicoUpdateTags extends NicoUpdate {
     async _getComments(api_data, cur_comments){
         return [{}];
     }
-    async _getCurrentComments(dir_path, video_info){
+    _getCurrentComments(){
         return [];
     }
     async _getThumbImg(url){
@@ -135,19 +95,21 @@ class TestNicoUpdateTags extends NicoUpdate {
     }
     async _writeFile(file_path, data){
     }
-
     _validateThumbnail(bytes){
         return true;
     }
 }
 
 test("update thumbinfo, comment if dbtype is json", async t => {
+    
     const video_id = "sm1";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, false);
 
-    t.truthy(await nico_update.update());
-    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
-    t.is(await library.getFieldValue(video_id, "thumbnail_size"), "L");
+    await nico_update.update();
+    const updated_video_item = nico_update.video_item;
+    t.falsy(updated_video_item.is_deleted);
+    t.is(updated_video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.paths, [
         path.normalize("/data/sm1[ThumbInfo].json"),
         path.normalize("/data/sm1[Comment].json"),
@@ -157,42 +119,50 @@ test("update thumbinfo, comment if dbtype is json", async t => {
 
 test("throw error if video is deleted", async t => {
     const video_id = "sm1";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, true);
 
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
-    t.is(await library.getFieldValue(video_id, "thumbnail_size"), "L");
+    t.truthy(updated_video_item.is_deleted);
+    t.is(updated_video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.paths, []);
 });
 
 test("throw error if is_deleted of librasy is true, video is not deleted", async t => {
     const video_id = "sm2";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, false);
 
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
+    t.truthy(updated_video_item.is_deleted);
     t.deepEqual(nico_update.paths, []);
 });
 
 test("throw error if is_deleted of librasy is true, video is deleted", async t => {
     const video_id = "sm2";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, true);
 
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
+    t.truthy(updated_video_item.is_deleted);
     t.deepEqual(nico_update.paths, []);
 });
 
 test("update thumbinfo, comment, thumnail if dbtype is xml", async t => {
     const video_id = "sm3";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, false);
 
-    t.truthy(await nico_update.update());
-    t.falsy(await library.getFieldValue(video_id, "is_deleted"));
-    t.is(await library.getFieldValue(video_id, "thumbnail_size"), "L");
+    await nico_update.update();
+    const updated_video_item = nico_update.video_item;
+    t.falsy(updated_video_item.is_deleted);
+    t.is(updated_video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.paths, [
         path.normalize("/data/サンプル3 - [sm3][ThumbInfo].json"),
         path.normalize("/data/サンプル3 - [sm3][Comment].json"),
@@ -202,48 +172,56 @@ test("update thumbinfo, comment, thumnail if dbtype is xml", async t => {
 
 test("throw error if dbtype is xml, video is deleted", async t => {
     const video_id = "sm3";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, true);
 
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
+    t.truthy(updated_video_item.is_deleted);
     t.deepEqual(nico_update.paths, []);
 });
 
 test("throw error if dbtype is xml, is_deleted of librasy is true", async t => {
     const video_id = "sm4";
-    const nico_update = new TestNicoUpdate(video_id, library, false);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, false);
 
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
+    t.truthy(updated_video_item.is_deleted);
     t.deepEqual(nico_update.paths, []);
 });
 
 test("throw error if dbtype is xml, is_deleted of librasy is true, video is deleted)", async t => {
     const video_id = "sm4";
-    const nico_update = new TestNicoUpdate(video_id, library, true);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdate(video_item, true);
     
     const error = await t.throwsAsync(nico_update.update());
+    const updated_video_item = nico_update.video_item;
     t.is(error.message, `${video_id}は削除されています`);
-    t.truthy(await library.getFieldValue(video_id, "is_deleted"));
+    t.truthy(updated_video_item.is_deleted);
     t.deepEqual(nico_update.paths, []);
 });
 
 test("update tag, add tags", async t => {
     const video_id = "sm5";
-    const nico_update = new TestNicoUpdateTags(video_id, library);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdateTags(video_item);
     
-    t.truthy(await nico_update.update());
-    const tags = await library.getFieldValue(video_id, "tags");
-    t.deepEqual(tags, ["tag1", "tag2", "tag3"]);
+    await nico_update.update();
+    const updated_video_item = nico_update.video_item;
+    t.deepEqual(updated_video_item.tags, ["tag1", "tag2", "tag3"]);
 });
 
 test("update tag, same tags", async t => {
     const video_id = "sm6";
-    const nico_update = new TestNicoUpdateTags(video_id, library);
+    const video_item = t.context.video_item_map[video_id];
+    const nico_update = new TestNicoUpdateTags(video_item);
     
-    t.truthy(await nico_update.update());
-    const tags = await library.getFieldValue(video_id, "tags");
-    t.deepEqual(tags, ["tag1", "tag2", "tag3"]);
+    await nico_update.update();
+    const updated_video_item = nico_update.video_item;
+    t.deepEqual(updated_video_item.tags, ["tag1", "tag2", "tag3"]);
 });

@@ -3,12 +3,12 @@ const nock = require("nock");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
 const { getThumbInfo, filterComments } = require("../app/js/niconico");
-const { NicoUpdate2 } = require("../app/js/nico-update");
+const { NicoUpdate } = require("../app/js/nico-update");
 
 const cur_comment = filterComments(TestData.no_owner_comment);
 const nico_mocks = new NicoDownLoadMocks();
 
-class TestNicoUpdate extends NicoUpdate2 {
+class TestNicoUpdate extends NicoUpdate {
     constructor(video_item){
         super(video_item);
         this.paths = [];

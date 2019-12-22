@@ -8,7 +8,7 @@ const { XMLDataConverter } = require("./xml-data-converter");
 const { VideoInfo } = require("./library2");
 
 
-class NicoUpdate2 extends EventEmitter {
+class NicoUpdate extends EventEmitter {
     /**
      * 
      * @param {Object} video_item 
@@ -472,5 +472,5 @@ class NicoUpdate2 extends EventEmitter {
 }
 
 module.exports = {
-    NicoUpdate2
+    NicoUpdate
 };

@@ -167,7 +167,7 @@
         const {Menu, MenuItem} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoUpdate2 } = require(`${app_base_dir}/js/nico-update`);
+        const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
         const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
@@ -336,7 +336,7 @@
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
                         const video_item = await main_store.action("getLibrary2Item", item.id);
-                        nico_update = new NicoUpdate2(video_item);
+                        nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
                             await main_store.action("updareLibrary2", video_id, props);
                             if(update_thumbnail){
@@ -566,7 +566,7 @@
             try {
                 //TODO
                 const video_item = await main_store.action("getLibrary2Item", video_id);
-                this.nico_update = new NicoUpdate2(video_item);
+                this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){
                     await this.nico_update.updateThumbInfo();

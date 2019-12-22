@@ -2,7 +2,7 @@ const test = require("ava");
 const nock = require("nock");
 const path = require("path");
 const { TestData} = require("./helper/nico-mock");
-const { NicoUpdate2 } = require("../app/js/nico-update");
+const { NicoUpdate } = require("../app/js/nico-update");
 
 test.beforeEach(async t => {
     nock.disableNetConnect();
@@ -48,7 +48,7 @@ test.beforeEach(async t => {
     t.context.video_item_map = video_item_map;
 });
 
-class TestNicoUpdate extends NicoUpdate2 {
+class TestNicoUpdate extends NicoUpdate {
     constructor(video_item, nico_video_deleted){
         super(video_item);
         this.nico_video_deleted = nico_video_deleted;
@@ -76,7 +76,7 @@ class TestNicoUpdate extends NicoUpdate2 {
     }
 }
 
-class TestNicoUpdateTags extends NicoUpdate2 {
+class TestNicoUpdateTags extends NicoUpdate {
     constructor(video_item){
         super(video_item);
         this.data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));

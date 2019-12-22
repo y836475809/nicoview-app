@@ -1,10 +1,10 @@
 const test = require("ava");
 const path = require("path");
-const { NicoUpdate2 } = require("../app/js/nico-update");
+const { NicoUpdate } = require("../app/js/nico-update");
 
 const test_video_id = "sm100";
 
-class TestNicoUpdate extends NicoUpdate2 {
+class TestNicoUpdate extends NicoUpdate {
     constructor(video_item){
         super(video_item);
 

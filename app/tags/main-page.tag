@@ -210,7 +210,7 @@
         // TODO
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_VIDEO_ITEM, async (event, args) => {
             const video_id  = args;
-            const video_item = await main_store.action("getLibrary2Item", video_id);
+            const video_item = await main_store.action("getLibraryItem", video_id);
             ipc_render.sendPlayer(ipc_render.IPCMsg.GET_VIDEO_ITEM_REPLY, {
                 video_item
             });  
@@ -253,7 +253,7 @@
 
             // TODO
             if(result.state == "ok" || result.state == "404"){
-                const video_item = await main_store.action("getLibrary2Item", video_id);
+                const video_item = await main_store.action("getLibraryItem", video_id);
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
                     video_item
                 });
@@ -276,7 +276,7 @@
         // TODO
         ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
             try {
-                await main_store.action("saveLibrary2");
+                await main_store.action("saveLibrary");
             } catch (error) {
                 const result = await showOKCancelBox("error", 
                     `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`);

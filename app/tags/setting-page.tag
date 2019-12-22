@@ -247,7 +247,7 @@
 
             try {
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                await main_store.action("setLibrary2Data", 
+                await main_store.action("setLibraryData", 
                     SettingStore.getSettingDir(),
                     dir_list, video_list);
 

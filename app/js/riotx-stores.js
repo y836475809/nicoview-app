@@ -97,7 +97,7 @@ class Store {
 const main_store = new Store({
     name: "main",
     state:{
-        library2:null,
+        library:null,
         download_Items:[]
     },
     actions: {
@@ -109,60 +109,51 @@ const main_store = new Store({
             video_item.modification_date = -1;
             video_item.play_count = 0;
 
-            const library = context.getter("library2");
+            const library = context.getter("library");
             await library.insert(video_item.dirpath, video_item);
             context.commit("addDownloadedItem", video_item.id);
         },
         updateDownloadItem: (context, download_Items) => {
             context.commit("updateDownloadItem", download_Items);
         },
-        // TODO
-        getLibrary2Item: (context, video_id) => {
-            const library = context.getter("library2");
+        getLibraryItem: (context, video_id) => {
+            const library = context.getter("library");
             return library.find(video_id);
         },
-        // TODO
-        getLibrary2Items: (context) => {
-            const library = context.getter("library2");
+        getLibraryItems: (context) => {
+            const library = context.getter("library");
             return library.findAll();
         },
-
-        // TODO
-        loadLibrary2: async (context, dir) => {
+        loadLibrary: async (context, dir) => {
             const library = new LibraryDB(
                 {filename : path.join(dir, "library.json")});
             await library.load();
-            context.commit("setLibrary2", library);
+            context.commit("setLibrary", library);
         },
-        // TODO
-        updareLibrary2: async (context, video_id, props) => {
-            const library = context.getter("library2");
+        updateLibrary: async (context, video_id, props) => {
+            const library = context.getter("library");
             await library.update(video_id, props);
             context.commit("updateLibraryItem", video_id, props);
         },
-        // TODO
-        saveLibrary2: async (context) => {
-            const library = context.getter("library2");
+        saveLibrary: async (context) => {
+            const library = context.getter("library");
             await library.save();
         },
-        // TODO
-        setLibrary2Data: async (context, dir, path_data_list, video_data_list) => {
+        setLibraryData: async (context, dir, path_data_list, video_data_list) => {
             const library = new LibraryDB(
                 {filename : path.join(dir, "library.json")});
             library.setPathData(path_data_list);
             library.setVideoData(video_data_list);
             await library.save();
 
-            context.commit("setLibrary2", library);
+            context.commit("setLibrary", library);
         }
     },
     mutations: {
-        // TODO
-        setLibrary2: (context, library) => {
-            context.state.library2 = library;
-            return [["libraryInitialized2"]];
+        setLibrary: (context, library) => {
+            context.state.library = library;
+            return [["libraryInitialized"]];
         },
-        // TODO
         updateLibraryItem: (context, video_id, props) => {
             return [["libraryItemUpdated", video_id, props]];
         },
@@ -175,13 +166,11 @@ const main_store = new Store({
         }
     },
     getters: {
-        // TODO
-        library2: (context) => {
-            return context.state.library2;
+        library: (context) => {
+            return context.state.library;
         },
-        // TODO
-        existLibrary2Data: (context, video_id) => {
-            const library = context.state.library2;
+        existLibraryItem: (context, video_id) => {
+            const library = context.state.library;
             return library.exist(video_id);
         },
         downloadItemSet : (context) => {

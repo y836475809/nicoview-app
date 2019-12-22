@@ -179,8 +179,8 @@
         const main_store = storex.get("main");
 
         // TODO 
-        main_store.change("libraryInitialized2", async (state, store) => {
-            const items = await store.action("getLibrary2Items");
+        main_store.change("libraryInitialized", async (state, store) => {
+            const items = await store.action("getLibraryItems");
             const library_items = items.map(value=>{
                 const video_data = new NicoVideoData(value);
                 value.thumb_img = video_data.getThumbImgPath();
@@ -198,7 +198,7 @@
         });
 
         main_store.change("libraryItemAdded", async (state, store, video_id) => {
-            const item = await store.action("getLibrary2Item", video_id);
+            const item = await store.action("getLibraryItem", video_id);
             const video_data = new NicoVideoData(item);
             item.thumb_img = video_data.getThumbImgPath();
             item.tags = item.tags ? item.tags.join(" ") : "";
@@ -334,12 +334,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await main_store.action("getLibrary2Item", item.id);
+                        const video_item = await main_store.action("getLibraryItem", item.id);
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                            await main_store.action("updareLibrary2", video_id, props);
+                            await main_store.action("updateLibrary", video_id, props);
                             if(update_thumbnail){
-                                const updated_video_item = await main_store.action("getLibrary2Item", video_id);
+                                const updated_video_item = await main_store.action("getLibraryItem", video_id);
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -376,7 +376,7 @@
             };
 
             try {
-                const video_item = await main_store.action("getLibrary2Item", video_id);
+                const video_item = await main_store.action("getLibraryItem", video_id);
                 const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
 
@@ -399,7 +399,7 @@
 
                 await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
-                await main_store.action("updareLibrary2", video_id, {video_type:"mp4"});
+                await main_store.action("updateLibrary", video_id, {video_type:"mp4"});
 
                 await showMessageBox("info", "変換完了");
                 updateState("変換完了");  
@@ -518,7 +518,7 @@
             resizeGridTable();
             
             try {
-                await main_store.action("loadLibrary2", SettingStore.getSettingDir());
+                await main_store.action("loadLibrary", SettingStore.getSettingDir());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -533,7 +533,7 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await main_store.action("getLibrary2Item", video_id);
+            const video_item = await main_store.action("getLibraryItem", video_id);
             if(video_item===null){
                 return;
             }
@@ -542,8 +542,8 @@
                 last_play_date : new Date().getTime(),
                 play_count : video_item.play_count + 1
             };
-            console.log("updareLibrary2 video_id=", video_id, ", props=", props);
-            main_store.action("updareLibrary2",  video_id, props);
+            console.log("updateLibrary video_id=", video_id, ", props=", props);
+            main_store.action("updateLibrary",  video_id, props);
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 
@@ -559,7 +559,7 @@
             const { video_id, update_target, cb } = args;
             try {
                 //TODO
-                const video_item = await main_store.action("getLibrary2Item", video_id);
+                const video_item = await main_store.action("getLibraryItem", video_id);
                 this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){

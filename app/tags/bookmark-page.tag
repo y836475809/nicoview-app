@@ -161,7 +161,7 @@
 
                         const video_id = items[0].data.video_id;
                         // TODO
-                        const exist = main_store.getter("existLibrary2Data", video_id);
+                        const exist = main_store.getter("existLibraryItem", video_id);
                         if(exist===true){
                             obs.trigger("main-page:select-page", "library");
                             obs.trigger("library-page:scrollto", video_id);     

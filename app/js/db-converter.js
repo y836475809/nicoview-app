@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
-const { createDBItem } = require("./library");
 const { FileUtils } = require("./file-utils");
 
 class DBConverter {
@@ -27,25 +26,6 @@ class DBConverter {
         this._read_tag_string();
         this._read_tag();
         this._read_video();
-    }
-
-    // TODO
-    read2() {
-        this._read_dirpath2();
-        this._read_tag_string();
-        this._read_tag();
-        this._read_video2();
-    }
-
-    _read_dirpath() {
-        // this.dirpath_map = new Map();
-        let res = this.db.exec("SELECT * FROM file");
-        const values = res[0].values;
-        this.dirpath_list = values.map(value=>{
-            const dirpath_id = value[0];
-            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
-            return { dirpath_id, dirpath };
-        });
     }
 
     _read_tag_string() {
@@ -77,53 +57,7 @@ class DBConverter {
         });
     }
 
-    _read_video() {
-        let res = this.db.exec("SELECT * FROM nnddvideo");
-        const values = res[0].values;
-        this.video_list = values.map(value=>{
-            const id = value[0];
-            const key = value[1];
-            const uri = value[2];
-            const dirpath_id = value[3];
-            const video_name = value[4];
-            const is_economy = value[5];
-            const modification_date = value[6];
-            const creation_date = value[7];
-            const thumb_url = value[8];
-            const play_count = value[9];
-            const time = value[10];
-            const last_play_date = value[11];
-            const yet_reading = value[12];
-            const pub_date = value[13];
-
-            const decoded_path = decodeURIComponent(uri);
-            const common_filename = path.basename(decoded_path, path.extname(decoded_path));
-            const video_type = path.extname(decoded_path).slice(1);
-            const tags = this.tag_map.get(id);
-            
-            const item = createDBItem();
-            item._db_type = "xml";
-            item.dirpath_id = dirpath_id;
-            item.video_id = key;
-            item.video_name = video_name;
-            item.video_type = video_type;
-            item.common_filename = common_filename;
-            item.is_economy = is_economy !== 0;
-            item.modification_date = modification_date; //-1の場合ある
-            item.creation_date = creation_date;         //-1の場合ある
-            item.pub_date = pub_date;               //-1の場合ある
-            item.last_play_date = last_play_date;   //-1の場合ある
-            item.play_count = play_count;
-            item.time = time;
-            item.tags = tags;
-            item.is_deleted = false;
-            
-            return item;
-        });
-    }
-
-    // TODO test
-    _read_dirpath2() {
+    _read_dirpath() {
         let res = this.db.exec("SELECT * FROM file");
         const values = res[0].values;
         this.dirpath_list = values.map(value=>{
@@ -133,8 +67,7 @@ class DBConverter {
         });
     }
     
-    // TODO test
-    _read_video2() {
+    _read_video() {
         let res = this.db.exec("SELECT * FROM nnddvideo");
         const values = res[0].values;
         this.video_list = values.map(value=>{

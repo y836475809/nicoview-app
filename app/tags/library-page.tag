@@ -178,7 +178,6 @@
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        // TODO 
         main_store.change("libraryInitialized", async (state, store) => {
             const items = await store.action("getLibraryItems");
             const library_items = items.map(value=>{
@@ -189,7 +188,7 @@
             });
             loadLibraryItems(library_items);
         });
-        // TODO 
+
         main_store.change("libraryItemUpdated", async (state, store, video_id, props) => {
             console.log("libraryItemUpdated video_id=", video_id, " props=", props);
 
@@ -558,7 +557,6 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                //TODO
                 const video_item = await main_store.action("getLibraryItem", video_id);
                 this.nico_update = new NicoUpdate(video_item);
                 

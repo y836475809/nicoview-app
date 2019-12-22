@@ -3,9 +3,6 @@ const { remote, ipcRenderer, ipcMain } = require("electron");
 
 const IPCRenderMsg =  Object.freeze({   
     PLAY_BY_VIDEO_ID: "ipc-play-by-video-id",
-    GET_PLAY_DATA: "ipc-get-play-data",
-    GET_PLAY_DATA_REPLY: "ipc-get-play-data-reply",
-    // TODO
     GET_VIDEO_ITEM: "ipc-get-videoitem-data",
     GET_VIDEO_ITEM_REPLY: "ipc-get-videoitem-reply",
 

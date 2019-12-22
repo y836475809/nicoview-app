@@ -207,15 +207,6 @@
             }); 
         });  
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
-            const video_id  = args;
-            const data = await main_store.action("getPlayData", video_id);
-            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
-                video_id,
-                data
-            });  
-        });
-
         // TODO
         ipc_monitor.on(ipc_monitor.IPCMsg.GET_VIDEO_ITEM, async (event, args) => {
             const video_id  = args;
@@ -260,10 +251,11 @@
                 });
             });
 
+            // TODO
             if(result.state == "ok" || result.state == "404"){
-                const data = await main_store.action("getPlayData", video_id);
+                const video_item = await main_store.action("getLibrary2Item", video_id);
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
-                    video_id, data
+                    video_item
                 });
             }
         });

@@ -419,9 +419,14 @@
             await new Promise((resolve, reject) => {
                 ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
-                    const { video_id, data } = args;
-                    const { video_data, viewinfo, comments } = data;
-
+                    const { video_item } = args;
+                    const vide_info = new VideoInfo(video_item)
+                    const viewinfo = {
+                        is_deleted: vide_info.getIsDeleted(),
+                        thumb_info: vide_info.getThumbInfo()      
+                    }; 
+                    const comments = vide_info.getComments();
+                    
                     comment_filter.setComments(comments);
                     const filtered_comments = comment_filter.getComments();
 

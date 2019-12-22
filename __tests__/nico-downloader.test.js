@@ -78,13 +78,13 @@ test("downloader dmc", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _db_type:"json", 
+        data_type:"json", 
         dirpath: dist_dir,
-        video_id: "sm12345678", 
+        id: "sm12345678", 
         video_name: "test",
         video_type: "mp4",
         is_economy: false,
-        time: 100,
+        play_time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
         is_deleted: false,
@@ -156,13 +156,13 @@ test("downloader smile", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _db_type:"json",
+        data_type:"json",
         dirpath: dist_dir, 
-        video_id: "sm12345678", 
+        id: "sm12345678", 
         video_name: "test",
         video_type: "mp4",
         is_economy: false,
-        time: 100,
+        play_time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
         is_deleted: false,
@@ -234,13 +234,13 @@ test("downloader dmc low quality", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _db_type:"json", 
+        data_type:"json", 
         dirpath: dist_dir,
-        video_id: "sm12345678",       
+        id: "sm12345678",       
         video_name: "test",
         video_type: "mp4",
         is_economy: true,
-        time: 100,
+        play_time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
         is_deleted: false,
@@ -266,13 +266,13 @@ test("downloader smile low quality", async (t) => {
 
     const item = nico_down.getDownloadedItem();
     t.deepEqual(item, { 
-        _db_type:"json", 
+        data_type:"json", 
         dirpath: dist_dir,
-        video_id: "sm12345678",    
+        id: "sm12345678",    
         video_name: "test",
         video_type: "mp4",
         is_economy: true,
-        time: 100,
+        play_time: 100,
         pub_date: new Date("2018/01/01 01:00:00").getTime(),
         tags:["tag1", "tag2", "tag3"],
         is_deleted: false,

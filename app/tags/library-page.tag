@@ -178,15 +178,6 @@
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        main_store.change("libraryItemAdded", async (state, store, video_id) => {
-            const item = await store.action("getLibraryItem", video_id);
-            grid_table.updateItem(item, video_id);
-        });
-
-        main_store.change("libraryInitialized", async (state, store) => {
-            loadLibraryItems(await store.action("getLibraryItems"));
-        });
-
         // TODO 
         main_store.change("libraryInitialized2", async (state, store) => {
             const items = await store.action("getLibrary2Items");
@@ -204,6 +195,14 @@
 
             props.tags = props.tags ? props.tags.join(" ") : "";
             grid_table.updateCells(video_id, props);
+        });
+
+        main_store.change("libraryItemAdded", async (state, store, video_id) => {
+            const item = await store.action("getLibrary2Item", video_id);
+            const video_info = new VideoInfo(item);
+            item.thumb_img = video_info.getThumbImgPath();
+            item.tags = item.tags ? item.tags.join(" ") : "";
+            grid_table.updateItem(item, video_id);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -519,11 +518,6 @@
             resizeGridTable();
             
             try {
-                // library = new Library();
-                // await library.init(SettingStore.getSettingDir());
-                // main_store.commit("initLibrary", library);
-
-                // TODO
                 await main_store.action("loadLibrary2", SettingStore.getSettingDir());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);

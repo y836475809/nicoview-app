@@ -165,12 +165,11 @@
  
         main_store.change("downloadItemChanged", (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
-            const video_id_set = store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
                 const video_id = item.id;
-                item.saved = video_id_set.has(video_id);
+                item.saved = store.getter("existLibrary2Data", video_id);
                 item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
@@ -340,7 +339,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
+                if(needConvertVideo(await main_store.action("getLibrary2Item", video_id))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -359,7 +358,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
+                if(needConvertVideo(await main_store.action("getLibrary2Item", video_id))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -399,10 +398,9 @@
 
         const setData = async (mylist_items) => {
             const download_video_id_set = main_store.getter("downloadItemSet");
-            const video_id_set = main_store.getter("libraryVideoIDSet");
 
             mylist_items.forEach(value=>{
-                const saved = video_id_set.has(value.id);
+                const saved = main_store.getter("existLibrary2Data", value.id);
                 const reg_download = download_video_id_set.has(value.id);
                 value.saved = saved;
                 value.reg_download = reg_download;

@@ -285,7 +285,7 @@ class LibraryDB {
     }
 
     exist(video_id) {
-        return this._db.exist("vieo", video_id);
+        return this._db.exist("video", video_id);
     }
 
     find(video_id) {

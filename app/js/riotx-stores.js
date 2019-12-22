@@ -287,7 +287,7 @@ const main_store = new Store({
         updareLibrary2: async (context, video_id, props) => {
             const library = context.getter("library2");
             await library.update(video_id, props);
-            context.commit("updateLibraryItem", video_id);
+            context.commit("updateLibraryItem", video_id, props);
         },
         // TODO
         saveLibrary2: async (context) => {
@@ -321,8 +321,8 @@ const main_store = new Store({
             return [["libraryInitialized2"]];
         },
         // TODO
-        updateLibraryItem: (context, video_id) => {
-            return [["libraryItemUpdated", video_id]];
+        updateLibraryItem: (context, video_id, props) => {
+            return [["libraryItemUpdated", video_id, props]];
         },
         addDownloadedItem : (context, video_id) => {
             return [["libraryItemAdded", video_id]];

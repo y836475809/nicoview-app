@@ -434,11 +434,61 @@ class NicoUpdate2 extends EventEmitter {
         super();
 
         this.video_item = video_item;
+        this.org_video_item = this._deepCopy(video_item);
         this.video_info = new VideoInfo(this.video_item);
 
         this.nico_watch = null;
         this.nico_comment = null;
         this.nico_thumbnail = null;
+    }
+
+    _emitUpdated(update_thumbnail=false){
+        const props = this._getChangedProps(this.org_video_item, this.video_item);
+        this.emit("updated", this.video_item.id, props, update_thumbnail); 
+    }
+
+    _getChangedProps(org_item, updated_item){
+        const updated_props = {};
+        Object.keys(org_item).forEach(key=>{
+            if(!updated_item.hasOwnProperty(key)){
+                throw new Error(`${key} is not exist`)
+            }
+            const org_value = org_item[key];
+            const updated_value = updated_item[key];
+            if (Array.isArray(org_value)) {
+                if(org_value.sort().toString() != updated_value.sort().toString()){
+                    updated_props[key] = updated_value;
+                } 
+            }else if(org_value != updated_value){
+                updated_props[key] = updated_value;
+            }
+        });
+        return updated_props;
+    }
+
+    _deepCopy(obj){
+        if ( typeof obj === "boolean" || typeof obj === "number" 
+        || typeof obj === "string" || obj === null ) {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            const ret = [];
+            obj.forEach(value => { 
+                ret.push(this._deepCopy(value)); 
+            });
+            return ret;
+        }
+        
+        if (typeof obj === "object") {
+            const ret = {};
+            Object.keys(obj).forEach(key => {
+                ret[key] = this._deepCopy(obj[key]);
+            });
+            return ret;
+        }
+
+        return null;
     }
 
     /**
@@ -462,7 +512,7 @@ class NicoUpdate2 extends EventEmitter {
             this._setDataType("json");
         }
 
-        this.emit("updated", this.video_item); 
+        this._emitUpdated(true);
     }
 
     async updateThumbInfo(){
@@ -480,7 +530,7 @@ class NicoUpdate2 extends EventEmitter {
             this._convertComment(nico_xml, nico_json);    
         }
 
-        this.emit("updated", this.video_item); 
+        this._emitUpdated();
     }
 
     async _updateThumbInfo(api_data, nico_json){
@@ -509,7 +559,7 @@ class NicoUpdate2 extends EventEmitter {
             this._convertThumbInfo(nico_xml, nico_json);  
         }
 
-        this.emit("updated", this.video_item); 
+        this._emitUpdated();
     }
     
     async _updateComment(api_data, nico_json){
@@ -545,7 +595,7 @@ class NicoUpdate2 extends EventEmitter {
         if(!is_update){
             return;
         }
-        this.emit("updated", this.video_item); 
+        this._emitUpdated(true);
     }  
 
     async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){

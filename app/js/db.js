@@ -290,6 +290,9 @@ class LibraryDB {
 
     find(video_id) {
         const video_item = this._db.find("video", video_id);
+        if(video_item===null){
+            return null;
+        }
         const path_item = this._db.find("path", video_item.dirpath_id);
         video_item.dirpath = path_item.dirpath;
         return video_item;

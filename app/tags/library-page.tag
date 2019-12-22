@@ -172,7 +172,7 @@
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
         const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { ConvertMP4, needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
-        const { VideoInfo } = require(`${app_base_dir}/js/library2`);
+        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -182,8 +182,8 @@
         main_store.change("libraryInitialized2", async (state, store) => {
             const items = await store.action("getLibrary2Items");
             const library_items = items.map(value=>{
-                const video_info = new VideoInfo(value);
-                value.thumb_img = video_info.getThumbImgPath();
+                const video_data = new NicoVideoData(value);
+                value.thumb_img = video_data.getThumbImgPath();
                 value.tags = value.tags ? value.tags.join(" ") : "";
                 return value;
             });
@@ -199,8 +199,8 @@
 
         main_store.change("libraryItemAdded", async (state, store, video_id) => {
             const item = await store.action("getLibrary2Item", video_id);
-            const video_info = new VideoInfo(item);
-            item.thumb_img = video_info.getThumbImgPath();
+            const video_data = new NicoVideoData(item);
+            item.thumb_img = video_data.getThumbImgPath();
             item.tags = item.tags ? item.tags.join(" ") : "";
             grid_table.updateItem(item, video_id);
         });
@@ -340,8 +340,8 @@
                             await main_store.action("updareLibrary2", video_id, props);
                             if(update_thumbnail){
                                 const updated_video_item = await main_store.action("getLibrary2Item", video_id);
-                                const video_info = new VideoInfo(updated_video_item);
-                                const thumb_img = `${video_info.getThumbImgPath()}?${new Date().getTime()}`;
+                                const video_data = new NicoVideoData(updated_video_item);
+                                const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
                             }
                         });
@@ -377,7 +377,7 @@
 
             try {
                 const video_item = await main_store.action("getLibrary2Item", video_id);
-                const video_info = new VideoInfo(video_item);
+                const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
 
                 const cnv_mp4 = new ConvertMP4();
@@ -397,7 +397,7 @@
 
                 updateState("変換中");
 
-                await cnv_mp4.convert(ffmpeg_path, video_info.getVideoPath());
+                await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
                 await main_store.action("updareLibrary2", video_id, {video_type:"mp4"});
 

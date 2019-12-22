@@ -3,9 +3,8 @@ const path = require("path");
 const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
     getThumbInfo, filterComments, NicoThumbnail } = require("./niconico");
-const { NicoJsonFile, NicoXMLFile } = require("./nico-data-file");
+const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./xml-data-converter");
-const { VideoInfo } = require("./library2");
 
 
 class NicoUpdate extends EventEmitter {
@@ -18,7 +17,7 @@ class NicoUpdate extends EventEmitter {
 
         this.video_item = video_item;
         this.org_video_item = this._deepCopy(video_item);
-        this.video_info = new VideoInfo(this.video_item);
+        this.video_data = new NicoVideoData(this.video_item);
 
         this.nico_watch = null;
         this.nico_comment = null;
@@ -295,7 +294,7 @@ class NicoUpdate extends EventEmitter {
     }
 
     _getCurrentComments(){
-        return this.video_info.getComments();
+        return this.video_data.getComments();
     }
 
     _isDataTypeJson(){

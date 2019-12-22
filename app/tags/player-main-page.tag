@@ -46,7 +46,7 @@
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { VideoInfo } = require(`${app_base_dir}/js/library2`);
+        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -334,19 +334,19 @@
                     if(state.is_online===true){
                         play_by_video_id(video_id, state);
                     }else{
-                        const vide_info = new VideoInfo(video_item);
+                        const video_data = new NicoVideoData(video_item);
 
-                        const video_data = {
-                            src: vide_info.getVideoPath(),
-                            type: `video/${vide_info.getVideoType()}`,
+                        const video = {
+                            src: video_data.getVideoPath(),
+                            type: `video/${video_data.getVideoType()}`,
                         };
                         const viewinfo = {
-                            is_deleted: vide_info.getIsDeleted(),
-                            thumb_info: vide_info.getThumbInfo()      
+                            is_deleted: video_data.getIsDeleted(),
+                            thumb_info: video_data.getThumbInfo()      
                         };      
-                        const comments = vide_info.getComments();
+                        const comments = video_data.getComments();
                         // const { video_data, viewinfo, comments } = data;
-                        play_by_video_data(video_data, viewinfo, comments, state);
+                        play_by_video_data(video, viewinfo, comments, state);
                     }                   
                 } catch (error) {
                     await showMessageBox("error", error.message);
@@ -420,12 +420,12 @@
                 ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
                     const { video_item } = args;
-                    const vide_info = new VideoInfo(video_item)
+                    const vide_data = new NicoVideoData(video_item);
                     const viewinfo = {
-                        is_deleted: vide_info.getIsDeleted(),
-                        thumb_info: vide_info.getThumbInfo()      
+                        is_deleted: vide_data.getIsDeleted(),
+                        thumb_info: vide_data.getThumbInfo()      
                     }; 
-                    const comments = vide_info.getComments();
+                    const comments = vide_data.getComments();
                     
                     comment_filter.setComments(comments);
                     const filtered_comments = comment_filter.getComments();

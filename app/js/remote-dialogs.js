@@ -38,11 +38,12 @@ const showMessageBox = async (type, message) => {
 };
 
 const showOKCancelBox = async (type, message) => {
-    return await dialog.showMessageBox(remote.getCurrentWindow(), {
+    const ret = await dialog.showMessageBox(remote.getCurrentWindow(), {
         type: type,
         buttons: ["OK", "Cancel"],
         message: message
     });
+    return ret.response;
 };
 
 module.exports = {

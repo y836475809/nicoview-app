@@ -166,31 +166,46 @@
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
         const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { Library } = require(`${app_base_dir}/js/library`);
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoXMLFile, NicoJsonFile } = require(`${app_base_dir}/js/nico-data-file`);
         const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
         const { BookMark } = require(`${app_base_dir}/js/bookmark`);
         const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
         const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { ConvertMP4, needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
+        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        main_store.change("libraryItemAdded", async (state, store, video_id) => {
-            const item = await store.action("getLibraryItem", video_id);
-            grid_table.updateItem(item, video_id);
+        main_store.change("libraryInitialized", async (state, store) => {
+            const items = await store.action("getLibraryItems");
+            const library_items = items.map(value=>{
+                const video_data = new NicoVideoData(value);
+                value.thumb_img = video_data.getThumbImgPath();
+                value.tags = value.tags ? value.tags.join(" ") : "";
+                return value;
+            });
+            loadLibraryItems(library_items);
         });
 
-        main_store.change("libraryInitialized", async (state, store) => {
-            loadLibraryItems(await store.action("getLibraryItems"));
+        main_store.change("libraryItemUpdated", async (state, store, video_id, props) => {
+            console.log("libraryItemUpdated video_id=", video_id, " props=", props);
+
+            props.tags = props.tags ? props.tags.join(" ") : "";
+            grid_table.updateCells(video_id, props);
+        });
+
+        main_store.change("libraryItemAdded", async (state, store, video_id) => {
+            const item = await store.action("getLibraryItem", video_id);
+            const video_data = new NicoVideoData(item);
+            item.thumb_img = video_data.getThumbImgPath();
+            item.tags = item.tags ? item.tags.join(" ") : "";
+            grid_table.updateItem(item, video_id);
         });
 
         const obs_trigger = new obsTrigger(obs);
 
-        let library = null;
         this.num_items = 0;
         this.num_filtered_items = 0;
     
@@ -210,7 +225,8 @@
         };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "name", name: "名前", sortable: true},
+            // {id: "name", name: "名前", sortable: true},
+            {id: "video_name", name: "名前", sortable: true},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},
@@ -317,10 +333,16 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        nico_update = new NicoUpdate(item.id, library);
-                        nico_update.on("updated-thumbnail", (thumbnail_size, img_src) => {
-                            grid_table.updateCell(item.id, "thumbnail_size", thumbnail_size);
-                            grid_table.updateCell(item.id, "thumb_img", `${img_src}?${new Date().getTime()}`);
+                        const video_item = await main_store.action("getLibraryItem", item.id);
+                        nico_update = new NicoUpdate(video_item);
+                        nico_update.on("updated", async (video_id, props, update_thumbnail) => {
+                            await main_store.action("updateLibrary", video_id, props);
+                            if(update_thumbnail){
+                                const updated_video_item = await main_store.action("getLibraryItem", video_id);
+                                const video_data = new NicoVideoData(updated_video_item);
+                                const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
+                                grid_table.updateCells(video_id, {thumb_img});
+                            }
                         });
                         await func(nico_update);
 
@@ -353,8 +375,8 @@
             };
 
             try {
-                const library_data = await library.getPlayData(video_id);
-                const { video_data }  = library_data;
+                const video_item = await main_store.action("getLibraryItem", video_id);
+                const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
 
                 const cnv_mp4 = new ConvertMP4();
@@ -374,11 +396,9 @@
 
                 updateState("変換中");
 
-                await cnv_mp4.convert(ffmpeg_path, video_data.src);
+                await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
-                await library.setFieldValue(video_id, "video_type", "mp4");
-                const updated_item = await library.getLibraryItem(video_id);
-                grid_table.updateItem(updated_item, video_id);
+                await main_store.action("updateLibrary", video_id, {video_type:"mp4"});
 
                 await showMessageBox("info", "変換完了");
                 updateState("変換完了");  
@@ -407,7 +427,7 @@
                         await convertVideo(self, video_id);
                     })();
                 }}
-            ];;
+            ];
             return Menu.buildFromTemplate(nemu_templete);
         };
 
@@ -497,9 +517,7 @@
             resizeGridTable();
             
             try {
-                library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                main_store.commit("initLibrary", library);
+                await main_store.action("loadLibrary", SettingStore.getSettingDir());
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -511,20 +529,20 @@
             await convertVideo(this, video_id);          
         });   
 
+        // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const library_item = await library.getLibraryItem(video_id);
-            if(library_item===null){
+            const video_item = await main_store.action("getLibraryItem", video_id);
+            if(video_item===null){
                 return;
             }
-
-            const last_play_date = new Date().getTime();
-            const play_count = library_item.play_count + 1;
-            library_item.last_play_date = last_play_date; 
-            library_item.play_count = play_count;
-            grid_table.updateItem(library_item, video_id);
-            await library.setFieldValue(video_id, "last_play_date", last_play_date);
-            await library.setFieldValue(video_id, "play_count", play_count);
+           
+            const props = { 
+                last_play_date : new Date().getTime(),
+                play_count : video_item.play_count + 1
+            };
+            console.log("updateLibrary video_id=", video_id, ", props=", props);
+            main_store.action("updateLibrary",  video_id, props);
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 
@@ -539,8 +557,8 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                //TODO
-                this.nico_update = new NicoUpdate(video_id, library);
+                const video_item = await main_store.action("getLibraryItem", video_id);
+                this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){
                     await this.nico_update.updateThumbInfo();

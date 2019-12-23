@@ -2,7 +2,7 @@ const { session, dialog, app, BrowserWindow } = require("electron");
 const fs = require("fs");
 const path = require("path");
 // const { IPCMsg, IPCMonitor } = require("./js/ipc-monitor");
-const { IPCMainMonitor } = require("./js/ipc-monitor");
+const { IPCMainMonitor, IPCRender } = require("./js/ipc-monitor");
 const { WindowStateStore } = require("./js/window-state-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -14,6 +14,7 @@ global.player_window = null;
 let win = null;
 let player_win = null;
 let is_debug_mode = false;
+let do_app_quit = false;
 
 let player_html_path = `file://${__dirname}/html/player.html`;
 
@@ -52,7 +53,14 @@ function createWindow() {
     }
 
     win.on("close", (e) => {
-        window_store.setState("main", win);
+        if(do_app_quit){
+            window_store.setState("main", win);
+        }else{
+            e.preventDefault();
+
+            const ipc_render = new IPCRender();
+            win.webContents.send(ipc_render.IPCMsg.APP_CLOSE);
+        }
     });
 
     // ウィンドウが閉じられた時に発行される
@@ -115,6 +123,11 @@ app.on("ready", ()=>{
 
     ipc_monitor.on(ipc_monitor.IPCMsg.SET_PLAYER_PATH, (event, args) => {
         player_html_path = args;
+    });
+
+    ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
+        do_app_quit = true;
+        app.quit();
     });
 });
 

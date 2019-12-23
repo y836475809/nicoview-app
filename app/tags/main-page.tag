@@ -122,6 +122,7 @@
         const { remote } = require("electron");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
+        const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const ipc_monitor = new IPCRenderMonitor();
         ipc_monitor.listen();
@@ -206,12 +207,11 @@
             }); 
         });  
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.GET_PLAY_DATA, async (event, args) => {
+        ipc_monitor.on(ipc_monitor.IPCMsg.GET_VIDEO_ITEM, async (event, args) => {
             const video_id  = args;
-            const data = await main_store.action("getPlayData", video_id);
-            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_PLAY_DATA_REPLY, {
-                video_id,
-                data
+            const video_item = await main_store.action("getLibraryItem", video_id);
+            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_VIDEO_ITEM_REPLY, {
+                video_item
             });  
         });
 
@@ -249,11 +249,11 @@
                     }
                 });
             });
-
+            
             if(result.state == "ok" || result.state == "404"){
-                const data = await main_store.action("getPlayData", video_id);
+                const video_item = await main_store.action("getLibraryItem", video_id);
                 ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
-                    video_id, data
+                    video_item
                 });
             }
         });
@@ -270,6 +270,25 @@
 
         window.onbeforeunload = (e) => {
         };
+        
+        // TODO
+        ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
+            try {
+                await main_store.action("saveLibrary");
+            } catch (error) {
+                const result = await showOKCancelBox("error", 
+                    `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`);
+                if(result!==0){
+                    return;
+                }
+            }
+
+            const result = await showOKCancelBox("info", "終了しますか?");
+            if(result!==0){
+                return;
+            }
+            ipc_main.send(ipc_main.IPCMsg.APP_CLOSE);
+        });
 
         const timeout = 200;
         let timer;

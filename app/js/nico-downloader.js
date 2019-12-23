@@ -339,18 +339,18 @@ class NicoDownloader {
         const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
         
         return {
-            _db_type:"json", 
+            data_type:"json", 
             dirpath: this.dist_dir,
-            video_id: video_id,      
+            id: video_id,
             video_name: api_data.video.title,
             video_type: video_type,
             is_economy: !this.videoinfo.maxQuality,
-            time: api_data.video.duration,
+            play_time: api_data.video.duration,
             pub_date: new Date(api_data.video.postedDateTime).getTime(),
             tags: tags,
             is_deleted: is_deleted,
             thumbnail_size: thumbnail_size,
-        };      
+        };
     }
 
     /**

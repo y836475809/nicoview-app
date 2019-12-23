@@ -165,12 +165,11 @@
  
         main_store.change("downloadItemChanged", (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
-            const video_id_set = store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
                 const video_id = item.id;
-                item.saved = video_id_set.has(video_id);
+                item.saved = store.getter("existLibraryItem", video_id);
                 item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
@@ -399,10 +398,9 @@
 
         const setData = async (mylist_items) => {
             const download_video_id_set = main_store.getter("downloadItemSet");
-            const video_id_set = main_store.getter("libraryVideoIDSet");
 
             mylist_items.forEach(value=>{
-                const saved = video_id_set.has(value.id);
+                const saved = main_store.getter("existLibraryItem", value.id);
                 const reg_download = download_video_id_set.has(value.id);
                 value.saved = saved;
                 value.reg_download = reg_download;

@@ -107,7 +107,6 @@
         const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
         const { selectFileDialog, selectFolderDialog, showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { FileUtils } = require(`${app_base_dir}/js/file-utils`);
-        const { Library } = require(`${app_base_dir}/js/library`);
 
         this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
@@ -248,12 +247,10 @@
 
             try {
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                const mode = getImportDBMode();
+                await main_store.action("setLibraryData", 
+                    SettingStore.getSettingDir(),
+                    dir_list, video_list);
 
-                const library = new Library();
-                await library.init(SettingStore.getSettingDir());
-                await library.setData(dir_list, video_list, mode); 
-                main_store.commit("initLibrary", library);
                 await showMessageBox("info", "インポート完了");
             } catch (error) {
                 console.log(error);

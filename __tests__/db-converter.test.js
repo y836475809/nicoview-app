@@ -11,8 +11,8 @@ test("sqlite db dirpath", (t) => {
     const dirpath_list = db.get_dirpath();
     t.deepEqual(dirpath_list, 
         [
-            { dirpath_id: 1, dirpath: `C:${path.sep}data${path.sep}サンプル` },
-            { dirpath_id: 2, dirpath: `C:${path.sep}data` }
+            { id: 1, dirpath: `C:${path.sep}data${path.sep}サンプル` },
+            { id: 2, dirpath: `C:${path.sep}data` }
         ]
     );    
 });
@@ -46,13 +46,13 @@ test("sqlite db video", (t) => {
     const sm4 = video_list[3];
     const sm5 = video_list[4];
 
-    t.is(sm1._db_type, "xml");
+    t.is(sm1.data_type, "xml");
 
-    t.is(sm1.video_id, "sm1");
-    t.is(sm2.video_id, "sm2");
-    t.is(sm3.video_id, "sm3");
-    t.is(sm4.video_id, "sm4");
-    t.is(sm5.video_id, "sm5");
+    t.is(sm1.id, "sm1");
+    t.is(sm2.id, "sm2");
+    t.is(sm3.id, "sm3");
+    t.is(sm4.id, "sm4");
+    t.is(sm5.id, "sm5");
 
     t.is(sm1.video_name, "サンプル1");
     t.is(sm1.common_filename, "サンプル1 - [sm1]");
@@ -73,9 +73,9 @@ test("sqlite db item", (t) => {
 
     const sm1 = video_list[0];
     t.deepEqual(sm1, {
-        _db_type: "xml",
+        data_type: "xml",
         dirpath_id: 1,
-        video_id: "sm1",
+        id: "sm1",
         video_name: "サンプル1",
         video_type: "mp4",
         common_filename: "サンプル1 - [sm1]",
@@ -85,7 +85,7 @@ test("sqlite db item", (t) => {
         pub_date: 1305678645000,
         last_play_date: -1,
         play_count:10,
-        time: 100,
+        play_time: 100,
         tags: ["タグ1", "タグ2"],
         is_deleted:false,
         thumbnail_size: "S",

@@ -3,8 +3,8 @@ const { remote, ipcRenderer, ipcMain } = require("electron");
 
 const IPCRenderMsg =  Object.freeze({   
     PLAY_BY_VIDEO_ID: "ipc-play-by-video-id",
-    GET_PLAY_DATA: "ipc-get-play-data",
-    GET_PLAY_DATA_REPLY: "ipc-get-play-data-reply",
+    GET_VIDEO_ITEM: "ipc-get-videoitem-data",
+    GET_VIDEO_ITEM_REPLY: "ipc-get-videoitem-reply",
 
     SEARCH_TAG: "ipc-search-tag",
     LOAD_MYLIST: "ipc-load-mylist",
@@ -14,7 +14,9 @@ const IPCRenderMsg =  Object.freeze({
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",
     CANCEL_UPDATE_DATA: "ipc-cancel-update-data",
-    ADD_BOOKMARK: "ipc-add-bookmark"
+    ADD_BOOKMARK: "ipc-add-bookmark",
+
+    APP_CLOSE: "ipc-app-close",
 });
 
 class IPCRender extends EventEmitter {
@@ -58,6 +60,7 @@ const IPCMainMsg =  Object.freeze({
     SHOW_PLAYER_SYNC: "ipc-show-player",
     SET_COOKIE_SYNC: "ipc-set-cookie",
     SET_PLAYER_PATH: "ipc-set-player-path",
+    APP_CLOSE: "ipc-app-close",
 });
 
 class IPCMain extends EventEmitter {

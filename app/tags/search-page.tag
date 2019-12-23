@@ -215,12 +215,11 @@
 
         main_store.change("downloadItemChanged", (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
-            const video_id_set = store.getter("libraryVideoIDSet");
             const items = grid_table.dataView.getItems();
 
             items.forEach(item => {
                 const video_id = item.id;
-                item.saved = video_id_set.has(video_id);
+                item.saved = store.getter("existLibraryItem", video_id);
                 item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);
             });
@@ -380,10 +379,10 @@
             }
 
             const donwload_video_id_set = main_store.getter("downloadItemSet");
-            const video_id_set = main_store.getter("libraryVideoIDSet");
             const items = search_result.data.map(value => {
-                const saved = video_id_set.has(value.contentId);
-                const reg_download = donwload_video_id_set.has(value.contentId);
+                const video_id = value.contentId;
+                const saved = main_store.getter("existLibraryItem", video_id);
+                const reg_download = donwload_video_id_set.has(video_id);
                 return createItem(value, saved, reg_download);
             });
             items.push(createEmptyItem());

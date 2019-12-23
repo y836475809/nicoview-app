@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
-const { createDBItem } = require("./library");
 const { FileUtils } = require("./file-utils");
 
 class DBConverter {
@@ -27,17 +26,6 @@ class DBConverter {
         this._read_tag_string();
         this._read_tag();
         this._read_video();
-    }
-
-    _read_dirpath() {
-        // this.dirpath_map = new Map();
-        let res = this.db.exec("SELECT * FROM file");
-        const values = res[0].values;
-        this.dirpath_list = values.map(value=>{
-            const dirpath_id = value[0];
-            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
-            return { dirpath_id, dirpath };
-        });
     }
 
     _read_tag_string() {
@@ -69,6 +57,16 @@ class DBConverter {
         });
     }
 
+    _read_dirpath() {
+        let res = this.db.exec("SELECT * FROM file");
+        const values = res[0].values;
+        this.dirpath_list = values.map(value=>{
+            const id = value[0];
+            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
+            return { id, dirpath };
+        });
+    }
+    
     _read_video() {
         let res = this.db.exec("SELECT * FROM nnddvideo");
         const values = res[0].values;
@@ -78,7 +76,7 @@ class DBConverter {
             const uri = value[2];
             const dirpath_id = value[3];
             const video_name = value[4];
-            const is_economy = value[5];
+            const is_economy = value[5] !== 0;
             const modification_date = value[6];
             const creation_date = value[7];
             const thumb_url = value[8];
@@ -93,22 +91,19 @@ class DBConverter {
             const video_type = path.extname(decoded_path).slice(1);
             const tags = this.tag_map.get(id);
             
-            const item = createDBItem();
-            item._db_type = "xml";
-            item.dirpath_id = dirpath_id;
-            item.video_id = key;
-            item.video_name = video_name;
-            item.video_type = video_type;
-            item.common_filename = common_filename;
-            item.is_economy = is_economy !== 0;
-            item.modification_date = modification_date; //-1の場合ある
-            item.creation_date = creation_date;         //-1の場合ある
-            item.pub_date = pub_date;               //-1の場合ある
-            item.last_play_date = last_play_date;   //-1の場合ある
-            item.play_count = play_count;
-            item.time = time;
-            item.tags = tags;
-            item.is_deleted = false;
+            const data_type = "xml";
+            const is_deleted = false;
+            const thumbnail_size = "S";
+
+            const item = {
+                data_type,
+                video_name, video_type,
+                dirpath_id, common_filename, thumbnail_size,
+                modification_date, creation_date, pub_date, last_play_date,
+                play_count, tags, is_economy, is_deleted
+            };
+            item.id = key;
+            item.play_time = time;
             
             return item;
         });

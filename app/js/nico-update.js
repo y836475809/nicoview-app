@@ -3,24 +3,74 @@ const path = require("path");
 const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
     getThumbInfo, filterComments, NicoThumbnail } = require("./niconico");
-const { NicoJsonFile, NicoXMLFile } = require("./nico-data-file");
+const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./xml-data-converter");
-const { Library } = require("./library");
+
 
 class NicoUpdate extends EventEmitter {
     /**
      * 
-     * @param {String} video_id 
-     * @param {Library} library 
+     * @param {Object} video_item 
      */
-    constructor(video_id, library){
+    constructor(video_item){
         super();
 
-        this.video_id = video_id;
-        this.library = library;
+        this.video_item = video_item;
+        this.org_video_item = this._deepCopy(video_item);
+        this.video_data = new NicoVideoData(this.video_item);
+
         this.nico_watch = null;
         this.nico_comment = null;
         this.nico_thumbnail = null;
+    }
+
+    _emitUpdated(update_thumbnail=false){
+        const props = this._getChangedProps(this.org_video_item, this.video_item);
+        this.emit("updated", this.video_item.id, props, update_thumbnail); 
+    }
+
+    _getChangedProps(org_item, updated_item){
+        const updated_props = {};
+        Object.keys(org_item).forEach(key=>{
+            if(!updated_item.hasOwnProperty(key)){
+                throw new Error(`${key} is not exist`);
+            }
+            const org_value = org_item[key];
+            const updated_value = updated_item[key];
+            if (Array.isArray(org_value)) {
+                if(org_value.sort().toString() != updated_value.sort().toString()){
+                    updated_props[key] = updated_value;
+                } 
+            }else if(org_value != updated_value){
+                updated_props[key] = updated_value;
+            }
+        });
+        return updated_props;
+    }
+
+    _deepCopy(obj){
+        if ( typeof obj === "boolean" || typeof obj === "number" 
+        || typeof obj === "string" || obj === null ) {
+            return obj;
+        }
+        
+        if (Array.isArray(obj)) {
+            const ret = [];
+            obj.forEach(value => { 
+                ret.push(this._deepCopy(value)); 
+            });
+            return ret;
+        }
+        
+        if (typeof obj === "object") {
+            const ret = {};
+            Object.keys(obj).forEach(key => {
+                ret[key] = this._deepCopy(obj[key]);
+            });
+            return ret;
+        }
+
+        return null;
     }
 
     /**
@@ -28,78 +78,81 @@ class NicoUpdate extends EventEmitter {
      * @returns {boolean} true:update false:not update 
      */
     async update(){
-        const { video_info, dir_path } = await this._getVideoInfo();
+        this._checkVideoDeleted();
+
         const api_data = await this._getApiData();
 
-        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        const { nico_xml, nico_json } = this._getNicoFileData();
 
         await this._updateThumbInfo(api_data, nico_json);
-        await this._updateComment(api_data, video_info, dir_path, nico_json);
+        await this._updateComment(api_data, nico_json);
 
         const thumbnail_size = "L";
         await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
 
-        if(!await this._isDBTypeJson()){
-            await this._setDBtype("json");
+        if(!this._isDataTypeJson()){
+            this._setDataType("json");
         }
 
-        return true;
+        this._emitUpdated(true);
     }
 
     async updateThumbInfo(){
-        const { video_info, dir_path } = await this._getVideoInfo();
+        this._checkVideoDeleted();
+
         const api_data = await this._getApiData();
-        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        const { nico_xml, nico_json } = this._getNicoFileData();
 
         await this._updateThumbInfo(api_data, nico_json);
 
-        if(!await this._isDBTypeJson()){
+        if(!this._isDataTypeJson()){
             this._convertComment(nico_xml, nico_json);
-            await this._setDBtype("json");
+            this._setDataType("json");
         }else if(!await this._existPath(nico_json.commentPath)){
             this._convertComment(nico_xml, nico_json);    
         }
 
-        return true;
+        this._emitUpdated();
     }
 
     async _updateThumbInfo(api_data, nico_json){
-        await this._setTags(api_data.tags);
+        this._setTags(api_data.tags);
 
         const thumbInfo = getThumbInfo(api_data);
         await this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
     }
 
     async updateComment(){
-        const { video_info, dir_path } = await this._getVideoInfo(true);
-        const api_data = await this._getApiData(true);
-        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
+        this._checkVideoDeleted(true);
 
-        const is_update = await this._updateComment(api_data, video_info, dir_path, nico_json);
+        const api_data = await this._getApiData(true);
+        const { nico_xml, nico_json } = this._getNicoFileData();
+
+        const is_update = await this._updateComment(api_data, nico_json);
         if(!is_update){
-            return false;
+            return;
         }
         
-        if(!await this._isDBTypeJson()){  
+        if(!this._isDataTypeJson()){  
             this._convertThumbInfo(nico_xml, nico_json);
-            await this._setTags(api_data.tags);
-            await this._setDBtype("json");
+            this._setTags(api_data.tags);
+            this._setDataType("json");
         }else if(!await this._existPath(nico_json.thumbInfoPath)){ 
             this._convertThumbInfo(nico_xml, nico_json);  
         }
 
-        return true;
+        this._emitUpdated();
     }
     
-    async _updateComment(api_data, video_info, dir_path, nico_json){
-        const cur_comments = await this._getCurrentComments(dir_path, video_info);
+    async _updateComment(api_data, nico_json){
+        const cur_comments = this._getCurrentComments();
         const comments_diff = await this._getComments(api_data, cur_comments);
         if(comments_diff.length===0){
             return false;
         }
 
         if(!this._validateComment(comments_diff)){
-            throw new Error(`${this.video_id}の差分コメントが正しくないデータです`);
+            throw new Error(`${this.video_item.id}の差分コメントが正しくないデータです`);
         }
 
         const new_comments = cur_comments.concat(filterComments(comments_diff));
@@ -108,18 +161,23 @@ class NicoUpdate extends EventEmitter {
     }
 
     async updateThumbnail(){
-        const { video_info, dir_path } = await this._getVideoInfo();
+        this._checkVideoDeleted();
+
         const api_data = await this._getApiData();
 
         let thumbnail_size = null;
-        if(await this._isDBTypeJson()){
+        if(this._isDataTypeJson()){
             thumbnail_size = "L";
         }else{
             thumbnail_size = "S"; 
         }
 
-        const { nico_xml, nico_json } = this._getNicoFileData(video_info, dir_path);
-        return await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+        const { nico_xml, nico_json } = this._getNicoFileData();
+        const is_update = await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+        if(!is_update){
+            return;
+        }
+        this._emitUpdated(true);
     }  
 
     async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){
@@ -142,14 +200,12 @@ class NicoUpdate extends EventEmitter {
         const thumbImg = await this._getThumbImg(thumb_url);
         
         if(!this._validateThumbnail(thumbImg)){
-            throw new Error(`${this.video_id}のサムネイルが正しくないデータです`);
+            throw new Error(`${this.video_item.id}のサムネイルが正しくないデータです`);
         }
 
         await this._writeFile(img_path, thumbImg, "binary");
 
-        await this._setThumbnailSize(thumbnail_size);
-
-        this.emit("updated-thumbnail", thumbnail_size, img_path); 
+        this._setThumbnailSize(thumbnail_size);
 
         return true;
     }  
@@ -173,56 +229,51 @@ class NicoUpdate extends EventEmitter {
             watch_data = await this._getWatchData();
         } catch (error) {
             if(/404:/.test(error.message)){
-                await this._setDeleted(true);
+                this._setDeleted(true);
             }
             throw error;
         }        
 
         if(!this._validateWatchData(watch_data)){
-            throw new Error(`${this.video_id}のwatch dataが正しくないデータです`);
+            throw new Error(`${this.video_item.id}のwatch dataが正しくないデータです`);
         }
 
         const api_data = watch_data.api_data;
         const is_deleted = api_data.video.isDeleted;
         
-        await this._setDeleted(is_deleted);
+        this._setDeleted(is_deleted);
 
         if(ignore_deleted===true){
             return api_data;
         }
 
         if(is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
+            throw new Error(`${this.video_item.id}は削除されています`);
         }
 
         return api_data;
     }
 
-    async _getVideoInfo(ignore_deleted=false){
-        const video_info = await this.library._getVideoInfo(this.video_id);
-        const dir_path = await this.library._getDir(video_info.dirpath_id);
-
+    _checkVideoDeleted(ignore_deleted=false){
         if(ignore_deleted===true){
-            return { video_info, dir_path };
+            return;
         }
 
-        if(video_info.is_deleted===true){
-            throw new Error(`${this.video_id}は削除されています`);
+        if(this.video_item.is_deleted===true){
+            throw new Error(`${this.video_item.id}は削除されています`);
         }
-        
-        return { video_info, dir_path };
     }
 
-    _getNicoFileData(video_info, dir_path){
+    _getNicoFileData(){
         const nico_xml = new NicoXMLFile();
-        nico_xml.dirPath = dir_path;
-        nico_xml.commonFilename = video_info.common_filename;
-        nico_xml.thumbnailSize = video_info.thumbnail_size;
+        nico_xml.dirPath = this.video_item.dirpath;
+        nico_xml.commonFilename = this.video_item.common_filename;
+        nico_xml.thumbnailSize = this.video_item.thumbnail_size;
 
         const nico_json = new NicoJsonFile();
-        nico_json.dirPath = dir_path;
-        nico_json.commonFilename = video_info.common_filename;
-        nico_json.thumbnailSize = video_info.thumbnail_size;
+        nico_json.dirPath = this.video_item.dirpath;
+        nico_json.commonFilename = this.video_item.common_filename;
+        nico_json.thumbnailSize = this.video_item.thumbnail_size;
 
         return { nico_xml, nico_json };
     }
@@ -242,42 +293,38 @@ class NicoUpdate extends EventEmitter {
         cnv_data.convertThumbInfo(nico_xml, nico_json);
     }
 
-    async _getCurrentComments(dir_path, video_info){
-        return await this.library._getComments(dir_path, video_info);
+    _getCurrentComments(){
+        return this.video_data.getComments();
     }
 
-    async _isDBTypeJson(){
-        const value = await this.library.getFieldValue(this.video_id, "_db_type");
+    _isDataTypeJson(){
+        const value = this.video_item.data_type;
         return value=="json";
     }
 
-    async _isDeleted(){
-        const value = await this.library.getFieldValue(this.video_id, "is_deleted");
-        return value;
-    }
     /**
      * 
      * @param {boolean} is_deleted 
      */
-    async _setDeleted(is_deleted){
-        await this.library.setFieldValue(this.video_id, "is_deleted", is_deleted);
+    _setDeleted(is_deleted){
+        this.video_item.is_deleted = is_deleted;
     }
 
-    async _setDBtype(db_type){
-        await this.library.setFieldValue(this.video_id, "_db_type", db_type);
+    _setDataType(data_type){
+        this.video_item.data_type = data_type;
     }
 
-    async _setThumbnailSize(thumbnail_size){
-        await this.library.setFieldValue(this.video_id, "thumbnail_size", thumbnail_size);
+    _setThumbnailSize(thumbnail_size){
+        this.video_item.thumbnail_size = thumbnail_size;
     }
 
-    async _setTags(tags){
+    _setTags(tags){
         const tag_names = tags.map(value => {
             return value.name;
         });
-        const cur_tags = await this.library.getFieldValue(this.video_id, "tags");
+        const cur_tags = this.video_item.tags;
         const new_tags = Array.from(new Set([...cur_tags, ...tag_names]));
-        await this.library.setFieldValue(this.video_id, "tags", new_tags);
+        this.video_item.tags = new_tags;
     }
     
     cancel(){
@@ -337,7 +384,7 @@ class NicoUpdate extends EventEmitter {
 
     async _getWatchData(){
         this.nico_watch = new NicoWatch();
-        const watch_data = await this.nico_watch.watch(this.video_id);
+        const watch_data = await this.nico_watch.watch(this.video_item.id);
         return watch_data;
     }
 

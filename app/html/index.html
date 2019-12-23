@@ -32,6 +32,8 @@
         const path = require("path");
         const { IPCMain } = require("../js/ipc-monitor");
         const { remote } = require("electron");
+        const { storex } = require("../js/riotx-stores");
+
         var shared_obj = remote.getGlobal("sharedObj"); // eslint-disable-line
         var app_base_dir = shared_obj.base_dir; // eslint-disable-line
         const obs = riot.observable();

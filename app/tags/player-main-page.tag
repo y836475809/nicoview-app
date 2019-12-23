@@ -46,6 +46,7 @@
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -286,17 +287,17 @@
                 this.obs_modal_dialog.trigger("close");
             }
         }; 
-
+        
         const playNiconico = (video_id, is_online, time=0) => {
             cancelPlay();
             
-            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY);
+            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY);
 
-            ipc_monitor.once(ipc_monitor.IPCMsg.GET_PLAY_DATA_REPLY, async (event, args) => {
-                const { video_id, data } = args;
+            ipc_monitor.once(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY, async (event, args) => {
+                const { video_item } = args;
                 const state = { 
-                    is_online: data === null?true:is_online,
-                    is_saved: data !== null,
+                    is_online: video_item === null?true:is_online,
+                    is_saved: video_item !== null,
                     time: time
                 };
                 try {
@@ -304,15 +305,26 @@
                     if(state.is_online===true){
                         play_by_video_id(video_id, state);
                     }else{
-                        const { video_data, viewinfo, comments } = data;
-                        play_by_video_data(video_data, viewinfo, comments, state);
+                        const video_data = new NicoVideoData(video_item);
+
+                        const video = {
+                            src: video_data.getVideoPath(),
+                            type: `video/${video_data.getVideoType()}`,
+                        };
+                        const viewinfo = {
+                            is_deleted: video_data.getIsDeleted(),
+                            thumb_info: video_data.getThumbInfo()      
+                        };      
+                        const comments = video_data.getComments();
+                        // const { video_data, viewinfo, comments } = data;
+                        play_by_video_data(video, viewinfo, comments, state);
                     }                   
                 } catch (error) {
                     await showMessageBox("error", error.message);
                 }
 
             });
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_PLAY_DATA, video_id);
+            ipc_render.sendMain(ipc_render.IPCMsg.GET_VIDEO_ITEM, video_id);
         }; 
 
         ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
@@ -378,9 +390,14 @@
             await new Promise((resolve, reject) => {
                 ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
                 ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
-                    const { video_id, data } = args;
-                    const { video_data, viewinfo, comments } = data;
-
+                    const { video_item } = args;
+                    const vide_data = new NicoVideoData(video_item);
+                    const viewinfo = {
+                        is_deleted: vide_data.getIsDeleted(),
+                        thumb_info: vide_data.getThumbInfo()      
+                    }; 
+                    const comments = vide_data.getComments();
+                    
                     comment_filter.setComments(comments);
                     const filtered_comments = comment_filter.getComments();
 

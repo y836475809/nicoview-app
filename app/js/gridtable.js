@@ -231,6 +231,20 @@ class GridTable {
         this.dataView.updateItem(id, item);
     }
 
+    // TODO
+    updateCells(id, props){
+        const item = this.dataView.getItemById(id);
+        if(item === undefined){
+            return;
+        }
+        Object.keys(props).forEach(key=>{
+            if(item[key]!==undefined){
+                item[key] = props[key];
+            }
+        });
+        this.dataView.updateItem(id, item);
+    }
+
     setFilter(filter){
         this.filter = filter;
     }

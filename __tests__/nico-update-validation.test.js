@@ -133,20 +133,16 @@ const test_comments = [
 
 class TestNicoUpdate extends NicoUpdate {
     constructor(){
-        super("sm100", {});
+        const video_item = {
+            data_type: "xml", 
+            id: "sm100",
+            dirpath: "/data/",
+            common_filename: "sm100",
+            is_deleted: false,
+            thumbnail_size: "S"
+        };
+        super(video_item);
         this.setupTestParams();
-
-        this.library._getVideoInfo = (video_id) => {
-            return {
-                common_filename: video_id,
-                thumbnail_size: "S",
-                is_deleted: false,
-            };
-        };
-        this.library._getDir = (dirpath_id) => {
-            return "/data/";
-        };
-
         this.log = [];
     }
 
@@ -165,21 +161,18 @@ class TestNicoUpdate extends NicoUpdate {
     _convertThumbInfo(nico_xml, nico_json){
         this.log.push("_convertThumbInfo");
     }
-    async _isDBTypeJson(){
-        this.log.push("_isDBTypeJson");
+    _isDataTypeJson(){
+        this.log.push("_isDataTypeJson");
         return false;
     }
-    async _setDBtype(db_type){
-        this.log.push("_setDBtype");
+    _setDataType(data_type){
+        this.log.push("_setDataType");
     }
-    async _isDeleted(){
-        return false;
-    }
-    async _setTags(tags){
+    _setTags(tags){
         this.log.push("_setTags");
     }
-    async _setDeleted(is_deleted){}
-    async _setThumbnailSize(thumbnail_size){
+    _setDeleted(is_deleted){}
+    _setThumbnailSize(thumbnail_size){
         this.log.push("_setThumbnailSize");
     }
     async _writeFile(file_path, data, encoding){
@@ -188,7 +181,6 @@ class TestNicoUpdate extends NicoUpdate {
     async _existPath(path){
         return false;
     }
-
     async _getWatchData(){
         this.log.push("_getWatchData");
         return this._watch_data;
@@ -197,12 +189,11 @@ class TestNicoUpdate extends NicoUpdate {
         this.log.push("_getComments");
         return this._comments_diff;
     }
-
     async _getThumbImg(url){
         this.log.push("_getThumbImg");
         return this._img_data;
     }
-    async _getCurrentComments(dir_path, video_info){
+    _getCurrentComments(){
         return [];
     }
 }
@@ -219,7 +210,7 @@ test.before(async t => {
 });
 
 test("validate watch_data", t => {
-    const nico_update = new NicoUpdate();
+    const nico_update = new NicoUpdate({data_type:"json"});
     
     t.truthy(nico_update._validateWatchData(test_watch_data));
 
@@ -229,7 +220,7 @@ test("validate watch_data", t => {
 });
 
 test("validate comments", t => {
-    const nico_update = new NicoUpdate();
+    const nico_update = new NicoUpdate({data_type:"json"});
     
     t.truthy(nico_update._validateComment(test_comments));
     t.truthy(nico_update._validateComment([]));
@@ -242,7 +233,7 @@ test("validate comments", t => {
 });
 
 test("validate thumbnail", t => {
-    const nico_update = new NicoUpdate();
+    const nico_update = new NicoUpdate({data_type:"json"});
     
     const { jpeg, png } = t.context.image;
     t.truthy(nico_update._validateThumbnail(jpeg));
@@ -258,14 +249,14 @@ test("validate thumbnail", t => {
 test("updateThumbInfo correct watch_data", async(t) => {
     const nico_update = t.context.nico_update;
 
-    t.truthy(await nico_update.updateThumbInfo());
+    await nico_update.updateThumbInfo();
     t.deepEqual(nico_update.log, [
         "_getWatchData",
         "_setTags",
         "_writeFile",
-        "_isDBTypeJson",
+        "_isDataTypeJson",
         "_convertComment",
-        "_setDBtype"
+        "_setDataType"
     ]);
 });
 
@@ -283,15 +274,15 @@ test("updateThumbInfo invalid watch_data", async(t) => {
 test("updateComment correct watch_data", async(t) => {
     const nico_update = t.context.nico_update;
 
-    t.truthy(await nico_update.updateComment());
+    await nico_update.updateComment();
     t.deepEqual(nico_update.log, [
         "_getWatchData",
         "_getComments",
         "_writeFile",
-        "_isDBTypeJson",
+        "_isDataTypeJson",
         "_convertThumbInfo",
         "_setTags",
-        "_setDBtype"
+        "_setDataType"
     ]);
 });
 
@@ -320,10 +311,10 @@ test("updateComment invalid comment diff", async(t) => {
 test("updateThumbnail correct watch_data", async(t) => {
     const nico_update = t.context.nico_update;
 
-    t.truthy(await nico_update.updateThumbnail());
+    await nico_update.updateThumbnail();
     t.deepEqual(nico_update.log, [
         "_getWatchData",
-        "_isDBTypeJson",
+        "_isDataTypeJson",
         "_getThumbImg",
         "_writeFile",
         "_setThumbnailSize"
@@ -347,7 +338,7 @@ test("updateThumbnail invalid image", async(t) => {
     await t.throwsAsync(nico_update.updateThumbnail());
     t.deepEqual(nico_update.log, [
         "_getWatchData",
-        "_isDBTypeJson",
+        "_isDataTypeJson",
         "_getThumbImg",
     ]);
 });
@@ -356,7 +347,7 @@ test("updateThumbnail invalid image", async(t) => {
 test("update correct data", async(t) => {
     const nico_update = t.context.nico_update;
 
-    t.truthy(await nico_update.update());
+    await nico_update.update();
     t.deepEqual(nico_update.log, [
         "_getWatchData",
         "_setTags",
@@ -369,8 +360,8 @@ test("update correct data", async(t) => {
         "_writeFile",
         "_setThumbnailSize",
         
-        "_isDBTypeJson",
-        "_setDBtype"
+        "_isDataTypeJson",
+        "_setDataType"
     ]);
 });
 

@@ -1,3 +1,4 @@
+const test = require("ava");
 // vpos 100ms
 
 // time=sec
@@ -27,6 +28,56 @@ class Ct {
             return 0;
         });
     }
+
+    _getlast(comments){
+        // const post_dates = comments.map(comment=> comment.post_date);
+        // return Math.max(...post_dates);
+        return comments[0].post_date;
+    }
+
+    _getMaxnNum(time_sec){
+        let limit_num = 0;
+        if(time_sec<1*60){
+            limit_num = 100;
+        }
+        else if(time_sec<5*60){
+            limit_num = 250;
+        }
+        else if(time_sec<10*60){
+            limit_num = 500;
+        }else{
+            limit_num = 1000;
+        }
+        return limit_num;
+    }
+
+    _divcmt(comments, limit_num){
+        if(comments.length <= limit_num){
+            return { main:comments, rest:[] };
+        }
+        /**
+         * @type {Array}
+         */
+        const main = comments.slice(0, limit_num);
+        const rest = comments.slice(limit_num+1, 0);
+        return { main, rest };
+    }
+
+    _getcmtbymin(comments, start_msec, time_sec){
+        let aaa = [];
+        const num = Math.floor(time_sec/60) + 1;
+        for (let index = 0; index < num; index++) {
+            const msec1 = start_msec - index*60*1000;
+            const msec2 = msec1 - 60*1000;
+            const dc = comments.filter(value=>{
+                const post_date = value.post_date;
+                return (msec1<=post_date && post_date < msec2);
+            });
+            aaa = aaa.concat(dc);
+        }
+        return aaa;
+    }
+
     filtertime(comments, time_sec){
         const src_comments = this._sortComments(comments.map(value=>{
             return Object.assign({}, value);
@@ -57,8 +108,8 @@ class Ct {
         let aaa = [];
         const num = Math.floor(time_sec/60) + 1;
         for (let index = 0; index < num; index++) {
-            const msec1 = start_msec + index*60*1000;
-            const msec2 = msec1 + 60*1000;
+            const msec1 = start_msec - index*60*1000;
+            const msec2 = msec1 - 60*1000;
             const dc = rest_comments.filter(value=>{
                 const post_date = value.post_date;
                 return (msec1<=post_date && post_date < msec2);
@@ -74,15 +125,15 @@ class Ct {
     }
 }
 
-test.beforeEach(t => {
-    const comments = [];
-    for (let index = 0; index < 1000; index++) {
-        comments.push({
-            no: index, vpos: index, post_date: index
-        });
-    }
-    t.context.comments = comments;
-});
+// test.beforeEach(t => {
+//     const comments = [];
+//     for (let index = 0; index < 1000; index++) {
+//         comments.push({
+//             no: index, vpos: index, post_date: index
+//         });
+//     }
+//     t.context.comments = comments;
+// });
 
 test("comments limit", t => {
     const time = 30;
@@ -90,4 +141,35 @@ test("comments limit", t => {
     const ct = new Ct();
     const f_comments =ct.filtertime(comments, time);
     t.is(30, f_comments.length);
+});
+
+test("comments last", t => {
+    const time = 30;
+    const comments = mkComments(time);
+
+    const ct = new Ct();
+    const last =ct._getlast(ct._sortComments(comments));
+    t.is((time-1)*1000, last);
+});
+
+test("comments maxnum", t => {
+    const ct = new Ct();
+    t.is(100, ct._getMaxnNum(30));
+    t.is(100, ct._getMaxnNum(59));
+    t.is(250, ct._getMaxnNum(60));
+    t.is(250, ct._getMaxnNum(299));
+    t.is(500, ct._getMaxnNum(300));
+    t.is(500, ct._getMaxnNum(599));
+    t.is(1000, ct._getMaxnNum(600));
+    t.is(1000, ct._getMaxnNum(800));
+});
+
+test("comments div", t => {
+    const time = 30;
+    const comments = mkComments(time);
+
+    const ct = new Ct();
+    const { main, rest } = ct._divcmt(comments, 100);
+    t.is(30, main.length);
+    t.is(0, rest.length);
 });

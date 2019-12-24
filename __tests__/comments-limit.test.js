@@ -59,7 +59,7 @@ class Ct {
          * @type {Array}
          */
         const main = comments.slice(0, limit_num);
-        const rest = comments.slice(limit_num+1, 0);
+        const rest = comments.slice(limit_num);
         return { main, rest };
     }
 
@@ -71,9 +71,9 @@ class Ct {
             const msec2 = msec1 - 60*1000;
             const dc = comments.filter(value=>{
                 const post_date = value.post_date;
-                return (msec1<=post_date && post_date < msec2);
+                return (msec2<=post_date && post_date < msec1);
             });
-            aaa = aaa.concat(dc);
+            aaa.push(dc);
         }
         return aaa;
     }
@@ -172,4 +172,25 @@ test("comments div", t => {
     const { main, rest } = ct._divcmt(comments, 100);
     t.is(30, main.length);
     t.is(0, rest.length);
+});
+
+test("comments div2", t => {
+    const time = 30;
+    const comments = mkComments(time);
+
+    const ct = new Ct();
+    const { main, rest } = ct._divcmt(comments, 10);
+    t.is(10, main.length);
+    t.is(20, rest.length);
+});
+
+test("comments by min", t => {
+    const time = 100;
+    const comments = mkComments(time);
+
+    const ct = new Ct();
+    const cmts= ct._getcmtbymin(ct._sortComments(comments), 100*1000, 100);
+    t.is(2, cmts.length);
+    t.is(60, cmts[0].length);
+    t.is(40, cmts[1].length);
 });

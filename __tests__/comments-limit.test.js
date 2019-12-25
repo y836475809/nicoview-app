@@ -21,18 +21,19 @@ const mkComments = (time_sec) => {
 };
 
 class Ct {
-    _sortComments(comments){
-        return comments.sort((a, b) => {
+    constructor(comments){
+        this.comments = comments.map(value=>{
+            return Object.assign({}, value);
+        });
+        this._sortDescBypPostDate();
+    }
+    
+    _sortDescBypPostDate(){
+        this.comments.sort((a, b) => {
             if (a.post_date < b.post_date) return 1;
             if (a.post_date > b.post_date) return -1;
             return 0;
         });
-    }
-
-    _getlast(comments){
-        // const post_dates = comments.map(comment=> comment.post_date);
-        // return Math.max(...post_dates);
-        return comments[0].post_date;
     }
 
     _getMaxnNum(time_sec){
@@ -80,73 +81,19 @@ class Ct {
         }
         return aaa;
     }
-
-    filtertime(comments, time_sec){
-        const src_comments = this._sortComments(comments.map(value=>{
-            return Object.assign({}, value);
-        }));
-        const start_msec = src_comments[0].post_date;
-
-        let limit_num = 0;
-        if(time_sec<1*1){
-            limit_num = 100;
-        }
-        else if(time_sec<1*5){
-            limit_num = 250;
-        }
-        else if(time_sec<1*10){
-            limit_num = 500;
-        }else{
-            limit_num = 1000;
-        }
-        if(comments.length <= limit_num){
-            return src_comments;
-        }
-        /**
-         * @type {Array}
-         */
-        const ti_comments = src_comments.slice(0, limit_num);
-        const rest_comments = src_comments.slice(limit_num+1, 0);
-
-        let aaa = [];
-        const num = Math.floor(time_sec/60) + 1;
-        for (let index = 0; index < num; index++) {
-            const msec1 = start_msec - index*60*1000;
-            const msec2 = msec1 - 60*1000;
-            const dc = rest_comments.filter(value=>{
-                const post_date = value.post_date;
-                return (msec1<=post_date && post_date < msec2);
-            });
-            aaa = aaa.concat(dc);
-        }
-
-        return aaa.concat(ti_comments).sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
-    }
 }
 
-test("comments limit", t => {
-    const time = 30;
-    const comments = mkComments(time);
-    const ct = new Ct();
-    const f_comments =ct.filtertime(comments, time);
-    t.is(30, f_comments.length);
-});
-
-test("comments last", t => {
+test("comments sort", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
-    const last =ct._getlast(ct._sortComments(comments));
+    const ct = new Ct(comments);
+    const last = ct.comments[0].post_date;
     t.is((time-1)*1000, last);
 });
 
 test("comments maxnum", t => {
-    const ct = new Ct();
+    const ct = new Ct([]);
     t.is(100, ct._getMaxnNum(30));
     t.is(100, ct._getMaxnNum(59));
     t.is(250, ct._getMaxnNum(60));
@@ -161,7 +108,7 @@ test("comments div", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
+    const ct = new Ct([]);
     const { main, rest } = ct._divcmt(comments, 100);
     t.is(30, main.length);
     t.is(0, rest.length);
@@ -171,7 +118,7 @@ test("comments div2", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
+    const ct = new Ct([]);
     const { main, rest } = ct._divcmt(comments, 10);
     t.is(10, main.length);
     t.is(20, rest.length);
@@ -181,8 +128,8 @@ test("comments by min", t => {
     const time = 100;
     const comments = mkComments(time);
 
-    const ct = new Ct();
-    const cmts= ct._getcmtbymin(ct._sortComments(comments), 100);
+    const ct = new Ct(comments);
+    const cmts= ct._getcmtbymin(ct.comments, 100);
     t.is(2, cmts.length);
     t.is(59, cmts[0].length);
     t.is(41, cmts[1].length);
@@ -210,9 +157,9 @@ test("comments by min2", t => {
     });
 
     const time_sec = 20*60;
-    const ct = new Ct();
+    const ct = new Ct([]);
     const cmts= ct._getcmtbymin(comments, time_sec);
-    
+
     t.is(5, cmts.length);
     t.is(3, cmts[0].length);
     t.is(1, cmts[1].length);

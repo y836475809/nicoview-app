@@ -63,7 +63,8 @@ class Ct {
         return { main, rest };
     }
 
-    _getcmtbymin(comments, start_msec, time_sec){
+    _getcmtbymin(comments, time_sec){
+        const start_msec = time_sec*1000;
         let aaa = [];
         const num = Math.floor(time_sec/60) + 1;
         for (let index = 0; index < num; index++) {
@@ -71,9 +72,11 @@ class Ct {
             const msec2 = msec1 - 60*1000;
             const dc = comments.filter(value=>{
                 const post_date = value.post_date;
-                return (msec2<=post_date && post_date < msec1);
+                return (msec2<post_date && post_date <= msec1);
             });
-            aaa.push(dc);
+            if(dc.length>0){
+                aaa.push(dc);
+            }
         }
         return aaa;
     }
@@ -124,16 +127,6 @@ class Ct {
         });
     }
 }
-
-// test.beforeEach(t => {
-//     const comments = [];
-//     for (let index = 0; index < 1000; index++) {
-//         comments.push({
-//             no: index, vpos: index, post_date: index
-//         });
-//     }
-//     t.context.comments = comments;
-// });
 
 test("comments limit", t => {
     const time = 30;
@@ -189,8 +182,41 @@ test("comments by min", t => {
     const comments = mkComments(time);
 
     const ct = new Ct();
-    const cmts= ct._getcmtbymin(ct._sortComments(comments), 100*1000, 100);
+    const cmts= ct._getcmtbymin(ct._sortComments(comments), 100);
     t.is(2, cmts.length);
-    t.is(60, cmts[0].length);
-    t.is(40, cmts[1].length);
+    t.is(59, cmts[0].length);
+    t.is(41, cmts[1].length);
+});
+
+test("comments by min2", t => {
+    const comments = [
+        {no: 0, vpos: 0, post_date: 15.0},
+        {no: 1, vpos: 0, post_date: 14.5},
+        {no: 2, vpos: 0, post_date: 14.1},
+
+        {no: 3, vpos: 0, post_date: 14.0},
+
+        {no: 4, vpos: 0, post_date: 12.0},
+
+        {no: 5, vpos: 0, post_date: 10.8},
+        {no: 6, vpos: 0, post_date: 10.7},
+        {no: 7, vpos: 0, post_date: 10.6},
+        {no: 8, vpos: 0, post_date: 10.5},
+
+        {no: 9, vpos: 0, post_date: 7.0},
+    ].map(value=>{
+        value.post_date *= 60*1000;
+        return value;
+    });
+
+    const time_sec = 20*60;
+    const ct = new Ct();
+    const cmts= ct._getcmtbymin(comments, time_sec);
+    
+    t.is(5, cmts.length);
+    t.is(3, cmts[0].length);
+    t.is(1, cmts[1].length);
+    t.is(1, cmts[2].length);
+    t.is(4, cmts[3].length);
+    t.is(1, cmts[4].length);
 });

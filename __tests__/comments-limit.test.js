@@ -81,6 +81,17 @@ class Ct {
         }
         return aaa;
     }
+
+    /**
+     * 
+     * @param {Array<Array>} comments_list 
+     * @param {*} num 
+     */
+    _getnum(comments_list, num){
+        return comments_list.map(comments=>{
+            return comments.slice(0, num);
+        }).flat();
+    }
 }
 
 test("comments sort", t => {
@@ -166,4 +177,14 @@ test("comments by min2", t => {
     t.is(1, cmts[2].length);
     t.is(4, cmts[3].length);
     t.is(1, cmts[4].length);
+});
+
+test("comments n", t => {
+    const ct = new Ct([]);
+    const ret = ct._getnum([[0,1], [2,3,4,5,6], [7,8,9]], 3);
+    t.deepEqual([
+        0,1, 
+        2,3,4, 
+        7,8,9
+    ],ret);
 });

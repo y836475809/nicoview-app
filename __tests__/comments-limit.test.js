@@ -20,7 +20,7 @@ const mkComments = (time_sec) => {
     return comments;
 };
 
-class Ct {
+class CommentDisplayAmount {
     constructor(num_per_min=100){
         this.num_per_min = num_per_min;
     }
@@ -33,59 +33,56 @@ class Ct {
         });
     }
 
-    _getMaxnNum(play_time_sec){
-        let limit_num = 0;
-        if(play_time_sec<1*60){
-            limit_num = 100;
+    _getMaxNum(play_time_sec){
+        let max_num = 0;
+        if(play_time_sec < 1*60){
+            max_num = 100;
         }
-        else if(play_time_sec<5*60){
-            limit_num = 250;
+        else if(play_time_sec < 5*60){
+            max_num = 250;
         }
-        else if(play_time_sec<10*60){
-            limit_num = 500;
+        else if(play_time_sec < 10*60){
+            max_num = 500;
         }else{
-            limit_num = 1000;
+            max_num = 1000;
         }
-        return limit_num;
+        return max_num;
     }
 
-    _divcmt(comments, limit_num){
-        if(comments.length <= limit_num){
+    _split(comments, num){
+        if(comments.length <= num){
             return { main:comments, rest:[] };
         }
-        /**
-         * @type {Array}
-         */
-        const main = comments.slice(0, limit_num);
-        const rest = comments.slice(limit_num);
+        const main = comments.slice(0, num);
+        const rest = comments.slice(num);
         return { main, rest };
     }
 
-    _getcmtbymin(comments, time_sec){
-        const start_msec = time_sec*1000;
-        let aaa = [];
-        const num = Math.floor(time_sec/60) + 1;
+    _splitParMinute(comments, play_time_sec){
+        const end_msec = play_time_sec*1000;
+        let ary = [];
+        const num = Math.floor(play_time_sec/60) + 1;
         for (let index = 0; index < num; index++) {
-            const msec1 = start_msec - index*60*1000;
-            const msec2 = msec1 - 60*1000;
+            const e1 = end_msec - index*60*1000;
+            const e2 = e1 - 60*1000;
             const dc = comments.filter(value=>{
                 const post_date = value.post_date;
-                return (msec2<post_date && post_date <= msec1);
+                return (e2 < post_date && post_date <= e1);
             });
-            if(dc.length>0){
-                aaa.push(dc);
+            if(dc.length > 0){
+                ary.push(dc);
             }
         }
-        return aaa;
+        return ary;
     }
 
     /**
      * 
      * @param {Array<Array>} comments_list 
-     * @param {*} num 
+     * @param {Number} num 
      */
-    _getnum(comments_list, num){
-        return comments_list.map(comments=>{
+    _getNumEach(comments_list, num){
+        return comments_list.map(comments => {
             return comments.slice(0, num);
         }).flat();
     }
@@ -95,56 +92,45 @@ test("comments sort", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
-    ct._sortDescByPostDate(comments);
+    const cda = new CommentDisplayAmount();
+    cda._sortDescByPostDate(comments);
     const last = comments[0].post_date;
     t.is((time-1)*1000, last);
 });
 
-test("comments maxnum", t => {
-    const ct = new Ct();
-    t.is(100, ct._getMaxnNum(30));
-    t.is(100, ct._getMaxnNum(59));
-    t.is(250, ct._getMaxnNum(60));
-    t.is(250, ct._getMaxnNum(299));
-    t.is(500, ct._getMaxnNum(300));
-    t.is(500, ct._getMaxnNum(599));
-    t.is(1000, ct._getMaxnNum(600));
-    t.is(1000, ct._getMaxnNum(800));
+test("comments max num", t => {
+    const cda = new CommentDisplayAmount();
+    t.is(100, cda._getMaxNum(30));
+    t.is(100, cda._getMaxNum(59));
+    t.is(250, cda._getMaxNum(60));
+    t.is(250, cda._getMaxNum(299));
+    t.is(500, cda._getMaxNum(300));
+    t.is(500, cda._getMaxNum(599));
+    t.is(1000, cda._getMaxNum(600));
+    t.is(1000, cda._getMaxNum(800));
 });
 
-test("comments div", t => {
+test("comments split rest0", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
-    const { main, rest } = ct._divcmt(comments, 100);
+    const cda = new CommentDisplayAmount();
+    const { main, rest } = cda._split(comments, 100);
     t.is(30, main.length);
     t.is(0, rest.length);
 });
 
-test("comments div2", t => {
+test("comments split", t => {
     const time = 30;
     const comments = mkComments(time);
 
-    const ct = new Ct();
-    const { main, rest } = ct._divcmt(comments, 10);
+    const cda = new CommentDisplayAmount();
+    const { main, rest } = cda._split(comments, 10);
     t.is(10, main.length);
     t.is(20, rest.length);
 });
 
-test("comments by min", t => {
-    const time = 100;
-    const comments = mkComments(time);
-
-    const ct = new Ct();
-    const cmts= ct._getcmtbymin(comments, 100);
-    t.is(2, cmts.length);
-    t.is(59, cmts[0].length);
-    t.is(41, cmts[1].length);
-});
-
-test("comments by min2", t => {
+test("comments split par min", t => {
     const comments = [
         {no: 0, vpos: 0, post_date: 15.0},
         {no: 1, vpos: 0, post_date: 14.5},
@@ -166,8 +152,8 @@ test("comments by min2", t => {
     });
 
     const time_sec = 20*60;
-    const ct = new Ct();
-    const cmts= ct._getcmtbymin(comments, time_sec);
+    const cda = new CommentDisplayAmount();
+    const cmts= cda._splitParMinute(comments, time_sec);
 
     t.is(5, cmts.length);
     t.is(3, cmts[0].length);
@@ -177,9 +163,9 @@ test("comments by min2", t => {
     t.is(1, cmts[4].length);
 });
 
-test("comments n", t => {
-    const ct = new Ct();
-    const ret = ct._getnum([[0,1], [2,3,4,5,6], [7,8,9]], 3);
+test("comments get each", t => {
+    const cda = new CommentDisplayAmount();
+    const ret = cda._getNumEach([[0,1], [2,3,4,5,6], [7,8,9]], 3);
     t.deepEqual([
         0,1, 
         2,3,4, 

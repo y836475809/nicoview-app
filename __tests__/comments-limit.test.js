@@ -25,6 +25,31 @@ class CommentDisplayAmount {
         this.num_per_min = num_per_min;
     }
 
+    getDisplayed(comments, play_time_sec){
+        const cp_comments = comments.map(value=>{
+            return Object.assign({}, value);
+        });
+        this._sortDescByPostDate(cp_comments);
+        const start_post_date = cp_comments[cp_comments.length-1].post_date;
+
+        const max_num = this._getMaxNum(play_time_sec);
+        const { main, rest } = this._split(cp_comments, max_num);
+        const comments_par_min = this._getNumEach(
+            this._splitParMinute(rest, start_post_date, play_time_sec), 
+            this.num_per_min);
+        const result = main.concat(comments_par_min);
+        this._sortByVPos(result);
+        return result;
+    }
+
+    _sortByVPos(comments){
+        comments.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+    }
+
     _sortDescByPostDate(comments){
         comments.sort((a, b) => {
             if (a.post_date < b.post_date) return 1;
@@ -58,8 +83,8 @@ class CommentDisplayAmount {
         return { main, rest };
     }
 
-    _splitParMinute(comments, play_time_sec){
-        const end_msec = play_time_sec*1000;
+    _splitParMinute(comments, start_post_date, play_time_sec){
+        const end_msec = start_post_date + play_time_sec*1000;
         let ary = [];
         const num = Math.floor(play_time_sec/60) + 1;
         for (let index = 0; index < num; index++) {
@@ -87,6 +112,21 @@ class CommentDisplayAmount {
         }).flat();
     }
 }
+
+class TestCommentDisplayAmount extends CommentDisplayAmount{
+    constructor(num_per_min, max_num){
+        super(num_per_min);
+        this.max_num = max_num;
+    }
+    
+    _getMaxNum(play_time_sec){
+        return this.max_num;
+    }
+}
+
+const to_date = (min) => {
+    return min*60*1000 + Math.pow(10, 10);
+};
 
 test("comments sort", t => {
     const time = 30;
@@ -147,13 +187,14 @@ test("comments split par min", t => {
 
         {no: 9, vpos: 0, post_date: 7.0},
     ].map(value=>{
-        value.post_date *= 60*1000;
+        value.post_date = to_date(value.post_date);
         return value;
     });
 
+    const start_post_date = comments[comments.length-1].post_date;
     const time_sec = 20*60;
     const cda = new CommentDisplayAmount();
-    const cmts= cda._splitParMinute(comments, time_sec);
+    const cmts= cda._splitParMinute(comments, start_post_date, time_sec);
 
     t.is(5, cmts.length);
     t.is(3, cmts[0].length);
@@ -171,4 +212,47 @@ test("comments get each", t => {
         2,3,4, 
         7,8,9
     ],ret);
+});
+
+
+
+test("comments getDisplayed", t => {
+    const comments = [
+        {no: 0, vpos: 10, post_date: 15.0},
+        {no: 1, vpos: 9, post_date: 14.5},
+        {no: 2, vpos: 8, post_date: 14.1},
+
+        {no: 3, vpos: 7, post_date: 14.0},
+
+        {no: 4, vpos: 6, post_date: 12.0},
+
+        {no: 5, vpos: 5, post_date: 10.8},
+        {no: 6, vpos: 4, post_date: 10.7},
+        {no: 7, vpos: 3, post_date: 10.6},
+        {no: 8, vpos: 2, post_date: 10.5},
+
+        {no: 9, vpos: 1, post_date: 7.0},
+    ].map(value=>{
+        value.post_date = to_date(value.post_date);
+        return value;
+    });
+
+    const time_sec = 20*60;
+    const cda = new TestCommentDisplayAmount(2, 3);
+    const cmts = cda.getDisplayed(comments, time_sec);
+
+    const pre_cmt = [
+        {no: 9, vpos: 1, post_date: 7.0},
+        {no: 6, vpos: 4, post_date: 10.7},
+        {no: 5, vpos: 5, post_date: 10.8},
+        {no: 4, vpos: 6, post_date: 12.0},
+        {no: 3, vpos: 7, post_date: 14.0},
+        {no: 2, vpos: 8, post_date: 14.1},
+        {no: 1, vpos: 9, post_date: 14.5},
+        {no: 0, vpos: 10, post_date: 15.0},
+    ].map(value=>{
+        value.post_date = to_date(value.post_date);
+        return value;
+    });
+    t.deepEqual(pre_cmt, cmts);
 });

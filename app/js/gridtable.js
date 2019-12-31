@@ -18,14 +18,14 @@ const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
     if(Number.isFinite(value) && value < 0){
         return "";
     }
-    return time_format.toDate(value);
+    return time_format.toDateString(value);
 };
 
 const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
     if(Number.isFinite(value) && value < 0){
         return "";
     }
-    return time_format.toPlayTime(value);
+    return time_format.toTimeString(value);
 };
 
 const numberFormatter = (row, cell, value, columnDef, dataContext)=> {

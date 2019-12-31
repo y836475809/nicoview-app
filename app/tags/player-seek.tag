@@ -93,8 +93,8 @@
             const slider = this.root.querySelector("div.slider");  
             picker.style.left = (per * (slider.clientWidth - picker.clientWidth)) + "px";
 
-            this.fmt_current = time_format.toPlayTime(this.current);
-            this.fmt_duration = time_format.toPlayTime(this.duration);
+            this.fmt_current = time_format.toTimeString(this.current);
+            this.fmt_duration = time_format.toTimeString(this.duration);
 
             this.update();
         };

@@ -1,7 +1,7 @@
 const EventEmitter = require("events").EventEmitter;
 const path = require("path");
 const { BookMark } = require("./bookmark");
-const { toPlayTime } = require("./time-format");
+const { toTimeString } = require("./time-format");
 const { LibraryDB } = require("./db");
 
 const getIcon = (store_name, item) => {
@@ -238,7 +238,7 @@ const createAcordionStore = (store_name) => {
                     if (context.state.name == "bookmark") {
                         const time = item.data.time;
                         if (time > 0) {
-                            item.title = `${item.title} ${toPlayTime(time)}`;
+                            item.title = `${item.title} ${toTimeString(time)}`;
                         }
                     }
                     context.state.items.push(item);

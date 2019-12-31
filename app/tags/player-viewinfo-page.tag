@@ -311,11 +311,11 @@
         };
 
         const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
-            return time_format.toPlayTime(value * 10 / 1000);
+            return time_format.toTimeString(value * 10 / 1000);
         };
         const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
             //sec->ms
-            return time_format.toDate(value * 1000);
+            return time_format.toDateString(value * 1000);
         };
 
         const columns = [
@@ -570,7 +570,7 @@
             this.video_id = video.video_id;
             this.title = video.title;
             this.video_thumbnail_url = video.thumbnailURL;
-            this.first_retrieve = time_format.toDate(video.postedDateTime);
+            this.first_retrieve = time_format.toDateString(video.postedDateTime);
             this.view_counter = video.viewCount;
             this.comment_counter = thread.commentCount;
             this.mylist_counter = video.mylistCount;

@@ -15,7 +15,7 @@ const toDateString = (time) => {
     const sec = ("0" + d.getSeconds()).slice(-2);
 
     return `${year}/${month}/${day} ${hour}:${min}:${sec}`;
-}
+};
 
 const toTimeString = (time_sec) => {
     const sec = parseInt(time_sec % 60);
@@ -25,22 +25,29 @@ const toTimeString = (time_sec) => {
     const s_sec = ("0" + sec).slice(-2);
     
     return `${s_min}:${s_sec}`;
-}
+};
 
-const toTimeSec = (time_str) => {
-    let result_sec = 0;
-    const time_array = time_str.split(":");
-    if(time_array.length == 2){
-        result_sec = parseInt( time_array[0] ) * 60 
-        + parseInt( time_array[1] );
-    }else if(time_array.length == 3){
-        result_sec = parseInt( time_array[0] ) * 60 * 60
-        + parseInt( time_array[1] ) * 60
-        + parseInt( time_array[2] );
-    }else{
-        throw new Error(`${time_str} is wrong`);
+/**
+ * time 01:00 or 60sec
+ * @param {number | string} time 
+ */
+const toTimeSec = (time) => {   
+    if(typeof time === "string"){
+        let result_sec = 0;        
+        const time_array = time.split(":");
+        if(time_array.length == 2){
+            result_sec = parseInt( time_array[0] ) * 60 
+            + parseInt( time_array[1] );
+        }else if(time_array.length == 3){
+            result_sec = parseInt( time_array[0] ) * 60 * 60
+            + parseInt( time_array[1] ) * 60
+            + parseInt( time_array[2] );
+        }
+        return result_sec;
+    }else if(typeof time === "number"){
+        return time;
     }
-    return result_sec;
+    throw new Error(`${time} is wrong`);
 };
 
 module.exports = {

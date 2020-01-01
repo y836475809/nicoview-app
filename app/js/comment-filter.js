@@ -1,6 +1,6 @@
 const JsonStore = require("./json-store");
 
-class CommentFilter {
+class CommentNG {
     constructor(file_path){
         this._store = new JsonStore(file_path);
 
@@ -81,5 +81,5 @@ class CommentFilter {
 }
 
 module.exports = {
-    CommentFilter
+    CommentNG
 };

@@ -44,7 +44,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const { CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
+        const { CommentNG } = require(`${app_base_dir}/js/comment-filter`);
         const { CommentDisplayAmount } = require(`${app_base_dir}/js/comment-display-amount`);
         const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
@@ -58,7 +58,7 @@
         const ipc_render = new IPCRender();
         const ipc_main = new IPCMain();
 
-        const comment_filter = new CommentFilter(SettingStore.getSettingFilePath("nglist.json"));
+        const comment_ng = new CommentNG(SettingStore.getSettingFilePath("nglist.json"));
 
         let nico_play = null;
 
@@ -146,7 +146,7 @@
                         label: "NG設定",
                         click: () => {
                             obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_filter.getNG(),
+                                ng_items : comment_ng.getNG(),
                                 selected_tab: "comment-ng"
                             });
                         }
@@ -155,7 +155,7 @@
                         label: "コメント表示",
                         click: () => {
                             obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_filter.getNG(),
+                                ng_items : comment_ng.getNG(),
                                 selected_tab: "comment-display"
                             });
                         }
@@ -186,8 +186,8 @@
         const getProcessedComments = (comments, play_time_sec) => {
             const cda = new CommentDisplayAmount();
             const da_comments = cda.getDisplayed(comments, play_time_sec);
-            comment_filter.setComments(da_comments);
-            return comment_filter.getComments(); 
+            comment_ng.setComments(da_comments);
+            return comment_ng.getComments(); 
         };
 
         const play_by_video_data = (video_data, viewinfo, comments, state) => { 
@@ -433,14 +433,14 @@
         });
 
         obs.on("player-main-page:add-comment-ng", (args) => {
-            comment_filter.addNG(args);
+            comment_ng.addNG(args);
             try {
-                comment_filter.save();
+                comment_ng.save();
             } catch (error) {
-                console.log("error comment_filter: ", error);
+                console.log("error comment_ng: ", error);
             }
 
-            const comments = comment_filter.getComments();
+            const comments = comment_ng.getComments();
             comments.sort((a, b) => {
                 if (a.vpos < b.vpos) return -1;
                 if (a.vpos > b.vpos) return 1;
@@ -451,14 +451,14 @@
         });
 
         obs.on("player-main-page:delete-comment-ng", (args) => {
-            comment_filter.deleteNG(args);
+            comment_ng.deleteNG(args);
             try {
-                comment_filter.save();
+                comment_ng.save();
             } catch (error) {
-                console.log("error comment_filter: ", error);
+                console.log("error comment_ng: ", error);
             }
 
-            const comments = comment_filter.getComments();
+            const comments = comment_ng.getComments();
             comments.sort((a, b) => {
                 if (a.vpos < b.vpos) return -1;
                 if (a.vpos > b.vpos) return 1;
@@ -482,7 +482,7 @@
             }
 
             try {
-                comment_filter.load();
+                comment_ng.load();
             } catch (error) {
                 console.log("comment ng load error=", error);
             }

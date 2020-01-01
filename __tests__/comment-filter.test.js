@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentFilter } = require("../app/js/comment-filter");
+const { CommentNG } = require("../app/js/comment-filter");
 
 const test_comments = Object.freeze([
     {
@@ -24,16 +24,16 @@ const test_comments = Object.freeze([
     }
 ]);
 
-class TestCommentFilter extends CommentFilter{
+class TestCommentNG extends CommentNG{
     load(){}
     save(){}
 }
 
 test.beforeEach(t => {
-    t.context.cf = new TestCommentFilter();
+    t.context.cf = new TestCommentNG();
     t.context.cf.setComments(test_comments);
 
-    t.context.delete_cf = new TestCommentFilter();
+    t.context.delete_cf = new TestCommentNG();
     t.context.delete_cf.addNG({ 
         ng_matching_texts: ["text1", "text2", "text3"], 
         ng_user_ids :["id1", "id2", "id3"] 

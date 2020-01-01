@@ -44,8 +44,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const { CommentNG } = require(`${app_base_dir}/js/comment-filter`);
-        const { CommentDisplayAmount } = require(`${app_base_dir}/js/comment-display-amount`);
+        const { CommentNG, CommentDisplayAmount } = require(`${app_base_dir}/js/comment-filter`);
         const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);

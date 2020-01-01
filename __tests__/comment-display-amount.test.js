@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentDisplayAmount } = require("../app/js/comment-display-amount");
+const { CommentDisplayAmount } = require("../app/js/comment-filter");
 
 // vpos 100ms
 

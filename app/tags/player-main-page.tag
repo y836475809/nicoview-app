@@ -44,7 +44,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const { CommentNG, CommentDisplayAmount } = require(`${app_base_dir}/js/comment-filter`);
+        const { CommentNG, CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
         const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
@@ -182,11 +182,10 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const getProcessedComments = (comments, play_time_sec) => {
-            const cda = new CommentDisplayAmount();
-            const da_comments = cda.getDisplayed(comments, play_time_sec);
-            comment_ng.setComments(da_comments);
-            return comment_ng.getComments(); 
+        const filterComments = (comments, play_time_sec) => {
+            const commnet_filter = new CommentFilter(comments, comment_ng);
+            commnet_filter.DisplayAmount(play_time_sec).NG();
+            return commnet_filter.getComments();
         };
 
         const play_by_video_data = (video_data, viewinfo, comments, state) => { 
@@ -198,20 +197,20 @@
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             const play_time_sec = toTimeSec(video.duration);
-            const processed_comments = getProcessedComments(comments, play_time_sec);
+            const filtered_comments = filterComments(comments, play_time_sec);
 
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
                 video_data: video_data,
                 viewinfo: viewinfo,
-                comments: processed_comments,
+                comments: filtered_comments,
                 state: state
             });
             obs.trigger("player-tag:set-tags", thumb_info.tags);
             obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
-                comments: processed_comments,
+                comments: filtered_comments,
                 state: state
             });   
             
@@ -407,15 +406,15 @@
                     const play_time_sec = video_item.play_time;
 
                     const comments = vide_data.getComments();              
-                    const processed_comments = getProcessedComments(comments, play_time_sec);
+                    const filtered_comments = filterComments(comments, play_time_sec);
 
                     obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
                     obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
                         viewinfo: viewinfo, 
-                        comments: processed_comments 
+                        comments: filtered_comments 
                     });   
 
-                    obs.trigger("player-video:update-comments", processed_comments);
+                    obs.trigger("player-video:update-comments", filtered_comments);
                     
                     resolve();   
                 });

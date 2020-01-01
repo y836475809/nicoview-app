@@ -184,7 +184,32 @@ class CommentDisplayAmount {
     }
 }
 
+class CommentFilter {
+    constructor(comments, comment_ng){
+        this.comments = comments;
+        this.comment_ng = comment_ng;
+    }
+
+    getComments(){
+        return this.comments;
+    }
+
+    NG(){
+        this.comment_ng.setComments(this.comments);
+        this.comments = this.comment_ng.getComments(); 
+        return this;
+    }
+
+    DisplayAmount(play_time_sec){
+        const comment_display = new CommentDisplayAmount();
+        this.comments = comment_display.getDisplayed(
+            this.comments, play_time_sec); 
+        return this;
+    }
+}
+
 module.exports = {
     CommentNG,
-    CommentDisplayAmount
+    CommentDisplayAmount,
+    CommentFilter
 };

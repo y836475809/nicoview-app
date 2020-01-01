@@ -44,7 +44,7 @@
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
         const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const { CommentNG, CommentFilter } = require(`${app_base_dir}/js/comment-filter`);
+        const { CommentNG, CommentDisplayAmount } = require(`${app_base_dir}/js/comment-filter`);
         const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
         const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
@@ -182,10 +182,14 @@
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 
-        const filterComments = (comments, play_time_sec) => {
-            const commnet_filter = new CommentFilter(comments, comment_ng);
-            commnet_filter.DisplayAmount(play_time_sec).NG();
-            return commnet_filter.getComments();
+        let filter_comment_func = null; 
+        const filterCommentsFunc = (comments, play_time_sec) => {
+            const _comments = JSON.parse(JSON.stringify(comments));
+            return (comment_ng) => {
+                const comment_display = new CommentDisplayAmount();
+                const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
+                return comment_ng.getComments(dp_comments); 
+            };
         };
 
         const play_by_video_data = (video_data, viewinfo, comments, state) => { 
@@ -197,9 +201,11 @@
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             const play_time_sec = toTimeSec(video.duration);
-            const filtered_comments = filterComments(comments, play_time_sec);
 
-            document.title = `${video.title}[${video.video_id}][${video.video_type}]`;
+            filter_comment_func = filterCommentsFunc(comments, play_time_sec);
+            const filtered_comments = filter_comment_func(comment_ng);
+            
+            document.title = `${video.title}[${video.video_id}][${video.video_type}]`;            
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
                 video_data: video_data,
@@ -406,7 +412,8 @@
                     const play_time_sec = video_item.play_time;
 
                     const comments = vide_data.getComments();              
-                    const filtered_comments = filterComments(comments, play_time_sec);
+                    filter_comment_func = filterCommentsFunc(comments, play_time_sec);
+                    const filtered_comments = filter_comment_func(comment_ng);
 
                     obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
                     obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
@@ -438,12 +445,7 @@
                 console.log("error comment_ng: ", error);
             }
 
-            const comments = comment_ng.getComments();
-            comments.sort((a, b) => {
-                if (a.vpos < b.vpos) return -1;
-                if (a.vpos > b.vpos) return 1;
-                return 0;
-            });
+            const comments = filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
@@ -456,12 +458,7 @@
                 console.log("error comment_ng: ", error);
             }
 
-            const comments = comment_ng.getComments();
-            comments.sort((a, b) => {
-                if (a.vpos < b.vpos) return -1;
-                if (a.vpos > b.vpos) return 1;
-                return 0;
-            });
+            const comments = filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });

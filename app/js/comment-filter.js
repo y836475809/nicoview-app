@@ -3,19 +3,12 @@ const JsonStore = require("./json-store");
 class CommentNG {
     constructor(file_path){
         this._store = new JsonStore(file_path);
-
-        //no, vpos, post_date, user_id, mail, text
-        this._comments = [];
         this._ng_matching_texts = [];
         this._ng_user_ids = [];
     }
 
-    setComments(comments){
-        this._comments = JSON.parse(JSON.stringify(comments));
-    }
-
-    getComments(){
-        return this._comments.filter(comment=>{
+    getComments(comments){
+        return comments.filter(comment=>{
             const has_ng_text = this._ng_matching_texts.includes(comment.text);
             if(has_ng_text){
                 return false;
@@ -184,32 +177,7 @@ class CommentDisplayAmount {
     }
 }
 
-class CommentFilter {
-    constructor(comments, comment_ng){
-        this.comments = comments;
-        this.comment_ng = comment_ng;
-    }
-
-    getComments(){
-        return this.comments;
-    }
-
-    NG(){
-        this.comment_ng.setComments(this.comments);
-        this.comments = this.comment_ng.getComments(); 
-        return this;
-    }
-
-    DisplayAmount(play_time_sec){
-        const comment_display = new CommentDisplayAmount();
-        this.comments = comment_display.getDisplayed(
-            this.comments, play_time_sec); 
-        return this;
-    }
-}
-
 module.exports = {
     CommentNG,
-    CommentDisplayAmount,
-    CommentFilter
+    CommentDisplayAmount
 };

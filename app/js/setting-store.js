@@ -56,13 +56,15 @@ class SettingStore {
     static getCommentParams() {
         return {
             duration_sec: SettingStore.getValue("comment-duration-sec", 4),
-            fps: SettingStore.getValue("comment-fps", 60)
+            fps: SettingStore.getValue("comment-fps", 60),
+            do_limit: SettingStore.getValue("comment-do-limit", true),
         };
     }
     static setCommentParams(params) {
-        const { duration_sec, fps } = params;
+        const { duration_sec, fps, do_limit } = params;
         SettingStore.setValue("comment-duration-sec", duration_sec);
         SettingStore.setValue("comment-fps", fps);
+        SettingStore.setValue("comment-do-limit", do_limit);
     }
 
     static getValue(key, default_value) {

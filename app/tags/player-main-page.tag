@@ -186,9 +186,14 @@
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
             return (comment_ng) => {
-                const comment_display = new CommentDisplayAmount();
-                const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
-                return comment_ng.getComments(dp_comments); 
+                const { do_limit } = SettingStore.getCommentParams();
+                if(do_limit===true){
+                    const comment_display = new CommentDisplayAmount();
+                    const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
+                    return comment_ng.getComments(dp_comments); 
+                }else{
+                    return comment_ng.getComments(_comments); 
+                }
             };
         };
 
@@ -204,7 +209,7 @@
 
             filter_comment_func = filterCommentsFunc(comments, play_time_sec);
             const filtered_comments = filter_comment_func(comment_ng);
-            
+
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;            
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
@@ -458,6 +463,12 @@
                 console.log("error comment_ng: ", error);
             }
 
+            const comments = filter_comment_func(comment_ng);
+            obs.trigger("player-video:update-comments", comments);
+            obs.trigger("player-viewinfo-page:update-comments", comments);
+        });
+
+        obs.on("player-main-page:update-comment-display-limit", (args) => {
             const comments = filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);

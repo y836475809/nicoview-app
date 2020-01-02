@@ -90,20 +90,36 @@ class CommentDisplayAmount {
     }
 
     getDisplayed(comments, play_time_sec){
-        const cp_comments = comments.map(value=>{
-            return Object.assign({}, value);
-        });
-        this._sortDescByPostDate(cp_comments);
-        const start_post_date = cp_comments[cp_comments.length-1].post_date;
+        this._sortDescByPostDate(comments);
+        const {owner_comments, user_comments} = this._splitByUserID(comments);
+        const start_post_date = comments[comments.length-1].post_date;
 
         const max_num = this._getMaxNum(play_time_sec);
-        const { main, rest } = this._split(cp_comments, max_num);
+        const { main, rest } = this._split(user_comments, max_num);
         const comments_par_min = this._getNumEach(
             this._splitParMinute(rest, start_post_date, play_time_sec), 
             this.num_per_min);
-        const result = main.concat(comments_par_min);
+        const result = main.concat(comments_par_min).concat(owner_comments);
         this._sortByVPos(result);
         return result;
+    }
+
+    /**
+     * 
+     * @param {Array} comments 
+     */
+    _splitByUserID(comments){
+        const owner_comments = [];
+        const user_comments = [];
+        comments.forEach(comment => {
+            const cp = Object.assign({}, comment);
+            if(comment.user_id == "owner"){
+                owner_comments.push(cp);
+            }else{
+                user_comments.push(cp);
+            }
+        });
+        return {owner_comments, user_comments};
     }
 
     _sortByVPos(comments){

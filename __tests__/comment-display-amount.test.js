@@ -16,7 +16,7 @@ const mkComments = (time_sec) => {
     const comments = [];
     for (let index = 0; index < time_sec; index++) {
         comments.push({
-            no: index, vpos: index, post_date: index*1000
+            no: index, vpos: index, post_date: index*1000, user_id:"a"
         });
     }
     return comments;
@@ -123,8 +123,6 @@ test("comments get each", t => {
     ],ret);
 });
 
-
-
 test("comments getDisplayed", t => {
     const comments = [
         {no: 0, vpos: 10, post_date: 15.0},
@@ -164,4 +162,67 @@ test("comments getDisplayed", t => {
         return value;
     });
     t.deepEqual(pre_cmt, cmts);
+});
+
+test("comments splitByUserID", t => {
+    const comments = [
+        {no: 0, user_id:"a"},
+        {no: 1, user_id:"owner"},
+        {no: 2, user_id:"a"},
+        {no: 3, user_id:"owner"},
+    ];
+
+    const cda = new CommentDisplayAmount();
+    const {owner_comments, user_comments} = cda._splitByUserID(comments);
+
+    t.deepEqual(owner_comments, [
+        {no: 1, user_id:"owner"},
+        {no: 3, user_id:"owner"},
+    ]);
+    t.deepEqual(user_comments, [
+        {no: 0, user_id:"a"},
+        {no: 2, user_id:"a"},
+    ]);
+});
+
+test("comments getDisplayed include owner", t => {
+    const comments = [
+        {no: 0, vpos: 10, post_date: 15.0},
+        {no: 1, vpos: 9, post_date: 14.5},
+        {no: 2, vpos: 8, post_date: 14.1, user_id:"owner"},
+
+        {no: 3, vpos: 7, post_date: 14.0},
+
+        {no: 4, vpos: 6, post_date: 12.0},
+
+        {no: 5, vpos: 5, post_date: 10.8},
+        {no: 6, vpos: 4, post_date: 10.7, user_id:"owner"},
+        {no: 7, vpos: 3, post_date: 10.6},
+        {no: 8, vpos: 2, post_date: 10.5},
+
+        {no: 9, vpos: 1, post_date: 7.0},
+    ].map(value=>{
+        value.post_date = to_date(value.post_date);
+        return value;
+    });
+
+    const time_sec = 20*60;
+    const cda = new TestCommentDisplayAmount(1, 1);
+    const cmts = cda.getDisplayed(comments, time_sec);
+
+    const exp_cmts = [
+        {no: 9, vpos: 1, post_date: 7.0},
+        {no: 6, vpos: 4, post_date: 10.7, user_id:"owner"},
+        {no: 5, vpos: 5, post_date: 10.8},
+        {no: 4, vpos: 6, post_date: 12.0},
+        {no: 3, vpos: 7, post_date: 14.0},
+        {no: 2, vpos: 8, post_date: 14.1, user_id:"owner"},
+        {no: 1, vpos: 9, post_date: 14.5},
+        {no: 0, vpos: 10, post_date: 15.0},
+    ].map(value=>{
+        value.post_date = to_date(value.post_date);
+        return value;
+    });
+    
+    t.deepEqual(cmts, exp_cmts);
 });

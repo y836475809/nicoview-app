@@ -44,7 +44,7 @@ test("comments sort", t => {
     const cda = new CommentDisplayAmount();
     cda._sortDescByPostDate(comments);
     const last = comments[0].post_date;
-    t.is((time-1)*1000, last);
+    t.is(last, (time-1)*1000);
 });
 
 test("comments max num", t => {
@@ -75,8 +75,8 @@ test("comments split", t => {
 
     const cda = new CommentDisplayAmount();
     const { main, rest } = cda._split(comments, 10);
-    t.is(10, main.length);
-    t.is(20, rest.length);
+    t.is(main.length, 10);
+    t.is(rest.length, 20);
 });
 
 test("comments split par min", t => {
@@ -105,22 +105,22 @@ test("comments split par min", t => {
     const cda = new CommentDisplayAmount();
     const cmts= cda._splitParMinute(comments, start_post_date, time_sec);
 
-    t.is(5, cmts.length);
-    t.is(3, cmts[0].length);
-    t.is(1, cmts[1].length);
-    t.is(1, cmts[2].length);
-    t.is(4, cmts[3].length);
-    t.is(1, cmts[4].length);
+    t.is(cmts.length, 5);
+    t.is(cmts[0].length, 3);
+    t.is(cmts[1].length, 1);
+    t.is(cmts[2].length, 1);
+    t.is(cmts[3].length, 4);
+    t.is(cmts[4].length, 1);
 });
 
 test("comments get each", t => {
     const cda = new CommentDisplayAmount();
     const ret = cda._getNumEach([[0,1], [2,3,4,5,6], [7,8,9]], 3);
-    t.deepEqual([
+    t.deepEqual(ret, [
         0,1, 
         2,3,4, 
         7,8,9
-    ],ret);
+    ]);
 });
 
 test("comments getDisplayed", t => {
@@ -148,7 +148,7 @@ test("comments getDisplayed", t => {
     const cda = new TestCommentDisplayAmount(2, 3);
     const cmts = cda.getDisplayed(comments, time_sec);
 
-    const pre_cmt = [
+    const exp_cmt = [
         {no: 9, vpos: 1, post_date: 7.0},
         {no: 6, vpos: 4, post_date: 10.7},
         {no: 5, vpos: 5, post_date: 10.8},
@@ -161,7 +161,7 @@ test("comments getDisplayed", t => {
         value.post_date = to_date(value.post_date);
         return value;
     });
-    t.deepEqual(pre_cmt, cmts);
+    t.deepEqual(cmts, exp_cmt);
 });
 
 test("comments splitByUserID", t => {
@@ -223,6 +223,6 @@ test("comments getDisplayed include owner", t => {
         value.post_date = to_date(value.post_date);
         return value;
     });
-    
+
     t.deepEqual(cmts, exp_cmts);
 });

@@ -2,10 +2,10 @@ const test = require("ava");
 const nock = require("nock");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
-const { getThumbInfo, filterComments } = require("../app/js/niconico");
+const { getThumbInfo, cnvJsonComments } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
-const cur_comment = filterComments(TestData.no_owner_comment);
+const cur_comment = cnvJsonComments(TestData.no_owner_comment);
 const nico_mocks = new NicoDownLoadMocks();
 
 class TestNicoUpdate extends NicoUpdate {

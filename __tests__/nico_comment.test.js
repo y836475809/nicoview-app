@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoComment, filterComments } = require("../app/js/niconico");
+const { NicoComment, cnvJsonComments } = require("../app/js/niconico");
 const { NicoMocks, TestData} = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");
 
@@ -227,9 +227,9 @@ test("get comment 500", async (t) => {
 
 test("filter comment", (t) => {
     const comments = TestData.owner_comment;
-    const filter_comments = filterComments(comments);
-    t.is(filter_comments.length, 4);
-    t.deepEqual(filter_comments, [
+    const cnved_comments = cnvJsonComments(comments);
+    t.is(cnved_comments.length, 4);
+    t.deepEqual(cnved_comments, [
         {no:1, vpos:100, post_date:1360996778, user_id:"owner", mail:"shita green small", text:"owner comment1\ncomment1"},
         {no:2, vpos:200, post_date:1360996778, user_id:"owner", mail:"shita green small", text:"owner comment2"},
         {no:16, vpos:300, post_date:1359607148, user_id:"abcdefg", mail:"184", text:"comment3"},

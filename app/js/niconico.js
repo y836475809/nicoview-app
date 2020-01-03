@@ -503,7 +503,7 @@ function getCookies(cookie_jar) {
  * 
  * @param {Array} comments 
  */
-const filterComments = (comments) => {
+const cnvJsonComments = (comments) => {
     return comments.filter(value => {
         return value.hasOwnProperty("chat");
     }).filter(value => {
@@ -582,6 +582,6 @@ module.exports = {
     getCookies: getCookies,
     getThumbInfo: getThumbInfo,
     getVideoType: getVideoType,
-    filterComments: filterComments,
+    cnvJsonComments: cnvJsonComments,
     getNicoURL
 };

@@ -2,7 +2,7 @@ const fsPromises = require("fs").promises;
 const path = require("path");
 const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
-    getThumbInfo, filterComments, NicoThumbnail } = require("./niconico");
+    getThumbInfo, cnvJsonComments, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./xml-data-converter");
 
@@ -155,7 +155,7 @@ class NicoUpdate extends EventEmitter {
             throw new Error(`${this.video_item.id}の差分コメントが正しくないデータです`);
         }
 
-        const new_comments = cur_comments.concat(filterComments(comments_diff));
+        const new_comments = cur_comments.concat(cnvJsonComments(comments_diff));
         await this._writeFile(nico_json.commentPath, new_comments, "json");
         return true;
     }

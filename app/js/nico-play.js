@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 const { NicoWatch, NicoVideo, NicoComment, 
-    getCookies, getThumbInfo, filterComments } = require("./niconico");
+    getCookies, getThumbInfo, cnvJsonComments } = require("./niconico");
 
 class NicoPlay extends EventEmitter {
     constructor(heart_beat_rate=0.9){
@@ -42,7 +42,7 @@ class NicoPlay extends EventEmitter {
                 this.emit("changeState", "startComment");
                 this.nico_comment = new NicoComment(api_data);
                 const comments = await this.nico_comment.getComment();
-                const filter_comments = filterComments(comments);
+                const cnved_comments = cnvJsonComments(comments);
                 this.emit("changeState", "finishComment");
 
                 this.nico_video = new NicoVideo(api_data, this.heart_beat_rate);
@@ -56,7 +56,7 @@ class NicoPlay extends EventEmitter {
                     resolve({
                         is_deleted: is_deleted,
                         nico_cookies: nico_cookies,
-                        comments: filter_comments,
+                        comments: cnved_comments,
                         thumb_info: thumb_info,
                         video_url: video_url
                     });
@@ -82,7 +82,7 @@ class NicoPlay extends EventEmitter {
                 resolve({
                     is_deleted: is_deleted,
                     nico_cookies: nico_cookies,
-                    comments: filter_comments,
+                    comments: cnved_comments,
                     thumb_info: thumb_info,
                     video_url: dmc_video_url
                 });                                

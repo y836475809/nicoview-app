@@ -8,12 +8,12 @@
     "test-main-player": "electron . test-player-main.html",
     "test-riotx": "electron . riotx/index.html",
     "main": "electron .",
-    "test": "ava -v -s  __tests__/*.test.js"
+    "test": "ava -v -s"
   },
   "author": "",
   "license": "MIT",
   "devDependencies": {
-    "ava": "^1.1.0",
+    "ava": "^2.4.0",
     "electron": "^6.0.3",
     "nock": "^10.0.4",
     "sinon": "^7.3.1"
@@ -39,5 +39,10 @@
     "win": {
       "target": "zip"
     }
+  },
+  "ava": {
+    "files": [
+      "__tests__/*.test.js"
+    ]
   }
 }

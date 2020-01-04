@@ -69,6 +69,7 @@
     /* globals riot */
     const path = require("path");
     const fs = require("fs");
+    require("./app-quit");
     const remote = require("electron").remote;
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line

@@ -23,7 +23,13 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
+    require("./app-quit");
     const { remote } = require("electron");
+    const { storex } = require("../app/js/riotx-stores");
+    const { setupLibrary } = require("./setup-data");
+    
+    setupLibrary(storex);
+
     const shared_obj = remote.getGlobal("sharedObj");
     var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
     const obs = riot.observable();    // eslint-disable-line

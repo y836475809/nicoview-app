@@ -139,14 +139,14 @@ class NicoSearchMocks {
                         startTime: new Date(new Date().getTime() - Math.floor(Math.random() * 5000)).toISOString()
                     });
                 }
-                return [code, {
+                return {
                     meta: { 
                         status: code,
                         totalCount: 1000,
                         id:"1234567890"
                     },
                     data: data
-                }];
+                };
             });     
     }
 }

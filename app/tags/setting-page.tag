@@ -79,14 +79,7 @@
         </div>
         <div class="content">
             <label class="section-label">NNDD DBのインポート</label>
-            <label>インポート方法</label>
-            <label each={item in import_db_mode_items} >
-                <input  type="radio" name="import-db" value={item.mode}
-                    onchange={onchangeImportDBMode.bind(this,item)}>{item.title}
-            </label>
-            <div>
-                <button onclick={onclickImport}>DB選択</button>
-            </div>
+            <button onclick={onclickImport}>DB選択</button>
         </div>
         <div class="content">
             <label class="section-label" title={this.ffmpeg_path_desc}>ffmpeg実行ファイルのパス</label>
@@ -157,10 +150,6 @@
             shell.openItem(dir);
         };
 
-        this.onchangeImportDBMode = (item, e) => {
-            SettingStore.setValue("import-db-mode", item.mode);
-        };
-
         this.onclickSelectffmpegPath = async (item, e) => {
             const file_path = await selectFileDialog("ffmpeg", ["*"]);
             if(!file_path){
@@ -190,21 +179,6 @@
             const download_dir = SettingStore.getDownloadDir();
             setInputValue(".download-dir-input", download_dir);
 
-            const elms = this.root.querySelectorAll("input[name='import-db']");
-            const import_db_mode = SettingStore.getValue("import-db-mode", "a");
-            try {
-                const index = this.import_db_mode_items.findIndex(
-                    item => item.mode === import_db_mode);
-                if(index<0){
-                    throw new Error(`${import_db_mode} is unkown import-db-mode`); 
-                }  
-                elms[index].checked = true;   
-            } catch (error) {
-                console.log(error);
-                elms[0].checked = true;
-                SettingStore.setValue("import-db-mode", "a");
-            }
-
             const ffmpeg_file_path = SettingStore.getValue("ffmpeg-path", "");
             setInputValue(".ffmpeg-path-input", ffmpeg_file_path);
         });
@@ -214,18 +188,12 @@
         };
 
         const importNNDDDB = async (sqlite_file_path)=>{
-            return new Promise(async (resolve, reject) => {
-                try {
-                    const db_converter = new DBConverter();
-                    db_converter.init(sqlite_file_path);
-                    db_converter.read();
-                    const dir_list = db_converter.get_dirpath();
-                    const video_list = db_converter.get_video();
-                    resolve({dir_list, video_list});    
-                } catch (error) {
-                    reject(error);
-                }                
-            });
+            const db_converter = new DBConverter();
+            db_converter.init(sqlite_file_path);
+            db_converter.read();
+            const dir_list = db_converter.get_dirpath();
+            const video_list = db_converter.get_video();
+            return { dir_list, video_list };
         };
 
         const getImportDBMode = () => {

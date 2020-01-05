@@ -74,6 +74,10 @@
         .search-container {
             display: flex;
         }
+
+        .acdn-item-ghost-class {
+            background-color: #C8EBFB;
+        }
     </style>
 
     <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
@@ -82,11 +86,12 @@
     <div class="acdn-menu-container">
         <div class="toggle-menu">
             <ul class="acdn-list">
-                <li class="acdn-item" each={ item in this.items }
+                <li class="acdn-item" data-id={i} each={ item, i in this.items }
                     title={item.title}
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
-                    onmouseup={this.onmouseUp.bind(this,item)}>
+                    onmouseup={this.onmouseUp.bind(this,item)}
+                    onmousedown={this.onmouseDown.bind(this,item)}>
                     <i class={getIconClass(item)}></i>
                     {item.title}
                 </li>
@@ -172,7 +177,7 @@
         };
 
         const sortItems = () => {
-            const order = sortable.toArray();
+            const order = sortable.toArray().map(value=>Number(value));
             const sorted_items = [];
             order.forEach(value => {
                 sorted_items.push(this.items[value]);
@@ -211,10 +216,15 @@
                 obs_accordion.trigger("show-contextmenu", e);
             }
         };
+        this.onmouseDown= (item, e) => {
+            setSelected(e.target, item);
+        };
 
         this.on("mount", () => {
             const elm = this.root.querySelector(".acdn-list");
             sortable = Sortable.create(elm, {
+                ghostClass: "acdn-item-ghost-class",
+                draggable: ".acdn-item",
                 onSort: (evt) => {
                     sortItems();
                 }

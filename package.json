@@ -19,7 +19,7 @@
     "sinon": "^8.0.2"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.7.2",
+    "@fortawesome/fontawesome-free": "^5.12.0",
     "cheerio": "^1.0.0-rc.3",
     "gsap": "^2.1.2",
     "jquery": "^3.4.1",

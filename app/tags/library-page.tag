@@ -225,7 +225,6 @@
         };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            // {id: "name", name: "名前", sortable: true},
             {id: "video_name", name: "名前", sortable: true},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
@@ -465,7 +464,7 @@
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.name, item.id);
+                        return BookMark.createVideoItem(item.video_name, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }}

@@ -435,7 +435,7 @@
                 this.sort_items[index].order = pre_order=="+"?"-":"+";
             }
 
-            nico_search_params.sortTarget(this.sort_items[index].name);
+            nico_search_params.sortTarget(this.sort_items[index].kind);
             nico_search_params.sortOder(this.sort_items[index].order);
 
             this.update();

@@ -30,7 +30,8 @@
     <script>
         /* globals riot */
         const path = require("path");
-        const { IPCMain } = require("../js/ipc-monitor");
+        const { ipcRenderer } = require("electron");
+        const { IPC_CHANNEL } = require("../js/ipc-channel");
         const { remote } = require("electron");
         const { storex } = require("../js/riotx-stores");
 
@@ -38,8 +39,7 @@
         var app_base_dir = shared_obj.base_dir; // eslint-disable-line
         const obs = riot.observable();
 
-        const ipc_main = new IPCMain();
-        ipc_main.send(ipc_main.IPCMsg.SET_PLAYER_PATH, path.join(__dirname, "player.html"));
+        ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, path.join(__dirname, "player.html"));
 
         riot.mount("main-page", {obs});
     </script>

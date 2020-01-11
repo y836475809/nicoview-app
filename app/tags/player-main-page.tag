@@ -40,10 +40,11 @@
     <script>
         /* globals app_base_dir riot */
         const {remote} = require("electron");
+        const { ipcRenderer } = require("electron");
+        const { IPC_CHANNEL } = require(`${app_base_dir}/js/ipc-channel`);
         const { Menu, MenuItem } = remote;
         const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
         const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
-        const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
         const { CommentNG, CommentDisplayAmount } = require(`${app_base_dir}/js/comment-filter`);
         const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
         const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
@@ -51,11 +52,6 @@
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
-        
-        const ipc_monitor = new IPCRenderMonitor();
-        ipc_monitor.listen();
-        const ipc_render = new IPCRender();
-        const ipc_main = new IPCMain();
 
         const comment_ng = new CommentNG(SettingStore.getSettingFilePath("nglist.json"));
 
@@ -231,7 +227,7 @@
                 name: video.title, 
                 url: video_data.src
             };
-            ipc_render.sendMain(ipc_render.IPCMsg.ADD_PLAY_HISTORY, history_item);
+            ipcRenderer.send(IPC_CHANNEL.ADD_PLAY_HISTORY, history_item);
         }; 
 
         const cancelPlay = () => {
@@ -276,7 +272,7 @@
 
                 const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = ipc_main.sendSync(ipc_main.IPCMsg.SET_COOKIE_SYNC,  nico_cookies);
+                const ret = await ipcRenderer.invoke(IPC_CHANNEL.SET_COOKIE, nico_cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 
@@ -306,46 +302,39 @@
             }
         }; 
         
-        const playNiconico = (video_id, is_online, time=0) => {
+        const playNiconico = async (video_id, is_online, time=0) => {
             cancelPlay();
-            
-            ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY);
 
-            ipc_monitor.once(ipc_monitor.IPCMsg.GET_VIDEO_ITEM_REPLY, async (event, args) => {
-                const { video_item } = args;
-                const state = { 
-                    is_online: video_item === null?true:is_online,
-                    is_saved: video_item !== null,
-                    time: time
-                };
-                try {
-                    //play online
-                    if(state.is_online===true){
-                        play_by_video_id(video_id, state);
-                    }else{
-                        const video_data = new NicoVideoData(video_item);
+            const video_item = await ipcRenderer.invoke(IPC_CHANNEL.GET_VIDEO_ITEM, video_id);
+            const state = { 
+                is_online: video_item === null?true:is_online,
+                is_saved: video_item !== null,
+                time: time
+            };
+            try {
+                //play online
+                if(state.is_online===true){
+                    play_by_video_id(video_id, state);
+                }else{
+                    const video_data = new NicoVideoData(video_item);
 
-                        const video = {
-                            src: video_data.getVideoPath(),
-                            type: `video/${video_data.getVideoType()}`,
-                        };
-                        const viewinfo = {
-                            is_deleted: video_data.getIsDeleted(),
-                            thumb_info: video_data.getThumbInfo()      
-                        };      
-                        const comments = video_data.getComments();
-                        // const { video_data, viewinfo, comments } = data;
-                        play_by_video_data(video, viewinfo, comments, state);
-                    }                   
-                } catch (error) {
-                    await showMessageBox("error", error.message);
-                }
-
-            });
-            ipc_render.sendMain(ipc_render.IPCMsg.GET_VIDEO_ITEM, video_id);
+                    const video = {
+                        src: video_data.getVideoPath(),
+                        type: `video/${video_data.getVideoType()}`,
+                    };
+                    const viewinfo = {
+                        is_deleted: video_data.getIsDeleted(),
+                        thumb_info: video_data.getThumbInfo()      
+                    };      
+                    const comments = video_data.getComments();
+                    play_by_video_data(video, viewinfo, comments, state);
+                }                   
+            } catch (error) {
+                await showMessageBox("error", error.message);
+            }
         }; 
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.PLAY_BY_VIDEO_ID, (event, args) => {
+        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_ID, (event, args) => {
             const { video_id, time, is_online } = args;
 
             playNiconico(video_id, is_online, time);
@@ -380,11 +369,19 @@
         });
 
         obs.on("player-main-page:search-tag", (args) => {
-            ipc_render.sendMain(ipc_render.IPCMsg.SEARCH_TAG, args);
+            ipcRenderer.send(IPC_CHANNEL.SEARCH_TAG, args);
         });
 
         obs.on("player-main-page:load-mylist", (args) => {
-            ipc_render.sendMain(ipc_render.IPCMsg.LOAD_MYLIST, args);
+            ipcRenderer.send(IPC_CHANNEL.LOAD_MYLIST, args);
+        });
+
+        obs.on("player-main-page:add-bookmark", (args) => {
+            ipcRenderer.send(IPC_CHANNEL.ADD_BOOKMARK, args);
+        });
+
+        obs.on("player-main-page:add-download-item", (args) => {
+            ipcRenderer.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
         });
 
         obs.on("player-main-page:test-play-by-data", (arg) => {
@@ -401,45 +398,33 @@
                 buttons: ["cancel"],
                 cb: result=>{
                     console.log("player main cancel update video_id=", video_id);
-                    ipc_render.sendMain(ipc_render.IPCMsg.CANCEL_UPDATE_DATA, video_id);
+                    ipcRenderer.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, video_id);
+                    this.obs_modal_dialog.trigger("close");
                 }
             });
 
-            await new Promise((resolve, reject) => {
-                ipc_monitor.removeAllListeners(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA);
-                ipc_monitor.once(ipc_monitor.IPCMsg.RETURN_UPDATE_DATA, (event, args) => {
-                    const { video_item } = args;
-                    const vide_data = new NicoVideoData(video_item);
-                    const viewinfo = {
-                        is_deleted: vide_data.getIsDeleted(),
-                        thumb_info: vide_data.getThumbInfo()      
-                    }; 
-                    const play_time_sec = video_item.play_time;
+            const video_item = await ipcRenderer.invoke(IPC_CHANNEL.UPDATE_DATA, { video_id, update_target });
+            const video_data = new NicoVideoData(video_item);
+            const viewinfo = {
+                is_deleted: video_data.getIsDeleted(),
+                thumb_info: video_data.getThumbInfo()      
+            }; 
+            const play_time_sec = video_item.play_time;
 
-                    const comments = vide_data.getComments();              
-                    filter_comment_func = filterCommentsFunc(comments, play_time_sec);
-                    const filtered_comments = filter_comment_func(comment_ng);
+            const comments = video_data.getComments();              
+            filter_comment_func = filterCommentsFunc(comments, play_time_sec);
+            const filtered_comments = filter_comment_func(comment_ng);
 
-                    obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
-                    obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
-                        viewinfo: viewinfo, 
-                        comments: filtered_comments 
-                    });   
+            obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
+            obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
+                viewinfo: viewinfo, 
+                comments: filtered_comments 
+            });   
 
-                    obs.trigger("player-video:update-comments", filtered_comments);
-                    
-                    resolve();   
-                });
+            obs.trigger("player-video:update-comments", filtered_comments);
 
-                ipc_render.sendMain(ipc_render.IPCMsg.UPDATE_DATA, { video_id, update_target });
-            });
-            
             this.obs_modal_dialog.trigger("close");
             console.log("player main prog_dialog.close update video_id=", video_id);
-        });
-
-        obs.on("player-main-page:add-download-item", (args) => {
-            ipc_render.sendMain(ipc_render.IPCMsg.ADD_DOWNLOAD_ITEM, args);
         });
 
         obs.on("player-main-page:add-comment-ng", (args) => {
@@ -493,10 +478,6 @@
                 console.log("comment ng load error=", error);
             }
         });   
-  
-        obs.on("player-main-page:add-bookmark", (args) => {
-            ipc_render.sendMain(ipc_render.IPCMsg.ADD_BOOKMARK, args);
-        });
 
         let resize_begin = false;
         const timeout = 200;

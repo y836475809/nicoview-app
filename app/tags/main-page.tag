@@ -120,14 +120,11 @@
     <script>
         /* globals app_base_dir */
         const { remote } = require("electron");
+        const { ipcRenderer } = require("electron");
+        const { IPC_CHANNEL } = require(`${app_base_dir}/js/ipc-channel`);
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { IPCMain, IPCRender, IPCRenderMonitor } = require(`${app_base_dir}/js/ipc-monitor`);
-        const ipc_monitor = new IPCRenderMonitor();
-        ipc_monitor.listen();
-        const ipc_render = new IPCRender();
-        const ipc_main = new IPCMain();
 
         this.obs = this.opts.obs;
         const main_store = storex.get("main");
@@ -185,60 +182,55 @@
             select_page(page_name);
         });
 
-        this.obs.on("main-page:play-by-videoid", (args)=>{
-            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
-
+        this.obs.on("main-page:play-by-videoid", async (args)=>{  
             const { video_id, time } = args; 
-            ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
+
+            await ipcRenderer.invoke(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
                 time: time,
                 is_online: false
-            }); 
+            });
         }); 
         
-        this.obs.on("main-page:play-by-videoid-online", (args)=>{
-            ipc_main.sendSync(ipc_main.IPCMsg.SHOW_PLAYER_SYNC);
-
+        this.obs.on("main-page:play-by-videoid-online", async (args)=>{
             const { video_id, time } = args; 
-            ipc_render.sendPlayer(ipc_render.IPCMsg.PLAY_BY_VIDEO_ID, {
+
+            await ipcRenderer.invoke(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
                 time: time,
                 is_online: true
-            }); 
+            });
         });  
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.GET_VIDEO_ITEM, async (event, args) => {
-            const video_id  = args;
+        ipcRenderer.on(IPC_CHANNEL.GET_VIDEO_ITEM, async (event, args) => {
+            const video_id = args;
             const video_item = await main_store.action("getLibraryItem", video_id);
-            ipc_render.sendPlayer(ipc_render.IPCMsg.GET_VIDEO_ITEM_REPLY, {
-                video_item
-            });  
+            ipcRenderer.send(IPC_CHANNEL.GET_VIDEO_ITEM_REPLY, video_item);
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.SEARCH_TAG, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.SEARCH_TAG, (event, args)=>{
             this.obs.trigger("main-page:select-page", "search");
             this.obs.trigger("search-page:search-tag", args);
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.LOAD_MYLIST, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.LOAD_MYLIST, (event, args)=>{
             this.obs.trigger("main-page:select-page", "mylist");
             this.obs.trigger("mylist-page:load-mylist", args);
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_DOWNLOAD_ITEM, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_PLAY_HISTORY, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args)=>{
             const item = args;
             this.obs.trigger("history-page:add-item", item);
             this.obs.trigger("library-page:play", item);
         });
-       
-        ipc_monitor.on(ipc_monitor.IPCMsg.UPDATE_DATA, async (event, args)=>{
+
+        ipcRenderer.on(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
             const { video_id, update_target } = args;
-            console.log("main update video_id=", video_id);
 
             const result = await new Promise((resolve, reject) => {
                 this.obs.trigger("library-page:update-data", { 
@@ -252,18 +244,16 @@
             
             if(result.state == "ok" || result.state == "404"){
                 const video_item = await main_store.action("getLibraryItem", video_id);
-                ipc_render.sendPlayer(ipc_render.IPCMsg.RETURN_UPDATE_DATA, {
-                    video_item
-                });
-            }
+                ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
+            } 
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.CANCEL_UPDATE_DATA, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.CANCEL_UPDATE_DATA, (event, args)=>{
             const video_id = args;
             this.obs.trigger("library-page:cancel-update-data", video_id);
         });
 
-        ipc_monitor.on(ipc_monitor.IPCMsg.ADD_BOOKMARK, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args)=>{
             const bk_item = args;
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });
@@ -272,7 +262,7 @@
         };
         
         // TODO
-        ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
+        ipcRenderer.on(IPC_CHANNEL.APP_CLOSE, async (event, args) => {
             try {
                 await main_store.action("saveLibrary");
             } catch (error) {
@@ -287,7 +277,8 @@
             if(result!==0){
                 return;
             }
-            ipc_main.send(ipc_main.IPCMsg.APP_CLOSE);
+
+            ipcRenderer.send(IPC_CHANNEL.APP_CLOSE);
         });
 
         const timeout = 200;

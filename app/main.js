@@ -1,14 +1,12 @@
 const { session, dialog, app, BrowserWindow } = require("electron");
 const fs = require("fs");
 const path = require("path");
-// const { IPCMsg, IPCMonitor } = require("./js/ipc-monitor");
-const { IPCMainMonitor, IPCRender } = require("./js/ipc-monitor");
+const { ipcMain } = require("electron");
+const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { WindowStateStore } = require("./js/window-state-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-global.main_window = null;
-global.player_window = null;
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
@@ -17,9 +15,6 @@ let is_debug_mode = false;
 let do_app_quit = false;
 
 let player_html_path = `file://${__dirname}/html/player.html`;
-
-const ipc_monitor = new IPCMainMonitor();
-ipc_monitor.listen();
 
 const window_store = new WindowStateStore(app.getPath("userData"));
 
@@ -57,9 +52,7 @@ function createWindow() {
             window_store.setState("main", win);
         }else{
             e.preventDefault();
-
-            const ipc_render = new IPCRender();
-            win.webContents.send(ipc_render.IPCMsg.APP_CLOSE);
+            win.webContents.send(IPC_CHANNEL.APP_CLOSE);
         }
     });
 
@@ -83,8 +76,6 @@ function createWindow() {
             });
         }
     });
-
-    global.main_window = win;
 }
 
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
@@ -94,38 +85,78 @@ app.on("ready", ()=>{
 
     createWindow();
 
-    ipc_monitor.on(ipc_monitor.IPCMsg.SHOW_PLAYER_SYNC, async (event, args) => {
+    ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
         await createPlayerWindow();
         player_win.show();
-        event.returnValue = true;
+
+        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, args);
+        return true;
     });
 
-    ipc_monitor.on(ipc_monitor.IPCMsg.SET_COOKIE_SYNC, async (event, args) => {
-        const cookies = args;
-        const ps = cookies.map(cookie=>{
-            return new Promise((resolve, reject) => {
-                session.defaultSession.cookies.set(cookie, (error) => {
-                    if (error) {
-                        reject(error);
-                    } else {
-                        resolve();
-                    }
-                });
+    ipcMain.handle(IPC_CHANNEL.GET_VIDEO_ITEM, async (event, args) => {
+        const video_id = args;
+        const video_item = await new Promise( resolve => {
+            ipcMain.once(IPC_CHANNEL.GET_VIDEO_ITEM_REPLY, (event, data) => {
+                // console.log('ipcRequest', data)
+                resolve(data);
             });
+            win.webContents.send(IPC_CHANNEL.GET_VIDEO_ITEM, video_id);
         });
+        return video_item;
+    });
+
+    ipcMain.handle(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
+        const video_item = await new Promise( resolve => {
+            ipcMain.once(IPC_CHANNEL.RETURN_UPDATE_DATA, (event, data) => {
+                // console.log('ipcRequest', data)
+                resolve(data);
+            });
+            win.webContents.send(IPC_CHANNEL.UPDATE_DATA, args);
+        });
+        return video_item;
+    });
+
+    ipcMain.on(IPC_CHANNEL.CANCEL_UPDATE_DATA, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, args);
+    });
+
+    ipcMain.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
+    });
+
+    ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
+    });
+
+    ipcMain.on(IPC_CHANNEL.LOAD_MYLIST, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.LOAD_MYLIST, args);
+    });
+
+    ipcMain.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.ADD_BOOKMARK, args);
+    });
+
+    ipcMain.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args) => {
+        win.webContents.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
+    });
+
+    ipcMain.handle(IPC_CHANNEL.SET_COOKIE, async (event, args) => {
+        const cookies = args;
         try {
-            await Promise.all(ps);
-            event.returnValue = "ok";
+            cookies.forEach(async cookie=>{
+                await session.defaultSession.cookies.set(cookie);
+            });
+            return "ok";
         } catch (error) {
-            event.returnValue = "error";
+            return "error";
         }
     });
 
-    ipc_monitor.on(ipc_monitor.IPCMsg.SET_PLAYER_PATH, (event, args) => {
+    ipcMain.on(IPC_CHANNEL.SET_PLAYER_PATH, (event, args) => {
         player_html_path = args;
     });
 
-    ipc_monitor.on(ipc_monitor.IPCMsg.APP_CLOSE, async (event, args) => {
+    ipcMain.on(IPC_CHANNEL.APP_CLOSE, (event, args) => {
         do_app_quit = true;
         app.quit();
     });
@@ -173,8 +204,6 @@ const createPlayerWindow = () => {
             resolve();
         });
         player_win.loadURL(player_html_path);
-
-        global.player_window = player_win;
     });  
 };
 

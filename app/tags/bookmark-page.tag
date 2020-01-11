@@ -65,13 +65,13 @@
     </aside>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require(`${app_base_dir}/js/json-store`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const JsonStore = rootRequire("app/js/json-store");
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
         const obs_trigger = new obsTrigger(obs);

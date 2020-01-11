@@ -94,12 +94,12 @@
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const { shell } = require("electron");
-        const DBConverter = require(`${app_base_dir}/js/db-converter`);
-        const { SettingStore, SettingDirConfig } = require(`${app_base_dir}/js/setting-store`);
-        const { selectFileDialog, selectFolderDialog, showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { FileUtils } = require(`${app_base_dir}/js/file-utils`);
+        const DBConverter = rootRequire("app/js/db-converter");
+        const { SettingStore, SettingDirConfig } = rootRequire("app/js/setting-store");
+        const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
+        const { FileUtils } = rootRequire("app/js/file-utils");
 
         this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";

@@ -248,14 +248,14 @@
     </div>
     
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const { remote, clipboard } = require("electron");
         const { Menu } = remote;
-        const { GridTable } = require(`${app_base_dir}/js/gridtable`);
+        const { GridTable } = rootRequire("app/js/gridtable");
         require("slickgrid/plugins/slick.autotooltips");
-        const time_format = require(`${app_base_dir}/js/time-format`);
-        const SyncCommentScroll = require(`${app_base_dir}/js/sync-comment-scroll`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const time_format = rootRequire("app/js/time-format");
+        const SyncCommentScroll = rootRequire("app/js/sync-comment-scroll");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
 

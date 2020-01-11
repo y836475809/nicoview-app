@@ -32,18 +32,16 @@
 <script type="riot/tag" src="../app/tags/bookmark-page.tag"></script>
 <script>
     /* globals riot */
-    const path = require("path");
     const { ipcRenderer } = require("electron");
-    const { IPC_CHANNEL } = require("../app/js/ipc-channel");
-    const { remote } = require("electron");
-    const { storex } = require("../app/js/riotx-stores");
+    const { rootRequire, getPathFromRoot } = require("../app/util");
+    global.rootRequire = rootRequire;
+    const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+    const { storex } = rootRequire("app/js/riotx-stores");
     
-    var shared_obj = remote.getGlobal("sharedObj");// eslint-disable-line
-    var app_base_dir = shared_obj.base_dir; // eslint-disable-line
     const obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
 
-    ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, path.join(__dirname, "test-player.html"));
+    ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, getPathFromRoot(["test", "test-player.html"]));
 
     riot.mount("main-page", {obs});
 

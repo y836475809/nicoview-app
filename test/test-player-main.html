@@ -67,13 +67,11 @@
 <script type="riot/tag" src="../app/tags/open-video-form.tag"></script>
 <script>
     /* globals riot */
-    const path = require("path");
     const fs = require("fs");
     require("./app-quit");
-    const remote = require("electron").remote;
-    const shared_obj = remote.getGlobal("sharedObj");
-    var app_base_dir = shared_obj.base_dir;  // eslint-disable-line
-    const test_dir = path.join(path.resolve(app_base_dir, ".."), "test");
+    const { rootRequire, getPathFromRoot } = require("../app/util");
+    global.rootRequire = rootRequire;
+    const test_dir = getPathFromRoot(["test"]);
     process.env.NODE_ENV = "DEBUG";
 
     const { NicoVideoMocks } = require("./mock_server/nico-mock");
@@ -91,7 +89,7 @@
     const obs = riot.observable(); // eslint-disable-line
     riot.mount("player-main-page", {obs});
       
-    const reader = require(`${app_base_dir}/js/reader`);
+    const reader = rootRequire("app/js/reader");
 
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;

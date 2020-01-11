@@ -26,9 +26,9 @@
     </div>
 
     <script>
-        /* globals app_base_dir */
-        const { CommentTimeLine, NicoScript } = require(`${app_base_dir}/js/comment-timeline`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        /* globals rootRequire */
+        const { CommentTimeLine, NicoScript } = rootRequire("app/js/comment-timeline");
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs = this.opts.obs; 
 

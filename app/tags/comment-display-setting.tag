@@ -47,8 +47,8 @@
         onclick={this.onclickLimitCommentCheck} /><label>表示数を制限</label>
     </div>
     <script>
-        /* globals app_base_dir */
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        /* globals rootRequire */
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs_dialog = this.opts.obs;
 

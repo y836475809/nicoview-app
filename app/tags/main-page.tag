@@ -118,13 +118,13 @@
     </div>
 
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const { remote } = require("electron");
         const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = require(`${app_base_dir}/js/ipc-channel`);
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
-        const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
 
         this.obs = this.opts.obs;
         const main_store = storex.get("main");

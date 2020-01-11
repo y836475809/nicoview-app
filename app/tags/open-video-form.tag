@@ -50,8 +50,8 @@
     </div>
 
     <script>
-        /* globals app_base_dir */
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        /* globals rootRequire */
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
 

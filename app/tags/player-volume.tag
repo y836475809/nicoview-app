@@ -33,8 +33,8 @@
     </div>
 
     <script>
-        /* globals app_base_dir */
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        /* globals rootRequire */
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs = this.opts.obs; 
         

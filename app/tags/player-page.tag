@@ -51,12 +51,12 @@
     <open-video-form obs={opts.obs}></open-video-form>
 
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const { remote, clipboard } = require("electron");
         const { Menu } = remote;
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { getNicoURL } = require(`${app_base_dir}/js/niconico`);       
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { getNicoURL } = rootRequire("app/js/niconico");       
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
         
         const obs = this.opts.obs; 
 

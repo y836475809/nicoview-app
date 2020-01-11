@@ -17,11 +17,11 @@
     </div>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require(`${app_base_dir}/js/json-store`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const JsonStore = rootRequire("app/js/json-store");
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs = this.opts.obs; 
         this.obs_search = riot.observable();
@@ -162,17 +162,17 @@
     <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
-        const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoUpdate } = require(`${app_base_dir}/js/nico-update`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
-        const { showMessageBox, showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { ConvertMP4, needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
-        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
+        const { GridTable } = rootRequire("app/js/gridtable");
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { NicoUpdate } = rootRequire("app/js/nico-update");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { showMessageBox, showOKCancelBox } = rootRequire("app/js/remote-dialogs");
+        const { ConvertMP4, needConvertVideo } = rootRequire("app/js/video-converter");
+        const { NicoVideoData } = rootRequire("app/js/nico-data-file");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();

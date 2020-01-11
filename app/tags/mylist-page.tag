@@ -17,11 +17,11 @@
     </div>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require(`${app_base_dir}/js/json-store`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const JsonStore = rootRequire("app/js/json-store");
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
@@ -147,17 +147,17 @@
     <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const { Menu } = remote;
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { NicoMylist, NicoMylistStore } = require(`${app_base_dir}/js/nico-mylist`);
-        const { CacheStore } = require(`${app_base_dir}/js/cache-store`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
-        const { needConvertVideo } = require(`${app_base_dir}/js/video-converter`);
-        const { showOKCancelBox } = require(`${app_base_dir}/js/remote-dialogs`);
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { GridTable } = rootRequire("app/js/gridtable");
+        const { NicoMylist, NicoMylistStore } = rootRequire("app/js/nico-mylist");
+        const { CacheStore } = rootRequire("app/js/cache-store");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { needConvertVideo } = rootRequire("app/js/video-converter");
+        const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();

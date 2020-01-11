@@ -66,17 +66,17 @@
     <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
 
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const EventEmitter = require("events");
         const { remote } = require("electron");
         const { Menu } = remote;
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoDownloader } = require(`${app_base_dir}/js/nico-downloader`);
-        const { GridTableDownloadItem } = require(`${app_base_dir}/js/gridtable-downloaditem`);
-        const { ScheduledTask } = require(`${app_base_dir}/js/scheduled-task`);
-        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { NicoDownloader } = rootRequire("app/js/nico-downloader");
+        const { GridTableDownloadItem } = rootRequire("app/js/gridtable-downloaditem");
+        const { ScheduledTask } = rootRequire("app/js/scheduled-task");
+        const { showMessageBox } = rootRequire("app/js/remote-dialogs");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
 

@@ -21,11 +21,11 @@
     </div>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const {Menu} = remote;
-        const JsonStore = require(`${app_base_dir}/js/json-store`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
+        const JsonStore = rootRequire("app/js/json-store");
+        const { SettingStore } = rootRequire("app/js/setting-store");
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
@@ -200,14 +200,14 @@
     <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const { Menu, MenuItem } = remote;
-        const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { NicoSearchParams, NicoSearch } = require(`${app_base_dir}/js/nico-search`);
-        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { GridTable } = rootRequire("app/js/gridtable");
+        const { NicoSearchParams, NicoSearch } = rootRequire("app/js/nico-search");
+        const { showMessageBox } = rootRequire("app/js/remote-dialogs");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();

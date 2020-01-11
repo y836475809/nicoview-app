@@ -38,17 +38,17 @@
     <comment-setting-dialog obs={this.opts.obs}></comment-setting-dialog>
 
     <script>
-        /* globals app_base_dir riot */
+        /* globals rootRequire riot */
         const {remote} = require("electron");
         const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = require(`${app_base_dir}/js/ipc-channel`);
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         const { Menu, MenuItem } = remote;
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const { NicoPlay } = require(`${app_base_dir}/js/nico-play`);
-        const { CommentNG, CommentDisplayAmount } = require(`${app_base_dir}/js/comment-filter`);
-        const { toTimeSec } = require(`${app_base_dir}/js/time-format`);
-        const { showMessageBox } = require(`${app_base_dir}/js/remote-dialogs`);
-        const { NicoVideoData } = require(`${app_base_dir}/js/nico-data-file`);
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { NicoPlay } = rootRequire("app/js/nico-play");
+        const { CommentNG, CommentDisplayAmount } = rootRequire("app/js/comment-filter");
+        const { toTimeSec } = rootRequire("app/js/time-format");
+        const { showMessageBox } = rootRequire("app/js/remote-dialogs");
+        const { NicoVideoData } = rootRequire("app/js/nico-data-file");
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();

@@ -18,14 +18,14 @@
     </div>    
 
     <script>
-        /* globals app_base_dir */
+        /* globals rootRequire */
         const { remote } = require("electron");
         const { Menu } = remote;
-        const { GridTable } = require(`${app_base_dir}/js/gridtable`);
-        const { SettingStore } = require(`${app_base_dir}/js/setting-store`);
-        const HistoryStore = require(`${app_base_dir}/js/history-store`);
-        const { BookMark } = require(`${app_base_dir}/js/bookmark`);
-        const { obsTrigger } = require(`${app_base_dir}/js/riot-obs`);
+        const { GridTable } = rootRequire("app/js/gridtable");
+        const { SettingStore } = rootRequire("app/js/setting-store");
+        const HistoryStore = rootRequire("app/js/history-store");
+        const { BookMark } = rootRequire("app/js/bookmark");
+        const { obsTrigger } = rootRequire("app/js/riot-obs");
 
         const obs = this.opts.obs; 
 

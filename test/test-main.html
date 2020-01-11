@@ -43,7 +43,7 @@
     const obs = riot.observable(); // eslint-disable-line
     process.env.NODE_ENV = "DEBUG";
 
-    ipcRenderer.invoke(IPC_CHANNEL.SET_PLAYER_PATH, path.join(__dirname, "test-player.html"));
+    ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, path.join(__dirname, "test-player.html"));
 
     riot.mount("main-page", {obs});
 

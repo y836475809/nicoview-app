@@ -4,6 +4,7 @@ const path = require("path");
 const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { WindowStateStore } = require("./js/window-state-store");
+const { ConfigMain } = require("./js/config");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -17,6 +18,18 @@ let do_app_quit = false;
 let player_html_path = `file://${__dirname}/html/player.html`;
 
 const window_store = new WindowStateStore(app.getPath("userData"));
+const config_main = new ConfigMain();
+
+const getWindowState = (w) => {
+    const bounds = w.getBounds(); 
+    return {
+        x: bounds.x, 
+        y: bounds.y,  
+        width: bounds.width,  
+        height: bounds.height, 
+        maximized: w.isMaximized()
+    };
+};
 
 function createWindow() {
     global.sharedObj = {
@@ -47,9 +60,12 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    win.on("close", (e) => {
+    win.on("close", async (e) => {
         if(do_app_quit){
             window_store.setState("main", win);
+
+            config_main.set("main.window.state", getWindowState(win));
+            await config_main.save();
         }else{
             e.preventDefault();
             win.webContents.send(IPC_CHANNEL.APP_CLOSE);
@@ -80,8 +96,38 @@ function createWindow() {
 
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
-app.on("ready", ()=>{
+app.on("ready", async ()=>{
     window_store.load();
+
+    try {
+        await config_main.load();
+    } catch (error) {
+        const ret = await dialog.showMessageBox({
+            type: "error",
+            buttons: ["OK", "Cancel"],
+            message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
+        });
+        if(ret===0){ //OK
+            config_main.clear();
+        }else{ //Cancel
+            do_app_quit = true;
+            app.quit();
+            return;
+        }
+    }
+    try {
+        await config_main.configFolder();
+    } catch (error) {
+        await dialog.showMessageBox({
+            type: "error",
+            buttons: ["OK"],
+            message: `設定失敗、終了します: ${error.message}`
+        });
+
+        do_app_quit = true;
+        app.quit();
+        return;
+    }
 
     createWindow();
 

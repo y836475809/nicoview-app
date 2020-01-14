@@ -92,8 +92,6 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", async ()=>{
-    // window_store.load();
-
     try {
         await config_main.load();
     } catch (error) {

@@ -48,33 +48,17 @@
 
     <div class="setting-page">
         <div class="content">
-            <label class="section-label">設定保存場所(*再起動後に有効)</label>
-            <div class="component">
-                <label class="setting-label" title={this.setting_path_desc}>
-                    <input type="radio" name="setting-radio" value="userdata"
-                        checked={enable_user_data}
-                        onchange={onchangeSetting}>UserDataに保存
-                </label>    
-                <input disabled={!enable_user_data} class="input-path userdata-dir-input" type="text" readonly title={this.setting_path_desc}>
+            <label class="setting-label" title={this.data_path_desc}>データの保存先を指定</label>     
+            <div style="display: flex;">
+                <input disabled=true class="input-path data-dir-input" type="text" readonly title={this.data_path_desc}>
+                <button class="input-button" onclick={onclickSelectDataDir}>フォルダ選択</button>
             </div>
-            <div class="component">
-                <label class="setting-label" title={this.setting_path_desc}>
-                    <input type="radio" name="setting-radio" value="specify"
-                        checked={!enable_user_data}
-                        onchange={onchangeSetting}>保存場所を指定
-                </label>
-                <div style="display: flex;">
-                    <input disabled={enable_user_data} class="input-path setting-dir-input" type="text" readonly title={this.setting_path_desc}>
-                    <button disabled={enable_user_data} class="input-button" onclick="{onclickSelectSettingDir.bind(this,'setting-dir-input')}">フォルダ選択</button>
-                </div>
-            </div>
-            <button onclick={onclickOpenDir}>設定フォルダを開く</button>
         </div>
         <div class="content">
             <label class="section-label">動画の保存先</label>
             <div style="display: flex;">
-                <input class="input-path download-dir-input" type="text" readonly>
-                <button class="input-button" onclick="{onclickSelectDownloadDir.bind(this,'download-dir-input')}">フォルダ選択</button>
+                <input disabled=true class="input-path download-dir-input" type="text" readonly>
+                <button class="input-button" onclick={onclickSelectDownloadDir}>フォルダ選択</button>
             </div>
         </div>
         <div class="content">
@@ -84,10 +68,17 @@
         <div class="content">
             <label class="section-label" title={this.ffmpeg_path_desc}>ffmpeg実行ファイルのパス</label>
             <div style="display: flex;">
-                <input class="input-path ffmpeg-path-input" type="text" readonly title={this.ffmpeg_path_desc}>
-                <button class="input-button" onclick="{onclickSelectffmpegPath.bind(this,'ffmpeg-path-input')}" title={this.ffmpeg_path_desc}>
+                <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly title={this.ffmpeg_path_desc}>
+                <button class="input-button" onclick={onclickSelectffmpegPath} title={this.ffmpeg_path_desc}>
                     ファイル選択
                 </button>
+            </div>
+        </div>
+        <div class="content">
+            <label class="section-label">アプリの設定保存フォルダ</label>
+            <div style="display: flex;">
+                <input disabled=true class="input-path app-setting-dir-input" type="text" readonly}>
+                <button class="input-button" onclick={onclickOpenDir}>フォルダを開く</button>
             </div>
         </div>
     </div>
@@ -97,66 +88,48 @@
         /* globals rootRequire riot */
         const { shell } = require("electron");
         const DBConverter = rootRequire("app/js/db-converter");
-        const { SettingStore, SettingDirConfig } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
         const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { FileUtils } = rootRequire("app/js/file-utils");
 
-        this.setting_path_desc = "ここに設定保存用フォルダ「setting」を作成";
+        this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        const setting_dir_config = new SettingDirConfig();
+        const config_renderer = new ConfigRenderer();
 
-        this.import_db_mode_items = [
-            {title:"差分を追加する", mode:"a"},
-            {title:"上書きする", mode:"w"},  
-        ];
-
-        this.onchangeSetting = (e) => {
-            if(e.target.value=="userdata"){
-                this.enable_user_data = true;
-            }else{
-                this.enable_user_data = false;
-                const dir = getInputValue(".setting-dir-input");
-                setting_dir_config.setDir(dir);   
-            }
-            setting_dir_config.enableUserData = this.enable_user_data;
-        };
-
-        this.onclickSelectSettingDir = async (item, e) => {
+        this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
-            if(dir!==null){
-                setting_dir_config.setDir(dir);
-                setInputValue(`.${item}`, dir);
-            }        
-        };
-
-        this.onclickSelectDownloadDir = async (item, e) => {
-            const dir = await selectFolderDialog();
-            if(dir!==null){
-                setInputValue(`.${item}`, dir);
-                SettingStore.setValue("download-dir", dir);
-                FileUtils.mkDirp(dir);
+            if(dir == null){
+                return;
             }
+            setInputValue(".data-dir-input", dir);
+            config_renderer.set("data-dir", dir);  
         };
 
-        this.onclickOpenDir = (e) => {
-            const dir = setting_dir_config.getDir(this.enable_user_data);
-            FileUtils.mkDirp(dir);
+        this.onclickSelectDownloadDir = async e => {
+            const dir = await selectFolderDialog();
+            if(dir == null){
+                return; 
+            }
+            setInputValue(".download-dir-input", dir);
+            config_renderer.set("download-dir", dir);
+        };
 
+        this.onclickOpenDir = async (e) => {
+            const dir = await config_renderer.get("app-setting-dir", "");
             shell.openItem(dir);
         };
 
-        this.onclickSelectffmpegPath = async (item, e) => {
+        this.onclickSelectffmpegPath = async e => {
             const file_path = await selectFileDialog("ffmpeg", ["*"]);
-            if(!file_path){
+            if(file_path == null){
                 return;
             }
-            setInputValue(`.${item}`, file_path);
-            SettingStore.setValue("ffmpeg-path", file_path);
+            setInputValue(".ffmpeg-path-input", file_path);
+            config_renderer.set("ffmpeg-path", file_path);
         };
 
         const setInputValue = (selector, value) => {          
@@ -164,28 +137,12 @@
             elm.value = value;
         };
 
-        const getInputValue = (selector) => {          
-            const elm = this.root.querySelector(selector);
-            return elm.value;
-        };
-
-        this.on("mount", () => {
-            setting_dir_config.load();
-
-            setInputValue(".userdata-dir-input", setting_dir_config.getParentDir(true));
-            setInputValue(".setting-dir-input", setting_dir_config.getParentDir(false));  
-            this.enable_user_data = setting_dir_config.enableUserData;
-
-            const download_dir = SettingStore.getDownloadDir();
-            setInputValue(".download-dir-input", download_dir);
-
-            const ffmpeg_file_path = SettingStore.getValue("ffmpeg-path", "");
-            setInputValue(".ffmpeg-path-input", ffmpeg_file_path);
+        this.on("mount", async () => {
+            setInputValue(".app-setting-dir-input", await config_renderer.get("app-setting-dir", ""));  
+            setInputValue(".data-dir-input", await config_renderer.get("data-dir", ""));  
+            setInputValue(".download-dir-input", await config_renderer.get("download-dir", ""));
+            setInputValue(".ffmpeg-path-input", await config_renderer.get("ffmpeg-path", ""));
         });
-
-        window.onbeforeunload = (e) => {
-            setting_dir_config.save();
-        };
 
         const importNNDDDB = async (sqlite_file_path)=>{
             const db_converter = new DBConverter();
@@ -196,14 +153,9 @@
             return { dir_list, video_list };
         };
 
-        const getImportDBMode = () => {
-            const elm = this.root.querySelector("input[name='import-db']:checked");
-            return elm.value;
-        };
-
         this.onclickImport = async ()=>{
             const db_file_path = await selectFileDialog("Sqlite db", ["db"]);
-            if(!db_file_path){
+            if(db_file_path == null){
                 return;
             }
 
@@ -214,10 +166,9 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
+                const data_path = await config_renderer.get("data-dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                await main_store.action("setLibraryData", 
-                    SettingStore.getSettingDir(),
-                    dir_list, video_list);
+                await main_store.action("setLibraryData", data_path, dir_list, video_list);
 
                 await showMessageBox("info", "インポート完了");
             } catch (error) {

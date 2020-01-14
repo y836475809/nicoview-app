@@ -10,11 +10,11 @@ const IPC_CHANNEL = Object.freeze({
 });
 
 class ConfigRenderer {
-    async getValue(key, default_value) {
+    async get(key, default_value) {
         return await ipcRenderer.invoke(IPC_CHANNEL.GET_VALUE, { key, default_value });
     }
 
-    setValue(key, value) {
+    set(key, value) {
         ipcRenderer.send(IPC_CHANNEL.SET_VALUE, { key, value });
     }
 }
@@ -26,17 +26,21 @@ class ConfigMain {
 
     setup(){
         this.config_path = path.join(app.getPath("userData"), "config.json");
-        this.json_data = {};
-
+        this._initJsonData();
         ipcMain.handle(IPC_CHANNEL.GET_VALUE, async (event, args) => {
             const { key, default_value } = args;
-            return this.getValue(key, default_value);
+            return this.get(key, default_value);
         });
 
         ipcMain.on(IPC_CHANNEL.SET_VALUE, async (event, args) => {
             const { key, value } = args;
-            this.setValue(key, value);
+            this.set(key, value);
         });
+    }
+
+    _initJsonData(){
+        this.json_data = {};
+        this.json_data["app-setting-dir"] = app.getPath("userData");
     }
 
     getObj(key, json_data){
@@ -82,28 +86,19 @@ class ConfigMain {
     }
 
     clear() {
-        this.json_data = {};
+        this._initJsonData();
     }
 
     async load() {
-        this.json_data = null;
-        try {
-            await fsPromises.stat(this.config_path);
-        } catch (error) {
-            this.json_data = {};
-        }
-        if (this.json_data === null) {
-            try {
-                const data = await fsPromises.readFile(this.config_path, "utf-8");
-                this.json_data = JSON.parse(data);
-            } catch (error) {
-                error.readfile = true;
-                throw error;
-            }
-        }
+        this._initJsonData();
+        await fsPromises.stat(this.config_path);
+
+        const data = await fsPromises.readFile(this.config_path, "utf-8");
+        Object.assign(this.json_data, JSON.parse(data));
     }
 
     async save() {
+        delete this.json_data["app-setting-dir"];
         const json = JSON.stringify(this.json_data, null, "  ");
         await fsPromises.writeFile(this.config_path, json, "utf-8");
     }

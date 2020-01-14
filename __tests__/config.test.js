@@ -5,28 +5,28 @@ class TestConfigMain extends ConfigMain {
     setup(){}
 }
 
-test("getObj dot notation", t => {
+test("getObj json_data empty", t => {
     const cfg_main = new TestConfigMain();
     const json_data = {};
     t.is(cfg_main.getObj("test", json_data), undefined);
     t.deepEqual(json_data, {});
 });
 
-test("getObj dot notation2", t => {
+test("getObj json_data has obj", t => {
     const cfg_main = new TestConfigMain();
-    const json_data = {};
-    json_data["test"] = {value1:10, value2:"val2"};
+    const json_data = {test: {value1:10, value2:"val2", value3:{}}};
 
-    t.deepEqual(cfg_main.getObj("test", json_data), {value1:10, value2:"val2"});
+    t.deepEqual(cfg_main.getObj("test", json_data), {value1:10, value2:"val2", value3:{}});
     t.is(cfg_main.getObj("test.value1", json_data), 10);
     t.is(cfg_main.getObj("test.value2", json_data), "val2");
-    t.is(cfg_main.getObj("test.value3", json_data), undefined);
+    t.deepEqual(cfg_main.getObj("test.value3", json_data), {});
+    t.is(cfg_main.getObj("test.value4", json_data), undefined);
     t.is(cfg_main.getObj("test.value1.value1", json_data), undefined);
 
-    t.deepEqual(json_data, {test:{value1:10, value2:"val2"}});
+    t.deepEqual(json_data, {test:{value1:10, value2:"val2", value3:{}}});
 });
 
-test("setObj dot notation1", t => {
+test("setObj add", t => {
     const cfg_main = new TestConfigMain();
     const json_data = {};
 
@@ -47,4 +47,42 @@ test("setObj dot notation1", t => {
 
     cfg_main.setObj("test.value2", 6, json_data);
     t.deepEqual(json_data, {test:{value1:4, value2:6}});
+});
+
+test("setObj replace obj", t => {
+    const cfg_main = new TestConfigMain();
+    const json_data = {};
+
+    cfg_main.setObj("test", {value:1}, json_data);
+    t.deepEqual(json_data, {test:{value:1}});
+
+    cfg_main.setObj("test", {value:2}, json_data);
+    t.deepEqual(json_data, {test:{value:2}});
+
+    cfg_main.setObj("test.value1", {value:3}, json_data);
+    t.deepEqual(json_data, {test:{value:2, value1:{value:3}}});
+
+    cfg_main.setObj("test.value1", {value:4}, json_data);
+    t.deepEqual(json_data, {test:{value:2, value1:{value:4}}});
+
+    cfg_main.setObj("test.value2", {value:5}, json_data);
+    t.deepEqual(json_data, {test:{value:2, value1:{value:4}, value2:{value:5}}});
+
+    cfg_main.setObj("test.value2", {value:6}, json_data);
+    t.deepEqual(json_data, {test:{value:2, value1:{value:4}, value2:{value:6}}});
+});
+
+test("setObj replace num to obj, obj to num", t => {
+    const cfg_main = new TestConfigMain();
+    const json_data = {};
+
+    cfg_main.setObj("test", {value:1}, json_data);
+    t.deepEqual(json_data, {test:{value:1}});
+
+    cfg_main.setObj("test", 2, json_data);
+    t.deepEqual(json_data, {test:2});
+
+    cfg_main.setObj("test", {value:1}, json_data);
+    t.deepEqual(json_data, {test:{value:1}});
+
 });

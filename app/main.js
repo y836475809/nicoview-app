@@ -3,10 +3,10 @@ const fs = require("fs");
 const path = require("path");
 const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
-const { WindowStateStore } = require("./js/window-state-store");
 const { ConfigMain } = require("./js/config");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
+const config_main = new ConfigMain();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -16,9 +16,6 @@ let is_debug_mode = false;
 let do_app_quit = false;
 
 let player_html_path = `file://${__dirname}/html/player.html`;
-
-const window_store = new WindowStateStore(app.getPath("userData"));
-const config_main = new ConfigMain();
 
 const getWindowState = (w) => {
     const bounds = w.getBounds(); 
@@ -44,7 +41,7 @@ function createWindow() {
     }
 
     // ブラウザウィンドウの作成
-    const state = window_store.getState("main", { width: 1000, height: 600 });
+    const state = config_main.get("main.window.state", { width: 1000, height: 600 });
     state.webPreferences =  {
         nodeIntegration: true
     };
@@ -62,8 +59,6 @@ function createWindow() {
 
     win.on("close", async (e) => {
         if(do_app_quit){
-            window_store.setState("main", win);
-
             config_main.set("main.window.state", getWindowState(win));
             await config_main.save();
         }else{
@@ -82,13 +77,13 @@ function createWindow() {
         win = null;
 
         try {
-            window_store.save();
+            config_main.save();
         } catch (error) {
             console.log(error);
             await dialog.showMessageBox({
                 type: "error",
                 buttons: ["OK"],
-                message: `ウインドウ状態の保存失敗: ${error.message}`
+                message: `設定の保存失敗: ${error.message}`
             });
         }
     });
@@ -97,7 +92,7 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", async ()=>{
-    window_store.load();
+    // window_store.load();
 
     try {
         await config_main.load();
@@ -229,7 +224,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = window_store.getState("player", { width: 800, height: 600 });
+        const state = config_main.get("main.player.state", { width: 800, height: 600 });
         state.webPreferences =  {
             nodeIntegration: true
         };
@@ -243,7 +238,7 @@ const createPlayerWindow = () => {
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
-                window_store.setState("player", player_win);
+                config_main.set("player.window.state", getWindowState(player_win));
                 player_win = null;
             });
 

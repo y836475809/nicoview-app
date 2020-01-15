@@ -222,7 +222,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = config_main.get("main.player.state", { width: 800, height: 600 });
+        const state = config_main.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
             nodeIntegration: true
         };
@@ -231,7 +231,7 @@ const createPlayerWindow = () => {
             player_win.maximize();
         }
 
-        player_win.webContents.on("did-finish-load", () => {
+        ipcMain.once(IPC_CHANNEL.READY_PLAYER, (event, args) => {
             if(is_debug_mode){
                 player_win.webContents.openDevTools();
             }

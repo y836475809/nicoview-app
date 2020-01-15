@@ -15,6 +15,7 @@ const IPC_CHANNEL =  Object.freeze({
     CANCEL_UPDATE_DATA: "ipc-cancel-update-data",
 
     SHOW_PLAYER: "ipc-show-player",
+    READY_PLAYER: "ipc-ready-player",
     SET_COOKIE: "ipc-set-cookie",
     SET_PLAYER_PATH: "ipc-set-player-path",
 

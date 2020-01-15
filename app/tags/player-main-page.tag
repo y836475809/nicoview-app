@@ -39,11 +39,12 @@
 
     <script>
         /* globals rootRequire riot */
+        const path = require("path");
         const {remote} = require("electron");
         const { ipcRenderer } = require("electron");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         const { Menu, MenuItem } = remote;
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
         const { NicoPlay } = rootRequire("app/js/nico-play");
         const { CommentNG, CommentDisplayAmount } = rootRequire("app/js/comment-filter");
         const { toTimeSec } = rootRequire("app/js/time-format");
@@ -52,22 +53,14 @@
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
+        const config_renderer = new ConfigRenderer();
 
-        const comment_ng = new CommentNG(SettingStore.getSettingFilePath("nglist.json"));
-
+        let comment_ng = null;
         let nico_play = null;
 
         let org_video_size = null;
         let gutter = false;
         let gutter_move = false;
-
-        const pref_sync_comment = "player-sync-comment";
-        const pref_default_size = "player-default-size";
-        const pref_size = "player-size";
-        const pref_infoview_width = "player-infoview-width";
-
-        this.sync_comment_checked = SettingStore.getValue(pref_sync_comment, false);
-        this.player_default_size = SettingStore.getValue(pref_default_size, { width: 854 ,height: 480 });
 
         this.mousemove = (e) => {
             if(gutter){   
@@ -181,8 +174,8 @@
         let filter_comment_func = null; 
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
-            return (comment_ng) => {
-                const { do_limit } = SettingStore.getCommentParams();
+            return async (comment_ng) => {
+                const do_limit = await config_renderer.get("comment.do-limit", true);
                 if(do_limit===true){
                     const comment_display = new CommentDisplayAmount();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
@@ -193,7 +186,7 @@
             };
         };
 
-        const play_by_video_data = (video_data, viewinfo, comments, state) => { 
+        const play_by_video_data = async (video_data, viewinfo, comments, state) => { 
             
             if(!/mp4/.test(video_data.type)){
                 throw new Error(`${video_data.type}形式は再生できません`);
@@ -204,7 +197,7 @@
             const play_time_sec = toTimeSec(video.duration);
 
             filter_comment_func = filterCommentsFunc(comments, play_time_sec);
-            const filtered_comments = filter_comment_func(comment_ng);
+            const filtered_comments = await filter_comment_func(comment_ng);
 
             document.title = `${video.title}[${video.video_id}][${video.video_type}]`;            
             obs.trigger("player-controls:set-state", "play"); 
@@ -289,7 +282,7 @@
                     if (a.vpos > b.vpos) return 1;
                     return 0;
                 });
-                play_by_video_data(video_data, viewinfo, comments, state);
+                await play_by_video_data(video_data, viewinfo, comments, state);
 
                 this.obs_modal_dialog.trigger("close");       
             } catch (error) {
@@ -327,7 +320,7 @@
                         thumb_info: video_data.getThumbInfo()      
                     };      
                     const comments = video_data.getComments();
-                    play_by_video_data(video, viewinfo, comments, state);
+                    await play_by_video_data(video, viewinfo, comments, state);
                 }                   
             } catch (error) {
                 await showMessageBox("error", error.message);
@@ -384,11 +377,11 @@
             ipcRenderer.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
         });
 
-        obs.on("player-main-page:test-play-by-data", (arg) => {
+        obs.on("player-main-page:test-play-by-data", async (arg) => {
             cancelPlay();
 
             const { video_data, viewinfo, comments, state } = arg;
-            play_by_video_data(video_data, viewinfo, comments, state);
+            await play_by_video_data(video_data, viewinfo, comments, state);
         });
 
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
@@ -413,7 +406,7 @@
 
             const comments = video_data.getComments();              
             filter_comment_func = filterCommentsFunc(comments, play_time_sec);
-            const filtered_comments = filter_comment_func(comment_ng);
+            const filtered_comments = await filter_comment_func(comment_ng);
 
             obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
             obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
@@ -463,8 +456,14 @@
             obs.trigger("player-video:update-comment-display-params", args);
         });
 
-        this.on("mount", () => {
-            const vw = SettingStore.getValue(pref_infoview_width, 200);
+        this.on("mount", async () => {
+            const params = await config_renderer.get("player", {
+                "sync-comment": false,
+                "infoview-width": 200
+            }); 
+            this.player_default_size = { width: 854 ,height: 480 };
+            this.sync_comment_checked = params["sync-comment"];
+            const vw = params["infoview-width"];
             if(vw){
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
@@ -473,10 +472,13 @@
             }
 
             try {
+                comment_ng = new CommentNG(path.join(await config_renderer.get("data-dir"), "nglist.json"));
                 comment_ng.load();
             } catch (error) {
                 console.log("comment ng load error=", error);
             }
+
+            ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);
         });   
 
         let resize_begin = false;
@@ -499,17 +501,11 @@
         window.onbeforeunload = (e) => {
             cancelPlay();
 
-            const h = this.refs.player_frame.getTagsPanelHeight() 
-                    + this.refs.player_frame.getControlPanelHeight();
-            const pf_elm = document.getElementById("player-frame");
-            const width = pf_elm.offsetWidth;
-            const height = pf_elm.offsetHeight - h;
-
             const ve = document.getElementById("viewinfo-frame");  
-
-            SettingStore.setValue(pref_size, { width: width, height: height });
-            SettingStore.setValue(pref_infoview_width, parseInt(ve.offsetWidth));
-            SettingStore.setValue(pref_sync_comment, this.refs.viewinfo_frame.getSyncCommentChecked());
+            config_renderer.set("player", {
+                "sync-comment": this.refs.viewinfo_frame.getSyncCommentChecked(),
+                "infoview-width": parseInt(ve.offsetWidth)
+            });
         };
     </script>
 </player-main-page>

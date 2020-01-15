@@ -55,7 +55,7 @@
                 <input type="checkbox" class="schedule-enable-check" checked={this.enable} name="schedule-enable">
                 <div class="label">毎日</div>
                 <select class="hour-select">
-                    <option each={hour in hours} value={hour} selected={hour==hour}>{hour}</option>
+                    <option each={hour in hours} value={hour} selected={sc_hour==hour}>{hour}</option>
                 </select>
                 <div class="label"> : </div>
                 <select class="minute-select">

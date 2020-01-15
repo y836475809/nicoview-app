@@ -102,8 +102,13 @@ class ConfigMain {
 
     async load() {
         this._initJsonData();
-        await fsPromises.stat(this.config_path);
-
+        try {
+            await fsPromises.stat(this.config_path);
+        } catch (error) {
+            console.error(error);
+            return;
+        }
+        
         const data = await fsPromises.readFile(this.config_path, "utf-8");
         Object.assign(this.json_data, JSON.parse(data));
     }

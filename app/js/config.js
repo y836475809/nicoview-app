@@ -70,7 +70,11 @@ class ConfigMain {
             obj = obj[prop];
         }
         const prop = props[props.length-1];
-        obj[prop] = value;
+        if(typeof(obj[prop])=="object" && typeof(value)=="object"){
+            Object.assign(obj[prop], value);
+        }else{
+            obj[prop] = value;
+        }
     }
 
     get(key, default_value) {

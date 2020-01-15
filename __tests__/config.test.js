@@ -47,6 +47,9 @@ test("setObj add", t => {
 
     cfg_main.setObj("test.value2", 6, json_data);
     t.deepEqual(json_data, {test:{value1:4, value2:6}});
+    
+    cfg_main.setObj("test", {value3:7}, json_data);
+    t.deepEqual(json_data, {test:{value1:4, value2:6, value3:7}});
 });
 
 test("setObj replace obj", t => {

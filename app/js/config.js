@@ -82,6 +82,13 @@ class ConfigMain {
         if (value === null || value === undefined) {
             return default_value;
         }
+        if(typeof(default_value)=="object"){
+            for (const key in default_value) {
+                if (!value.hasOwnProperty(key)) {
+                    value[key] = default_value[key];
+                }
+            }
+        }
         return value;
     }
 

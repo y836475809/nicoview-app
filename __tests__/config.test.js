@@ -12,6 +12,20 @@ test("getObj json_data empty", t => {
     t.deepEqual(json_data, {});
 });
 
+test("get default value", t => {
+    const cfg_main = new TestConfigMain();
+    
+    cfg_main.json_data = {};
+    t.deepEqual(cfg_main.get("test", 
+        {value1:20, value2:"val2", value3:{}}), {value1:20, value2:"val2", value3:{}}
+    );
+
+    cfg_main.json_data = {test:{value1:10}};
+    t.deepEqual(cfg_main.get("test", 
+        {value1:20, value2:"val2", value3:{}}), {value1:10, value2:"val2", value3:{}}
+    );
+});
+
 test("getObj json_data has obj", t => {
     const cfg_main = new TestConfigMain();
     const json_data = {test: {value1:10, value2:"val2", value3:{}}};

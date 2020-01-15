@@ -323,6 +323,7 @@
                     await play_by_video_data(video, viewinfo, comments, state);
                 }                   
             } catch (error) {
+                console.error(error);
                 await showMessageBox("error", error.message);
             }
         }; 

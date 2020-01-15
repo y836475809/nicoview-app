@@ -70,25 +70,21 @@
         const EventEmitter = require("events");
         const { remote } = require("electron");
         const { Menu } = remote;
-        const { SettingStore } = rootRequire("app/js/setting-store");
         const { NicoDownloader } = rootRequire("app/js/nico-downloader");
         const { GridTableDownloadItem } = rootRequire("app/js/gridtable-downloaditem");
         const { ScheduledTask } = rootRequire("app/js/scheduled-task");
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
 
         const obs_trigger = new obsTrigger(obs);
         const main_store = storex.get("main");
+        const config_renderer = new ConfigRenderer();
 
-        const download_dir = SettingStore.getDownloadDir();
-
-        const donwload_schedule = {
-            date: SettingStore.getValue("donwload-schedule-date", {hour:0, minute:0}),
-            enable: SettingStore.getValue("donwload-schedule-enable", false)
-        };
+        let donwload_schedule = null;
 
         const updateDonwloadScheduleLabel = () =>{
             const enable = donwload_schedule.enable;
@@ -183,9 +179,10 @@
             const enable = donwload_schedule.enable;
             this.refs["schedule-dialog"].showModal(date, enable, result=>{
                 if(result.type=="ok"){
-                    SettingStore.setValue("donwload-schedule-date", result.date);
-                    SettingStore.setValue("donwload-schedule-enable", result.enable);
-
+                    config_renderer.set("donwload.schedule", {
+                        date:result.date,
+                        enable:result.enable
+                    });
                     donwload_schedule.date = result.date;
                     donwload_schedule.enable = result.enable;
                     
@@ -288,6 +285,8 @@
         };
 
         const startDownload = async() => {
+            // TODO check exist download_dir
+            const download_dir = await config_renderer.get("download_dir", "");
             event_em.emit("donwload-start");
             try {
                 cancel_donwload = false;
@@ -400,6 +399,11 @@
         });
 
         this.on("mount", async () => {
+            donwload_schedule = await config_renderer.get("donwload.schedule", {
+                date: {hour:0, minute:0},
+                enable: false
+            });
+
             grid_table_dl = new GridTableDownloadItem(
                 this.root.querySelector(".download-grid"), htmlFormatter);
             

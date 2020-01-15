@@ -48,33 +48,38 @@
     </div>
     <script>
         /* globals rootRequire */
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
+
+        const config_renderer = new ConfigRenderer();
 
         const obs_dialog = this.opts.obs;
 
         this.duration_items = [3, 4, 5];
         this.fps_items = [10, 60];
+        const default_params = {
+            duration_sec: 4,
+            fps: 10,
+            do_limit: true
+        }
 
-        const changeParams = (name, value) => {
-            const params = SettingStore.getCommentParams();
+        const changeParams = async (name, value) => {
+            const params = await config_renderer.get("comment", default_params);
             params[name] = value;
-            SettingStore.setCommentParams(params);
+            config_renderer.set(`comment.${name}`, value);
             obs_dialog.trigger("player-main-page:update-comment-display-params", params);
         };
 
-        this.onchangeDuration = (item, e) => {
-            changeParams("duration_sec", item);
+        this.onchangeDuration = async (item, e) => {
+            await changeParams("duration_sec", parseInt(item));
         };
 
-        this.onchangeFPS = (item, e) => {
-            changeParams("fps", item);
+        this.onchangeFPS = async (item, e) => {
+            await changeParams("fps", parseInt(item));
         };
 
         this.onclickLimitCommentCheck = (e) => {
             const do_limit = e.target.checked;
-            const params = SettingStore.getCommentParams();
-            params["do_limit"] = do_limit;
-            SettingStore.setCommentParams(params);
+            config_renderer.set("comment.do_limit", do_limit);
             obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
         };
 
@@ -84,8 +89,8 @@
             elms[index].checked = true;
         };
 
-        this.on("mount", () => {
-            const params = SettingStore.getCommentParams();
+        this.on("mount", async () => {
+            const params = await config_renderer.get("comment", default_params);
             setup("duration", this.duration_items, params.duration_sec);
             setup("fps", this.fps_items, params.fps);
 

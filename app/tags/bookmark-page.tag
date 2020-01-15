@@ -66,12 +66,13 @@
 
     <script>
         /* globals rootRequire riot */
+        const path = require("path");
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = rootRequire("app/js/json-store");
-        const { SettingStore } = rootRequire("app/js/setting-store");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
         const obs_trigger = new obsTrigger(obs);
@@ -80,9 +81,10 @@
         this.storname = "bookmark";
         const store = storex.get(this.storname);
         const main_store = storex.get("main");
+        const config_renderer = new ConfigRenderer();
 
-        this.on("mount", () => {
-            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+        this.on("mount", async () => {
+            const file_path = path.join(await config_renderer.get("data_dir"), `${this.storname}.json`);
             try {
                 this.json_store = new JsonStore(file_path);
                 const items = this.json_store.load();

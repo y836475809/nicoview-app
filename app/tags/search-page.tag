@@ -22,18 +22,20 @@
 
     <script>
         /* globals rootRequire riot */
+        const path = require("path");
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = rootRequire("app/js/json-store");
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
         this.storname = "nico-search";
         const store = storex.get(this.storname);
+        const config_renderer = new ConfigRenderer();
     
-        this.on("mount", () => {
-            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+        this.on("mount", async () => {
+            const file_path = path.join(await config_renderer.get("data_dir"), `${this.storname}.json`);
             try {
                 this.json_store = new JsonStore(file_path);
                 const items = this.json_store.load();

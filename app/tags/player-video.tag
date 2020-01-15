@@ -28,15 +28,15 @@
     <script>
         /* globals rootRequire */
         const { CommentTimeLine, NicoScript } = rootRequire("app/js/comment-timeline");
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
-
-        const comment_params = SettingStore.getCommentParams();
+        const config_renderer = new ConfigRenderer();
 
         let video_elm = null;
         let play_data = null;
         let comment_tl = null;
+        let comment_params = null;
 
         const createTimeLine = (comments)=>{
             const row_num = 12;
@@ -84,7 +84,9 @@
             video_elm.load();
         });
 
-        this.on("mount", function () {
+        this.on("mount", async () => {
+            comment_params = await config_renderer.get("comment", null);
+
             video_elm = this.root.querySelector("#player");
 
             video_elm.addEventListener("loadedmetadata", (event) => {

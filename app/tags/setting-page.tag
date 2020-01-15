@@ -106,7 +106,7 @@
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            config_renderer.set("data-dir", dir);  
+            config_renderer.set("data_dir", dir);  
         };
 
         this.onclickSelectDownloadDir = async e => {
@@ -115,11 +115,11 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            config_renderer.set("download-dir", dir);
+            config_renderer.set("download_dir", dir);
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await config_renderer.get("app-setting-dir", "");
+            const dir = await config_renderer.get("app_setting_dir", "");
             shell.openItem(dir);
         };
 
@@ -129,7 +129,7 @@
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            config_renderer.set("ffmpeg-path", file_path);
+            config_renderer.set("ffmpeg_path", file_path);
         };
 
         const setInputValue = (selector, value) => {          
@@ -138,10 +138,10 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await config_renderer.get("app-setting-dir", ""));  
-            setInputValue(".data-dir-input", await config_renderer.get("data-dir", ""));  
-            setInputValue(".download-dir-input", await config_renderer.get("download-dir", ""));
-            setInputValue(".ffmpeg-path-input", await config_renderer.get("ffmpeg-path", ""));
+            setInputValue(".app-setting-dir-input", await config_renderer.get("app_setting_dir", ""));  
+            setInputValue(".data-dir-input", await config_renderer.get("data_dir", ""));  
+            setInputValue(".download-dir-input", await config_renderer.get("download_dir", ""));
+            setInputValue(".ffmpeg-path-input", await config_renderer.get("ffmpeg_path", ""));
         });
 
         const importNNDDDB = async (sqlite_file_path)=>{
@@ -166,7 +166,7 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
-                const data_path = await config_renderer.get("data-dir", "");
+                const data_path = await config_renderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
                 await main_store.action("setLibraryData", data_path, dir_list, video_list);
 

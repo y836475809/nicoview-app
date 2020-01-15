@@ -175,7 +175,7 @@
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
             return async (comment_ng) => {
-                const do_limit = await config_renderer.get("comment.do-limit", true);
+                const do_limit = await config_renderer.get("comment.do_limit", true);
                 if(do_limit===true){
                     const comment_display = new CommentDisplayAmount();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
@@ -459,8 +459,8 @@
 
         this.on("mount", async () => {
             const params = await config_renderer.get("player", {
-                "sync-comment": false,
-                "infoview-width": 200
+                sync_comment: false,
+                infoview_width: 200
             }); 
             this.player_default_size = { width: 854 ,height: 480 };
             this.sync_comment_checked = params["sync-comment"];
@@ -473,7 +473,7 @@
             }
 
             try {
-                comment_ng = new CommentNG(path.join(await config_renderer.get("data-dir"), "nglist.json"));
+                comment_ng = new CommentNG(path.join(await config_renderer.get("data_dir"), "nglist.json"));
                 comment_ng.load();
             } catch (error) {
                 console.log("comment ng load error=", error);
@@ -504,8 +504,8 @@
 
             const ve = document.getElementById("viewinfo-frame");  
             config_renderer.set("player", {
-                "sync-comment": this.refs.viewinfo_frame.getSyncCommentChecked(),
-                "infoview-width": parseInt(ve.offsetWidth)
+                sync_comment: this.refs.viewinfo_frame.getSyncCommentChecked(),
+                infoview_width: parseInt(ve.offsetWidth)
             });
         };
     </script>

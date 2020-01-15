@@ -40,7 +40,7 @@ class ConfigMain {
 
     _initJsonData(){
         this.json_data = {};
-        this.json_data["app-setting-dir"] = app.getPath("userData");
+        this.json_data["app_setting_dir"] = app.getPath("userData");
     }
 
     getObj(key, json_data){
@@ -109,23 +109,23 @@ class ConfigMain {
     }
 
     async save() {
-        delete this.json_data["app-setting-dir"];
+        delete this.json_data["app_setting_dir"];
         const json = JSON.stringify(this.json_data, null, "  ");
         await fsPromises.writeFile(this.config_path, json, "utf-8");
     }
 
     async configFolder() {
-        const data_dir = await this._selectFolder(this.json_data["data-dir"], "データを保存するフォルダの選択");
+        const data_dir = await this._selectFolder(this.json_data["data_dir"], "データを保存するフォルダの選択");
         if (data_dir === undefined) {
             throw new Error("データを保存するフォルダが選択されていない");
         }
-        this.json_data["data-dir"] = data_dir;
+        this.json_data["data_dir"] = data_dir;
 
-        const download_dir = await this._selectFolder(this.json_data["download-dir"], "動画を保存するフォルダの選択");
+        const download_dir = await this._selectFolder(this.json_data["download_dir"], "動画を保存するフォルダの選択");
         if (download_dir === undefined) {
             throw new Error("動画を保存するフォルダが選択されていない");
         }
-        this.json_data["download-dir"] = download_dir;
+        this.json_data["download_dir"] = download_dir;
     }
 
     async _checkDir(dir) {

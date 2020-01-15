@@ -1,9 +1,12 @@
 require("slickgrid/lib/jquery.event.drag-2.3.0");
 require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
+const path = require("path");
 const { GridTable } = require("./gridtable");
-const { SettingStore } = require("./setting-store");
 const { DownloadItemStore } = require("./download-item-store");
+const { ConfigRenderer } = require("./config");
+
+const config_renderer = new ConfigRenderer();
 
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
     const video_id = dataContext.id;
@@ -96,9 +99,7 @@ class GridTableDownloadItem {
         this.grid_table.grid.registerPlugin(moveRowsPlugin); 
     }
 
-    init(on_context_menu, on_dbl_click){
-        this.store = new DownloadItemStore(SettingStore.getSettingFilePath("download.json"));
-
+    async init(on_context_menu, on_dbl_click){
         this.grid_table.onContextMenu((e)=>{
             on_context_menu(e);
         });
@@ -107,6 +108,8 @@ class GridTableDownloadItem {
             on_dbl_click(e, data);
         });
 
+        const file_path = path.join(await config_renderer.get("data_dir"), "download.json");
+        this.store = new DownloadItemStore(file_path);
         this.store.load(); 
         this.grid_table.setData(this.store.getItems());
         this.grid_table.dataView.setFilter((item)=>{

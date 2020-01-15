@@ -399,13 +399,13 @@
             deleteDownloadItems(video_ids);
         });
 
-        this.on("mount", () => {
+        this.on("mount", async () => {
             grid_table_dl = new GridTableDownloadItem(
                 this.root.querySelector(".download-grid"), htmlFormatter);
             
             const context_menu = createMenu();
             try {
-                grid_table_dl.init((e)=>{
+                await grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
                     obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, data.id); 

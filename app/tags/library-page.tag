@@ -18,18 +18,20 @@
 
     <script>
         /* globals rootRequire riot */
+        const path = require("path");
         const {remote} = require("electron");
         const {Menu} = remote;
         const JsonStore = rootRequire("app/js/json-store");
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
         this.obs_search = riot.observable();
         this.storname = "library-search";
         const store = storex.get(this.storname);
+        const config_renderer = new ConfigRenderer();
 
-        this.on("mount", () => {
-            const file_path = SettingStore.getSettingFilePath(`${this.storname}.json`);
+        this.on("mount", async () => {
+            const file_path = path.join(await config_renderer.get("data_dir"), `${this.storname}.json`);
             try {
                 this.json_store = new JsonStore(file_path);
                 const items = this.json_store.load();
@@ -166,17 +168,18 @@
         const {remote} = require("electron");
         const {Menu, MenuItem} = remote;
         const { GridTable } = rootRequire("app/js/gridtable");
-        const { SettingStore } = rootRequire("app/js/setting-store");
         const { NicoUpdate } = rootRequire("app/js/nico-update");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { showMessageBox, showOKCancelBox } = rootRequire("app/js/remote-dialogs");
         const { ConvertMP4, needConvertVideo } = rootRequire("app/js/video-converter");
         const { NicoVideoData } = rootRequire("app/js/nico-data-file");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
+        const config_renderer = new ConfigRenderer();
 
         main_store.change("libraryInitialized", async (state, store) => {
             const items = await store.action("getLibraryItems");
@@ -376,7 +379,7 @@
             try {
                 const video_item = await main_store.action("getLibraryItem", video_id);
                 const video_data = new NicoVideoData(video_item);
-                const ffmpeg_path = SettingStore.getValue("ffmpeg-path", "");
+                const ffmpeg_path = await config_renderer.get("ffmpeg_path", "");
 
                 const cnv_mp4 = new ConvertMP4();
 
@@ -516,7 +519,7 @@
             resizeGridTable();
             
             try {
-                await main_store.action("loadLibrary", SettingStore.getSettingDir());
+                await main_store.action("loadLibrary", await config_renderer.get("data_dir"));
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);

@@ -155,7 +155,7 @@ class NicoMylistStore {
     }
 
     _getFilePath(mylist_id){
-        const dir = this.get_dir_path();
+        const dir = this.get_dir_path;
         return path.join(dir, `mylist${mylist_id}.xml`);
     }
 }

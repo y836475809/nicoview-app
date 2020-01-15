@@ -421,7 +421,7 @@
             console.log("player main prog_dialog.close update video_id=", video_id);
         });
 
-        obs.on("player-main-page:add-comment-ng", (args) => {
+        obs.on("player-main-page:add-comment-ng", async (args) => {
             comment_ng.addNG(args);
             try {
                 comment_ng.save();
@@ -429,12 +429,12 @@
                 console.log("error comment_ng: ", error);
             }
 
-            const comments = filter_comment_func(comment_ng);
+            const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
-        obs.on("player-main-page:delete-comment-ng", (args) => {
+        obs.on("player-main-page:delete-comment-ng", async (args) => {
             comment_ng.deleteNG(args);
             try {
                 comment_ng.save();
@@ -442,13 +442,13 @@
                 console.log("error comment_ng: ", error);
             }
 
-            const comments = filter_comment_func(comment_ng);
+            const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });
 
-        obs.on("player-main-page:update-comment-display-limit", (args) => {
-            const comments = filter_comment_func(comment_ng);
+        obs.on("player-main-page:update-comment-display-limit", async (args) => {
+            const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-viewinfo-page:update-comments", comments);
         });

@@ -34,11 +34,10 @@
 
     <script>
         /* globals rootRequire */
-        const { SettingStore } = rootRequire("app/js/setting-store");
+        const { ConfigRenderer } = rootRequire("app/js/config");
 
+        const config_renderer = new ConfigRenderer();
         const obs = this.opts.obs; 
-        
-        const pref_volume_key = "player-volume";
 
         this.picker_mousedown = (e) => {
             let picker = this.root.querySelector("div.picker");
@@ -59,19 +58,18 @@
 
             let slider = this.root.querySelector("div.slider");
             const volume = pos / slider.clientWidth;
-
-            SettingStore.setValue(pref_volume_key, volume);
+            config_renderer.set("player.volume", volume);
 
             obs.trigger("player-video:volume-changed", volume); 
         };
 
-        this.on("mount", ()=> {
+        this.on("mount", async ()=> {
             let picker = this.root.querySelector("div.picker");
             let slider = this.root.querySelector("div.slider");   
-            const player_volume = SettingStore.getValue(pref_volume_key, 0.5);
-            picker.style.left = player_volume * slider.clientWidth - 5 + "px";
-            
-            obs.trigger("player-video:volume-changed", player_volume); 
+            const volume = await config_renderer.get("player.volume", 0.5);
+            picker.style.left = volume * slider.clientWidth - 5 + "px";
+
+            obs.trigger("player-video:volume-changed", volume); 
         });
     </script>
 </player-volume>

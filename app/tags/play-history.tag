@@ -27,6 +27,8 @@
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
+        const { ipcRenderer } = require("electron");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         
@@ -117,8 +119,9 @@
             }
         });
 
-        obs.on("history-page:add-item", (item)=> {
-            history_store.add(item);
+        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args)=>{
+            const { history_item } = args;
+            history_store.add(history_item);
             grid_table.setData(history_store.getItems());
         });
     </script>

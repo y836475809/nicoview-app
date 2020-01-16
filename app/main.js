@@ -4,9 +4,11 @@ const path = require("path");
 const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
+const { myliib } = require("./js/library");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 const config_main = new ConfigMain();
+const my_lib = new myliib();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -131,6 +133,40 @@ app.on("ready", async ()=>{
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, args);
         return true;
     });
+    
+    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, async (event, args) => {
+        await createPlayerWindow();
+        player_win.show();
+
+        const {video_id, time} = args;
+        const video_item = my_lib.getLibraryItem({video_id});
+        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
+            video_id,
+            video_item,
+            time
+        });
+    });
+
+    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
+        await createPlayerWindow();
+        player_win.show();
+
+        const {video_id, time} = args;
+        if(my_lib.existLibraryItem(video_id)){
+            const video_item = my_lib.getLibraryItem({video_id});
+            player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
+                video_id,
+                video_item,
+                time
+            });
+        }else{
+            player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                video_id:video_id,
+                video_item:null,
+                time:time
+            });
+        }
+    });
 
     ipcMain.handle(IPC_CHANNEL.GET_VIDEO_ITEM, async (event, args) => {
         const video_id = args;
@@ -161,6 +197,19 @@ app.on("ready", async ()=>{
 
     ipcMain.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args) => {
         win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
+
+        const { history_item } = args;
+        const video_id = history_item.id;
+        const video_item = my_lib.getLibraryItem({video_id});
+        if(video_item===null){
+            return;
+        }
+       
+        const props = { 
+            last_play_date : new Date().getTime(),
+            play_count : video_item.play_count + 1
+        };
+        my_lib.updateLibrary({video_id, props});
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
@@ -198,6 +247,15 @@ app.on("ready", async ()=>{
     ipcMain.on(IPC_CHANNEL.APP_CLOSE, (event, args) => {
         do_app_quit = true;
         app.quit();
+    });
+
+    my_lib.on("libraryInitialized", ()=>{  
+        win.webContents.send("libraryInitialized", {
+            items:my_lib.getLibraryItems()
+        });
+    });
+    my_lib.on("libraryItemUpdated", (args)=>{  
+        win.webContents.send("libraryItemUpdated", args);
     });
 });
 

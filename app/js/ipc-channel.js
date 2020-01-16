@@ -1,6 +1,8 @@
 
 const IPC_CHANNEL =  Object.freeze({   
     PLAY_BY_VIDEO_ID: "ipc-play-by-video-id",
+    PLAY_BY_VIDEO_DATA: "ipc-play-by-video-data",
+    PLAY_BY_VIDEO_ONLINE: "ipc-play-by-video-online",
     GET_VIDEO_ITEM: "ipc-get-videoitem-data",
     GET_VIDEO_ITEM_REPLY: "ipc-get-videoitem-reply",
 

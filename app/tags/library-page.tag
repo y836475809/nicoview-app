@@ -165,7 +165,7 @@
 
     <script>
         /* globals rootRequire */
-        const {remote} = require("electron");
+        const {remote, ipcRenderer} = require("electron");
         const {Menu, MenuItem} = remote;
         const { GridTable } = rootRequire("app/js/gridtable");
         const { NicoUpdate } = rootRequire("app/js/nico-update");
@@ -175,29 +175,30 @@
         const { ConvertMP4, needConvertVideo } = rootRequire("app/js/video-converter");
         const { NicoVideoData } = rootRequire("app/js/nico-data-file");
         const { ConfigRenderer } = rootRequire("app/js/config");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
         const config_renderer = new ConfigRenderer();
 
-        main_store.change("libraryInitialized", async (state, store) => {
-            const items = await store.action("getLibraryItems");
-            const library_items = items.map(value=>{
-                const video_data = new NicoVideoData(value);
-                value.thumb_img = video_data.getThumbImgPath();
-                value.tags = value.tags ? value.tags.join(" ") : "";
-                return value;
-            });
-            loadLibraryItems(library_items);
-        });
+        // main_store.change("libraryInitialized", async (state, store) => {
+        //     const items = await store.action("getLibraryItems");
+        //     const library_items = items.map(value=>{
+        //         const video_data = new NicoVideoData(value);
+        //         value.thumb_img = video_data.getThumbImgPath();
+        //         value.tags = value.tags ? value.tags.join(" ") : "";
+        //         return value;
+        //     });
+        //     loadLibraryItems(library_items);
+        // });
 
-        main_store.change("libraryItemUpdated", async (state, store, video_id, props) => {
-            console.log("libraryItemUpdated video_id=", video_id, " props=", props);
+        // main_store.change("libraryItemUpdated", async (state, store, video_id, props) => {
+        //     console.log("libraryItemUpdated video_id=", video_id, " props=", props);
 
-            props.tags = props.tags ? props.tags.join(" ") : "";
-            grid_table.updateCells(video_id, props);
-        });
+        //     props.tags = props.tags ? props.tags.join(" ") : "";
+        //     grid_table.updateCells(video_id, props);
+        // });
 
         main_store.change("libraryItemAdded", async (state, store, video_id) => {
             const item = await store.action("getLibraryItem", video_id);
@@ -205,6 +206,25 @@
             item.thumb_img = video_data.getThumbImgPath();
             item.tags = item.tags ? item.tags.join(" ") : "";
             grid_table.updateItem(item, video_id);
+        });
+
+        ipcRenderer.on("libraryItemUpdated", (event, args) => {
+            const {video_id, props} = args;
+            console.log("libraryItemUpdated video_id=", video_id, " props=", props);
+
+            props.tags = props.tags ? props.tags.join(" ") : "";
+            grid_table.updateCells(video_id, props);
+        });
+
+        ipcRenderer.on("libraryInitialized", (event, args) =>{
+            const {items} = args;
+            const library_items = items.map(value=>{
+                const video_data = new NicoVideoData(value);
+                value.thumb_img = video_data.getThumbImgPath();
+                value.tags = value.tags ? value.tags.join(" ") : "";
+                return value;
+            });
+            loadLibraryItems(library_items);
         });
 
         const obs_trigger = new obsTrigger(obs);
@@ -500,7 +520,11 @@
                     }
                     await convertVideo(this, video_id);
                 }else{
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    const time = 0;
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
+                        video_id,
+                        time
+                    });
                 }
             });
             
@@ -519,7 +543,11 @@
             resizeGridTable();
             
             try {
-                await main_store.action("loadLibrary", await config_renderer.get("data_dir"));
+                const data_dir = await config_renderer.get("data_dir");
+                await ipcRenderer.invoke("ipc-data-get-value", {
+                    name:"loadLibrary",
+                    args: {data_dir}
+                });
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -534,7 +562,10 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await main_store.action("getLibraryItem", video_id);
+            const video_item = await ipcRenderer.invoke("ipc-data-get-value", {
+                name:"getLibraryItem",
+                args: {video_id}
+            });
             if(video_item===null){
                 return;
             }

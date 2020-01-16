@@ -223,12 +223,6 @@
             this.obs.trigger("download-page:add-download-items", [item]);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args)=>{
-            const item = args;
-            this.obs.trigger("history-page:add-item", item);
-            this.obs.trigger("library-page:play", item);
-        });
-
         ipcRenderer.on(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
             const { video_id, update_target } = args;
 

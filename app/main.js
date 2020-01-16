@@ -68,7 +68,7 @@ function createWindow() {
             return;
         }
 
-        const ret = await dialog.showMessageBox({
+        const ret = dialog.showMessageBoxSync({
             type: "info", 
             buttons: ["OK", "Cancel"],
             message:"終了しますか?"
@@ -78,29 +78,29 @@ function createWindow() {
             e.preventDefault();
             return;
         }
-        
+
         try {
-            await my_lib.saveLibrary();
+            config_main.set("main.window.state", getWindowState(win));
+            await config_main.save();
         } catch (error) {
-            const ret = await dialog.showMessageBox({
+            const ret = dialog.showMessageBoxSync({
                 type: "error",
                 buttons: ["OK", "Cancel"],
-                message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
+                message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
             });
             if(ret==0){
                 // OK, 終了する
                 return;
             }
         }
-
+        
         try {
-            config_main.set("main.window.state", getWindowState(win));
-            await config_main.save();
+            await my_lib.saveLibrary();
         } catch (error) {
-            const ret = await dialog.showMessageBox({
+            const ret = dialog.showMessageBoxSync({
                 type: "error",
                 buttons: ["OK", "Cancel"],
-                message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
+                message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
             });
             if(ret==0){
                 // OK, 終了する

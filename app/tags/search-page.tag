@@ -208,7 +208,6 @@
         const { NicoSearchParams, NicoSearch } = rootRequire("app/js/nico-search");
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { DataRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
@@ -236,8 +235,6 @@
             item.saved = true;
             grid_table.dataView.updateItem(video_id, item);
         });
-
-        const obs_trigger = new obsTrigger(obs);
 
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },

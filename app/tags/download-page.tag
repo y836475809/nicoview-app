@@ -75,14 +75,11 @@
         const { ScheduledTask } = rootRequire("app/js/scheduled-task");
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { DataRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
-
-        const obs_trigger = new obsTrigger(obs);
         const main_store = storex.get("main");
 
         let donwload_schedule = null;

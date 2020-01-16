@@ -56,12 +56,9 @@
         const { Menu } = remote;
         const { BookMark } = rootRequire("app/js/bookmark");
         const { getNicoURL } = rootRequire("app/js/niconico");       
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         
         const obs = this.opts.obs; 
-
-        const obs_trigger = new obsTrigger(obs);
 
         let tags_height = 0;
         let controls_height = 0;
@@ -172,7 +169,10 @@
                                 time: 0
                             }); 
                         }else{
-                            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+                            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                                video_id: video_id,
+                                time: 0
+                            });
                         }
                     }
                 },

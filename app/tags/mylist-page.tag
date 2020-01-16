@@ -156,7 +156,6 @@
         const { NicoMylist, NicoMylistStore } = rootRequire("app/js/nico-mylist");
         const { CacheStore } = rootRequire("app/js/cache-store");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { needConvertVideo } = rootRequire("app/js/video-converter");
         const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
         const { ConfigRenderer } = rootRequire("app/js/config");
@@ -188,8 +187,6 @@
             grid_table.dataView.updateItem(video_id, item);
         });
  
-
-        const obs_trigger = new obsTrigger(obs);
 
         this.mylist_description = "";
 

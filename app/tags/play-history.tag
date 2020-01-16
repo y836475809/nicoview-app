@@ -25,15 +25,12 @@
         const { GridTable } = rootRequire("app/js/gridtable");
         const HistoryStore = rootRequire("app/js/history-store");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { ipcRenderer } = require("electron");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         
-        const obs_trigger = new obsTrigger(obs);
-
         let history_store = null;
         const row_img_width = 130/2;
         const row_hight = 100/2;

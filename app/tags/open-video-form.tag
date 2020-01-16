@@ -51,18 +51,20 @@
 
     <script>
         /* globals rootRequire */
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { ipcRenderer } = require("electron");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
-
-        const obs_trigger = new obsTrigger(obs);
 
         this.video_id_form_display = "open-form-none";
 
         const playByVideoID = () => {
             const elm = this.root.querySelector(".open-form input");
             const video_id = elm.value;
-            obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                video_id: video_id,
+                time: 0
+            }); 
         }
 
         this.onkeydownPlay = (e) => {

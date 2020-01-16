@@ -71,13 +71,11 @@
         const {Menu} = remote;
         const JsonStore = rootRequire("app/js/json-store");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { DataRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
-        const obs_trigger = new obsTrigger(obs);
         this.obs_bookmark = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";

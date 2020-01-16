@@ -169,7 +169,6 @@
         const { GridTable } = rootRequire("app/js/gridtable");
         const { NicoUpdate } = rootRequire("app/js/nico-update");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { showMessageBox, showOKCancelBox } = rootRequire("app/js/remote-dialogs");
         const { ConvertMP4, needConvertVideo } = rootRequire("app/js/video-converter");
         const { NicoVideoData } = rootRequire("app/js/nico-data-file");
@@ -208,8 +207,6 @@
             });
             loadLibraryItems(library_items);
         });
-
-        const obs_trigger = new obsTrigger(obs);
 
         this.num_items = 0;
         this.num_filtered_items = 0;

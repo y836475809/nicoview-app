@@ -85,8 +85,12 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await config_renderer.get("comment", null);
-
+            comment_params = await config_renderer.get("comment", {
+                duration_sec: 4,
+                fps: 10,
+                do_limit: true
+            });
+            
             video_elm = this.root.querySelector("#player");
 
             video_elm.addEventListener("loadedmetadata", (event) => {

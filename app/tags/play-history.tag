@@ -33,7 +33,6 @@
         const obs = this.opts.obs; 
         
         const obs_trigger = new obsTrigger(obs);
-        const config_renderer = new ConfigRenderer();
 
         let history_store = null;
         const row_img_width = 130/2;
@@ -118,7 +117,7 @@
             resizeGridTable();
 
             try {
-                const history_file_path = path.join(await config_renderer.get("data_dir"), "history.json");
+                const history_file_path = path.join(await ConfigRenderer.get("data_dir"), "history.json");
                 history_store = new HistoryStore(history_file_path, 50);
                 history_store.load(); 
                 grid_table.setData(history_store.getItems());

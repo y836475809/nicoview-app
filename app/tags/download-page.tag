@@ -84,7 +84,6 @@
 
         const obs_trigger = new obsTrigger(obs);
         const main_store = storex.get("main");
-        const config_renderer = new ConfigRenderer();
 
         let donwload_schedule = null;
 
@@ -181,7 +180,7 @@
             const enable = donwload_schedule.enable;
             this.refs["schedule-dialog"].showModal(date, enable, result=>{
                 if(result.type=="ok"){
-                    config_renderer.set("donwload.schedule", {
+                    ConfigRenderer.set("donwload.schedule", {
                         date:result.date,
                         enable:result.enable
                     });
@@ -294,7 +293,7 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await config_renderer.get("download.dir", "");
+            const download_dir = await ConfigRenderer.get("download.dir", "");
             event_em.emit("donwload-start");
             try {
                 cancel_donwload = false;
@@ -406,7 +405,7 @@
         });
 
         this.on("mount", async () => {
-            donwload_schedule = await config_renderer.get("donwload.schedule", {
+            donwload_schedule = await ConfigRenderer.get("donwload.schedule", {
                 date: {hour:0, minute:0},
                 enable: false
             });

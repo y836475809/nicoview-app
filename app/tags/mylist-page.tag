@@ -28,10 +28,9 @@
         this.obs_accordion = riot.observable();
         this.storname = "mylist";
         const store = storex.get(this.storname);
-        const config_renderer = new ConfigRenderer();
 
         this.on("mount", async () => {
-            const file_path = path.join(await config_renderer.get("data_dir"), `${this.storname}.json`);
+            const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
             try {
                 this.json_store = new JsonStore(file_path);
                 const items = this.json_store.load();
@@ -167,7 +166,6 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
-        const config_renderer = new ConfigRenderer();
  
         main_store.change("downloadItemChanged", async (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
@@ -347,7 +345,7 @@
 
         // TODO
         this.on("mount", async () => {
-            const mylist_dir = path.join(await config_renderer.get("data_dir", ""), "mylist");
+            const mylist_dir = path.join(await ConfigRenderer.get("data_dir", ""), "mylist");
             image_cache = new CacheStore(mylist_dir, "image-cache.json");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
 

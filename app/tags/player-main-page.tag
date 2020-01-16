@@ -53,7 +53,6 @@
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
-        const config_renderer = new ConfigRenderer();
 
         let comment_ng = null;
         let nico_play = null;
@@ -175,7 +174,7 @@
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
             return async (comment_ng) => {
-                const do_limit = await config_renderer.get("comment.do_limit", true);
+                const do_limit = await ConfigRenderer.get("comment.do_limit", true);
                 if(do_limit===true){
                     const comment_display = new CommentDisplayAmount();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
@@ -449,7 +448,7 @@
         });
 
         this.on("mount", async () => {
-            const params = await config_renderer.get("player", {
+            const params = await ConfigRenderer.get("player", {
                 sync_comment: false,
                 infoview_width: 200
             }); 
@@ -464,7 +463,7 @@
             }
 
             try {
-                comment_ng = new CommentNG(path.join(await config_renderer.get("data_dir"), "nglist.json"));
+                comment_ng = new CommentNG(path.join(await ConfigRenderer.get("data_dir"), "nglist.json"));
                 comment_ng.load();
             } catch (error) {
                 console.log("comment ng load error=", error);
@@ -494,7 +493,7 @@
             cancelPlay();
 
             const ve = document.getElementById("viewinfo-frame");  
-            config_renderer.set("player", {
+            ConfigRenderer.set("player", {
                 sync_comment: this.refs.viewinfo_frame.getSyncCommentChecked(),
                 infoview_width: parseInt(ve.offsetWidth)
             });

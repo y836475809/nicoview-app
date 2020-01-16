@@ -50,8 +50,6 @@
         /* globals rootRequire */
         const { ConfigRenderer } = rootRequire("app/js/config");
 
-        const config_renderer = new ConfigRenderer();
-
         const obs_dialog = this.opts.obs;
 
         this.duration_items = [3, 4, 5];
@@ -63,9 +61,9 @@
         }
 
         const changeParams = async (name, value) => {
-            const params = await config_renderer.get("comment", default_params);
+            const params = await ConfigRenderer.get("comment", default_params);
             params[name] = value;
-            config_renderer.set(`comment.${name}`, value);
+            ConfigRenderer.set(`comment.${name}`, value);
             obs_dialog.trigger("player-main-page:update-comment-display-params", params);
         };
 
@@ -79,7 +77,7 @@
 
         this.onclickLimitCommentCheck = (e) => {
             const do_limit = e.target.checked;
-            config_renderer.set("comment.do_limit", do_limit);
+            ConfigRenderer.set("comment.do_limit", do_limit);
             obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
         };
 
@@ -90,7 +88,7 @@
         };
 
         this.on("mount", async () => {
-            const params = await config_renderer.get("comment", default_params);
+            const params = await ConfigRenderer.get("comment", default_params);
             setup("duration", this.duration_items, params.duration_sec);
             setup("fps", this.fps_items, params.fps);
 

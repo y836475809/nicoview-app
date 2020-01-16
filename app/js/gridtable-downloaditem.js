@@ -6,8 +6,6 @@ const { GridTable } = require("./gridtable");
 const { DownloadItemStore } = require("./download-item-store");
 const { ConfigRenderer } = require("./config");
 
-const config_renderer = new ConfigRenderer();
-
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
     const video_id = dataContext.id;
     return `ID: ${video_id}`;
@@ -108,7 +106,7 @@ class GridTableDownloadItem {
             on_dbl_click(e, data);
         });
 
-        const file_path = path.join(await config_renderer.get("data_dir"), "download.json");
+        const file_path = path.join(await ConfigRenderer.get("data_dir"), "download.json");
         this.store = new DownloadItemStore(file_path);
         this.store.load(); 
         this.grid_table.setData(this.store.getItems());

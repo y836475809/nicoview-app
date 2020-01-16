@@ -10,11 +10,11 @@ const IPC_CHANNEL = Object.freeze({
 });
 
 class ConfigRenderer {
-    async get(key, default_value) {
+    static async get(key, default_value) {
         return await ipcRenderer.invoke(IPC_CHANNEL.GET_VALUE, { key, default_value });
     }
 
-    set(key, value) {
+    static set(key, value) {
         ipcRenderer.send(IPC_CHANNEL.SET_VALUE, { key, value });
     }
 }

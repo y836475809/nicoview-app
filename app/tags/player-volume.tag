@@ -36,7 +36,6 @@
         /* globals rootRequire */
         const { ConfigRenderer } = rootRequire("app/js/config");
 
-        const config_renderer = new ConfigRenderer();
         const obs = this.opts.obs; 
 
         this.picker_mousedown = (e) => {
@@ -58,7 +57,7 @@
 
             let slider = this.root.querySelector("div.slider");
             const volume = pos / slider.clientWidth;
-            config_renderer.set("player.volume", volume);
+            ConfigRenderer.set("player.volume", volume);
 
             obs.trigger("player-video:volume-changed", volume); 
         };
@@ -66,7 +65,7 @@
         this.on("mount", async ()=> {
             let picker = this.root.querySelector("div.picker");
             let slider = this.root.querySelector("div.slider");   
-            const volume = await config_renderer.get("player.volume", 0.5);
+            const volume = await ConfigRenderer.get("player.volume", 0.5);
             picker.style.left = volume * slider.clientWidth - 5 + "px";
 
             obs.trigger("player-video:volume-changed", volume); 

@@ -31,7 +31,6 @@
         const { ConfigRenderer } = rootRequire("app/js/config");
 
         const obs = this.opts.obs; 
-        const config_renderer = new ConfigRenderer();
 
         let video_elm = null;
         let play_data = null;
@@ -85,7 +84,7 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await config_renderer.get("comment", {
+            comment_params = await ConfigRenderer.get("comment", {
                 duration_sec: 4,
                 fps: 10,
                 do_limit: true

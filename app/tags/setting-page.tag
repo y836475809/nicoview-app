@@ -98,15 +98,13 @@
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
 
-        const config_renderer = new ConfigRenderer();
-
         this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
             if(dir == null){
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            config_renderer.set("data_dir", dir);  
+            ConfigRenderer.set("data_dir", dir);  
         };
 
         this.onclickSelectDownloadDir = async e => {
@@ -115,11 +113,11 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            config_renderer.set("download.dir", dir);
+            ConfigRenderer.set("download.dir", dir);
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await config_renderer.get("app_setting_dir", "");
+            const dir = await ConfigRenderer.get("app_setting_dir", "");
             shell.openItem(dir);
         };
 
@@ -129,7 +127,7 @@
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            config_renderer.set("ffmpeg_path", file_path);
+            ConfigRenderer.set("ffmpeg_path", file_path);
         };
 
         const setInputValue = (selector, value) => {          
@@ -138,10 +136,10 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await config_renderer.get("app_setting_dir", ""));  
-            setInputValue(".data-dir-input", await config_renderer.get("data_dir", ""));  
-            setInputValue(".download-dir-input", await config_renderer.get("download.dir", ""));
-            setInputValue(".ffmpeg-path-input", await config_renderer.get("ffmpeg_path", ""));
+            setInputValue(".app-setting-dir-input", await ConfigRenderer.get("app_setting_dir", ""));  
+            setInputValue(".data-dir-input", await ConfigRenderer.get("data_dir", ""));  
+            setInputValue(".download-dir-input", await ConfigRenderer.get("download.dir", ""));
+            setInputValue(".ffmpeg-path-input", await ConfigRenderer.get("ffmpeg_path", ""));
         });
 
         const importNNDDDB = async (sqlite_file_path)=>{
@@ -166,7 +164,7 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
-                const data_dir = await config_renderer.get("data_dir", "");
+                const data_dir = await ConfigRenderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
                 await DataRenderer.action("setLibraryData", {
                     data_dir : data_dir, 

@@ -83,10 +83,9 @@
         this.storname = "bookmark";
         const store = storex.get(this.storname);
         const main_store = storex.get("main");
-        const config_renderer = new ConfigRenderer();
 
         this.on("mount", async () => {
-            const file_path = path.join(await config_renderer.get("data_dir"), `${this.storname}.json`);
+            const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
             try {
                 this.json_store = new JsonStore(file_path);
                 const items = this.json_store.load();

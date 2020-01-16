@@ -8,9 +8,7 @@ const data_api_data = require("./data/api-data.json");
 const dmc_session = require("./data/dmc-session.json");
 
 const disableNetConnect = () => {
-    const yellow  = "\u001b[33m";
-    const reset = "\u001b[0m";
-    console.warn(yellow + "disable http_proxy, https_proxy, no_proxy in this test" + reset);
+    console.warn("disable http_proxy, https_proxy, no_proxy in this test");
 
     process.env["http_proxy"]="";
     process.env["https_proxy"]="";

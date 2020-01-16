@@ -11,12 +11,24 @@ const data_api_data = require(`${base_dir}/data/sm12345678-data-api-data.json`);
 const dmc_session = require(`${base_dir}/data/sm12345678-dmc-session-max-quality.json`);
 const dmc_session_low = require(`${base_dir}/data/sm12345678-dmc-session-low-quality.json`);
 
+const disableNetConnect = () => {
+    const yellow  = "\u001b[33m";
+    const reset = "\u001b[0m";
+    console.warn(yellow + "disable http_proxy, https_proxy, no_proxy in this test" + reset);
+
+    process.env["http_proxy"]="";
+    process.env["https_proxy"]="";
+    process.env["no_proxy"]="";
+    
+    nock.disableNetConnect();
+};
+
 class NicoMocks {
     constructor(){
         this.hb_options_count = 0;
         this.hb_post_count = 0;
 
-        nock.disableNetConnect();
+        disableNetConnect();
     }
 
     clean(){
@@ -214,7 +226,7 @@ class NicoMocks {
 
 class NicoDownLoadMocks {
     constructor(){
-        nock.disableNetConnect();
+        disableNetConnect();
     }
 
     clean(){
@@ -498,7 +510,7 @@ const setupNicoDownloadNock = (target_nock, {
 
 class NicoMylistMocks {
     constructor(){
-        nock.disableNetConnect();
+        disableNetConnect();
     }
     
     clean(){

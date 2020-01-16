@@ -33,8 +33,6 @@ const byteToString = (byte) => {
 };
 
 test.beforeEach(async t => {
-    nock.disableNetConnect();
-
     const video_item = {
         data_type:"json", 
         id: TestData.video_id,

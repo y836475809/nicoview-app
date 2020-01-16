@@ -1,12 +1,9 @@
 const test = require("ava");
-const nock = require("nock");
 const path = require("path");
 const { TestData} = require("./helper/nico-mock");
 const { NicoUpdate } = require("../app/js/nico-update");
 
 test.beforeEach(async t => {
-    nock.disableNetConnect();
-
     const video_item_map = {};
     [1, 2, 3, 4, 5, 6].map(value => {
         return {

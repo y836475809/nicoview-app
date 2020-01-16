@@ -7,10 +7,22 @@ const comment = require("./data/comment.json");
 const data_api_data = require("./data/api-data.json");
 const dmc_session = require("./data/dmc-session.json");
 
+const disableNetConnect = () => {
+    const yellow  = "\u001b[33m";
+    const reset = "\u001b[0m";
+    console.warn(yellow + "disable http_proxy, https_proxy, no_proxy in this test" + reset);
+
+    process.env["http_proxy"]="";
+    process.env["https_proxy"]="";
+    process.env["no_proxy"]="";
+    
+    nock.disableNetConnect();
+};
+
 class NicoVideoMocks {
     constructor(video_id){
         this.video_id = video_id;
-        nock.disableNetConnect();
+        disableNetConnect();
     }
 
     clean(){
@@ -103,7 +115,7 @@ class NicoVideoMocks {
 
 class NicoSearchMocks {
     constructor(){
-        nock.disableNetConnect();
+        disableNetConnect();
     }
     
     clean(){
@@ -158,7 +170,7 @@ class NicoDownLoadMocks {
         this.lowq_set = lowq_set;
         this.smile_set = smile_set;
 
-        nock.disableNetConnect();
+        disableNetConnect();
     }
 
     clean(){
@@ -453,7 +465,7 @@ class MockNicoUitl {
 
 class NicoMylistMocks {
     constructor(){
-        nock.disableNetConnect();
+        disableNetConnect();
     }
     clean(){
         nock.cleanAll();

@@ -125,6 +125,7 @@
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
+        const { DataRenderer } = rootRequire("app/js/library");
 
         this.obs = this.opts.obs;
         const main_store = storex.get("main");
@@ -180,33 +181,7 @@
 
         this.obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
-        });
-
-        this.obs.on("main-page:play-by-videoid", async (args)=>{  
-            const { video_id, time } = args; 
-
-            await ipcRenderer.invoke(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
-                video_id: video_id,
-                time: time,
-                is_online: false
-            });
-        }); 
-        
-        this.obs.on("main-page:play-by-videoid-online", async (args)=>{
-            const { video_id, time } = args; 
-
-            await ipcRenderer.invoke(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
-                video_id: video_id,
-                time: time,
-                is_online: true
-            });
         });  
-
-        ipcRenderer.on(IPC_CHANNEL.GET_VIDEO_ITEM, async (event, args) => {
-            const video_id = args;
-            const video_item = await main_store.action("getLibraryItem", video_id);
-            ipcRenderer.send(IPC_CHANNEL.GET_VIDEO_ITEM_REPLY, video_item);
-        });
 
         ipcRenderer.on(IPC_CHANNEL.SEARCH_TAG, (event, args)=>{
             this.obs.trigger("main-page:select-page", "search");
@@ -237,7 +212,7 @@
             });
             
             if(result.state == "ok" || result.state == "404"){
-                const video_item = await main_store.action("getLibraryItem", video_id);
+                const video_item = await DataRenderer.action("getLibraryItem", {video_id});
                 ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
             } 
         });
@@ -250,29 +225,6 @@
         ipcRenderer.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args)=>{
             const bk_item = args;
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
-        });
-
-        window.onbeforeunload = (e) => {
-        };
-        
-        // TODO
-        ipcRenderer.on(IPC_CHANNEL.APP_CLOSE, async (event, args) => {
-            try {
-                await main_store.action("saveLibrary");
-            } catch (error) {
-                const result = await showOKCancelBox("error", 
-                    `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`);
-                if(result!==0){
-                    return;
-                }
-            }
-
-            const result = await showOKCancelBox("info", "終了しますか?");
-            if(result!==0){
-                return;
-            }
-
-            ipcRenderer.send(IPC_CHANNEL.APP_CLOSE);
         });
 
         const timeout = 200;

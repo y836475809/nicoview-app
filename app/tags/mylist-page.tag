@@ -151,7 +151,7 @@
     <script>
         /* globals rootRequire riot */
         const path = require("path");
-        const {remote} = require("electron");
+        const {remote, ipcRenderer} = require("electron");
         const { Menu } = remote;
         const { GridTable } = rootRequire("app/js/gridtable");
         const { NicoMylist, NicoMylistStore } = rootRequire("app/js/nico-mylist");
@@ -161,24 +161,30 @@
         const { needConvertVideo } = rootRequire("app/js/video-converter");
         const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
         const { ConfigRenderer } = rootRequire("app/js/config");
+        const { DataRenderer } = rootRequire("app/js/library");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
         const config_renderer = new ConfigRenderer();
  
-        main_store.change("downloadItemChanged", (state, store) => {
+        main_store.change("downloadItemChanged", async (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
             const items = grid_table.dataView.getItems();
 
-            items.forEach(item => {
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
                 const video_id = item.id;
-                item.saved = store.getter("existLibraryItem", video_id);
+                item.saved = await DataRenderer.action("existLibraryItem", {video_id});
                 item.reg_download = download_video_id_set.has(video_id);
-                grid_table.dataView.updateItem(video_id, item);
-            });
+                grid_table.dataView.updateItem(video_id, item);    
+            }
         });
-        main_store.change("libraryItemAdded", async (state, store, video_id) => {
+
+        ipcRenderer.on("libraryItemAdded", async (args) => {
+            const {video_item} = args;
+            const video_id = video_item.id;
             const item = grid_table.dataView.getItemById(video_id);
             item.saved = true;
             grid_table.dataView.updateItem(video_id, item);
@@ -286,12 +292,18 @@
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().map(value => {
@@ -343,7 +355,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
+                if(needConvertVideo(await DataRenderer.action("getLibraryItem", {video_id}))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -351,7 +363,10 @@
                     }        
                     obs.trigger("library-page:convert-video", video_id);
                 }else{
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }
             });
             
@@ -362,7 +377,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await main_store.action("getLibraryItem", video_id))===true){
+                if(needConvertVideo(await DataRenderer.action("getLibraryItem", {video_id}))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -402,13 +417,12 @@
 
         const setData = async (mylist_items) => {
             const download_video_id_set = main_store.getter("downloadItemSet");
-
-            mylist_items.forEach(value=>{
-                const saved = main_store.getter("existLibraryItem", value.id);
-                const reg_download = download_video_id_set.has(value.id);
-                value.saved = saved;
-                value.reg_download = reg_download;
-            });
+            for (let i=0; i<mylist_items.length; i++) {
+                const item = mylist_items[i];
+                const video_id = item.id;
+                item.saved = await DataRenderer.action("existLibraryItem", {video_id});;
+                item.reg_download = download_video_id_set.has(video_id);     
+            }
             grid_table.setData(mylist_items);
             grid_table.scrollToTop();   
         };

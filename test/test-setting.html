@@ -18,11 +18,11 @@
 <script type="riot/tag" src="../app/tags/setting-page.tag"></script>
 <script>
     /* globals riot */
-    require("./app-quit");
     const { rootRequire } = require("../app/util");
     global.rootRequire = rootRequire;
     const { storex } = rootRequire("app/js/riotx-stores");
-    
+    process.env.DATA_SAVE = "NO";
+
     const obs = riot.observable(); // eslint-disable-line
 
     try {

@@ -68,7 +68,7 @@
     <script>
         /* globals rootRequire */
         const EventEmitter = require("events");
-        const { remote } = require("electron");
+        const { remote, ipcRenderer } = require("electron");
         const { Menu } = remote;
         const { NicoDownloader } = rootRequire("app/js/nico-downloader");
         const { GridTableDownloadItem } = rootRequire("app/js/gridtable-downloaditem");
@@ -77,6 +77,8 @@
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
+        const { DataRenderer } = rootRequire("app/js/library");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
 
@@ -252,12 +254,18 @@
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : video_id,
+                        time : 0
+                    });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "削除", click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
@@ -341,9 +349,8 @@
                     });
 
                     if(result.type==NicoDownloader.ResultType.complete){
-                        const item = nico_down.getDownloadedItem();
-                        // obs.trigger("library-page:add-item", item); 
-                        main_store.action("addDownloadedItem", item);
+                        const download_item = nico_down.getDownloadedItem();
+                        await DataRenderer.action("addDownloadedItem", {download_item});
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
@@ -412,7 +419,10 @@
                 await grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, data.id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : data.id,
+                        time : 0
+                    });
                 });
             } catch (error) {
                 console.log("donwload item load error=", error);

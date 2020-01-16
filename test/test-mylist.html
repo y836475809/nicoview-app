@@ -23,11 +23,11 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
-    require("./app-quit");
     const { rootRequire } = require("../app/util");
     global.rootRequire = rootRequire;
     const { storex } = rootRequire("app/js/riotx-stores");
     const { setupLibrary } = require("./setup-data");
+    process.env.DATA_SAVE = "NO";
     
     setupLibrary(storex);
 

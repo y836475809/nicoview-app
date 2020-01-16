@@ -52,11 +52,12 @@
 
     <script>
         /* globals rootRequire */
-        const { remote, clipboard } = require("electron");
+        const { remote, clipboard, ipcRenderer } = require("electron");
         const { Menu } = remote;
         const { BookMark } = rootRequire("app/js/bookmark");
         const { getNicoURL } = rootRequire("app/js/niconico");       
         const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         
         const obs = this.opts.obs; 
 
@@ -166,7 +167,10 @@
                         const { video_id } = viewinfo.thumb_info.video;
 
                         if(state.is_online===true){
-                            obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+                            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                                video_id: video_id,
+                                time: 0
+                            }); 
                         }else{
                             obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                         }

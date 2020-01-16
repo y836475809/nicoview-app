@@ -4,17 +4,12 @@ const EventEmitter = require("events");
 const { LibraryDB } = require("./db");
 
 const IPC_CHANNEL = Object.freeze({
-    SET_VALUE: "ipc-data-set-value",
-    GET_VALUE: "ipc-data-get-value",
+    ACITON: "ipc-data-action",
 });
 
 class DataRenderer {
-    async get(name, args) {
-        return await ipcRenderer.invoke(IPC_CHANNEL.GET_VALUE, {name, args});
-    }
-
-    set(name, args) {
-        ipcRenderer.invoke(IPC_CHANNEL.SET_VALUE, {name, args});
+    static async action(name, args) {
+        return await ipcRenderer.invoke(IPC_CHANNEL.ACITON, {name, args});
     }
 }
 
@@ -25,9 +20,14 @@ class myliib extends EventEmitter {
     }
     setup(){
         this.library = null;
-        ipcMain.handle(IPC_CHANNEL.GET_VALUE, async (event, _args) => {
+        ipcMain.handle(IPC_CHANNEL.ACITON, async (event, _args) => {
             const { name, args } = _args;
-            return await this[name](args);
+            const func = this[name];
+            if(func.constructor.name === "AsyncFunction"){
+                return await this[name](args);
+            }else{
+                return this[name](args);
+            }
         });
     }
 
@@ -36,7 +36,7 @@ class myliib extends EventEmitter {
         return this.library.find(video_id);
     }
 
-    getLibraryItems(){;
+    getLibraryItems(){
         return this.library.findAll();
     }
 
@@ -71,6 +71,19 @@ class myliib extends EventEmitter {
             {filename : path.join(data_dir, "library.json")});
         await this.library.load();
         this.emit("libraryInitialized");
+    }
+
+    async addDownloadedItem(args){
+        const { download_item } = args;
+        const video_item = Object.assign({}, download_item);
+        video_item.common_filename = video_item.id;
+        video_item.creation_date = new Date().getTime();
+        video_item.last_play_date = -1;
+        video_item.modification_date = -1;
+        video_item.play_count = 0;
+
+        await this.library.insert(video_item.dirpath, video_item);
+        this.emit("libraryItemAdded", {video_item});
     }
 }
 

@@ -71,12 +71,18 @@
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : video_id,
+                        time : 0
+                    });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
@@ -98,7 +104,10 @@
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    video_id : video_id,
+                    time : 0
+                });
             });
 
             const context_menu = createMenu();

@@ -249,13 +249,14 @@
     
     <script>
         /* globals rootRequire */
-        const { remote, clipboard } = require("electron");
+        const { remote, clipboard, ipcRenderer } = require("electron");
         const { Menu } = remote;
         const { GridTable } = rootRequire("app/js/gridtable");
         require("slickgrid/plugins/slick.autotooltips");
         const time_format = rootRequire("app/js/time-format");
         const SyncCommentScroll = rootRequire("app/js/sync-comment-scroll");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
 
@@ -356,7 +357,10 @@
                     obs_trigger.play(obs_trigger.Msg.PLAYER_PLAY, video_id); 
                 }},
                 { label: "オンラインで再生", click() {
-                    obs_trigger.playOnline(obs_trigger.Msg.PLAYER_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
             ];
             return Menu.buildFromTemplate(nemu_templete);

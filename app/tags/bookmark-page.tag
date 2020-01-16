@@ -67,12 +67,14 @@
     <script>
         /* globals rootRequire riot */
         const path = require("path");
-        const {remote} = require("electron");
+        const {remote, ipcRenderer} = require("electron");
         const {Menu} = remote;
         const JsonStore = rootRequire("app/js/json-store");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
         const { ConfigRenderer } = rootRequire("app/js/config");
+        const { DataRenderer } = rootRequire("app/js/library");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         const obs_trigger = new obsTrigger(obs);
@@ -144,14 +146,20 @@
                             return;
                         }
                         const { video_id, time } = items[0].data;
-                        obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                            video_id,
+                            time
+                        });
                     }
                 },
                 { 
                     id: "play",
                     label: "オンラインで再生", click() {
                         const { video_id, time } = items[0].data;
-                        obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id, time);
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                            video_id,
+                            time
+                        });
                     }
                 },
                 { 
@@ -162,11 +170,13 @@
                         }
 
                         const video_id = items[0].data.video_id;
-                        const exist = main_store.getter("existLibraryItem", video_id);
-                        if(exist===true){
-                            obs.trigger("main-page:select-page", "library");
-                            obs.trigger("library-page:scrollto", video_id);     
-                        } 
+                        (async ()=>{
+                            const exist = await DataRenderer.action("existLibraryItem", {video_id});
+                            if(exist===true){
+                                obs.trigger("main-page:select-page", "library");
+                                obs.trigger("library-page:scrollto", video_id);     
+                            } 
+                        })();
                     }
                 },
                 { 
@@ -202,7 +212,10 @@
         this.obs_bookmark.on("item-dlbclicked", (item) => {  
             if(BookMark.isVideo(item)){
                 const { video_id, time } = item.data;
-                obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id, time);
+                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    video_id,
+                    time
+                });
                 return;
             }
             if(BookMark.isSearch(item)){

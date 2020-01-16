@@ -176,36 +176,20 @@
         const { NicoVideoData } = rootRequire("app/js/nico-data-file");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { DataRenderer } = rootRequire("app/js/library");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
         const config_renderer = new ConfigRenderer();
 
-        // main_store.change("libraryInitialized", async (state, store) => {
-        //     const items = await store.action("getLibraryItems");
-        //     const library_items = items.map(value=>{
-        //         const video_data = new NicoVideoData(value);
-        //         value.thumb_img = video_data.getThumbImgPath();
-        //         value.tags = value.tags ? value.tags.join(" ") : "";
-        //         return value;
-        //     });
-        //     loadLibraryItems(library_items);
-        // });
-
-        // main_store.change("libraryItemUpdated", async (state, store, video_id, props) => {
-        //     console.log("libraryItemUpdated video_id=", video_id, " props=", props);
-
-        //     props.tags = props.tags ? props.tags.join(" ") : "";
-        //     grid_table.updateCells(video_id, props);
-        // });
-
-        main_store.change("libraryItemAdded", async (state, store, video_id) => {
-            const item = await store.action("getLibraryItem", video_id);
-            const video_data = new NicoVideoData(item);
-            item.thumb_img = video_data.getThumbImgPath();
-            item.tags = item.tags ? item.tags.join(" ") : "";
-            grid_table.updateItem(item, video_id);
+        ipcRenderer.on("libraryItemAdded", async (args) => {
+            const {video_item} = args;
+            const video_data = new NicoVideoData(video_item);
+            const video_id = video_item.id;
+            video_item.thumb_img = video_data.getThumbImgPath();
+            video_item.tags = video_item.tags ? video_item.tags.join(" ") : "";
+            grid_table.updateItem(video_item, video_id);
         });
 
         ipcRenderer.on("libraryItemUpdated", (event, args) => {
@@ -312,7 +296,10 @@
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {
             const video_id = item.video_id;
-            obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id);        
+            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                video_id : video_id,
+                time : 0
+            });     
         });
     
         const loadLibraryItems = (items)=>{
@@ -355,12 +342,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await main_store.action("getLibraryItem", item.id);
+                        const video_item = await DataRenderer.action("getLibraryItem", {video_id:item.id});
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                            await main_store.action("updateLibrary", video_id, props);
+                            await DataRenderer.action("updateLibrary", {video_id, props});
                             if(update_thumbnail){
-                                const updated_video_item = await main_store.action("getLibraryItem", video_id);
+                                const updated_video_item = await DataRenderer.action("getLibraryItem", {video_id});
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -397,7 +384,7 @@
             };
 
             try {
-                const video_item = await main_store.action("getLibraryItem", video_id);
+                const video_item = await DataRenderer.action("getLibraryItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = await config_renderer.get("ffmpeg_path", "");
 
@@ -420,7 +407,8 @@
 
                 await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
-                await main_store.action("updateLibrary", video_id, {video_type:"mp4"});
+                const props = {video_type:"mp4"};
+                await DataRenderer.action("updateLibrary", {video_id, props});
 
                 await showMessageBox("info", "変換完了");
                 updateState("変換完了");  
@@ -459,12 +447,18 @@
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : video_id,
+                        time : 0
+                    });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "コメント更新", click() {
                     const items = grid_table.getSelectedDatas();
@@ -544,10 +538,7 @@
             
             try {
                 const data_dir = await config_renderer.get("data_dir");
-                await ipcRenderer.invoke("ipc-data-get-value", {
-                    name:"loadLibrary",
-                    args: {data_dir}
-                });
+                await DataRenderer.action("loadLibrary", {data_dir});
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -562,10 +553,7 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await ipcRenderer.invoke("ipc-data-get-value", {
-                name:"getLibraryItem",
-                args: {video_id}
-            });
+            const video_item = await DataRenderer.action("getLibraryItem", {video_id});
             if(video_item===null){
                 return;
             }
@@ -575,7 +563,7 @@
                 play_count : video_item.play_count + 1
             };
             console.log("updateLibrary video_id=", video_id, ", props=", props);
-            main_store.action("updateLibrary",  video_id, props);
+            await DataRenderer.action("updateLibrary", {video_id, props});
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 
@@ -590,7 +578,7 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                const video_item = await main_store.action("getLibraryItem", video_id);
+                const video_item = await DataRenderer.action("getLibraryItem", {video_id});
                 this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){

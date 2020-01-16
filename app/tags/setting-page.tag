@@ -90,13 +90,13 @@
         const DBConverter = rootRequire("app/js/db-converter");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
-
+        const { DataRenderer } = rootRequire("app/js/library");
+        
         this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
-        const main_store = storex.get("main");
 
         const config_renderer = new ConfigRenderer();
 
@@ -166,10 +166,13 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             try {
-                const data_path = await config_renderer.get("data_dir", "");
+                const data_dir = await config_renderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                await main_store.action("setLibraryData", data_path, dir_list, video_list);
-
+                await DataRenderer.action("setLibraryData", {
+                    data_dir : data_dir, 
+                    path_data_list : dir_list, 
+                    video_data_list : video_list
+                });
                 await showMessageBox("info", "インポート完了");
             } catch (error) {
                 console.log(error);

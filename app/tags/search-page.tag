@@ -203,30 +203,36 @@
 
     <script>
         /* globals rootRequire riot */
-        const {remote} = require("electron");
+        const {remote, ipcRenderer} = require("electron");
         const { Menu, MenuItem } = remote;
         const { GridTable } = rootRequire("app/js/gridtable");
         const { NicoSearchParams, NicoSearch } = rootRequire("app/js/nico-search");
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { obsTrigger } = rootRequire("app/js/riot-obs");
+        const { DataRenderer } = rootRequire("app/js/library");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        main_store.change("downloadItemChanged", (state, store) => {
+        main_store.change("downloadItemChanged", async (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");
             const items = grid_table.dataView.getItems();
 
-            items.forEach(item => {
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
                 const video_id = item.id;
-                item.saved = store.getter("existLibraryItem", video_id);
+                item.saved = await DataRenderer.action("existLibraryItem", {video_id});
                 item.reg_download = download_video_id_set.has(video_id);
-                grid_table.dataView.updateItem(video_id, item);
-            });
+                grid_table.dataView.updateItem(video_id, item);    
+            }
         });
-        main_store.change("libraryItemAdded", async (state, store, video_id) => {
+
+        ipcRenderer.on("libraryItemAdded", async (args) => {
+            const {video_item} = args;
+            const video_id = video_item.id;
             const item = grid_table.dataView.getItemById(video_id);
             item.saved = true;
             grid_table.dataView.updateItem(video_id, item);
@@ -381,12 +387,14 @@
             }
 
             const donwload_video_id_set = main_store.getter("downloadItemSet");
-            const items = search_result.data.map(value => {
-                const video_id = value.contentId;
-                const saved = main_store.getter("existLibraryItem", video_id);
-                const reg_download = donwload_video_id_set.has(video_id);
-                return createItem(value, saved, reg_download);
-            });
+            const items = await Promise.all(
+                search_result.data.map(async value => {
+                    const video_id = value.contentId;
+                    const saved = await DataRenderer.action("existLibraryItem", {video_id});
+                    const reg_download = donwload_video_id_set.has(video_id);
+                    return createItem(value, saved, reg_download);
+                })
+            );
             items.push(createEmptyItem());
             grid_table.setData(items);
             grid_table.scrollToTop();  
@@ -541,14 +549,20 @@
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : video_id,
+                        time : 0
+                    });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    obs_trigger.playOnline(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        video_id: video_id,
+                        time: 0
+                    });
                 }},
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
@@ -589,7 +603,10 @@
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 if(video_id){
-                    obs_trigger.play(obs_trigger.Msg.MAIN_PLAY, video_id); 
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        video_id : video_id,
+                        time : 0
+                    });
                 }
             });
             grid_table.onContextMenu((e)=>{

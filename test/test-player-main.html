@@ -68,11 +68,15 @@
 <script>
     /* globals riot */
     const fs = require("fs");
-    require("./app-quit");
     const { rootRequire, getPathFromRoot } = require("../app/util");
     global.rootRequire = rootRequire;
     const test_dir = getPathFromRoot(["test"]);
+
+    const { ipcRenderer } = require("electron");
+    const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+
     process.env.NODE_ENV = "DEBUG";
+    process.env.DATA_SAVE = "NO";
 
     const { NicoVideoMocks } = require("./mock_server/nico-mock");
     const video_mocks = [];
@@ -189,7 +193,10 @@
             { viewinfo, comments, state });
     };
     const onclickLoad3 = () => {
-        obs.trigger("player-main-page:play-by-videoid-online", "sm20"); 
+        ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+            video_id: "sm20",
+            time: 0
+        });
     };
 </script>
 

@@ -294,39 +294,6 @@
                 this.obs_modal_dialog.trigger("close");
             }
         }; 
-        
-        const playNiconico = async (video_id, is_online, time=0) => {
-            cancelPlay();
-
-            const video_item = await ipcRenderer.invoke(IPC_CHANNEL.GET_VIDEO_ITEM, video_id);
-            const state = { 
-                is_online: video_item === null?true:is_online,
-                is_saved: video_item !== null,
-                time: time
-            };
-            try {
-                //play online
-                if(state.is_online===true){
-                    play_by_video_id(video_id, state);
-                }else{
-                    const video_data = new NicoVideoData(video_item);
-
-                    const video = {
-                        src: video_data.getVideoPath(),
-                        type: `video/${video_data.getVideoType()}`,
-                    };
-                    const viewinfo = {
-                        is_deleted: video_data.getIsDeleted(),
-                        thumb_info: video_data.getThumbInfo()      
-                    };      
-                    const comments = video_data.getComments();
-                    await play_by_video_data(video, viewinfo, comments, state);
-                }                   
-            } catch (error) {
-                console.error(error);
-                await showMessageBox("error", error.message);
-            }
-        }; 
 
         const playVideoItem = async (video_item, time=0) => {
             cancelPlay();
@@ -376,38 +343,10 @@
             await playVideoItem(video_item, time);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_ID, (event, args) => {
+        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, (event, args) => {
             const { video_id, video_item, time } = args;
 
             playNiconicoOnline(video_id, video_item, time);
-        });
-
-        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_ID, (event, args) => {
-            const { video_id, time, is_online } = args;
-
-            playNiconico(video_id, is_online, time);
-        });
-
-        obs.on("player-main-page:play-by-videoid", async (args) => {
-
-            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, args);
-        });
-
-        obs.on("player-main-page:play-by-videoid-online", (args) => {
-            const { video_id, time } = args;
-            const is_online = true;
-
-            if(process.env.NODE_ENV == "DEBUG"){
-                const state = {
-                    is_online: true,
-                    is_saved: false,
-                    time: time
-                };
-                cancelPlay();
-                play_by_video_id(video_id, state);   
-            }else{
-                playNiconico(video_id, is_online, time);
-            }
         });
 
         obs.on("player-main-page:metadata-loaded", (args) => {

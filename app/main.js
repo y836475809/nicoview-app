@@ -59,14 +59,57 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    win.on("close", async (e) => {
+    win.on("close", async (e) => {      
+        if(process.env.DATA_SAVE == "NO"){
+            return;
+        }
+        
         if(do_app_quit){
+            return;
+        }
+
+        const ret = await dialog.showMessageBox({
+            type: "info", 
+            buttons: ["OK", "Cancel"],
+            message:"終了しますか?"
+        });
+        if(ret!=0){
+            // cancel, 終了しない
+            e.preventDefault();
+            return;
+        }
+        
+        try {
+            await my_lib.saveLibrary();
+        } catch (error) {
+            const ret = await dialog.showMessageBox({
+                type: "error",
+                buttons: ["OK", "Cancel"],
+                message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
+            });
+            if(ret==0){
+                // OK, 終了する
+                return;
+            }
+        }
+
+        try {
             config_main.set("main.window.state", getWindowState(win));
             await config_main.save();
-        }else{
-            e.preventDefault();
-            win.webContents.send(IPC_CHANNEL.APP_CLOSE);
+        } catch (error) {
+            const ret = await dialog.showMessageBox({
+                type: "error",
+                buttons: ["OK", "Cancel"],
+                message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
+            });
+            if(ret==0){
+                // OK, 終了する
+                return;
+            }
         }
+
+        // 終了しない
+        e.preventDefault();
     });
 
     // ウィンドウが閉じられた時に発行される
@@ -168,16 +211,17 @@ app.on("ready", async ()=>{
         }
     });
 
-    ipcMain.handle(IPC_CHANNEL.GET_VIDEO_ITEM, async (event, args) => {
-        const video_id = args;
-        const video_item = await new Promise( resolve => {
-            ipcMain.once(IPC_CHANNEL.GET_VIDEO_ITEM_REPLY, (event, data) => {
-                // console.log('ipcRequest', data)
-                resolve(data);
-            });
-            win.webContents.send(IPC_CHANNEL.GET_VIDEO_ITEM, video_id);
+    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, async (event, args) => {
+        await createPlayerWindow();
+        player_win.show();
+
+        const {video_id, time} = args;
+        const video_item = my_lib.getLibraryItem({video_id});
+        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+            video_id,
+            video_item,
+            time
         });
-        return video_item;
     });
 
     ipcMain.handle(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
@@ -244,11 +288,6 @@ app.on("ready", async ()=>{
         player_html_path = args;
     });
 
-    ipcMain.on(IPC_CHANNEL.APP_CLOSE, (event, args) => {
-        do_app_quit = true;
-        app.quit();
-    });
-
     my_lib.on("libraryInitialized", ()=>{  
         win.webContents.send("libraryInitialized", {
             items:my_lib.getLibraryItems()
@@ -256,6 +295,9 @@ app.on("ready", async ()=>{
     });
     my_lib.on("libraryItemUpdated", (args)=>{  
         win.webContents.send("libraryItemUpdated", args);
+    });
+    my_lib.on("libraryItemAdded", (args)=>{  
+        win.webContents.send("libraryItemAdded", args);
     });
 });
 

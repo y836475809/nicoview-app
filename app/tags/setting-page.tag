@@ -115,7 +115,7 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            config_renderer.set("download_dir", dir);
+            config_renderer.set("download.dir", dir);
         };
 
         this.onclickOpenDir = async (e) => {
@@ -140,7 +140,7 @@
         this.on("mount", async () => {
             setInputValue(".app-setting-dir-input", await config_renderer.get("app_setting_dir", ""));  
             setInputValue(".data-dir-input", await config_renderer.get("data_dir", ""));  
-            setInputValue(".download-dir-input", await config_renderer.get("download_dir", ""));
+            setInputValue(".download-dir-input", await config_renderer.get("download.dir", ""));
             setInputValue(".ffmpeg-path-input", await config_renderer.get("ffmpeg_path", ""));
         });
 

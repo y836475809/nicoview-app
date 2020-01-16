@@ -286,7 +286,7 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await config_renderer.get("download_dir", "");
+            const download_dir = await config_renderer.get("download.dir", "");
             event_em.emit("donwload-start");
             try {
                 cancel_donwload = false;

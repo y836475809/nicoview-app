@@ -76,7 +76,7 @@
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { ConfigRenderer } = rootRequire("app/js/config");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
@@ -346,7 +346,7 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const download_item = nico_down.getDownloadedItem();
-                        await DataRenderer.action("addDownloadedItem", {download_item});
+                        await DataIpcRenderer.action("addDownloadedItem", {download_item});
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {

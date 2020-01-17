@@ -7,7 +7,7 @@ const IPC_CHANNEL = Object.freeze({
     ACITON: "ipc-data-action",
 });
 
-class DataRenderer {
+class DataIpcRenderer {
     static async action(name, args) {
         return await ipcRenderer.invoke(IPC_CHANNEL.ACITON, {name, args});
     }
@@ -88,6 +88,6 @@ class Library extends EventEmitter {
 }
 
 module.exports = {
-    DataRenderer,
+    DataIpcRenderer,
     Library
 };

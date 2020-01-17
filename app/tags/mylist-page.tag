@@ -159,7 +159,7 @@
         const { needConvertVideo } = rootRequire("app/js/video-converter");
         const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
         const { ConfigRenderer } = rootRequire("app/js/config");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
@@ -173,7 +173,7 @@
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await DataRenderer.action("existLibraryItem", {video_id});
+                item.saved = await DataIpcRenderer.action("existLibraryItem", {video_id});
                 item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -350,7 +350,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await DataRenderer.action("getLibraryItem", {video_id}))===true){
+                if(needConvertVideo(await DataIpcRenderer.action("getLibraryItem", {video_id}))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -372,7 +372,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await DataRenderer.action("getLibraryItem", {video_id}))===true){
+                if(needConvertVideo(await DataIpcRenderer.action("getLibraryItem", {video_id}))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -415,7 +415,7 @@
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
-                item.saved = await DataRenderer.action("existLibraryItem", {video_id});;
+                item.saved = await DataIpcRenderer.action("existLibraryItem", {video_id});;
                 item.reg_download = download_video_id_set.has(video_id);     
             }
             grid_table.setData(mylist_items);

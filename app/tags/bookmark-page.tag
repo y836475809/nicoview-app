@@ -72,7 +72,7 @@
         const JsonStore = rootRequire("app/js/json-store");
         const { BookMark } = rootRequire("app/js/bookmark");
         const { ConfigRenderer } = rootRequire("app/js/config");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
@@ -168,7 +168,7 @@
 
                         const video_id = items[0].data.video_id;
                         (async ()=>{
-                            const exist = await DataRenderer.action("existLibraryItem", {video_id});
+                            const exist = await DataIpcRenderer.action("existLibraryItem", {video_id});
                             if(exist===true){
                                 obs.trigger("main-page:select-page", "library");
                                 obs.trigger("library-page:scrollto", video_id);     

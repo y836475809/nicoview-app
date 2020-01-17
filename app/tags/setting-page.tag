@@ -90,7 +90,7 @@
         const DBConverter = rootRequire("app/js/db-converter");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
         
         this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
@@ -166,7 +166,7 @@
             try {
                 const data_dir = await ConfigRenderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                await DataRenderer.action("setLibraryData", {
+                await DataIpcRenderer.action("setLibraryData", {
                     data_dir : data_dir, 
                     path_data_list : dir_list, 
                     video_data_list : video_list

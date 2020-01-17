@@ -208,7 +208,7 @@
         const { NicoSearchParams, NicoSearch } = rootRequire("app/js/nico-search");
         const { showMessageBox } = rootRequire("app/js/remote-dialogs");
         const { BookMark } = rootRequire("app/js/bookmark");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
         const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
 
         const obs = this.opts.obs; 
@@ -222,7 +222,7 @@
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await DataRenderer.action("existLibraryItem", {video_id});
+                item.saved = await DataIpcRenderer.action("existLibraryItem", {video_id});
                 item.reg_download = download_video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -386,7 +386,7 @@
             const items = await Promise.all(
                 search_result.data.map(async value => {
                     const video_id = value.contentId;
-                    const saved = await DataRenderer.action("existLibraryItem", {video_id});
+                    const saved = await DataIpcRenderer.action("existLibraryItem", {video_id});
                     const reg_download = donwload_video_id_set.has(video_id);
                     return createItem(value, saved, reg_download);
                 })

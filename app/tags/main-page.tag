@@ -125,7 +125,7 @@
         const { dialog } = require("electron").remote;
         const {Menu} = remote;
         const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
-        const { DataRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = rootRequire("app/js/library");
 
         this.obs = this.opts.obs;
         const main_store = storex.get("main");
@@ -212,7 +212,7 @@
             });
             
             if(result.state == "ok" || result.state == "404"){
-                const video_item = await DataRenderer.action("getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("getLibraryItem", {video_id});
                 ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
             } 
         });

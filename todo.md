@@ -94,3 +94,12 @@
   - [ ] 手動でのダウンロード中はダウンロード定期実行を停止し、終了後に再実行する
   - [ ] オプションでエコノミーでもダウンロードできるようにする？
   - [ ] ダウンロードして保存するときに*[ThumbInfo].json,*[Comment].jsonは整形しておく
+
+- [] script cmd
+  - []  npm run test-main
+  - []  npm run test-player-main
+  - []  npm run test-search
+  - []  npm run test-setting
+  - []  npm run test-other -- test-mylist.html
+  - []  npm run test-other -- test-nicoscript.html
+  - []  npm run test-other -- test-tween.html

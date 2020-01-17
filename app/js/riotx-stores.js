@@ -2,7 +2,6 @@ const EventEmitter = require("events").EventEmitter;
 const path = require("path");
 const { BookMark } = require("./bookmark");
 const { toTimeString } = require("./time-format");
-const { LibraryDB } = require("./db");
 
 const getIcon = (store_name, item) => {
     if (store_name == "bookmark") {
@@ -97,68 +96,17 @@ class Store {
 const main_store = new Store({
     name: "main",
     state:{
-        library:null,
         download_Items:[]
     },
     actions: {
-        addDownloadedItem: async (context, download_item) => {
-            const video_item = Object.assign({}, download_item);
-            video_item.common_filename = video_item.id;
-            video_item.creation_date = new Date().getTime();
-            video_item.last_play_date = -1;
-            video_item.modification_date = -1;
-            video_item.play_count = 0;
-
-            const library = context.getter("library");
-            await library.insert(video_item.dirpath, video_item);
-            context.commit("addDownloadedItem", video_item.id);
-        },
         updateDownloadItem: (context, download_Items) => {
             context.commit("updateDownloadItem", download_Items);
         },
-        getLibraryItem: (context, video_id) => {
-            const library = context.getter("library");
-            return library.find(video_id);
-        },
-        getLibraryItems: (context) => {
-            const library = context.getter("library");
-            return library.findAll();
-        },
-        loadLibrary: async (context, dir) => {
-            const library = new LibraryDB(
-                {filename : path.join(dir, "library.json")});
-            await library.load();
-            context.commit("setLibrary", library);
-        },
-        updateLibrary: async (context, video_id, props) => {
-            const library = context.getter("library");
-            await library.update(video_id, props);
-            context.commit("updateLibraryItem", video_id, props);
-        },
-        saveLibrary: async (context) => {
-            const library = context.getter("library");
-            await library.save();
-        },
-        setLibraryData: async (context, dir, path_data_list, video_data_list) => {
-            const library = new LibraryDB(
-                {filename : path.join(dir, "library.json")});
-            library.setPathData(path_data_list);
-            library.setVideoData(video_data_list);
-            await library.save();
-
-            context.commit("setLibrary", library);
-        }
     },
     mutations: {
         setLibrary: (context, library) => {
             context.state.library = library;
             return [["libraryInitialized"]];
-        },
-        updateLibraryItem: (context, video_id, props) => {
-            return [["libraryItemUpdated", video_id, props]];
-        },
-        addDownloadedItem : (context, video_id) => {
-            return [["libraryItemAdded", video_id]];
         },
         updateDownloadItem: (context, download_Items) => {
             context.state.download_Items = download_Items;
@@ -166,13 +114,6 @@ const main_store = new Store({
         }
     },
     getters: {
-        library: (context) => {
-            return context.state.library;
-        },
-        existLibraryItem: (context, video_id) => {
-            const library = context.state.library;
-            return library.exist(video_id);
-        },
         downloadItemSet : (context) => {
             const id_set = new Set();
             context.state.download_Items.forEach(item => {

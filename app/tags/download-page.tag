@@ -98,7 +98,7 @@
         };
 
         let wait_time = 10;
-        if(process.env.NODE_ENV == "DEBUG"){
+        if(process.env.NODE_ENV!==undefined && process.env.NODE_ENV.trim() == "DEBUG"){
             wait_time = 1;
         }
 
@@ -163,7 +163,7 @@
             }
             cancel_donwload = true;
 
-            if(process.env.NODE_ENV == "DEBUG"){
+            if(process.env.NODE_ENV!==undefined && process.env.NODE_ENV.trim() == "DEBUG"){
                 obs.trigger("main-page:cancel-download");
             }
         };

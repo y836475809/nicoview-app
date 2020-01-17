@@ -25,21 +25,20 @@
     const { rootRequire } = require("../app/util");
     global.rootRequire = rootRequire;
     const { storex } = rootRequire("app/js/riotx-stores");
-    const { setupLibrary } = require("./setup-data");
-    process.env.DATA_SAVE = "NO";
-
-    setupLibrary(storex);
-
+    const { DataIpcRenderer } = rootRequire("app/js/library");
     const obs = riot.observable();  // eslint-disable-line
 
-    process.env.NODE_ENV = "SEARCH-PAGE-DEBUG";
+    DataIpcRenderer.action("library", "setData", {
+        data_dir : __dirname, 
+        path_data_list : [{id:"0", dirpath:"dir1"},{id:"1", dirpath:"dir2"}],
+        video_data_list : [{id:"sm1", dirpath_id:"0"},{id:"sm20", dirpath_id:"1"}]
+    }).then(()=>{
+        const { NicoSearchMocks } = require("./mock_server/nico-mock");
+        const nico_search_mock = new NicoSearchMocks();
+        nico_search_mock.search();
 
-    const { NicoSearchMocks } = require("./mock_server/nico-mock");
-    const nico_search_mock = new NicoSearchMocks();
-    nico_search_mock.search();
-
-    riot.mount("search-page", {obs});
- 
+        riot.mount("search-page", {obs});
+    }); 
 </script>
 
 </html>

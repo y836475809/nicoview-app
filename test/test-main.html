@@ -39,7 +39,6 @@
     const { storex } = rootRequire("app/js/riotx-stores");
     
     const obs = riot.observable(); // eslint-disable-line
-    process.env.NODE_ENV = "DEBUG";
 
     ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, getPathFromRoot(["test", "test-player.html"]));
 

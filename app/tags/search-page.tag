@@ -374,7 +374,7 @@
             //     return value.contentId;
             // });
 
-            if(process.env.NODE_ENV == "SEARCH-PAGE-DEBUG"){
+            if(process.env.NICO_SEARCH_MODE!==undefined && process.env.NICO_SEARCH_MODE.trim() == "DEBUG"){
                 const items = search_result.data.map(value => {
                     return createItem(value, false, false);
                 });

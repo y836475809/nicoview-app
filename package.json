@@ -4,9 +4,11 @@
   "description": "",
   "main": "app/main.js",
   "scripts": {
-    "test-main": "electron . test-main.html",
-    "test-main-player": "electron . test-player-main.html",
-    "test-riotx": "electron . riotx/index.html",
+    "test-main": "SET NODE_ENV=DEBUG&&electron . test-main.html",
+    "test-main-player": "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-player-main.html",
+    "test-search": "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&SET NICO_SEARCH_MODE=DEBUG&&electron . test-search.html",
+    "test-setting": "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&SET SETTING_MODE=DEBUG&&electron . test-setting.html",
+    "testel": "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron .",
     "main": "electron .",
     "test": "ava -v -s"
   },

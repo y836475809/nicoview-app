@@ -20,12 +20,13 @@ class ConfigRenderer {
 }
 
 class ConfigMain {
-    constructor() {
+    constructor(filename="config.json") {
+        this.filename = filename;
         this.setup();
     }
 
     setup(){
-        this.config_path = path.join(app.getPath("userData"), "config.json");
+        this.config_path = path.join(app.getPath("userData"), this.filename);
         this._initJsonData();
         ipcMain.handle(IPC_CHANNEL.GET_VALUE, async (event, args) => {
             const { key, default_value } = args;

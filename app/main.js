@@ -7,7 +7,14 @@ const { ConfigMain } = require("./js/config");
 const { Library } = require("./js/library");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
-const config_main = new ConfigMain();
+
+let config_fiiename = "config.json";
+
+if(process.env.NODE_ENV!==undefined && process.env.NODE_ENV.trim() == "DEBUG"){
+    config_fiiename = "config-debug.json";
+    console.info("debug mode, use config = ", config_fiiename);
+}
+const config_main = new ConfigMain(config_fiiename);
 const library = new Library();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -60,7 +67,8 @@ function createWindow() {
     }
 
     win.on("close", async (e) => {      
-        if(process.env.DATA_SAVE == "NO"){
+        if(process.env.DATA_SAVE!==undefined && process.env.DATA_SAVE.trim() == "NO"){
+            console.info("debug mdoe, not save data");
             return;
         }
         

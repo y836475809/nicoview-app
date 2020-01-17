@@ -68,7 +68,9 @@ function createWindow() {
 
     win.on("close", async (e) => {      
         if(process.env.DATA_SAVE!==undefined && process.env.DATA_SAVE.trim() == "NO"){
-            console.info("debug mdoe, not save data");
+            config_main.set("main.window.state", getWindowState(win));
+            await config_main.save();
+            console.info("debug mdoe, save config");
             return;
         }
         

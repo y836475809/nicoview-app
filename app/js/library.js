@@ -4,12 +4,18 @@ const EventEmitter = require("events");
 const { LibraryDB } = require("./db");
 
 const IPC_CHANNEL = Object.freeze({
-    ACITON: "ipc-data-action",
+    LIBRARY_ACITON: "ipc-library-action",
 });
 
 class DataIpcRenderer {
-    static async action(name, args) {
-        return await ipcRenderer.invoke(IPC_CHANNEL.ACITON, {name, args});
+    static async action(name, method, args) {
+        let channnel = null;
+        if (name=="library") {
+            channnel = IPC_CHANNEL.LIBRARY_ACITON;
+        }
+        if(channnel!=null){
+            return await ipcRenderer.invoke(channnel, {method, args});
+        }
     }
 }
 
@@ -18,44 +24,45 @@ class Library extends EventEmitter {
         super();
         this.setup();
     }
+
     setup(){
         this.library_db = null;
-        ipcMain.handle(IPC_CHANNEL.ACITON, async (event, _args) => {
-            const { name, args } = _args;
-            const func = this[name];
-            if(func.constructor.name === "AsyncFunction"){
-                return await this[name](args);
+        ipcMain.handle(IPC_CHANNEL.LIBRARY_ACITON, async (event, _args) => {
+            const { method, args } = _args;
+            const func = this[method];
+            if(func.constructor.method === "AsyncFunction"){
+                return await this[method](args);
             }else{
-                return this[name](args);
+                return this[method](args);
             }
         });
     }
 
-    getLibraryItem(args){
+    getItem(args){
         const { video_id } = args;
         return this.library_db.find(video_id);
     }
 
-    getLibraryItems(){
+    getItems(){
         return this.library_db.findAll();
     }
 
-    existLibraryItem(args){
+    existItem(args){
         const { video_id } = args;
         return this.library_db.exist(video_id);
     }
 
-    async updateLibrary(args){
+    async update(args){
         const { video_id, props } = args;
         await this.library_db.update(video_id, props);
         this.emit("libraryItemUpdated", {video_id, props});
     }
 
-    async saveLibrary(){
+    async save(){
         await this.library_db.save();
     }
 
-    async setLibraryData(args){
+    async setData(args){
         const { data_dir, path_data_list, video_data_list } = args;
         this.library_db = new LibraryDB(
             {filename : path.join(data_dir, "library.json")});
@@ -65,7 +72,7 @@ class Library extends EventEmitter {
 
         this.emit("libraryInitialized");
     }
-    async loadLibrary(args){
+    async load(args){
         const { data_dir } = args;
         this.library_db = new LibraryDB(
             {filename : path.join(data_dir, "library.json")});

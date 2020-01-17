@@ -95,7 +95,7 @@ function createWindow() {
         }
         
         try {
-            await library.saveLibrary();
+            await library.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -182,7 +182,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library.getLibraryItem({video_id});
+        const video_item = library.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
             video_id,
             video_item,
@@ -195,8 +195,8 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        if(library.existLibraryItem(video_id)){
-            const video_item = library.getLibraryItem({video_id});
+        if(library.existItem({video_id})){
+            const video_item = library.getItem({video_id});
             player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
                 video_id,
                 video_item,
@@ -216,7 +216,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library.getLibraryItem({video_id});
+        const video_item = library.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
             video_id,
             video_item,
@@ -244,7 +244,7 @@ app.on("ready", async ()=>{
 
         const { history_item } = args;
         const video_id = history_item.id;
-        const video_item = library.getLibraryItem({video_id});
+        const video_item = library.getItem({video_id});
         if(video_item===null){
             return;
         }
@@ -253,7 +253,7 @@ app.on("ready", async ()=>{
             last_play_date : new Date().getTime(),
             play_count : video_item.play_count + 1
         };
-        library.updateLibrary({video_id, props});
+        library.update({video_id, props});
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
@@ -290,7 +290,7 @@ app.on("ready", async ()=>{
 
     library.on("libraryInitialized", ()=>{  
         win.webContents.send("libraryInitialized", {
-            items:library.getLibraryItems()
+            items:library.getItems()
         });
     });
     library.on("libraryItemUpdated", (args)=>{  

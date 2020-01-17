@@ -337,12 +337,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await DataIpcRenderer.action("getLibraryItem", {video_id:item.id});
+                        const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id:item.id});
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                            await DataIpcRenderer.action("updateLibrary", {video_id, props});
+                            await DataIpcRenderer.action("library", "update", {video_id, props});
                             if(update_thumbnail){
-                                const updated_video_item = await DataIpcRenderer.action("getLibraryItem", {video_id});
+                                const updated_video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -379,7 +379,7 @@
             };
 
             try {
-                const video_item = await DataIpcRenderer.action("getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = await ConfigRenderer.get("ffmpeg_path", "");
 
@@ -403,7 +403,7 @@
                 await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
                 const props = {video_type:"mp4"};
-                await DataIpcRenderer.action("updateLibrary", {video_id, props});
+                await DataIpcRenderer.action("library", "update", {video_id, props});
 
                 await showMessageBox("info", "変換完了");
                 updateState("変換完了");  
@@ -533,7 +533,7 @@
             
             try {
                 const data_dir = await ConfigRenderer.get("data_dir");
-                await DataIpcRenderer.action("loadLibrary", {data_dir});
+                await DataIpcRenderer.action("library", "load", {data_dir});
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);
                 loadLibraryItems([]);
@@ -548,7 +548,7 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await DataIpcRenderer.action("getLibraryItem", {video_id});
+            const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
             if(video_item===null){
                 return;
             }
@@ -557,8 +557,8 @@
                 last_play_date : new Date().getTime(),
                 play_count : video_item.play_count + 1
             };
-            console.log("updateLibrary video_id=", video_id, ", props=", props);
-            await DataIpcRenderer.action("updateLibrary", {video_id, props});
+            console.log("update library video_id=", video_id, ", props=", props);
+            await DataIpcRenderer.action("library", "update", {video_id, props});
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 
@@ -573,7 +573,7 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                const video_item = await DataIpcRenderer.action("getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
                 this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){

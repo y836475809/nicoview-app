@@ -168,7 +168,7 @@
 
                         const video_id = items[0].data.video_id;
                         (async ()=>{
-                            const exist = await DataIpcRenderer.action("existLibraryItem", {video_id});
+                            const exist = await DataIpcRenderer.action("library", "existItem", {video_id});
                             if(exist===true){
                                 obs.trigger("main-page:select-page", "library");
                                 obs.trigger("library-page:scrollto", video_id);     

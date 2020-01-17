@@ -346,7 +346,7 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const download_item = nico_down.getDownloadedItem();
-                        await DataIpcRenderer.action("addDownloadedItem", {download_item});
+                        await DataIpcRenderer.action("library", "addDownloadedItem", {download_item});
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {

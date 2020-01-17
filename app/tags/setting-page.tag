@@ -166,7 +166,7 @@
             try {
                 const data_dir = await ConfigRenderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
-                await DataIpcRenderer.action("setLibraryData", {
+                await DataIpcRenderer.action("library", "setData", {
                     data_dir : data_dir, 
                     path_data_list : dir_list, 
                     video_data_list : video_list

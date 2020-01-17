@@ -167,7 +167,7 @@
                 const data_dir = await ConfigRenderer.get("data_dir", "");
                 const {dir_list, video_list} = await importNNDDDB(db_file_path);
 
-                if(process.env.SETTING_MODE!==undefined && process.env.SETTING_MODE.trim() == "DEBUG"){
+                if(process.env.SETTING_MODE == "DEBUG"){
                     console.log("data_dir=", data_dir);
                     console.log("import dir_list=", dir_list);
                     console.log("import video_list=", video_list);

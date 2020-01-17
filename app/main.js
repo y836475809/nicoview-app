@@ -10,7 +10,7 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 let config_fiiename = "config.json";
 
-if(process.env.NODE_ENV!==undefined && process.env.NODE_ENV.trim() == "DEBUG"){
+if(process.env.NODE_ENV == "DEBUG"){
     config_fiiename = "config-debug.json";
     console.info("debug mode, use config = ", config_fiiename);
 }
@@ -67,7 +67,7 @@ function createWindow() {
     }
 
     win.on("close", async (e) => {      
-        if(process.env.DATA_SAVE!==undefined && process.env.DATA_SAVE.trim() == "NO"){
+        if(process.env.DATA_SAVE == "NO"){
             config_main.set("main.window.state", getWindowState(win));
             await config_main.save();
             console.info("debug mdoe, save config");

@@ -139,7 +139,7 @@
         this.donwnload_item_num = 0;
 
         let template = [];
-        if(process.env.NODE_ENV!==undefined && process.env.NODE_ENV.trim() == "DEBUG"){
+        if(process.env.NODE_ENV == "DEBUG"){
             template.push({
                 label: "ツール",
                 submenu: [

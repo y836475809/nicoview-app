@@ -374,14 +374,6 @@
             //     return value.contentId;
             // });
 
-            if(process.env.NICO_SEARCH_MODE!==undefined && process.env.NICO_SEARCH_MODE.trim() == "DEBUG"){
-                const items = search_result.data.map(value => {
-                    return createItem(value, false, false);
-                });
-                grid_table.setData(items);
-                grid_table.scrollToTop();
-            }
-
             const donwload_video_id_set = main_store.getter("downloadItemSet");
             const items = await Promise.all(
                 search_result.data.map(async value => {

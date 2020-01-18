@@ -82,14 +82,15 @@ class Library extends EventEmitter {
 
     async addDownloadedItem(args){
         const { download_item } = args;
-        const video_item = Object.assign({}, download_item);
-        video_item.common_filename = video_item.id;
-        video_item.creation_date = new Date().getTime();
-        video_item.last_play_date = -1;
-        video_item.modification_date = -1;
-        video_item.play_count = 0;
-
-        await this.library_db.insert(video_item.dirpath, video_item);
+        const video_id = download_item.id;
+        const item = Object.assign({}, download_item);
+        item.common_filename = video_id;
+        item.creation_date = new Date().getTime();
+        item.last_play_date = -1;
+        item.modification_date = -1;
+        item.play_count = 0;
+        await this.library_db.insert(item.dirpath, item);
+        const video_item = this.library_db.find(video_id);
         this.emit("libraryItemAdded", {video_item});
     }
 }

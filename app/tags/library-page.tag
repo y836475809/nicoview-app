@@ -180,7 +180,7 @@
         this.obs_modal_dialog = riot.observable();
         const main_store = storex.get("main");
 
-        ipcRenderer.on("libraryItemAdded", async (args) => {
+        ipcRenderer.on("libraryItemAdded", async (event, args) => {
             const {video_item} = args;
             const video_data = new NicoVideoData(video_item);
             const video_id = video_item.id;

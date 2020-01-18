@@ -228,10 +228,13 @@
             }
         });
 
-        ipcRenderer.on("libraryItemAdded", async (args) => {
+        ipcRenderer.on("libraryItemAdded", async (event, args) => {
             const {video_item} = args;
             const video_id = video_item.id;
             const item = grid_table.dataView.getItemById(video_id);
+            if(item === undefined){
+                return;
+            }
             item.saved = true;
             grid_table.dataView.updateItem(video_id, item);
         });

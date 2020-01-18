@@ -308,11 +308,12 @@ class LibraryDB {
     }
 
     async insert(dirpath, video_data) {
+        const cp_video_data = { ...video_data };
         const dirpath_id = await this._getPathID(dirpath);
-        video_data.dirpath_id = dirpath_id;
-        this._deleteNoUseProp(video_data);
+        cp_video_data.dirpath_id = dirpath_id;
+        this._deleteNoUseProp(cp_video_data);
         await this._db.insert("path", { "id": dirpath_id, "dirpath": dirpath });
-        await this._db.insert("video", video_data);
+        await this._db.insert("video", cp_video_data);
     }
 
     async update(video_id, props) {

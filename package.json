@@ -5,12 +5,12 @@
   "main": "app/main.js",
   "scripts": {
     "test-main":        "SET NODE_ENV=DEBUG&&electron . test-main.html",
-    "test-player-main": "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-player-main.html",
-    "test-search":      "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-search.html",
-    "test-setting":     "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-setting.html",
-    "test-mylist":      "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-mylist.html",
-    "test-nicoscript":  "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-nicoscript.html",
-    "test-tween":       "SET NODE_ENV=DEBUG&&SET DATA_SAVE=NO&&electron . test-tween.html",
+    "test-player-main": "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-player-main.html",
+    "test-search":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-search.html",
+    "test-setting":     "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-setting.html",
+    "test-mylist":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-mylist.html",
+    "test-nicoscript":  "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-nicoscript.html",
+    "test-tween":       "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&electron . test-tween.html",
     "main": "electron .",
     "test": "ava -v -s"
   },

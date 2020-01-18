@@ -100,6 +100,6 @@
   - []  npm run test-player-main
   - []  npm run test-search
   - []  npm run test-setting
-  - []  npm run test-other -- test-mylist.html
-  - []  npm run test-other -- test-nicoscript.html
-  - []  npm run test-other -- test-tween.html
+  - []  npm run test-mylist.html
+  - []  npm run test-nicoscript.html
+  - []  npm run test-tween.html

@@ -11,7 +11,7 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 let config_fiiename = "config.json";
 
-if(process.env.NODE_ENV == "DEBUG"){
+if(process.env.USE_CONFIG == "DEBUG"){
     config_fiiename = "config-debug.json";
     console.info("debug mode, use config = ", config_fiiename);
 }

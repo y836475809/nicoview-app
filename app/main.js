@@ -5,6 +5,7 @@ const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { Library } = require("./js/library");
+const DBConverter = require("./js/db-converter");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -35,6 +36,15 @@ const getWindowState = (w) => {
         height: bounds.height, 
         maximized: w.isMaximized()
     };
+};
+
+const importNNDDDB = async (sqlite_file_path)=>{
+    const db_converter = new DBConverter();
+    db_converter.init(sqlite_file_path);
+    db_converter.read();
+    const dir_list = db_converter.get_dirpath();
+    const video_list = db_converter.get_video();
+    return { dir_list, video_list };
 };
 
 function createWindow() {
@@ -296,6 +306,37 @@ app.on("ready", async ()=>{
 
     ipcMain.on(IPC_CHANNEL.SET_PLAYER_PATH, (event, args) => {
         player_html_path = args;
+    });
+
+    ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {
+        const { db_file_path } = args;
+        const data_dir = config_main.get("data_dir", "");
+
+        if(data_dir == ""){
+            return {
+                result : false,
+                error : new Error("データを保存するフォルダが設定されていない")
+            };
+        }
+
+        try {
+            const { dir_list, video_list } = await importNNDDDB(db_file_path);
+            await library.setData({
+                data_dir : data_dir, 
+                path_data_list : dir_list, 
+                video_data_list : video_list
+            }); 
+        } catch (error) {
+            return {
+                result : false,
+                error : error
+            };   
+        }
+
+        return {
+            result : true,
+            error : null
+        };
     });
 
     library.on("libraryInitialized", ()=>{  

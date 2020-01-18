@@ -86,11 +86,10 @@
 
     <script>
         /* globals rootRequire riot */
-        const { shell } = require("electron");
-        const DBConverter = rootRequire("app/js/db-converter");
+        const { shell, ipcRenderer } = require("electron");
         const { ConfigRenderer } = rootRequire("app/js/config");
         const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { DataIpcRenderer } = rootRequire("app/js/library");
+        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
         
         this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
@@ -142,15 +141,6 @@
             setInputValue(".ffmpeg-path-input", await ConfigRenderer.get("ffmpeg_path", ""));
         });
 
-        const importNNDDDB = async (sqlite_file_path)=>{
-            const db_converter = new DBConverter();
-            db_converter.init(sqlite_file_path);
-            db_converter.read();
-            const dir_list = db_converter.get_dirpath();
-            const video_list = db_converter.get_video();
-            return { dir_list, video_list };
-        };
-
         this.onclickImport = async ()=>{
             const db_file_path = await selectFileDialog("Sqlite db", ["db"]);
             if(db_file_path == null){
@@ -160,31 +150,15 @@
             this.obs_msg_dialog.trigger("show", {
                 message: "インポート中...",
             });
-            //TODO
-            await new Promise(resolve => setTimeout(resolve, 100));
 
-            try {
-                const data_dir = await ConfigRenderer.get("data_dir", "");
-                const {dir_list, video_list} = await importNNDDDB(db_file_path);
-
-                if(process.env.SETTING_MODE == "DEBUG"){
-                    console.log("data_dir=", data_dir);
-                    console.log("import dir_list=", dir_list);
-                    console.log("import video_list=", video_list);
-                }else{
-                    await DataIpcRenderer.action("library", "setData", {
-                        data_dir : data_dir, 
-                        path_data_list : dir_list, 
-                        video_data_list : video_list
-                    });
-                }
+            const ret = await ipcRenderer.invoke(IPC_CHANNEL.IMPORT_NNDD_DB, {db_file_path});
+            if(ret.result===true){
                 await showMessageBox("info", "インポート完了");
-            } catch (error) {
-                console.log(error);
-                await showMessageBox("error", `インポート失敗: ${error.message}`);
-            }finally{
-                this.obs_msg_dialog.trigger("close");
+            } else {
+                console.log(ret.error);
+                await showMessageBox("error", `インポート失敗: ${ret.error.message}`);
             }
+            this.obs_msg_dialog.trigger("close");
         };
     </script>
 </setting-page>

@@ -5,7 +5,7 @@ const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { Library } = require("./js/library");
-const DBConverter = require("./js/db-converter");
+const { importNNDDDB } = require("./js/import-nndd-db");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -36,15 +36,6 @@ const getWindowState = (w) => {
         height: bounds.height, 
         maximized: w.isMaximized()
     };
-};
-
-const importNNDDDB = async (sqlite_file_path)=>{
-    const db_converter = new DBConverter();
-    db_converter.init(sqlite_file_path);
-    db_converter.read();
-    const dir_list = db_converter.get_dirpath();
-    const video_list = db_converter.get_video();
-    return { dir_list, video_list };
 };
 
 function createWindow() {

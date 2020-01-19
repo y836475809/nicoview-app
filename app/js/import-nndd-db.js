@@ -110,4 +110,16 @@ class DBConverter {
     }
 }
 
-module.exports = DBConverter;
+const importNNDDDB = async (db_file_path)=>{
+    const db_converter = new DBConverter();
+    db_converter.init(db_file_path);
+    db_converter.read();
+    const path_data_list = db_converter.get_dirpath();
+    const video_data_list = db_converter.get_video();
+    return { path_data_list, video_data_list };
+};
+
+module.exports = {
+    DBConverter,
+    importNNDDDB
+};

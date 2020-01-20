@@ -20,13 +20,12 @@
     <script>
         /* globals */
         const path = window.path;
-        const { remote } = window.electron;
+        const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const HistoryStore = window.HistoryStore;
         const { BookMark } = window.BookMark;
         const { ConfigRenderer } = window.ConfigRenderer;
-        const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 

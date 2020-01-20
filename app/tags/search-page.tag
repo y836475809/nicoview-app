@@ -203,7 +203,7 @@
     <script>
         /* globals riot */
         const {remote, ipcRenderer} = window.electron;
-        const { Menu, MenuItem } = remote;
+        const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const { NicoSearchParams, NicoSearch } = window.NicoSearch;
         const { showMessageBox } = window.RemoteDailog;

@@ -119,10 +119,9 @@
 
     <script>
         /* globals */
-        const { remote } = window.electron;
-        const { ipcRenderer } = window.electron;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { DataIpcRenderer } = window.DataIpcRenderer;
 
         this.obs = this.opts.obs;

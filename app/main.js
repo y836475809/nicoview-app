@@ -1,7 +1,6 @@
-const { session, dialog, app, BrowserWindow } = require("electron");
+const { session, dialog, app, BrowserWindow, ipcMain } = require("electron");
 const fs = require("fs");
 const path = require("path");
-const { ipcMain } = require("electron");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { Library } = require("./js/library");

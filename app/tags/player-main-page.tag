@@ -40,10 +40,9 @@
     <script>
         /* globals riot */
         const path = window.path;
-        const {remote} = window.electron;
-        const { ipcRenderer } = window.electron;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { Menu, MenuItem } = remote;
+        const { remote, ipcRenderer } = window.electron;
+        const { Menu } = remote;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { ConfigRenderer } = window.ConfigRenderer;
         const { NicoPlay } = window.NicoPlay;
         const { CommentNG, CommentDisplayAmount } = window.CommentFilter;

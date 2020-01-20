@@ -1,5 +1,5 @@
 const { remote } = require("electron");
-const { dialog } = require("electron").remote;
+const { dialog } = remote;
 
 const selectFileDialog = async (name, extensions)=>{
     const result = await dialog.showOpenDialog(remote.getCurrentWindow(), {

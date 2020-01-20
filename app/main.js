@@ -25,7 +25,7 @@ let player_win = null;
 let is_debug_mode = false;
 let do_app_quit = false;
 
-let player_html_path = `file://${__dirname}/html/player.html`;
+let player_html_path = `${__dirname}/html/player.html`;
 
 const getWindowState = (w) => {
     const bounds = w.getBounds(); 
@@ -39,14 +39,10 @@ const getWindowState = (w) => {
 };
 
 function createWindow() {
-    global.sharedObj = {
-        base_dir: __dirname
-    };
-
-    let main_html_path = `file://${__dirname}/html/index.html`;
+    let main_html_path = `${__dirname}/html/index.html`;
     if (process.argv.length > 2) {
         const filename = process.argv[2];
-        main_html_path = `file://${path.resolve(__dirname, "..")}/test/${filename}`;
+        main_html_path = `${path.resolve(__dirname, "..")}/test/${filename}`;
         is_debug_mode = true;
     }
 

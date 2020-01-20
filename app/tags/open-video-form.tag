@@ -50,9 +50,9 @@
     </div>
 
     <script>
-        /* globals rootRequire */
-        const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        /* globals */
+        const { ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
 

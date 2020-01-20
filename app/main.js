@@ -53,7 +53,9 @@ function createWindow() {
     // ブラウザウィンドウの作成
     const state = config_main.get("main.window.state", { width: 1000, height: 600 });
     state.webPreferences =  {
-        nodeIntegration: true
+        nodeIntegration: false,
+        contextIsolation: false,
+        preload: `${__dirname}/preload_main.js`,
     };
     win = new BrowserWindow(state);
     if (state.maximized) {
@@ -366,7 +368,9 @@ const createPlayerWindow = () => {
         }
         const state = config_main.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
-            nodeIntegration: true
+            nodeIntegration: false,
+            contextIsolation: false,
+            preload: `${__dirname}/preload_player.js`,
         };
         player_win = new BrowserWindow(state);
         if (state.maximized) {

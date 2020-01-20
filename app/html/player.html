@@ -3,9 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <script>
-        window.jQuery = window.$ = require("jquery");
-    </script>
     <link rel="stylesheet" type="text/css" href="../css/app.css">
     <style type="text/css">
     </style>
@@ -31,8 +28,6 @@
 
 <script>
     /* globals riot */
-    const { rootRequire } = require("../util");
-    global.rootRequire = rootRequire;
     const obs = riot.observable();
     
     riot.mount("player-main-page", {obs});

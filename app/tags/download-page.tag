@@ -66,21 +66,21 @@
     <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
 
     <script>
-        /* globals rootRequire */
-        const EventEmitter = require("events");
-        const { remote, ipcRenderer } = require("electron");
+        /* globals */
+        const EventEmitter = window.EventEmitter;
+        const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { NicoDownloader } = rootRequire("app/js/nico-downloader");
-        const { GridTableDownloadItem } = rootRequire("app/js/gridtable-downloaditem");
-        const { ScheduledTask } = rootRequire("app/js/scheduled-task");
-        const { showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { BookMark } = rootRequire("app/js/bookmark");
-        const { ConfigRenderer } = rootRequire("app/js/config");
-        const { DataIpcRenderer } = rootRequire("app/js/library");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { NicoDownloader } = window.NicoDownloader;
+        const { GridTableDownloadItem } = window.GridTableDownloadItem;
+        const { ScheduledTask } = window.ScheduledTask;
+        const { showMessageBox } = window.RemoteDailog;
+        const { BookMark } = window.BookMark;
+        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
-        const main_store = storex.get("main");
+        const main_store = window.storex.get("main");
 
         let donwload_schedule = null;
 

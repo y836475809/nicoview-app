@@ -26,9 +26,9 @@
     </div>
 
     <script>
-        /* globals rootRequire */
-        const { CommentTimeLine, NicoScript } = rootRequire("app/js/comment-timeline");
-        const { ConfigRenderer } = rootRequire("app/js/config");
+        /* globals */
+        const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs = this.opts.obs; 
 

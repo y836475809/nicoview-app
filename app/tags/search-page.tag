@@ -21,17 +21,17 @@
     </div>
 
     <script>
-        /* globals rootRequire riot */
-        const path = require("path");
-        const {remote} = require("electron");
+        /* globals riot */
+        const path = window.path;
+        const {remote} = window.electron;
         const {Menu} = remote;
-        const JsonStore = rootRequire("app/js/json-store");
-        const { ConfigRenderer } = rootRequire("app/js/config");
+        const JsonStore = window.JsonStore;
+        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
         this.storname = "nico-search";
-        const store = storex.get(this.storname);
+        const store = window.storex.get(this.storname);
     
         this.on("mount", async () => {
             const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
@@ -201,19 +201,19 @@
     <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals rootRequire riot */
-        const {remote, ipcRenderer} = require("electron");
+        /* globals riot */
+        const {remote, ipcRenderer} = window.electron;
         const { Menu, MenuItem } = remote;
-        const { GridTable } = rootRequire("app/js/gridtable");
-        const { NicoSearchParams, NicoSearch } = rootRequire("app/js/nico-search");
-        const { showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { BookMark } = rootRequire("app/js/bookmark");
-        const { DataIpcRenderer } = rootRequire("app/js/library");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { GridTable } = window.GridTable;
+        const { NicoSearchParams, NicoSearch } = window.NicoSearch;
+        const { showMessageBox } = window.RemoteDailog;
+        const { BookMark } = window.BookMark;
+        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const main_store = storex.get("main");
+        const main_store = window.storex.get("main");
 
         main_store.change("downloadItemChanged", async (state, store) => {
             const download_video_id_set = store.getter("downloadItemSet");

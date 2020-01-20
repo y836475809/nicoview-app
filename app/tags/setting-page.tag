@@ -85,11 +85,11 @@
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
     <script>
-        /* globals rootRequire riot */
-        const { shell, ipcRenderer } = require("electron");
-        const { ConfigRenderer } = rootRequire("app/js/config");
-        const { selectFileDialog, selectFolderDialog, showMessageBox } = rootRequire("app/js/remote-dialogs");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        /* globals riot */
+        const { shell, ipcRenderer } = window.electron;
+        const { ConfigRenderer } = window.ConfigRenderer;
+        const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         
         this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";

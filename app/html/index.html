@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>Hello World!</title>
-        <script>window.jQuery = window.$ = require("jquery");</script>
         <link rel="stylesheet" type="text/css" href="../css/app.css">
         <link rel="stylesheet" type="text/css" href="../css/split-page.css">
 
@@ -29,15 +28,12 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script>
         /* globals riot */
-        const { rootRequire, getPathFromRoot } = require("../util");
-        global.rootRequire = rootRequire;
-        const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
-        const { storex } = rootRequire("app/js/riotx-stores");
+        const { ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = riot.observable();
 
-        ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, getPathFromRoot(["app", "html", "player.html"]));
+        ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, window.getPathFromRoot(["app", "html", "player.html"]));
 
         riot.mount("main-page", {obs});
     </script>

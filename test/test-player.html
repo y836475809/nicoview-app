@@ -4,9 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>test</title>
-    <script>
-        window.jQuery = window.$ = require("jquery");
-    </script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
     </style>
@@ -31,13 +28,11 @@
 <script type="riot/tag" src="../app/tags/open-video-form.tag"></script>
 <script>
     /* globals riot */
-    const { rootRequire } = require("../app/util");
-    global.rootRequire = rootRequire;
     const obs = riot.observable(); // eslint-disable-line
     
     riot.mount("player-main-page", {obs});
 
-    const { NicoVideoMocks } = require("./mock_server/nico-mock");
+    const { NicoVideoMocks } = window.NicoMock;
 
     const video_mocks = [];
     const video_ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];

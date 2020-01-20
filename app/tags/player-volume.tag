@@ -33,8 +33,8 @@
     </div>
 
     <script>
-        /* globals rootRequire */
-        const { ConfigRenderer } = rootRequire("app/js/config");
+        /* globals */
+        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs = this.opts.obs; 
 

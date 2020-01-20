@@ -36,10 +36,10 @@
     <button type="button" class="delete-button" onclick={this.onclickDelete}>Delete</button>
 
     <script>
-        /* globals rootRequire */
-        const { remote } = require("electron");
+        /* globals */
+        const { remote } = window.electron;
         const { Menu } = remote;
-        const { GridTable } = rootRequire("app/js/gridtable");
+        const { GridTable } = window.GridTable;
 
         const obs_dialog = this.opts.obs;
 

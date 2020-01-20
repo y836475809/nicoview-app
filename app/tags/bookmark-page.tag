@@ -65,22 +65,21 @@
     </aside>
 
     <script>
-        /* globals rootRequire riot */
-        const path = require("path");
-        const {remote, ipcRenderer} = require("electron");
+        /* globals riot */
+        const path = window.path;
+        const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
-        const JsonStore = rootRequire("app/js/json-store");
-        const { BookMark } = rootRequire("app/js/bookmark");
-        const { ConfigRenderer } = rootRequire("app/js/config");
-        const { DataIpcRenderer } = rootRequire("app/js/library");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const JsonStore = window.JsonStore;
+        const { BookMark } = window.BookMark;
+        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_bookmark = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
-        const store = storex.get(this.storname);
-        const main_store = storex.get("main");
+        const store = window.storex.get(this.storname);
 
         this.on("mount", async () => {
             const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);

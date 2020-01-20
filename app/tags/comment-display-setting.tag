@@ -47,8 +47,8 @@
         onclick={this.onclickLimitCommentCheck} /><label>表示数を制限</label>
     </div>
     <script>
-        /* globals rootRequire */
-        const { ConfigRenderer } = rootRequire("app/js/config");
+        /* globals */
+        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs_dialog = this.opts.obs;
 

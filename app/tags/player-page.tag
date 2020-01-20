@@ -51,12 +51,12 @@
     <open-video-form obs={opts.obs}></open-video-form>
 
     <script>
-        /* globals rootRequire */
-        const { remote, clipboard, ipcRenderer } = require("electron");
+        /* globals */
+        const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { BookMark } = rootRequire("app/js/bookmark");
-        const { getNicoURL } = rootRequire("app/js/niconico");       
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { BookMark } = window.BookMark;
+        const { getNicoURL } = window.Niconico;       
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         
         const obs = this.opts.obs; 
 

@@ -248,14 +248,13 @@
     </div>
     
     <script>
-        /* globals rootRequire */
-        const { remote, clipboard, ipcRenderer } = require("electron");
+        /* globals */
+        const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { GridTable } = rootRequire("app/js/gridtable");
-        require("slickgrid/plugins/slick.autotooltips");
-        const time_format = rootRequire("app/js/time-format");
-        const SyncCommentScroll = rootRequire("app/js/sync-comment-scroll");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { GridTable } = window.GridTable;
+        const time_format = window.TimeFormat;
+        const SyncCommentScroll = window.SyncCommentScroll;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
 

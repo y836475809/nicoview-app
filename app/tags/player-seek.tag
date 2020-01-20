@@ -59,8 +59,8 @@
     <div class="duration">{this.fmt_duration}</div>
 
     <script>
-        /* globals rootRequire */
-        const time_format = rootRequire("app/js/time-format");
+        /* globals */
+        const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
 

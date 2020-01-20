@@ -18,16 +18,16 @@
     </div>    
 
     <script>
-        /* globals rootRequire */
-        const path = require("path");
-        const { remote } = require("electron");
+        /* globals */
+        const path = window.path;
+        const { remote } = window.electron;
         const { Menu } = remote;
-        const { GridTable } = rootRequire("app/js/gridtable");
-        const HistoryStore = rootRequire("app/js/history-store");
-        const { BookMark } = rootRequire("app/js/bookmark");
-        const { ConfigRenderer } = rootRequire("app/js/config");
-        const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
+        const { GridTable } = window.GridTable;
+        const HistoryStore = window.HistoryStore;
+        const { BookMark } = window.BookMark;
+        const { ConfigRenderer } = window.ConfigRenderer;
+        const { ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         

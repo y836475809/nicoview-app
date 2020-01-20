@@ -4,9 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>test</title>
-    <script>
-        window.jQuery = window.$ = require("jquery");
-    </script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <link rel="stylesheet" type="text/css" href="../app/css/split-page.css">
 
@@ -32,22 +29,17 @@
 <script type="riot/tag" src="../app/tags/bookmark-page.tag"></script>
 <script>
     /* globals riot */
-    const { ipcRenderer } = require("electron");
-    const { rootRequire, getPathFromRoot } = require("../app/util");
-    global.rootRequire = rootRequire;
-    const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
-    const { storex } = rootRequire("app/js/riotx-stores");
+    const { ipcRenderer } = window.electron;
+    const { IPC_CHANNEL } = window.IPC_CHANNEL;
     
     const obs = riot.observable(); // eslint-disable-line
 
-    ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, getPathFromRoot(["test", "test-player.html"]));
+    ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, window.getPathFromRoot(["test", "test-player.html"]));
 
     riot.mount("main-page", {obs});
 
     const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
-        setupNicoDownloadNock } = require("./mock_server/nico-mock");
-    require("./mock_server/http-server");
-
+        setupNicoDownloadNock } = window.NicoMock;
     const nico_search_mock = new NicoSearchMocks();
     nico_search_mock.search();
 

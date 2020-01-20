@@ -118,17 +118,15 @@
     </div>
 
     <script>
-        /* globals rootRequire */
-        const { remote } = require("electron");
-        const { ipcRenderer } = require("electron");
-        const { IPC_CHANNEL } = rootRequire("app/js/ipc-channel");
-        const { dialog } = require("electron").remote;
+        /* globals */
+        const { remote } = window.electron;
+        const { ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const {Menu} = remote;
-        const { showOKCancelBox } = rootRequire("app/js/remote-dialogs");
-        const { DataIpcRenderer } = rootRequire("app/js/library");
+        const { DataIpcRenderer } = window.DataIpcRenderer;
 
         this.obs = this.opts.obs;
-        const main_store = storex.get("main");
+        const main_store = window.storex.get("main");
 
         main_store.change("downloadItemChanged", (state, store) => {
             const id_set = store.getter("downloadIncompleteItemSet");

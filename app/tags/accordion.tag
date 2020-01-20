@@ -100,13 +100,13 @@
     </div>
 
     <script>
-        const Sortable = require("sortablejs");
+        const Sortable = window.Sortable;
 
         let sortable = null;
         const menu_item_h = 30;
         const obs_accordion = this.opts.obs;
 
-        const store = storex.get(this.opts.storname);
+        const store = window.storex.get(this.opts.storname);
 
         store.change("loaded", (state, store) => {
             this.item_attr_map = store.getter("attmap");

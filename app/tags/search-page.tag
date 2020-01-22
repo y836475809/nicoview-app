@@ -23,8 +23,9 @@
 
     <script>
         /* globals riot */
-        const { remote, ipcRenderer } = window.electron;
+        const { remote } = window.electron;
         const {Menu} = remote;
+        const { BookMarkIpcRenderer } = window.BookMark;
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
@@ -34,14 +35,15 @@
         };
 
         this.on("mount", async () => {
-            const file_name = `${this.storname}.json`;
-            const items =  await ipcRenderer.invoke("getbookmark", { file_name });
+            const name = this.storname;
+            const items = await BookMarkIpcRenderer.action("getData", { name });
             this.obs_accordion.trigger("loadData", { items });
         });
 
-        this.obs_accordion.on("changed", (args) => {
+        this.obs_accordion.on("changed", async (args) => {
             const { items } = args;
-            console.log("search:items=", items);
+            const name = this.storname;
+            await BookMarkIpcRenderer.action("save", { name, items });
         });
 
         const createMenu = (self) => {

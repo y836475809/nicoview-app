@@ -7,6 +7,7 @@ const IPC_CHANNEL = Object.freeze({
     LIBRARY_ACITON: "ipc-library-action",
 });
 
+// TODO
 class DataIpcRenderer {
     static async action(name, method, args) {
         let channnel = null;

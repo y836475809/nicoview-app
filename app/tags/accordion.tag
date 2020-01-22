@@ -116,8 +116,6 @@
             this.items = items;
             this.update();
             chanegExpand(true);
-
-            triggerChange();
         });
 
         obs_accordion.on("addList", async (args) => {

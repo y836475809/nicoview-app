@@ -69,7 +69,7 @@
         /* globals riot */
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
-        const { BookMark } = window.BookMark;
+        const { BookMark, BookMarkIpcRenderer } = window.BookMark;
         const { DataIpcRenderer } = window.DataIpcRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
@@ -84,14 +84,15 @@
         };
 
         this.on("mount", async () => {
-            const file_name = `${this.storname}.json`;
-            const items =  await ipcRenderer.invoke("getbookmark", { file_name });
+            const name = this.storname;
+            const items = await BookMarkIpcRenderer.action("getData", { name });
             this.obs_accordion.trigger("loadData", { items });
         });
 
-        this.obs_accordion.on("changed", (args) => {
+        this.obs_accordion.on("changed", async (args) => {
             const { items } = args;
-            console.log("bookmark:items=", items);
+            const name = this.storname;
+            await BookMarkIpcRenderer.action("save", { name, items });
         });
 
         this.onclickSideBar = (e) => {

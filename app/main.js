@@ -4,6 +4,7 @@ const path = require("path");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { Library } = require("./js/library");
+const { BookMarkIpcMain } = require("./js/bookmark");
 const { importNNDDDB } = require("./js/import-nndd-db");
 const JsonStore = require("./js/json-store");
 
@@ -17,6 +18,7 @@ if(process.env.USE_CONFIG == "DEBUG"){
 }
 const config_main = new ConfigMain(config_fiiename);
 const library = new Library();
+const bookmark_ipc_main = new BookMarkIpcMain();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -175,8 +177,6 @@ app.on("ready", async ()=>{
         app.quit();
         return;
     }
-
-    createWindow();
 
     ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
         await createPlayerWindow();
@@ -354,6 +354,10 @@ app.on("ready", async ()=>{
     library.on("libraryItemAdded", (args)=>{  
         win.webContents.send("libraryItemAdded", args);
     });
+        
+    bookmark_ipc_main.setup(await config_main.get("data_dir", ""))
+
+    createWindow();
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

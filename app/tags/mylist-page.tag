@@ -18,56 +18,44 @@
 
     <script>
         /* globals riot */
-        const path = window.path;
         const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
-        const JsonStore = window.JsonStore;
-        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
         this.storname = "mylist";
-        const store = window.storex.get(this.storname);
 
         this.on("mount", async () => {
-            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            // try {
-            //     this.json_store = new JsonStore(file_path);
-            //     const items = this.json_store.load();
-            //     store.commit("loadData", {items});
-            // } catch (error) { 
-            //     const items = [];
-            //     store.commit("loadData", {items});
-            //     console.log(error);
-            // }
             const file_name = `${this.storname}.json`;
             const items =  await ipcRenderer.invoke("getbookmark", { file_name });
-            this.obs_search.trigger("loadData", { items });
+            this.obs_accordion.trigger("loadData", { items });
         });
         
-        store.change("changed", (state, store) => {
-            // this.json_store.save(state.items);
+        let hasItem = null;
+
+        this.obs_accordion.on("changed", (args) => {
+            const { items } = args;
+            console.log("mylist:items=", items);
+
+            hasItem = (mylist_id) => {
+                return items.some(value=>{
+                    return value.mylist_id == mylist_id;
+                });
+            };
         });
 
-        const hasItem = (mylist_id) => {
-            const items = store.getter("state").items;
-            return items.some(value=>{
-                return value.mylist_id == mylist_id;
-            });
-        };
-
-        const createMenu = () => {
+        const createMenu = (self) => {
             const nemu_templete = [
                 { 
                     label: "削除", click() {
-                        store.action("deleteList");
+                        self.obs_accordion.trigger("deleteList");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
         this.obs_accordion.on("show-contextmenu", (e) => {
-            const context_menu = createMenu();
+            const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
@@ -80,7 +68,7 @@
             const items = [
                 { title, mylist_id, creator, link }
             ];
-            store.action("addList", {items});
+            this.obs_accordion.trigger("addList", { items });
         });
 
         obs.on("mylist-page:sidebar:has-item", (args) => {

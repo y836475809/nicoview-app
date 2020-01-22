@@ -107,27 +107,53 @@
         const obs_accordion = this.opts.obs;
         const icon_class = this.opts.icon_class;
 
-        const store = window.storex.get(this.opts.storname);
-
-        // store.change("loaded", (state, store) => {
-        //     this.item_attr_map = store.getter("attmap");
-        //     this.items = store.getter("state").items;
-        //     this.update();
-        //     chanegExpand(true);
-        // });
-        store.change("changed", (state, store) => {
-            this.item_attr_map = store.getter("attmap");
-            const query = getInputValue();
-            filter(query);
-        });
+        const triggerChange = () => {
+            obs_accordion.trigger("changed", {items:this.items});
+        };
 
         obs_accordion.on("loadData", async (args) => {
             const { items } = args;
-            this.item_attr_map = store.getter("attmap");
             this.items = items;
             this.update();
             chanegExpand(true);
+
+            triggerChange();
         });
+
+        obs_accordion.on("addList", async (args) => {
+            const { items } = args;
+            this.items = this.items.concat(items);
+
+            const query = getInputValue();
+            filter(query);
+
+            triggerChange();
+        });
+
+        obs_accordion.on("deleteList", () => {
+            const elms = this.root.querySelectorAll(".acdn-item");
+            this.items = this.items.filter((item, index) => {
+                return elms[index].classList.contains("selected")===false;
+            });
+            this.update();
+            chanegExpand(true);
+
+            triggerChange();
+        });
+
+        const sortItems = () => {
+            const order = sortable.toArray().map(value=>Number(value));
+            const sorted_items = [];
+            order.forEach(value => {
+                sorted_items.push(this.items[value]);
+            });
+            this.items = sorted_items;
+
+            this.update();
+            chanegExpand(true);
+
+            triggerChange();
+        };
 
         const getInputValue = () => {
             const elm = this.root.querySelector(".query-input");
@@ -135,7 +161,20 @@
         };
 
         const filter = (query) => {
-            this.items = store.getter("filter", {query});
+            const elms = this.root.querySelectorAll(".acdn-item");
+            elms.forEach((elm, index) => {
+                if (query == "") {
+                    elm.style.display ="";
+                }else{
+                    if(this.items[index].title.toLowerCase().includes(query)){
+                        
+                        elm.style.display ="";
+                    }else{
+                        elm.style.display ="none";
+                    }
+                }
+            });
+
             this.update();
             chanegExpand(true);
 
@@ -151,16 +190,6 @@
         };
 
         this.getIconClass = (item) => {
-            // if(this.item_attr_map.has(item)==false){
-            //     return ""; 
-            // }
-
-            // const icon = this.item_attr_map.get(item);
-            // if(icon!==undefined && icon.name!==undefined && icon.class_name!==undefined){
-            //     return `center-hv icont-item ${icon.name} ${icon.class_name}`;
-            // }
-            // return "";
-
             const type = item.type;
             if(icon_class === undefined || type === undefined){
                 return ""; 
@@ -169,8 +198,7 @@
             if(icon_name === undefined){
                 return ""; 
             }
-            return `center-hv icont-item ${icon_name} ${this.opts.storname}-item`;
-            
+            return `center-hv icont-item ${icon_name} ${this.opts.storname}-item`; 
         };
 
         const getMenuElm = () => {
@@ -197,25 +225,19 @@
             chanegExpand(elm.clientHeight===0);
         };
 
-        const sortItems = () => {
-            const order = sortable.toArray().map(value=>Number(value));
-            const sorted_items = [];
-            order.forEach(value => {
-                sorted_items.push(this.items[value]);
-            });
-
-            store.commit("updateData", {items:sorted_items});
-        };
-
         const setSelected = (target_elm, item) => {
             const elms = this.root.querySelectorAll(".acdn-item");
             elms.forEach((elm) => {
                 elm.classList.remove("selected");
             });
             target_elm.classList.add("selected"); 
+        };
 
-            const selected_items = [item];
-            store.commit("setSelectedData", {selected_items});
+        const getSelectedItems = () => {
+            const elms = this.root.querySelectorAll(".acdn-item");
+            return this.items.filter((item, index) => {
+                return elms[index].classList.contains("selected")===true;
+            });
         };
 
         this.onclickMenubar = (e) => {
@@ -234,9 +256,11 @@
         this.onmouseUp= (item, e) => {
             setSelected(e.target, item);
             if(e.button===2){
-                obs_accordion.trigger("show-contextmenu", e);
+                const items = getSelectedItems();
+                obs_accordion.trigger("show-contextmenu", e, { items });
             }
         };
+
         this.onmouseDown= (item, e) => {
             setSelected(e.target, item);
         };

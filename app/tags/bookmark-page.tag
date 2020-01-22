@@ -59,7 +59,7 @@
         <accordion class="content"
             title="ブックマーク" 
             expand={true} 
-            obs={obs_bookmark}
+            obs={obs_accordion}
             icon_class={icon_class}
             storname={storname}>
         </accordion>
@@ -67,45 +67,31 @@
 
     <script>
         /* globals riot */
-        const path = window.path;
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
-        const JsonStore = window.JsonStore;
         const { BookMark } = window.BookMark;
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { DataIpcRenderer } = window.DataIpcRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
-        this.obs_bookmark = riot.observable();
+        this.obs_accordion = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
         this.icon_class = {
             video :  "fas fa-bookmark fa-lg fa-fw",
             search : "fas fa-search fa-lg fa-fw"
         };
-        const store = window.storex.get(this.storname);
-        this.items = 
 
         this.on("mount", async () => {
-            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            // try {
-            //     this.json_store = new JsonStore(file_path);
-            //     const items = this.json_store.load();
-            //     store.commit("loadData", {items});
-            // } catch (error) { 
-            //     const items = [];
-            //     store.commit("loadData", {items});
-            //     console.log(error);
-            // }
             const file_name = `${this.storname}.json`;
             const items =  await ipcRenderer.invoke("getbookmark", { file_name });
-            // store.commit("loadData", {items});
-            this.obs_bookmark.trigger("loadData", { items });
+            this.obs_accordion.trigger("loadData", { items });
         });
 
-        store.change("changed", (state, store) => {
-            // this.json_store.save(state.items);
+        this.obs_accordion.on("changed", (args) => {
+            const { items } = args;
+            console.log("bookmark:items=", items);
         });
 
         this.onclickSideBar = (e) => {
@@ -143,7 +129,7 @@
             return false;
         };
 
-        const createMenu = (items) => {
+        const createMenu = (items, self) => {
             return Menu.buildFromTemplate([
                 { 
                     id: "play",
@@ -199,15 +185,15 @@
                 { 
                     id: "delete",
                     label: "削除", click() {
-                        store.action("deleteList");
+                        self.obs_accordion.trigger("deleteList");
                     }
                 }
             ]);
         };
         
-        this.obs_bookmark.on("show-contextmenu", async (e) => {
-            const items = store.getter("state").selected_items;
-            const context_menu = createMenu(items);
+        this.obs_accordion.on("show-contextmenu", async (e, args) => {
+            const { items } = args;
+            const context_menu = createMenu(items, this);
             context_menu.items.forEach(menu => {
                 const id = menu.id;
                 menu.enabled =  getMenuEnable(id, items);
@@ -215,7 +201,7 @@
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        this.obs_bookmark.on("item-dlbclicked", (item) => {  
+        this.obs_accordion.on("item-dlbclicked", (item) => {  
             if(BookMark.isVideo(item)){
                 const { video_id, time } = item.data;
                 ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
@@ -233,7 +219,13 @@
         });
         
         obs.on("bookmark-page:add-items", items => {
-            store.action("addList", {items});
+            items.forEach(item => {
+                const time = item.data.time;
+                if (time > 0) {
+                    item.title = `${item.title} ${time_format.toTimeString(time)}`;
+                }
+            });
+            this.obs_accordion.trigger("addList", { items });
         });
     </script>
 </bookmark-page>

@@ -11,64 +11,54 @@
         <accordion 
             title="ライブラリ検索" 
             expand={true} 
-            obs={obs_search}
+            obs={obs_accordion}
             storname={storname}>
         </accordion>
     </div>
 
     <script>
         /* globals riot */
-        const path = window.path;
         const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
-        const JsonStore = window.JsonStore;
-        const { ConfigRenderer } = window.ConfigRenderer;
 
         const obs = this.opts.obs; 
-        this.obs_search = riot.observable();
+        this.obs_accordion = riot.observable();
         this.storname = "library-search";
-        const store = window.storex.get(this.storname);
 
         this.on("mount", async () => {
-            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            // try {
-            //     this.json_store = new JsonStore(file_path);
-            //     const items = this.json_store.load();
-            //     store.commit("loadData", {items});
-            // } catch (error) { 
-            //     const items = [];
-            //     store.commit("loadData", {items});
-            //     console.log(error);
-            // }
             const file_name = `${this.storname}.json`;
             const items =  await ipcRenderer.invoke("getbookmark", { file_name });
-            this.obs_search.trigger("loadData", { items });
+            this.obs_accordion.trigger("loadData", { items });
         });
 
-        store.change("changed", (state, store) => {
-            // this.json_store.save(state.items);
+        this.obs_accordion.on("changed", (args) => {
+            const { items } = args;
+            console.log("library:items=", items);
         });
 
-        const search_context_menu = Menu.buildFromTemplate([
-            { 
-                label: "削除", click() {
-                    store.action("deleteList");
+        const createMenu = (self) => {
+            return  Menu.buildFromTemplate([
+                { 
+                    label: "削除", click() {
+                        self.obs_accordion.trigger("deleteList");
+                    }
                 }
-            }
-        ]);
+            ]);
+        };
         
-        this.obs_search.on("show-contextmenu", (e) => {
-            search_context_menu.popup({window: remote.getCurrentWindow()}); 
+        this.obs_accordion.on("show-contextmenu", (e) => {
+            const context_menu = createMenu(this);
+            context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
         obs.on("library-page:sidebar:add-search-item", (query) => {
             const items = [
                 { title: query, query: query }
             ];
-            store.action("addList", {items});
+            this.obs_accordion.trigger("addList", { items });
         });
 
-        this.obs_search.on("item-dlbclicked", (item) => {
+        this.obs_accordion.on("item-dlbclicked", (item) => {
             obs.trigger("library-page:search-item-dlbclicked", item.query);
         });
     </script>

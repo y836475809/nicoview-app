@@ -19,7 +19,7 @@
     <script>
         /* globals riot */
         const path = window.path;
-        const {remote} = window.electron;
+        const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
         const JsonStore = window.JsonStore;
         const { ConfigRenderer } = window.ConfigRenderer;
@@ -30,20 +30,23 @@
         const store = window.storex.get(this.storname);
 
         this.on("mount", async () => {
-            const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            try {
-                this.json_store = new JsonStore(file_path);
-                const items = this.json_store.load();
-                store.commit("loadData", {items});
-            } catch (error) { 
-                const items = [];
-                store.commit("loadData", {items});
-                console.log(error);
-            }
+            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
+            // try {
+            //     this.json_store = new JsonStore(file_path);
+            //     const items = this.json_store.load();
+            //     store.commit("loadData", {items});
+            // } catch (error) { 
+            //     const items = [];
+            //     store.commit("loadData", {items});
+            //     console.log(error);
+            // }
+            const file_name = `${this.storname}.json`;
+            const items =  await ipcRenderer.invoke("getbookmark", { file_name });
+            this.obs_search.trigger("loadData", { items });
         });
         
         store.change("changed", (state, store) => {
-            this.json_store.save(state.items);
+            // this.json_store.save(state.items);
         });
 
         const hasItem = (mylist_id) => {

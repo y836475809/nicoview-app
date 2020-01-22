@@ -2,6 +2,7 @@ const JsonStore = require("./json-store");
 
 class CommentNG {
     constructor(file_path){
+        // TODO
         this._store = new JsonStore(file_path);
         this._ng_matching_texts = [];
         this._ng_user_ids = [];

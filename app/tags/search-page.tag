@@ -6,7 +6,7 @@
             background-color: var(--control-color);
         }
         
-        .search-item {
+        .nico-search-item {
             color:royalblue;
         }
     </style>
@@ -16,6 +16,7 @@
             title="ニコニコ動画検索" 
             expand={true} 
             obs={obs_accordion}
+            icon_class={icon_class}
             storname={storname}>
         </accordion>
     </div>
@@ -23,7 +24,7 @@
     <script>
         /* globals riot */
         const path = window.path;
-        const {remote} = window.electron;
+        const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
         const JsonStore = window.JsonStore;
         const { ConfigRenderer } = window.ConfigRenderer;
@@ -32,22 +33,28 @@
         this.obs_accordion = riot.observable();
         this.storname = "nico-search";
         const store = window.storex.get(this.storname);
-    
+        this.icon_class = {
+            tag :  "fas fa-tag fa-lg"
+        };
+
         this.on("mount", async () => {
-            const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            try {
-                this.json_store = new JsonStore(file_path);
-                const items = this.json_store.load();
-                store.commit("loadData", {items});
-            } catch (error) { 
-                const items = [];
-                store.commit("loadData", {items});
-                console.log(error);
-            }
+            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
+            // try {
+            //     this.json_store = new JsonStore(file_path);
+            //     const items = this.json_store.load();
+            //     store.commit("loadData", {items});
+            // } catch (error) { 
+            //     const items = [];
+            //     store.commit("loadData", {items});
+            //     console.log(error);
+            // }
+            const file_name = `${this.storname}.json`;
+            const items =  await ipcRenderer.invoke("getbookmark", { file_name });
+            this.obs_accordion.trigger("loadData", { items });
         });
 
         store.change("changed", (state, store) => {
-            this.json_store.save(state.items);
+            // this.json_store.save(state.items);
         });
 
         const createMenu = () => {
@@ -72,8 +79,9 @@
 
         obs.on("search-page:sidebar:add-item", (cond) => {
             const items = [
-                { title: cond.query, cond: cond }
+                { title: cond.query, type:cond.search_kind , cond: cond }
             ];
+            console.log("search-page items =", items)
             store.action("addList", {items});
         });
     </script>

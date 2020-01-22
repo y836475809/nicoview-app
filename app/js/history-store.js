@@ -2,6 +2,7 @@ const JsonStore = require("./json-store");
 
 class HistoryStore{
     constructor(file_path, history_max){
+        // TODO
         this.store = new JsonStore(file_path);
         this.history_max = history_max;
         this.history_items = [];

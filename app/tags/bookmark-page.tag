@@ -60,6 +60,7 @@
             title="ブックマーク" 
             expand={true} 
             obs={obs_bookmark}
+            icon_class={icon_class}
             storname={storname}>
         </accordion>
     </aside>
@@ -79,23 +80,32 @@
         this.obs_bookmark = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.storname = "bookmark";
+        this.icon_class = {
+            video :  "fas fa-bookmark fa-lg fa-fw",
+            search : "fas fa-search fa-lg fa-fw"
+        };
         const store = window.storex.get(this.storname);
+        this.items = 
 
         this.on("mount", async () => {
-            const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
-            try {
-                this.json_store = new JsonStore(file_path);
-                const items = this.json_store.load();
-                store.commit("loadData", {items});
-            } catch (error) { 
-                const items = [];
-                store.commit("loadData", {items});
-                console.log(error);
-            }
+            // const file_path = path.join(await ConfigRenderer.get("data_dir"), `${this.storname}.json`);
+            // try {
+            //     this.json_store = new JsonStore(file_path);
+            //     const items = this.json_store.load();
+            //     store.commit("loadData", {items});
+            // } catch (error) { 
+            //     const items = [];
+            //     store.commit("loadData", {items});
+            //     console.log(error);
+            // }
+            const file_name = `${this.storname}.json`;
+            const items =  await ipcRenderer.invoke("getbookmark", { file_name });
+            // store.commit("loadData", {items});
+            this.obs_bookmark.trigger("loadData", { items });
         });
 
         store.change("changed", (state, store) => {
-            this.json_store.save(state.items);
+            // this.json_store.save(state.items);
         });
 
         this.onclickSideBar = (e) => {

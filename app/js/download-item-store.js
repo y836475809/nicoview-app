@@ -2,6 +2,7 @@ const JsonStore = require("./json-store");
 
 class DownloadItemStore {
     constructor(file_path){
+        // TODO
         this.store = new JsonStore(file_path);
     }
 

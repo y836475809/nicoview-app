@@ -106,6 +106,7 @@ class GridTableDownloadItem {
             on_dbl_click(e, data);
         });
 
+        // TODO
         const file_path = path.join(await ConfigRenderer.get("data_dir"), "download.json");
         this.store = new DownloadItemStore(file_path);
         this.store.load(); 

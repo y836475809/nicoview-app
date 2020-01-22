@@ -105,19 +105,28 @@
         let sortable = null;
         const menu_item_h = 30;
         const obs_accordion = this.opts.obs;
+        const icon_class = this.opts.icon_class;
 
         const store = window.storex.get(this.opts.storname);
 
-        store.change("loaded", (state, store) => {
-            this.item_attr_map = store.getter("attmap");
-            this.items = store.getter("state").items;
-            this.update();
-            chanegExpand(true);
-        });
+        // store.change("loaded", (state, store) => {
+        //     this.item_attr_map = store.getter("attmap");
+        //     this.items = store.getter("state").items;
+        //     this.update();
+        //     chanegExpand(true);
+        // });
         store.change("changed", (state, store) => {
             this.item_attr_map = store.getter("attmap");
             const query = getInputValue();
             filter(query);
+        });
+
+        obs_accordion.on("loadData", async (args) => {
+            const { items } = args;
+            this.item_attr_map = store.getter("attmap");
+            this.items = items;
+            this.update();
+            chanegExpand(true);
         });
 
         const getInputValue = () => {
@@ -142,14 +151,26 @@
         };
 
         this.getIconClass = (item) => {
-            if(this.item_attr_map.has(item)==false){
+            // if(this.item_attr_map.has(item)==false){
+            //     return ""; 
+            // }
+
+            // const icon = this.item_attr_map.get(item);
+            // if(icon!==undefined && icon.name!==undefined && icon.class_name!==undefined){
+            //     return `center-hv icont-item ${icon.name} ${icon.class_name}`;
+            // }
+            // return "";
+
+            const type = item.type;
+            if(icon_class === undefined || type === undefined){
                 return ""; 
             }
-            const icon = this.item_attr_map.get(item);
-            if(icon!==undefined && icon.name!==undefined && icon.class_name!==undefined){
-                return `center-hv icont-item ${icon.name} ${icon.class_name}`;
+            const icon_name = icon_class[type];
+            if(icon_name === undefined){
+                return ""; 
             }
-            return "";
+            return `center-hv icont-item ${icon_name} ${this.opts.storname}-item`;
+            
         };
 
         const getMenuElm = () => {

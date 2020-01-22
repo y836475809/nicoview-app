@@ -112,6 +112,7 @@
 
             resizeGridTable();
 
+            // TODO
             try {
                 const history_file_path = path.join(await ConfigRenderer.get("data_dir"), "history.json");
                 history_store = new HistoryStore(history_file_path, 50);

@@ -76,7 +76,7 @@
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
         const { ConfigRenderer } = window.ConfigRenderer;
-        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 

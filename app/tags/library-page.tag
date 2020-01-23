@@ -169,7 +169,7 @@
         const { NicoVideoData } = window.NicoVideoData;
         const { ConfigRenderer } = window.ConfigRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();

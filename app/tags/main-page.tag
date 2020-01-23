@@ -122,7 +122,7 @@
         const { remote, ipcRenderer } = window.electron;
         const {Menu} = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
 
         this.obs = this.opts.obs;
         const main_store = window.storex.get("main");

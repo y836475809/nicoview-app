@@ -1,42 +1,16 @@
-const { ipcRenderer, ipcMain } = require("electron");
 const path = require("path");
-const EventEmitter = require("events");
 const { LibraryDB } = require("./db");
+const { DataIpcMain } = require("./data-ipc");
 
-const IPC_CHANNEL = Object.freeze({
-    LIBRARY_ACITON: "ipc-library-action",
-});
-
-// TODO
-class DataIpcRenderer {
-    static async action(name, method, args) {
-        let channnel = null;
-        if (name=="library") {
-            channnel = IPC_CHANNEL.LIBRARY_ACITON;
-        }
-        if(channnel!=null){
-            return await ipcRenderer.invoke(channnel, {method, args});
-        }
-    }
-}
-
-class Library extends EventEmitter {
+class Library extends DataIpcMain {
     constructor(){
-        super();
+        super("library");
         this.setup();
     }
 
     setup(){
         this.library_db = null;
-        ipcMain.handle(IPC_CHANNEL.LIBRARY_ACITON, async (event, _args) => {
-            const { method, args } = _args;
-            const func = this[method];
-            if(func.constructor.method === "AsyncFunction"){
-                return await this[method](args);
-            }else{
-                return this[method](args);
-            }
-        });
+        this.handle();
     }
 
     getItem(args){
@@ -96,6 +70,5 @@ class Library extends EventEmitter {
 }
 
 module.exports = {
-    DataIpcRenderer,
     Library
 };

@@ -70,7 +70,7 @@
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
         const { BookMark, BookMarkIpcRenderer } = window.BookMark;
-        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
 

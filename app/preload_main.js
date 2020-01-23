@@ -37,7 +37,7 @@ window.addEventListener("load", () => {
         require("slickgrid/plugins/slick.autotooltips");
         const GridTable = require(`${root_dir}/app/js/gridtable`);
         const ConfigRenderer = require(`${root_dir}/app/js/config`);
-        const DataIpcRenderer = require(`${root_dir}/app/js/library`);
+        const DataIpc = require(`${root_dir}/app/js/data-ipc`);
         const RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
         const TimeFormat = require(`${root_dir}/app/js/time-format`);
         const NicoSearch = require(`${root_dir}/app/js/nico-search`);
@@ -56,7 +56,7 @@ window.addEventListener("load", () => {
         global.Sortable = Sortable;
         global.GridTable = GridTable;
         global.ConfigRenderer = ConfigRenderer;
-        global.DataIpcRenderer = DataIpcRenderer;
+        global.DataIpc = DataIpc;
         global.RemoteDailog = RemoteDailog;
         global.TimeFormat = TimeFormat;
         global.NicoSearch = NicoSearch;

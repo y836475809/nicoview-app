@@ -204,7 +204,7 @@
         const { NicoSearchParams, NicoSearch } = window.NicoSearch;
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
-        const { DataIpcRenderer } = window.DataIpcRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 

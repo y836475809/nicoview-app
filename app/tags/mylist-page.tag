@@ -20,7 +20,7 @@
         /* globals riot */
         const { remote } = window.electron;
         const {Menu} = remote;
-        const { BookMarkIpcRenderer } = window.BookMark;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
@@ -28,7 +28,7 @@
 
         this.on("mount", async () => {
             const name = this.storname;
-            const items = await BookMarkIpcRenderer.action("getData", { name });
+            const items = await DataIpcRenderer.action("bookmark", "getData", { name });
             this.obs_accordion.trigger("loadData", { items });
         });
         
@@ -44,7 +44,7 @@
             };
 
             const name = this.storname;
-            await BookMarkIpcRenderer.action("save", { name, items });
+            await DataIpcRenderer.action("bookmark", "save", { name, items });
         });
 
         const createMenu = (self) => {

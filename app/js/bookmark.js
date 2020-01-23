@@ -1,30 +1,16 @@
 
-const { ipcRenderer, ipcMain } = require("electron");
 const path = require("path");
 const JsonStore = require("./json-store");
+const { DataIpcMain } = require("./data-ipc");
 
-const IPC_CHANNEL = Object.freeze({
-    BOOKMARK_ACITON: "ipc-bookmark-action",
-});
-
-class BookMarkIpcRenderer {
-    static async action(method, args) {
-        return await ipcRenderer.invoke(IPC_CHANNEL.BOOKMARK_ACITON, {method, args});
+class BookMarkIpcMain extends DataIpcMain {
+    constructor(){
+        super("bookmark");
     }
-}
 
-class BookMarkIpcMain {
     setup(data_dir){
         this.data_dir = data_dir;
-        ipcMain.handle(IPC_CHANNEL.BOOKMARK_ACITON, async (event, _args) => {
-            const { method, args } = _args;
-            const func = this[method];
-            if(func.constructor.method === "AsyncFunction"){
-                return await this[method](args);
-            }else{
-                return this[method](args);
-            }
-        });
+        this.handle();
     }
 
     getData(args){
@@ -103,6 +89,5 @@ class BookMark {
 
 module.exports = {
     BookMark,
-    BookMarkIpcRenderer,
     BookMarkIpcMain
 };

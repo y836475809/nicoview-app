@@ -2,7 +2,7 @@ const path = require("path");
 const { LibraryDB } = require("./db");
 const { DataIpcMain } = require("./data-ipc");
 
-class Library extends DataIpcMain {
+class LibraryIpcMain extends DataIpcMain {
     constructor(){
         super("library");
         this.setup();
@@ -70,5 +70,5 @@ class Library extends DataIpcMain {
 }
 
 module.exports = {
-    Library
+    LibraryIpcMain
 };

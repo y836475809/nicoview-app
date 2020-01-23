@@ -3,10 +3,9 @@ const fs = require("fs");
 const path = require("path");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
-const { Library } = require("./js/library");
+const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
 const { importNNDDDB } = require("./js/import-nndd-db");
-const JsonStore = require("./js/json-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -17,7 +16,7 @@ if(process.env.USE_CONFIG == "DEBUG"){
     console.info("debug mode, use config = ", config_fiiename);
 }
 const config_main = new ConfigMain(config_fiiename);
-const library = new Library();
+const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -106,7 +105,7 @@ function createWindow() {
         }
         
         try {
-            await library.save();
+            await library_ipc_main.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -191,7 +190,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library.getItem({video_id});
+        const video_item = library_ipc_main.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
             video_id,
             video_item,
@@ -204,8 +203,8 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        if(library.existItem({video_id})){
-            const video_item = library.getItem({video_id});
+        if(library_ipc_main.existItem({video_id})){
+            const video_item = library_ipc_main.getItem({video_id});
             player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
                 video_id,
                 video_item,
@@ -225,7 +224,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library.getItem({video_id});
+        const video_item = library_ipc_main.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
             video_id,
             video_item,
@@ -253,7 +252,7 @@ app.on("ready", async ()=>{
 
         const { history_item } = args;
         const video_id = history_item.id;
-        const video_item = library.getItem({video_id});
+        const video_item = library_ipc_main.getItem({video_id});
         if(video_item===null){
             return;
         }
@@ -262,7 +261,7 @@ app.on("ready", async ()=>{
             last_play_date : new Date().getTime(),
             play_count : video_item.play_count + 1
         };
-        library.update({video_id, props});
+        library_ipc_main.update({video_id, props});
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
@@ -310,7 +309,7 @@ app.on("ready", async ()=>{
 
         try {
             const { dir_list, video_list } = await importNNDDDB(db_file_path);
-            await library.setData({
+            await library_ipc_main.setData({
                 data_dir : data_dir, 
                 path_data_list : dir_list, 
                 video_data_list : video_list
@@ -328,19 +327,19 @@ app.on("ready", async ()=>{
         };
     });
 
-    library.on("libraryInitialized", ()=>{  
+    library_ipc_main.on("libraryInitialized", ()=>{  
         win.webContents.send("libraryInitialized", {
-            items:library.getItems()
+            items:library_ipc_main.getItems()
         });
     });
-    library.on("libraryItemUpdated", (args)=>{  
+    library_ipc_main.on("libraryItemUpdated", (args)=>{  
         win.webContents.send("libraryItemUpdated", args);
     });
-    library.on("libraryItemAdded", (args)=>{  
+    library_ipc_main.on("libraryItemAdded", (args)=>{  
         win.webContents.send("libraryItemAdded", args);
     });
         
-    bookmark_ipc_main.setup(await config_main.get("data_dir", ""))
+    bookmark_ipc_main.setup(await config_main.get("data_dir", ""));
 
     createWindow();
 });

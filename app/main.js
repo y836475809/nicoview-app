@@ -5,7 +5,9 @@ const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
+const { HistoryIpcMain } = require("./js/history-store");
 const { importNNDDDB } = require("./js/import-nndd-db");
+const JsonStore = require("./js/json-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -18,6 +20,7 @@ if(process.env.USE_CONFIG == "DEBUG"){
 const config_main = new ConfigMain(config_fiiename);
 const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
+const history_ipc_main = new HistoryIpcMain();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -27,6 +30,20 @@ let is_debug_mode = false;
 let do_app_quit = false;
 
 let player_html_path = `${__dirname}/html/player.html`;
+
+const loadJson = async (name) => {
+    const data_dir = await config_main.get("data_dir", "");
+    const file_path = path.join(data_dir, `${name}.json`);
+    const json_store = new JsonStore(file_path);
+    return json_store.load();
+};
+
+const saveJson = async (name, items) => {
+    const data_dir = await config_main.get("data_dir", "");
+    const file_path = path.join(data_dir, `${name}.json`);
+    const json_store = new JsonStore(file_path);
+    json_store.save(items);
+};
 
 const getWindowState = (w) => {
     const bounds = w.getBounds(); 
@@ -340,6 +357,16 @@ app.on("ready", async ()=>{
     });
         
     bookmark_ipc_main.setup(await config_main.get("data_dir", ""));
+
+    const history_max = 50;
+    const items = await loadJson("history");
+    history_ipc_main.setup(history_max);  
+    history_ipc_main.setData({ items });
+
+    history_ipc_main.on("historyItemUpdated", async (args)=>{  
+        const items = history_ipc_main.getData();
+        await saveJson("history", items);    
+    });
 
     createWindow();
 });

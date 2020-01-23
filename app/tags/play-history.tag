@@ -19,18 +19,15 @@
 
     <script>
         /* globals */
-        const path = window.path;
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
-        const HistoryStore = window.HistoryStore;
         const { BookMark } = window.BookMark;
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
         
-        let history_store = null;
         const row_img_width = 130/2;
         const row_hight = 100/2;
 
@@ -51,10 +48,6 @@
             _saveColumnWidth: true,
         }; 
         const grid_table = new GridTable("history-grid", columns, options);
-
-        const loadHistoryItems = () => {
-            grid_table.setData(history_store.getItems());
-        };
 
         const resizeGridTable = () => {
             const container = this.root.querySelector(".history-grid-container");
@@ -112,22 +105,20 @@
 
             resizeGridTable();
 
-            // TODO
             try {
-                const history_file_path = path.join(await ConfigRenderer.get("data_dir"), "history.json");
-                history_store = new HistoryStore(history_file_path, 50);
-                history_store.load(); 
-                grid_table.setData(history_store.getItems());
+                const items = await DataIpcRenderer.action("history", "getData");
+                grid_table.setData(items);
             } catch (error) {
                 console.log("player history load error=", error);
                 grid_table.setData([]); 
             }
         });
 
-        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args)=>{
+        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{
             const { history_item } = args;
-            history_store.add(history_item);
-            grid_table.setData(history_store.getItems());
+            await DataIpcRenderer.action("history", "add", { history_item });
+            const items = await DataIpcRenderer.action("history", "getData");
+            grid_table.setData(items);
         });
     </script>
 </play-history>

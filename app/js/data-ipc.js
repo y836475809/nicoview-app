@@ -4,11 +4,13 @@ const EventEmitter = require("events");
 const IPC_CHANNEL = Object.freeze({
     LIBRARY_ACITON: "ipc-library-action",
     BOOKMARK_ACITON: "ipc-bookmark-action",
+    HISTORY_ACITON: "ipc-history-action",
 });
 
 const channel_map = {
     library: IPC_CHANNEL.LIBRARY_ACITON,
     bookmark: IPC_CHANNEL.BOOKMARK_ACITON,
+    history: IPC_CHANNEL.HISTORY_ACITON,
 };
 
 class DataIpcRenderer {

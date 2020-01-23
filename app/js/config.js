@@ -9,6 +9,7 @@ const IPC_CHANNEL = Object.freeze({
     GET_VALUE: "ipc-config-get-value",
 });
 
+// TODO replace to DataIpcRenderer
 class ConfigRenderer {
     static async get(key, default_value) {
         return await ipcRenderer.invoke(IPC_CHANNEL.GET_VALUE, { key, default_value });
@@ -19,6 +20,7 @@ class ConfigRenderer {
     }
 }
 
+// TODO extends DataIpcMain
 class ConfigMain {
     constructor(filename="config.json") {
         this.filename = filename;

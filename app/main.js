@@ -5,7 +5,7 @@ const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
 const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
-const { HistoryIpcMain } = require("./js/history-store");
+const { HistoryIpcMain } = require("./js/history");
 const { importNNDDDB } = require("./js/import-nndd-db");
 const JsonStore = require("./js/json-store");
 

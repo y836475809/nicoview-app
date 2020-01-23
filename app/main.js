@@ -328,21 +328,6 @@ app.on("ready", async ()=>{
         };
     });
 
-    ipcMain.handle("getbookmark", async (event, args) => {
-        const { file_name } = args;
-        const data_dir = config_main.get("data_dir", "");
-        const file_path = path.join(data_dir, file_name);
-        try {
-            const json_store = new JsonStore(file_path);
-            const items = json_store.load();
-            return items;
-        } catch (error) { 
-            console.log(error);
-            const items = [];
-            return items;
-        }
-    });
-
     library.on("libraryInitialized", ()=>{  
         win.webContents.send("libraryInitialized", {
             items:library.getItems()

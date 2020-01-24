@@ -1,10 +1,7 @@
 require("slickgrid/lib/jquery.event.drag-2.3.0");
 require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
-const path = require("path");
 const { GridTable } = require("./gridtable");
-const { DownloadItemStore } = require("./download-item-store");
-const { ConfigRenderer } = require("./config");
 
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
     const video_id = dataContext.id;
@@ -97,7 +94,7 @@ class GridTableDownloadItem {
         this.grid_table.grid.registerPlugin(moveRowsPlugin); 
     }
 
-    async init(on_context_menu, on_dbl_click){
+    init(on_context_menu, on_dbl_click){
         this.grid_table.onContextMenu((e)=>{
             on_context_menu(e);
         });
@@ -106,14 +103,21 @@ class GridTableDownloadItem {
             on_dbl_click(e, data);
         });
 
-        // TODO
-        const file_path = path.join(await ConfigRenderer.get("data_dir"), "download.json");
-        this.store = new DownloadItemStore(file_path);
-        this.store.load(); 
-        this.grid_table.setData(this.store.getItems());
         this.grid_table.dataView.setFilter((item)=>{
             return item.visible===true;
         });
+    }
+
+    setData(items){
+        const dl_items = items.map(value=>{
+            const dl_item = Object.assign({...value});
+            Object.assign(dl_item, {
+                progress: "",
+                visible: true
+            });
+            return dl_item;
+        });
+        this.grid_table.setData(dl_items);
     }
 
     /**

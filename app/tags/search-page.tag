@@ -211,15 +211,15 @@
         this.obs_modal_dialog = riot.observable();
         const main_store = window.storex.get("main");
 
-        main_store.change("downloadItemChanged", async (state, store) => {
-            const download_video_id_set = store.getter("downloadItemSet");
+        ipcRenderer.on("downloadItemUpdated", async (event) => {
+            const video_id_set = await DataIpcRenderer.action("downloaditem", "getIDSet", {state:"all"});
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
                 item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
-                item.reg_download = download_video_id_set.has(video_id);
+                item.reg_download = video_id_set.has(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
         });
@@ -373,12 +373,12 @@
             //     return value.contentId;
             // });
 
-            const donwload_video_id_set = main_store.getter("downloadItemSet");
+            const video_id_set = await DataIpcRenderer.action("downloaditem", "getIDSet", {state:"all"});
             const items = await Promise.all(
                 search_result.data.map(async value => {
                     const video_id = value.contentId;
                     const saved = await DataIpcRenderer.action("library", "existItem", {video_id});
-                    const reg_download = donwload_video_id_set.has(video_id);
+                    const reg_download = video_id_set.has(video_id);
                     return createItem(value, saved, reg_download);
                 })
             );

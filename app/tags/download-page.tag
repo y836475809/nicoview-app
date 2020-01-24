@@ -168,8 +168,8 @@
             }
         };
 
-        this.onclickClearDownloadedItems = () => {
-            clearDownloadItems(donwload_state.complete);
+        this.onclickClearDownloadedItems = async () => {
+            await clearDownloadItems(donwload_state.complete);
         }; 
 
         this.onclickScheduleDialog = () => {
@@ -205,7 +205,7 @@
         };
 
         // TODO
-        const onChangeDownloadItem = () => {
+        const onChangeDownloadItem = async () => {
             const download_Items = [];
             grid_table_dl.filterItems([
                 donwload_state.wait,
@@ -219,16 +219,26 @@
             ]).forEach(item => {
                 download_Items.push({video_id: item.id, state:"complete"});
             });
-            main_store.action("updateDownloadItem", download_Items);
+            const items = download_Items.filter(value => {
+                return value.visible === true;
+            }).map(value => {
+                return {
+                    thumb_img: value.thumb_img,
+                    id: value.id,
+                    name: value.name,
+                    state: value.state
+                };
+            });
+            await DataIpcRenderer.action("downloaditem", "updateData", {items});
         };
 
-        const addDownloadItems = (items) => {
+        const addDownloadItems = async (items) => {
             grid_table_dl.addItems(items, donwload_state.wait);
 
-            onChangeDownloadItem(); 
+            await onChangeDownloadItem(); 
         };
 
-        const deleteDownloadItems = (video_ids) => {
+        const deleteDownloadItems = async (video_ids) => {
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){
                     nico_down.cancel();
@@ -236,13 +246,13 @@
             } 
             grid_table_dl.deleteItems(video_ids); 
 
-            onChangeDownloadItem();
+            await onChangeDownloadItem();
         };
 
-        const clearDownloadItems = (state) => {
+        const clearDownloadItems = async (state) => {
             grid_table_dl.clearItems(state);
 
-            onChangeDownloadItem();
+            await onChangeDownloadItem();
         };
 
         const createMenu = () => {
@@ -263,9 +273,9 @@
                         time: 0
                     });
                 }},
-                { label: "削除", click() {
+                { label: "削除", async click() {
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
-                    deleteDownloadItems(deleted_ids);
+                    await deleteDownloadItems(deleted_ids);
                 }},
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
@@ -374,7 +384,8 @@
 
                     grid_table_dl.save();
                
-                    onChangeDownloadItem();
+                    // TODO
+                    // await onChangeDownloadItem();
 
                     if(cancel_donwload){
                         break;
@@ -393,12 +404,12 @@
             }    
         };
 
-        obs.on("download-page:add-download-items", (items) => {
-            addDownloadItems(items);
+        obs.on("download-page:add-download-items", async (items) => {
+            await addDownloadItems(items);
         });
 
-        obs.on("download-page:delete-download-items", (video_ids) => {
-            deleteDownloadItems(video_ids);
+        obs.on("download-page:delete-download-items", async (video_ids) => {
+            await deleteDownloadItems(video_ids);
         });
 
         this.on("mount", async () => {
@@ -412,7 +423,7 @@
             
             const context_menu = createMenu();
             try {
-                await grid_table_dl.init((e)=>{
+                grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
                     ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
@@ -420,11 +431,13 @@
                         time : 0
                     });
                 });
+                const items = await DataIpcRenderer.action("downloaditem", "getData");
+                grid_table_dl.setData(items);
             } catch (error) {
                 console.log("donwload item load error=", error);
             }
 
-            onChangeDownloadItem();
+            // await onChangeDownloadItem();
 
             resizeGridTable();
 

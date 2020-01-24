@@ -6,6 +6,7 @@ const { ConfigMain } = require("./js/config");
 const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
 const { HistoryIpcMain } = require("./js/history");
+const { DownloadItemIpcMain } = require("./js/download-item-store");
 const { importNNDDDB } = require("./js/import-nndd-db");
 const JsonStore = require("./js/json-store");
 
@@ -21,7 +22,7 @@ const config_main = new ConfigMain(config_fiiename);
 const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 const history_ipc_main = new HistoryIpcMain();
-
+const downloaditem_ipc_main = new DownloadItemIpcMain();
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
@@ -366,6 +367,16 @@ app.on("ready", async ()=>{
     history_ipc_main.on("historyItemUpdated", async (args)=>{  
         const items = history_ipc_main.getData();
         await saveJson("history", items);    
+    });
+
+    downloaditem_ipc_main.handle();
+    downloaditem_ipc_main.setData({items:await loadJson("download")});
+    downloaditem_ipc_main.on("updated", async (args)=>{  
+        win.webContents.send("downloadItemUpdated");
+
+        // TODO
+        // const { items }  = args;
+        // await saveJson("download", items);
     });
 
     createWindow();

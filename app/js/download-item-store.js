@@ -1,55 +1,46 @@
-const JsonStore = require("./json-store");
+const { DataIpcMain } = require("./data-ipc");
 
-class DownloadItemStore {
-    constructor(file_path){
-        // TODO
-        this.store = new JsonStore(file_path);
+class DownloadItemIpcMain extends DataIpcMain {
+    constructor(){
+        super("downloaditem");
     }
 
-    //TODO
-    load(){
-        try {
-            const items = this.store.load();
-            this.items = items.map(value=>{
-                return {
-                    thumb_img: value.thumb_img,
-                    id: value.id,
-                    name: value.name,
-                    state: value.state,
-                    progress: "",
-                    visible: true
-                };       
-            });
-        } catch (error) {
-            this.items = [];
-            throw error;
-        }
+    setData(args){
+        const { items } = args;
+        this.items = items;
     }
 
-    //TODO
-    save(){
-        const items = this.items.filter(value => {
-            return value.visible === true;
-        }).map(value => {
-            return {
-                thumb_img: value.thumb_img,
-                id: value.id,
-                name: value.name,
-                state: value.state
-            };
-        });
-        this.store.save(items);
-    }
-
-    getItems(){
+    getData(){
         return this.items;
     }
 
-    setItems(items){
+    updateData(args){
+        const { items } = args;
         this.items = items;
+        this.emit("updated", {items});
+    }
+
+    // TODO Set to json? 
+    getIDSet(args) {
+        const { state } = args;
+
+        const id_set = new Set();
+        if(state == "all"){
+            this.items.forEach(item => {
+                id_set.add(item.video_id);
+            });
+            return id_set;
+        }
+
+        this.items.forEach(item => {
+            if(item.state==state){
+                id_set.add(item.video_id);
+            } 
+        });
+        return id_set;
     }
 }
 
 module.exports = {
-    DownloadItemStore: DownloadItemStore
+    DownloadItemIpcMain
 };

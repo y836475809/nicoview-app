@@ -127,9 +127,10 @@
         this.obs = this.opts.obs;
         const main_store = window.storex.get("main");
 
-        main_store.change("downloadItemChanged", (state, store) => {
-            const id_set = store.getter("downloadIncompleteItemSet");
-            this.donwnload_item_num = id_set.size;
+        ipcRenderer.on("downloadItemUpdated", async (event) => {
+            const state = "incomplete";
+            const items = await DataIpcRenderer.action("downloaditem", "getIDSet", {state});
+            this.donwnload_item_num = items.size;
             this.update();
         });
 
@@ -172,8 +173,12 @@
             select_page(page_name);
         };
 
-        this.on("mount", function () {
+        this.on("mount", async () => {
             select_page("library");
+
+            const state = "incomplete";
+            const items = await DataIpcRenderer.action("downloaditem", "getIDSet", {state});
+            this.donwnload_item_num = items.size;
         });
 
         this.obs.on("main-page:select-page", (page_name)=>{

@@ -82,14 +82,14 @@
         const obs = this.opts.obs; 
         const main_store = window.storex.get("main");
 
-        let donwload_schedule = null;
+        let download_schedule = null;
 
         const updateDonwloadScheduleLabel = () =>{
-            const enable = donwload_schedule.enable;
+            const enable = download_schedule.enable;
             if(enable==false){
                 this.download_schedule_label = "ダウンロード実行 なし";
             }else{
-                const date = donwload_schedule.date;
+                const date = download_schedule.date;
                 const hour = ("0" + date.hour).slice(-2);
                 const minute = ("0" + date.minute).slice(-2);
                 this.download_schedule_label = `ダウンロード実行 ${hour}:${minute}`;
@@ -102,7 +102,7 @@
             wait_time = 1;
         }
 
-        const donwload_state = Object.freeze({
+        const download_state = Object.freeze({
             wait: 0,
             downloading: 1,
             complete: 2,
@@ -110,14 +110,14 @@
         });
 
         const message_map = new Map([
-            [donwload_state.wait, "待機"],
-            [donwload_state.downloading, "ダウンロード中"],
-            [donwload_state.complete, "ダウンロード完了"],
-            [donwload_state.error, "ダウンロード失敗"],
+            [download_state.wait, "待機"],
+            [download_state.downloading, "ダウンロード中"],
+            [download_state.complete, "ダウンロード完了"],
+            [download_state.error, "ダウンロード失敗"],
         ]);
 
         const getDlStateClass = (state) => {
-            if(state==donwload_state.complete){
+            if(state==download_state.complete){
                 return 'class="download-state-complete"'; // eslint-disable-line
             }
 
@@ -133,11 +133,11 @@
 
         this.dl_disabled = "";
         const event_em = new EventEmitter(); 
-        event_em.on("donwload-start", ()=>{
+        event_em.on("download-start", ()=>{
             this.dl_disabled = "disabled";
             this.update();
         });
-        event_em.on("donwload-end", ()=>{
+        event_em.on("download-end", ()=>{
             this.dl_disabled = "";
             this.update();
         });
@@ -145,14 +145,14 @@
         let scheduled_task = null;
         let grid_table_dl = null;
         let nico_down = null;
-        let cancel_donwload = false;
+        let cancel_download = false;
 
         this.onclickStartDownload = async(e) => {
             scheduled_task.stop();
 
             await startDownload();
 
-            if(donwload_schedule.enable==true){
+            if(download_schedule.enable==true){
                 scheduled_task.start();
             }
         };
@@ -161,7 +161,7 @@
             if(nico_down){
                 nico_down.cancel();
             }
-            cancel_donwload = true;
+            cancel_download = true;
 
             if(process.env.NODE_ENV == "DEBUG"){
                 obs.trigger("main-page:cancel-download");
@@ -169,24 +169,24 @@
         };
 
         this.onclickClearDownloadedItems = async () => {
-            await clearDownloadItems(donwload_state.complete);
+            await clearDownloadItems(download_state.complete);
         }; 
 
         this.onclickScheduleDialog = () => {
-            const date = donwload_schedule.date;
-            const enable = donwload_schedule.enable;
+            const date = download_schedule.date;
+            const enable = download_schedule.enable;
             this.refs["schedule-dialog"].showModal(date, enable, result=>{
                 if(result.type=="ok"){
-                    ConfigRenderer.set("donwload.schedule", {
+                    ConfigRenderer.set("download.schedule", {
                         date:result.date,
                         enable:result.enable
                     });
-                    donwload_schedule.date = result.date;
-                    donwload_schedule.enable = result.enable;
+                    download_schedule.date = result.date;
+                    download_schedule.enable = result.enable;
                     
-                    if(donwload_schedule.enable==true){
+                    if(download_schedule.enable==true){
                         scheduled_task.stop();
-                        scheduled_task = new ScheduledTask(donwload_schedule.date, ()=>{
+                        scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
                             startDownload();
                         });
                         scheduled_task.start();
@@ -206,9 +206,9 @@
 
         const onChangeDownloadItem = async () => {
             const items = grid_table_dl.getData().map(value => {
-                let state = donwload_state.complete;
-                if(value.state !== donwload_state.complete){
-                    state = donwload_state.wait;
+                let state = download_state.complete;
+                if(value.state !== download_state.complete){
+                    state = download_state.wait;
                 }
                 return {
                     thumb_img: value.thumb_img,
@@ -221,7 +221,7 @@
         };
 
         const addDownloadItems = async (items) => {
-            grid_table_dl.addItems(items, donwload_state.wait);
+            grid_table_dl.addItems(items, download_state.wait);
 
             await onChangeDownloadItem(); 
         };
@@ -289,18 +289,18 @@
         const startDownload = async() => {
             // TODO check exist download_dir
             const download_dir = await ConfigRenderer.get("download.dir", "");
-            event_em.emit("donwload-start");
+            event_em.emit("download-start");
             try {
-                cancel_donwload = false;
+                cancel_download = false;
                 const first_item = grid_table_dl.getItemByIdx(0);
                 if(!first_item){
-                    event_em.emit("donwload-end");
+                    event_em.emit("download-end");
                     return;
                 }
 
                 let video_id = first_item.id;
-                while(!cancel_donwload){
-                    if(!grid_table_dl.canDownload(video_id, [donwload_state.wait, donwload_state.error])){
+                while(!cancel_download){
+                    if(!grid_table_dl.canDownload(video_id, [download_state.wait, download_state.error])){
                         video_id = grid_table_dl.getNextVideoID(video_id);
                         if(video_id===undefined){
                             break;
@@ -311,11 +311,11 @@
                     }
 
                     await wait(()=>{ 
-                        return cancel_donwload || !grid_table_dl.hasItem(video_id);
+                        return cancel_download || !grid_table_dl.hasItem(video_id);
                     }, (progress)=>{ 
                         grid_table_dl.updateItem(video_id, {
                             progress: progress, 
-                            state: donwload_state.wait
+                            state: download_state.wait
                         });
                     });
 
@@ -326,10 +326,10 @@
                         }
                         continue;
                     }
-                    if(cancel_donwload){
+                    if(cancel_download){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
-                            state: donwload_state.wait
+                            state: download_state.wait
                         });
                         break;
                     }
@@ -338,7 +338,7 @@
                     const result = await nico_down.download((progress)=>{
                         grid_table_dl.updateItem(video_id, {
                             progress: `${progress}`, 
-                            state: donwload_state.downloading
+                            state: download_state.downloading
                         });
                     });
 
@@ -349,30 +349,30 @@
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
-                            state: donwload_state.complete,
+                            state: download_state.complete,
                             thumb_img: thumb_img
                         });
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
-                            state: donwload_state.wait
+                            state: download_state.wait
                         });
                     }else if(result.type==NicoDownloader.ResultType.skip){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `スキップ: ${result.reason}`, 
-                            state: donwload_state.wait
+                            state: download_state.wait
                         });
                     }else if(result.type==NicoDownloader.ResultType.error){
                         console.log("reason: ", result.reason);
                         grid_table_dl.updateItem(video_id, {
                             progress: `エラー: ${result.reason.message}`, 
-                            state: donwload_state.error
+                            state: download_state.error
                         });
                     }
                
                     await onChangeDownloadItem();
 
-                    if(cancel_donwload){
+                    if(cancel_download){
                         break;
                     }
 
@@ -385,7 +385,7 @@
                 console.log(error);
                 await showMessageBox("error", error.message);
             } finally {
-                event_em.emit("donwload-end");
+                event_em.emit("download-end");
             }    
         };
 
@@ -398,7 +398,7 @@
         });
 
         this.on("mount", async () => {
-            donwload_schedule = await ConfigRenderer.get("donwload.schedule", {
+            download_schedule = await ConfigRenderer.get("download.schedule", {
                 date: {hour:0, minute:0},
                 enable: false
             });
@@ -419,17 +419,17 @@
                 const items = await DataIpcRenderer.action("downloaditem", "getData");
                 grid_table_dl.setData(items);
             } catch (error) {
-                console.log("donwload item load error=", error);
+                console.log("download item load error=", error);
             }
 
             // await onChangeDownloadItem();
 
             resizeGridTable();
 
-            scheduled_task = new ScheduledTask(donwload_schedule.date, ()=>{
+            scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
                 startDownload();
             });
-            if(donwload_schedule.enable==true){
+            if(download_schedule.enable==true){
                 scheduled_task.start();
             }
 

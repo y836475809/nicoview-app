@@ -374,9 +374,8 @@ app.on("ready", async ()=>{
     downloaditem_ipc_main.on("updated", async (args)=>{  
         win.webContents.send("downloadItemUpdated");
 
-        // TODO
-        // const { items }  = args;
-        // await saveJson("download", items);
+        const { items }  = args;
+        await saveJson("download", items);
     });
 
     createWindow();

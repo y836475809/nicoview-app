@@ -87,8 +87,6 @@ class GridTableDownloadItem {
             this.grid_table.dataView.endUpdate();
 
             this.grid_table.grid.setSelectedRows(selectedRows);
-
-            this.save();
         });
 
         this.grid_table.grid.registerPlugin(moveRowsPlugin); 
@@ -102,10 +100,6 @@ class GridTableDownloadItem {
         this.grid_table.onDblClick((e, data)=>{
             on_dbl_click(e, data);
         });
-
-        this.grid_table.dataView.setFilter((item)=>{
-            return item.visible===true;
-        });
     }
 
     setData(items){
@@ -118,6 +112,10 @@ class GridTableDownloadItem {
             return dl_item;
         });
         this.grid_table.setData(dl_items);
+
+        this.grid_table.dataView.setFilter((item)=>{
+            return item.visible===true;
+        });
     }
 
     /**
@@ -126,6 +124,7 @@ class GridTableDownloadItem {
      */
     filterItems(states){
         const items = this.grid_table.dataView.getItems();
+        console.log("###filterItems=", items)
         return items.filter(item => {
             return item.visible === true && states.includes(item.state);
         });
@@ -133,11 +132,6 @@ class GridTableDownloadItem {
 
     resizeFitContainer(container){
         this.grid_table.resizeFitContainer(container);
-    }
-
-    save(){
-        this.store.setItems(this.grid_table.dataView.getItems()); 
-        this.store.save(); 
     }
 
     hasItem(id){
@@ -183,7 +177,6 @@ class GridTableDownloadItem {
         });
 
         this.grid_table.dataView.refresh();
-        this.save();
     }
 
     deleteItems(video_ids){
@@ -194,7 +187,6 @@ class GridTableDownloadItem {
             }
         });
         this.grid_table.dataView.refresh();
-        this.save();
     }
 
     deleteSelectedItems(){
@@ -206,7 +198,6 @@ class GridTableDownloadItem {
         this.grid_table.dataView.refresh();
         this.grid_table.grid.setSelectedRows([]);
         this.grid_table.grid.resetActiveCell();
-        this.save();
 
         const deleted_ids = items.map(value => {
             return value.id;

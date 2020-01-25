@@ -1,5 +1,6 @@
 const { session, dialog, app, BrowserWindow, ipcMain } = require("electron");
 const fs = require("fs");
+const fsPromises = fs.promises;
 const path = require("path");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
 const { ConfigMain } = require("./js/config");
@@ -32,18 +33,42 @@ let do_app_quit = false;
 
 let player_html_path = `${__dirname}/html/player.html`;
 
-const loadJson = async (name) => {
+const loadJson = async (name, default_value) => {
     const data_dir = await config_main.get("data_dir", "");
     const file_path = path.join(data_dir, `${name}.json`);
-    const json_store = new JsonStore(file_path);
-    return json_store.load();
+    try {
+        await fsPromises.stat(file_path);
+    } catch (error) {
+        return default_value;
+    }
+
+    try {
+        const json_store = new JsonStore(file_path);
+        return json_store.load();
+    } catch (error) {
+        await dialog.showMessageBox({
+            type: "error",
+            buttons: ["OK"],
+            message: `${file_path}の読み込みに失敗\n${error.message}`
+        });
+        return default_value;
+    }
 };
 
 const saveJson = async (name, items) => {
     const data_dir = await config_main.get("data_dir", "");
     const file_path = path.join(data_dir, `${name}.json`);
-    const json_store = new JsonStore(file_path);
-    json_store.save(items);
+    try {
+        const json_store = new JsonStore(file_path);
+        json_store.save(items);
+    } catch (error) {
+        await dialog.showMessageBox({
+            type: "error",
+            buttons: ["OK"],
+            message: `${file_path}の保存に失敗\n${error.message}`
+        });
+    }
+
 };
 
 const getWindowState = (w) => {
@@ -360,7 +385,7 @@ app.on("ready", async ()=>{
     bookmark_ipc_main.setup(await config_main.get("data_dir", ""));
 
     const history_max = 50;
-    const items = await loadJson("history");
+    const items = await loadJson("history", []);
     history_ipc_main.setup(history_max);  
     history_ipc_main.setData({ items });
 
@@ -370,7 +395,7 @@ app.on("ready", async ()=>{
     });
 
     downloaditem_ipc_main.handle();
-    downloaditem_ipc_main.setData({items:await loadJson("download")});
+    downloaditem_ipc_main.setData({items:await loadJson("download", [])});
     downloaditem_ipc_main.on("updated", async (args)=>{  
         win.webContents.send("downloadItemUpdated");
 

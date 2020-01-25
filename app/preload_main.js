@@ -7,7 +7,6 @@ const root_dir = path.resolve(__dirname, "..");
 
 const { getPathFromRoot } = require(`${root_dir}/app/util`);
 const IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
-const { storex } = require(`${root_dir}/app/js/riotx-stores`);
 
 let NicoMock = null;
 if (process.env.NODE_ENV == "DEBUG") {
@@ -21,7 +20,6 @@ process.once("loaded", () => {
     global.module = module;
     global.EventEmitter = EventEmitter;
 
-    global.storex = storex;
     global.IPC_CHANNEL = IPC_CHANNEL;
     global.getPathFromRoot = getPathFromRoot;
 

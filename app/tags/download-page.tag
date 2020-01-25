@@ -80,7 +80,6 @@
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
-        const main_store = window.storex.get("main");
 
         let download_schedule = null;
 

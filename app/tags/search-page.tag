@@ -209,7 +209,6 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
-        const main_store = window.storex.get("main");
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");

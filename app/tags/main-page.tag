@@ -125,7 +125,6 @@
         const { DataIpcRenderer } = window.DataIpc;
 
         this.obs = this.opts.obs;
-        const main_store = window.storex.get("main");
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");

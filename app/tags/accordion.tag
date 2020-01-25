@@ -196,7 +196,7 @@
             if(icon_name === undefined){
                 return ""; 
             }
-            return `center-hv icont-item ${icon_name} ${this.opts.storname}-item`; 
+            return `center-hv icont-item ${icon_name} ${this.opts.name}-item`; 
         };
 
         const getMenuElm = () => {

@@ -12,7 +12,7 @@
             title="マイリスト" 
             expand={true} 
             obs={obs_accordion}
-            storname={storname}>
+            name={name}>
         </accordion>
     </div>
 
@@ -24,10 +24,10 @@
 
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
-        this.storname = "mylist";
+        this.name = "mylist";
 
         this.on("mount", async () => {
-            const name = this.storname;
+            const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
             this.obs_accordion.trigger("loadData", { items });
         });
@@ -43,7 +43,7 @@
                 });
             };
 
-            const name = this.storname;
+            const name = this.name;
             await DataIpcRenderer.action("bookmark", "save", { name, items });
         });
 

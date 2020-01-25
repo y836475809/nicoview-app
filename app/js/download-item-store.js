@@ -20,24 +20,14 @@ class DownloadItemIpcMain extends DataIpcMain {
         this.emit("updated", {items});
     }
 
-    // TODO Set to json? 
-    getIDSet(args) {
-        const { state } = args;
-
-        const id_set = new Set();
-        if(state == "all"){
-            this.items.forEach(item => {
-                id_set.add(item.video_id);
-            });
-            return id_set;
-        }
-
+    getIncompleteIDs() {
+        const ids = [];
         this.items.forEach(item => {
-            if(item.state==state){
-                id_set.add(item.video_id);
+            if(item.state != 2){
+                ids.push(item.id);
             } 
         });
-        return id_set;
+        return ids;
     }
 }
 

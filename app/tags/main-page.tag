@@ -128,9 +128,8 @@
         const main_store = window.storex.get("main");
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const state = "incomplete";
-            const items = await DataIpcRenderer.action("downloaditem", "getIDSet", {state});
-            this.donwnload_item_num = items.size;
+            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            this.donwnload_item_num = video_ids.length;
             this.update();
         });
 
@@ -176,9 +175,9 @@
         this.on("mount", async () => {
             select_page("library");
 
-            const state = "incomplete";
-            const items = await DataIpcRenderer.action("downloaditem", "getIDSet", {state});
-            this.donwnload_item_num = items.size;
+            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            this.donwnload_item_num = video_ids.length;
+            this.update();
         });
 
         this.obs.on("main-page:select-page", (page_name)=>{

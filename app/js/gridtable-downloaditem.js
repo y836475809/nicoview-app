@@ -113,20 +113,21 @@ class GridTableDownloadItem {
         });
         this.grid_table.setData(dl_items);
 
-        this.grid_table.dataView.setFilter((item)=>{
-            return item.visible===true;
-        });
+        this.filterVisible();
     }
 
-    /**
-     * 
-     * @param {Array} states 
-     */
-    filterItems(states){
-        const items = this.grid_table.dataView.getItems();
-        console.log("###filterItems=", items)
-        return items.filter(item => {
-            return item.visible === true && states.includes(item.state);
+    getData(){
+        const cp_items = [];
+        const items = this.grid_table.dataView.getItems().filter(item => {
+            return item.visible === true;
+        });
+        Object.assign(cp_items , items);
+        return cp_items;
+    }
+
+    filterVisible(){
+        this.grid_table.dataView.setFilter((item)=>{
+            return item.visible===true;
         });
     }
 
@@ -186,7 +187,7 @@ class GridTableDownloadItem {
                 item.visible = false;
             }
         });
-        this.grid_table.dataView.refresh();
+        this.filterVisible();
     }
 
     deleteSelectedItems(){
@@ -195,7 +196,7 @@ class GridTableDownloadItem {
             const item = this.grid_table.dataView.getItemById(value.id);
             item.visible = false;
         });
-        this.grid_table.dataView.refresh();
+        this.filterVisible();
         this.grid_table.grid.setSelectedRows([]);
         this.grid_table.grid.resetActiveCell();
 
@@ -212,7 +213,7 @@ class GridTableDownloadItem {
                 this.grid_table.dataView.deleteItem(item.id);
             }
         });
-        this.save();
+        this.filterVisible();
     }
 
     updateItem(video_id, prop){

@@ -204,29 +204,17 @@
             grid_table_dl.resizeFitContainer(container);
         };
 
-        // TODO
         const onChangeDownloadItem = async () => {
-            const download_Items = [];
-            grid_table_dl.filterItems([
-                donwload_state.wait,
-                donwload_state.downloading,
-                donwload_state.error,
-            ]).forEach(item => {
-                download_Items.push({video_id: item.id, state:"incomplete"});
-            });
-            grid_table_dl.filterItems([
-                donwload_state.complete
-            ]).forEach(item => {
-                download_Items.push({video_id: item.id, state:"complete"});
-            });
-            const items = download_Items.filter(value => {
-                return value.visible === true;
-            }).map(value => {
+            const items = grid_table_dl.getData().map(value => {
+                let state = donwload_state.complete;
+                if(value.state !== donwload_state.complete){
+                    state = donwload_state.wait;
+                }
                 return {
                     thumb_img: value.thumb_img,
                     id: value.id,
                     name: value.name,
-                    state: value.state
+                    state: state
                 };
             });
             await DataIpcRenderer.action("downloaditem", "updateData", {items});
@@ -381,11 +369,8 @@
                             state: donwload_state.error
                         });
                     }
-
-                    grid_table_dl.save();
                
-                    // TODO
-                    // await onChangeDownloadItem();
+                    await onChangeDownloadItem();
 
                     if(cancel_donwload){
                         break;

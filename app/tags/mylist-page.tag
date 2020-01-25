@@ -161,14 +161,14 @@
         const main_store = window.storex.get("main");
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_id_set = await DataIpcRenderer.action("downloaditem", "getIDSet", {state:"all"});
+            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
                 item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
-                item.reg_download = video_id_set.has(video_id);
+                item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
         });
@@ -408,12 +408,12 @@
         };
 
         const setData = async (mylist_items) => {
-            const video_id_set = await DataIpcRenderer.action("downloaditem", "getIDSet", {state:"all"});
+            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
                 item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
-                item.reg_download = video_id_set.has(video_id);     
+                item.reg_download = video_ids.includes(video_id);     
             }
             grid_table.setData(mylist_items);
             grid_table.scrollToTop();   

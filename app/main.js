@@ -7,7 +7,7 @@ const { ConfigMain } = require("./js/config");
 const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
 const { HistoryIpcMain } = require("./js/history");
-const { DownloadItemIpcMain } = require("./js/download-item-store");
+const { DownloadItemIpcMain } = require("./js/download-item");
 const { importNNDDDB } = require("./js/import-nndd-db");
 const JsonStore = require("./js/json-store");
 

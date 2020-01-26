@@ -92,7 +92,7 @@
         this.obs_accordion.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
-            await DataIpcRenderer.action("bookmark", "save", { name, items });
+            await DataIpcRenderer.action("bookmark", "update", { name, items });
         });
 
         this.onclickSideBar = (e) => {

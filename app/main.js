@@ -382,7 +382,14 @@ app.on("ready", async ()=>{
         win.webContents.send("libraryItemAdded", args);
     });
         
-    bookmark_ipc_main.setup(await config_main.get("data_dir", ""));
+    bookmark_ipc_main.setup(async (args)=>{
+        const { name } = args;
+        return await loadJson(name, []);
+    });  
+    bookmark_ipc_main.on("bookmarkItemUpdated", async (args)=>{  
+        const { name, items } = args;
+        await saveJson(name, items);    
+    });
 
     const history_max = 50;
     const items = await loadJson("history", []);

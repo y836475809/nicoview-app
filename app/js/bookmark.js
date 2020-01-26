@@ -1,6 +1,4 @@
 
-const path = require("path");
-const JsonStore = require("./json-store");
 const { DataIpcMain } = require("./data-ipc");
 
 class BookMarkIpcMain extends DataIpcMain {
@@ -8,30 +6,17 @@ class BookMarkIpcMain extends DataIpcMain {
         super("bookmark");
     }
 
-    setup(data_dir){
-        this.data_dir = data_dir;
+    setup(getdata_callback){
+        this.getdata_callback = getdata_callback;
         this.handle();
     }
 
     getData(args){
-        const { name } = args;
-        const file_path = path.join(this.data_dir, `${name}.json`);
-        try {
-            const json_store = new JsonStore(file_path);
-            const items = json_store.load();
-            return items;
-        } catch (error) { 
-            console.log(error);
-            const items = [];
-            return items;
-        }
+        return this.getdata_callback(args);
     }
 
-    save(args){
-        const { name, items } = args;
-        const file_path = path.join(this.data_dir, `${name}.json`);
-        const json_store = new JsonStore(file_path);
-        json_store.save(items);
+    update(args){
+        this.emit("bookmarkItemUpdated", args);
     }
 }
 

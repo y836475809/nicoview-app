@@ -95,6 +95,11 @@
   - [ ] オプションでエコノミーでもダウンロードできるようにする？
   - [ ] ダウンロードして保存するときに*[ThumbInfo].json,*[Comment].jsonは整形しておく
 
+- [ ] db変更なかったら終了時の保存なしにする
+- [ ] mylist更新で入力が空の場合でもリクエストしてエラーとなる
+- [ ] mylistのhasItemがnullのまま呼ばれる場合があるのでmount時に設定する
+- [ ] updateMylistでエラーをつぶしてしまっているので404でnico_mylist.xml=nullで保存してしまっている
+
 - [] script cmd
   - []  npm run test-main
   - []  npm run test-player-main

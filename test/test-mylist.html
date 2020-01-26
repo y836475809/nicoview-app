@@ -27,11 +27,10 @@
     const { rootRequire } = require("../app/util");
     global.rootRequire = rootRequire;
     const { DataIpcRenderer } = rootRequire("app/js/library");
-    const { ConfigRenderer } = rootRequire("app/js/config");
 
     const obs = riot.observable();    // eslint-disable-line
 
-    ConfigRenderer.get("data_dir", "").then((data_dir)=>{
+    DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }).then((data_dir)=>{
         DataIpcRenderer.action("library", "setData", {
             data_dir : data_dir, 
             path_data_list : [{id:"0", dirpath:"dir1"},{id:"1", dirpath:"dir2"}],

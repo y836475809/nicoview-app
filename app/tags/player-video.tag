@@ -28,7 +28,7 @@
     <script>
         /* globals */
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
-        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
 
@@ -84,11 +84,15 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await ConfigRenderer.get("comment", {
-                duration_sec: 4,
-                fps: 10,
-                do_limit: true
-            });
+            comment_params = await DataIpcRenderer.action("config", "get", 
+                { 
+                    key:"comment", 
+                    value: {
+                        duration_sec: 4,
+                        fps: 10,
+                        do_limit: true
+                    }
+                });
             
             video_elm = this.root.querySelector("#player");
 

@@ -6,6 +6,7 @@ const IPC_CHANNEL = Object.freeze({
     BOOKMARK_ACITON: "ipc-bookmark-action",
     HISTORY_ACITON: "ipc-history-action",
     DOWNLOADITEM_ACITON: "ipc-downloaditem-action",
+    CONFIG_ACITON: "ipc-config-action",
 });
 
 const channel_map = {
@@ -13,6 +14,7 @@ const channel_map = {
     bookmark: IPC_CHANNEL.BOOKMARK_ACITON,
     history: IPC_CHANNEL.HISTORY_ACITON,
     downloaditem: IPC_CHANNEL.DOWNLOADITEM_ACITON,
+    config: IPC_CHANNEL.CONFIG_ACITON,
 };
 
 class DataIpcRenderer {

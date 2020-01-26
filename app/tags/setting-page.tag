@@ -87,7 +87,7 @@
     <script>
         /* globals riot */
         const { shell, ipcRenderer } = window.electron;
-        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         
@@ -103,7 +103,7 @@
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            ConfigRenderer.set("data_dir", dir);  
+            await DataIpcRenderer.action("config", "set", { key:"data_dir", value:dir });
         };
 
         this.onclickSelectDownloadDir = async e => {
@@ -112,11 +112,11 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            ConfigRenderer.set("download.dir", dir);
+            await DataIpcRenderer.action("config", "set", { key:"download.dir", value:dir });
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await ConfigRenderer.get("app_setting_dir", "");
+            const dir = await DataIpcRenderer.action("config", "get", { key:"app_setting_dir", value:"" });
             shell.openItem(dir);
         };
 
@@ -126,7 +126,7 @@
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            ConfigRenderer.set("ffmpeg_path", file_path);
+            await DataIpcRenderer.action("config", "set", { key:"ffmpeg_path", value:file_path });
         };
 
         const setInputValue = (selector, value) => {          
@@ -135,10 +135,10 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await ConfigRenderer.get("app_setting_dir", ""));  
-            setInputValue(".data-dir-input", await ConfigRenderer.get("data_dir", ""));  
-            setInputValue(".download-dir-input", await ConfigRenderer.get("download.dir", ""));
-            setInputValue(".ffmpeg-path-input", await ConfigRenderer.get("ffmpeg_path", ""));
+            setInputValue(".app-setting-dir-input", await DataIpcRenderer.action("config", "get", { key:"app_setting_dir", value:"" }));  
+            setInputValue(".data-dir-input", await DataIpcRenderer.action("config", "get",{ key:"data_dir", value:""}));  
+            setInputValue(".download-dir-input", await DataIpcRenderer.action("config", "get",{ key:"download.dir", value:""}));
+            setInputValue(".ffmpeg-path-input", await DataIpcRenderer.action("config", "get",{ key:"ffmpeg_path", value:""}));
         });
 
         this.onclickImport = async ()=>{

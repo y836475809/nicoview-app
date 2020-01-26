@@ -167,7 +167,6 @@
         const { showMessageBox, showOKCancelBox } = window.RemoteDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { DataIpcRenderer } = window.DataIpc;
 
@@ -375,7 +374,7 @@
             try {
                 const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
-                const ffmpeg_path = await ConfigRenderer.get("ffmpeg_path", "");
+                const ffmpeg_path = await DataIpcRenderer.action("config", "get", { key:"ffmpeg_path", value:"" });
 
                 const cnv_mp4 = new ConvertMP4();
 
@@ -526,7 +525,7 @@
             resizeGridTable();
             
             try {
-                const data_dir = await ConfigRenderer.get("data_dir");
+                const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });
                 await DataIpcRenderer.action("library", "load", {data_dir});
             } catch (error) {
                 console.log("library.getLibraryItems error=", error);

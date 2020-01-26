@@ -43,12 +43,12 @@
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;  
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { NicoPlay } = window.NicoPlay;
         const { CommentNG, CommentDisplayAmount } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RemoteDailog;
         const { NicoVideoData } = window.NicoVideoData;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -173,7 +173,7 @@
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
             return async (comment_ng) => {
-                const do_limit = await ConfigRenderer.get("comment.do_limit", true);
+                const do_limit = await DataIpcRenderer.action("config", "get", { key:"comment.do_limit", value:true });
                 if(do_limit===true){
                     const comment_display = new CommentDisplayAmount();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
@@ -447,10 +447,11 @@
         });
 
         this.on("mount", async () => {
-            const params = await ConfigRenderer.get("player", {
-                sync_comment: false,
-                infoview_width: 200
-            }); 
+            const params = await DataIpcRenderer.action("config", "get", 
+                { 
+                    key:"player", 
+                    value:{ sync_comment: false, infoview_width: 200 } 
+                });
             this.player_default_size = { width: 854 ,height: 480 };
             this.sync_comment_checked = params["sync-comment"]; // TODO use sync_comment
             const vw = params["infoview-width"]; // TODO use infoview_width
@@ -462,7 +463,8 @@
             }
 
             try {
-                comment_ng = new CommentNG(path.join(await ConfigRenderer.get("data_dir"), "nglist.json"));
+                const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });
+                comment_ng = new CommentNG(path.join(data_dir, "nglist.json"));
                 comment_ng.load();
             } catch (error) {
                 console.log("comment ng load error=", error);
@@ -488,14 +490,18 @@
             }, timeout);
         });
 
-        window.onbeforeunload = (e) => {
+        window.onbeforeunload = async (e) => {
             cancelPlay();
 
             const ve = document.getElementById("viewinfo-frame");  
-            ConfigRenderer.set("player", {
-                sync_comment: this.refs.viewinfo_frame.getSyncCommentChecked(),
-                infoview_width: parseInt(ve.offsetWidth)
-            });
+            await DataIpcRenderer.action("config", "set", 
+                { 
+                    key:"player",
+                    value: {
+                        sync_comment: this.refs.viewinfo_frame.getSyncCommentChecked(),
+                        infoview_width: parseInt(ve.offsetWidth)
+                    }
+                });
         };
     </script>
 </player-main-page>

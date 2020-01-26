@@ -30,7 +30,6 @@ window.addEventListener("load", () => {
         window.$ = window.jQuery = require("jquery");
         require("slickgrid/plugins/slick.autotooltips");
         const GridTable = require(`${root_dir}/app/js/gridtable`);
-        const ConfigRenderer = require(`${root_dir}/app/js/config`);
         const RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
         const TimeFormat = require(`${root_dir}/app/js/time-format`);
         const Niconico = require(`${root_dir}/app/js/niconico`);
@@ -43,7 +42,6 @@ window.addEventListener("load", () => {
 
         global.Sortable = Sortable;
         global.GridTable = GridTable;
-        global.ConfigRenderer = ConfigRenderer;
         global.RemoteDailog = RemoteDailog;
         global.TimeFormat = TimeFormat;
         global.Niconico = Niconico;

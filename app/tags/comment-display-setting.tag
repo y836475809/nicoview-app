@@ -48,7 +48,7 @@
     </div>
     <script>
         /* globals */
-        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs_dialog = this.opts.obs;
 
@@ -61,9 +61,9 @@
         }
 
         const changeParams = async (name, value) => {
-            const params = await ConfigRenderer.get("comment", default_params);
+            const params = await DataIpcRenderer.action("config", "get", { key: "comment", value: default_params });
             params[name] = value;
-            ConfigRenderer.set(`comment.${name}`, value);
+            await DataIpcRenderer.action("config", "set", { key: `comment.${name}`, value: value });
             obs_dialog.trigger("player-main-page:update-comment-display-params", params);
         };
 
@@ -75,9 +75,9 @@
             await changeParams("fps", parseInt(item));
         };
 
-        this.onclickLimitCommentCheck = (e) => {
+        this.onclickLimitCommentCheck = async (e) => {
             const do_limit = e.target.checked;
-            ConfigRenderer.set("comment.do_limit", do_limit);
+            await DataIpcRenderer.action("config", "set", { key:"comment.do_limit", value:do_limit });
             obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
         };
 
@@ -88,7 +88,7 @@
         };
 
         this.on("mount", async () => {
-            const params = await ConfigRenderer.get("comment", default_params);
+            const params = await DataIpcRenderer.action("config", "get", { key:"comment", value:default_params });
             setup("duration", this.duration_items, params.duration_sec);
             setup("fps", this.fps_items, params.fps);
 

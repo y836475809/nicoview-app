@@ -34,7 +34,7 @@
 
     <script>
         /* globals */
-        const { ConfigRenderer } = window.ConfigRenderer;
+        const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
 
@@ -57,7 +57,9 @@
 
             let slider = this.root.querySelector("div.slider");
             const volume = pos / slider.clientWidth;
-            ConfigRenderer.set("player.volume", volume);
+
+            // TODO check
+            DataIpcRenderer.action("config", "set", { key:"player.volume", value:volume}).then();
 
             obs.trigger("player-video:volume-changed", volume); 
         };
@@ -65,7 +67,7 @@
         this.on("mount", async ()=> {
             let picker = this.root.querySelector("div.picker");
             let slider = this.root.querySelector("div.slider");   
-            const volume = await ConfigRenderer.get("player.volume", 0.5);
+            const volume = await DataIpcRenderer.action("config", "get", { key:"player.volume", value:0.5 });
             picker.style.left = volume * slider.clientWidth - 5 + "px";
 
             obs.trigger("player-video:volume-changed", volume); 

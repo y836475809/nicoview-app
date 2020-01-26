@@ -3,7 +3,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 const { IPC_CHANNEL } = require("./js/ipc-channel");
-const { ConfigMain } = require("./js/config");
+const { ConfigIpcMain } = require("./js/config");
 const { LibraryIpcMain } = require("./js/library");
 const { BookMarkIpcMain } = require("./js/bookmark");
 const { HistoryIpcMain } = require("./js/history");
@@ -13,13 +13,7 @@ const JsonStore = require("./js/json-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-let config_fiiename = "config.json";
-
-if(process.env.USE_CONFIG == "DEBUG"){
-    config_fiiename = "config-debug.json";
-    console.info("debug mode, use config = ", config_fiiename);
-}
-const config_main = new ConfigMain(config_fiiename);
+const config_ipc_main = new ConfigIpcMain();
 const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 const history_ipc_main = new HistoryIpcMain();
@@ -34,7 +28,7 @@ let do_app_quit = false;
 let player_html_path = `${__dirname}/html/player.html`;
 
 const loadJson = async (name, default_value) => {
-    const data_dir = await config_main.get("data_dir", "");
+    const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         await fsPromises.stat(file_path);
@@ -56,7 +50,7 @@ const loadJson = async (name, default_value) => {
 };
 
 const saveJson = async (name, items) => {
-    const data_dir = await config_main.get("data_dir", "");
+    const data_dir = await config_ipc_main.get({ key: "data_dir", value:"" });
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         const json_store = new JsonStore(file_path);
@@ -91,7 +85,7 @@ function createWindow() {
     }
 
     // ブラウザウィンドウの作成
-    const state = config_main.get("main.window.state", { width: 1000, height: 600 });
+    const state = config_ipc_main.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
     state.webPreferences =  {
         nodeIntegration: false,
         contextIsolation: false,
@@ -111,8 +105,8 @@ function createWindow() {
 
     win.on("close", async (e) => {      
         if(process.env.DATA_SAVE == "NO"){
-            config_main.set("main.window.state", getWindowState(win));
-            await config_main.save();
+            config_ipc_main.set({ key:"main.window.state", value:getWindowState(win) });
+            await config_ipc_main.save();
             console.info("debug mdoe, save config");
             return;
         }
@@ -133,8 +127,8 @@ function createWindow() {
         }
 
         try {
-            config_main.set("main.window.state", getWindowState(win));
-            await config_main.save();
+            config_ipc_main.set({ key:"main.window.state", value:getWindowState(win) });
+            await config_ipc_main.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -175,7 +169,7 @@ function createWindow() {
         win = null;
 
         try {
-            config_main.save();
+            config_ipc_main.save();
         } catch (error) {
             console.log(error);
             await dialog.showMessageBox({
@@ -191,7 +185,14 @@ function createWindow() {
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", async ()=>{
     try {
-        await config_main.load();
+        let config_fiiename = "config.json";
+        if(process.env.USE_CONFIG == "DEBUG"){
+            config_fiiename = "config-debug.json";
+            console.info("debug mode, use config = ", config_fiiename);
+        }
+        config_ipc_main.handle();
+        config_ipc_main.setup(config_fiiename);
+        await config_ipc_main.load();
     } catch (error) {
         const ret = await dialog.showMessageBox({
             type: "error",
@@ -199,7 +200,7 @@ app.on("ready", async ()=>{
             message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
         });
         if(ret===0){ //OK
-            config_main.clear();
+            config_ipc_main.clear();
         }else{ //Cancel
             do_app_quit = true;
             app.quit();
@@ -207,7 +208,7 @@ app.on("ready", async ()=>{
         }
     }
     try {
-        await config_main.configFolder();
+        await config_ipc_main.configFolder();
     } catch (error) {
         await dialog.showMessageBox({
             type: "error",
@@ -341,7 +342,7 @@ app.on("ready", async ()=>{
 
     ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {
         const { db_file_path } = args;
-        const data_dir = config_main.get("data_dir", "");
+        const data_dir = config_ipc_main.get({ key:"data_dir", value:"" });
 
         if(data_dir == ""){
             return {
@@ -434,7 +435,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = config_main.get("player.window.state", { width: 800, height: 600 });
+        const state = config_ipc_main.get({ key:"player.window.state", value:{ width: 800, height: 600 } });
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
@@ -450,7 +451,7 @@ const createPlayerWindow = () => {
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
-                config_main.set("player.window.state", getWindowState(player_win));
+                config_ipc_main.set({ key:"player.window.state", value:getWindowState(player_win) });
                 player_win = null;
             });
 

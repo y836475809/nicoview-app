@@ -152,7 +152,6 @@
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox } = window.RemoteDailog;
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
@@ -338,7 +337,7 @@
 
         // TODO
         this.on("mount", async () => {
-            const mylist_dir = path.join(await ConfigRenderer.get("data_dir", ""), "mylist");
+            const mylist_dir = path.join(await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }), "mylist");
             image_cache = new CacheStore(mylist_dir, "image-cache.json");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
 

@@ -75,7 +75,6 @@
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
-        const { ConfigRenderer } = window.ConfigRenderer;
         const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
@@ -176,10 +175,14 @@
             const enable = download_schedule.enable;
             this.refs["schedule-dialog"].showModal(date, enable, result=>{
                 if(result.type=="ok"){
-                    ConfigRenderer.set("download.schedule", {
-                        date:result.date,
-                        enable:result.enable
-                    });
+                    // TODO check
+                    DataIpcRenderer.action("config", "set", { 
+                        key:"download.schedule", 
+                        value: {
+                            date:result.date,
+                            enable:result.enable
+                        }
+                    }).then();
                     download_schedule.date = result.date;
                     download_schedule.enable = result.enable;
                     
@@ -287,7 +290,7 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await ConfigRenderer.get("download.dir", "");
+            const download_dir = await DataIpcRenderer.action("config", "get", { key:"download.dir", value:"" });
             event_em.emit("download-start");
             try {
                 cancel_download = false;
@@ -397,9 +400,12 @@
         });
 
         this.on("mount", async () => {
-            download_schedule = await ConfigRenderer.get("download.schedule", {
-                date: {hour:0, minute:0},
-                enable: false
+            download_schedule = await DataIpcRenderer.action("config", "get", { 
+                key:"download.schedule", 
+                value:  {
+                    date: {hour:0, minute:0},
+                    enable: false
+                }
             });
 
             grid_table_dl = new GridTableDownloadItem(

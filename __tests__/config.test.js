@@ -1,33 +1,35 @@
 const test = require("ava");
-const { ConfigMain } = require("../app/js/config");
+const { ConfigIpcMain } = require("../app/js/config");
 
-class TestConfigMain extends ConfigMain {
+class TestConfiIpcgMain extends ConfigIpcMain {
     setup(){}
 }
 
 test("getObj json_data empty", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     const json_data = {};
     t.is(cfg_main.getObj("test", json_data), undefined);
     t.deepEqual(json_data, {});
 });
 
 test("get default value", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     
     cfg_main.json_data = {};
-    t.deepEqual(cfg_main.get("test", 
-        {value1:20, value2:"val2", value3:{}}), {value1:20, value2:"val2", value3:{}}
-    );
+    t.deepEqual(cfg_main.get({
+        key:"test", 
+        value:{value1:20, value2:"val2", value3:{}}
+    }), {value1:20, value2:"val2", value3:{}});
 
     cfg_main.json_data = {test:{value1:10}};
-    t.deepEqual(cfg_main.get("test", 
-        {value1:20, value2:"val2", value3:{}}), {value1:10, value2:"val2", value3:{}}
-    );
+    t.deepEqual(cfg_main.get({
+        key:"test", 
+        value:{value1:20, value2:"val2", value3:{}}
+    }), {value1:10, value2:"val2", value3:{}});
 });
 
 test("getObj json_data has obj", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     const json_data = {test: {value1:10, value2:"val2", value3:{}}};
 
     t.deepEqual(cfg_main.getObj("test", json_data), {value1:10, value2:"val2", value3:{}});
@@ -41,7 +43,7 @@ test("getObj json_data has obj", t => {
 });
 
 test("setObj add", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     const json_data = {};
 
     cfg_main.setObj("test", 1, json_data);
@@ -67,7 +69,7 @@ test("setObj add", t => {
 });
 
 test("setObj replace obj", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     const json_data = {};
 
     cfg_main.setObj("test", {value:1}, json_data);
@@ -90,7 +92,7 @@ test("setObj replace obj", t => {
 });
 
 test("setObj replace num to obj, obj to num", t => {
-    const cfg_main = new TestConfigMain();
+    const cfg_main = new TestConfiIpcgMain();
     const json_data = {};
 
     cfg_main.setObj("test", {value:1}, json_data);

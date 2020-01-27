@@ -1,5 +1,5 @@
 
-const { app, dialog } = require("electron");
+const { dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
@@ -10,14 +10,14 @@ class ConfigIpcMain extends DataIpcMain {
         super("config");
     }
 
-    setup(filename="config.json"){
-        this.config_path = path.join(app.getPath("userData"), filename);
+    setup(config_path){
+        this.config_path = config_path;
         this._initJsonData();
     }
 
     _initJsonData(){
         this.json_data = {};
-        this.json_data["app_setting_dir"] = app.getPath("userData");
+        this.json_data["app_setting_dir"] = path.dirname(this.config_path);
         this.json_data.download = {};
     }
 
@@ -99,18 +99,15 @@ class ConfigIpcMain extends DataIpcMain {
         await fsPromises.writeFile(this.config_path, json, "utf-8");
     }
 
-    async configFolder() {
-        const data_dir = await this._selectFolder(this.json_data["data_dir"], "データを保存するフォルダの選択");
-        if (data_dir === undefined) {
-            throw new Error("データを保存するフォルダが選択されていない");
+    async configFolder(key, label) {
+        const cfg_dir = this.get({key:key, value:undefined});
+        if (await this._checkDir(cfg_dir) !== true) {     
+            const dir = await this._selectFolder(`${label}を保存するフォルダの選択`);
+            if (dir === undefined) {
+                throw new Error(`${label}を保存するフォルダが選択されていない`);
+            }
+            this.set({key:key, value:dir});
         }
-        this.json_data["data_dir"] = data_dir;
-
-        const download_dir = await this._selectFolder(this.json_data.download.dir, "動画を保存するフォルダの選択");
-        if (download_dir === undefined) {
-            throw new Error("動画を保存するフォルダが選択されていない");
-        }
-        this.json_data.download.dir = download_dir;
     }
 
     async _checkDir(dir) {
@@ -125,19 +122,15 @@ class ConfigIpcMain extends DataIpcMain {
         }
     }
 
-    async _selectFolder(dir, title) {
-        if (await this._checkDir(dir) === true) {
-            return dir;
-        } else {
-            const dirs = dialog.showOpenDialogSync({
-                title: title,
-                properties: ["openDirectory", "createDirectory"]
-            });
-            if (dirs === undefined) {
-                return undefined;
-            }
-            return dirs[0];
+    async _selectFolder(title) {
+        const dirs = dialog.showOpenDialogSync({
+            title: title,
+            properties: ["openDirectory", "createDirectory"]
+        });
+        if (dirs === undefined) {
+            return undefined;
         }
+        return dirs[0];
     }
 }
 

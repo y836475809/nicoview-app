@@ -167,17 +167,6 @@ function createWindow() {
             player_win.close();
         }
         win = null;
-
-        try {
-            config_ipc_main.save();
-        } catch (error) {
-            console.log(error);
-            await dialog.showMessageBox({
-                type: "error",
-                buttons: ["OK"],
-                message: `設定の保存失敗: ${error.message}`
-            });
-        }
     });
 }
 
@@ -190,8 +179,9 @@ app.on("ready", async ()=>{
             config_fiiename = "config-debug.json";
             console.info("debug mode, use config = ", config_fiiename);
         }
+        const config_path = path.join(app.getPath("userData"), config_fiiename);
         config_ipc_main.handle();
-        config_ipc_main.setup(config_fiiename);
+        config_ipc_main.setup(config_path);
         await config_ipc_main.load();
     } catch (error) {
         const ret = await dialog.showMessageBox({
@@ -208,7 +198,8 @@ app.on("ready", async ()=>{
         }
     }
     try {
-        await config_ipc_main.configFolder();
+        await config_ipc_main.configFolder("data_dir", "データ");
+        await config_ipc_main.configFolder("download.dir", "動画");
     } catch (error) {
         await dialog.showMessageBox({
             type: "error",

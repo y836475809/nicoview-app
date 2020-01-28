@@ -63,9 +63,9 @@
 
 <script>
     // TODO
-    const { CommentTimeLine } = require("../app/js/comment-timeline");
+    const { CommentTimeLine } = window.CommentTimeLine;
     const { randomComments, sampleComments, 
-        fixedSampleComments, randomfixedComments } = require("./test-comments");  
+        fixedSampleComments, randomfixedComments } = window.TestComments;  
 
     const duration_sec = 4;
     let commnet_tl = null;

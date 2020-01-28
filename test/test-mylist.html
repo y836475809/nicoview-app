@@ -5,9 +5,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>test mylist</title>
-    <script>
-        window.jQuery = window.$ = require("jquery");
-    </script>
     <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
 
@@ -23,12 +20,12 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
-    // TODO
-    const { rootRequire } = require("../app/util");
-    global.rootRequire = rootRequire;
-    const { DataIpcRenderer } = rootRequire("app/js/library");
+    const { DataIpcRenderer } = window.DataIpc;
+    const { NicoMylistMocks } = window.NicoMock;
+    const { NicoHttpServer } = window.NicoHttpServer;
 
     const obs = riot.observable();    // eslint-disable-line
+    const nico_hhtp_server = new NicoHttpServer();
 
     DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }).then((data_dir)=>{
         DataIpcRenderer.action("library", "setData", {
@@ -38,8 +35,8 @@
         }).then(()=>{
             riot.mount("mylist-page", {obs});
 
-            const { NicoMylistMocks } = require("./mock_server/nico-mock");
-            require("./mock_server/http-server");
+            nico_hhtp_server.create();
+            nico_hhtp_server.listen(8099);
 
             const mylist_mock = new NicoMylistMocks();
             mylist_mock.mylist();

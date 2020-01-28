@@ -490,6 +490,7 @@
             }, timeout);
         });
 
+        // TODO mainが先に閉じられた場合、DataIpcRenderer.actionがかえってこない？
         window.onbeforeunload = async (e) => {
             cancelPlay();
 

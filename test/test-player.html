@@ -28,11 +28,11 @@
 <script type="riot/tag" src="../app/tags/open-video-form.tag"></script>
 <script>
     /* globals riot */
+    const { NicoVideoMocks } = window.NicoMock;
+    
     const obs = riot.observable(); // eslint-disable-line
     
     riot.mount("player-main-page", {obs});
-
-    const { NicoVideoMocks } = window.NicoMock;
 
     const video_mocks = [];
     const video_ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];

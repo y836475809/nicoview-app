@@ -26,6 +26,11 @@ let is_debug_mode = false;
 let do_app_quit = false;
 
 let player_html_path = `${__dirname}/html/player.html`;
+let preload_main_path = `${__dirname}/preload_main.js`;
+if(process.env.PRELOAD == "TEST"){
+    const dir = path.resolve(__dirname, "..");
+    preload_main_path = path.join(dir, "test", "preload_test.js")
+}
 
 const loadJson = async (name, default_value) => {
     const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
@@ -89,7 +94,7 @@ function createWindow() {
     state.webPreferences =  {
         nodeIntegration: false,
         contextIsolation: false,
-        preload: `${__dirname}/preload_main.js`,
+        preload: preload_main_path,
     };
     win = new BrowserWindow(state);
     if (state.maximized) {

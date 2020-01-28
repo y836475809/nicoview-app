@@ -75,10 +75,16 @@
                 gutter = true;     
             }
         };
-        this.mouseup = (e) => {
+        this.mouseup = async (e) => {
             if(gutter_move){
                 obs.trigger("player-video:reset-comment-timelime");
                 obs.trigger("player-viewinfo-page:split-resized");
+
+                const ve = this.root.querySelector("#viewinfo-frame");
+                await DataIpcRenderer.action("config", "set", { 
+                    key:"player.infoview_width",
+                    value: parseInt(ve.offsetWidth)
+                });
             }
             gutter = false;
             gutter_move = false;
@@ -446,6 +452,14 @@
             obs.trigger("player-video:update-comment-display-params", args);
         });
 
+        obs.on("player-main-page:sync-comment-checked", async (args) => {
+            const checked = args;
+            await DataIpcRenderer.action("config", "set", { 
+                key:"player.sync_comment",
+                value: checked
+            });
+        });
+
         this.on("mount", async () => {
             const params = await DataIpcRenderer.action("config", "get", 
                 { 
@@ -489,20 +503,5 @@
                 obs.trigger("window-resized");    
             }, timeout);
         });
-
-        // TODO mainが先に閉じられた場合、DataIpcRenderer.actionがかえってこない？
-        window.onbeforeunload = async (e) => {
-            cancelPlay();
-
-            const ve = document.getElementById("viewinfo-frame");  
-            await DataIpcRenderer.action("config", "set", 
-                { 
-                    key:"player",
-                    value: {
-                        sync_comment: this.refs.viewinfo_frame.getSyncCommentChecked(),
-                        infoview_width: parseInt(ve.offsetWidth)
-                    }
-                });
-        };
     </script>
 </player-main-page>

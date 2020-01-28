@@ -330,11 +330,9 @@
         const grid_table = new GridTable("comment-grid", columns, options);
 
         this.onclickSyncCommentCheck = (e) => {
-            sync_comment_checked = e.target.checked;
-        };
-
-        this.getSyncCommentChecked = () => {
-            return sync_comment_checked;
+            const checked = e.target.checked;
+            sync_comment_checked = checked;
+            obs.trigger("player-main-page:sync-comment-checked", checked);
         };
 
         const resizeCommentList = () => {

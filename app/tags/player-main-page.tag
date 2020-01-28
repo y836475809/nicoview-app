@@ -467,14 +467,16 @@
                     value:{ sync_comment: false, infoview_width: 200 } 
                 });
             this.player_default_size = { width: 854 ,height: 480 };
-            this.sync_comment_checked = params["sync-comment"]; // TODO use sync_comment
-            const vw = params["infoview-width"]; // TODO use infoview_width
+            this.sync_comment_checked = params.sync_comment;
+            const vw = params.infoview_width;
             if(vw){
                 let pe = document.getElementById("player-frame");
                 let ve = document.getElementById("viewinfo-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }
+
+            obs.trigger("player-viewinfo-page:sync-comment-checked", params.sync_comment);
 
             try {
                 const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });

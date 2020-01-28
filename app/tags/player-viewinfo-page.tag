@@ -543,6 +543,11 @@
             setComments(comments);
         });
 
+        obs.on("player-viewinfo-page:sync-comment-checked", (args)=> {
+            sync_comment_checked = args;
+            updateSyncCommentCheckBox();
+        });
+
         obs.on("player-viewinfo-page:set-viewinfo-data", (args)=> {
             resizeCommentList();
 
@@ -636,7 +641,6 @@
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
 
-            updateSyncCommentCheckBox();
             resizeCommentList();
         });
         

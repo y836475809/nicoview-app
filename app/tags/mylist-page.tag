@@ -156,7 +156,7 @@
         const { CacheStore } = window.CacheStore;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
-        const { showOKCancelBox } = window.RemoteDailog;
+        const { showOKCancelBox, showMessageBox } = window.RemoteDailog;
         const { DataIpcRenderer } = window.DataIpc;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
@@ -424,16 +424,8 @@
 
         const updateMylist = async(mylist_id) => {
             nico_mylist = new NicoMylist();
-            try {
-                const mylist = await nico_mylist.getMylist(mylist_id);
-                setMylist(mylist);    
-            } catch (error) {
-                if(error.cancel===true){
-                    console.log("cancel mylist");
-                }else{
-                    console.log(error);
-                }
-            }
+            const mylist = await nico_mylist.getMylist(mylist_id);
+            setMylist(mylist);
         };
 
         const addMylist = (mylist) => {
@@ -478,11 +470,20 @@
                 }
             });
             
-            is_local_item = await hasLocalItem();
-            const mylist_id = getMylistID();
-            await updateMylist(mylist_id);
-            if(is_local_item){
-                nico_mylist_store.save(mylist_id, nico_mylist.xml);
+            try {
+                is_local_item = await hasLocalItem();
+                const mylist_id = getMylistID();
+                await updateMylist(mylist_id);
+                if(is_local_item){
+                    nico_mylist_store.save(mylist_id, nico_mylist.xml);
+                }
+            } catch (error) {
+                if(error.cancel===true){
+                    console.log("cancel mylist");
+                }else{
+                    console.error(error);
+                    await showMessageBox("error", error.message);
+                } 
             }
 
             this.obs_modal_dialog.trigger("close");
@@ -494,19 +495,32 @@
             getImageCache();
         };
 
-        obs.on("mylist-page:item-dlbclicked", (item) => {
+        obs.on("mylist-page:item-dlbclicked", async (item) => {
             is_local_item = true;
 
-            const mylist_id = item.mylist_id;
-            const mylist = nico_mylist_store.load(mylist_id);
-
-            setMylistID(mylist_id);
-            setMylist(mylist);
+            try {
+                const mylist_id = item.mylist_id;
+                const mylist = nico_mylist_store.load(mylist_id);
+                setMylistID(mylist_id);
+                setMylist(mylist); 
+            } catch (error) {
+                console.error(error);
+                await showMessageBox("error", error.message);
+            }
         });
 
         obs.on("mylist-page:load-mylist", async(mylist_id)=> {
             setMylistID(mylist_id);
-            await updateMylist(mylist_id);
+            try {
+                await updateMylist(mylist_id);
+            } catch (error) {
+                if(error.cancel===true){
+                    console.log("cancel mylist");
+                }else{
+                    console.log(error);
+                    await showMessageBox("error", error.message);
+                } 
+            }   
         });
 
         obs.on("window-resized", ()=> {

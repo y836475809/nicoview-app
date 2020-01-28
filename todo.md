@@ -97,7 +97,7 @@
 
 - [ ] db変更なかったら終了時の保存なしにする
 - [ ] mylist更新で入力が空の場合でもリクエストしてエラーとなる
-- [ ] mylistのhasItemがnullのまま呼ばれる場合があるのでmount時に設定する
+- [x] mylistのhasItemがnullのまま呼ばれる場合があるのでmount時に設定する
 - [ ] updateMylistでエラーをつぶしてしまっているので404でnico_mylist.xml=nullで保存してしまっている
 
 - [] script cmd

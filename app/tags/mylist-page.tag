@@ -25,14 +25,19 @@
         const obs = this.opts.obs; 
         this.obs_accordion = riot.observable();
         this.name = "mylist";
+        let hasItem = (mylist_id) => false;
 
         this.on("mount", async () => {
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
             this.obs_accordion.trigger("loadData", { items });
+
+            hasItem = (mylist_id) => {
+                return items.some(value=>{
+                    return value.mylist_id == mylist_id;
+                });
+            };
         });
-        
-        let hasItem = null;
 
         this.obs_accordion.on("changed", async (args) => {
             const { items } = args;

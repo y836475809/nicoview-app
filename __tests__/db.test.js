@@ -129,6 +129,16 @@ test("db1", async t => {
     
 });
 
+test("db delete", async t => {
+    const db = new testMapDB();
+    await db.load();
+
+    t.deepEqual(db.find("video", "sm1"), {id:"sm1",dirpath_id:"0", tags:["tag1"]});
+    db.delete("video", "sm1");
+    t.is(db.find("video", "sm1"), null);
+});
+
+
 test("db2", async t => {
     const filename = path.join(__dirname, "test.join");
     const db = new MapDB({filename:filename});
@@ -149,6 +159,7 @@ test("db3", async t => {
     await db.insert("path", {id:1, dirpath:1});
     await db.update("video", "sm1", {dirpath_id:1});
     await db.save();
+    await db.delete("video", "sm1", {dirpath_id:1});
 
     t.deepEqual(db.test_log, [
         `append ${log_fname}`,
@@ -163,6 +174,8 @@ test("db3", async t => {
         `writeFile ${db_tmp_fname}`,
         `rename ${db_tmp_fname} ${db_fname}`,
         `unlink ${log_fname}`,
+
+        `append ${log_fname}`,
     ]);
 });
 

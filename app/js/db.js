@@ -96,6 +96,17 @@ class MapDB {
         });
     }
 
+    async delete(name, id) {
+        const map = this.db_map.get(name);
+        map.delete(id);  
+        
+        await this._log({
+            target: name,
+            type: "delete",
+            value: { id: id, data: {} }
+        });
+    }
+
     async update(name, id, props) {
         const map = this.db_map.get(name);
         if (!map.has(id)) {
@@ -246,6 +257,10 @@ class MapDB {
                 data_map.set(value.id, value.data);
             }
 
+            if (item.type == "delete") {
+                data_map.delete(value.id);
+            }
+
             if (item.type == "update") {
                 if (!data_map.has(value.id)) {
                     return;
@@ -314,6 +329,10 @@ class LibraryDB {
         this._deleteNoUseProp(cp_video_data);
         await this._db.insert("path", { "id": dirpath_id, "dirpath": dirpath });
         await this._db.insert("video", cp_video_data);
+    }
+
+    async delete(video_id) {
+        await this._db.delete("video", video_id);
     }
 
     async update(video_id, props) {

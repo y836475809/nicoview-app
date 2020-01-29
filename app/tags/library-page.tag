@@ -159,7 +159,7 @@
 
     <script>
         /* globals */
-        const {remote, ipcRenderer} = window.electron;
+        const {remote, ipcRenderer, shell } = window.electron;
         const {Menu, MenuItem} = remote;
         const { GridTable } = window.GridTable;
         const { NicoUpdate } = window.NicoUpdate;
@@ -472,6 +472,21 @@
                         return BookMark.createVideoItem(item.video_name, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
+                }},
+                { type: "separator" },
+                { label: "削除", async click() {
+                    // TODO 
+                    const items = grid_table.getSelectedDatas();
+                    const video_id = items[0].id;
+                    const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                    const video_data = new NicoVideoData(video_item);
+                    // const bk_items = items.map(item => {
+                    //     return BookMark.createVideoItem(item.video_name, item.id);
+                    // });
+                    // obs.trigger("bookmark-page:add-items", bk_items);
+                    const fullpath = video_data.videoPath;
+                    const result = shell.moveItemToTrash(fullpath);
+                    console.log(result); 
                 }}
             ];
             return Menu.buildFromTemplate(nemu_templete);

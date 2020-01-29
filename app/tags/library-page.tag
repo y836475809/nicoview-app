@@ -330,12 +330,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id:item.id});
+                        const video_item = await DataIpcRenderer.action("library", "getItem", {video_id:item.id});
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
                             await DataIpcRenderer.action("library", "update", {video_id, props});
                             if(update_thumbnail){
-                                const updated_video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                                const updated_video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -372,7 +372,7 @@
             };
 
             try {
-                const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
                 const ffmpeg_path = await DataIpcRenderer.action("config", "get", { key:"ffmpeg_path", value:"" });
 
@@ -556,7 +556,7 @@
         // TODO update
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+            const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
             if(video_item===null){
                 return;
             }
@@ -581,7 +581,7 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
                 this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){

@@ -212,7 +212,7 @@
             });
             
             if(result.state == "ok" || result.state == "404"){
-                const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
                 ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
             } 
         });

@@ -59,6 +59,10 @@ class NicoXMLFile extends NicoDataFile {
         return path.join(this.dir_path, `${this.common_filename}[Owner].xml`);
     }
 
+    get ichibaInfoPath(){
+        return `${this.common_filename}[IchibaInfo].html`;
+    }
+
     get thumbInfoFilename(){
         return `${this.common_filename}[ThumbInfo].xml`;
     }
@@ -194,6 +198,22 @@ class NicoVideoData {
         nico_data.thumbnailSize = video_item.thumbnail_size;
         nico_data.is_deleted = video_item.is_deleted;
         return nico_data;
+    }
+
+    // TODO
+    getFilePaths(){
+        const paths = [];
+        paths.push(this.nico_data.videoPath);
+        paths.push(this.nico_data.thumbImgPath);
+        paths.push(this.nico_data.thumbInfoPath);
+        paths.push(this.nico_data.commentPath);
+        if(this.nico_data.hasOwnProperty["ownerCommentPath"]){
+            paths.push(this.nico_data.ownerCommentPath);
+        }
+        if(this.nico_data.hasOwnProperty["ichibaInfoPath"]){
+            paths.push(this.nico_data.ichibaInfoPath);
+        }
+        return paths;
     }
 
     getVideoPath() {

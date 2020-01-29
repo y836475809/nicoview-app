@@ -477,16 +477,12 @@
                 { label: "削除", async click() {
                     // TODO 
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    const video_item = await DataIpcRenderer.action("library", "getLibraryItem", {video_id});
+                    const video_id = items[0].id; 
+                    const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
                     const video_data = new NicoVideoData(video_item);
-                    // const bk_items = items.map(item => {
-                    //     return BookMark.createVideoItem(item.video_name, item.id);
-                    // });
-                    // obs.trigger("bookmark-page:add-items", bk_items);
-                    const fullpath = video_data.videoPath;
-                    const result = shell.moveItemToTrash(fullpath);
-                    console.log(result); 
+                    const paths = video_data.getFilePaths();
+                    // const result = shell.moveItemToTrash(fullpath);
+                    console.log(paths); 
                 }}
             ];
             return Menu.buildFromTemplate(nemu_templete);

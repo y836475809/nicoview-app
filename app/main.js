@@ -1,4 +1,4 @@
-const { session, dialog, app, BrowserWindow, ipcMain } = require("electron");
+const { session, dialog, app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
@@ -9,6 +9,7 @@ const { BookMarkIpcMain } = require("./js/bookmark");
 const { HistoryIpcMain } = require("./js/history");
 const { DownloadItemIpcMain } = require("./js/download-item");
 const { importNNDDDB } = require("./js/import-nndd-db");
+const { getNicoDataFilePaths } = require("./js/nico-data-file");
 const JsonStore = require("./js/json-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -364,6 +365,34 @@ app.on("ready", async ()=>{
         return {
             result : true,
             error : null
+        };
+    });
+
+    // TODO
+    ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_FILES, async (event, args) => {
+        const { video_id } = args;
+        
+        const video_item = library_ipc_main.getItem({video_id});
+        const paths = getNicoDataFilePaths(video_item);
+
+        for (let index = 0; index < paths.length; index++) {
+            const file_path = paths[index];
+            try {
+                await fsPromises.stat(file_path);
+            } catch (error) {
+                continue;
+            }
+            const result = shell.moveItemToTrash(file_path);
+            if(!result){
+                return {
+                    result:false,
+                    error:new Error(`${file_path}のゴミ箱への移動に失敗`)
+                };
+            }
+        }
+        return {
+            result:true,
+            error:null
         };
     });
 

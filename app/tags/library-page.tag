@@ -478,11 +478,8 @@
                     // TODO 
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id; 
-                    const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});
-                    const video_data = new NicoVideoData(video_item);
-                    const paths = video_data.getFilePaths();
-                    // const result = shell.moveItemToTrash(fullpath);
-                    console.log(paths); 
+                    const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_FILES, { video_id });
+                    console.log(result); 
                 }}
             ];
             return Menu.buildFromTemplate(nemu_templete);

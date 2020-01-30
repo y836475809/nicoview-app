@@ -200,22 +200,6 @@ class NicoVideoData {
         return nico_data;
     }
 
-    // TODO
-    getFilePaths(){
-        const paths = [];
-        paths.push(this.nico_data.videoPath);
-        paths.push(this.nico_data.thumbImgPath);
-        paths.push(this.nico_data.thumbInfoPath);
-        paths.push(this.nico_data.commentPath);
-        if(this.nico_data.hasOwnProperty["ownerCommentPath"]){
-            paths.push(this.nico_data.ownerCommentPath);
-        }
-        if(this.nico_data.hasOwnProperty["ichibaInfoPath"]){
-            paths.push(this.nico_data.ichibaInfoPath);
-        }
-        return paths;
-    }
-
     getVideoPath() {
         return this.nico_data.videoPath;
     }
@@ -245,8 +229,32 @@ class NicoVideoData {
     }
 }
 
+// TODO
+const getNicoDataFilePaths = (video_item) => {
+    video_item.data_type = "xml"; 
+    const xml_item = new NicoDataFile(video_item);
+    video_item.data_type = "json";
+    const jso_item = new NicoDataFile(video_item);
+
+    const paths = [];
+    paths.push(xml_item.videoPath);
+    paths.push(xml_item.thumbImgPath);
+    paths.push(xml_item.thumbInfoPath);
+    paths.push(xml_item.commentPath);
+    paths.push(xml_item.ownerCommentPath);
+    paths.push(xml_item.ichibaInfoPath);
+
+    paths.push(jso_item.videoPath);
+    paths.push(jso_item.thumbImgPath);
+    paths.push(jso_item.thumbInfoPath);
+    paths.push(jso_item.commentPath);
+
+    return paths;  
+};
+
 module.exports = {
     NicoXMLFile,
     NicoJsonFile,
-    NicoVideoData
+    NicoVideoData,
+    getNicoDataFilePaths
 };

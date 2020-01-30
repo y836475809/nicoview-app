@@ -99,6 +99,8 @@
 - [x] mylist更新で入力が空の場合でもリクエストしてエラーとなる
 - [x] mylistのhasItemがnullのまま呼ばれる場合があるのでmount時に設定する
 - [x] updateMylistでエラーをつぶしてしまっているので404でnico_mylist.xml=nullで保存してしまっている
+- [ ] モーダルダイアログのボタンにマウスが乗ったときやフォーカスがあるときの変化がない 
+- [ ] モーダルダイアログのボタンを押したときの変化がない 
 
 - [] script cmd
   - []  npm run test-main

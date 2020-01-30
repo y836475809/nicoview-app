@@ -60,7 +60,7 @@ class NicoXMLFile extends NicoDataFile {
     }
 
     get ichibaInfoPath(){
-        return `${this.common_filename}[IchibaInfo].html`;
+        return path.join(this.dir_path, `${this.common_filename}[IchibaInfo].html`);
     }
 
     get thumbInfoFilename(){
@@ -231,25 +231,34 @@ class NicoVideoData {
 
 // TODO
 const getNicoDataFilePaths = (video_item) => {
-    video_item.data_type = "xml"; 
-    const xml_item = new NicoDataFile(video_item);
-    video_item.data_type = "json";
-    const jso_item = new NicoDataFile(video_item);
+    const xml_item = new NicoXMLFile();
+    xml_item.dirPath        = video_item.dirpath;
+    xml_item.commonFilename = video_item.common_filename;
+    xml_item.videoType      = video_item.video_type;
+    xml_item.thumbnailSize  = video_item.thumbnail_size;
+    xml_item.is_deleted     = video_item.is_deleted;
 
-    const paths = [];
-    paths.push(xml_item.videoPath);
-    paths.push(xml_item.thumbImgPath);
-    paths.push(xml_item.thumbInfoPath);
-    paths.push(xml_item.commentPath);
-    paths.push(xml_item.ownerCommentPath);
-    paths.push(xml_item.ichibaInfoPath);
+    const json_item = new NicoJsonFile();
+    json_item.dirPath        = video_item.dirpath;
+    json_item.commonFilename = video_item.common_filename;
+    json_item.videoType      = video_item.video_type;
+    json_item.thumbnailSize  = video_item.thumbnail_size;
+    json_item.is_deleted     = video_item.is_deleted;
 
-    paths.push(jso_item.videoPath);
-    paths.push(jso_item.thumbImgPath);
-    paths.push(jso_item.thumbInfoPath);
-    paths.push(jso_item.commentPath);
+    const paths = new Set();
+    paths.add(xml_item.videoPath);
+    paths.add(xml_item.thumbImgPath);
+    paths.add(xml_item.thumbInfoPath);
+    paths.add(xml_item.commentPath);
+    paths.add(xml_item.ownerCommentPath);
+    paths.add(xml_item.ichibaInfoPath);
 
-    return paths;  
+    paths.add(json_item.videoPath);
+    paths.add(json_item.thumbImgPath);
+    paths.add(json_item.thumbInfoPath);
+    paths.add(json_item.commentPath);
+
+    return [...paths];  
 };
 
 module.exports = {

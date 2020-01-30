@@ -371,27 +371,41 @@ app.on("ready", async ()=>{
     // TODO
     ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_FILES, async (event, args) => {
         const { video_id } = args;
-        
+
         const video_item = library_ipc_main.getItem({video_id});
+        if(video_item===null){
+            return {
+                success:false,
+                error:new Error(`${video_id}が存在しません`)
+            };
+        }
+
+        /**
+         * @type {Array}
+         */
         const paths = getNicoDataFilePaths(video_item);
 
+        const exist_paths = [];
         for (let index = 0; index < paths.length; index++) {
             const file_path = paths[index];
             try {
                 await fsPromises.stat(file_path);
-            } catch (error) {
-                continue;
-            }
+                exist_paths.push(file_path);
+            } catch (error) {}
+        }
+
+        for (let index = 0; index < exist_paths.length; index++) {
+            const file_path = exist_paths[index];
             const result = shell.moveItemToTrash(file_path);
             if(!result){
                 return {
-                    result:false,
+                    success:false,
                     error:new Error(`${file_path}のゴミ箱への移動に失敗`)
                 };
             }
         }
         return {
-            result:true,
+            success:true,
             error:null
         };
     });

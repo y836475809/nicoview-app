@@ -366,6 +366,36 @@
             this.obs_modal_dialog.trigger("close");
         };
 
+        const deleteLibraryData = async (video_ids) => {
+            let cancel = false;
+            this.obs_modal_dialog.trigger("show", {
+                message: "...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    cancel = true;
+                }
+            });
+            
+            for (let index = 0; index < video_ids.length; index++) {
+                if(cancel===true){
+                    break;
+                }
+                const video_id = video_ids[index];
+                // TODO delete library db item, delete event
+                this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
+                const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_FILES, { video_id });
+                // await wait(3000);
+                // const result =  {
+                //     success : true,
+                //     error : null
+                // };  
+                if(result.success===false){
+                    await showMessageBox("error", `失敗\n${result.error.message}`);
+                }
+            }
+            this.obs_modal_dialog.trigger("close");
+        };
+
         const convertVideo = async (self, video_id) => {
             const updateState = (state) => {
                 grid_table.updateCell(video_id, "state", state);
@@ -477,9 +507,8 @@
                 { label: "削除", async click() {
                     // TODO 
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id; 
-                    const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_FILES, { video_id });
-                    console.log(result); 
+                    const video_ids = items.map(item => item.id);
+                    await deleteLibraryData(video_ids);
                 }}
             ];
             return Menu.buildFromTemplate(nemu_templete);

@@ -508,6 +508,10 @@
                     // TODO 
                     const items = grid_table.getSelectedDatas();
                     const video_ids = items.map(item => item.id);
+                    const result = await showOKCancelBox("info", "動画を削除しますか?");
+                    if(result!==0){
+                        return;
+                    }
                     await deleteLibraryData(video_ids);
                 }}
             ];

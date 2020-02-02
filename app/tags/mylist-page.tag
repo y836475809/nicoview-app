@@ -179,22 +179,12 @@
         ipcRenderer.on("libraryItemAdded", async (event, args) => {
             const {video_item} = args;
             const video_id = video_item.id;
-            const item = grid_table.dataView.getItemById(video_id);
-            if(item === undefined){
-                return;
-            }
-            item.saved = true;
-            grid_table.dataView.updateItem(video_id, item);
+            grid_table.updateCells(video_id, { saved:true });
         });
 
         ipcRenderer.on("libraryItemDeleted", async (event, args) => {
             const { video_id } = args;
-            const item = grid_table.dataView.getItemById(video_id);
-            if(item === undefined){
-                return;
-            }
-            item.saved = false;
-            grid_table.dataView.updateItem(video_id, item);
+            grid_table.updateCells(video_id, { saved:false });
         });
  
 

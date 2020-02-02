@@ -232,7 +232,6 @@ class GridTable {
         this.dataView.reSort();
     }
     
-
     updateCell(id, column_id, value){
         const item = this.dataView.getItemById(id);
         if(item === undefined){

@@ -182,6 +182,11 @@
             grid_table.updateItem(video_item, video_id);
         });
 
+        ipcRenderer.on("libraryItemDeleted", async (event, args) => {
+            const { video_id } = args;
+            grid_table.deleteItemById(video_id);
+        });
+
         ipcRenderer.on("libraryItemUpdated", (event, args) => {
             const {video_id, props} = args;
             console.log("libraryItemUpdated video_id=", video_id, " props=", props);

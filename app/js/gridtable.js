@@ -213,6 +213,13 @@ class GridTable {
         this.grid.render();
     }
 
+    deleteItemById(id){
+        this.dataView.deleteItem(id);
+        this.clearSelected();
+        this.grid.invalidate();
+        this.grid.render();
+    }
+
     updateItem(item, id){
         if(this.dataView.getItemById(id) === undefined){
             this.dataView.addItem(item);     

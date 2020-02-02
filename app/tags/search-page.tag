@@ -234,6 +234,16 @@
             grid_table.dataView.updateItem(video_id, item);
         });
 
+        ipcRenderer.on("libraryItemDeleted", async (event, args) => {
+            const { video_id } = args;
+            const item = grid_table.dataView.getItemById(video_id);
+            if(item === undefined){
+                return;
+            }
+            item.saved = false;
+            grid_table.dataView.updateItem(video_id, item);
+        });
+
         this.sort_items = [
             { kind: "startTime",    order:"-", select: true, title:"投稿日" },
             { kind: "commentCounter", order:"-", select: false, title:"コメント数" },

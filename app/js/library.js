@@ -67,6 +67,13 @@ class LibraryIpcMain extends DataIpcMain {
         await this.library_db.insert(video_item.dirpath, video_item);
         this.emit("libraryItemAdded", {video_item});
     }
+    
+    async delete(args){
+        const { video_id } = args;
+        await this.library_db.delete(video_id);
+        this.emit("libraryItemDeleted", { video_id });
+    }
+
 }
 
 module.exports = {

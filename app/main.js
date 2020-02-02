@@ -380,6 +380,15 @@ app.on("ready", async ()=>{
             };
         }
 
+        try {
+            await library_ipc_main.delete({ video_id });
+        } catch (error) {
+            return {
+                success:false,
+                error:error
+            };
+        }
+
         /**
          * @type {Array}
          */
@@ -420,6 +429,9 @@ app.on("ready", async ()=>{
     });
     library_ipc_main.on("libraryItemAdded", (args)=>{  
         win.webContents.send("libraryItemAdded", args);
+    });
+    library_ipc_main.on("libraryItemDeleted", (args)=>{  
+        win.webContents.send("libraryItemDeleted", args);
     });
         
     bookmark_ipc_main.setup(async (args)=>{

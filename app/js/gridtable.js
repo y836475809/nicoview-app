@@ -220,14 +220,18 @@ class GridTable {
         this.grid.render();
     }
 
+    // TODO id, itemの並びに修正する
     updateItem(item, id){
         if(this.dataView.getItemById(id) === undefined){
             this.dataView.addItem(item);     
         }else{
             this.dataView.updateItem(id, item);
         }
+
+        // TODO いきなりスクロールしたりしないか？
         this.dataView.reSort();
     }
+    
 
     updateCell(id, column_id, value){
         const item = this.dataView.getItemById(id);

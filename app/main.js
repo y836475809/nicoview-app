@@ -368,8 +368,7 @@ app.on("ready", async ()=>{
         };
     });
 
-    // TODO
-    ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_FILES, async (event, args) => {
+    ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, async (event, args) => {
         const { video_id } = args;
 
         const video_item = library_ipc_main.getItem({video_id});

@@ -386,9 +386,8 @@
                     break;
                 }
                 const video_id = video_ids[index];
-                // TODO delete library db item, delete event
                 this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
-                const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_FILES, { video_id });
+                const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, { video_id });
                 // await wait(3000);
                 // const result =  {
                 //     success : true,

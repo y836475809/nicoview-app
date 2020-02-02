@@ -22,7 +22,7 @@ const IPC_CHANNEL =  Object.freeze({
     SET_PLAYER_PATH: "ipc-set-player-path",
     IMPORT_NNDD_DB: "ipc-import-nndd-db",
 
-    DELETE_LIBRARY_FILES: "ipc-delete-library-files",
+    DELETE_LIBRARY_ITEMS: "ipc-delete-library-items",
 
     APP_CLOSE: "ipc-app-close",
 });

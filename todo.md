@@ -101,12 +101,4 @@
 - [x] updateMylistでエラーをつぶしてしまっているので404でnico_mylist.xml=nullで保存してしまっている
 - [ ] モーダルダイアログのボタンにマウスが乗ったときやフォーカスがあるときの変化がない 
 - [ ] モーダルダイアログのボタンを押したときの変化がない 
-
-- [] script cmd
-  - []  npm run test-main
-  - []  npm run test-player-main
-  - []  npm run test-search
-  - []  npm run test-setting
-  - []  npm run test-mylist.html
-  - []  npm run test-nicoscript.html
-  - []  npm run test-tween.html
+- [ ] ショートカットキーで操作できるようにする

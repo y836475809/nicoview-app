@@ -1,6 +1,51 @@
 const test = require("ava");
 const path = require('path');
+const fs = require("fs");
+const fsPromises = fs.promises;
 const { NicoXMLFile, NicoJsonFile } = require("../app/js/nico-data-file");
+
+class imp {
+    async getInfo(video_filepath){
+        const dir = path.dirname(video_filepath);
+        const filename = path.basename(video_filepath);
+        const common_filename = path.basename(filename, path.extname(filename));
+        const match_json = /(sm\d+)\.(mp4|flv|swf)/.exec(filename);
+        if(match_json !== null){
+            return {
+                id: match_json[1],
+                type: "json",
+                common_filename:common_filename
+            };
+        }
+
+        const m = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(filename);
+        
+        if(m !== null){      
+            try {
+                const thumbinfo_path = path.join(dir, `${common_filename}[ThumbInfo].json`);
+                await fsPromises.stat(thumbinfo_path);
+                return {
+                    id: m[1],
+                    type: "json",
+                    common_filename:common_filename
+                };
+            } catch (error) {}
+
+            try {
+                const thumbinfo_path = path.join(dir, `${common_filename}[ThumbInfo].xml`);
+                await fsPromises.stat(thumbinfo_path);
+                return {
+                    id: m[1],
+                    type: "xml",
+                    common_filename:common_filename
+                };
+            } catch (error) {
+                throw new Error("not find ThumbInfo");
+            }
+        }
+
+    }
+}
 
 test("regx param", t => {
     // t.truthy(/sm\d+\.[mp4|flv|swf]/.test("sm10.mp4"));

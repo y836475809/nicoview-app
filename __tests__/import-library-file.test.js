@@ -1,8 +1,6 @@
 const test = require("ava");
-const path = require('path');
-const fs = require("fs");
-const fsPromises = fs.promises;
-const { NicoXMLFile, NicoJsonFile, NicoVideoData } = require("../app/js/nico-data-file");
+const path = require("path");
+const { NicoVideoData } = require("../app/js/nico-data-file");
 const { FileUtils } = require("../app/js/file-utils");
 const { toTimeSec } = require("../app/js/time-format");
 
@@ -25,77 +23,84 @@ class imp {
         return path.join(this.dir, `${this.common_filename}[ThumbImg]${thumbnail_size}.jpeg`);
     }
 
+    getVideoItem(thumb_info){
+        const video = thumb_info.video;
+        return {
+            data_type:null,
+            thumbnail_size: null,
+
+            id: video.video_id, 
+            dirpath: this.dir,
+            video_name: video.title,
+            video_type: video.video_type,
+            common_filename:this.common_filename,
+            creation_date: new Date().getTime(),
+            last_play_date:-1,
+            modification_date: -1,
+            play_count:video.viewCount,
+            is_economy: false,
+            play_time: toTimeSec(video.duration),
+            pub_date: video.postedDateTime,
+            tags: thumb_info.tags,
+            is_deleted: false,       
+        };
+    }
+
+    async _existThumbnail(is_large){
+        let thumbnail_size = "";
+        if(is_large===true){
+            thumbnail_size = ".L";
+        }
+        const file_path = path.join(this.dir, `${this.common_filename}[ThumbImg]${thumbnail_size}.jpeg`);
+        return await FileUtils.exist(file_path);
+    }
+
+    async _existThumbInfo(data_type){
+        const file_path = path.join(this.dir, `${this.common_filename}[ThumbInfo].${data_type}`);
+        return await FileUtils.exist(file_path);
+    }
+
+    async getDataType(){
+        const match1 = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
+        const match2 = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
+        if(match1 === null && match2 === null){
+            throw new Error(`${this.filename}`);
+        }
+
+        if(match1 !== null){
+            return "json";
+        }
+
+        if(match2 !== null){
+            if(await FileUtils.exist(this.getThumbInfoPath("json")) === true){
+                return "json";
+            }
+            if(await FileUtils.exist(this.getThumbInfoPath("xml")) === true){
+                return "xml"; 
+            }
+        }
+    }
 
     async getInfo(){
-        // const dir = path.dirname(video_filepath);
-        // const filename = path.basename(video_filepath);
-        // const common_filename = path.basename(filename, path.extname(filename));
         let thumbnail_size = "S";
         if(await FileUtils.exist(this.getThumbnailPath(true)) === true){
             thumbnail_size = "L";
         }
 
-        const match_json = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
-        if(match_json !== null){
-            const id = match_json[1];
-            const video_type = match_json[2];
-            const nico_video_data = new NicoVideoData({
-                data_type       : "json",
-                dirPath         : this.dir,
-                common_filename : this.common_filename,
-                video_type      : video_type,
-                thumbnail_size  : thumbnail_size,
-                is_deleted      : false
-            });
-            const thumb_info = nico_video_data.getThumbInfo();
-            const video = thumb_info.video;
-            return {
-                data_type:"json", 
-                dirpath: this.dir,
-                id: id,
-                video_name: video.title,
-                video_type: video_type,
-                common_filename:this.common_filename,
-                creation_date: new Date().getTime(),
-                last_play_date:-1,
-                modification_date: -1,
-                play_count:video.viewCount,
-                is_economy: false,
-                play_time: toTimeSec(video.duration),
-                pub_date: video.postedDateTime,
-                tags: thumb_info.tags,
-                is_deleted: false,
-                thumbnail_size: thumbnail_size,
-            };
-        }
-
-        const m = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
-        
-        if(m === null){   
-            throw new Error(`${this.filename}`);
-        }
-        const id = m[1];
-        const video_type = m[2];
-        if(await FileUtils.exist(this.getThumbInfoPath("json")) === true){
-            return {
-                id: id,
-                type: "json",
-                common_filename:this.common_filename,
-                video_type:video_type
-            };    
-        }
-        if(await FileUtils.exist(this.getThumbInfoPath("xml")) === true){
-            return {
-                id: m[1],
-                type: "xml",
-                common_filename:this.common_filename
-            };    
-        }
-
-        throw new Error("not find ThumbInfo");
-
-        
-
+        const data_type = this.getDataType();
+        const nico_video_data = new NicoVideoData({
+            data_type       : data_type,
+            dirPath         : this.dir,
+            common_filename : this.common_filename,
+            // video_type      : video_type,
+            // thumbnail_size  : thumbnail_size,
+            // is_deleted      : false
+        });   
+        const thumb_info = nico_video_data.getThumbInfo();
+        const video_item = this.getVideoItem(thumb_info);
+        video_item.data_type = data_type;
+        video_item.thumbnail_size = thumbnail_size;
+        return video_item;
     }
 }
 

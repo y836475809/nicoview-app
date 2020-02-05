@@ -1,0 +1,26 @@
+<nicovideo_thumb_response status="ok">
+  <thumb>
+    <video_id>sm100</video_id>
+    <title>import test</title>
+    <description></description>
+    <thumbnail_url>http://tn-skr3.smilevideo.jp/smile?i=100</thumbnail_url>
+    <first_retrieve>2000-01-01T00:00:100+09:00</first_retrieve>
+    <length>1:10</length>
+    <movie_type>mp4</movie_type>
+    <size_high>0</size_high>
+    <size_low>0</size_low>
+    <view_counter>100</view_counter>
+    <comment_num>100</comment_num>
+    <mylist_counter>100</mylist_counter>
+    <last_res_body></last_res_body>
+    <watch_url>http://www.nicovideo.jp/watch/sm100</watch_url>
+    <thumb_type>video</thumb_type>
+    <embeddable>1</embeddable>
+    <no_live_play>0</no_live_play>
+    <tags domain="jp">
+      <tag category="1" lock="1">tag1</tag>
+      <tag>tag2</tag>
+    </tags>
+    <user_id>100</user_id>
+  </thumb>
+</nicovideo_thumb_response>

@@ -4,31 +4,20 @@ const { NicoVideoData } = require("../app/js/nico-data-file");
 const { FileUtils } = require("../app/js/file-utils");
 const { toTimeSec } = require("../app/js/time-format");
 
-class imp {
-    constructor(video_filepath){
+class ImportData {
+    async createLibraryItem(video_filepath){
         this.dir = path.dirname(video_filepath);
         this.filename = path.basename(video_filepath);
         this.common_filename = path.basename(this.filename, path.extname(this.filename));
-    }
 
-    getThumbInfoPath(data_type){
-        return path.join(this.dir, `${this.common_filename}[ThumbInfo].${data_type}`);
-    }
+        const thumbnail_size = await this._getThumbnailSize();
+        const data_type = this._getDataType();
+        const thumb_info = this._getThumbInfo(data_type);
 
-    getThumbnailPath(is_large){
-        let thumbnail_size = "";
-        if(is_large===true){
-            thumbnail_size = ".L";
-        }
-        return path.join(this.dir, `${this.common_filename}[ThumbImg]${thumbnail_size}.jpeg`);
-    }
-
-    getVideoItem(thumb_info){
         const video = thumb_info.video;
         return {
-            data_type:null,
-            thumbnail_size: null,
-
+            data_type:data_type,
+            thumbnail_size: thumbnail_size,
             id: video.video_id, 
             dirpath: this.dir,
             video_name: video.title,
@@ -46,13 +35,19 @@ class imp {
         };
     }
 
-    async _existThumbnail(is_large){
-        let thumbnail_size = "";
-        if(is_large===true){
-            thumbnail_size = ".L";
+    async _getThumbnailSize(){
+        const filename_L = `${this.common_filename}[ThumbImg].L.jpeg`;
+        const filename_S = `${this.common_filename}[ThumbImg].jpeg`;
+        
+        if(await FileUtils.exist(path.join(this.dir, filename_L) === true)){
+            return "L";
         }
-        const file_path = path.join(this.dir, `${this.common_filename}[ThumbImg]${thumbnail_size}.jpeg`);
-        return await FileUtils.exist(file_path);
+
+        if(await FileUtils.exist(path.join(this.dir, filename_S) === true)){
+            return "S";
+        }
+
+        throw new Error(`サムネル画像${filename_S}または${filename_L}が存在しない`);
     }
 
     async _existThumbInfo(data_type){
@@ -60,7 +55,16 @@ class imp {
         return await FileUtils.exist(file_path);
     }
 
-    async getDataType(){
+    _getThumbInfo(data_type){
+        const nico_video_data = new NicoVideoData({
+            data_type       : data_type,
+            dirPath         : this.dir,
+            common_filename : this.common_filename,
+        });   
+        return nico_video_data.getThumbInfo();
+    }
+
+    async _getDataType(){
         const match1 = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
         const match2 = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
         if(match1 === null && match2 === null){
@@ -72,35 +76,13 @@ class imp {
         }
 
         if(match2 !== null){
-            if(await FileUtils.exist(this.getThumbInfoPath("json")) === true){
+            if(await this._existThumbInfo("json") === true){
                 return "json";
             }
-            if(await FileUtils.exist(this.getThumbInfoPath("xml")) === true){
+            if(await this._existThumbInfo("xml") === true){
                 return "xml"; 
             }
         }
-    }
-
-    async getInfo(){
-        let thumbnail_size = "S";
-        if(await FileUtils.exist(this.getThumbnailPath(true)) === true){
-            thumbnail_size = "L";
-        }
-
-        const data_type = this.getDataType();
-        const nico_video_data = new NicoVideoData({
-            data_type       : data_type,
-            dirPath         : this.dir,
-            common_filename : this.common_filename,
-            // video_type      : video_type,
-            // thumbnail_size  : thumbnail_size,
-            // is_deleted      : false
-        });   
-        const thumb_info = nico_video_data.getThumbInfo();
-        const video_item = this.getVideoItem(thumb_info);
-        video_item.data_type = data_type;
-        video_item.thumbnail_size = thumbnail_size;
-        return video_item;
     }
 }
 

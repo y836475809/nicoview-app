@@ -30,7 +30,7 @@ class ImportData {
             play_count:video.viewCount,
             is_economy: false,
             play_time: toTimeSec(video.duration),
-            pub_date: video.postedDateTime,
+            pub_date: new Date(video.postedDateTime).getTime(),
             tags: thumb_info.tags,
             is_deleted: false,       
         };
@@ -48,7 +48,8 @@ class ImportData {
             return "S";
         }
 
-        throw new Error(`サムネル画像${filename_S}または${filename_L}が存在しない`);
+        // throw new Error(`サムネル画像${filename_S}または${filename_L}が存在しない`);
+        return "S";
     }
 
     async _existThumbInfo(data_type){
@@ -59,8 +60,8 @@ class ImportData {
     _getThumbInfo(data_type){
         const nico_video_data = new NicoVideoData({
             data_type       : data_type,
-            dirPath         : this.dir,
-            common_filename : this.common_filename,
+            dirpath         : this.dir,
+            common_filename : this.common_filename
         });   
         return nico_video_data.getThumbInfo();
     }
@@ -97,57 +98,82 @@ class ImportData {
     }
 }
 
-test("regx param", t => {
-    const im_data = new ImportData(path.join(__dirname, "sm10.mp4"));
-    t.truthy(im_data._matchJoin());
-    t.falsy(im_data._matchNNDD());
+test("match", t => {
+    {
+        const im_data = new ImportData(path.join(__dirname, "sm100.mp4"));
+        t.truthy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "sm100.flv"));
+        t.truthy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "sm100.swf"));
+        t.truthy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "sm100.jpeg"));
+        t.falsy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
+
+    {
+        const im_data = new ImportData(path.join(__dirname, "サンプル1 - [sm100].mp4"));
+        t.falsy(im_data._matchJoin());
+        t.truthy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "サンプル1 - [sm100].flv"));
+        t.falsy(im_data._matchJoin());
+        t.truthy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "サンプル1 - [sm100].swf"));
+        t.falsy(im_data._matchJoin());
+        t.truthy(im_data._matchNNDD());
+    }
+    {
+        const im_data = new ImportData(path.join(__dirname, "サンプル1 - [sm100].jpeg"));
+        t.falsy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
+
+    {
+        const im_data = new ImportData(path.join(__dirname, "サンプル1.mp4"));
+        t.falsy(im_data._matchJoin());
+        t.falsy(im_data._matchNNDD());
+    }
 });
 
-test("regx param", t => {
-    // t.truthy(/sm\d+\.[mp4|flv|swf]/.test("sm10.mp4"));
-    // t.truthy(/sm\d+\.[mp4|flv|swf]/.test("sm10.flv"));
-    // t.truthy(/sm\d+\.[mp4|flv|swf]/.test("sm10.swf"));
-    // t.falsy(/sm\d+\.[mp4|flv|swf]/.test("サンプル1 - [sm10].mp4"));
-    // t.falsy(/sm\d+\.[mp4|flv|swf]/.test("サンプル1 - [sm10].flv"));
-    // t.falsy(/sm\d+\.[mp4|flv|swf]/.test("サンプル1 - [sm10].swf"));
+test("_getThumbInfo ", t => {
 
-    // t.falsy(/\[sm\d+\]\.[mp4|flv|swf]/.test("sm10.mp4"));
-    // t.falsy(/\[sm\d+\]\.[mp4|flv|swf]/.test("sm10.flv"));
-    // t.falsy(/\[sm\d+\]\.[mp4|flv|swf]/.test("sm10.swf"));
-    // t.truthy(/\[sm\d+\]\.[mp4|flv|swf]/.test("サンプル1 - [sm10].mp4")); 
-    // t.truthy(/\[sm\d+\]\.[mp4|flv|swf]/.test("サンプル1 - [sm10].flv"));
-    // t.truthy(/\[sm\d+\]\.[mp4|flv|swf]/.test("サンプル1 - [sm10].swf"));  
-    const fname1 = "sm10.mp4"; 
-    const fname2 = "サンプル1 - [sm10].mp4";
+    const dir = path.join(__dirname, "data", "import");
+    {
+        const im_data = new ImportData(path.join(dir, "sm100.mp4"));
+        const thumb_info = im_data._getThumbInfo("json");
+        t.is(thumb_info.video.video_id, "sm100");
+    }
+    {
+        const im_data = new ImportData(path.join(dir, "import - [sm100].mp4"));
+        const thumb_info = im_data._getThumbInfo("xml");
+        t.is(thumb_info.video.video_id, "sm100");
+    }
+    {
+        const im_data = new ImportData(path.join(dir, "import - [sm100].mp4"));
+        const thumb_info = im_data._getThumbInfo("json");
+        t.is(thumb_info.video.video_id, "sm100");
+    }
 
-    const m1 = /(sm\d+)\.(mp4|flv|swf)/.exec(fname1);
-    console.log(m1)
-    t.is(m1[1], "sm10");
-    t.is(path.basename(fname1, path.extname(fname1)), "sm10");
-    const m2 = /(sm\d+)\.(mp4|flv|swf)/.exec(fname2);
-    t.is(m2, null);
+    {
+        const im_data = new ImportData(path.join(dir, "sm1000.mp4"));
+        t.throws(() => { im_data._getThumbInfo("json"); });
+    }
 
-    const m3 = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(fname1);
-    t.is(m3, null);
-    const m4 = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(fname2);
-    console.log(m4)
-    t.is(m4[1], "sm10");
-    t.is(path.basename(fname2, path.extname(fname2)), "サンプル1 - [sm10]");
-    // "sm10.flv";
-    // "sm10.swf";
-    // "サンプル1 - [sm10].mp4";
-    // "サンプル1 - [sm10].flv";
-    // "サンプル1 - [sm10].swf";
+    {
+        const im_data = new ImportData(path.join(dir, "sm1000.mp4"));
+        t.throws(() => { im_data._getThumbInfo("xml"); });
+    }
 });
-
-// test("file", t => {
-//     const video_item = {
-//         data_type:"",
-//         dirpath:,
-//         common_filename:,
-//         video_type:,
-//         thumbnail_size:,
-//         is_deleted
-//     };
-//     const nd = new NicoVideoData();
-// });

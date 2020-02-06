@@ -5,11 +5,12 @@ const { FileUtils } = require("../app/js/file-utils");
 const { toTimeSec } = require("../app/js/time-format");
 
 class ImportData {
-    async createLibraryItem(video_filepath){
+    constructor(video_filepath){
         this.dir = path.dirname(video_filepath);
         this.filename = path.basename(video_filepath);
         this.common_filename = path.basename(this.filename, path.extname(this.filename));
-
+    }
+    async createLibraryItem(){
         const thumbnail_size = await this._getThumbnailSize();
         const data_type = this._getDataType();
         const thumb_info = this._getThumbInfo(data_type);
@@ -64,18 +65,28 @@ class ImportData {
         return nico_video_data.getThumbInfo();
     }
 
+    _matchJoin(){
+        const match = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
+        return match !== null;
+    }
+
+    _matchNNDD(){
+        const match = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
+        return match !== null;
+    }
+
     async _getDataType(){
-        const match1 = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
-        const match2 = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
-        if(match1 === null && match2 === null){
+        const match_json = this._matchJoin(this.filename);
+        const match_NNDD = this._matchNNDD(this.filename);
+        if(match_json === false && match_NNDD === false){
             throw new Error(`${this.filename}`);
         }
 
-        if(match1 !== null){
+        if(match_json === true){
             return "json";
         }
 
-        if(match2 !== null){
+        if(match_NNDD === true){
             if(await this._existThumbInfo("json") === true){
                 return "json";
             }
@@ -85,6 +96,12 @@ class ImportData {
         }
     }
 }
+
+test("regx param", t => {
+    const im_data = new ImportData(path.join(__dirname, "sm10.mp4"));
+    t.truthy(im_data._matchJoin());
+    t.falsy(im_data._matchNNDD());
+});
 
 test("regx param", t => {
     // t.truthy(/sm\d+\.[mp4|flv|swf]/.test("sm10.mp4"));

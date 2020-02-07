@@ -38,15 +38,15 @@ class ImportData {
 
     async _getThumbnailSize(){
         const filename_L = `${this.common_filename}[ThumbImg].L.jpeg`;
-        const filename_S = `${this.common_filename}[ThumbImg].jpeg`;
+        // const filename_S = `${this.common_filename}[ThumbImg].jpeg`;
         
         if(await FileUtils.exist(path.join(this.dir, filename_L) === true)){
             return "L";
         }
 
-        if(await FileUtils.exist(path.join(this.dir, filename_S) === true)){
-            return "S";
-        }
+        // if(await FileUtils.exist(path.join(this.dir, filename_S) === true)){
+        //     return "S";
+        // }
 
         // throw new Error(`サムネル画像${filename_S}または${filename_L}が存在しない`);
         return "S";

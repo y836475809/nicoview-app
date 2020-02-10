@@ -66,6 +66,10 @@
             <button onclick={onclickImport}>DB選択</button>
         </div>
         <div class="content">
+            <label class="section-label">ファイルのインポート</label>
+            <button onclick={onclickImportFiles}>ファイル選択</button>
+        </div>
+        <div class="content">
             <label class="section-label" title={this.ffmpeg_path_desc}>ffmpeg実行ファイルのパス</label>
             <div style="display: flex;">
                 <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly title={this.ffmpeg_path_desc}>
@@ -86,10 +90,12 @@
 
     <script>
         /* globals riot */
-        const { shell, ipcRenderer } = window.electron;
+        const { shell, ipcRenderer, remote } = window.electron;
+        const { dialog } = remote;
         const { DataIpcRenderer } = window.DataIpc;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { ImportLibrary } = window.ImportLibrary;
         
         this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
         this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
@@ -159,6 +165,48 @@
                 await showMessageBox("error", `インポート失敗: ${ret.error.message}`);
             }
             this.obs_msg_dialog.trigger("close");
+        };
+
+        this.onclickImportFiles = async ()=>{
+            const result = await dialog.showOpenDialog(remote.getCurrentWindow(), {
+                properties: ["openFile", "multiSelections"],
+                title: "ファイルを選択",
+                defaultPath: ".",
+                filters: [
+                    {name: "avi", extensions:  ["mp4", "flv", "swf"]}
+                ]
+            });
+            if(result.canceled===true){
+                return;
+            }
+
+            let cancel = false;
+            this.obs_msg_dialog.trigger("show", {
+                message: "インポート中...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    cancel = true;
+                }
+            });
+            await new Promise(resolve => setTimeout(resolve, 500));
+            try {
+                const file_paths = result.filePaths;
+                for (let index = 0; index < file_paths.length; index++) {
+                    if(cancel===true){
+                        break;
+                    }
+                    const file_path = file_paths[index];
+                    const import_lib = new ImportLibrary(file_path);
+                    const item = await import_lib.createLibraryItem();
+                    console.log(item);
+                }         
+            } catch (error) {
+                console.error(error);
+                await showMessageBox("error", `インポート失敗: ${error.message}`);
+            }
+
+            this.obs_msg_dialog.trigger("close");
+            
         };
     </script>
 </setting-page>

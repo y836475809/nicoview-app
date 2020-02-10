@@ -16,6 +16,7 @@ const CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
 const CommentFilter = require(`${root_dir}/app/js/comment-filter`);
 const TestComments = require(`${root_dir}/test/test-comments`);
 const reader = require(`${root_dir}/app/js/reader`);
+const ImportLibrary = require(`${root_dir}/app/js/import-library`);
 
 process.once("loaded", () => {
     global.process = process;
@@ -35,6 +36,7 @@ process.once("loaded", () => {
     global.CommentFilter = CommentFilter;
     global.TestComments = TestComments;
     global.reader = reader;
+    global.ImportLibrary = ImportLibrary;
 });
 
 window.addEventListener("load", () => {

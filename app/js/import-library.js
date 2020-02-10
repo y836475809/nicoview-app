@@ -11,7 +11,7 @@ class ImportLibrary {
     }
     async createLibraryItem(){
         const thumbnail_size = await this._getThumbnailSize();
-        const data_type = this._getDataType();
+        const data_type = await this._getDataType();
         const thumb_info = this._getThumbInfo(data_type);
 
         const video = thumb_info.video;

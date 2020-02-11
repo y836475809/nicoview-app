@@ -189,20 +189,25 @@
                 }
             });
             await new Promise(resolve => setTimeout(resolve, 500));
+            let file_path = null;
             try {
                 const file_paths = result.filePaths;
                 for (let index = 0; index < file_paths.length; index++) {
                     if(cancel===true){
                         break;
                     }
-                    const file_path = file_paths[index];
+
+                    this.obs_msg_dialog.trigger("update-message", `インポート中 ${index+1}/${file_paths.length}`);
+
+                    file_path = file_paths[index];
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
-                    console.log(item);
+                    await DataIpcRenderer.action("library", "addItem", { item });
+                    await new Promise(resolve => setTimeout(resolve, 500));
                 }         
             } catch (error) {
                 console.error(error);
-                await showMessageBox("error", `インポート失敗: ${error.message}`);
+                await showMessageBox("error", `${file_path}のインポートが失敗\n ${error.message}`);
             }
 
             this.obs_msg_dialog.trigger("close");

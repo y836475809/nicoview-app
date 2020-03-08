@@ -65,6 +65,7 @@
     </dialog>
 
     <script>
+        const path = window.path;
         const { GridTable } = window.GridTable;
 
         const obs_dialog = this.opts.obs;
@@ -83,10 +84,10 @@
             return "-";
         };
         const columns = [
-            { id: "result", name: "結果", formatter:resultFormatter},
-            { id: "id", name: "id" },
+            // { id: "id", name: "id" },
             { id: "title", name: "title" },
             { id: "path", name: "パス" },
+            { id: "result", name: "結果", formatter:resultFormatter},
         ];
         const options = {
             rowHeight: 25,
@@ -98,8 +99,8 @@
             grid_table.resizeFitContainer(container);
         };
 
-        const setup = (args) => {
-            const { items } = args;
+        const setData = (args) => {
+            const { file_paths } = args;
             if (grid_table == null) {
                 grid_table = new GridTable("listbox-grid", columns, options);
                 grid_table.init(this.root.querySelector(".listbox-grid"));
@@ -109,12 +110,21 @@
                 // });
             } 
 
+            const items = file_paths.map((file_path, index) => {
+                return {
+                    id: index,
+                    title: path.basename(file_path, path.extname(file_path)),
+                    path: file_path,
+                    result: "",
+                    error:null
+                };
+            });
             grid_table.setData(items);
             resizeGridTable();
         };
 
-        obs_dialog.on("setup", (args) => {
-            setup(args);
+        obs_dialog.on("setdata", (args) => {
+            setData(args);
         });
 
         obs_dialog.on("show", async (args) => {
@@ -128,10 +138,19 @@
             dialog.showModal();
         });
 
-        obs_dialog.on("update", (args) => {
-            const { video_id, result, message} = args;
+        obs_dialog.on("update-message", (args) => {
+            const { message} = args;
             this.message = message;
-            grid_table.updateCell(video_id, "result", result);
+            this.update();
+        });
+
+        obs_dialog.on("update-item", (args) => {
+            const { index, result , error } = args;
+            grid_table.scrollRow(index);
+            grid_table.updateCells(index, {
+                result: result,
+                error: error
+            });
             this.update();
         });
 

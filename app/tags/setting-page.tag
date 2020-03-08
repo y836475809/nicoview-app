@@ -87,6 +87,7 @@
         </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
+    <modal-dialog-listbox obs={obs_dialog_listbox}></modal-dialog-listbox>
 
     <script>
         /* globals riot */
@@ -102,6 +103,7 @@
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
+        this.obs_dialog_listbox = riot.observable();
 
         this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
@@ -181,33 +183,49 @@
             }
 
             let cancel = false;
-            this.obs_msg_dialog.trigger("show", {
+            this.obs_dialog_listbox.trigger("show", {
                 message: "インポート中...",
-                buttons: ["cancel"],
                 cb: result=>{
                     cancel = true;
                 }
             });
             await new Promise(resolve => setTimeout(resolve, 500));
-            let file_path = null;
-            try {
-                const file_paths = result.filePaths;
-                for (let index = 0; index < file_paths.length; index++) {
-                    if(cancel===true){
-                        break;
-                    }
+            const file_paths = result.filePaths;
+            this.obs_dialog_listbox.trigger("setdata", { file_paths });
 
-                    this.obs_msg_dialog.trigger("update-message", `インポート中 ${index+1}/${file_paths.length}`);
-
-                    file_path = file_paths[index];
-                    const import_lib = new ImportLibrary(file_path);
-                    const item = await import_lib.createLibraryItem();
-                    await DataIpcRenderer.action("library", "addItem", { item });
+            // let file_path = null;
+            let update_item = null;
+            // const file_paths = result.filePaths;
+            for (let index = 0; index < file_paths.length; index++) {
+                if(cancel===true){
+                    break;
+                }
+                const file_path = file_paths[index];
+                try {
+                    // const import_lib = new ImportLibrary(file_path);
+                    // const item = await import_lib.createLibraryItem();
+                    // await DataIpcRenderer.action("library", "addItem", { item });
                     await new Promise(resolve => setTimeout(resolve, 500));
-                }         
-            } catch (error) {
-                console.error(error);
-                await showMessageBox("error", `${file_path}のインポートが失敗\n ${error.message}`);
+
+                    update_item = {
+                        index:index,
+                        result: "success",
+                        error : null
+                    };
+                } catch (error) {
+                    console.error(error);
+                    update_item = {
+                        index:index,
+                        result: "fault",
+                        error : error
+                    };
+                }
+
+                const message = `${index+1}/${file_paths.length}`;
+                this.obs_msg_dialog.trigger("update-message", { message });
+                this.obs_msg_dialog.trigger("update-item", update_item);
+
+                await new Promise(resolve => setTimeout(resolve, 500));
             }
 
             this.obs_msg_dialog.trigger("close");

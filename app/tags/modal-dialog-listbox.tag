@@ -1,8 +1,8 @@
 <modal-dialog-listbox>
     <style scoped>
         .container {
-            width: 250px;
-            height: 150px;
+            width: 100%;
+            height: 100%;
             display: grid;
             grid-template-rows: 1fr 30px 30px;
             grid-template-areas: 
@@ -14,6 +14,8 @@
         dialog {
             border: solid 1px #aaa;
             border-radius: 5px;
+            width: 50%;
+            height: 50%;
         }
         dialog::backdrop {
             opacity: 0;
@@ -51,16 +53,18 @@
     </style>
 
     <dialog class="dialog-shadow" oncancel={this.oncancel}>
-        <div class="listbox-grid-container">
-            <div class="listbox-grid"></div>
-        </div>
-        <div class="center-hv">
-            <p class="message">{this.message}</p>
-        </div>
         <div class="container">
-            <div class="button-container">
-                <div class="button" onclick=this.onclickCancel()>cancel</div>
+            <div class="listbox-grid-container">
+                <div class="listbox-grid"></div>
             </div>
+            <div class="center-hv">
+                <p class="message">{this.message}</p>
+            </div>
+            <!-- <div class="container"> -->
+                <div class="button-container">
+                    <div class="button" onclick=this.onclickCancel()>cancel</div>
+                </div>
+            <!-- </div> -->
         </div>
     </dialog>
 
@@ -77,8 +81,8 @@
                 return "成功";
             }
             if(value=="fault"){
-                const icon_class = "fas fa-times item-red";
-                return `<p><i class="${icon_class}"></i>失敗</p>`;
+                const icon_class = "center-v fas fa-times item-red";
+                return `<div><i class="${icon_class}"></i>失敗</div>`;
             }
 
             return "-";

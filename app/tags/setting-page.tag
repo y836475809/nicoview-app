@@ -183,14 +183,16 @@
             }
 
             let cancel = false;
+            const file_paths = result.filePaths;
+           
             this.obs_dialog_listbox.trigger("show", {
                 message: "インポート中...",
                 cb: result=>{
                     cancel = true;
                 }
             });
-            await new Promise(resolve => setTimeout(resolve, 500));
-            const file_paths = result.filePaths;
+
+            await new Promise(resolve => setTimeout(resolve, 100));
             this.obs_dialog_listbox.trigger("setdata", { file_paths });
 
             // let file_path = null;
@@ -209,7 +211,7 @@
 
                     update_item = {
                         index:index,
-                        result: "success",
+                        result: "fault",
                         error : null
                     };
                 } catch (error) {
@@ -222,8 +224,8 @@
                 }
 
                 const message = `${index+1}/${file_paths.length}`;
-                this.obs_msg_dialog.trigger("update-message", { message });
-                this.obs_msg_dialog.trigger("update-item", update_item);
+                this.obs_dialog_listbox.trigger("update-message", { message });
+                this.obs_dialog_listbox.trigger("update-item", update_item);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }

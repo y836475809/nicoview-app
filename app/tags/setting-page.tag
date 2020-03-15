@@ -87,7 +87,6 @@
         </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
-    <modal-dialog-listbox obs={obs_dialog_listbox}></modal-dialog-listbox>
 
     <script>
         /* globals riot */
@@ -103,7 +102,6 @@
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
-        this.obs_dialog_listbox = riot.observable();
 
         this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
@@ -185,7 +183,7 @@
             let cancel = false;
             const file_paths = result.filePaths;
            
-            this.obs_dialog_listbox.trigger("show", {
+            this.obs_msg_dialog.trigger("show", {
                 message: "インポート中...",
                 cb: result=>{
                     cancel = true;
@@ -193,10 +191,10 @@
             });
 
             await new Promise(resolve => setTimeout(resolve, 100));
-            this.obs_dialog_listbox.trigger("setdata", { file_paths });
 
             // let file_path = null;
             let update_item = null;
+            let error_count = 0;
             // const file_paths = result.filePaths;
             for (let index = 0; index < file_paths.length; index++) {
                 if(cancel===true){
@@ -208,24 +206,13 @@
                     // const item = await import_lib.createLibraryItem();
                     // await DataIpcRenderer.action("library", "addItem", { item });
                     await new Promise(resolve => setTimeout(resolve, 500));
-
-                    update_item = {
-                        index:index,
-                        result: "fault",
-                        error : null
-                    };
                 } catch (error) {
                     console.error(error);
-                    update_item = {
-                        index:index,
-                        result: "fault",
-                        error : error
-                    };
+                    error_count++;
                 }
 
-                const message = `${index+1}/${file_paths.length}`;
-                this.obs_dialog_listbox.trigger("update-message", { message });
-                this.obs_dialog_listbox.trigger("update-item", update_item);
+                const message = `${index+1}/${file_paths.length} \n失敗 ${error_count}`;
+                this.obs_msg_dialog.trigger("update-message", { message });
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }

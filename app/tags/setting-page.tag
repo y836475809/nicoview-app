@@ -193,7 +193,6 @@
             await new Promise(resolve => setTimeout(resolve, 100));
 
             // let file_path = null;
-            let update_item = null;
             let error_count = 0;
             // const file_paths = result.filePaths;
             for (let index = 0; index < file_paths.length; index++) {
@@ -211,13 +210,13 @@
                     error_count++;
                 }
 
-                const message = `${index+1}/${file_paths.length} \n失敗 ${error_count}`;
-                this.obs_msg_dialog.trigger("update-message", { message });
+                const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_count}`;
+                this.obs_msg_dialog.trigger("update-message", message);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             // TODO
-            await showMessageBox("info", `インポート完了\n失敗 ${error_count}`);
+            await showMessageBox("info", `インポート完了\n失敗:${error_count}`);
             this.obs_msg_dialog.trigger("close");
             
         };

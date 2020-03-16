@@ -216,7 +216,8 @@
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
-
+            // TODO
+            await showMessageBox("info", `インポート完了\n失敗 ${error_count}`);
             this.obs_msg_dialog.trigger("close");
             
         };

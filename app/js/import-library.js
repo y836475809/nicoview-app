@@ -26,8 +26,8 @@ class ImportLibrary {
             creation_date: new Date().getTime(),
             last_play_date:-1,
             modification_date: -1,
-            play_count:video.viewCount,
-            is_economy: false,
+            play_count: 0,     // TODO とりあえず再生回数0にする
+            is_economy: false, // TODO とりあえず高画質にする
             play_time: toTimeSec(video.duration),
             pub_date: new Date(video.postedDateTime).getTime(),
             tags: thumb_info.tags,

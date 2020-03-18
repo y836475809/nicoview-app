@@ -192,19 +192,17 @@
 
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // let file_path = null;
             let error_count = 0;
-            // const file_paths = result.filePaths;
             for (let index = 0; index < file_paths.length; index++) {
                 if(cancel===true){
                     break;
                 }
                 const file_path = file_paths[index];
                 try {
-                    // const import_lib = new ImportLibrary(file_path);
-                    // const item = await import_lib.createLibraryItem();
-                    // await DataIpcRenderer.action("library", "addItem", { item });
-                    await new Promise(resolve => setTimeout(resolve, 500));
+                    const import_lib = new ImportLibrary(file_path);
+                    const item = await import_lib.createLibraryItem();
+                    await DataIpcRenderer.action("library", "addItem", { item });
+                    await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     console.error(error);
                     error_count++;
@@ -215,8 +213,12 @@
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
-            // TODO
-            await showMessageBox("info", `インポート完了\n失敗:${error_count}`);
+            // TODO ログを参照するとか入れる
+            let result_msg = "インポート完了";
+            if(error_count>0){
+                result_msg += `\n失敗:${error_count}`;
+            }
+            await showMessageBox("info", result_msg);
             this.obs_msg_dialog.trigger("close");
             
         };

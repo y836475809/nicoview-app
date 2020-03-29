@@ -16,7 +16,7 @@ const mkComments = (time_sec) => {
     const comments = [];
     for (let index = 0; index < time_sec; index++) {
         comments.push({
-            no: index, vpos: index, post_date: index*1000, user_id:"a"
+            no: index, vpos: index, date: index*1000, user_id:"a"
         });
     }
     return comments;
@@ -43,7 +43,7 @@ test("comments sort", t => {
 
     const cda = new CommentDisplayAmount();
     cda._sortDescByPostDate(comments);
-    const last = comments[0].post_date;
+    const last = comments[0].date;
     t.is(last, (time-1)*1000);
 });
 
@@ -81,26 +81,26 @@ test("comments split", t => {
 
 test("comments split par min", t => {
     const comments = [
-        {no: 0, vpos: 0, post_date: 15.0},
-        {no: 1, vpos: 0, post_date: 14.5},
-        {no: 2, vpos: 0, post_date: 14.1},
+        {no: 0, vpos: 0, date: 15.0},
+        {no: 1, vpos: 0, date: 14.5},
+        {no: 2, vpos: 0, date: 14.1},
 
-        {no: 3, vpos: 0, post_date: 14.0},
+        {no: 3, vpos: 0, date: 14.0},
 
-        {no: 4, vpos: 0, post_date: 12.0},
+        {no: 4, vpos: 0, date: 12.0},
 
-        {no: 5, vpos: 0, post_date: 10.8},
-        {no: 6, vpos: 0, post_date: 10.7},
-        {no: 7, vpos: 0, post_date: 10.6},
-        {no: 8, vpos: 0, post_date: 10.5},
+        {no: 5, vpos: 0, date: 10.8},
+        {no: 6, vpos: 0, date: 10.7},
+        {no: 7, vpos: 0, date: 10.6},
+        {no: 8, vpos: 0, date: 10.5},
 
-        {no: 9, vpos: 0, post_date: 7.0},
+        {no: 9, vpos: 0, date: 7.0},
     ].map(value=>{
-        value.post_date = to_date(value.post_date);
+        value.date = to_date(value.date);
         return value;
     });
 
-    const start_post_date = comments[comments.length-1].post_date;
+    const start_post_date = comments[comments.length-1].date;
     const time_sec = 20*60;
     const cda = new CommentDisplayAmount();
     const cmts= cda._splitParMinute(comments, start_post_date, time_sec);
@@ -125,22 +125,22 @@ test("comments get each", t => {
 
 test("comments getDisplayed", t => {
     const comments = [
-        {no: 0, vpos: 10, post_date: 15.0},
-        {no: 1, vpos: 9, post_date: 14.5},
-        {no: 2, vpos: 8, post_date: 14.1},
+        {no: 0, vpos: 10, date: 15.0},
+        {no: 1, vpos: 9, date: 14.5},
+        {no: 2, vpos: 8, date: 14.1},
 
-        {no: 3, vpos: 7, post_date: 14.0},
+        {no: 3, vpos: 7, date: 14.0},
 
-        {no: 4, vpos: 6, post_date: 12.0},
+        {no: 4, vpos: 6, date: 12.0},
 
-        {no: 5, vpos: 5, post_date: 10.8},
-        {no: 6, vpos: 4, post_date: 10.7},
-        {no: 7, vpos: 3, post_date: 10.6},
-        {no: 8, vpos: 2, post_date: 10.5},
+        {no: 5, vpos: 5, date: 10.8},
+        {no: 6, vpos: 4, date: 10.7},
+        {no: 7, vpos: 3, date: 10.6},
+        {no: 8, vpos: 2, date: 10.5},
 
-        {no: 9, vpos: 1, post_date: 7.0},
+        {no: 9, vpos: 1, date: 7.0},
     ].map(value=>{
-        value.post_date = to_date(value.post_date);
+        value.date = to_date(value.date);
         return value;
     });
 
@@ -149,16 +149,16 @@ test("comments getDisplayed", t => {
     const cmts = cda.getDisplayed(comments, time_sec);
 
     const exp_cmt = [
-        {no: 9, vpos: 1, post_date: 7.0},
-        {no: 6, vpos: 4, post_date: 10.7},
-        {no: 5, vpos: 5, post_date: 10.8},
-        {no: 4, vpos: 6, post_date: 12.0},
-        {no: 3, vpos: 7, post_date: 14.0},
-        {no: 2, vpos: 8, post_date: 14.1},
-        {no: 1, vpos: 9, post_date: 14.5},
-        {no: 0, vpos: 10, post_date: 15.0},
+        {no: 9, vpos: 1, date: 7.0},
+        {no: 6, vpos: 4, date: 10.7},
+        {no: 5, vpos: 5, date: 10.8},
+        {no: 4, vpos: 6, date: 12.0},
+        {no: 3, vpos: 7, date: 14.0},
+        {no: 2, vpos: 8, date: 14.1},
+        {no: 1, vpos: 9, date: 14.5},
+        {no: 0, vpos: 10, date: 15.0},
     ].map(value=>{
-        value.post_date = to_date(value.post_date);
+        value.date = to_date(value.date);
         return value;
     });
     t.deepEqual(cmts, exp_cmt);
@@ -187,22 +187,22 @@ test("comments splitByUserID", t => {
 
 test("comments getDisplayed include owner", t => {
     const comments = [
-        {no: 0, vpos: 10, post_date: 15.0},
-        {no: 1, vpos: 9, post_date: 14.5},
-        {no: 2, vpos: 8, post_date: 14.1, user_id:"owner"},
+        {no: 0, vpos: 10, date: 15.0},
+        {no: 1, vpos: 9, date: 14.5},
+        {no: 2, vpos: 8, date: 14.1, user_id:"owner"},
 
-        {no: 3, vpos: 7, post_date: 14.0},
+        {no: 3, vpos: 7, date: 14.0},
 
-        {no: 4, vpos: 6, post_date: 12.0},
+        {no: 4, vpos: 6, date: 12.0},
 
-        {no: 5, vpos: 5, post_date: 10.8},
-        {no: 6, vpos: 4, post_date: 10.7, user_id:"owner"},
-        {no: 7, vpos: 3, post_date: 10.6},
-        {no: 8, vpos: 2, post_date: 10.5},
+        {no: 5, vpos: 5, date: 10.8},
+        {no: 6, vpos: 4, date: 10.7, user_id:"owner"},
+        {no: 7, vpos: 3, date: 10.6},
+        {no: 8, vpos: 2, date: 10.5},
 
-        {no: 9, vpos: 1, post_date: 7.0},
+        {no: 9, vpos: 1, date: 7.0},
     ].map(value=>{
-        value.post_date = to_date(value.post_date);
+        value.date = to_date(value.date);
         return value;
     });
 
@@ -211,16 +211,16 @@ test("comments getDisplayed include owner", t => {
     const cmts = cda.getDisplayed(comments, time_sec);
 
     const exp_cmts = [
-        {no: 9, vpos: 1, post_date: 7.0},
-        {no: 6, vpos: 4, post_date: 10.7, user_id:"owner"},
-        {no: 5, vpos: 5, post_date: 10.8},
-        {no: 4, vpos: 6, post_date: 12.0},
-        {no: 3, vpos: 7, post_date: 14.0},
-        {no: 2, vpos: 8, post_date: 14.1, user_id:"owner"},
-        {no: 1, vpos: 9, post_date: 14.5},
-        {no: 0, vpos: 10, post_date: 15.0},
+        {no: 9, vpos: 1, date: 7.0},
+        {no: 6, vpos: 4, date: 10.7, user_id:"owner"},
+        {no: 5, vpos: 5, date: 10.8},
+        {no: 4, vpos: 6, date: 12.0},
+        {no: 3, vpos: 7, date: 14.0},
+        {no: 2, vpos: 8, date: 14.1, user_id:"owner"},
+        {no: 1, vpos: 9, date: 14.5},
+        {no: 0, vpos: 10, date: 15.0},
     ].map(value=>{
-        value.post_date = to_date(value.post_date);
+        value.date = to_date(value.date);
         return value;
     });
 

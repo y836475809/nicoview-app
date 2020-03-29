@@ -93,7 +93,7 @@ class CommentDisplayAmount {
     getDisplayed(comments, play_time_sec){
         this._sortDescByPostDate(comments);
         const {owner_comments, user_comments} = this._splitByUserID(comments);
-        const start_post_date = comments[comments.length-1].post_date;
+        const start_post_date = comments[comments.length-1].date;
 
         const max_num = this._getMaxNum(play_time_sec);
         const { main, rest } = this._split(user_comments, max_num);
@@ -133,8 +133,8 @@ class CommentDisplayAmount {
 
     _sortDescByPostDate(comments){
         comments.sort((a, b) => {
-            if (a.post_date < b.post_date) return 1;
-            if (a.post_date > b.post_date) return -1;
+            if (a.date < b.date) return 1;
+            if (a.date > b.date) return -1;
             return 0;
         });
     }
@@ -172,7 +172,7 @@ class CommentDisplayAmount {
             const e1 = end_msec - index*60*1000;
             const e2 = e1 - 60*1000;
             const dc = comments.filter(value=>{
-                const post_date = value.post_date;
+                const post_date = value.date;
                 return (e2 < post_date && post_date <= e1);
             });
             if(dc.length > 0){

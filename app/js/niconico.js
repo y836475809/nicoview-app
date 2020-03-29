@@ -513,7 +513,7 @@ const cnvJsonComments = (comments) => {
         return {
             no:        chat.no, 
             vpos:      chat.vpos, 
-            post_date: chat.date,
+            date:      chat.date,
             user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
             mail:      chat.mail,
             content:   chat.content

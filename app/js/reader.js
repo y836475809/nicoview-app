@@ -20,7 +20,7 @@ function comment(xml) {
             comments.push({
                 no: no,
                 vpos: vpos,
-                post_date: date,
+                date: date,
                 user_id: user_id,
                 mail: mail ? mail : "184",
                 content: text

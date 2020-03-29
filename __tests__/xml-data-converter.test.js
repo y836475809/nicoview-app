@@ -57,7 +57,7 @@ test("_convertComment", async (t) => {
         {
             no: 1,
             vpos: 400,
-            post_date: 0,
+            date: 0,
             user_id: "AAA",
             mail: "naka medium 184",
             content: "AAAテスト"
@@ -65,7 +65,7 @@ test("_convertComment", async (t) => {
         {
             no: 2,
             vpos: 300,
-            post_date: 1,
+            date: 1,
             user_id: "BBB",
             mail: "184",
             content: "BBBあ"

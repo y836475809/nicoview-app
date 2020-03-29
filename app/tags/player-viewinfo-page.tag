@@ -319,7 +319,7 @@
             {id: "vpos", name: "時間", sortable: true, formatter: timeFormatter},
             {id: "content", name: "コメント", sortable: true},
             {id: "user_id", name: "ユーザーID", sortable: true},
-            {id: "post_date", name: "投稿日", sortable: true, formatter: dateFormatter},
+            {id: "date", name: "投稿日", sortable: true, formatter: dateFormatter},
             {id: "no", name: "番号", sortable: true},
             {id: "mail", name: "オプション", sortable: true}
         ];

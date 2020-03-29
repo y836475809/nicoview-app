@@ -5,30 +5,57 @@ const cheerio = require("cheerio");
  * 
  * @param {string} xml 
  */
-function comment(xml) {
+function comment(xml, is_owner) {
     let $ = cheerio.load(xml);
+
+    let threads = [];
+    $("thread").each((i, el) => {
+        const item = $(el);
+        const obj = {
+            resultcode:parseInt(item.attr("resultcode")),
+            thread:item.attr("thread"),
+            server_time:parseInt(item.attr("server_time")),
+            last_res:parseInt(item.attr("last_res")),
+            ticket:item.attr("ticket"),
+            revision:parseInt(item.attr("revision"))
+        };
+        if(is_owner){
+            obj.fork = 1;
+        }
+        threads.push({thread:obj});
+    });
+
     let comments = [];
     $("chat").each(function (i, el) {
         const item = $(el);
         if(!item.attr("deleted")){
-            const text = item.text();
+            const content = item.text();
             const no = parseInt(item.attr("no"));
             const vpos = parseInt(item.attr("vpos"));
             const date = parseInt(item.attr("date"));
-            const user_id = item.attr("user_id");
-            const mail = item.attr("mail");
-            comments.push({
+            
+            const obj = {
                 no: no,
                 vpos: vpos,
                 date: date,
-                user_id: user_id,
-                mail: mail ? mail : "184",
-                content: text
-            });
+                content: content
+            };
+            if(is_owner){
+                obj.fork = 1;
+            }
+            const mail = item.attr("mail");
+            if(mail){
+                obj.mail = mail;
+            }
+            const user_id = item.attr("user_id");
+            if(user_id){
+                obj.user_id = user_id;
+            }
+            comments.push({chat:obj});
         }
     });
 
-    return comments;
+    return threads.concat(comments);
 }
 
 /**

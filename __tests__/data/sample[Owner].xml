@@ -1,0 +1,6 @@
+<packet>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="2" ticket="0x00000000" revision="1"/>
+  <ngups/>
+  <chat thread="1505300000" no="1" vpos="100" date="1000" premium="1" fork="1">owner1</chat>
+  <chat thread="1505300000" no="2" vpos="200" date="2000" mail="shita" premium="1">owner2</chat>
+</packet>

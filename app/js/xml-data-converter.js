@@ -24,8 +24,8 @@ class XMLDataConverter {
     }
 
     _convertComment(owner_xml, user_xml){
-        const owner_comment_data = reader.comment(owner_xml, true);
-        const user_comment_data = reader.comment(user_xml, false);
+        const owner_comment_data = reader.xml_comment(owner_xml, true);
+        const user_comment_data = reader.xml_comment(user_xml, false);
         return owner_comment_data.concat(user_comment_data);
     }
 

@@ -5,7 +5,7 @@ const cheerio = require("cheerio");
  * 
  * @param {string} xml 
  */
-function comment(xml, is_owner) {
+function xml_comment(xml, is_owner) {
     let $ = cheerio.load(xml);
 
     let threads = [];
@@ -159,7 +159,7 @@ const makeComments = (comment_data) => {
     return comments;
 };
 
-module.exports.comment = comment;
+module.exports.xml_comment = xml_comment;
 module.exports.thumb_info = thumb_info;
 module.exports.json_comment = json_comment;
 module.exports.makeComments = makeComments;

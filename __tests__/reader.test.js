@@ -6,7 +6,7 @@ const dir = `${__dirname}/data`;
 
 test("read user comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample.xml`, "utf-8");
-    const obj = reader.comment(xml, false);
+    const obj = reader.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         thread:"1505300000",
@@ -45,7 +45,7 @@ test("read user comment", (t) => {
 
 test("read owner comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[Owner].xml`, "utf-8");
-    const obj = reader.comment(xml, true);
+    const obj = reader.xml_comment(xml, true);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         fork:1,
@@ -65,7 +65,7 @@ test("read owner comment", (t) => {
 
 test("read comment deleted", (t) => {
     const xml = fs.readFileSync(`${dir}/sample-deleted.xml`, "utf-8");
-    const obj = reader.comment(xml, false);
+    const obj = reader.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         thread:"1505300000",

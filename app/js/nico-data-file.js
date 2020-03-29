@@ -79,8 +79,8 @@ class NicoXMLFile extends NicoDataFile {
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
 
-        const owner_comment_data = reader.comment(owner_xml, true);
-        const user_comment_data = reader.comment(user_xml, false);
+        const owner_comment_data = reader.xml_comment(owner_xml, true);
+        const user_comment_data = reader.xml_comment(user_xml, false);
         const comment_data = owner_comment_data.concat(user_comment_data);
         return reader.makeComments(comment_data);
     }

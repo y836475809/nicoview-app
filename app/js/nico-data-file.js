@@ -158,7 +158,20 @@ class NicoJsonFile extends NicoDataFile {
     getComments() {
         const file_path = this.commentPath;
         const text = fs.readFileSync(file_path, "utf-8");
-        const comments = JSON.parse(text);
+
+        const comment_data = reader.json_comment(text);
+        const comments = comment_data.filter(value => {
+            return value.hasOwnProperty("chat");
+        }).map(value => {
+            if(value.chat.hasOwnProperty("fork")){
+                value.chat.user_id = "owner";
+            }
+            if(!value.chat.hasOwnProperty("mail")){
+                value.chat.mail = "184";
+            }
+            return value.chat;
+        });
+
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;

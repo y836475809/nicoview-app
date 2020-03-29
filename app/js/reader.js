@@ -95,5 +95,22 @@ function thumb_info(xml) {
     };
 }
 
+const json_comment = (json_str) => {
+    const json_data = JSON.parse(json_str);
+    
+    const threads = json_data.filter(value => {
+        return value.hasOwnProperty("thread");
+    });
+
+    const chats =  json_data.filter(value => {
+        return value.hasOwnProperty("chat");
+    }).filter(value => {
+        return !value.chat.hasOwnProperty("deleted");
+    });
+
+    return threads.concat(chats);
+};
+
 module.exports.comment = comment;
 module.exports.thumb_info = thumb_info;
+module.exports.json_comment = json_comment;

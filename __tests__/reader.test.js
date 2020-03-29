@@ -60,3 +60,74 @@ test("read thumb info", (t) => {
     t.is(obj.user_nickname, "ニックネーム");
     t.is(obj.user_icon_url, "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg");
 });
+
+const hasEqProps = (obj, props) => {
+    Object.keys(props).forEach(key => {
+        if(obj[key] != props[key]){
+            throw new Error(`key is ${key}, obj:${obj[key]} not eq props:${props[key]}`);
+        }
+    });
+    return true;
+};
+
+test("read json no owner comment", (t) => {
+    const text = fs.readFileSync(`${dir}/no-owner-comment.json`, "utf-8");
+    const comment = reader.json_comment(text);
+    t.deepEqual(comment[0].thread,
+        {
+            resultcode:0,
+            thread:"1234567890",
+            server_time:1546694145,
+            last_res:2,
+            ticket:"0xb18d801d",
+            revision:1,
+            click_revision:3
+        }
+    );
+    t.true(hasEqProps(comment[1].chat, 
+        {no:1, vpos:100, date:1522161709, user_id:"abcdefg", mail:"184", content:"comment1"}));
+    t.true(hasEqProps(comment[2].chat, 
+        {no:2, vpos:200, date:1522161986, user_id:"hijklmn", mail:"184", content:"comment2"}));
+});
+
+test("read json owner comment", (t) => {
+    const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
+    const comment = reader.json_comment(text);
+    t.deepEqual(comment[0].thread, 
+        {
+            resultcode:0,
+            thread:"1234567890",
+            fork: 1,
+            server_time:1546694359,
+            last_res:2,
+            ticket:"1234567890",
+            revision:1,
+        });
+    t.deepEqual(comment[1].thread, 
+        {
+            resultcode:0,
+            thread:"1234567890",
+            server_time:1546694359,
+            last_res:3336,
+            ticket:"0x83d23581",
+            revision:2,
+        });
+    t.deepEqual(comment[2].thread, 
+        {
+            resultcode:0,
+            thread:"1234567890",
+            server_time:1546694359,
+            last_res:5,
+            ticket:"0x83d23581",
+            revision:2,
+        });
+
+    t.true(hasEqProps(comment[3].chat, 
+        {no:1, vpos:100, date:1360996778, fork:1, mail:"shita green small", content:"owner comment1\ncomment1"}));
+    t.true(hasEqProps(comment[4].chat, 
+        {no:2, vpos:200, date:1360996778, fork:1, mail:"shita green small", content:"owner comment2"}));
+    t.true(hasEqProps(comment[5].chat, 
+        {no:16, vpos:300, date:1359607148, user_id:"abcdefg", mail:"184", content:"comment3"}));
+    t.true(hasEqProps(comment[6].chat, 
+        {no:17, vpos:400, date:1359607224, user_id:"hijklnm", mail:"184", content:"comment4"}));
+});

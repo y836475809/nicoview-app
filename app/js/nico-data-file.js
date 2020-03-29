@@ -77,20 +77,12 @@ class NicoXMLFile extends NicoDataFile {
      */
     getComments() {
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
-        const owner_comments = reader.comment(owner_xml).map(comment=>{
-            return Object.assign(comment, {user_id: "owner"});
-        });
-
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
-        const user_comments = reader.comment(user_xml);
 
-        const comments = owner_comments.concat(user_comments);
-        comments.sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
-        return comments;
+        const owner_comment_data = reader.comment(owner_xml, true);
+        const user_comment_data = reader.comment(user_xml, false);
+        const comment_data = owner_comment_data.concat(user_comment_data);
+        return reader.makeComments(comment_data);
     }
 
     getThumbInfo() {
@@ -160,24 +152,7 @@ class NicoJsonFile extends NicoDataFile {
         const text = fs.readFileSync(file_path, "utf-8");
 
         const comment_data = reader.json_comment(text);
-        const comments = comment_data.filter(value => {
-            return value.hasOwnProperty("chat");
-        }).map(value => {
-            if(value.chat.hasOwnProperty("fork")){
-                value.chat.user_id = "owner";
-            }
-            if(!value.chat.hasOwnProperty("mail")){
-                value.chat.mail = "184";
-            }
-            return value.chat;
-        });
-
-        comments.sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
-        return comments;
+        return reader.makeComments(comment_data);
     }
 
     getThumbInfo() {

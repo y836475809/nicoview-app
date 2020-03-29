@@ -195,3 +195,18 @@ test("read json owner comment", (t) => {
     t.true(hasEqProps(comment[6].chat, 
         {no:17, vpos:400, date:1359607224, user_id:"hijklnm", mail:"184", content:"comment4"}));
 });
+
+test("makeComments", (t) => {
+    const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
+    const comment_data = reader.json_comment(text);
+    const comments = reader.makeComments(comment_data);
+    t.true(hasEqProps(comments[0], 
+        {no:1, vpos:100, date:1360996778, user_id:"owner", mail:"shita green small", content:"owner comment1\ncomment1"}));
+    t.true(hasEqProps(comments[1], 
+        {no:2, vpos:200, date:1360996778, user_id:"owner", mail:"shita green small", content:"owner comment2"}));
+    t.true(hasEqProps(comments[2], 
+        {no:16, vpos:300, date:1359607148, user_id:"abcdefg", mail:"184", content:"comment3"}));
+    t.true(hasEqProps(comments[3], 
+        {no:17, vpos:400, date:1359607224, user_id:"hijklnm", mail:"184", content:"comment4"}));
+
+});

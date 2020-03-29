@@ -97,7 +97,7 @@
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
-        const comments = reader.comment(xml);
+        const comments = reader.makeComments(reader.comment(xml, false));
         const video_data = {
             src: `${test_dir}/data/test1.mp4`,
             type: "video/mp4",

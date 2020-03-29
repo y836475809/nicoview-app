@@ -138,6 +138,28 @@ const json_comment = (json_str) => {
     return threads.concat(chats);
 };
 
+const makeComments = (comment_data) => {
+    const comments = comment_data.filter(value => {
+        return value.hasOwnProperty("chat");
+    }).map(value => {
+        if(value.chat.hasOwnProperty("fork")){
+            value.chat.user_id = "owner";
+        }
+        if(!value.chat.hasOwnProperty("mail")){
+            value.chat.mail = "184";
+        }
+        return value.chat;
+    });
+
+    comments.sort((a, b) => {
+        if (a.vpos < b.vpos) return -1;
+        if (a.vpos > b.vpos) return 1;
+        return 0;
+    });
+    return comments;
+};
+
 module.exports.comment = comment;
 module.exports.thumb_info = thumb_info;
 module.exports.json_comment = json_comment;
+module.exports.makeComments = makeComments;

@@ -317,7 +317,7 @@
 
         const columns = [
             {id: "vpos", name: "時間", sortable: true, formatter: timeFormatter},
-            {id: "text", name: "コメント", sortable: true},
+            {id: "content", name: "コメント", sortable: true},
             {id: "user_id", name: "ユーザーID", sortable: true},
             {id: "post_date", name: "投稿日", sortable: true, formatter: dateFormatter},
             {id: "no", name: "番号", sortable: true},

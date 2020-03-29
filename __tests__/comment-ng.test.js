@@ -3,10 +3,10 @@ const { CommentNG } = require("../app/js/comment-filter");
 
 const mkComments = () => {
     return [
-        { no: 0, vpos: 0, user_id: "aa", text: "comment11" },
-        { no: 1, vpos: 1, user_id: "aa", text: "comment22" },
-        { no: 2, vpos: 2, user_id: "aab",text: "comment11" },
-        { no: 3, vpos: 3, user_id: "c",  text: "comment111" }
+        { no: 0, vpos: 0, user_id: "aa", content: "comment11" },
+        { no: 1, vpos: 1, user_id: "aa", content: "comment22" },
+        { no: 2, vpos: 2, user_id: "aab",content: "comment11" },
+        { no: 3, vpos: 3, user_id: "c",  content: "comment111" }
     ];
 };
 
@@ -116,8 +116,8 @@ test("ng words", t => {
     cf.addNG({ ng_matching_texts: ["comment11"], ng_user_ids: [] });
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
-        { no: 1, vpos: 1, user_id: "aa", text: "comment22" },
-        { no: 3, vpos: 3, user_id: "c", text: "comment111" }
+        { no: 1, vpos: 1, user_id: "aa", content: "comment22" },
+        { no: 3, vpos: 3, user_id: "c", content: "comment111" }
     ]);
 });
 
@@ -127,8 +127,8 @@ test("ng user ids", t => {
     cf.addNG({ ng_matching_texts: [], ng_user_ids: ["aa"] });
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
-        { no: 2, vpos: 2, user_id: "aab", text: "comment11" },
-        { no: 3, vpos: 3, user_id: "c", text: "comment111" }
+        { no: 2, vpos: 2, user_id: "aab", content: "comment11" },
+        { no: 3, vpos: 3, user_id: "c", content: "comment111" }
     ]);
 });
 
@@ -138,8 +138,8 @@ test("ng words, ng user ids", t => {
     cf.addNG({ ng_matching_texts: ["comment22"], ng_user_ids: ["c"] });
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
-        { no: 0, vpos: 0, user_id: "aa", text: "comment11" },
-        { no: 2, vpos: 2, user_id: "aab", text: "comment11" }
+        { no: 0, vpos: 0, user_id: "aa", content: "comment11" },
+        { no: 2, vpos: 2, user_id: "aab", content: "comment11" }
     ]);
 });
 

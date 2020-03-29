@@ -23,7 +23,7 @@ function comment(xml) {
                 post_date: date,
                 user_id: user_id,
                 mail: mail ? mail : "184",
-                text: text
+                content: text
             });
         }
     });

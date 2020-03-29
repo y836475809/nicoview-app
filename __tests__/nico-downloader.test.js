@@ -103,8 +103,8 @@ test("downloader dmc", async (t) => {
     }
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
-        t.is(data[0].text, "comment1");  
-        t.is(data[1].text, "comment2");  
+        t.is(data[0].content, "comment1");  
+        t.is(data[1].content, "comment2");  
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
@@ -181,8 +181,8 @@ test("downloader smile", async (t) => {
     }
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
-        t.is(data[0].text, "comment1");  
-        t.is(data[1].text, "comment2");  
+        t.is(data[0].content, "comment1");  
+        t.is(data[1].content, "comment2");  
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));

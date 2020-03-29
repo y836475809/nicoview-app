@@ -60,7 +60,7 @@ test("_convertComment", async (t) => {
             post_date: 0,
             user_id: "AAA",
             mail: "naka medium 184",
-            text: "AAAテスト"
+            content: "AAAテスト"
         },
         {
             no: 2,
@@ -68,6 +68,6 @@ test("_convertComment", async (t) => {
             post_date: 1,
             user_id: "BBB",
             mail: "184",
-            text: "BBBあ"
+            content: "BBBあ"
         }]);  
 });

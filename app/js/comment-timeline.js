@@ -38,10 +38,10 @@ class NicoScript {
      */
     getApplied(comments){
         const script_comments = comments.filter(comment => {
-            return this._hasScript(comment.text);
+            return this._hasScript(comment.content);
         });
         const normal_comments = comments.filter(comment => {
-            return !this._hasScript(comment.text);
+            return !this._hasScript(comment.content);
         });
 
         const applied_comments = this._applyDefault(script_comments, normal_comments);
@@ -55,7 +55,7 @@ class NicoScript {
      */
     _applyDefault(script_comments, normal_comments){
         const f = script_comments.find(comment => {
-            return /[@＠]デフォルト/ig.test(comment.text);
+            return /[@＠]デフォルト/ig.test(comment.content);
         });
         if(f===undefined){
             return normal_comments;
@@ -384,7 +384,7 @@ class CommentTimeLine {
         const elm = document.createElement("div");
         elm.classList.add("comment");
 
-        elm.innerText = comment.text;
+        elm.innerText = comment.content;
 
         elm.style.display = "none";
         elm.style.whiteSpace = "nowrap";
@@ -404,7 +404,7 @@ class CommentTimeLine {
         }else{
             elm.style.fontSize = Math.floor(view_height/20) + "px";
         } 
-        const text_width = this._getTextWidth(comment.text, parseInt(elm.style.fontSize));
+        const text_width = this._getTextWidth(comment.content, parseInt(elm.style.fontSize));
         
         elm.style.top = (row_index * row_h) + "px";
         elm.style.left = view_width + "px";
@@ -486,7 +486,7 @@ class CommentTimeLine {
                 user_id:comment.user_id,
                 no:comment.no, 
                 vpos:comment.vpos*10, 
-                text:comment.text, 
+                content:comment.content, 
                 duration: this.duration_sec*1000
             };
             const opts = cmt_opt_parser.parse(comment.mail, comment.user_id);

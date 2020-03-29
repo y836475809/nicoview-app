@@ -45,7 +45,7 @@ class FlowComment {
         const scale_map = new Map([["big", 1.3],["middle", 1], ["small", 0.8]]);
 
         return comments.map((comment) => {
-            const text = comment.text;
+            const text = comment.content;
             // const scale = comment.font_scale;
             const scale = scale_map.get(comment.font_size);
 

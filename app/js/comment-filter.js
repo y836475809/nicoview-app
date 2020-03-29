@@ -10,7 +10,7 @@ class CommentNG {
 
     getComments(comments){
         return comments.filter(comment=>{
-            const has_ng_text = this._ng_matching_texts.includes(comment.text);
+            const has_ng_text = this._ng_matching_texts.includes(comment.content);
             if(has_ng_text){
                 return false;
             }

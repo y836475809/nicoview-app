@@ -516,7 +516,7 @@ const cnvJsonComments = (comments) => {
             post_date: chat.date,
             user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
             mail:      chat.mail,
-            text:      chat.content
+            content:   chat.content
         };  
     });
 };

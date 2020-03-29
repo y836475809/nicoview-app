@@ -52,7 +52,7 @@ test("_convertComment", async (t) => {
     const cnv_data = new TestXMLDataConverter();
     const { user_comment_xml, owner_comment_xml } = t.context.xml;
 
-    const comment_data = cnv_data._convertComment(user_comment_xml, owner_comment_xml);
+    const comment_data = cnv_data._convertComment(owner_comment_xml, user_comment_xml);
     const threads = comment_data.filter(value => {
         return value.hasOwnProperty("thread");
     });

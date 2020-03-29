@@ -8,9 +8,10 @@ class XMLDataConverter {
     }
 
     async convertComment(nico_xml, nico_json){
-        const common_xml = await this._read(nico_xml.commentPath);
         const owner_xml = await this._read(nico_xml.ownerCommentPath);
-        await this._write(nico_json.commentPath, this._convertComment(common_xml, owner_xml));
+        const user_xml = await this._read(nico_xml.commentPath);
+        
+        await this._write(nico_json.commentPath, this._convertComment(owner_xml, user_xml));
     }
 
     async _read(file_path){
@@ -22,10 +23,10 @@ class XMLDataConverter {
         await fsPromises.writeFile(file_path, json, "utf-8");
     }
 
-    _convertComment(common_xml, owner_xml){
-        const common_cmts = reader.comment(common_xml, false);
-        const owner_cmts = reader.comment(owner_xml, true);
-        return owner_cmts.concat(common_cmts);
+    _convertComment(owner_xml, user_xml){
+        const owner_comment_data = reader.comment(owner_xml, true);
+        const user_comment_data = reader.comment(user_xml, false);
+        return owner_comment_data.concat(user_comment_data);
     }
 
     _convertThumbinfo(xml){

@@ -5,8 +5,8 @@ const { XMLDataConverter } = require("../app/js/xml-data-converter");
 test.beforeEach(async t => {
     t.context.xml ={
         thumbinfo:await fsPromises.readFile(`${__dirname}/data/convert_sample[ThumbInfo].xml`),
-        comments:await fsPromises.readFile(`${__dirname}/data/convert_sample.xml`),
-        owner_comments:await fsPromises.readFile(`${__dirname}/data/convert_sample[Owner].xml`)
+        user_comment_xml:await fsPromises.readFile(`${__dirname}/data/convert_sample.xml`),
+        owner_comment_xml:await fsPromises.readFile(`${__dirname}/data/convert_sample[Owner].xml`)
     };
 });
 
@@ -50,24 +50,50 @@ test("_convertThumbinfo", async (t) => {
 
 test("_convertComment", async (t) => {
     const cnv_data = new TestXMLDataConverter();
-    const { comments, owner_comments } = t.context.xml;
+    const { user_comment_xml, owner_comment_xml } = t.context.xml;
 
-    const data = cnv_data._convertComment(comments, owner_comments);
-    t.deepEqual(data, [
+    const comment_data = cnv_data._convertComment(user_comment_xml, owner_comment_xml);
+    const threads = comment_data.filter(value => {
+        return value.hasOwnProperty("thread");
+    });
+    const comments = comment_data.filter(value => {
+        return value.hasOwnProperty("chat");
+    });
+
+    t.deepEqual(threads,[ 
         {
-            no: 1,
-            vpos: 400,
-            date: 0,
-            user_id: "AAA",
-            mail: "naka medium 184",
-            content: "AAAテスト"
-        },
-        {
-            no: 2,
-            vpos: 300,
-            date: 1,
-            user_id: "BBB",
-            mail: "184",
-            content: "BBBあ"
-        }]);  
+            thread:{
+                resultcode:0,
+                thread:"1505300000",
+                fork: 1,
+                server_time:1505310000,
+                last_res:1,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        },{
+            thread:{
+                resultcode:0,
+                thread:"1505300000",
+                server_time:1505310000,
+                last_res:10,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        },{
+            thread:{
+                resultcode:0,
+                thread:"1505300000",
+                server_time:1505310000,
+                last_res:10,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        }
+    ]);
+    t.deepEqual(comments,[ 
+        {chat:{no:1, vpos:100, date:1000, fork:1, content:"owner1"}},
+        {chat:{no:1, vpos:400, date:0, user_id:"AAA", mail:"naka medium 184", content:"AAAテスト"}},
+        {chat:{no:2, vpos:300, date:1, user_id:"BBB", mail:"184", content:"BBBあ"}},
+    ]);  
 });

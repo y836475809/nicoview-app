@@ -23,8 +23,8 @@ class XMLDataConverter {
     }
 
     _convertComment(common_xml, owner_xml){
-        const common_cmts = reader.comment(common_xml);
-        const owner_cmts = reader.comment(owner_xml);
+        const common_cmts = reader.comment(common_xml, false);
+        const owner_cmts = reader.comment(owner_xml, true);
         return owner_cmts.concat(common_cmts);
     }
 

@@ -1,3 +1,4 @@
 <packet>
-  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="10" ticket="0x00000000" revision="1"/>
+  <thread resultcode="0" thread="1505300000" server_time="1505310000" last_res="1" ticket="0x00000000" revision="1"/>
+  <chat thread="1505300000" no="1" vpos="100" date="1000" premium="1" fork="1">owner1</chat>
 </packet>

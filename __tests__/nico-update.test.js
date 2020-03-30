@@ -1,11 +1,9 @@
 const test = require("ava");
-const nock = require("nock");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
-const { getThumbInfo, cnvJsonComments } = require("../app/js/niconico");
+const { getThumbInfo } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
-const cur_comment = cnvJsonComments(TestData.no_owner_comment);
 const nico_mocks = new NicoDownLoadMocks();
 
 class TestNicoUpdate extends NicoUpdate {
@@ -14,8 +12,9 @@ class TestNicoUpdate extends NicoUpdate {
         this.paths = [];
         this.data = [];
     }
-    _getCurrentComments(){
-        return cur_comment;
+    
+    _getCurrentCommentData(){
+        return TestData.no_owner_comment;
     }
 
     async _writeFile(file_path, data){
@@ -60,7 +59,7 @@ test("update", async(t) => {
     t.is(video_item.data_type, "json");
     t.is(video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
-    t.is(nico_update.data[1].length,2);
+    t.is(nico_update.data[1].length,3);
     t.is(byteToString(nico_update.data[2]), "thumbnail");
     t.deepEqual(nico_update.paths, [
         path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),

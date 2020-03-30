@@ -86,7 +86,7 @@ class TestNicoUpdate extends NicoUpdate {
         return watch_data;
     }
 
-    _getCurrentComments(){
+    _getCurrentCommentData(){
         return [];
     }
 

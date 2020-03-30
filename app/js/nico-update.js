@@ -2,7 +2,7 @@ const fsPromises = require("fs").promises;
 const path = require("path");
 const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
-    getThumbInfo, cnvJsonComments, NicoThumbnail } = require("./niconico");
+    getThumbInfo, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./xml-data-converter");
 
@@ -145,7 +145,14 @@ class NicoUpdate extends EventEmitter {
     }
     
     async _updateComment(api_data, nico_json){
-        const cur_comments = this._getCurrentComments();
+        const cur_comment_data = this._getCurrentCommentData();
+        const cur_comments = cur_comment_data.filter(value => {
+            return value.hasOwnProperty("chat");
+        }).map(value => {
+            return {
+                no: value.no
+            };
+        });
         const comments_diff = await this._getComments(api_data, cur_comments);
         if(comments_diff.length===0){
             return false;
@@ -155,9 +162,48 @@ class NicoUpdate extends EventEmitter {
             throw new Error(`${this.video_item.id}の差分コメントが正しくないデータです`);
         }
 
-        const new_comments = cur_comments.concat(cnvJsonComments(comments_diff));
-        await this._writeFile(nico_json.commentPath, new_comments, "json");
+        const updated_comment_data =this._margeCommentData(cur_comment_data, comments_diff);
+        await this._writeFile(nico_json.commentPath, updated_comment_data, "json");
         return true;
+    }
+
+    _margeCommentData(current_data, diff_data){
+        const current = this._getCommentDataProps(current_data);
+        const diff = this._getCommentDataProps(diff_data);
+
+        let owner_threads = current.owner_threads;
+        if(diff.owner_threads.length>0){
+            owner_threads = diff.owner_threads; 
+        }
+
+        let user_threads = current.user_threads;
+        if(diff.user_threads.length>0){
+            user_threads = diff.user_threads; 
+        }
+        const comments = current.comments.concat(diff.comments);
+        
+        return owner_threads.concat(user_threads).concat(comments);
+    }
+
+    _getCommentDataProps(comment_data){
+        const threads = comment_data.filter(value => {
+            return value.hasOwnProperty("thread");
+        });
+        const owner_threads = threads.filter(value => {
+            return value.thread.hasOwnProperty("fork");
+        });
+        const user_threads = threads.filter(value => {
+            return !value.thread.hasOwnProperty("fork");
+        });
+        const comments = comment_data.filter(value => {
+            return value.hasOwnProperty("chat");
+        });
+
+        return {
+            owner_threads,
+            user_threads,
+            comments
+        };
     }
 
     async updateThumbnail(){
@@ -295,6 +341,10 @@ class NicoUpdate extends EventEmitter {
 
     _getCurrentComments(){
         return this.video_data.getComments();
+    }
+
+    _getCurrentCommentData(){
+        return this.video_data.getCommentData();
     }
 
     _isDataTypeJson(){

@@ -76,13 +76,16 @@ class NicoXMLFile extends NicoDataFile {
      * @returns {Array} comments 
      */
     getComments() {
+        const comment_data = this.getCommentData();
+        return reader.makeComments(comment_data);
+    }
+
+    getCommentData(){
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
-
         const owner_comment_data = reader.xml_comment(owner_xml, true);
         const user_comment_data = reader.xml_comment(user_xml, false);
-        const comment_data = owner_comment_data.concat(user_comment_data);
-        return reader.makeComments(comment_data);
+        return owner_comment_data.concat(user_comment_data);
     }
 
     getThumbInfo() {
@@ -148,11 +151,13 @@ class NicoJsonFile extends NicoDataFile {
     }
 
     getComments() {
-        const file_path = this.commentPath;
-        const text = fs.readFileSync(file_path, "utf-8");
-
-        const comment_data = reader.json_comment(text);
+        const comment_data = this.getCommentData();
         return reader.makeComments(comment_data);
+    }
+
+    getCommentData(){
+        const text = fs.readFileSync(this.commentPath, "utf-8");
+        return reader.json_comment(text);
     }
 
     getThumbInfo() {
@@ -202,6 +207,10 @@ class NicoVideoData {
 
     getComments() {
         return this.nico_data.getComments();
+    }
+
+    getCommentData() {
+        return this.nico_data.getCommentData();
     }
 
     getThumbInfo() {

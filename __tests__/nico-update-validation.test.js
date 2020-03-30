@@ -193,7 +193,7 @@ class TestNicoUpdate extends NicoUpdate {
         this.log.push("_getThumbImg");
         return this._img_data;
     }
-    _getCurrentComments(){
+    _getCurrentCommentData(){
         return [];
     }
 }

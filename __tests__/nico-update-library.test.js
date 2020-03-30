@@ -56,7 +56,7 @@ class TestNicoUpdate extends NicoUpdate {
     async _getWatchData(){
         return { cookie_jar: null, api_data: this.data_api_data };
     }
-    _getCurrentComments(){
+    _getCurrentCommentData(){
         return [];
     }
     async _getComments(api_data, cur_comments){
@@ -84,7 +84,7 @@ class TestNicoUpdateTags extends NicoUpdate {
     async _getComments(api_data, cur_comments){
         return [{}];
     }
-    _getCurrentComments(){
+    _getCurrentCommentData(){
         return [];
     }
     async _getThumbImg(url){

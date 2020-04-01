@@ -1,12 +1,21 @@
 const test = require("ava");
 const fs = require("fs");
-const reader = require("../app/js/reader");
+const NicoDataParser = require("../app/js/nico-data-parser");
 
 const dir = `${__dirname}/data`;
 
-test("read user comment", (t) => {
+const hasEqProps = (obj, props) => {
+    Object.keys(props).forEach(key => {
+        if(obj[key] != props[key]){
+            throw new Error(`key is ${key}, obj:${obj[key]} not eq props:${props[key]}`);
+        }
+    });
+    return true;
+};
+
+test("parse user comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample.xml`, "utf-8");
-    const obj = reader.xml_comment(xml, false);
+    const obj = NicoDataParser.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         thread:"1505300000",
@@ -43,9 +52,9 @@ test("read user comment", (t) => {
     ));
 });
 
-test("read owner comment", (t) => {
+test("parse owner comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[Owner].xml`, "utf-8");
-    const obj = reader.xml_comment(xml, true);
+    const obj = NicoDataParser.xml_comment(xml, true);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         fork:1,
@@ -63,9 +72,9 @@ test("read owner comment", (t) => {
     ));
 });
 
-test("read comment deleted", (t) => {
+test("parse comment deleted", (t) => {
     const xml = fs.readFileSync(`${dir}/sample-deleted.xml`, "utf-8");
-    const obj = reader.xml_comment(xml, false);
+    const obj = NicoDataParser.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
         resultcode:0,
         thread:"1505300000",
@@ -93,9 +102,9 @@ test("read comment deleted", (t) => {
     ));
 });
 
-test("read thumb info", (t) => {
+test("parse thumb info", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[ThumbInfo].xml`, "utf-8");
-    const obj = reader.thumb_info(xml);
+    const obj = NicoDataParser.thumb_info(xml);
 
     t.is(obj.video_id, "sm1000");
     t.is(obj.title, "sample.mp4");
@@ -125,18 +134,9 @@ test("read thumb info", (t) => {
     t.is(obj.user_icon_url, "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg");
 });
 
-const hasEqProps = (obj, props) => {
-    Object.keys(props).forEach(key => {
-        if(obj[key] != props[key]){
-            throw new Error(`key is ${key}, obj:${obj[key]} not eq props:${props[key]}`);
-        }
-    });
-    return true;
-};
-
-test("read json no owner comment", (t) => {
+test("parse json no owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/no-owner-comment.json`, "utf-8");
-    const comment = reader.json_comment(text);
+    const comment = NicoDataParser.json_comment(text);
     t.deepEqual(comment[0].thread,
         {
             resultcode:0,
@@ -154,9 +154,9 @@ test("read json no owner comment", (t) => {
         {no:2, vpos:200, date:1522161986, user_id:"hijklmn", mail:"184", content:"comment2"}));
 });
 
-test("read json owner comment", (t) => {
+test("parse json owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
-    const comment = reader.json_comment(text);
+    const comment = NicoDataParser.json_comment(text);
     t.deepEqual(comment[0].thread, 
         {
             resultcode:0,
@@ -198,8 +198,8 @@ test("read json owner comment", (t) => {
 
 test("makeComments", (t) => {
     const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
-    const comment_data = reader.json_comment(text);
-    const comments = reader.makeComments(comment_data);
+    const comment_data = NicoDataParser.json_comment(text);
+    const comments = NicoDataParser.makeComments(comment_data);
     t.true(hasEqProps(comments[0], 
         {no:1, vpos:100, date:1360996778, user_id:"owner", mail:"shita green small", content:"owner comment1\ncomment1"}));
     t.true(hasEqProps(comments[1], 

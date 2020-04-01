@@ -1,5 +1,5 @@
 const fsPromises = require("fs").promises;
-const reader = require("./reader");
+const NicoDataParser = require("./nico-data-parser");
 
 class XMLDataConverter {
     async convertThumbInfo(nico_xml, nico_json){
@@ -24,13 +24,13 @@ class XMLDataConverter {
     }
 
     _convertComment(owner_xml, user_xml){
-        const owner_comment_data = reader.xml_comment(owner_xml, true);
-        const user_comment_data = reader.xml_comment(user_xml, false);
+        const owner_comment_data = NicoDataParser.xml_comment(owner_xml, true);
+        const user_comment_data = NicoDataParser.xml_comment(user_xml, false);
         return owner_comment_data.concat(user_comment_data);
     }
 
     _convertThumbinfo(xml){
-        const obj = reader.thumb_info(xml);
+        const obj = NicoDataParser.thumb_info(xml);
         const tags = obj.tags.map((tag, index)=>{
             return {
                 id: index.toString(),

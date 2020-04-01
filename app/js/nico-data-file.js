@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const reader = require("./reader");
+const NicoDataParser = require("./nico-data-parser");
 
 class NicoDataFile {
     set dirPath(dir_path){
@@ -77,21 +77,21 @@ class NicoXMLFile extends NicoDataFile {
      */
     getComments() {
         const comment_data = this.getCommentData();
-        return reader.makeComments(comment_data);
+        return NicoDataParser.makeComments(comment_data);
     }
 
     getCommentData(){
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
-        const owner_comment_data = reader.xml_comment(owner_xml, true);
-        const user_comment_data = reader.xml_comment(user_xml, false);
+        const owner_comment_data = NicoDataParser.xml_comment(owner_xml, true);
+        const user_comment_data = NicoDataParser.xml_comment(user_xml, false);
         return owner_comment_data.concat(user_comment_data);
     }
 
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const xml = fs.readFileSync(file_path, "utf-8");
-        const thumb_info = reader.thumb_info(xml);
+        const thumb_info = NicoDataParser.thumb_info(xml);
         const tags = thumb_info.tags.map((value, index) => {
             return {
                 id: index+1,
@@ -152,12 +152,12 @@ class NicoJsonFile extends NicoDataFile {
 
     getComments() {
         const comment_data = this.getCommentData();
-        return reader.makeComments(comment_data);
+        return NicoDataParser.makeComments(comment_data);
     }
 
     getCommentData(){
         const text = fs.readFileSync(this.commentPath, "utf-8");
-        return reader.json_comment(text);
+        return NicoDataParser.json_comment(text);
     }
 
     getThumbInfo() {

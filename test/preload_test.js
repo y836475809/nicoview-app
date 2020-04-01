@@ -15,7 +15,7 @@ const NicoPlay = require(`${root_dir}/app/js/nico-play`);
 const CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
 const CommentFilter = require(`${root_dir}/app/js/comment-filter`);
 const TestComments = require(`${root_dir}/test/test-comments`);
-const reader = require(`${root_dir}/app/js/reader`);
+const NicoDataParser = require(`${root_dir}/app/js/nico_data_parser`);
 const ImportLibrary = require(`${root_dir}/app/js/import-library`);
 
 process.once("loaded", () => {
@@ -35,7 +35,7 @@ process.once("loaded", () => {
     global.CommentTimeLine = CommentTimeLine;
     global.CommentFilter = CommentFilter;
     global.TestComments = TestComments;
-    global.reader = reader;
+    global.NicoDataParser = NicoDataParser;
     global.ImportLibrary = ImportLibrary;
 });
 

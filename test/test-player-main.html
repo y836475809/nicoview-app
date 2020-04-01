@@ -70,7 +70,7 @@
     const { IPC_CHANNEL } = window.IPC_CHANNEL;
     const { DataIpcRenderer } = window.DataIpc;
     const { NicoVideoMocks } = window.NicoMock;
-    const reader = window.reader;
+    const NicoDataParser = window.NicoDataParser;
 
     const video_mocks = [];
     const video_ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];
@@ -97,7 +97,7 @@
     const onclickLoad = () => {
         const comment_path = `${test_dir}/data/test1-comment.xml`;
         const xml = fs.readFileSync(comment_path, "utf-8");
-        const comments = reader.makeComments(reader.xml_comment(xml, false));
+        const comments = NicoDataParser.makeComments(NicoDataParser.xml_comment(xml, false));
         const video_data = {
             src: `${test_dir}/data/test1.mp4`,
             type: "video/mp4",

@@ -30,7 +30,7 @@ class XMLDataConverter {
     }
 
     _convertThumbinfo(xml){
-        const obj = NicoDataParser.thumb_info(xml);
+        const obj = NicoDataParser.xml_thumb_info(xml);
         const tags = obj.tags.map((tag, index)=>{
             return {
                 id: index.toString(),

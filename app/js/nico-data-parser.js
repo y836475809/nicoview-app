@@ -62,7 +62,7 @@ function xml_comment(xml, is_owner) {
  * 
  * @param {string} xml 
  */
-function thumb_info(xml) {
+function xml_thumb_info(xml) {
     let $ = cheerio.load(xml);
 
     const video_id = $("video_id").text();
@@ -160,6 +160,6 @@ const makeComments = (comment_data) => {
 };
 
 module.exports.xml_comment = xml_comment;
-module.exports.thumb_info = thumb_info;
+module.exports.xml_thumb_info = xml_thumb_info;
 module.exports.json_comment = json_comment;
 module.exports.makeComments = makeComments;

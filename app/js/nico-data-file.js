@@ -91,7 +91,7 @@ class NicoXMLFile extends NicoDataFile {
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const xml = fs.readFileSync(file_path, "utf-8");
-        const thumb_info = NicoDataParser.thumb_info(xml);
+        const thumb_info = NicoDataParser.xml_thumb_info(xml);
         const tags = thumb_info.tags.map((value, index) => {
             return {
                 id: index+1,

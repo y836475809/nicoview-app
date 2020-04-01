@@ -104,7 +104,7 @@ test("parse comment deleted", (t) => {
 
 test("parse thumb info", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[ThumbInfo].xml`, "utf-8");
-    const obj = NicoDataParser.thumb_info(xml);
+    const obj = NicoDataParser.xml_thumb_info(xml);
 
     t.is(obj.video_id, "sm1000");
     t.is(obj.title, "sample.mp4");

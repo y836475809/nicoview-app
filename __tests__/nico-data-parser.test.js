@@ -137,6 +137,9 @@ test("parse thumb info", (t) => {
 test("parse json no owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/no-owner-comment.json`, "utf-8");
     const comment = NicoDataParser.json_comment(text);
+
+    t.is(comment.length, 3);
+
     t.deepEqual(comment[0].thread,
         {
             resultcode:0,
@@ -157,6 +160,9 @@ test("parse json no owner comment", (t) => {
 test("parse json owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
     const comment = NicoDataParser.json_comment(text);
+    
+    t.is(comment.length, 7);
+
     t.deepEqual(comment[0].thread, 
         {
             resultcode:0,
@@ -198,8 +204,11 @@ test("parse json owner comment", (t) => {
 
 test("makeComments", (t) => {
     const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
-    const comment_data = NicoDataParser.json_comment(text);
+    const comment_data = JSON.parse(text);
     const comments = NicoDataParser.makeComments(comment_data);
+    
+    t.is(comments.length, 4);
+
     t.true(hasEqProps(comments[0], 
         {no:1, vpos:100, date:1360996778, user_id:"owner", mail:"shita green small", content:"owner comment1\ncomment1"}));
     t.true(hasEqProps(comments[1], 

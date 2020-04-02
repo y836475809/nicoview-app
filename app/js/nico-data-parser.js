@@ -140,7 +140,7 @@ const json_comment = (json_str) => {
 
 const makeComments = (comment_data) => {
     const comments = comment_data.filter(value => {
-        return value.hasOwnProperty("chat");
+        return value.hasOwnProperty("chat") && !value.chat.hasOwnProperty("deleted");
     }).map(value => {
         if(value.chat.hasOwnProperty("fork")){
             value.chat.user_id = "owner";

@@ -1,6 +1,7 @@
 const EventEmitter = require("events");
 const { NicoWatch, NicoVideo, NicoComment, 
-    getCookies, getThumbInfo, cnvJsonComments } = require("./niconico");
+    getCookies, getThumbInfo } = require("./niconico");
+const NicoDataParser = require("./nico-data-parser");
 
 class NicoPlay extends EventEmitter {
     constructor(heart_beat_rate=0.9){
@@ -42,7 +43,7 @@ class NicoPlay extends EventEmitter {
                 this.emit("changeState", "startComment");
                 this.nico_comment = new NicoComment(api_data);
                 const comments = await this.nico_comment.getComment();
-                const cnved_comments = cnvJsonComments(comments);
+                const cnved_comments = NicoDataParser.makeComments(comments);
                 this.emit("changeState", "finishComment");
 
                 this.nico_video = new NicoVideo(api_data, this.heart_beat_rate);

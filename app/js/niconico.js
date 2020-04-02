@@ -499,28 +499,6 @@ function getCookies(cookie_jar) {
     return nico_cookies;
 }
 
-/**
- * 
- * @param {Array} comments 
- */
-const cnvJsonComments = (comments) => {
-    return comments.filter(value => {
-        return value.hasOwnProperty("chat");
-    }).filter(value => {
-        return !value.chat.hasOwnProperty("deleted");
-    }). map(value => {
-        const chat = value.chat;
-        return {
-            no:        chat.no, 
-            vpos:      chat.vpos, 
-            date:      chat.date,
-            user_id:   chat.hasOwnProperty("fork") ? "owner" : chat.user_id,
-            mail:      chat.mail,
-            content:   chat.content
-        };  
-    });
-};
-
 function getVideoType(smile_url){
     //"https://smile-cls30.sl.nicovideo.jp/smile?v=XXXXXXX.XXXXX" => flv
     //"https://smile-cls30.sl.nicovideo.jp/smile?m=XXXXXXX.XXXXX" => mp4
@@ -582,6 +560,5 @@ module.exports = {
     getCookies: getCookies,
     getThumbInfo: getThumbInfo,
     getVideoType: getVideoType,
-    cnvJsonComments: cnvJsonComments,
     getNicoURL
 };

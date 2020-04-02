@@ -10,6 +10,18 @@ const video_id = TestData.video_id;
 const dist_dir = __dirname;
 const log = [];
 
+const getPropNum = (objs, prop_name) => {
+    let count = 0;
+    objs.forEach(obj => {
+        Object.keys(obj).forEach(key => {
+            if(key == prop_name){
+                count++;
+            }
+        });
+    });
+    return count;
+};
+
 const nico_download_mocks = new NicoDownLoadMocks();
 
 test.before(t => {
@@ -103,8 +115,8 @@ test("downloader dmc", async (t) => {
     }
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
-        t.is(data[0].content, "comment1");  
-        t.is(data[1].content, "comment2");  
+        t.is(getPropNum(data, "thread"), 1);
+        t.is(getPropNum(data, "chat"), 2);
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
@@ -180,9 +192,9 @@ test("downloader smile", async (t) => {
         t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
     }
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
-        t.is(data[0].content, "comment1");  
-        t.is(data[1].content, "comment2");  
+        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json")); 
+        t.is(getPropNum(data, "thread"), 1);
+        t.is(getPropNum(data, "chat"), 2);
     } 
     {
         const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));

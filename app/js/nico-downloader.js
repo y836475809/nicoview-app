@@ -2,7 +2,7 @@ const fs = require("fs");
 const util = require("util");
 const path = require("path");
 const request = require("request");
-const { NicoWatch, NicoVideo, NicoComment, getVideoType, getThumbInfo, cnvJsonComments } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment, getVideoType, getThumbInfo } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 
 const validateStatus = (status) => {
@@ -241,8 +241,7 @@ class NicoDownloader {
     async _getComment(){
         const api_data = this.watch_data.api_data;
         this.nico_comment = new NicoComment(api_data);
-        const comments = await this.nico_comment.getComment();
-        return cnvJsonComments(comments);
+        return await this.nico_comment.getComment();
     }
 
     _getThumbnailData(api_data){
@@ -384,7 +383,7 @@ class NicoDownloader {
     }
 
     _writeJson(file_path, data){
-        const json = JSON.stringify(data);
+        const json = JSON.stringify(data, null, "  ");
         fs.writeFileSync(file_path, json, "utf-8");
     }
 

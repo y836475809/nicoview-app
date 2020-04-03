@@ -4,7 +4,7 @@ const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
     getThumbInfo, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
-const { XMLDataConverter } = require("./xml-data-converter");
+const { XMLDataConverter } = require("./nico-data-converter");
 
 
 class NicoUpdate extends EventEmitter {

@@ -150,7 +150,7 @@ class NicoUpdate extends EventEmitter {
             return value.hasOwnProperty("chat");
         }).map(value => {
             return {
-                no: value.no
+                no: value.chat.no
             };
         });
         const comments_diff = await this._getComments(api_data, cur_comments);

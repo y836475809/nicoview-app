@@ -1,4 +1,4 @@
-const fs = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 
 class MapDB {
@@ -171,7 +171,7 @@ class MapDB {
 
     async _existFile(file_path) {
         try {
-            await fs.stat(file_path);
+            await fs.promises.stat(file_path);
             return true;
         } catch (error) {
             return false;
@@ -180,8 +180,8 @@ class MapDB {
 
     async _safeWriteFile(file_path, data) {
         const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
-        await this._writeFile(tmp_path, data, "utf-8");
-        await this._rename(tmp_path, file_path);
+        this._writeFile(tmp_path, data, "utf-8");
+        this._rename(tmp_path, file_path);
     }
 
     async _log(cmd) {
@@ -223,21 +223,21 @@ class MapDB {
     }
 
     async _readFile(file_path) {
-        return await fs.readFile(file_path, "utf-8");
+        return await fs.promises.readFile(file_path, "utf-8");
     }
     async _appendFile(file_path, data) {
-        await fs.appendFile(file_path, data, "utf-8");
+        await fs.promises.appendFile(file_path, data, "utf-8");
     }
     async _unlink(file_path) {
         if (await this._existFile(this.log_path)) {
-            await fs.unlink(file_path);
+            fs.unlinkSync(file_path);
         }
     }
-    async _writeFile(file_path, data) {
-        await fs.writeFile(file_path, data, "utf-8");
+    _writeFile(file_path, data) {
+        fs.writeFileSync(file_path, data, "utf-8");
     }
-    async _rename(old_path, new_path) {
-        await fs.rename(old_path, new_path);
+    _rename(old_path, new_path) {
+        fs.renameSync(old_path, new_path);
     }
 
     /**

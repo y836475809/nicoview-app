@@ -50,11 +50,11 @@ class testMapDB extends MapDB {
         const fname = path.basename(file_path);
         this.test_log.push(`unlink ${fname}`);
     }
-    async _writeFile(file_path, data){
+    _writeFile(file_path, data){
         const fname = path.basename(file_path);
         this.test_log.push(`writeFile ${fname}`);   
     }
-    async _rename(old_path, new_path){
+    _rename(old_path, new_path){
         const old_fname = path.basename(old_path);
         const new_fname = path.basename(new_path);
         this.test_log.push(`rename ${old_fname} ${new_fname}`);

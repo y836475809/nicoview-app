@@ -119,7 +119,7 @@ class NicoDownloader {
         this.dist_dir = dist_dir;
         this.only_max_quality = only_max_quality;
 
-        this.nico_json = new NicoJsonFile();
+        this.nico_json = new NicoJsonFile(video_id);
     }
 
     static get ResultType(){
@@ -352,29 +352,12 @@ class NicoDownloader {
         };
     }
 
-    /**
-     * 
-     * @param {string} filename 
-     */
-    _getName(title){
-        // \/:?*"<>|
-        return title
-            .replace(/\\/g, "＼")
-            .replace(/\//g, "／")
-            .replace(/:/g, "：")
-            .replace(/\?/g, "？")
-            .replace(/\*/g, "＊")
-            .replace(/</g, "＜")
-            .replace(/>/g, "＞")
-            .replace(/\|/g, "｜");
-    }
-
     _setupNicoFilePath(){
         const { api_data } = this.watch_data;
         const video_type = getVideoType(api_data.video.smileInfo.url);
 
         this.nico_json.dirPath = this.dist_dir;
-        this.nico_json.commonFilename = this.video_id;
+        this.nico_json.commonFilename = api_data.video.title;
         this.nico_json.videoType = video_type;
     }
 

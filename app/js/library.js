@@ -57,9 +57,8 @@ class LibraryIpcMain extends DataIpcMain {
 
     async addDownloadedItem(args){
         const { download_item } = args;
-        const video_id = download_item.id;
         const video_item = Object.assign({}, download_item);
-        video_item.common_filename = video_id;
+        video_item.common_filename = download_item.video_name;
         video_item.creation_date = new Date().getTime();
         video_item.last_play_date = -1;
         video_item.modification_date = -1;

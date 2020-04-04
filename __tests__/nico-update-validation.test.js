@@ -210,7 +210,7 @@ test.before(async t => {
 });
 
 test("validate watch_data", t => {
-    const nico_update = new NicoUpdate({data_type:"json"});
+    const nico_update = new NicoUpdate({data_type:"json", common_filename:"test"});
     
     t.truthy(nico_update._validateWatchData(test_watch_data));
 
@@ -220,7 +220,7 @@ test("validate watch_data", t => {
 });
 
 test("validate comments", t => {
-    const nico_update = new NicoUpdate({data_type:"json"});
+    const nico_update = new NicoUpdate({data_type:"json", common_filename:"test"});
     
     t.truthy(nico_update._validateComment(test_comments));
     t.truthy(nico_update._validateComment([]));
@@ -233,7 +233,7 @@ test("validate comments", t => {
 });
 
 test("validate thumbnail", t => {
-    const nico_update = new NicoUpdate({data_type:"json"});
+    const nico_update = new NicoUpdate({data_type:"json", common_filename:"test"});
     
     const { jpeg, png } = t.context.image;
     t.truthy(nico_update._validateThumbnail(jpeg));

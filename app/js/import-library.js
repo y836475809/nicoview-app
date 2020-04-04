@@ -1,5 +1,6 @@
 const path = require("path");
-const { NicoVideoData } = require("./nico-data-file");
+const { NicoVideoData, 
+    getIDFromFilename, getCommonNameFromFilename } = require("./nico-data-file");
 const { FileUtils } = require("./file-utils");
 const { toTimeSec } = require("./time-format");
 
@@ -7,9 +8,10 @@ class ImportLibrary {
     constructor(video_filepath){
         this.dir = path.dirname(video_filepath);
         this.filename = path.basename(video_filepath);
-        this.common_filename = path.basename(this.filename, path.extname(this.filename));
+        this.id = getIDFromFilename(this.filename);
+        this.common_filename = getCommonNameFromFilename(this.filename);
     }
-    async createLibraryItem(){
+    async createLibraryItem(){        
         const thumbnail_size = await this._getThumbnailSize();
         const data_type = await this._getDataType();
         const thumb_info = this._getThumbInfo(data_type);
@@ -36,8 +38,15 @@ class ImportLibrary {
     }
 
     async _getThumbnailSize(){
-        const filename_L = `${this.common_filename}[ThumbImg].L.jpeg`;
-        if(await FileUtils.exist(path.join(this.dir, filename_L) === true)){
+        const nico_vieo_data = new NicoVideoData({
+            id              : this.id,
+            data_type       : "json",
+            dirpath         : this.dir,
+            common_filename : this.common_filename,
+            thumbnail_size  : "L"
+        });
+        const file_path = nico_vieo_data.getThumbImgPath();
+        if(await this._existFile(file_path) === true){
             return "L";
         }
 
@@ -45,12 +54,19 @@ class ImportLibrary {
     }
 
     async _existThumbInfo(data_type){
-        const file_path = path.join(this.dir, `${this.common_filename}[ThumbInfo].${data_type}`);
-        return await FileUtils.exist(file_path);
+        const nico_vieo_data = new NicoVideoData({
+            id              : this.id,
+            data_type       : data_type,
+            dirpath         : this.dir,
+            common_filename : this.common_filename,
+        });
+        const file_path = nico_vieo_data.getThumbInfoPath();
+        return await this._existFile(file_path);
     }
 
     _getThumbInfo(data_type){
         const nico_video_data = new NicoVideoData({
+            id              : this.id,
             data_type       : data_type,
             dirpath         : this.dir,
             common_filename : this.common_filename
@@ -58,35 +74,17 @@ class ImportLibrary {
         return nico_video_data.getThumbInfo();
     }
 
-    _matchJoin(){
-        const match = /(sm\d+)\.(mp4|flv|swf)/.exec(this.filename);
-        return match !== null;
-    }
-
-    _matchNNDD(){
-        const match = /\[(sm\d+)\]\.(mp4|flv|swf)/.exec(this.filename);
-        return match !== null;
-    }
-
     async _getDataType(){
-        const match_json = this._matchJoin(this.filename);
-        const match_NNDD = this._matchNNDD(this.filename);
-        if(match_json === false && match_NNDD === false){
-            throw new Error(`${this.filename}`);
-        }
-
-        if(match_json === true){
+        if(await this._existThumbInfo("json") === true){
             return "json";
         }
-
-        if(match_NNDD === true){
-            if(await this._existThumbInfo("json") === true){
-                return "json";
-            }
-            if(await this._existThumbInfo("xml") === true){
-                return "xml"; 
-            }
+        if(await this._existThumbInfo("xml") === true){
+            return "xml"; 
         }
+    }
+    
+    async _existFile(file_path){
+        return await FileUtils.exist(file_path);
     }
 }
 

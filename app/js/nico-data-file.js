@@ -3,6 +3,14 @@ const fs = require("fs");
 const NicoDataParser = require("./nico-data-parser");
 
 class NicoDataFile {
+    constructor(id){
+        this.id = id;
+    }
+
+    set commonFilename(name){
+        this.common_filename = `${this._cnvFilename(name)} - [${this.id}]`;
+    }
+
     set dirPath(dir_path){
         this.dir_path = dir_path;
     }
@@ -40,17 +48,27 @@ class NicoDataFile {
     get thumbImgPath(){
         return path.join(this.dir_path, this.thumbImgFilename);
     }
-}
-
-class NicoXMLFile extends NicoDataFile {
-    set commonFilename(name){
-        this.common_filename = name;
-    }
 
     get videoFilename(){
         return `${this.common_filename}.${this.video_type}`;
     }
 
+    _cnvFilename(name){
+        // \/:?*"<>|
+        return name
+            .replace(/\\/g, "＼")
+            .replace(/\//g, "／")
+            .replace(/:/g, "：")
+            .replace(/\?/g, "？")
+            .replace(/\*/g, "＊")
+            .replace(/</g, "＜")
+            .replace(/>/g, "＞")
+            .replace(/\|/g, "｜")
+            .replace(/#/g, "＃");
+    }
+}
+
+class NicoXMLFile extends NicoDataFile {
     get commentFilename(){
         return `${this.common_filename}.xml`;
     }
@@ -126,14 +144,6 @@ class NicoXMLFile extends NicoDataFile {
 }
 
 class NicoJsonFile extends NicoDataFile {   
-    set commonFilename(name){
-        this.common_filename = name;
-    }
-
-    get videoFilename(){
-        return `${this.common_filename}.${this.video_type}`;
-    }
-
     get commentFilename(){
         return `${this.common_filename}[Comment].json`;
     }
@@ -178,9 +188,9 @@ class NicoVideoData {
 
         const data_type = video_item.data_type;
         if(data_type=="xml"){
-            nico_data = new NicoXMLFile();
+            nico_data = new NicoXMLFile(video_item.id);
         } else if(data_type=="json"){
-            nico_data = new NicoJsonFile();
+            nico_data = new NicoJsonFile(video_item.id);
         }else{
             throw new Error(`${data_type} is unkown`);
         }
@@ -213,6 +223,10 @@ class NicoVideoData {
         return this.nico_data.getCommentData();
     }
 
+    getThumbInfoPath() {
+        return this.nico_data.thumbInfoPath;
+    }
+
     getThumbInfo() {
         const thumb_info = this.nico_data.getThumbInfo();
         const thumb_img_path = this.getThumbImgPath();
@@ -228,14 +242,14 @@ class NicoVideoData {
 
 // TODO
 const getNicoDataFilePaths = (video_item) => {
-    const xml_item = new NicoXMLFile();
+    const xml_item = new NicoXMLFile(video_item.id);
     xml_item.dirPath        = video_item.dirpath;
     xml_item.commonFilename = video_item.common_filename;
     xml_item.videoType      = video_item.video_type;
     xml_item.thumbnailSize  = video_item.thumbnail_size;
     xml_item.is_deleted     = video_item.is_deleted;
 
-    const json_item = new NicoJsonFile();
+    const json_item = new NicoJsonFile(video_item.id);
     json_item.dirPath        = video_item.dirpath;
     json_item.commonFilename = video_item.common_filename;
     json_item.videoType      = video_item.video_type;
@@ -258,9 +272,42 @@ const getNicoDataFilePaths = (video_item) => {
     return [...paths];  
 };
 
+/**
+ * *** - [(***)].***
+ * @param {string} finename 
+ */
+const getIDFromFilename = (finename) => {
+    const regexp = /\s-\s\[([a-z]*[\d]+|[\d]+)\]\.+/gi;
+    let match = null;
+    let id = null;
+    while ((match = regexp.exec(finename))!== null) {
+        id = match[1];
+    }
+    if(id==null){
+        throw new Error(`cant get id form ${finename}`);
+    }
+    return id;
+};
+
+/**
+ * (***) - [***].***
+ * @param {string} finename 
+ */
+const getCommonNameFromFilename = (finename) => {
+    const regexp = /(.+)\s-\s\[[a-z]*[\d]+\]\.+/gi;
+    const match = regexp.exec(finename);
+    if(match==null){
+        throw new Error(`cant get common name form ${finename}`);
+    }
+    return match[1];
+};
+
 module.exports = {
+    NicoDataFile,
     NicoXMLFile,
     NicoJsonFile,
     NicoVideoData,
-    getNicoDataFilePaths
+    getNicoDataFilePaths,
+    getIDFromFilename,
+    getCommonNameFromFilename
 };

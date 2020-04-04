@@ -2,82 +2,59 @@ const test = require("ava");
 const path = require("path");
 const { ImportLibrary } = require("../app/js/import-library");
 
-test("match", t => {
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "sm100.mp4"));
-        t.truthy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "sm100.flv"));
-        t.truthy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "sm100.swf"));
-        t.truthy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "sm100.jpeg"));
-        t.falsy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
+const dir = path.join(__dirname, "data", "import");
+const video_filepath = path.join(dir, "import - [sm100].mp4");
+const dummy_video_filepath = path.join(dir, "import - [sm1000].mp4");
 
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "サンプル1 - [sm100].mp4"));
-        t.falsy(im_lib._matchJoin());
-        t.truthy(im_lib._matchNNDD());
+class TestImportLibrary extends ImportLibrary {
+    constructor(video_filepath){
+        super(video_filepath);
+        this.paths = [];
     }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "サンプル1 - [sm100].flv"));
-        t.falsy(im_lib._matchJoin());
-        t.truthy(im_lib._matchNNDD());
+    async _existFile(file_path){
+        this.paths.push(file_path);
+        return true;
     }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "サンプル1 - [sm100].swf"));
-        t.falsy(im_lib._matchJoin());
-        t.truthy(im_lib._matchNNDD());
-    }
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "サンプル1 - [sm100].jpeg"));
-        t.falsy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
-
-    {
-        const im_lib = new ImportLibrary(path.join(__dirname, "サンプル1.mp4"));
-        t.falsy(im_lib._matchJoin());
-        t.falsy(im_lib._matchNNDD());
-    }
-});
+}
 
 test("_getThumbInfo ", t => {
-
-    const dir = path.join(__dirname, "data", "import");
     {
-        const im_lib = new ImportLibrary(path.join(dir, "sm100.mp4"));
+        const im_lib = new ImportLibrary(video_filepath);
         const thumb_info = im_lib._getThumbInfo("json");
         t.is(thumb_info.video.video_id, "sm100");
     }
     {
-        const im_lib = new ImportLibrary(path.join(dir, "import - [sm100].mp4"));
+        const im_lib = new ImportLibrary(video_filepath);
         const thumb_info = im_lib._getThumbInfo("xml");
         t.is(thumb_info.video.video_id, "sm100");
     }
     {
-        const im_lib = new ImportLibrary(path.join(dir, "import - [sm100].mp4"));
+        const im_lib = new ImportLibrary(video_filepath);
         const thumb_info = im_lib._getThumbInfo("json");
         t.is(thumb_info.video.video_id, "sm100");
     }
 
     {
-        const im_lib = new ImportLibrary(path.join(dir, "sm1000.mp4"));
+        const im_lib = new ImportLibrary(dummy_video_filepath);
         t.throws(() => { im_lib._getThumbInfo("json"); });
     }
 
     {
-        const im_lib = new ImportLibrary(path.join(dir, "sm1000.mp4"));
+        const im_lib = new ImportLibrary(dummy_video_filepath);
         t.throws(() => { im_lib._getThumbInfo("xml"); });
     }
+});
+
+test("file path ", async t => {
+    const im_lib = new TestImportLibrary(video_filepath);
+    await im_lib._getThumbnailSize();
+    await im_lib._existThumbInfo("xml");
+    await im_lib._existThumbInfo("json");
+
+    const paths = im_lib.paths;
+    t.deepEqual(paths, [
+        path.join(dir, "import - [sm100][ThumbImg].L.jpeg"),
+        path.join(dir, "import - [sm100][ThumbInfo].xml"),
+        path.join(dir, "import - [sm100][ThumbInfo].json")
+    ]);
 });

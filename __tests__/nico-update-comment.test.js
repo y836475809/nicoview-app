@@ -89,7 +89,7 @@ const no_owner_data_diff = [
 
 class TestNicoUpdate extends NicoUpdate {
     constructor(current_comment_data, diff_comment_data){
-        super({data_type:"json"});
+        super({data_type:"json", common_filename:"test"});
         this.data = null;
         this.current_comment_data = current_comment_data;
         this.diff_comment_data = diff_comment_data;

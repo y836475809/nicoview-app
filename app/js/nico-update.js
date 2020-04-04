@@ -311,12 +311,12 @@ class NicoUpdate extends EventEmitter {
     }
 
     _getNicoFileData(){
-        const nico_xml = new NicoXMLFile();
+        const nico_xml = new NicoXMLFile(this.video_item.id);
         nico_xml.dirPath = this.video_item.dirpath;
         nico_xml.commonFilename = this.video_item.common_filename;
         nico_xml.thumbnailSize = this.video_item.thumbnail_size;
 
-        const nico_json = new NicoJsonFile();
+        const nico_json = new NicoJsonFile(this.video_item.id);
         nico_json.dirPath = this.video_item.dirpath;
         nico_json.commonFilename = this.video_item.common_filename;
         nico_json.thumbnailSize = this.video_item.thumbnail_size;

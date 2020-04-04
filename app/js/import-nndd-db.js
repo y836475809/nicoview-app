@@ -2,6 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
 const { FileUtils } = require("./file-utils");
+const { getCommonNameFromFilename } = require("./nico-data-file");
 
 class DBConverter {
     /**
@@ -87,7 +88,7 @@ class DBConverter {
             const pub_date = value[13];
 
             const decoded_path = decodeURIComponent(uri);
-            const common_filename = path.basename(decoded_path, path.extname(decoded_path));
+            const common_filename = getCommonNameFromFilename(path.basename(decoded_path));
             const video_type = path.extname(decoded_path).slice(1);
             const tags = this.tag_map.get(id);
             

@@ -32,7 +32,8 @@ test.beforeEach(t => {
 
     t.context.video_item = {
         id : "sm10",
-        data_type : "xml"
+        data_type : "xml",
+        common_filename: "test"
     };
 });
 
@@ -48,7 +49,7 @@ test("writeFile sucess", async t => {
 
 test("writeFile _write error", async t => {
     class TestNicoUpdate extends NicoUpdate {
-        async _write(file_path, data){
+        _write(file_path, data){
             fs.writeFileSync(file_path, JSON.stringify(data));
             throw new Error();
         } 
@@ -64,7 +65,7 @@ test("writeFile _write error", async t => {
 
 test("writeFile _unlink error", async t => {
     class TestNicoUpdate extends NicoUpdate {
-        async _write(file_path, data){
+        _write(file_path, data){
             fs.writeFileSync(file_path, JSON.stringify(data));
             throw new Error();
         } 

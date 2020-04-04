@@ -62,9 +62,9 @@ test("update", async(t) => {
     t.is(nico_update.data[1].length,3);
     t.is(byteToString(nico_update.data[2]), "thumbnail");
     t.deepEqual(nico_update.paths, [
-        path.normalize(`/data/${TestData.video_id}[ThumbInfo].json`),
-        path.normalize(`/data/${TestData.video_id}[Comment].json`),
-        path.normalize(`/data/${TestData.video_id}[ThumbImg].L.jpeg`)
+        path.normalize(`/data/${TestData.video_id} - [${TestData.video_id}][ThumbInfo].json`),
+        path.normalize(`/data/${TestData.video_id} - [${TestData.video_id}][Comment].json`),
+        path.normalize(`/data/${TestData.video_id} - [${TestData.video_id}][ThumbImg].L.jpeg`)
     ]);
 });
 

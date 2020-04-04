@@ -55,7 +55,7 @@ test("sqlite db video", (t) => {
     t.is(sm5.id, "sm5");
 
     t.is(sm1.video_name, "サンプル1");
-    t.is(sm1.common_filename, "サンプル1 - [sm1]");
+    t.is(sm1.common_filename, "サンプル1");
     t.is(sm1.video_type, "mp4");
 
     t.deepEqual(sm1.tags, ["タグ1", "タグ2"]);
@@ -78,7 +78,7 @@ test("sqlite db item", (t) => {
         id: "sm1",
         video_name: "サンプル1",
         video_type: "mp4",
-        common_filename: "サンプル1 - [sm1]",
+        common_filename: "サンプル1",
         is_economy: false,
         modification_date: 1307213799000,
         creation_date: 1332592373506,

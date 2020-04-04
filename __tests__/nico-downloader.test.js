@@ -104,22 +104,22 @@ test("downloader dmc", async (t) => {
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].L.jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbImg].L.jpeg"));
         t.is(data, "thumbnail");
     }
     {
         const video_path = path.join(dist_dir, "_video.tmp");
         const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video dmc");
-        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
+        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "test - [sm12345678].mp4"));
     }
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json"));
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][Comment].json"));
         t.is(getPropNum(data, "thread"), 1);
         t.is(getPropNum(data, "chat"), 2);
     } 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbInfo].json"));
         t.deepEqual(data, {
             video:{
                 video_id: "sm12345678",
@@ -182,22 +182,22 @@ test("downloader smile", async (t) => {
     });
 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbImg].L.jpeg"));
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbImg].L.jpeg"));
         t.is(data, "thumbnail");
     }
     {
         const video_path = path.join(dist_dir, "_video.tmp");
         const writer = nico_down.map.get(video_path);
         t.is(writer.buf, "video smile");
-        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "sm12345678.mp4"));
+        t.is(nico_down.rename_map.get(video_path), path.join(dist_dir, "test - [sm12345678].mp4"));
     }
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[Comment].json")); 
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][Comment].json")); 
         t.is(getPropNum(data, "thread"), 1);
         t.is(getPropNum(data, "chat"), 2);
     } 
     {
-        const data = nico_down.map.get(path.join(dist_dir, "sm12345678[ThumbInfo].json"));
+        const data = nico_down.map.get(path.join(dist_dir, "test - [sm12345678][ThumbInfo].json"));
         t.deepEqual(data, {
             video:{
                 video_id: "sm12345678",

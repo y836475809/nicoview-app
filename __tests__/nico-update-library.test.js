@@ -27,12 +27,12 @@ test.beforeEach(async t => {
     });
     Object.assign(video_item_map["sm3"], {
         data_type :"xml",
-        common_filename : "サンプル3 - [sm3]",
+        common_filename : "サンプル3",
         thumbnail_size: "S"
     });
     Object.assign(video_item_map["sm4"], {
         data_type :"xml",
-        common_filename : "サンプル4 - [sm4]",
+        common_filename : "サンプル4",
         is_deleted: true,
         thumbnail_size: "S"
     });
@@ -108,9 +108,9 @@ test("update thumbinfo, comment if dbtype is json", async t => {
     t.falsy(updated_video_item.is_deleted);
     t.is(updated_video_item.thumbnail_size, "L");
     t.deepEqual(nico_update.paths, [
-        path.normalize("/data/sm1[ThumbInfo].json"),
-        path.normalize("/data/sm1[Comment].json"),
-        path.normalize("/data/sm1[ThumbImg].L.jpeg")
+        path.normalize("/data/sm1 - [sm1][ThumbInfo].json"),
+        path.normalize("/data/sm1 - [sm1][Comment].json"),
+        path.normalize("/data/sm1 - [sm1][ThumbImg].L.jpeg")
     ]);
 });
 

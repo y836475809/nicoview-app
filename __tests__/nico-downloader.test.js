@@ -137,7 +137,7 @@ test("downloader dmc", async (t) => {
                 commentCount: 1000
             },
             tags:[
-                {id: "1", name: "tag1", isLocked: true},
+                {id: "1", name: "tag1", isLocked: true, category:true},
                 {id: "2", name: "tag2", isLocked: true},
                 {id: "3", name: "tag3", isLocked: false}
             ],
@@ -215,7 +215,7 @@ test("downloader smile", async (t) => {
                 commentCount: 1000
             },
             tags:[
-                {id: "1", name: "tag1", isLocked: true},
+                {id: "1", name: "tag1", isLocked: true, category:true},
                 {id: "2", name: "tag2", isLocked: true},
                 {id: "3", name: "tag3", isLocked: false}
             ],

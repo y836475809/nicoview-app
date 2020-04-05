@@ -147,17 +147,27 @@ const getVideoType = (smile_url) => {
     throw new Error("not flv or mp4");
 };
 
-const json_thumb_info = (api_data) => {
-    const video = api_data.video;
-    const thread = api_data.thread;
-    const owner = api_data.owner;
-    const tags = api_data.tags.map((value) => {
-        return {
+const json_thumb_info_tags = (api_data_tags) => {
+    return api_data_tags.map((value) => {
+        const tag = {
             id: value.id,
             name: value.name,
             isLocked: value.isLocked,
         };
-    });
+
+        if(value.isCategory === true){
+            tag.category = true;
+        }
+
+        return tag;
+    });  
+};
+
+const json_thumb_info = (api_data) => {
+    const video = api_data.video;
+    const thread = api_data.thread;
+    const owner = api_data.owner;
+    const tags = json_thumb_info_tags(api_data.tags);
     return {
         video: {
             video_id: video.id,
@@ -224,6 +234,7 @@ module.exports = {
     xml_comment,
     xml_thumb_info_tags,
     xml_thumb_info,
+    json_thumb_info_tags,
     json_thumb_info,
     json_comment,
     makeComments,

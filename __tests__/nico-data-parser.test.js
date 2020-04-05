@@ -14,7 +14,7 @@ const hasEqProps = (obj, props) => {
     return true;
 };
 
-test("parse user comment", (t) => {
+test("parse xml user comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample.xml`, "utf-8");
     const obj = NicoDataParser.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
@@ -53,7 +53,7 @@ test("parse user comment", (t) => {
     ));
 });
 
-test("parse owner comment", (t) => {
+test("parse xml owner comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[Owner].xml`, "utf-8");
     const obj = NicoDataParser.xml_comment(xml, true);
     t.deepEqual(obj[0].thread, {
@@ -73,7 +73,7 @@ test("parse owner comment", (t) => {
     ));
 });
 
-test("parse comment deleted", (t) => {
+test("parse xml comment deleted", (t) => {
     const xml = fs.readFileSync(`${dir}/sample-deleted.xml`, "utf-8");
     const obj = NicoDataParser.xml_comment(xml, false);
     t.deepEqual(obj[0].thread, {
@@ -103,7 +103,7 @@ test("parse comment deleted", (t) => {
     ));
 });
 
-test("parse thumb info tags", (t) => {
+test("parse xml thumb info tags", (t) => {
     const $ = cheerio.load(`
     <tags domain="jp">
         <tag category="1" lock="1">タグ1</tag>
@@ -120,7 +120,7 @@ test("parse thumb info tags", (t) => {
         ]);
 });
 
-test("parse thumb info", (t) => {
+test("parse xml thumb info", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[ThumbInfo].xml`, "utf-8");
     const obj = NicoDataParser.xml_thumb_info(xml);
 
@@ -150,6 +150,42 @@ test("parse thumb info", (t) => {
     t.is(obj.user_id, "00000");
     t.is(obj.user_nickname, "ニックネーム");
     t.is(obj.user_icon_url, "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/defaults/blank_s.jpg");
+});
+
+test("parse json thumb info tags", t => {
+    const api_data_tags = [
+        {
+            id: "10",
+            name: "タグ1",
+            isCategory: true,
+            isCategoryCandidate: true,
+            isDictionaryExists: true,
+            isLocked: true
+        },
+        {
+            id: "20",
+            name: "タグ2",
+            isCategory: false,
+            isCategoryCandidate: false,
+            isDictionaryExists: true,
+            isLocked: false
+        },
+        {
+            id: "30",
+            name: "タグ3",
+            isCategory: false,
+            isCategoryCandidate: false,
+            isDictionaryExists: true,
+            isLocked: true
+        },
+    ];
+    const tags = NicoDataParser.json_thumb_info_tags(api_data_tags);
+    t.deepEqual(tags,
+        [
+            {id:"10", name:"タグ1", isLocked:true, category:true},
+            {id:"20", name:"タグ2", isLocked:false},
+            {id:"30", name:"タグ3", isLocked:true}
+        ]);
 });
 
 test("parse json no owner comment", (t) => {

@@ -5,7 +5,7 @@ const cheerio = require("cheerio");
  * 
  * @param {string} xml 
  */
-function xml_comment(xml, is_owner) {
+const xml_comment = (xml, is_owner) => {
     let $ = cheerio.load(xml);
 
     let threads = [];
@@ -56,7 +56,7 @@ function xml_comment(xml, is_owner) {
     });
 
     return threads.concat(comments);
-}
+};
 
 const xml_thumb_info_tags = ($) => {
     const tags = [];
@@ -80,7 +80,7 @@ const xml_thumb_info_tags = ($) => {
  * 
  * @param {string} xml 
  */
-function xml_thumb_info(xml) {
+const xml_thumb_info  = (xml) => {
     let $ = cheerio.load(xml);
 
     const video_id = $("video_id").text();
@@ -132,7 +132,7 @@ function xml_thumb_info(xml) {
         user_nickname: user_nickname,
         user_icon_url: user_icon_url
     };
-}
+};
 
 const json_comment = (json_str) => {
     const json_data = JSON.parse(json_str);
@@ -171,8 +171,10 @@ const makeComments = (comment_data) => {
     return comments;
 };
 
-module.exports.xml_comment = xml_comment;
-module.exports.xml_thumb_info_tags = xml_thumb_info_tags;
-module.exports.xml_thumb_info = xml_thumb_info;
-module.exports.json_comment = json_comment;
-module.exports.makeComments = makeComments;
+module.exports = { 
+    xml_comment,
+    xml_thumb_info_tags,
+    xml_thumb_info,
+    json_comment,
+    makeComments
+};

@@ -102,7 +102,7 @@ class TestNicoUpdate extends NicoUpdate {
         return this.diff_comment_data;
     }
     
-    async _writeFile(file_path, data){
+    _writeFile(file_path, data){
         this.data = data;
     }
 }

@@ -1,4 +1,4 @@
-const fsPromises = require("fs").promises;
+const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
 const { NicoWatch, NicoComment, 
@@ -84,7 +84,7 @@ class NicoUpdate extends EventEmitter {
 
         const { nico_xml, nico_json } = this._getNicoFileData();
 
-        await this._updateThumbInfo(api_data, nico_json);
+        this._updateThumbInfo(api_data, nico_json);
         await this._updateComment(api_data, nico_json);
 
         const thumbnail_size = "L";
@@ -103,7 +103,7 @@ class NicoUpdate extends EventEmitter {
         const api_data = await this._getApiData();
         const { nico_xml, nico_json } = this._getNicoFileData();
 
-        await this._updateThumbInfo(api_data, nico_json);
+        this._updateThumbInfo(api_data, nico_json);
 
         if(!this._isDataTypeJson()){
             this._convertComment(nico_xml, nico_json);
@@ -115,11 +115,11 @@ class NicoUpdate extends EventEmitter {
         this._emitUpdated();
     }
 
-    async _updateThumbInfo(api_data, nico_json){
+    _updateThumbInfo(api_data, nico_json){
         this._setTags(api_data.tags);
 
         const thumbInfo = getThumbInfo(api_data);
-        await this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
+        this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
     }
 
     async updateComment(){
@@ -163,7 +163,7 @@ class NicoUpdate extends EventEmitter {
         }
 
         const updated_comment_data =this._margeCommentData(cur_comment_data, comments_diff);
-        await this._writeFile(nico_json.commentPath, updated_comment_data, "json");
+        this._writeFile(nico_json.commentPath, updated_comment_data, "json");
         return true;
     }
 
@@ -249,7 +249,7 @@ class NicoUpdate extends EventEmitter {
             throw new Error(`${this.video_item.id}のサムネイルが正しくないデータです`);
         }
 
-        await this._writeFile(img_path, thumbImg, "binary");
+        this._writeFile(img_path, thumbImg, "binary");
 
         this._setThumbnailSize(thumbnail_size);
 
@@ -389,34 +389,34 @@ class NicoUpdate extends EventEmitter {
         }        
     }
 
-    async _writeFile(file_path, data, encoding){
+    _writeFile(file_path, data, encoding){
         const tmp_path = path.join(path.dirname(file_path), "_update.tmp");
         try {
-            await this._write(tmp_path, data, encoding);
+            this._write(tmp_path, data, encoding);
         } catch (error) {
-            await this._unlink(tmp_path);
+            this._unlink(tmp_path);
             throw error;
         }     
-        await this._rename(tmp_path, file_path);
+        this._rename(tmp_path, file_path);
     }
 
-    async _unlink(file_path){
-        await fsPromises.unlink(file_path);
+    _unlink(file_path){
+        fs.unlinkSync(file_path);
     }
 
-    async _rename(old_path, new_path){
-        await fsPromises.rename(old_path, new_path);
+    _rename(old_path, new_path){
+        fs.renameSync(old_path, new_path);
     }
 
-    async _write(file_path, data, encoding){
+    _write(file_path, data, encoding){
         if(encoding=="json"){
             const json = JSON.stringify(data, null, "  ");
-            await fsPromises.writeFile(file_path, json, "utf-8");
+            fs.writeFileSync(file_path, json, "utf-8");
             return;
         }
 
         if(encoding=="binary"){
-            await fsPromises.writeFile(file_path, data, "binary");
+            fs.writeFileSync(file_path, data, "binary");
             return;
         }
 
@@ -425,7 +425,7 @@ class NicoUpdate extends EventEmitter {
 
     async _existPath(path){
         try {
-            await fsPromises.stat(path);
+            await fs.promises.stat(path);
             return true;
         } catch (error) {
             return false;

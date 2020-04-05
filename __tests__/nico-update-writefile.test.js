@@ -37,17 +37,17 @@ test.beforeEach(t => {
     };
 });
 
-test("writeFile sucess", async t => {
+test("writeFile sucess", t => {
     const video_item = t.context.video_item;
     const nico_update = new NicoUpdate(video_item);
-    await nico_update._writeFile(test_file_path, new_data, "json");
+    nico_update._writeFile(test_file_path, new_data, "json");
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.throws(()=>{fs.statSync(tmp_file_path);});
     t.deepEqual(cnvJson(test_file_path), new_data);
 });
 
-test("writeFile _write error", async t => {
+test("writeFile _write error", t => {
     class TestNicoUpdate extends NicoUpdate {
         _write(file_path, data){
             fs.writeFileSync(file_path, JSON.stringify(data));
@@ -56,26 +56,26 @@ test("writeFile _write error", async t => {
     }
     const video_item = t.context.video_item;
     const nico_update = new TestNicoUpdate(video_item);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
+    t.throws(()=>{nico_update._writeFile(test_file_path, new_data, "json");});
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.throws(()=>{fs.statSync(tmp_file_path);});
     t.deepEqual(cnvJson(test_file_path), old_data);
 });
 
-test("writeFile _unlink error", async t => {
+test("writeFile _unlink error", t => {
     class TestNicoUpdate extends NicoUpdate {
         _write(file_path, data){
             fs.writeFileSync(file_path, JSON.stringify(data));
             throw new Error();
         } 
-        async _unlink(file_path){
+        _unlink(file_path){
             throw new Error();
         } 
     }
     const video_item = t.context.video_item;
     const nico_update = new TestNicoUpdate(video_item);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
+    t.throws(()=>{nico_update._writeFile(test_file_path, new_data, "json");});
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.notThrows(()=>{fs.statSync(tmp_file_path);});
@@ -83,15 +83,15 @@ test("writeFile _unlink error", async t => {
 });
 
 
-test("writeFile _rename error", async t => {
+test("writeFile _rename error", t => {
     class TestNicoUpdate extends NicoUpdate {
-        async _rename(old_path, new_path){
+        _rename(old_path, new_path){
             throw new Error();
         } 
     }
     const video_item = t.context.video_item;
     const nico_update = new TestNicoUpdate(video_item);
-    await t.throwsAsync(nico_update._writeFile(test_file_path, new_data, "json"));
+    t.throws(()=>{nico_update._writeFile(test_file_path, new_data, "json");});
 
     t.notThrows(()=>{fs.statSync(test_file_path);});
     t.notThrows(()=>{fs.statSync(tmp_file_path);});

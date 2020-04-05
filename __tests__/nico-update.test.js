@@ -17,7 +17,7 @@ class TestNicoUpdate extends NicoUpdate {
         return TestData.no_owner_comment;
     }
 
-    async _writeFile(file_path, data){
+    _writeFile(file_path, data){
         this.paths.push(file_path);
         this.data.push(data);
     }

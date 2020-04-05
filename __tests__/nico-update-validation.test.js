@@ -175,7 +175,7 @@ class TestNicoUpdate extends NicoUpdate {
     _setThumbnailSize(thumbnail_size){
         this.log.push("_setThumbnailSize");
     }
-    async _writeFile(file_path, data, encoding){
+    _writeFile(file_path, data, encoding){
         this.log.push("_writeFile");
     }
     async _existPath(path){

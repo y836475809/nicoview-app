@@ -46,7 +46,7 @@ class TestNicoUpdate extends NicoUpdate {
         super._setThumbnailSize(thumbnail_size);
     }
 
-    async _writeFile(file_path, data, encoding){
+    _writeFile(file_path, data, encoding){
         this.log.push("_writeFile");
         this.paths.push(file_path);
         this.data.push(data);

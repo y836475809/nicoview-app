@@ -65,7 +65,7 @@ class TestNicoUpdate extends NicoUpdate {
     async _getThumbImg(url){
         return "jpeg";
     }
-    async _writeFile(file_path, data){
+    _writeFile(file_path, data){
         this.paths.push(file_path);
     }
     _validateThumbnail(bytes){
@@ -90,7 +90,7 @@ class TestNicoUpdateTags extends NicoUpdate {
     async _getThumbImg(url){
         return "jpeg";
     }
-    async _writeFile(file_path, data){
+    _writeFile(file_path, data){
     }
     _validateThumbnail(bytes){
         return true;

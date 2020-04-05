@@ -1,10 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const EventEmitter = require("events");
-const { NicoWatch, NicoComment, 
-    getThumbInfo, NicoThumbnail } = require("./niconico");
+const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./nico-data-converter");
+const NicoDataParser = require("./nico-data-parser");
 
 
 class NicoUpdate extends EventEmitter {
@@ -118,7 +118,7 @@ class NicoUpdate extends EventEmitter {
     _updateThumbInfo(api_data, nico_json){
         this._setTags(api_data.tags);
 
-        const thumbInfo = getThumbInfo(api_data);
+        const thumbInfo = NicoDataParser.json_thumb_info(api_data);
         this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
     }
 
@@ -265,7 +265,7 @@ class NicoUpdate extends EventEmitter {
             return { api_data, is_deleted: is_deleted, tags: tags, thumbInfo: null };
         }
 
-        const thumbInfo = getThumbInfo(api_data);
+        const thumbInfo = NicoDataParser.json_thumb_info(api_data);
         return { api_data, is_deleted, tags, thumbInfo };
     }
 

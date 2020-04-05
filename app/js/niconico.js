@@ -499,66 +499,11 @@ function getCookies(cookie_jar) {
     return nico_cookies;
 }
 
-function getVideoType(smile_url){
-    //"https://smile-cls30.sl.nicovideo.jp/smile?v=XXXXXXX.XXXXX" => flv
-    //"https://smile-cls30.sl.nicovideo.jp/smile?m=XXXXXXX.XXXXX" => mp4
-    if(/.*\/smile\?v=.*/.test(smile_url)){
-        return "flv";
-    }
-    if(/.*\/smile\?m=.*/.test(smile_url)){
-        return "mp4";
-    }
-
-    throw new Error("not flv or mp4");
-}
-
-const getThumbInfo = (api_data) => {
-    const video = api_data.video;
-    const thread = api_data.thread;
-    const owner = api_data.owner;
-    const tags = api_data.tags.map((value) => {
-        return {
-            id: value.id,
-            name: value.name,
-            isLocked: value.isLocked,
-        };
-    });
-    return {
-        video: {
-            video_id: video.id,
-            title: video.title, 
-            description: video.description, 
-            thumbnailURL: video.thumbnailURL, 
-            largeThumbnailURL: video.largeThumbnailURL, 
-            postedDateTime: video.postedDateTime, 
-            duration: video.duration, 
-            viewCount: video.viewCount, 
-            mylistCount: video.mylistCount, 
-            video_type: video.movieType ? video.movieType : getVideoType(video.smileInfo.url)
-        },
-        thread: {
-            commentCount: thread.commentCount
-        },
-        tags: tags,
-        owner: {
-            id: owner.id, 
-            nickname: owner.nickname,
-            iconURL: owner.iconURL,
-        }
-    };
-};
-
 module.exports = {
-    // NicoUrls:{
-    //     video_url: nicovideo_url,
-    //     niconmsg_url: niconmsg_url
-    // },
     NicoWatch: NicoWatch,
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,
     NicoThumbnail: NicoThumbnail,
     getCookies: getCookies,
-    getThumbInfo: getThumbInfo,
-    getVideoType: getVideoType,
     getNicoURL
 };

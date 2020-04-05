@@ -1,7 +1,7 @@
 const test = require("ava");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
-const { getThumbInfo } = require("../app/js/niconico");
+const NicoDataParser = require("../app/js/nico-data-parser");
 const { NicoUpdate } = require("../app/js/nico-update");
 
 const nico_mocks = new NicoDownLoadMocks();
@@ -58,7 +58,7 @@ test("update", async(t) => {
     t.falsy(video_item.is_deleted);
     t.is(video_item.data_type, "json");
     t.is(video_item.thumbnail_size, "L");
-    t.deepEqual(nico_update.data[0], getThumbInfo(TestData.data_api_data));
+    t.deepEqual(nico_update.data[0], NicoDataParser.json_thumb_info(TestData.data_api_data));
     t.is(nico_update.data[1].length,3);
     t.is(byteToString(nico_update.data[2]), "thumbnail");
     t.deepEqual(nico_update.paths, [

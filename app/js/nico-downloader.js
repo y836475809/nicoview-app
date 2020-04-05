@@ -2,8 +2,9 @@ const fs = require("fs");
 const util = require("util");
 const path = require("path");
 const request = require("request");
-const { NicoWatch, NicoVideo, NicoComment, getVideoType, getThumbInfo } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
+const  NicoDataParser = require("./nico-data-parser");
 
 const validateStatus = (status) => {
     return status >= 200 && status < 300;
@@ -168,7 +169,7 @@ class NicoDownloader {
             this._setupNicoFilePath();
 
             on_progress(DonwloadProgMsg.start_thumbinfo);
-            const thumbInfo_data = getThumbInfo(this.watch_data.api_data);
+            const thumbInfo_data = NicoDataParser.json_thumb_info(this.watch_data.api_data);
 
             on_progress(DonwloadProgMsg.start_comment);
             const comment_data = await this._getComment();
@@ -331,7 +332,7 @@ class NicoDownloader {
         const { api_data } = this.watch_data;
         const is_deleted = api_data.video.isDeleted;
         const video_id = api_data.video.id;
-        const video_type = getVideoType(api_data.video.smileInfo.url);
+        const video_type = NicoDataParser.getVideoType(api_data.video.smileInfo.url);
         const tags = api_data.tags.map((value) => {
             return value.name;
         });
@@ -354,7 +355,7 @@ class NicoDownloader {
 
     _setupNicoFilePath(){
         const { api_data } = this.watch_data;
-        const video_type = getVideoType(api_data.video.smileInfo.url);
+        const video_type = NicoDataParser.getVideoType(api_data.video.smileInfo.url);
 
         this.nico_json.dirPath = this.dist_dir;
         this.nico_json.commonFilename = api_data.video.title;

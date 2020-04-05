@@ -1,6 +1,5 @@
 const EventEmitter = require("events");
-const { NicoWatch, NicoVideo, NicoComment, 
-    getCookies, getThumbInfo } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment, getCookies } = require("./niconico");
 const NicoDataParser = require("./nico-data-parser");
 
 class NicoPlay extends EventEmitter {
@@ -52,7 +51,7 @@ class NicoPlay extends EventEmitter {
                 {
                     this.emit("changeState", "startPlaySmile");
                     const nico_cookies = getCookies(cookie_jar);
-                    const thumb_info = getThumbInfo(api_data); 
+                    const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                     const video_url = this.nico_video.SmileUrl;
                     resolve({
                         is_deleted: is_deleted,
@@ -78,7 +77,7 @@ class NicoPlay extends EventEmitter {
 
                 this.emit("changeState", "startPlayVideo");
                 const nico_cookies = getCookies(cookie_jar);
-                const thumb_info = getThumbInfo(api_data); 
+                const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 resolve({
                     is_deleted: is_deleted,

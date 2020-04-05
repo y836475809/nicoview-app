@@ -1,5 +1,6 @@
 const test = require("ava");
 const fs = require("fs");
+const cheerio = require("cheerio");
 const NicoDataParser = require("../app/js/nico-data-parser");
 
 const dir = `${__dirname}/data`;
@@ -100,6 +101,23 @@ test("parse comment deleted", (t) => {
     t.true(hasEqProps(obj[4].chat, 
         {no:4,  vpos:400, date:40, user_id:"CCC", mail:"184", content:"CCCテスト"}
     ));
+});
+
+test("parse thumb info tags", (t) => {
+    const $ = cheerio.load(`
+    <tags domain="jp">
+        <tag category="1" lock="1">タグ1</tag>
+        <tag lock="1">タグ2</tag>
+        <tag>タグ3</tag>
+    </tags>
+    `);
+    const tags = NicoDataParser.xml_thumb_info_tags($);
+    t.deepEqual(tags,
+        [
+            {text:"タグ1", lock:true, category:true},
+            {text:"タグ2", lock:true},
+            {text:"タグ3", lock:false}
+        ]);
 });
 
 test("parse thumb info", (t) => {

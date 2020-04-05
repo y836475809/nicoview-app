@@ -31,13 +31,7 @@ class XMLDataConverter {
 
     _convertThumbinfo(xml){
         const obj = NicoDataParser.xml_thumb_info(xml);
-        const tags = obj.tags.map((tag, index)=>{
-            return {
-                id: index.toString(),
-                name: tag.text,
-                isLocked: tag.lock
-            };
-        });
+        const tags = this._convertTags(obj.tags);
         return {
             video: {
                 video_id: obj.video_id,
@@ -61,6 +55,20 @@ class XMLDataConverter {
                 iconURL: obj.user_icon_url
             }
         };
+    }
+
+    _convertTags(tags){
+        return tags.map((tag, index)=>{
+            const obj = {
+                id: index.toString(),
+                name: tag.text,
+                isLocked: tag.lock
+            };
+            if(tag.category === true){
+                obj.category = true;
+            }
+            return obj;
+        });
     }
 }
 

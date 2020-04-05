@@ -58,6 +58,24 @@ function xml_comment(xml, is_owner) {
     return threads.concat(comments);
 }
 
+const xml_thumb_info_tags = ($) => {
+    const tags = [];
+    $("tag").each(function (i, el) {
+        const item = $(el);
+        const text = item.text();
+        const lock = item.attr("lock");
+        const tag = { 
+            text: text, 
+            lock: lock == "1" ? true : false 
+        };
+        if(item.attr("category")){
+            tag.category = true;
+        }
+        tags.push(tag);
+    });
+    return tags;
+};
+
 /**
  * 
  * @param {string} xml 
@@ -85,13 +103,7 @@ function xml_thumb_info(xml) {
     const embeddable = parseInt($("embeddable").text());
     const no_live_play = parseInt($("no_live_play").text());
 
-    let tags = [];
-    $("tag").each(function (i, el) {
-        const item = $(el);
-        const text = item.text();
-        const lock = item.attr("lock");
-        tags.push({ text: text, lock: lock == "1" ? true : false });
-    });
+    const tags = xml_thumb_info_tags($);
 
     const user_id = $("user_id").text();
     const user_nickname = $("user_nickname").text();
@@ -160,6 +172,7 @@ const makeComments = (comment_data) => {
 };
 
 module.exports.xml_comment = xml_comment;
+module.exports.xml_thumb_info_tags = xml_thumb_info_tags;
 module.exports.xml_thumb_info = xml_thumb_info;
 module.exports.json_comment = json_comment;
 module.exports.makeComments = makeComments;

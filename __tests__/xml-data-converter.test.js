@@ -15,6 +15,20 @@ class TestXMLDataConverter extends XMLDataConverter {
     async _write(file_path, data){} 
 }
 
+test("_convertTags", (t) => {
+    const cnv_data = new TestXMLDataConverter();
+    const tags = cnv_data._convertTags([
+        { text: "タグ1", lock: true, category: true },
+        { text: "タグ2", lock: false, category: false },
+        { text: "タグ3", lock: false }
+    ]);
+    t.deepEqual(tags, [
+        { id: "0", name: "タグ1", isLocked: true, category: true},
+        { id: "1", name: "タグ2", isLocked: false},
+        { id: "2", name: "タグ3", isLocked: false},
+    ]);
+});
+
 test("_convertThumbinfo", async (t) => {
     const cnv_data = new TestXMLDataConverter();
     const { thumbinfo } = t.context.xml;

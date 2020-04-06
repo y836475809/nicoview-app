@@ -220,11 +220,11 @@ test("parse json owner comment", (t) => {
     t.deepEqual(comment[0].thread, 
         {
             resultcode:0,
-            thread:"1234567890",
+            thread:"01234567890",
             fork: 1,
             server_time:1546694359,
             last_res:2,
-            ticket:"1234567890",
+            ticket:"0x1234567890",
             revision:1,
         });
     t.deepEqual(comment[1].thread, 

@@ -169,6 +169,7 @@
         const { NicoVideoData } = window.NicoVideoData;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { DataIpcRenderer } = window.DataIpc;
+        const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -371,6 +372,61 @@
             this.obs_modal_dialog.trigger("close");
         };
 
+        const convertNicoDataToNNDD = async (items) => {
+            let cnv_cancel = false;
+            this.obs_modal_dialog.trigger("show", {
+                message: "...",
+                buttons: ["cancel"],
+                cb: result=>{
+                    cnv_cancel = true;
+                }
+            });
+            
+            try {
+                let cur_update = 1;
+                for(let item of items) {
+                    if(cnv_cancel===true){
+                        const error = new Error("cancel");
+                        error.cancel=true;   
+                        throw error;
+                    }
+                    
+                    this.obs_modal_dialog.trigger("update-message", `NNDD形式に変換中 ${cur_update}/${items.length}`);
+
+                    grid_table.updateCell(item.id, "state", "変換中");
+                    try {
+                        const video_item = await DataIpcRenderer.action("library", "getItem", {video_id:item.id});
+                        if(video_item.data_type == "json"){
+                            const cnv_nico = new JsonDataConverter(video_item);
+                            await cnv_nico.convertThumbInfo();
+                            await cnv_nico.convertComment();
+                            await cnv_nico.convertThumbnai();
+                            grid_table.updateCell(item.id, "state", "変換完了");
+                        }else{
+                            grid_table.updateCell(item.id, "state", "変換不要");
+                        }
+                    } catch (error) {
+                        console.log(error);
+                        if(error.cancel===true){   
+                            grid_table.updateCell(item.id, "state", "変換キャンセル");
+                            throw error;
+                        }else{
+                            this.obs_modal_dialog.trigger("update-message", `変換失敗 ${cur_update}/${items.length}`);
+                            grid_table.updateCell(item.id, "state", `変換失敗: ${error.message}`);
+                        }
+                    }
+                    if(cur_update < items.length){
+                        await wait(100);
+                    }
+                    cur_update++;
+                }                
+            } catch (error) {
+                this.obs_modal_dialog.trigger("update-message", "変換キャンセル");
+            }
+
+            this.obs_modal_dialog.trigger("close");
+        };
+
         const deleteLibraryData = async (video_ids) => {
             let cancel = false;
             this.obs_modal_dialog.trigger("show", {
@@ -506,6 +562,11 @@
                         return BookMark.createVideoItem(item.video_name, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
+                }},
+                { type: "separator" },
+                { label: "NNDD形式(XML)に変換", async click() {
+                    const items = grid_table.getSelectedDatas();
+                    await convertNicoDataToNNDD(items);
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {

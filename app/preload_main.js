@@ -50,7 +50,8 @@ window.addEventListener("load", () => {
         const GridTableDownloadItem = require(`${root_dir}/app/js/gridtable-downloaditem`);
         const ScheduledTask = require(`${root_dir}/app/js/scheduled-task`);
         const ImportLibrary = require(`${root_dir}/app/js/import-library`);
-        
+        const NicoDataConverter = require(`${root_dir}/app/js/nico-data-converter`);
+
         global.Sortable = Sortable;
         global.GridTable = GridTable;
         global.DataIpc = DataIpc;
@@ -69,6 +70,7 @@ window.addEventListener("load", () => {
         global.GridTableDownloadItem = GridTableDownloadItem;
         global.ScheduledTask = ScheduledTask;
         global.ImportLibrary = ImportLibrary;
+        global.NicoDataConverter = NicoDataConverter;
     } catch (error) {
         console.error(error);
         throw error;

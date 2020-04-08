@@ -4,6 +4,7 @@ const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const { DataIpcMain } = require("./data-ipc");
+const { deepCopy } = require("./deepcopy");
 
 class ConfigIpcMain extends DataIpcMain {
     constructor() {
@@ -22,7 +23,7 @@ class ConfigIpcMain extends DataIpcMain {
     }
 
     getObj(key, json_data){
-        let obj = json_data;
+        let obj = deepCopy(json_data);
         const props = key.split(".");
         props.some(prop => {
             if(obj[prop] === undefined){

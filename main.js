@@ -24,7 +24,7 @@ const cmdline_parser = new CmdLineParser(process.argv);
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
-let win = null;
+let main_win = null;
 let player_win = null;
 let do_app_quit = false;
 
@@ -93,19 +93,19 @@ function createWindow() {
         contextIsolation: false,
         preload: preload_main_path,
     };
-    win = new BrowserWindow(state);
+    main_win = new BrowserWindow(state);
     if (state.maximized) {
-        win.maximize();
+        main_win.maximize();
     }
     // アプリケーションのindex.htmlの読み込み
-    win.loadURL(main_html_path);
+    main_win.loadURL(main_html_path);
 
     if(is_debug_mode){
         // DevToolsを開く
-        win.webContents.openDevTools();
+        main_win.webContents.openDevTools();
     }
 
-    win.on("close", async (e) => {        
+    main_win.on("close", async (e) => {        
         if(do_app_quit){
             return;
         }
@@ -124,7 +124,7 @@ function createWindow() {
         }
 
         try {
-            config_ipc_main.set({ key:"main.window.state", value:getWindowState(win) });
+            config_ipc_main.set({ key:"main.window.state", value:getWindowState(main_win) });
             await config_ipc_main.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
@@ -157,13 +157,13 @@ function createWindow() {
     });
 
     // ウィンドウが閉じられた時に発行される
-    win.on("closed", async () => {
+    main_win.on("closed", async () => {
         // ウィンドウオブジェクトを参照から外す。
         // もし何個かウィンドウがあるならば、配列として持っておいて、対応するウィンドウのオブジェクトを消去するべき。
         if (player_win !== null) {
             player_win.close();
         }
-        win = null;
+        main_win = null;
     });
 }
 
@@ -265,17 +265,17 @@ app.on("ready", async ()=>{
                 // console.log('ipcRequest', data)
                 resolve(data);
             });
-            win.webContents.send(IPC_CHANNEL.UPDATE_DATA, args);
+            main_win.webContents.send(IPC_CHANNEL.UPDATE_DATA, args);
         });
         return video_item;
     });
 
     ipcMain.on(IPC_CHANNEL.CANCEL_UPDATE_DATA, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, args);
+        main_win.webContents.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, args);
     });
 
     ipcMain.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
+        main_win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
 
         const { history_item } = args;
         const video_id = history_item.id;
@@ -292,19 +292,19 @@ app.on("ready", async ()=>{
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
+        main_win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
     });
 
     ipcMain.on(IPC_CHANNEL.LOAD_MYLIST, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.LOAD_MYLIST, args);
+        main_win.webContents.send(IPC_CHANNEL.LOAD_MYLIST, args);
     });
 
     ipcMain.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.ADD_BOOKMARK, args);
+        main_win.webContents.send(IPC_CHANNEL.ADD_BOOKMARK, args);
     });
 
     ipcMain.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args) => {
-        win.webContents.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
+        main_win.webContents.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
     });
 
     ipcMain.handle(IPC_CHANNEL.SET_COOKIE, async (event, args) => {
@@ -402,18 +402,18 @@ app.on("ready", async ()=>{
     });
 
     library_ipc_main.on("libraryInitialized", ()=>{  
-        win.webContents.send("libraryInitialized", {
+        main_win.webContents.send("libraryInitialized", {
             items:library_ipc_main.getItems()
         });
     });
     library_ipc_main.on("libraryItemUpdated", (args)=>{  
-        win.webContents.send("libraryItemUpdated", args);
+        main_win.webContents.send("libraryItemUpdated", args);
     });
     library_ipc_main.on("libraryItemAdded", (args)=>{  
-        win.webContents.send("libraryItemAdded", args);
+        main_win.webContents.send("libraryItemAdded", args);
     });
     library_ipc_main.on("libraryItemDeleted", (args)=>{  
-        win.webContents.send("libraryItemDeleted", args);
+        main_win.webContents.send("libraryItemDeleted", args);
     });
         
     bookmark_ipc_main.setup(async (args)=>{
@@ -438,7 +438,7 @@ app.on("ready", async ()=>{
     downloaditem_ipc_main.handle();
     downloaditem_ipc_main.setData({items:await loadJson("download", [])});
     downloaditem_ipc_main.on("updated", async (args)=>{  
-        win.webContents.send("downloadItemUpdated");
+        main_win.webContents.send("downloadItemUpdated");
 
         const { items }  = args;
         await saveJson("download", items);
@@ -457,7 +457,7 @@ app.on("window-all-closed", () => {
 
 app.on("activate", () => {
     // macOS では、ドックをクリックされた時にウィンドウがなければ新しく作成する。
-    if (win === null) {
+    if (main_win === null) {
         createWindow();
     }
 });

@@ -37,6 +37,11 @@
             /* width: 150px; */
         }
 
+        .setting-checkbox{
+            height: 25px;
+            vertical-align:middle;
+        }
+
         .input-path{
             /* width: 300px; */
             width: 40vw;
@@ -84,6 +89,10 @@
                 <input disabled=true class="input-path app-setting-dir-input" type="text" readonly}>
                 <button class="input-button" onclick={onclickOpenDir}>フォルダを開く</button>
             </div>
+        </div>
+        <div class="content">
+            <input class="setting-checkbox check-window-close" type="checkbox" 
+            onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
         </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
@@ -135,9 +144,19 @@
             await DataIpcRenderer.action("config", "set", { key:"ffmpeg_path", value:file_path });
         };
 
+        this.onclickCheckWindowClose = async (e) => {
+            const ch_elm = this.root.querySelector(".check-window-close");
+            await DataIpcRenderer.action("config", "set", { key:"check_window_close", value:ch_elm.checked });
+        };
+
         const setInputValue = (selector, value) => {          
             const elm = this.root.querySelector(selector);
             elm.value = value;
+        };
+
+        const setCheckValue = (selector, value) => {          
+            const elm = this.root.querySelector(selector);
+            elm.checked = value;
         };
 
         this.on("mount", async () => {
@@ -145,6 +164,7 @@
             setInputValue(".data-dir-input", await DataIpcRenderer.action("config", "get",{ key:"data_dir", value:""}));  
             setInputValue(".download-dir-input", await DataIpcRenderer.action("config", "get",{ key:"download.dir", value:""}));
             setInputValue(".ffmpeg-path-input", await DataIpcRenderer.action("config", "get",{ key:"ffmpeg_path", value:""}));
+            setCheckValue(".check-window-close", await DataIpcRenderer.action("config", "get",{ key:"check_window_close", value:true}));
         });
 
         this.onclickImport = async ()=>{

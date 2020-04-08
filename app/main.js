@@ -117,15 +117,17 @@ function createWindow() {
             return;
         }
 
-        const ret = dialog.showMessageBoxSync({
-            type: "info", 
-            buttons: ["OK", "Cancel"],
-            message:"終了しますか?"
-        });
-        if(ret!=0){
-            // cancel, 終了しない
-            e.preventDefault();
-            return;
+        if(config_ipc_main.get({ key: "check_window_close", value:true})){
+            const ret = dialog.showMessageBoxSync({
+                type: "info", 
+                buttons: ["OK", "Cancel"],
+                message:"終了しますか?"
+            });
+            if(ret!=0){
+                // cancel, 終了しない
+                e.preventDefault();
+                return;
+            }
         }
 
         try {

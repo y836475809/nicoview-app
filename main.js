@@ -2,15 +2,15 @@ const { session, dialog, app, BrowserWindow, ipcMain, shell } = require("electro
 const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
-const { IPC_CHANNEL } = require("./js/ipc-channel");
-const { ConfigIpcMain } = require("./js/config");
-const { LibraryIpcMain } = require("./js/library");
-const { BookMarkIpcMain } = require("./js/bookmark");
-const { HistoryIpcMain } = require("./js/history");
-const { DownloadItemIpcMain } = require("./js/download-item");
-const { importNNDDDB } = require("./js/import-nndd-db");
-const { getNicoDataFilePaths } = require("./js/nico-data-file");
-const JsonStore = require("./js/json-store");
+const { IPC_CHANNEL } = require("./app/js/ipc-channel");
+const { ConfigIpcMain } = require("./app/js/config");
+const { LibraryIpcMain } = require("./app/js/library");
+const { BookMarkIpcMain } = require("./app/js/bookmark");
+const { HistoryIpcMain } = require("./app/js/history");
+const { DownloadItemIpcMain } = require("./app/js/download-item");
+const { importNNDDDB } = require("./app/js/import-nndd-db");
+const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
+const JsonStore = require("./app/js/json-store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -26,8 +26,9 @@ let player_win = null;
 let is_debug_mode = false;
 let do_app_quit = false;
 
-let player_html_path = `${__dirname}/html/player.html`;
-const preload_main_path = `${__dirname}/preload_main.js`;
+let player_html_path = `${__dirname}/app/html/player.html`;
+const preload_main_path = `${__dirname}/app/preload_main.js`;
+const preload_player_path = `${__dirname}/app/preload_player.js`;
 
 const loadJson = async (name, default_value) => {
     const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
@@ -79,10 +80,10 @@ const getWindowState = (w) => {
 };
 
 function createWindow() {
-    let main_html_path = `${__dirname}/html/index.html`;
+    let main_html_path = `${__dirname}/app/html/index.html`;
     if (process.argv.length > 2) {
         const filename = process.argv[2];
-        main_html_path = `${path.resolve(__dirname, "..")}/test/${filename}`;
+        main_html_path = `${__dirname}/test/${filename}`;
         is_debug_mode = true;
     }
 
@@ -481,7 +482,7 @@ const createPlayerWindow = () => {
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
-            preload: `${__dirname}/preload_player.js`,
+            preload: preload_player_path,
         };
         player_win = new BrowserWindow(state);
         if (state.maximized) {

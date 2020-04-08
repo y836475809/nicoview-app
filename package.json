@@ -2,7 +2,7 @@
   "name": "riot_test",
   "version": "0.0.0",
   "description": "",
-  "main": "app/main.js",
+  "main": "main.js",
   "scripts": {
     "test-main":        "SET NODE_ENV=DEBUG&&electron . test-main.html",
     "test-search":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-search.html",

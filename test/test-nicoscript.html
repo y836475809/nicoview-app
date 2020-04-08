@@ -44,7 +44,10 @@
 </body>
 
 <script>
+    const { setupLibrary } = window.SetupLibrary;
     const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+    
+    setupLibrary(()=>{});
     
     const duration_sec = 4;
     let commnet_tl = null;

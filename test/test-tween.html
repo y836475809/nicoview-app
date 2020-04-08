@@ -63,9 +63,12 @@
 
 <script>
     // TODO
+    const { setupLibrary } = window.SetupLibrary;
     const { CommentTimeLine } = window.CommentTimeLine;
     const { randomComments, sampleComments, 
         fixedSampleComments, randomfixedComments } = window.TestComments;  
+
+    setupLibrary(()=>{});
 
     const duration_sec = 4;
     let commnet_tl = null;

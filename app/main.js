@@ -105,14 +105,7 @@ function createWindow() {
         win.webContents.openDevTools();
     }
 
-    win.on("close", async (e) => {      
-        if(process.env.DATA_SAVE == "NO"){
-            config_ipc_main.set({ key:"main.window.state", value:getWindowState(win) });
-            await config_ipc_main.save();
-            console.info("debug mdoe, save config");
-            return;
-        }
-        
+    win.on("close", async (e) => {        
         if(do_app_quit){
             return;
         }

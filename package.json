@@ -5,11 +5,11 @@
   "main": "app/main.js",
   "scripts": {
     "test-main":        "SET NODE_ENV=DEBUG&&electron . test-main.html",
-    "test-search":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&SET PRELOAD=TEST&&electron . test-search.html",
-    "test-setting":     "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&SET PRELOAD=TEST&&electron . test-setting.html",
-    "test-mylist":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&SET PRELOAD=TEST&&electron . test-mylist.html",
-    "test-nicoscript":  "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&SET PRELOAD=TEST&&electron . test-nicoscript.html",
-    "test-tween":       "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&SET DATA_SAVE=NO&&SET PRELOAD=TEST&&electron . test-tween.html",
+    "test-search":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-search.html",
+    "test-setting":     "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-setting.html",
+    "test-mylist":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-mylist.html",
+    "test-nicoscript":  "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-nicoscript.html",
+    "test-tween":       "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-tween.html",
     "main": "electron .",
     "test": "ava -v -s"
   },

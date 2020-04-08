@@ -18,17 +18,20 @@
 <script type="riot/tag" src="../app/tags/setting-page.tag"></script>
 <script>
     /* globals riot */
+    const { setupLibrary } = window.SetupLibrary;
     const obs = riot.observable(); // eslint-disable-line
 
-    try {
-        riot.mount("setting-page", {obs});
+    setupLibrary(()=>{
+        try {
+            riot.mount("setting-page", {obs});
 
-        obs.on("on_load_library", () => {
-            console.log("on_load_library");
-        });
-    } catch (error) {
-        console.log("error=", error);
-    }
+            obs.on("on_load_library", () => {
+                console.log("on_load_library");
+            });
+        } catch (error) {
+            console.log("error=", error);
+        }
+    });
 </script>
 
 </html>

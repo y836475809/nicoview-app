@@ -25,6 +25,7 @@ process.once("loaded", () => {
         global.NicoHttpServer = require(`${root_dir}/test/mock_server/http-server`);
         global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
         global.TestComments = require(`${root_dir}/test/test-comments`);
+        global.SetupLibrary = require(`${root_dir}/test/setup-library`);
     }
 });
 

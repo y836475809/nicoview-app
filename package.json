@@ -4,12 +4,12 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test-main":        "SET NODE_ENV=DEBUG&&electron . test-main.html",
-    "test-search":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-search.html",
-    "test-setting":     "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-setting.html",
-    "test-mylist":      "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-mylist.html",
-    "test-nicoscript":  "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-nicoscript.html",
-    "test-tween":       "SET NODE_ENV=DEBUG&&SET USE_CONFIG=DEBUG&&electron . test-tween.html",
+    "test-main":       "SET NODE_ENV=DEBUG&&electron . --main test/test-main.html --player test/test-player.html",
+    "test-search":     "SET NODE_ENV=DEBUG&&electron . --main test/test-search.html --config config-debug.json",
+    "test-setting":    "SET NODE_ENV=DEBUG&&electron . --main test/test-setting.html --config config-debug.json",
+    "test-mylist":     "SET NODE_ENV=DEBUG&&electron . --main test/test-mylist.html --config config-debug.json",
+    "test-nicoscript": "SET NODE_ENV=DEBUG&&electron . --main test/test-nicoscript.html --config config-debug.json",
+    "test-tween":      "SET NODE_ENV=DEBUG&&electron . --main test/test-tween.html --config config-debug.json",
     "main": "electron .",
     "test": "ava -v -s"
   },

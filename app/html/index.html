@@ -28,12 +28,7 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script>
         /* globals riot */
-        const { ipcRenderer } = window.electron;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
-
         const obs = riot.observable();
-
-        ipcRenderer.send(IPC_CHANNEL.SET_PLAYER_PATH, window.getPathFromRoot(["app", "html", "player.html"]));
 
         riot.mount("main-page", {obs});
     </script>

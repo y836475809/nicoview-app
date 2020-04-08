@@ -19,7 +19,6 @@ const IPC_CHANNEL =  Object.freeze({
     SHOW_PLAYER: "ipc-show-player",
     READY_PLAYER: "ipc-ready-player",
     SET_COOKIE: "ipc-set-cookie",
-    SET_PLAYER_PATH: "ipc-set-player-path",
     IMPORT_NNDD_DB: "ipc-import-nndd-db",
 
     DELETE_LIBRARY_ITEMS: "ipc-delete-library-items",

@@ -11,6 +11,7 @@ const { DownloadItemIpcMain } = require("./app/js/download-item");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");
+const { CmdLineParser } = require("./app/js/main-util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -19,16 +20,20 @@ const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 const history_ipc_main = new HistoryIpcMain();
 const downloaditem_ipc_main = new DownloadItemIpcMain();
+const cmdline_parser = new CmdLineParser(process.argv);
+
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let win = null;
 let player_win = null;
-let is_debug_mode = false;
 let do_app_quit = false;
 
-let player_html_path = `${__dirname}/app/html/player.html`;
+const is_debug_mode = process.env.NODE_ENV == "DEBUG";
+const main_html_path = `${__dirname}/${cmdline_parser.get("--main", "app/html/index.html")}`;
+const player_html_path = `${__dirname}/${cmdline_parser.get("--player", "app/html/player.html")}`;
 const preload_main_path = `${__dirname}/app/preload_main.js`;
 const preload_player_path = `${__dirname}/app/preload_player.js`;
+const config_fiiename = cmdline_parser.get("--config", "config.json");
 
 const loadJson = async (name, default_value) => {
     const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
@@ -80,12 +85,6 @@ const getWindowState = (w) => {
 };
 
 function createWindow() {
-    let main_html_path = `${__dirname}/app/html/index.html`;
-    if (process.argv.length > 2) {
-        const filename = process.argv[2];
-        main_html_path = `${__dirname}/test/${filename}`;
-        is_debug_mode = true;
-    }
 
     // ブラウザウィンドウの作成
     const state = config_ipc_main.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
@@ -172,11 +171,6 @@ function createWindow() {
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", async ()=>{
     try {
-        let config_fiiename = "config.json";
-        if(process.env.USE_CONFIG == "DEBUG"){
-            config_fiiename = "config-debug.json";
-            console.info("debug mode, use config = ", config_fiiename);
-        }
         const config_path = path.join(app.getPath("userData"), config_fiiename);
         config_ipc_main.handle();
         config_ipc_main.setup(config_path);
@@ -323,10 +317,6 @@ app.on("ready", async ()=>{
         } catch (error) {
             return "error";
         }
-    });
-
-    ipcMain.on(IPC_CHANNEL.SET_PLAYER_PATH, (event, args) => {
-        player_html_path = args;
     });
 
     ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {

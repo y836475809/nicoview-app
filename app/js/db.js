@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const { deepCopy } = require("./deepcopy");
 
 class MapDB {
     constructor({ filename = "./db.json", autonum = 10, use_log = true } = {}) {
@@ -74,7 +75,7 @@ class MapDB {
         if (!map.has(id)) {
             return null;
         }
-        return this._deepCopy(map.get(id));
+        return deepCopy(map.get(id));
     }
 
     findAll(name) {
@@ -82,7 +83,7 @@ class MapDB {
             return [];
         }
         const map = this.db_map.get(name);
-        return this._deepCopy(Array.from(map.values()));
+        return deepCopy(Array.from(map.values()));
     }
 
     async insert(name, data) {
@@ -134,31 +135,6 @@ class MapDB {
         await this._safeWriteFile(this.db_path, jsonString);
         await this._deletelog();
         this.cmd_log_count = 0;
-    }
-
-    _deepCopy(obj){
-        if ( typeof obj === "boolean" || typeof obj === "number" 
-        || typeof obj === "string" || obj === null ) {
-            return obj;
-        }
-        
-        if (Array.isArray(obj)) {
-            const ret = [];
-            obj.forEach(value => { 
-                ret.push(this._deepCopy(value)); 
-            });
-            return ret;
-        }
-        
-        if (typeof obj === "object") {
-            const ret = {};
-            Object.keys(obj).forEach(key => {
-                ret[key] = this._deepCopy(obj[key]);
-            });
-            return ret;
-        }
-
-        return null;
     }
 
     _convertString(key, ary) {

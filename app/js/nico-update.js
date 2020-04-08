@@ -5,7 +5,7 @@ const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./nico-data-converter");
 const NicoDataParser = require("./nico-data-parser");
-
+const { deepCopy } = require("./deepcopy");
 
 class NicoUpdate extends EventEmitter {
     /**
@@ -16,7 +16,7 @@ class NicoUpdate extends EventEmitter {
         super();
 
         this.video_item = video_item;
-        this.org_video_item = this._deepCopy(video_item);
+        this.org_video_item = deepCopy(video_item);
         this.video_data = new NicoVideoData(this.video_item);
 
         this.nico_watch = null;
@@ -46,31 +46,6 @@ class NicoUpdate extends EventEmitter {
             }
         });
         return updated_props;
-    }
-
-    _deepCopy(obj){
-        if ( typeof obj === "boolean" || typeof obj === "number" 
-        || typeof obj === "string" || obj === null ) {
-            return obj;
-        }
-        
-        if (Array.isArray(obj)) {
-            const ret = [];
-            obj.forEach(value => { 
-                ret.push(this._deepCopy(value)); 
-            });
-            return ret;
-        }
-        
-        if (typeof obj === "object") {
-            const ret = {};
-            Object.keys(obj).forEach(key => {
-                ret[key] = this._deepCopy(obj[key]);
-            });
-            return ret;
-        }
-
-        return null;
     }
 
     /**

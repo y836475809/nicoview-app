@@ -139,7 +139,7 @@ function createWindow() {
         }
         
         try {
-            await library_ipc_main.save();
+            await library_ipc_main.save(false);
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",

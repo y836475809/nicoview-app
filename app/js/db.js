@@ -264,8 +264,13 @@ class LibraryDB {
         await this._db.load();
     }
 
-    async save(){
+    async save(force=true){
+        if(force===false && this._db.cmd_log_count==0){
+            console.log("not save library");
+            return;
+        }
         await this._db.save();
+        console.log("save library");
     }
 
     setPathData(data_list){

@@ -33,8 +33,8 @@ class LibraryIpcMain extends DataIpcMain {
         this.emit("libraryItemUpdated", {video_id, props});
     }
 
-    async save(){
-        await this.library_db.save();
+    async save(force=true){
+        await this.library_db.save(force);
     }
 
     setData(args){

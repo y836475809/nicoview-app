@@ -346,11 +346,12 @@ app.on("ready", async ()=>{
 
         try {
             const { path_data_list, video_data_list } = await importNNDDDB(db_file_path);
-            await library_ipc_main.setData({
+            library_ipc_main.setData({
                 data_dir, 
                 path_data_list, 
                 video_data_list
             }); 
+            await library_ipc_main.save();
         } catch (error) {
             return {
                 result : false,

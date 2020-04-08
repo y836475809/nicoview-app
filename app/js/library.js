@@ -37,13 +37,12 @@ class LibraryIpcMain extends DataIpcMain {
         await this.library_db.save();
     }
 
-    async setData(args){
+    setData(args){
         const { data_dir, path_data_list, video_data_list } = args;
         this.library_db = new LibraryDB(
             {filename : path.join(data_dir, "library.json")});
         this.library_db.setPathData(path_data_list);
         this.library_db.setVideoData(video_data_list);
-        await this.library_db.save();
 
         this.emit("libraryInitialized");
     }

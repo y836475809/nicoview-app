@@ -7,11 +7,7 @@ const root_dir = path.resolve(__dirname, "..");
 
 const { getPathFromRoot } = require(`${root_dir}/app/util`);
 const IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
-
-let NicoMock = null;
-if (process.env.NODE_ENV == "DEBUG") {
-    NicoMock = require(`${root_dir}/test/mock_server/nico-mock`);
-}
+const DataIpc = require(`${root_dir}/app/js/data-ipc`);
 
 process.once("loaded", () => {
     global.process = process;
@@ -21,10 +17,14 @@ process.once("loaded", () => {
     global.EventEmitter = EventEmitter;
 
     global.IPC_CHANNEL = IPC_CHANNEL;
+    global.DataIpc = DataIpc;
     global.getPathFromRoot = getPathFromRoot;
 
     if (process.env.NODE_ENV == "DEBUG") {
-        global.NicoMock = NicoMock;
+        global.NicoMock = require(`${root_dir}/test/mock_server/nico-mock`);
+        global.NicoHttpServer = require(`${root_dir}/test/mock_server/http-server`);
+        global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
+        global.TestComments = require(`${root_dir}/test/test-comments`);
     }
 });
 
@@ -34,7 +34,6 @@ window.addEventListener("load", () => {
 
         require("slickgrid/plugins/slick.autotooltips");
         const GridTable = require(`${root_dir}/app/js/gridtable`);
-        const DataIpc = require(`${root_dir}/app/js/data-ipc`);
         const RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
         const TimeFormat = require(`${root_dir}/app/js/time-format`);
         const NicoSearch = require(`${root_dir}/app/js/nico-search`);
@@ -54,7 +53,6 @@ window.addEventListener("load", () => {
 
         global.Sortable = Sortable;
         global.GridTable = GridTable;
-        global.DataIpc = DataIpc;
         global.RemoteDailog = RemoteDailog;
         global.TimeFormat = TimeFormat;
         global.NicoSearch = NicoSearch;

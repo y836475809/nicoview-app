@@ -7,11 +7,6 @@ const root_dir = path.resolve(__dirname, "..");
 
 const IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
 
-let NicoMock = null;
-if (process.env.NODE_ENV == "DEBUG") {
-    NicoMock = require(`${root_dir}/test/mock_server/nico-mock`);
-}
-
 process.once("loaded", () => {
     global.process = process;
     global.electron = electron;
@@ -21,7 +16,7 @@ process.once("loaded", () => {
     global.IPC_CHANNEL = IPC_CHANNEL;
 
     if (process.env.NODE_ENV == "DEBUG") {
-        global.NicoMock = NicoMock;
+        global.NicoMock = require(`${root_dir}/test/mock_server/nico-mock`);
     }
 });
 

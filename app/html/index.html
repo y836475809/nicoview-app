@@ -28,6 +28,8 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script>
         /* globals riot */
+        var logger = window.logger; // eslint-disable-line
+        
         const obs = riot.observable();
 
         riot.mount("main-page", {obs});

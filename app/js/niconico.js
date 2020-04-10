@@ -1,5 +1,6 @@
 const cheerio = require("cheerio");
 const { NicoRequest } = require("./nico-request");
+const logger = require("./logger");
 
 const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
@@ -233,13 +234,13 @@ class NicoVideo extends NicoRequest {
                 }
             });
 
-            console.log("HeartBeat ", new Date());
+            logger.debug("nico video HeartBeat");
         }, interval_ms);
     }
 
     stopHeartBeat() {
         if (this.heart_beat_id) {
-            console.log("stopHeartBeat");
+            logger.debug("nico video stop HeartBeat");
             clearInterval(this.heart_beat_id);
             this.heart_beat_id = null;
         }

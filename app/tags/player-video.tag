@@ -26,7 +26,7 @@
     </div>
 
     <script>
-        /* globals */
+        /* globals logger */
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
         const { DataIpcRenderer } = window.DataIpc;
 
@@ -106,7 +106,7 @@
             });
 
             video_elm.addEventListener("loadeddata", (event) => {
-                console.log("loadeddata event=", event);
+                logger.debug("loadeddata event=", event);
                 obs.trigger("player-controls:loaded-data");
 
                 const { time } = play_data.state;
@@ -115,10 +115,10 @@
                 }
             });
             video_elm.addEventListener("play", () => {
-                console.log("addEventListener playによるイベント発火");
+                logger.debug("playによるイベント発火");
             });
             video_elm.addEventListener("pause", () => {
-                console.log("addEventListener pauseによるイベント発火");
+                logger.debug("pauseによるイベント発火");
                 if(comment_tl){
                     comment_tl.pause();
                 }
@@ -130,16 +130,16 @@
                 obs.trigger("player-viewinfo-page:seek-update", current);
             });
             video_elm.addEventListener("progress", function(){
-                console.log("addEventListener progressによるイベント発火");
+                logger.debug("progressによるイベント発火");
             }); 
             video_elm.addEventListener("waiting", function(){
-                console.log("addEventListener waitingによるイベント発火");
+                logger.debug("waitingによるイベント発火");
             }); 
             video_elm.addEventListener("canplay", function(){
-                console.log("addEventListener canplayによるイベント発火");
+                logger.debug("canplayによるイベント発火");
             }); 
             video_elm.addEventListener("playing", () => {
-                console.log("addEventListener playingによるイベント発火");
+                logger.debug("playingによるイベント発火");
 
                 if(comment_tl.paused===true){
                     const pre_tiem = video_elm.currentTime;
@@ -156,16 +156,16 @@
             });
 
             video_elm.addEventListener("ended", () => {
-                console.log("addEventListener endedによるイベント発火");
+                logger.debug("endedによるイベント発火");
                 obs.trigger("player-controls:set-state", "pause"); 
             });
             
             obs.on("player-video:play", () => {
-                console.log("player.tag play");
+                logger.debug("player play");
                 video_elm.play();
             });
             obs.on("player-video:pause", () => {
-                console.log("player.tag pause");
+                logger.debug("player pause");
                 video_elm.pause();
             });
 

@@ -28,6 +28,7 @@
         let hasItem = (mylist_id) => false;
 
         this.on("mount", async () => {
+            // TODO error対応
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
             this.obs_accordion.trigger("loadData", { items });
@@ -147,7 +148,7 @@
     <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals riot */
+        /* globals riot logger */
         const path = window.path;
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
@@ -221,11 +222,9 @@
             if(is_local_item){
                 const image = new Image();
                 if(image_cache.has(value)){
-                    // console.log("cache value=", value);
                     image.src = image_cache.get(value);    
                 }else{
                     image.onload = (e) => {
-                        // console.log("onload value=", value);
                         const org_width = e.target.width;
                         const org_height = e.target.height;
                         const width = 130;
@@ -238,7 +237,6 @@
                 image.classList.add("gridtable-thumbnail", "mylist-img");
                 return image.outerHTML;
             }else{
-                // console.log("img value=", value);
                 return `<img src="${value}" 
                     class="gridtable-thumbnail mylist-img"/>`;
             }
@@ -383,7 +381,7 @@
             try {
                 image_cache.load();
             } catch (error) {
-                console.log(error);
+                logger.error(error);
             }   
         });
 
@@ -479,9 +477,9 @@
                 }
             } catch (error) {
                 if(error.cancel===true){
-                    console.log("cancel mylist");
+                    logger.info("update mylist cancel");
                 }else{
-                    console.error(error);
+                    logger.error(error);
                     await showMessageBox("error", error.message);
                 } 
             }
@@ -504,7 +502,7 @@
                 setMylistID(mylist_id);
                 setMylist(mylist); 
             } catch (error) {
-                console.error(error);
+                logger.error(error);
                 await showMessageBox("error", error.message);
             }
         });
@@ -515,9 +513,9 @@
                 await updateMylist(mylist_id);
             } catch (error) {
                 if(error.cancel===true){
-                    console.log("cancel mylist");
+                    logger.info(`load mylist cancel id=${mylist_id}`);
                 }else{
-                    console.log(error);
+                    logger.error(error);
                     await showMessageBox("error", error.message);
                 } 
             }   

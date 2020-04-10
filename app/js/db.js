@@ -1,6 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { deepCopy } = require("./deepcopy");
+const logger = require("./logger");
 
 class MapDB {
     constructor({ filename = "./db.json", autonum = 10, use_log = true } = {}) {
@@ -266,11 +267,12 @@ class LibraryDB {
 
     async save(force=true){
         if(force===false && this._db.cmd_log_count==0){
-            console.log("not save library");
+            logger.debug("no save library");
             return;
         }
-        await this._db.save();
-        console.log("save library");
+
+        logger.debug("save library cmd_log_count=", this._db.cmd_log_count);
+        await this._db.save(); 
     }
 
     setPathData(data_list){

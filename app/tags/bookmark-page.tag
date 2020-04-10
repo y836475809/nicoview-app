@@ -84,6 +84,7 @@
         };
 
         this.on("mount", async () => {
+            // TODO error対応
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
             this.obs_accordion.trigger("loadData", { items });

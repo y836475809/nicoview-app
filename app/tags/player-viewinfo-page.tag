@@ -248,7 +248,7 @@
     </div>
     
     <script>
-        /* globals */
+        /* globals logger */
         const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
@@ -523,7 +523,7 @@
 
         //TODO
         this.onclickUpdateComment = (e) => {
-            console.log("player update video_id=", this.video_id);
+            logger.debug("player video info update video_id=", this.video_id);
             obs.trigger("player-main-page:update-data", this.video_id, "comment");
         };
 

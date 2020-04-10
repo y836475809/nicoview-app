@@ -21,8 +21,7 @@ class DataIpcRenderer {
     static async action(name, method, args) {
         const channel = channel_map[name];
         if (channel===undefined) {
-            console.error(`DataIpcRenderer, ${name} is not find`);
-            return;
+            throw new Error(`DataIpcRenderer action: ${name} is not find`);
         }   
         return await ipcRenderer.invoke(channel, {method, args});
     }

@@ -67,6 +67,7 @@
     const { CommentTimeLine } = window.CommentTimeLine;
     const { randomComments, sampleComments, 
         fixedSampleComments, randomfixedComments } = window.TestComments;  
+    var logger = window.logger; // eslint-disable-line
 
     setupLibrary(()=>{});
 
@@ -109,9 +110,7 @@
         cutimer = 0;
         updateTimer(cutimer);
 
-        console.log("start create");
         commnet_tl.create(commnets);
-        console.log("end create");
     };
 
     const createFlowTL = ()=>{
@@ -156,10 +155,8 @@
 
     const seek = ()=>{
         const num  = parseFloat(document.getElementById("seek-num").value);
-        
-        console.log("start seek");
+
         commnet_tl.seek(num); 
-        console.log("end seek");
 
         cutimer=num*1000;
         updateTimer(cutimer);

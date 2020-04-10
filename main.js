@@ -12,6 +12,7 @@ const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");
 const { CmdLineParser } = require("./app/js/main-util");
+const logger = require("./app/js/logger");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -34,6 +35,28 @@ const player_html_path = `${__dirname}/${cmdline_parser.get("--player", "app/htm
 const preload_main_path = `${__dirname}/app/preload_main.js`;
 const preload_player_path = `${__dirname}/app/preload_player.js`;
 const config_fiiename = cmdline_parser.get("--config", "config.json");
+
+process.on("uncaughtException", (error) => {
+    logger.error("uncaught exception:", error);
+
+    dialog.showMessageBoxSync({
+        type: "error",
+        buttons: ["OK"],
+        message: `致命的エラー: ${error.message}\n終了します`
+    });
+
+    do_app_quit = true;
+    app.quit();
+});
+
+process.on('unhandledRejection', (reason, p) => {
+    logger.error("unhandled rejection:", p, "reason:", reason);
+    dialog.showMessageBoxSync({
+        type: "error",
+        buttons: ["OK"],
+        message: `エラー: ${reason.message}`
+    });
+});
 
 const loadJson = async (name, default_value) => {
     const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
@@ -85,7 +108,6 @@ const getWindowState = (w) => {
 };
 
 function createWindow() {
-
     // ブラウザウィンドウの作成
     const state = config_ipc_main.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
     state.webPreferences =  {
@@ -262,7 +284,6 @@ app.on("ready", async ()=>{
     ipcMain.handle(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
         const video_item = await new Promise( resolve => {
             ipcMain.once(IPC_CHANNEL.RETURN_UPDATE_DATA, (event, data) => {
-                // console.log('ipcRequest', data)
                 resolve(data);
             });
             main_win.webContents.send(IPC_CHANNEL.UPDATE_DATA, args);

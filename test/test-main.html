@@ -29,6 +29,8 @@
 <script type="riot/tag" src="../app/tags/bookmark-page.tag"></script>
 <script>
     /* globals riot */
+    var logger = window.logger; // eslint-disable-line
+
     const obs = riot.observable(); // eslint-disable-line
 
     riot.mount("main-page", {obs});
@@ -50,10 +52,6 @@
 
     const mylist_mock = new NicoMylistMocks();
     mylist_mock.mylist({delay:2000});
-
-    obs.on("on_error", (error)=> {
-        console.error(error);
-    });
 
     obs.on("main-page:cancel-download", () => {
         video_fs.forEach(value => {

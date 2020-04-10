@@ -158,7 +158,7 @@
     <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals */
+        /* globals logger */
         const {remote, ipcRenderer, shell } = window.electron;
         const {Menu, MenuItem} = remote;
         const { GridTable } = window.GridTable;
@@ -190,7 +190,7 @@
 
         ipcRenderer.on("libraryItemUpdated", (event, args) => {
             const {video_id, props} = args;
-            console.log("libraryItemUpdated video_id=", video_id, " props=", props);
+            logger.debug("libraryItemUpdated video_id=", video_id, " props=", props);
 
             props.tags = props.tags ? props.tags.join(" ") : "";
             grid_table.updateCells(video_id, props);
@@ -351,11 +351,12 @@
 
                         grid_table.updateCell(item.id, "state", "更新完了");
                     } catch (error) {
-                        console.log(error);
                         if(error.cancel===true){   
+                            logger.info(`library update cancel id=${item.id}`);
                             grid_table.updateCell(item.id, "state", "更新キャンセル");
                             throw error;
                         }else{
+                            logger.error(error);
                             this.obs_modal_dialog.trigger("update-message", `更新失敗 ${cur_update}/${items.length}`);
                             grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
                         }
@@ -406,11 +407,12 @@
                             grid_table.updateCell(item.id, "state", "変換不要");
                         }
                     } catch (error) {
-                        console.log(error);
                         if(error.cancel===true){   
+                            logger.info(`library update cancel id=${item.id}`);
                             grid_table.updateCell(item.id, "state", "変換キャンセル");
                             throw error;
                         }else{
+                            logger.error(error);
                             this.obs_modal_dialog.trigger("update-message", `変換失敗 ${cur_update}/${items.length}`);
                             grid_table.updateCell(item.id, "state", `変換失敗: ${error.message}`);
                         }
@@ -477,7 +479,7 @@
                 });
 
                 cnv_mp4.on("cancel_error", async error=>{
-                    console.log(error);
+                    logger.error(error);
                     await showMessageBox("error", `中断失敗: ${error.message}`);
                 });
 
@@ -492,12 +494,11 @@
                 updateState("変換完了");  
 
             } catch (error) {
-                console.log(error);
-
                 if(error.cancel === true){
                     await showMessageBox("info", "変換中断");
                     updateState("変換中断");   
                 }else{
+                    logger.error(error);
                     await showMessageBox("error", `変換失敗: ${error.message}`);
                     updateState("変換失敗");   
                 }
@@ -597,7 +598,7 @@
             });
     
             grid_table.onDblClick(async (e, data)=>{
-                console.log("onDblClick data=", data);
+                logger.debug("library onDblClick data=", data);
                 const video_id = data.id;
                 const video_type = data.video_type;
                 if(needConvertVideo(video_type)){
@@ -634,7 +635,8 @@
                 const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });
                 await DataIpcRenderer.action("library", "load", {data_dir});
             } catch (error) {
-                console.log("library.getLibraryItems error=", error);
+                // TODO show message box
+                logger.error(error);
                 loadLibraryItems([]);
             }
         });
@@ -656,7 +658,7 @@
                 last_play_date : new Date().getTime(),
                 play_count : video_item.play_count + 1
             };
-            console.log("update library video_id=", video_id, ", props=", props);
+            logger.debug("update library video_id=", video_id, ", props=", props);
             await DataIpcRenderer.action("library", "update", {video_id, props});
         });
 
@@ -683,7 +685,7 @@
 
                 cb({ state:"ok", reason:null });
             } catch (error) {
-                console.log(error);
+                logger.error(error);
                 if(error.cancel===true){
                     cb({ state:"cancel", reason:null });
                 }else if(/404:/.test(error.message)){

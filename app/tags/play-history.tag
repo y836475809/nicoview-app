@@ -18,7 +18,7 @@
     </div>    
 
     <script>
-        /* globals */
+        /* globals logger */
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
@@ -109,7 +109,8 @@
                 const items = await DataIpcRenderer.action("history", "getData");
                 grid_table.setData(items);
             } catch (error) {
-                console.log("player history load error=", error);
+                // TODO show messgae box
+                logger.error(error);
                 grid_table.setData([]); 
             }
         });

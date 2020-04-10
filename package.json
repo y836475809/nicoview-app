@@ -4,12 +4,12 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test-main":       "SET NODE_ENV=DEBUG&&electron . --main test/test-main.html --player test/test-player.html",
-    "test-search":     "SET NODE_ENV=DEBUG&&electron . --main test/test-search.html --config config-debug.json",
-    "test-setting":    "SET NODE_ENV=DEBUG&&electron . --main test/test-setting.html --config config-debug.json",
-    "test-mylist":     "SET NODE_ENV=DEBUG&&electron . --main test/test-mylist.html --config config-debug.json",
+    "test-main": "SET NODE_ENV=DEBUG&&electron . --main test/test-main.html --player test/test-player.html",
+    "test-search": "SET NODE_ENV=DEBUG&&electron . --main test/test-search.html --config config-debug.json",
+    "test-setting": "SET NODE_ENV=DEBUG&&electron . --main test/test-setting.html --config config-debug.json",
+    "test-mylist": "SET NODE_ENV=DEBUG&&electron . --main test/test-mylist.html --config config-debug.json",
     "test-nicoscript": "SET NODE_ENV=DEBUG&&electron . --main test/test-nicoscript.html --config config-debug.json",
-    "test-tween":      "SET NODE_ENV=DEBUG&&electron . --main test/test-tween.html --config config-debug.json",
+    "test-tween": "SET NODE_ENV=DEBUG&&electron . --main test/test-tween.html --config config-debug.json",
     "main": "electron .",
     "test": "ava -v -s"
   },
@@ -24,6 +24,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.0",
     "cheerio": "^1.0.0-rc.3",
+    "electron-log": "^4.1.1",
     "gsap": "^2.1.3",
     "jquery": "^3.4.1",
     "request": "^2.88.0",

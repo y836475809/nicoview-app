@@ -98,7 +98,7 @@
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
     <script>
-        /* globals riot */
+        /* globals riot logger */
         const { shell, ipcRenderer, remote } = window.electron;
         const { dialog } = remote;
         const { DataIpcRenderer } = window.DataIpc;
@@ -181,7 +181,7 @@
             if(ret.result===true){
                 await showMessageBox("info", "インポート完了");
             } else {
-                console.log(ret.error);
+                logger.error(ret.error);
                 await showMessageBox("error", `インポート失敗: ${ret.error.message}`);
             }
             this.obs_msg_dialog.trigger("close");
@@ -224,7 +224,7 @@
                     await DataIpcRenderer.action("library", "addItem", { item });
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
-                    console.error(error);
+                    logger.error(error);
                     error_count++;
                 }
 

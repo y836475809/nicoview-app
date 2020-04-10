@@ -38,7 +38,7 @@
     <comment-setting-dialog obs={this.opts.obs}></comment-setting-dialog>
 
     <script>
-        /* globals riot */
+        /* globals riot logger */
         const path = window.path;
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
@@ -256,12 +256,12 @@
 
             try {
                 nico_play.on("changeState", (state)=>{
-                    console.log(state);
+                    logger.debug("player main changeState state=", state);
                     const msg = play_msg_map.get(state);
                     this.obs_modal_dialog.trigger("update-message", msg);
                 });
                 nico_play.on("cancelHeartBeat", ()=>{
-                    console.log("hb canceled");
+                    logger.debug("player main HeartBeat cancel");
                 });
                 nico_play.on("errorHeartBeat", (error)=>{
                     throw error;
@@ -290,7 +290,7 @@
 
                 this.obs_modal_dialog.trigger("close");       
             } catch (error) {
-                console.log(error);
+                logger.error(error);
                 if(!error.cancel){
                     await showMessageBox("error", error.message);
                 }
@@ -320,7 +320,7 @@
                 const comments = video_data.getComments();
                 await play_by_video_data(video, viewinfo, comments, state);
             } catch (error) {
-                console.error(error);
+                logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
                 await showMessageBox("error", error.message);
             }
         }; 
@@ -336,7 +336,7 @@
             try {
                 play_by_video_id(video_id, state);               
             } catch (error) {
-                console.error(error);
+                logger.error(`id=${video_id}, online=${is_online}, is_saved=${is_saved}`, error);
                 await showMessageBox("error", error.message);
             }
         }; 
@@ -381,12 +381,12 @@
         });
 
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
-            console.log("player main update video_id=", video_id);
+            logger.debug("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],
                 cb: result=>{
-                    console.log("player main cancel update video_id=", video_id);
+                    logger.debug("player main update cancel video_id=", video_id);
                     ipcRenderer.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, video_id);
                     this.obs_modal_dialog.trigger("close");
                 }
@@ -413,7 +413,7 @@
             obs.trigger("player-video:update-comments", filtered_comments);
 
             this.obs_modal_dialog.trigger("close");
-            console.log("player main prog_dialog.close update video_id=", video_id);
+            logger.info("player main update video_id=", video_id);
         });
 
         obs.on("player-main-page:add-comment-ng", async (args) => {
@@ -421,7 +421,8 @@
             try {
                 comment_ng.save();
             } catch (error) {
-                console.log("error comment_ng: ", error);
+                // TODO show messgae box
+                logger.error("player main add comment ng", error);
             }
 
             const comments = await filter_comment_func(comment_ng);
@@ -434,7 +435,8 @@
             try {
                 comment_ng.save();
             } catch (error) {
-                console.log("error comment_ng: ", error);
+                // TODO show messgae box
+                logger.error("player main delete comment ng", error);
             }
 
             const comments = await filter_comment_func(comment_ng);
@@ -483,7 +485,8 @@
                 comment_ng = new CommentNG(path.join(data_dir, "nglist.json"));
                 comment_ng.load();
             } catch (error) {
-                console.log("comment ng load error=", error);
+                // TODO show messgae box
+                logger.error("player main load comment ng", error);
             }
 
             ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);

@@ -5,6 +5,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const { DataIpcMain } = require("./data-ipc");
 const { deepCopy } = require("./deepcopy");
+const logger = require("./logger");
 
 class ConfigIpcMain extends DataIpcMain {
     constructor() {
@@ -86,7 +87,7 @@ class ConfigIpcMain extends DataIpcMain {
         try {
             await fsPromises.stat(this.config_path);
         } catch (error) {
-            console.error(error);
+            logger.debug(error);
             return;
         }
         

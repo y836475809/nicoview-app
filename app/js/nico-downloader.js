@@ -5,6 +5,7 @@ const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 const  NicoDataParser = require("./nico-data-parser");
+const logger = require("./logger");
 
 const validateStatus = (status) => {
     return status >= 200 && status < 300;
@@ -301,8 +302,8 @@ class NicoDownloader {
         //cancel
         await this.nico_video.optionsHeartBeat();
         this.nico_video.postHeartBeat((error)=>{
-            console.log("hb error=", error);
-            //cancel
+            logger.error("video dmc HeartBeat: ", error);
+            throw error;
         });
 
         const { cookie_jar } = this.watch_data;

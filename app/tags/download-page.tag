@@ -66,7 +66,7 @@
     <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
 
     <script>
-        /* globals */
+        /* globals logger */
         const EventEmitter = window.EventEmitter;
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
@@ -292,6 +292,8 @@
             // TODO check exist download_dir
             const download_dir = await DataIpcRenderer.action("config", "get", { key:"download.dir", value:"" });
             event_em.emit("download-start");
+
+            let video_id = null;
             try {
                 cancel_download = false;
                 const first_item = grid_table_dl.getItemByIdx(0);
@@ -300,7 +302,7 @@
                     return;
                 }
 
-                let video_id = first_item.id;
+                video_id = first_item.id;
                 while(!cancel_download){
                     if(!grid_table_dl.canDownload(video_id, [download_state.wait, download_state.error])){
                         video_id = grid_table_dl.getNextVideoID(video_id);
@@ -354,22 +356,25 @@
                             state: download_state.complete,
                             thumb_img: thumb_img
                         });
+                        logger.info(`download complete id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
                             state: download_state.wait
                         });
+                        logger.info(`download cancel id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.skip){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `スキップ: ${result.reason}`, 
                             state: download_state.wait
                         });
-                    }else if(result.type==NicoDownloader.ResultType.error){
-                        console.log("reason: ", result.reason);
+                        logger.info(`download skip id=${video_id}: `, result.reason);
+                    }else if(result.type==NicoDownloader.ResultType.error){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `エラー: ${result.reason.message}`, 
                             state: download_state.error
                         });
+                        logger.error(`download id=${video_id}: `, result.reason);
                     }
                
                     await onChangeDownloadItem();
@@ -384,7 +389,7 @@
                     }
                 }
             } catch (error) {
-                console.log(error);
+                logger.error(`download id=${video_id}: `, error);
                 await showMessageBox("error", error.message);
             } finally {
                 event_em.emit("download-end");
@@ -424,7 +429,8 @@
                 const items = await DataIpcRenderer.action("downloaditem", "getData");
                 grid_table_dl.setData(items);
             } catch (error) {
-                console.log("download item load error=", error);
+                // TODO show messgae box
+                logger.error("download item load error=", error);
             }
 
             // await onChangeDownloadItem();

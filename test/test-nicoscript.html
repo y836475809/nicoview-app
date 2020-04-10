@@ -46,6 +46,7 @@
 <script>
     const { setupLibrary } = window.SetupLibrary;
     const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+    var logger = window.logger; // eslint-disable-line
     
     setupLibrary(()=>{});
     
@@ -97,11 +98,9 @@
         cutimer = 0;
         updateTimer(cutimer);
 
-        console.log("start create");
         const nico_script = new NicoScript();
         const app_comments = nico_script.getApplied(default_comments);
         commnet_tl.create(app_comments);
-        console.log("end create");
     };
 
     const createFix = ()=>{
@@ -111,11 +110,9 @@
         cutimer = 0;
         updateTimer(cutimer);
 
-        console.log("start create");
         const nico_script = new NicoScript();
         const app_comments = nico_script.getApplied(duration_comments);
         commnet_tl.create(app_comments);
-        console.log("end create");
     };
 
     const play = ()=>{

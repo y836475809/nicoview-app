@@ -308,7 +308,6 @@
             await new Promise(resolve => setTimeout(resolve, msec)); 
         };
 
-        //TODO
         const updateNicoData = async (items, func) => {
             let update_cancel = false;
             let nico_update = null;
@@ -520,7 +519,6 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        //TODO
         const createMenu = () => {
             const nemu_templete = [
                 { label: "再生", click() {
@@ -571,7 +569,6 @@
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
-                    // TODO 
                     const items = grid_table.getSelectedDatas();
                     const video_ids = items.map(item => item.id);
                     const result = await showOKCancelBox("info", "動画を削除しますか?");
@@ -645,8 +642,7 @@
             const video_id = args;
             await convertVideo(this, video_id);          
         });   
-
-        // TODO update
+        
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
             const video_item = await DataIpcRenderer.action("library", "getItem", {video_id});

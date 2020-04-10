@@ -386,7 +386,6 @@
             grid_table.scrollToTop();  
         };
 
-        //TODO
         const setSearchCondState = (sort_kind, sort_order, search_kind) => {
             if(sort_kind){
                 const index = this.sort_items.findIndex(value=>{
@@ -492,7 +491,6 @@
             this.refs.page.resetPage();
         });
 
-        //TODO
         obs.on("search-page:search-tag", (args)=> {
             const { query, search_kind } = args;
             const elm = getSearchInputElm();
@@ -506,7 +504,6 @@
             this.refs.page.resetPage();
         });
 
-        //TODO
         obs.on("search-page:search", (args)=> {
             const { query, sort_order, sort_name, search_kind, page } = args;
             const elm = getSearchInputElm();
@@ -566,7 +563,6 @@
                     obs.trigger("download-page:delete-download-items", video_ids);
                 }},
                 { label: "動画をブックマーク", click() {
-                    //TODO
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });

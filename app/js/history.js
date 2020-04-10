@@ -13,7 +13,7 @@ class HistoryIpcMain extends DataIpcMain {
 
     setData(args){    
         const { items } = args;
-        this.history_items = items; //TODO copy
+        this.history_items = items; //TODO need copy?
         this.history_items.sort((a, b) => {
             if (a.play_date < b.play_date) return 1;
             if (a.play_date > b.play_date) return -1;

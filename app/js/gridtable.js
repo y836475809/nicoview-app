@@ -100,8 +100,6 @@ class GridTable {
         });
         this.dataView.onRowCountChanged.subscribe((e, args) => {
             this.grid.updateRowCount();
-            //todo
-            // this.grid.render();
         });
     
         this.dataView.onRowsChanged.subscribe((e, args) => {
@@ -198,7 +196,6 @@ class GridTable {
         this._loadState();
     }
 
-    //TODO
     addItem(item){
         this.dataView.addItem(item);
         this.dataView.reSort();
@@ -240,8 +237,7 @@ class GridTable {
         item[column_id] = value;
         this.dataView.updateItem(id, item);
     }
-
-    // TODO
+    
     updateCells(id, props){
         const item = this.dataView.getItemById(id);
         if(item === undefined){

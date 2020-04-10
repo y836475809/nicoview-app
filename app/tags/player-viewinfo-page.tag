@@ -515,13 +515,11 @@
             };
             obs.trigger("player-main-page:add-download-item", item);
         };
-
-        //TODO
+        
         this.onclickUpdateThumbInfo = (e) => {
             obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
         };
 
-        //TODO
         this.onclickUpdateComment = (e) => {
             logger.debug("player video info update video_id=", this.video_id);
             obs.trigger("player-main-page:update-data", this.video_id, "comment");

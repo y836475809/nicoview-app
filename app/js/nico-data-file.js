@@ -27,12 +27,10 @@ class NicoDataFile {
         return path.join(this.dir_path, this.videoFilename);
     }
 
-    // TODO
     get videoType(){
         return this.video_type;
     }
 
-    // TODO
     set videoType(video_type){
         this.video_type = video_type;
     }
@@ -240,7 +238,6 @@ class NicoVideoData {
     }
 }
 
-// TODO
 const getNicoDataFilePaths = (video_item) => {
     const xml_item = new NicoXMLFile(video_item.id);
     xml_item.dirPath        = video_item.dirpath;

@@ -338,7 +338,6 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        // TODO
         this.on("mount", async () => {
             const mylist_dir = path.join(await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }), "mylist");
             image_cache = new CacheStore(mylist_dir, "image-cache.json");
@@ -363,7 +362,6 @@
                 }
             });
             
-            // TODO
             const context_menu = createMenu();
             const context_menu_cnv_video = createConvertVideoMenu();
             grid_table.onContextMenu(async (e)=>{

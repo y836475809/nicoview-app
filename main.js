@@ -1,7 +1,15 @@
+const { CmdLineParser } = require("./app/js/main-util");
+const cmdline_parser = new CmdLineParser(process.argv);
+const is_debug = cmdline_parser.get("--debug", false);
+if(is_debug===true){
+    process.env.NODE_ENV = "DEBUG";
+}
+
 const { session, dialog, app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
+
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIpcMain } = require("./app/js/config");
 const { LibraryIpcMain } = require("./app/js/library");
@@ -11,7 +19,6 @@ const { DownloadItemIpcMain } = require("./app/js/download-item");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");
-const { CmdLineParser } = require("./app/js/main-util");
 const logger = require("./app/js/logger");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -21,7 +28,6 @@ const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 const history_ipc_main = new HistoryIpcMain();
 const downloaditem_ipc_main = new DownloadItemIpcMain();
-const cmdline_parser = new CmdLineParser(process.argv);
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -29,7 +35,6 @@ let main_win = null;
 let player_win = null;
 let do_app_quit = false;
 
-const is_debug_mode = process.env.NODE_ENV == "DEBUG";
 const main_html_path = `${__dirname}/${cmdline_parser.get("--main", "app/html/index.html")}`;
 const player_html_path = `${__dirname}/${cmdline_parser.get("--player", "app/html/player.html")}`;
 const preload_main_path = `${__dirname}/app/preload_main.js`;
@@ -122,7 +127,7 @@ function createWindow() {
     // アプリケーションのindex.htmlの読み込み
     main_win.loadURL(main_html_path);
 
-    if(is_debug_mode){
+    if(is_debug){
         // DevToolsを開く
         main_win.webContents.openDevTools();
     }
@@ -501,7 +506,7 @@ const createPlayerWindow = () => {
         }
 
         ipcMain.once(IPC_CHANNEL.READY_PLAYER, (event, args) => {
-            if(is_debug_mode){
+            if(is_debug){
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {

@@ -267,11 +267,11 @@ class LibraryDB {
 
     async save(force=true){
         if(force===false && this._db.cmd_log_count==0){
-            logger.debug("no save library");
+            logger.debug("no library writing");
             return;
         }
 
-        logger.debug("save library cmd_log_count=", this._db.cmd_log_count);
+        logger.debug("library writing, cmd_log_count=", this._db.cmd_log_count);
         await this._db.save(); 
     }
 

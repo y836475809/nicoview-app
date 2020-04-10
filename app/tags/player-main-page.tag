@@ -373,13 +373,6 @@
             ipcRenderer.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
         });
 
-        obs.on("player-main-page:test-play-by-data", async (arg) => {
-            cancelPlay();
-
-            const { video_data, viewinfo, comments, state } = arg;
-            await play_by_video_data(video_data, viewinfo, comments, state);
-        });
-
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             logger.debug("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {

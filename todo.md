@@ -53,7 +53,7 @@
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
 - [ ] userlistページ追加
-- [ ] ロギングの追加
+- [x] ロギングの追加
 - [ ] timelineのclear時にtimeline.removeを入れておく
 - [ ] watchページが削除されていて404の場合がある
 - [x] ライブラリの数が多いと、ニコニコの検索結果に「local」「download」をタグ付けするため、少し遅くなる

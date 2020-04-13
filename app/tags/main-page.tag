@@ -118,8 +118,8 @@
     </div>
 
     <script>
-        /* globals */
-        const { remote, ipcRenderer } = window.electron;
+        /* globals logger */
+        const { remote, ipcRenderer, shell } = window.electron;
         const {Menu} = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { DataIpcRenderer } = window.DataIpc;
@@ -152,6 +152,18 @@
                 ]
             });
         }
+        template.push({
+            label: "ログ",
+            submenu: [
+                { label: "ログファイルを開く", click() {
+                    shell.openExternal(logger.getPath());
+                }},
+                { label: "ログの場所を開く", click() {
+                    shell.showItemInFolder(logger.getPath());
+                }}
+            ]
+        });
+        
         const menu = Menu.buildFromTemplate(template);
         remote.getCurrentWindow().setMenu(menu);
 

@@ -71,4 +71,5 @@ window.addEventListener("load", () => {
     global.CommentFilter = CommentFilter;
     global.BookMark = BookMark;
     global.SyncCommentScroll = SyncCommentScroll;
+    global.ToastWrapper = require(`${root_dir}/app/js/toast-wrapper`);
 });

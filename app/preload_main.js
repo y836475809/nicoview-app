@@ -93,4 +93,5 @@ window.addEventListener("load", () => {
     global.ScheduledTask = ScheduledTask;
     global.ImportLibrary = ImportLibrary;
     global.NicoDataConverter = NicoDataConverter;
+    global.ToastWrapper = require(`${root_dir}/app/js/toast-wrapper`);
 });

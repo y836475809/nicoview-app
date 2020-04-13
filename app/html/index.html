@@ -29,8 +29,18 @@
     <script>
         /* globals riot */
         var logger = window.logger; // eslint-disable-line
-        
+        let toast_wrapper = null;
+
         const obs = riot.observable();
+
+        obs.on("main-page:toastr", (args) => {
+            const { type, title, message } = args;
+            toast_wrapper[type](title, message);
+        });
+
+        window.onload = () => {
+            toast_wrapper = new window.ToastWrapper();
+        };
 
         riot.mount("main-page", {obs});
     </script>

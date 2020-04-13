@@ -30,11 +30,10 @@
     /* globals riot */
     const { NicoVideoMocks } = window.NicoMock;
     var logger = window.logger; // eslint-disable-line
+    let toast_wrapper = null;
     
     const obs = riot.observable(); // eslint-disable-line
     
-    riot.mount("player-main-page", {obs});
-
     const video_mocks = [];
     const video_ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];
     video_ids.forEach(video_id => {
@@ -45,6 +44,17 @@
         video_mock.dmc_hb();
         video_mocks.push(video_mock);
     });
+
+    obs.on("player-page:toastr", (args) => {
+        const { type, title, message } = args;
+        toast_wrapper[type](title, message);
+    });
+
+    window.onload = () => {
+        toast_wrapper = new window.ToastWrapper();
+    };
+
+    riot.mount("player-main-page", {obs});
 </script>
 
 </html>

@@ -116,6 +116,12 @@ const getWindowState = (w) => {
     };
 };
 
+const setLogLevel = () => {
+    const level = config_ipc_main.get({ key: "log.level", value:"info"});
+    process.env.LOG_LEVEL = level;
+    logger.setLevel(level);
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config_ipc_main.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
@@ -234,6 +240,8 @@ app.on("ready", async ()=>{
         app.quit();
         return;
     }
+
+    setLogLevel();
 
     ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
         await createPlayerWindow();

@@ -3,11 +3,22 @@ const log = require("electron-log");
 class Logger {
     constructor(){
         log.transports.file.fileName = "app.log";
-        log.transports.console.level = "verbose";
-        log.transports.file.level = "verbose";
-        if (process.env.NODE_ENV == "DEBUG") {
-            log.transports.console.level = "silly";
-            log.transports.file.level = "silly";
+
+        log.transports.console.level = "info";
+        log.transports.file.level = "info";
+        if (process.env.LOG_LEVEL == "debug") {
+            log.transports.console.level = "debug";
+            log.transports.file.level = "debug";
+        }
+    }
+
+    setLevel(level){
+        if(level=="debug"){
+            log.transports.console.level = "debug";
+            log.transports.file.level = "debug";
+        }else{
+            log.transports.console.level = "info";
+            log.transports.file.level = "info";
         }
     }
 

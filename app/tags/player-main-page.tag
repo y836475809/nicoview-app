@@ -220,7 +220,7 @@
             
             const history_item = {
                 id: video.video_id, 
-                image: video.largeThumbnailURL, 
+                image: video.thumbnailURL, 
                 name: video.title, 
                 url: video_data.src
             };

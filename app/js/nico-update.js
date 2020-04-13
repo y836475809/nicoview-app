@@ -206,7 +206,7 @@ class NicoUpdate extends EventEmitter {
         let img_path = null;
         
         if(thumbnail_size=="L"){
-            thumb_url = api_data.video.largeThumbnailURL;
+            thumb_url = api_data.video.thumbnailURL + ".L";
             nico_json.thumbnailSize = thumbnail_size;
             img_path = nico_json.thumbImgPath;
         }else{

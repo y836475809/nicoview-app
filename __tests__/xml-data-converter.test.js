@@ -40,7 +40,7 @@ test("_convertThumbinfo", async (t) => {
             title: "sample.mp4",
             description: "投稿コメントサンプル",
             thumbnailURL: "http://smile?i=1000",
-            largeThumbnailURL: "http://smile?i=1000",
+            largeThumbnailURL: "http://smile?i=1000.L",
             postedDateTime: "2000-01-01T01:02:03+09:00",
             duration: "00:10",
             viewCount: 100,

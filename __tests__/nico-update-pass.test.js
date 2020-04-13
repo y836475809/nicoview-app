@@ -414,7 +414,7 @@ test.cb("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not delete
         ]);
         t.deepEqual(nico_update.log, [
             "_isDataTypeJson",
-            "_getThumbImg:url-L",
+            "_getThumbImg:url-S.L",
             "_writeFile",
             "_setThumbnailSize:L",
             "updated"
@@ -440,7 +440,7 @@ test.cb("updateThumbnail, db=json, thumb_size=L, not deleted in nico, not delete
         ]);
         t.deepEqual(nico_update.log, [
             "_isDataTypeJson",
-            "_getThumbImg:url-L",
+            "_getThumbImg:url-S.L",
             "_writeFile",
             "_setThumbnailSize:L",
             "updated"
@@ -463,9 +463,15 @@ test.cb("updateThumbnail, db=json, thumb_size=L, large_thumb_url=null, not delet
     nico_update.updateThumbnail().then(()=>{
         t.falsy(nico_update.video_item.is_deleted);
         t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, []);
+        t.deepEqual(nico_update.paths, [
+            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
+        ]);
         t.deepEqual(nico_update.log, [
-            "_isDataTypeJson"
+            "_isDataTypeJson",
+            "_getThumbImg:url-S.L",
+            "_writeFile",
+            "_setThumbnailSize:L",
+            "updated"
         ]);
         t.end();
     });
@@ -506,7 +512,7 @@ test.cb("update, db=xml, not deleted in nico, not deleted in db", (t) => {
             "_setTags",
             "_writeFile",
             "_writeFile",
-            "_getThumbImg:url-L",
+            "_getThumbImg:url-S.L",
             "_writeFile",
             "_setThumbnailSize:L",
             "_isDataTypeJson",
@@ -538,7 +544,7 @@ test.cb("update, db=json, not deleted in nico, not deleted in db", (t) => {
             "_setTags",
             "_writeFile",
             "_writeFile",
-            "_getThumbImg:url-L",
+            "_getThumbImg:url-S.L",
             "_writeFile",
             "_setThumbnailSize:L",
             "_isDataTypeJson",

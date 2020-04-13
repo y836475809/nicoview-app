@@ -248,20 +248,12 @@ class NicoDownloader {
 
     _getThumbnailData(api_data){
         const video = api_data.video;
-        if(video.largeThumbnailURL!==null){
-            return { 
-                thumbnail_url: video.largeThumbnailURL, 
-                thumbnail_size: "L" 
-            };
-        }
-        
         return { 
-            thumbnail_url: video.thumbnailURL, 
-            thumbnail_size: "S" 
+            thumbnail_url: video.thumbnailURL + ".L", 
+            thumbnail_size: "L" 
         };
     }
 
-    // TODO 大きいサムネイルを取得するurlを「thumbnailURL + .L」にする
     _getThumbImg(){
         const api_data = this.watch_data.api_data;
         const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);

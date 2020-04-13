@@ -40,7 +40,7 @@ class XMLDataConverter {
                 title: obj.title,
                 description: obj.description,
                 thumbnailURL: obj.thumbnail_url,
-                largeThumbnailURL: obj.thumbnail_url,
+                largeThumbnailURL: obj.thumbnail_url + ".L",
                 postedDateTime: obj.first_retrieve,
                 duration: obj.length,
                 viewCount: obj.view_counter,

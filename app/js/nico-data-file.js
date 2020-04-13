@@ -121,7 +121,7 @@ class NicoXMLFile extends NicoDataFile {
                 title: thumb_info.title, 
                 description: thumb_info.description, 
                 thumbnailURL: thumb_info.thumbnail_url, 
-                largeThumbnailURL: thumb_info.thumbnail_url, 
+                largeThumbnailURL: thumb_info.thumbnail_url + ".L", 
                 postedDateTime: thumb_info.first_retrieve, 
                 duration: thumb_info.length, 
                 viewCount: thumb_info.view_counter, 

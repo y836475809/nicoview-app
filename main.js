@@ -116,8 +116,7 @@ const getWindowState = (w) => {
     };
 };
 
-const setLogLevel = () => {
-    const level = config_ipc_main.get({ key: "log.level", value:"info"});
+const setLogLevel = (level) => {
     process.env.LOG_LEVEL = level;
     logger.setLevel(level);
 };
@@ -241,7 +240,8 @@ app.on("ready", async ()=>{
         return;
     }
 
-    setLogLevel();
+    const log_level = config_ipc_main.get({ key: "log.level", value:"info"});
+    setLogLevel(log_level);
 
     ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
         await createPlayerWindow();
@@ -437,6 +437,15 @@ app.on("ready", async ()=>{
             success:true,
             error:null
         };
+    });
+
+    ipcMain.handle(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+        const { level } = args;
+        setLogLevel(level);
+        main_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
+        if(player_win !== null){
+            player_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
+        }
     });
 
     library_ipc_main.on("libraryInitialized", ()=>{  

@@ -94,6 +94,11 @@
             <input class="setting-checkbox check-window-close" type="checkbox" 
             onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
         </div>
+        <div class="content">
+            <label class="section-label">ログ出力レベル設定</label>
+            <input class="setting-checkbox check-loglevel-debug" type="checkbox" 
+            onclick={onclickCheckLogLevelDebug} /><label>Debug</label>
+        </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>
 
@@ -149,6 +154,16 @@
             await DataIpcRenderer.action("config", "set", { key:"check_window_close", value:ch_elm.checked });
         };
 
+        this.onclickCheckLogLevelDebug = async (e) => {
+            const ch_elm = this.root.querySelector(".check-loglevel-debug");
+            let value = "info";
+            if(ch_elm.checked === true){
+                value = "debug";
+            }
+            await DataIpcRenderer.action("config", "set", { key:"log.level", value:value });
+            await ipcRenderer.invoke(IPC_CHANNEL.LOG_LEVEL, { level:value });
+        };
+
         const setInputValue = (selector, value) => {          
             const elm = this.root.querySelector(selector);
             elm.value = value;
@@ -165,6 +180,9 @@
             setInputValue(".download-dir-input", await DataIpcRenderer.action("config", "get",{ key:"download.dir", value:""}));
             setInputValue(".ffmpeg-path-input", await DataIpcRenderer.action("config", "get",{ key:"ffmpeg_path", value:""}));
             setCheckValue(".check-window-close", await DataIpcRenderer.action("config", "get",{ key:"check_window_close", value:true}));
+        
+            const log_level = await DataIpcRenderer.action("config", "get",{ key:"log.level", value:"info"});
+            setCheckValue(".check-loglevel-debug", log_level=="debug");
         });
 
         this.onclickImport = async ()=>{

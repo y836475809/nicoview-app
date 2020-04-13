@@ -24,6 +24,8 @@ const IPC_CHANNEL =  Object.freeze({
     DELETE_LIBRARY_ITEMS: "ipc-delete-library-items",
 
     APP_CLOSE: "ipc-app-close",
+
+    LOG_LEVEL: "ipc-log-level",
 });
 
 module.exports = {

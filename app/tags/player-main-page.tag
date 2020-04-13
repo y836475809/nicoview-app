@@ -353,6 +353,11 @@
             playNiconicoOnline(video_id, video_item, time);
         });
 
+        ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+            const { level } = args;
+            logger.setLevel(level);
+        });
+
         obs.on("player-main-page:metadata-loaded", (args) => {
             org_video_size = args;
         });

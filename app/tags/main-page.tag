@@ -132,6 +132,11 @@
             this.update();
         });
 
+        ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+            const { level } = args;
+            logger.setLevel(level);
+        });
+
         this.donwnload_item_num = 0;
 
         let template = [];

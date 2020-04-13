@@ -76,6 +76,8 @@ const loadJson = async (name, default_value) => {
         const json_store = new JsonStore(file_path);
         return json_store.load();
     } catch (error) {
+        logger.error(`loadJson ${name}`, error);
+
         await dialog.showMessageBox({
             type: "error",
             buttons: ["OK"],
@@ -92,6 +94,8 @@ const saveJson = async (name, items) => {
         const json_store = new JsonStore(file_path);
         json_store.save(items);
     } catch (error) {
+        logger.error(`saveJson ${name}`, error);
+
         await dialog.showMessageBox({
             type: "error",
             buttons: ["OK"],

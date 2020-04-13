@@ -429,8 +429,12 @@
                 const items = await DataIpcRenderer.action("downloaditem", "getData");
                 grid_table_dl.setData(items);
             } catch (error) {
-                // TODO show messgae box
-                logger.error("download item load error=", error);
+                logger.error("download item load error: ", error);
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: "ダウンロードリストの読み込み失敗",
+                    message: error.message,
+                });
             }
 
             // await onChangeDownloadItem();

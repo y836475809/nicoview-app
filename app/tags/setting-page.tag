@@ -212,7 +212,7 @@
 
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            let error_count = 0;
+            const error_files = [];
             for (let index = 0; index < file_paths.length; index++) {
                 if(cancel===true){
                     break;
@@ -225,22 +225,26 @@
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     logger.error(error);
-                    error_count++;
+                    error_files.push(file_path);
                 }
 
-                const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_count}`;
+                const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
                 this.obs_msg_dialog.trigger("update-message", message);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
-            // TODO ログを参照するとか入れる
-            let result_msg = "インポート完了";
-            if(error_count>0){
-                result_msg += `\n失敗:${error_count}`;
-            }
+            
+            const result_msg = `インポート完了\n失敗:${error_files.length}`;
             await showMessageBox("info", result_msg);
             this.obs_msg_dialog.trigger("close");
-            
+
+            if(error_files.length>0){
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: `${error_files.length}個がインポートに失敗しました`,
+                    message: error_files.join("\n"),
+                });
+            } 
         };
     </script>
 </setting-page>

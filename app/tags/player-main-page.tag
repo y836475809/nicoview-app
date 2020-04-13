@@ -336,7 +336,7 @@
             try {
                 play_by_video_id(video_id, state);               
             } catch (error) {
-                logger.error(`id=${video_id}, online=${is_online}, is_saved=${is_saved}`, error);
+                logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
                 await showMessageBox("error", error.message);
             }
         }; 
@@ -414,8 +414,8 @@
             try {
                 comment_ng.save();
             } catch (error) {
-                // TODO show messgae box
-                logger.error("player main add comment ng", error);
+                logger.error("player main save comment ng", error);
+                await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
             }
 
             const comments = await filter_comment_func(comment_ng);
@@ -428,8 +428,8 @@
             try {
                 comment_ng.save();
             } catch (error) {
-                // TODO show messgae box
-                logger.error("player main delete comment ng", error);
+                logger.error("player main save comment ng", error);
+                await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
             }
 
             const comments = await filter_comment_func(comment_ng);
@@ -478,8 +478,12 @@
                 comment_ng = new CommentNG(path.join(data_dir, "nglist.json"));
                 comment_ng.load();
             } catch (error) {
-                // TODO show messgae box
                 logger.error("player main load comment ng", error);
+                obs.trigger("player-page:toastr", {
+                    type: "error",
+                    title: "NGコメントリストの読み込み失敗",
+                    message: error.message,
+                });
             }
 
             ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);

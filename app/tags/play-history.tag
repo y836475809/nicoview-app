@@ -109,9 +109,13 @@
                 const items = await DataIpcRenderer.action("history", "getData");
                 grid_table.setData(items);
             } catch (error) {
-                // TODO show messgae box
                 logger.error(error);
-                grid_table.setData([]); 
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: "再生履歴の読み込み失敗",
+                    message: error.message,
+                });
+                // grid_table.setData([]); 
             }
         });
 

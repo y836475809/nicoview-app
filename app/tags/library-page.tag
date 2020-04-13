@@ -322,8 +322,10 @@
                 }
             });
             
+            let cur_update = 0; 
+            const error_items = [];
             try {
-                let cur_update = 1;
+                 
                 for(let item of items) {
                     if(update_cancel===true){
                         const error = new Error("cancel");
@@ -331,7 +333,9 @@
                         throw error;
                     }
                     
-                    this.obs_modal_dialog.trigger("update-message", `更新中 ${cur_update}/${items.length}`);
+                    cur_update++;
+                    this.obs_modal_dialog.trigger("update-message", 
+                        `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
@@ -355,21 +359,36 @@
                             grid_table.updateCell(item.id, "state", "更新キャンセル");
                             throw error;
                         }else{
+                            error_items.push(item);
                             logger.error(error);
-                            this.obs_modal_dialog.trigger("update-message", `更新失敗 ${cur_update}/${items.length}`);
                             grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
                         }
                     }
                     if(cur_update < items.length){
                         await wait(1000);
                     }
-                    cur_update++;
+                    this.obs_modal_dialog.trigger("update-message", 
+                        `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
                 }                
             } catch (error) {
                 this.obs_modal_dialog.trigger("update-message", "更新キャンセル");
             }
 
             this.obs_modal_dialog.trigger("close");
+            
+            if(error_items.length > 0){
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: `${error_items.length}個が更新に失敗しました`,
+                    message: error_items.map(item => item.video_name).join("\n"),
+                });
+            }else{
+                obs.trigger("main-page:toastr", {
+                    type: "info",
+                    title: "",
+                    message: `更新完了(${cur_update}/${items.length})`,
+                });
+            }
         };
 
         const convertNicoDataToNNDD = async (items) => {
@@ -382,8 +401,9 @@
                 }
             });
             
-            try {
-                let cur_update = 1;
+            let cur_update = 0;
+            const error_items = [];
+            try {    
                 for(let item of items) {
                     if(cnv_cancel===true){
                         const error = new Error("cancel");
@@ -391,7 +411,9 @@
                         throw error;
                     }
                     
-                    this.obs_modal_dialog.trigger("update-message", `NNDD形式に変換中 ${cur_update}/${items.length}`);
+                    cur_update++;
+                    this.obs_modal_dialog.trigger("update-message", 
+                        `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
                     grid_table.updateCell(item.id, "state", "変換中");
                     try {
@@ -411,21 +433,36 @@
                             grid_table.updateCell(item.id, "state", "変換キャンセル");
                             throw error;
                         }else{
+                            error_items.push(item);
                             logger.error(error);
-                            this.obs_modal_dialog.trigger("update-message", `変換失敗 ${cur_update}/${items.length}`);
                             grid_table.updateCell(item.id, "state", `変換失敗: ${error.message}`);
                         }
                     }
                     if(cur_update < items.length){
                         await wait(100);
                     }
-                    cur_update++;
+                    this.obs_modal_dialog.trigger("update-message", 
+                        `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
                 }                
             } catch (error) {
                 this.obs_modal_dialog.trigger("update-message", "変換キャンセル");
             }
 
             this.obs_modal_dialog.trigger("close");
+
+            if(error_items.length > 0){
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: `${error_items.length}個がNNDD形式への変換に失敗しました`,
+                    message: error_items.map(item => item.video_name).join("\n"),
+                });
+            }else{
+                obs.trigger("main-page:toastr", {
+                    type: "info",
+                    title: "",
+                    message: `NNDD形式への変換完了(${cur_update}/${items.length})`,
+                });
+            }
         };
 
         const deleteLibraryData = async (video_ids) => {
@@ -632,9 +669,13 @@
                 const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });
                 await DataIpcRenderer.action("library", "load", {data_dir});
             } catch (error) {
-                // TODO show message box
                 logger.error(error);
-                loadLibraryItems([]);
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: "ライブラリの読み込み失敗",
+                    message: error.message,
+                });
+                // loadLibraryItems([]);
             }
         });
 

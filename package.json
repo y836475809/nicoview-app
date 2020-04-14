@@ -11,13 +11,16 @@
     "test-nicoscript": "electron . --debug --main test/test-nicoscript.html --config config-debug.json",
     "test-tween": "electron . --debug --main test/test-tween.html --config config-debug.json",
     "main": "electron .",
-    "test": "ava -v -s"
+    "test": "ava -v -s",
+    "pack-dir": "electron-builder --x64 --dir",
+    "pack": "electron-builder --x64"
   },
   "author": "y836475809",
   "license": "MIT",
   "devDependencies": {
     "ava": "^2.4.0",
     "electron": "^7.1.8",
+    "electron-builder": "^22.4.1",
     "nock": "^11.7.1",
     "sinon": "^8.0.2"
   },
@@ -35,10 +38,12 @@
     "sql.js": "^0.5.0"
   },
   "build": {
+    "appId": "com.y836475809.riot_test",
     "directories": {
       "output": "./build"
     },
     "files": [
+      "./main.js",
       "./app/**/*"
     ],
     "win": {

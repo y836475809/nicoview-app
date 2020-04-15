@@ -450,8 +450,6 @@
             const query = elm.value;
             nico_search_params.query(query);
             this.search();
-
-            this.refs.page.resetPage();
         };
 
         this.onkeydownSearchInput = (e) =>{
@@ -459,7 +457,6 @@
                 const param = e.target.value;
                 nico_search_params.query(param);
                 this.search();
-                this.refs.page.resetPage();
             }
         };
 
@@ -488,7 +485,6 @@
             setSearchCondState(cond.sort_name, cond.sort_order, cond.search_kind);
 
             this.search();
-            this.refs.page.resetPage();
         });
 
         obs.on("search-page:search-tag", (args)=> {
@@ -501,7 +497,6 @@
             setSearchCondState(null, null, search_kind);
 
             this.search();
-            this.refs.page.resetPage();
         });
 
         obs.on("search-page:search", (args)=> {

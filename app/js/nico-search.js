@@ -134,6 +134,7 @@ class NicoSearch extends NicoRequest {
         const service = params._service;
         const query_json = params.get();
         const url = `${this.host}/api/v2/${service}/contents/search`;
+        const page = params._page;
         
         return new Promise((resolve, reject) => {
             const options = {
@@ -168,6 +169,7 @@ class NicoSearch extends NicoRequest {
                     return;
                 }
                 const result = JSON.parse(body);
+                result.meta.page = page;
                 resolve(result); 
             });       
         });

@@ -365,7 +365,9 @@
         };
 
         const setData = async (search_result) => {     
+            const page = search_result.meta.page;
             const total_count = search_result.meta.totalCount;
+            this.refs.page.setCurrentPage(page);
             this.refs.page.setTotaCount(total_count);
             if(total_count<search_offset+search_limit){
                 this.refs.page.setTotalPages(Math.ceil(total_count/search_limit));

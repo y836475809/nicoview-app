@@ -123,6 +123,7 @@ test("nico search", async t => {
     const result = await nico_search.search(pramas);
     const meta = result.meta;
     t.is(meta.status, 200);
+    t.is(meta.page, 1);
     t.is(meta.totalCount, 1);
     t.is(result.data.length, 1);
 });

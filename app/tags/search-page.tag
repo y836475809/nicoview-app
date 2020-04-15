@@ -298,6 +298,10 @@
         };
 
         this.search = async () => {
+            if(nico_search_params.isQueryEmpty()){
+                return;
+            }
+
             this.obs_modal_dialog.trigger("show", {
                 message: "検索中...",
                 buttons: ["cancel"],

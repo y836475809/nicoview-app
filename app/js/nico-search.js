@@ -47,6 +47,10 @@ class NicoSearchParams {
         this._resetParams();
     }
 
+    isQueryEmpty(){
+        return this._query.length === 0;
+    }
+
     cond(kind){
         this.search_kind = kind;
         if(kind=="keyword"){

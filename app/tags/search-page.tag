@@ -327,7 +327,7 @@
 
         this.onmovePage = async (page) => {
             nico_search_params.page(page);
-            this.search();
+            await this.search();
         };
 
         this.onCancelSearch = () => {
@@ -449,18 +449,18 @@
             nico_search_params.cond(this.search_items[index].kind);
         };
 
-        this.onclickSearch = (e) => {
+        this.onclickSearch = async (e) => {
             const elm = getSearchInputElm();
             const query = elm.value;
             nico_search_params.query(query);
-            this.search();
+            await this.search();
         };
 
-        this.onkeydownSearchInput = (e) =>{
+        this.onkeydownSearchInput = async (e) =>{
             if(e.keyCode===13){
                 const param = e.target.value;
                 nico_search_params.query(param);
-                this.search();
+                await this.search();
             }
         };
 
@@ -476,7 +476,7 @@
             
             obs.trigger("search-page:sidebar:add-item", cond);
         };
-        obs.on("search-page:item-dlbclicked", (item) => {
+        obs.on("search-page:item-dlbclicked", async (item) => {
             const cond = item;
             const elm = getSearchInputElm();
             elm.value = cond.query;
@@ -488,10 +488,10 @@
 
             setSearchCondState(cond.sort_name, cond.sort_order, cond.search_kind);
 
-            this.search();
+            await this.search();
         });
 
-        obs.on("search-page:search-tag", (args)=> {
+        obs.on("search-page:search-tag", async (args)=> {
             const { query, search_kind } = args;
             const elm = getSearchInputElm();
             elm.value = query;
@@ -500,10 +500,10 @@
             
             setSearchCondState(null, null, search_kind);
 
-            this.search();
+            await this.search();
         });
 
-        obs.on("search-page:search", (args)=> {
+        obs.on("search-page:search", async (args)=> {
             const { query, sort_order, sort_name, search_kind, page } = args;
             const elm = getSearchInputElm();
             elm.value = query;
@@ -516,7 +516,7 @@
             setSearchCondState(sort_name, sort_order, search_kind);
             this.refs.page.setCurrentPage(page);
 
-            this.search();
+            await this.search();
         });
 
         const resizeGridTable = () => {

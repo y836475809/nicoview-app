@@ -28,9 +28,11 @@
             width: 30px;
             height: 30px;
         }
-        .navi:hover {
-            background-color: lightgray;
-            cursor: pointer;
+        .navi > i {
+            color: gray;
+        }
+        .navi > i:hover {
+            color: black;
         }
     </style>
 

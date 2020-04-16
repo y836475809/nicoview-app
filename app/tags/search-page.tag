@@ -133,23 +133,44 @@
             width: 150px;
             height: 30px;
             font-size: 1.2em;
+            
+            border-width: 1px;
+            border-right-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
+        }
+        .search-query-container input:focus {
+            outline: none;
         }
 
         .search-query-container > .search-button {
             width: 30px;
             height: 30px;
+
+            background-color: white;
+            border-width: 1px;  
+            border-left-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
         }
         .search-query-container > .search-button > i  {
-            font-size: 24px;
+            font-size: 20px;
+            color: gray;   
+        }
+        .search-query-container > .search-button > i:hover {
+            color: black;
         }
 
         .search-query-container > .add-search-cond-button {
-            margin-left: 30px;
             width: 30px;
             height: 30px;
         }
         .search-query-container > .add-search-cond-button > i {
-            font-size: 24px;
+            font-size: 20px;
+            color: gray;
+        }
+        .search-query-container > .add-search-cond-button > i:hover {
+            color: black;
         }
 
         .search-grid-container {
@@ -181,12 +202,12 @@
         </div>
         <div class="search-query-container">
             <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
-            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
-            </button>
-            <button class="add-search-cond-button center-hv" title="検索条件に追加" onclick={onclickAddNicoSearchCond}>
+            </div>
+            <div class="add-search-cond-button center-hv" title="検索条件を保存" onclick={onclickAddNicoSearchCond}>
                 <i class="fas fa-plus"></i>
-            </button>
+            </div>
         </div>      
     </div>
     <pagination ref="page" onmovepage={this.onmovePage}></pagination>

@@ -94,19 +94,47 @@
         .library-controls-container .search-input {
             width: var(--search-input-width);
             height: var(--search-button-size);
+            font-size: 1.2em;
+
+            border-width: 1px;
+            border-right-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
+        }
+        .library-controls-container .search-input:focus {
+            outline: none;
         }
 
-        .search-container > button {
+        .search-container > div {
             width: var(--search-button-size);
-            height: var(--search-button-size);  
+            height: var(--search-button-size); 
+            background-color: white; 
         }
-
-        .search-container > button > i {
+        .search-container > div > i {
             font-size: 20px;
+            color: gray;
+        }
+        .search-container > div > i:hover {
+            color: black;
         }
 
-        .add-button {
-            margin-left: 30px;
+        .search-container > .search-button {
+            border-width: 1px;
+            border-left-width: 0px !important;
+            border-right-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
+        }
+
+        .search-container > .clear-button {
+            border-width: 1px;
+            border-left-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
+        }
+
+        .search-container > .add-button {
+            background-color: rgba(0, 0, 0, 0);
         }
 
         .library-grid-container {
@@ -141,15 +169,15 @@
         <div class="item-info center-v">項目数 {this.num_filtered_items.toLocaleString()}/{this.num_items.toLocaleString()}</div>
         <div class="search-container">
             <input class="search-input" type="search" onkeydown={onkeydownSearchInput} />
-            <button class="search-button center-hv" title="検索" onclick={onclickSearch}>
+            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
-            </button>
-            <button class="clear-button center-hv" title="検索条件クリア" onclick={onclickClear}>
+            </div>
+            <div class="clear-button center-hv" title="検索条件クリア" onclick={onclickClear}>
                 <i class="fas fa-ban"></i>
-            </button>
-            <button class="add-button center-hv" title="検索条件に追加" onclick={onclickAdd}>
+            </div>
+            <div class="add-button center-hv" title="検索条件を保存" onclick={onclickAdd}>
                 <i class="fas fa-plus"></i>
-            </button>
+            </div>
         </div>
     </div>
     <div class="library-grid-container">

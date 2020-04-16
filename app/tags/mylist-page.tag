@@ -97,23 +97,50 @@
             --margin: 5px;
         }
 
+        .mylist-container {
+            display: flex;
+            margin-top: var(--margin);
+        }
+
         .mylist-label {
             margin-right: 5px;
             user-select: none;
         }
 
+        .mylist-input {
+            font-size: 1.2em;
+            border-width: 1px;
+            border-right-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
+        }
+        .mylist-input:focus {
+            outline: none;
+        }
+
+        .mylist-container > div > i {
+            font-size: 20px;
+            color: gray;
+        }
+        .mylist-container > div > i:hover {
+            color: black;
+        }
+
         .update-button {
-            margin-left: 1px;
-            width: 60px;
+            width: var(--control-height);
+            height: var(--control-height);
+            background-color: white; 
+
+            border-width: 1px;
+            border-left-width: 0px !important;
+            border-style: solid;
+            border-color: gray;
         }
 
         .add-mylist-button {
-            margin-left: 30px;
-            width: 30px;
+            width: var(--control-height);
             height: var(--control-height);
-        }
-        .add-mylist-button > i {
-            font-size: 24px;
+            background-color: rgba(0, 0, 0, 0);
         }
 
         .mylist-description {
@@ -124,6 +151,7 @@
             padding: 3px;
             border: 1px solid var(--control-border-color);
             margin: var(--margin);
+            background-color: white;
         }
 
         .mylist-grid-container {
@@ -134,12 +162,14 @@
         }
     </style>      
 
-    <div style="display:flex;">
+    <div class="mylist-container">
         <div class="mylist-label center-hv">mylist/</div><input class="mylist-input" type="text"/>
-        <button class="update-button" onclick={onclickUpdateMylist}>更新</button>
-        <button class="add-mylist-button center-hv" title="マイリストに追加" onclick={onclickAddMylist}>
+        <div class="update-button center-hv" title="更新", onclick={onclickUpdateMylist}>
+            <i class="fas fa-redo-alt"></i>
+        </div>
+        <div class="add-mylist-button center-hv" title="マイリストを保存" onclick={onclickAddMylist}>
             <i class="fas fa-plus"></i>
-        </button>
+        </div>
     </div>
     <div class="mylist-description">{this.mylist_description}</div>
     <div class="mylist-grid-container">

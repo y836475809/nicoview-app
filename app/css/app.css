@@ -32,6 +32,10 @@ html, body {
   background-color: #6190cd6b;
 }
 
+.slick-header-column, .slick-cell {
+  user-select: none;
+}
+
 .center-hv {
   display: flex;
   justify-content: center;

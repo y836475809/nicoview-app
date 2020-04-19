@@ -133,6 +133,18 @@ function createWindow() {
     if (state.maximized) {
         main_win.maximize();
     }
+
+    main_win.webContents.on("did-finish-load", async () => {
+        const file_path = config_ipc_main.get({ key: "css_path", value:"" });
+        if(!file_path){
+            return;
+        }
+        const css_data = await fs.promises.readFile(file_path, "utf8");
+        main_win.webContents.insertCSS(css_data);
+
+        await main_win.webContents.executeJavaScript('riot.mount("main-page", {obs});');
+    });
+
     // アプリケーションのindex.htmlの読み込み
     main_win.loadURL(main_html_path);
 
@@ -446,6 +458,16 @@ app.on("ready", async ()=>{
         if(player_win !== null){
             player_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
         }
+    });
+
+    ipcMain.handle(IPC_CHANNEL.RELOAD_CSS, async (event, args) => {
+        const { file_path } = args;
+        if(!file_path){
+            return;
+        }
+        const css_data = await fs.promises.readFile(file_path, "utf8");
+        main_win.webContents.insertCSS(css_data);
+        main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
     });
 
     library_ipc_main.on("libraryInitialized", ()=>{  

@@ -244,6 +244,10 @@
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });
 
+        ipcRenderer.on(IPC_CHANNEL.MAIN_CSS_LOADED, (event)=>{
+            this.obs.trigger("window-resized");
+        });
+
         const timeout = 200;
         let timer;
         window.addEventListener("resize", () => {

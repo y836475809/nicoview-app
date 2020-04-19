@@ -91,6 +91,14 @@
             </div>
         </div>
         <div class="content">
+            <label class="section-label">CSS</label>
+            <div style="display: flex;">
+                <input disabled=true class="input-path css-path-input" type="text" readonly}>
+                <button class="input-button" onclick={onclickSelectcCssPath}>ファイルを選択</button>
+                <button class="input-button" onclick={onclickReloadCss}>読み込み</button>
+            </div>
+        </div>
+        <div class="content">
             <input class="setting-checkbox check-window-close" type="checkbox" 
             onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
         </div>
@@ -106,6 +114,8 @@
         /* globals riot logger */
         const { shell, ipcRenderer, remote } = window.electron;
         const { dialog } = remote;
+        const path = window.path;
+        const fs = window.fs;
         const { DataIpcRenderer } = window.DataIpc;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
@@ -149,6 +159,22 @@
             await DataIpcRenderer.action("config", "set", { key:"ffmpeg_path", value:file_path });
         };
 
+        
+        this.onclickSelectcCssPath = async e => {
+            const file_path = await selectFileDialog("CSS", ["css"]);
+            if(file_path == null){
+                return;
+            }
+            setInputValue(".css-path-input", file_path);
+            await DataIpcRenderer.action("config", "set", { key:"css_path", value:file_path });
+        };
+
+        this.onclickReloadCss = async e => {
+            const elm = this.root.querySelector(".css-path-input");
+            const file_path = elm.value;
+            await ipcRenderer.invoke(IPC_CHANNEL.RELOAD_CSS, { file_path });
+        };
+
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
             await DataIpcRenderer.action("config", "set", { key:"check_window_close", value:ch_elm.checked });
@@ -174,8 +200,22 @@
             elm.checked = value;
         };
 
+        const getDefaultCSSPath = async () => {
+            try {
+                const css_path = path.join(process.resourcesPath, "setting.css");
+                await fs.promises.stat(css_path);
+                return css_path;
+            } catch(err) {
+                return "";
+            }
+        };
+
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await DataIpcRenderer.action("config", "get", { key:"app_setting_dir", value:"" }));  
+            setInputValue(".app-setting-dir-input", await DataIpcRenderer.action("config", "get", { key:"app_setting_dir", value:"" })); 
+            
+            const css_path = await getDefaultCSSPath();
+            setInputValue(".css-path-input", await DataIpcRenderer.action("config", "get", { key:"css_path", value:css_path }));   
+            
             setInputValue(".data-dir-input", await DataIpcRenderer.action("config", "get",{ key:"data_dir", value:""}));  
             setInputValue(".download-dir-input", await DataIpcRenderer.action("config", "get",{ key:"download.dir", value:""}));
             setInputValue(".ffmpeg-path-input", await DataIpcRenderer.action("config", "get",{ key:"ffmpeg_path", value:""}));

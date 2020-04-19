@@ -26,6 +26,9 @@ const IPC_CHANNEL =  Object.freeze({
     APP_CLOSE: "ipc-app-close",
 
     LOG_LEVEL: "ipc-log-level",
+
+    RELOAD_CSS: "ipc-reload-css",
+    MAIN_CSS_LOADED: "ipc-main-css-loaded",
 });
 
 module.exports = {

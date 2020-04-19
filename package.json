@@ -46,6 +46,12 @@
       "./main.js",
       "./app/**/*"
     ],
+    "extraResources": [
+      {
+        "from": "./app/css/setting.css",
+        "to": "setting.css"
+      }
+    ],
     "win": {
       "target": "zip"
     }

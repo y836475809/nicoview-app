@@ -9,6 +9,7 @@
 
         label, input[type='text'], button {
             height: 25px;
+            user-select: none;
         }
 
         .input-button {
@@ -22,19 +23,8 @@
             border-radius: 5px;
         }
 
-        .component {
-            display: flex;
-            padding-bottom: 5px;
-        }
-
         .section-label {
             display: block;
-            /* font-size: 1.2em; */
-        }
-
-        .setting-label {
-            width: 10em;
-            /* width: 150px; */
         }
 
         .setting-checkbox{
@@ -43,59 +33,96 @@
         }
 
         .input-path{
-            /* width: 300px; */
             width: 40vw;
             padding:2px;
             border: solid 1px #ccc;
             border-radius: 2px;
         }
+
+        .import > ul {
+            padding-left: 0px;
+            margin-top: 0px;
+            margin-bottom: 0px;
+        }
+        .import > ul li {
+            list-style: none;
+        }
+        .import > ul li:not(:first-child){
+            margin-top: 5px;
+        }
+        .import > ul li div {
+            height: 25px;
+            width:220px;
+            float: left; 
+            line-height: 25px;
+            user-select: none;
+        }
     </style>
 
     <div class="setting-page">
         <div class="content">
-            <label class="setting-label" title={this.data_path_desc}>データの保存先を指定</label>     
+            <label class="section-label">ブックマーク, 履歴, DB等の保存先</label>     
             <div style="display: flex;">
-                <input disabled=true class="input-path data-dir-input" type="text" readonly title={this.data_path_desc}>
-                <button class="input-button" onclick={onclickSelectDataDir}>フォルダ選択</button>
+                <input disabled=true class="input-path data-dir-input" type="text" readonly>
+                <button class="input-button" title="フォルダ選択" onclick={onclickSelectDataDir}>
+                    <i class="far fa-folder-open"></i>
+                </button>
             </div>
         </div>
         <div class="content">
             <label class="section-label">動画の保存先</label>
             <div style="display: flex;">
                 <input disabled=true class="input-path download-dir-input" type="text" readonly>
-                <button class="input-button" onclick={onclickSelectDownloadDir}>フォルダ選択</button>
+                <button class="input-button" title="フォルダ選択" onclick={onclickSelectDownloadDir}>
+                    <i class="far fa-folder-open"></i>
+                </button>
             </div>
         </div>
-        <div class="content">
-            <label class="section-label">NNDD DBのインポート</label>
-            <button onclick={onclickImport}>DB選択</button>
+        <div class="content import">
+            <label class="section-label">インポート</label>
+            <ul>
+                <li>
+                    <div>NNDDのDB(library.db)のインポート</div>
+                    <button title="DB選択" onclick={onclickImport}>
+                        <i class="far fa-file"></i>
+                    </button>
+                </li>
+                <li>
+                    <div>動画のインポート</div>
+                    <button title="ファイル選択" onclick={onclickImportFiles}>
+                        <i class="far fa-file"></i>
+                    </button>
+                </li>
+            </ul>        
         </div>
         <div class="content">
-            <label class="section-label">ファイルのインポート</label>
-            <button onclick={onclickImportFiles}>ファイル選択</button>
-        </div>
-        <div class="content">
-            <label class="section-label" title={this.ffmpeg_path_desc}>ffmpeg実行ファイルのパス</label>
+            <label class="section-label">ffmpeg実行ファイルのパス(保存済みflv, swfをmp4の変換に使用)</label>
             <div style="display: flex;">
-                <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly title={this.ffmpeg_path_desc}>
-                <button class="input-button" onclick={onclickSelectffmpegPath} title={this.ffmpeg_path_desc}>
-                    ファイル選択
+                <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly>
+                <button class="input-button" title="ファイル選択" onclick={onclickSelectffmpegPath}>
+                    <i class="far fa-file"></i>
                 </button>
             </div>
         </div>
         <div class="content">
-            <label class="section-label">アプリの設定保存フォルダ</label>
+            <label class="section-label">設定ファイル(config.json)のフォルダ</label>
             <div style="display: flex;">
                 <input disabled=true class="input-path app-setting-dir-input" type="text" readonly}>
-                <button class="input-button" onclick={onclickOpenDir}>フォルダを開く</button>
+                <button class="input-button" title="フォルダを開く" onclick={onclickOpenDir}>
+                    <i class="far fa-folder-open"></i>
+                </button>
             </div>
         </div>
         <div class="content">
             <label class="section-label">CSS</label>
             <div style="display: flex;">
                 <input disabled=true class="input-path css-path-input" type="text" readonly}>
-                <button class="input-button" onclick={onclickSelectcCssPath}>ファイルを選択</button>
-                <button class="input-button" onclick={onclickReloadCss}>読み込み</button>
+                <button class="input-button" title="ファイル選択" onclick={onclickSelectcCssPath}>
+                    <i class="far fa-file"></i>
+                </button>
+                <button class="input-button" title="読み込み" onclick={onclickReloadCss}>
+                    <i class="fas fa-redo-alt"></i>
+                </button>
             </div>
         </div>
         <div class="content">
@@ -120,9 +147,6 @@
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;
-        
-        this.data_path_desc = "ブックマーク、履歴等のデータを保存するフォルダ";
-        this.ffmpeg_path_desc = "保存済みflv, swfをmp4に変換するffmpegのパスを設定";
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();

@@ -1,7 +1,6 @@
 <accordion>
     <style scoped>
         :scope {
-            max-width: 360px;
             --menubar-height: 30px;
         }
 
@@ -31,7 +30,7 @@
         .acdn-item {
             display: flex;
             height: 30px;
-            padding: 5px 0 5px 20px;
+            padding: 5px 0 5px 10px;
             transition: all 0.5s;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;

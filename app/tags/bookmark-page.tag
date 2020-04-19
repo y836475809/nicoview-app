@@ -1,7 +1,7 @@
 <bookmark-page>
     <style scoped>
         :scope {
-            --page-width: 250px;
+            --page-width: 300px;
             --button-width: 30px;
             --button-height: 70px;
         }

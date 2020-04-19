@@ -9,3 +9,7 @@ mylist-page > .split-page {
 search-page > .split-page {
     --left-width: 300px !important;
 }
+
+bookmark-page {
+    --page-width: 300px !important;
+}

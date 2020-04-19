@@ -95,11 +95,6 @@
             this.update();
         };
 
-        let wait_time = 10;
-        if(process.env.NODE_ENV == "DEBUG"){
-            wait_time = 1;
-        }
-
         const download_state = Object.freeze({
             wait: 0,
             downloading: 1,
@@ -278,7 +273,7 @@
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        const wait = async (do_cancel, on_progress) => {
+        const wait = async (wait_time, do_cancel, on_progress) => {
             for (let index = wait_time; index >= 0; index--) {
                 if(do_cancel()){
                     break;
@@ -292,6 +287,11 @@
             // TODO check exist download_dir
             const download_dir = await DataIpcRenderer.action("config", "get", { key:"download.dir", value:"" });
             event_em.emit("download-start");
+
+            let wait_time = await DataIpcRenderer.action("config", "get", { key:"download.wait_time", value:10 });
+            if(!wait_time || wait_time <= 0){
+                wait_time = 10;
+            }
 
             let video_id = null;
             try {
@@ -314,7 +314,7 @@
                         }   
                     }
 
-                    await wait(()=>{ 
+                    await wait(wait_time, ()=>{ 
                         return cancel_download || !grid_table_dl.hasItem(video_id);
                     }, (progress)=>{ 
                         grid_table_dl.updateItem(video_id, {

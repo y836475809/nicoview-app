@@ -27,10 +27,14 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script>
         /* globals riot */
+        const { DataIpcRenderer } = window.DataIpc;
         var logger = window.logger; // eslint-disable-line
         let toast_wrapper = null;
 
         const obs = riot.observable();
+
+        DataIpcRenderer.action("config", "set", 
+            { key:"download.wait_time", value:10 }).then();
 
         obs.on("main-page:toastr", (args) => {
             const { type, title, message } = args;

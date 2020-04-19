@@ -28,6 +28,7 @@
 <script type="riot/tag" src="../app/tags/bookmark-page.tag"></script>
 <script>
     /* globals riot */
+    const { DataIpcRenderer } = window.DataIpc;
     var logger = window.logger; // eslint-disable-line
     let toast_wrapper = null;
 
@@ -50,6 +51,9 @@
 
     const mylist_mock = new NicoMylistMocks();
     mylist_mock.mylist({delay:2000});
+
+    DataIpcRenderer.action("config", "set", 
+        { key:"download.wait_time", value:1 }).then();
 
     obs.on("main-page:cancel-download", () => {
         video_fs.forEach(value => {

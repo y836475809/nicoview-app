@@ -1,11 +1,11 @@
 library-page > .split-page {
-    --left-width: 300px;
+    --left-width: 300px !important;
 }
 
 mylist-page > .split-page {
-    --left-width: 300px;
+    --left-width: 300px !important;
 }
 
 search-page > .split-page {
-    --left-width: 300px;
+    --left-width: 300px !important;
 }

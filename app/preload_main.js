@@ -5,7 +5,6 @@ const Sortable = require("sortablejs");
 
 const root_dir = path.resolve(__dirname, "..");
 
-const { getPathFromRoot } = require(`${root_dir}/app/util`);
 const IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
 const DataIpc = require(`${root_dir}/app/js/data-ipc`);
 const logger = require(`${root_dir}/app/js/logger`);
@@ -19,7 +18,6 @@ process.once("loaded", () => {
 
     global.IPC_CHANNEL = IPC_CHANNEL;
     global.DataIpc = DataIpc;
-    global.getPathFromRoot = getPathFromRoot;
     global.logger = logger;
 
     if (process.env.NODE_ENV == "DEBUG") {

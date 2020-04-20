@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
 const sql = require("sql.js");
-const { FileUtils } = require("./file-utils");
 const { getCommonNameFromFilename } = require("./nico-data-file");
 
 class DBConverter {
@@ -63,9 +62,13 @@ class DBConverter {
         const values = res[0].values;
         this.dirpath_list = values.map(value=>{
             const id = value[0];
-            const dirpath = FileUtils.normalizePath(decodeURIComponent(value[1]));
+            const dirpath = this._normalizePath(decodeURIComponent(value[1]));
             return { id, dirpath };
         });
+    }
+
+    _normalizePath(file_path){
+        return file_path.replace(/^(file:\/\/\/)|^(file:\/\/)/i, "").replace(/\//g, path.sep);
     }
     
     _read_video() {

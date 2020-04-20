@@ -1,7 +1,7 @@
 const path = require("path");
+const fs = require("fs");
 const { NicoVideoData, 
     getIDFromFilename, getCommonNameFromFilename } = require("./nico-data-file");
-const { FileUtils } = require("./file-utils");
 const { toTimeSec } = require("./time-format");
 
 class ImportLibrary {
@@ -84,7 +84,12 @@ class ImportLibrary {
     }
     
     async _existFile(file_path){
-        return await FileUtils.exist(file_path);
+        try {
+            await fs.promises.stat(file_path);
+            return true;
+        } catch (error) {
+            return false;
+        }
     }
 }
 

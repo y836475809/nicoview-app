@@ -1,10 +1,3 @@
-const { CmdLineParser } = require("./app/js/main-util");
-const cmdline_parser = new CmdLineParser(process.argv);
-const is_debug = cmdline_parser.get("--debug", false);
-if(is_debug===true){
-    process.env.NODE_ENV = "DEBUG";
-}
-
 const { session, dialog, app, BrowserWindow, ipcMain, shell } = require("electron");
 const fs = require("fs");
 const fsPromises = fs.promises;
@@ -20,6 +13,7 @@ const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");
 const logger = require("./app/js/logger");
+const { CmdLineParser } = require("./app/js/main-util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -28,6 +22,7 @@ const library_ipc_main = new LibraryIpcMain();
 const bookmark_ipc_main = new BookMarkIpcMain();
 const history_ipc_main = new HistoryIpcMain();
 const downloaditem_ipc_main = new DownloadItemIpcMain();
+const cmdline_parser = new CmdLineParser(process.argv);
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -40,6 +35,10 @@ const player_html_path = `${__dirname}/${cmdline_parser.get("--player", "app/htm
 const preload_main_path = `${__dirname}/app/preload_main.js`;
 const preload_player_path = `${__dirname}/app/preload_player.js`;
 const config_fiiename = cmdline_parser.get("--config", "config.json");
+const is_debug = cmdline_parser.get("--debug", false);
+if(is_debug===true){
+    process.env.NODE_ENV = "DEBUG";
+}
 
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);

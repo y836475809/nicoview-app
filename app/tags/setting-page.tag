@@ -226,7 +226,7 @@
 
         const getDefaultCSSPath = async () => {
             try {
-                const css_path = path.join(process.resourcesPath, "setting.css");
+                const css_path = path.join(process.resourcesPath, "user.css");
                 await fs.promises.stat(css_path);
                 return css_path;
             } catch(err) {

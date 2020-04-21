@@ -48,8 +48,8 @@
     ],
     "extraResources": [
       {
-        "from": "./app/css/setting.css",
-        "to": "setting.css"
+        "from": "./app/css/user.css",
+        "to": "user.css"
       }
     ],
     "win": {

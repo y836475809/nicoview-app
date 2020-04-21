@@ -27,6 +27,8 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script>
         /* globals riot */
+        const { ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { DataIpcRenderer } = window.DataIpc;
         var logger = window.logger; // eslint-disable-line
         let toast_wrapper = null;
@@ -37,6 +39,11 @@
             { key:"download.wait_time", value:10 }).then();
 
         obs.on("main-page:toastr", (args) => {
+            const { type, title, message } = args;
+            toast_wrapper[type](title, message);
+        });
+
+        ipcRenderer.on(IPC_CHANNEL.MAIN_TOASTR, (event, args)=>{
             const { type, title, message } = args;
             toast_wrapper[type](title, message);
         });

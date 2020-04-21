@@ -142,6 +142,11 @@ function createWindow() {
                 main_win.webContents.insertCSS(css_data);
             } catch (error) {
                 logger.error(error);
+                main_win.webContents.send(IPC_CHANNEL.MAIN_TOASTR, {
+                    type: "error",
+                    title: `${path.basename(file_path)}の読み込みに失敗しました`,
+                    message: error.message,
+                });
             }
         }
 

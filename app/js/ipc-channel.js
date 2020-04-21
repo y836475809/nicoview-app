@@ -29,6 +29,8 @@ const IPC_CHANNEL =  Object.freeze({
 
     RELOAD_CSS: "ipc-reload-css",
     MAIN_CSS_LOADED: "ipc-main-css-loaded",
+
+    MAIN_TOASTR: "ipc-main-toastr",
 });
 
 module.exports = {

@@ -568,18 +568,6 @@ const createPlayerWindow = () => {
             resolve();
         });
 
-        if(is_debug){
-            player_win.webContents.on("did-finish-load", async () => {
-                try {
-                    const file_path = path.join(__dirname, "test", "setup-player-nock.js");
-                    const data = await fs.promises.readFile(file_path, "utf8");
-                    await player_win.webContents.executeJavaScript(data);
-                } catch (error) {
-                    logger.error(error);
-                }
-            });
-        }
-
         player_win.loadURL(player_html_path);
     });  
 };

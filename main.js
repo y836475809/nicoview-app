@@ -135,11 +135,15 @@ function createWindow() {
 
     main_win.webContents.on("did-finish-load", async () => {
         const file_path = config_ipc_main.get({ key: "css_path", value:"" });
-        if(!file_path){
-            return;
+        if(file_path){
+            try {
+                await fs.promises.stat(file_path);
+                const css_data = await fs.promises.readFile(file_path, "utf8");
+                main_win.webContents.insertCSS(css_data);
+            } catch (error) {
+                logger.error(error);
+            }
         }
-        const css_data = await fs.promises.readFile(file_path, "utf8");
-        main_win.webContents.insertCSS(css_data);
 
         await main_win.webContents.executeJavaScript('riot.mount("main-page", {obs});');
     });

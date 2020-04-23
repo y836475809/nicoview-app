@@ -210,7 +210,7 @@
             </div>
         </div>      
     </div>
-    <pagination ref="page" onmovepage={this.onmovePage}></pagination>
+    <pagination obs={pagination_obs}></pagination>
     <div class="search-grid-container">
         <div class="search-grid"></div>
     </div>
@@ -230,6 +230,13 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        this.pagination_obs = riot.observable();
+
+        this.pagination_obs.on("move-page", async args => {
+            const { page_num } = args;
+            nico_search_params.page(page_num);
+            await this.search();
+        });
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
@@ -346,11 +353,6 @@
             elm.focus();
         };
 
-        this.onmovePage = async (page) => {
-            nico_search_params.page(page);
-            await this.search();
-        };
-
         this.onCancelSearch = () => {
             nico_search.cancel();
         };
@@ -386,18 +388,17 @@
         };
 
         const setData = async (search_result) => {     
-            const page = search_result.meta.page;
+            const page_num = search_result.meta.page;
             const total_count = search_result.meta.totalCount;
-            this.refs.page.setCurrentPage(page);
-            this.refs.page.setTotaCount(total_count);
+            let total_page_num = 0;
             if(total_count<search_offset+search_limit){
-                this.refs.page.setTotalPages(Math.ceil(total_count/search_limit));
+                total_page_num = Math.ceil(total_count/search_limit);
             }else{
-                this.refs.page.setTotalPages(Math.ceil((search_offset+search_limit)/search_limit))
+                total_page_num = Math.ceil((search_offset+search_limit)/search_limit);
             }
-            // const video_ids = search_result.data.map(value => {
-            //     return value.contentId;
-            // });
+            this.pagination_obs.trigger("set-data", {
+                page_num, total_page_num, total_count
+            });
 
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
             const items = await Promise.all(
@@ -537,7 +538,7 @@
             nico_search_params.page(page);
             
             setSearchCondState(sort_name, sort_order, search_kind);
-            this.refs.page.setCurrentPage(page);
+            this.pagination_obs.trigger("set-page-num", { page_num:page });
 
             await this.search();
         });

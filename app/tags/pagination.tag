@@ -45,31 +45,27 @@
     <div class="label center-hv">ヒット件数: {this.total_count.toLocaleString()}</div>
 
     <script>
+        const pagination_obs = this.opts.obs;
+
         this.current_page = 1;
         this.total_pages = 0;
         this.total_count = 0;
 
-        this.setCurrentPage = (page) => {
-            this.current_page = page;
-            this.update();
-        };
+        pagination_obs.on("set-page-num", (args) => {
+            const { page_num } = args;
 
-        this.setTotalPages = (pages) => {
-            this.total_pages = pages;
+            this.current_page = page_num;
             this.update();
-        };
-        
-        this.setTotaCount = (total_count) => {
+        });
+
+        pagination_obs.on("set-data", (args) => {
+            const { page_num, total_page_num, total_count } = args;
+
+            this.current_page = page_num;
+            this.total_pages = total_page_num;
             this.total_count = total_count;
             this.update();
-        };
-
-        this.resetPage = () => {
-            this.current_page = 1;
-            this.total_pages = 0;
-            this.total_count = 0;  
-            this.update();
-        };
+        });
 
         this.onkeypress = (e) =>{
             if(e.key=="Enter"){
@@ -78,7 +74,8 @@
                     return;
                 }
                 this.current_page = num;
-                this.opts.onmovepage(this.current_page);
+
+                pagination_obs.trigger("move-page", { page_num: this.current_page });
                 return;
             }
             if(!/^[0-9]+$/.test(e.key)){
@@ -91,7 +88,7 @@
                 this.current_page -= 1;
                 this.update();
 
-                this.opts.onmovepage(this.current_page);
+                pagination_obs.trigger("move-page", { page_num: this.current_page });
             }
         };
 
@@ -100,7 +97,7 @@
                 this.current_page += 1;
                 this.update();
 
-                this.opts.onmovepage(this.current_page);
+                pagination_obs.trigger("move-page", { page_num: this.current_page });
             }
         };
 

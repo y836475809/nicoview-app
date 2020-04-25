@@ -201,7 +201,7 @@
             </label>
         </div>
         <div class="search-query-container">
-            <input class="query-input" type="search" onkeydown={onkeydownSearchInput}>
+            <input class="query-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput}>
             <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
             </div>

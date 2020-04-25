@@ -1,4 +1,4 @@
-<play-history>
+<play-history-page>
     <style scoped>
         :scope {
             width: 100%;
@@ -126,4 +126,4 @@
             grid_table.setData(items);
         });
     </script>
-</play-history>
+</play-history-page>

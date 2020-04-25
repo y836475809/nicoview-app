@@ -9,21 +9,39 @@
             overflow-y: hidden;
         }
 
-        .main-group-buttons {
-            display: inline-block;
-            width: var(--main-group-buttons-width);
+        .main-container {
+            width: 100%;
             height: 100%;
-            background-color: #222222
+            display: flex;
+
         }
 
-        .page-container {
-            display: inline-block;
+        .page-container.left > * {
             position: absolute;
             height: 100%;
-            width: calc(100% - var(--main-group-buttons-width) - var(--page-margin)); 
+            width: calc(100% - var(--main-group-buttons-width) * 2 - var(--page-margin)); 
             overflow-x: hidden;          
         }
+        .page-container.right > * {
+            position: absolute;
+            top: 40px;
+            right:  var(--main-group-buttons-width);
+            overflow-x: hidden; 
+            overflow-y: hidden; 
+            height: calc(100vh - 60px);
+        }
+        .page-container.right > div {
+            border: 1px solid gray;
+            border-radius: 5px;
+            padding: 5px;
+            background-color: var(--control-color);
+        }
 
+        .main-group-buttons {
+            width: var(--main-group-buttons-width);
+            height: 100%;
+            background-color: #1e2229;
+        }
         .main-group-buttons input[type=radio] {
             display: none; 
         }
@@ -34,20 +52,15 @@
             margin: 2px;
             text-align: center;
             box-sizing: border-box;
-        }
-        .main-group-buttons .label .button{
             width: 50px;
-            height: 50px;
+            height: 50px;      
         }
-
-        .main-group-buttons > .label .fa-book, 
-        .main-group-buttons > .label .fa-search,
-        .main-group-buttons > .label .fa-download,  
-        .main-group-buttons > .label .fa-history, 
-        .main-group-buttons > .label .fa-cog,
-        .main-group-buttons > .label .fa-list {
-            font-size: 30px;
-            color: lightgrey;
+        .main-group-buttons .fas {
+            font-size: 24px;
+            color: grey;
+        }
+        .main-group-buttons.right {
+            margin-left: auto;
         }
 
         .download-badge {
@@ -68,53 +81,55 @@
             text-align: center;
         }
     </style>
-    <div class="main-group-buttons">
-        <label class="label">
-            <input type="radio" name="page_select" class="library-radio" onclick="{this.onclickPageSelect.bind(this,'library')}"> 
-            <span title="ライブラリ" class="button center-hv"><span class="fas fa-book"></span></span>
-        </label>
-        <label class="label">
-            <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
-            <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
-        </label>
-        <label class="label">
-            <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
-            <span title="マイリスト" class="button center-hv"><span class="fas fa-list"></span></span> 
-        </label>
-        <label class="label">
-            <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
-            <span title="ダウンロード" class="button download-badge center-hv">
-                <span class="fas fa-download"></span>
-                <span class="item-num">{this.donwnload_item_num}</span>
-            </span> 
-        </label>
-        <label class="label">
-            <input type="radio" name="page_select" class="history-radio" onclick="{this.onclickPageSelect.bind(this,'history')}"> 
-            <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
-        </label>
-        <label class="label">
-            <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
-            <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
-        </label>     
-        <bookmark-page obs={obs}></bookmark-page>
-    </div>
-    <div class="page-container library-page">
-        <library-page obs={obs}></library-page>
-    </div>
-    <div class="page-container search-page">
-        <search-page obs={obs}></search-page>
-    </div>
-    <div class="page-container mylist-page">
-        <mylist-page obs={obs}></mylist-page>
-    </div>
-    <div class="page-container download-page">
-        <download-page obs={obs}></download-page>
-    </div>
-    <div class="page-container history-page">
-        <play-history obs={obs}></play-history>
-    </div>
-    <div class="page-container setting-page">
-        <setting-page obs={obs}></setting-page>
+
+    <div class="main-container">
+        <div class="main-group-buttons left">
+            <label class="label">
+                <input type="radio" name="page_select" class="library-radio" onclick="{this.onclickPageSelect.bind(this,'library')}"> 
+                <span title="ライブラリ" class="button center-hv"><span class="fas fa-book"></span></span>
+            </label>
+            <label class="label">
+                <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
+                <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
+            </label>
+            <label class="label">
+                <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
+                <span title="マイリスト" class="button center-hv"><span class="fas fa-list"></span></span> 
+            </label>
+            <label class="label">
+                <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
+                <span title="ダウンロード" class="button download-badge center-hv">
+                    <span class="fas fa-download"></span>
+                    <span class="item-num">{this.donwnload_item_num}</span>
+                </span> 
+            </label>
+            <label class="label">
+                <input type="radio" name="page_select" class="play-history-radio" onclick="{this.onclickPageSelect.bind(this,'play-history')}"> 
+                <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
+            </label>
+            <label class="label">
+                <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
+                <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
+            </label>     
+        </div>
+        <div class="page-container left">
+            <library-page obs={obs}></library-page>
+            <search-page obs={obs}></search-page>
+            <mylist-page obs={obs}></mylist-page>
+            <download-page obs={obs}></download-page>
+            <play-history-page obs={obs}></play-history-page>
+            <setting-page obs={obs}></setting-page>
+        </div>
+        <div class="page-container right">
+            <div class="bookmark-page dialog-shadow">
+                <bookmark-page obs={obs}></bookmark-page>
+            </div>
+        </div>
+        <div class="main-group-buttons right">
+            <div class="button center-hv" title="ブックマーク" onclick="{this.onclickShowPage.bind(this,'bookmark')}">
+                <i class="fas fa-bookmark"></i>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -173,11 +188,11 @@
         remote.getCurrentWindow().setMenu(menu);
 
         const select_page = (page_name)=>{
-            Array.from(this.root.querySelectorAll(".page-container"), 
-                (elm, index) => {
+            Array.from(this.root.querySelectorAll(".page-container.left > *"), 
+                (elm) => {
                     elm.style.zIndex = 0;
                 });
-            const page = this.root.querySelector(`.${page_name}-page`);
+            const page = this.root.querySelector(`${page_name}-page`);
             page.style.zIndex = 1;
 
             const radio = this.root.querySelector(`.${page_name}-radio`);
@@ -186,6 +201,22 @@
 
         this.onclickPageSelect = (page_name, e) => {
             select_page(page_name);
+        };
+
+        this.onclickShowPage = (page_name, e) => {
+            const page = this.root.querySelector(`.${page_name}-page`);
+            const page_zIndex = page.style.zIndex;
+
+            Array.from(this.root.querySelectorAll(".page-container.right > *"), 
+                (elm) => {
+                    elm.style.zIndex = -1;
+                });
+
+            if(page_zIndex > 0){
+                page.style.zIndex = -1;
+            }else{
+                page.style.zIndex = 2;
+            }
         };
 
         this.on("mount", async () => {

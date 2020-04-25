@@ -2,51 +2,23 @@
     <style scoped>
         :scope {
             --page-width: 300px;
-            --button-width: 30px;
-            --button-height: 70px;
         }
+
         .sidebar {
-            position: fixed;
-            top: 0px;
-            right: calc(-1 * var(--page-width));
             width: var(--page-width);
             height: 100%;
-            z-index: 10;
-            transition-property: all;
-            transition-duration: 300ms;
-            transition-delay: 0s;
-            transition-timing-function: linear;
         }
-        .sidebar > .button {
-            position: relative;
-            display: block;
-            top: calc(50% - var(--button-height));
-            left: calc(-1 * var(--button-width));   
-            width: var(--button-width);
-            height: var(--button-height);
-            color: white;
-            background-color: rgba(0, 0, 0, 0.5);
-            text-align: center;
-            text-decoration: none;
-            line-height: var(--button-height);
-            border-radius: 5px 0px 0px 5px;
-        }
+
         .content {
-            position: absolute;
-            top: 0px;
             width: 100%;
             height: 100%;
             background-color: var(--control-color);
         }
-        .open {
-            transform: translateX(calc(-1 * var(--page-width)));
-        }
-        .close {
-            transform: translateX(0px);
-        }
+
         .bookmark-item {
             color:royalblue;
         }
+        
         .acdn-menu-container {
             width: 100%;
             height: calc(100% - var(--menubar-height) - 5px);
@@ -54,8 +26,7 @@
         }
     </style>    
 
-    <aside class="sidebar dialog-shadow close">
-        <div class="button {sb_button_icon}" title="ブックマーク" onclick={onclickSideBar}></div>
+    <aside class="sidebar">
         <accordion class="content"
             title="ブックマーク" 
             expand={true} 
@@ -95,18 +66,6 @@
             const name = this.name;
             await DataIpcRenderer.action("bookmark", "update", { name, items });
         });
-
-        this.onclickSideBar = (e) => {
-            const elm = this.root.querySelector(".sidebar");
-            elm.classList.toggle("close");
-            elm.classList.remove("open");
-            if(!elm.classList.contains("close")){
-                elm.classList.add("open");
-                this.sb_button_icon = "fas fa-chevron-right";
-            }else{
-                this.sb_button_icon = "fas fa-chevron-left";
-            }
-        };
 
         const getMenuEnable = (type, items) => {
             if(items.length === 0) {

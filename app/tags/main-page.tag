@@ -1,7 +1,7 @@
 <main-page>
     <style scoped>
         :scope {
-            --main-group-buttons-width: 55px;
+            --main-sidebar-width: 55px;
             --page-margin: 1px;
             width: 100%;
             height: 100%;
@@ -13,19 +13,18 @@
             width: 100%;
             height: 100%;
             display: flex;
-
         }
 
         .page-container.left > * {
             position: absolute;
             height: 100%;
-            width: calc(100% - var(--main-group-buttons-width) * 2 - var(--page-margin)); 
+            width: calc(100% - var(--main-sidebar-width) * 2 - var(--page-margin)); 
             overflow-x: hidden;          
         }
         .page-container.right > * {
             position: absolute;
             top: 40px;
-            right:  var(--main-group-buttons-width);
+            right:  var(--main-sidebar-width);
             overflow-x: hidden; 
             overflow-y: hidden; 
             height: calc(100vh - 60px);
@@ -37,29 +36,29 @@
             background-color: var(--control-color);
         }
 
-        .main-group-buttons {
-            width: var(--main-group-buttons-width);
+        .main-sidebar {
+            width: var(--main-sidebar-width);
             height: 100%;
             background-color: #1e2229;
         }
-        .main-group-buttons input[type=radio] {
+        .main-sidebar input[type=radio] {
             display: none; 
         }
-        .main-group-buttons input[type=radio]:checked + .button{
+        .main-sidebar input[type=radio]:checked + .button{
             border-left: 3px solid #2C7CFF;
         }
-        .main-group-buttons .button {
+        .main-sidebar .button {
             margin: 2px;
             text-align: center;
             box-sizing: border-box;
             width: 50px;
             height: 50px;      
         }
-        .main-group-buttons .fas {
+        .main-sidebar .fas {
             font-size: 24px;
             color: grey;
         }
-        .main-group-buttons.right {
+        .main-sidebar.right {
             margin-left: auto;
         }
 
@@ -83,18 +82,18 @@
     </style>
 
     <div class="main-container">
-        <div class="main-group-buttons left">
+        <div class="main-sidebar left">
             <label class="label">
                 <input type="radio" name="page_select" class="library-radio" onclick="{this.onclickPageSelect.bind(this,'library')}"> 
-                <span title="ライブラリ" class="button center-hv"><span class="fas fa-book"></span></span>
+                <span title="ライブラリ" class="button center-hv fas fa-book"></span>
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
-                <span title="検索" class="button center-hv"><span class="fas fa-search"></span></span> 
+                <span title="検索" class="button center-hv fas fa-search"></span> 
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
-                <span title="マイリスト" class="button center-hv"><span class="fas fa-list"></span></span> 
+                <span title="マイリスト" class="button center-hv fas fa-list"></span> 
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
@@ -105,11 +104,11 @@
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="play-history-radio" onclick="{this.onclickPageSelect.bind(this,'play-history')}"> 
-                <span title="履歴" class="button center-hv"><span class="fas fa-history"></span></span> 
+                <span title="履歴" class="button center-hv fas fa-history"></span> 
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
-                <span title="設定" class="button center-hv"><span class="fas fa-cog"></span></span> 
+                <span title="設定" class="button center-hv fas fa-cog"></span> 
             </label>     
         </div>
         <div class="page-container left">
@@ -125,7 +124,7 @@
                 <bookmark-page obs={obs}></bookmark-page>
             </div>
         </div>
-        <div class="main-group-buttons right">
+        <div class="main-sidebar right">
             <div class="button center-hv" title="ブックマーク" onclick="{this.onclickShowPage.bind(this,'bookmark')}">
                 <i class="fas fa-bookmark"></i>
             </div>

@@ -1,7 +1,7 @@
 <main-page>
     <style scoped>
         :scope {
-            --main-sidebar-width: 55px;
+            --main-sidebar-width: 75px;
             --page-margin: 1px;
             width: 100%;
             height: 100%;
@@ -48,11 +48,20 @@
             border-left: 3px solid #2C7CFF;
         }
         .main-sidebar .button {
+            padding-top: 10px;
             margin: 2px;
             text-align: center;
             box-sizing: border-box;
-            width: 50px;
-            height: 50px;      
+            width: 70px;
+            height: 60px;   
+            display: block;
+        }
+        .main-sidebar .button-label {
+            margin: 2px;
+            text-align: center;
+            color: white;   
+            font-size: 10px;
+            user-select: none;
         }
         .main-sidebar .fas {
             font-size: 24px;
@@ -77,7 +86,6 @@
             height: 20px;
             border-radius: 50%;
             background-color: red;
-            text-align: center;
         }
     </style>
 
@@ -85,30 +93,48 @@
         <div class="main-sidebar left">
             <label class="label">
                 <input type="radio" name="page_select" class="library-radio" onclick="{this.onclickPageSelect.bind(this,'library')}"> 
-                <span title="ライブラリ" class="button center-hv fas fa-book"></span>
+                <div class="button">
+                    <span class="center-hv fas fa-book"></span>
+                    <div class="button-label">ライブラリ</div>
+                </div>
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="search-radio" onclick="{this.onclickPageSelect.bind(this,'search')}"> 
-                <span title="検索" class="button center-hv fas fa-search"></span> 
+                <div class="button">
+                    <span class="center-hv fas fa-search"></span> 
+                    <div class="button-label">検索</div>
+                </div>
             </label>
             <label class="label">
-                <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}"> 
-                <span title="マイリスト" class="button center-hv fas fa-list"></span> 
+                <input type="radio" name="page_select" class="mylist-radio" onclick="{this.onclickPageSelect.bind(this,'mylist')}">
+                <div class="button"> 
+                    <span class="center-hv fas fa-list"></span> 
+                    <div class="button-label">マイリスト</div>
+                </div>
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="download-radio" onclick="{this.onclickPageSelect.bind(this,'download')}"> 
-                <span title="ダウンロード" class="button download-badge center-hv">
-                    <span class="fas fa-download"></span>
-                    <span class="item-num">{this.donwnload_item_num}</span>
-                </span> 
+                <div class="button"> 
+                    <span class="download-badge center-hv">
+                        <span class="fas fa-download"></span>
+                        <span class="item-num">{this.donwnload_item_num}</span>
+                    </span> 
+                    <div class="button-label">ダウンロード</div>
+                </div>
             </label>
             <label class="label">
                 <input type="radio" name="page_select" class="play-history-radio" onclick="{this.onclickPageSelect.bind(this,'play-history')}"> 
-                <span title="履歴" class="button center-hv fas fa-history"></span> 
+                <div class="button"> 
+                    <span class="center-hv fas fa-history"></span> 
+                    <div class="button-label">履歴</div>
+                </div>
             </label>
             <label class="label">
-                <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}"> 
-                <span title="設定" class="button center-hv fas fa-cog"></span> 
+                <input type="radio" name="page_select" class="setting-radio" onclick="{this.onclickPageSelect.bind(this,'setting')}">
+                <div class="button">  
+                    <span class="center-hv fas fa-cog"></span> 
+                    <div class="button-label">設定</div>
+                </div>
             </label>     
         </div>
         <div class="page-container left">
@@ -125,8 +151,11 @@
             </div>
         </div>
         <div class="main-sidebar right">
-            <div class="button center-hv" title="ブックマーク" onclick="{this.onclickShowPage.bind(this,'bookmark')}">
-                <i class="fas fa-bookmark"></i>
+            <div class="button center-hv" onclick="{this.onclickShowPage.bind(this,'bookmark')}">
+                <div class="button">
+                    <i class="fas fa-bookmark"></i>
+                    <div class="button-label">ブックマーク</div>
+                </div>
             </div>
         </div>
     </div>

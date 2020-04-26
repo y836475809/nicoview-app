@@ -14,7 +14,6 @@
     <div class="nico-search-sidebar">
         <listview 
             title="ニコニコ動画検索" 
-            expand={true} 
             obs={obs_listview}
             icon_class={icon_class}
             name={name}>

@@ -13,7 +13,6 @@
             line-height: 1;
             color: #111111;
             background: #f4f4f4;
-            cursor: pointer;
             font-size: 1.5em;
             border-bottom: 1px solid lightgrey;
         }
@@ -55,11 +54,6 @@
             width: 100%;
             overflow: auto;
         }
-
-        .toggle-menu {
-            overflow: hidden;
-            transition-duration: 300ms;
-        }
         
         .listview-input {
             height: 30px;
@@ -75,30 +69,27 @@
         }
     </style>
 
-    <label class="listview-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
+    <label class="listview-menubar">{opts.title}</label>
     <input class="listview-input" type="search" placeholder="検索" 
         onkeydown={onkeydownSearchInput}>
     <div class="listview-menu-container">
-        <div class="toggle-menu">
-            <ul class="listview-list">
-                <li class="listview-item" data-id={i} each={ item, i in this.items }
-                    title={item.title}
-                    onclick={this.onclickItem.bind(this,item)} 
-                    ondblclick={this.ondblclickItem.bind(this,item)}
-                    onmouseup={this.onmouseUp.bind(this,item)}
-                    onmousedown={this.onmouseDown.bind(this,item)}>
-                    <i class={getIconClass(item)}></i>
-                    {item.title}
-                </li>
-            </ul>
-        </div>
+        <ul class="listview-list">
+            <li class="listview-item" data-id={i} each={ item, i in this.items }
+                title={item.title}
+                onclick={this.onclickItem.bind(this,item)} 
+                ondblclick={this.ondblclickItem.bind(this,item)}
+                onmouseup={this.onmouseUp.bind(this,item)}
+                onmousedown={this.onmouseDown.bind(this,item)}>
+                <i class={getIconClass(item)}></i>
+                {item.title}
+            </li>
+        </ul>
     </div>
 
     <script>
         const Sortable = window.Sortable;
 
         let sortable = null;
-        const menu_item_h = 30;
         const obs = this.opts.obs;
         const icon_class = this.opts.icon_class;
 
@@ -110,7 +101,6 @@
             const { items } = args;
             this.items = items;
             this.update();
-            chanegExpand(true);
         });
 
         obs.on("addList", async (args) => {
@@ -129,7 +119,6 @@
                 return elms[index].classList.contains("selected")===false;
             });
             this.update();
-            chanegExpand(true);
 
             triggerChange();
         });
@@ -143,13 +132,12 @@
             this.items = sorted_items;
 
             this.update();
-            chanegExpand(true);
 
             triggerChange();
         };
 
         const getInputValue = () => {
-            const elm = this.root.querySelector(".query-input");
+            const elm = this.root.querySelector(".listview-input");
             return elm.value.toLowerCase();
         };
 
@@ -169,7 +157,6 @@
             });
 
             this.update();
-            chanegExpand(true);
 
             const dofilter = query!="";
             sortable.option("disabled", dofilter);
@@ -194,30 +181,6 @@
             return `center-hv listview-item-icon ${icon_name} ${this.opts.name}-item`; 
         };
 
-        const getMenuElm = () => {
-            return this.root.querySelector(".toggle-menu");
-        };
-
-        const chanegExpand = (is_expand) => {
-            if(!this.items){
-                return;
-            }
-
-            const elm = getMenuElm();
-            if(is_expand){
-                const length = this.items.length;
-                const _clientH = length * menu_item_h + 30;
-                elm.style.height = _clientH + "px";
-            }else{
-                elm.style.height = "0px";
-            }  
-        };
-
-        const toggleExpand = () => {
-            const elm = getMenuElm();
-            chanegExpand(elm.clientHeight===0);
-        };
-
         const setSelected = (target_elm, item) => {
             const elms = this.root.querySelectorAll(".listview-item");
             elms.forEach((elm) => {
@@ -231,10 +194,6 @@
             return this.items.filter((item, index) => {
                 return elms[index].classList.contains("selected")===true;
             });
-        };
-
-        this.onclickMenubar = (e) => {
-            toggleExpand();
         };
 
         this.onclickItem = (item, e) => {

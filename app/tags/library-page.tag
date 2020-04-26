@@ -10,7 +10,6 @@
     <div class="library-sidebar">
         <listview 
             title="ライブラリ検索" 
-            expand={true} 
             obs={obs_listview}
             name={name}>
         </listview>

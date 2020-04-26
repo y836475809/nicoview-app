@@ -29,7 +29,6 @@
     <aside class="sidebar">
         <listview class="content"
             title="ブックマーク" 
-            expand={true} 
             obs={obs_listview}
             icon_class={icon_class}
             name={name}>

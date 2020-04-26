@@ -12,13 +12,13 @@
     </style>
 
     <div class="nico-search-sidebar">
-        <accordion 
+        <listview 
             title="ニコニコ動画検索" 
             expand={true} 
             obs={obs_accordion}
             icon_class={icon_class}
             name={name}>
-        </accordion>
+        </listview>
     </div>
 
     <script>

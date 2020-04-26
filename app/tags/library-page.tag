@@ -8,12 +8,12 @@
     </style>
 
     <div class="library-sidebar">
-        <accordion 
+        <listview 
             title="ライブラリ検索" 
             expand={true} 
             obs={obs_accordion}
             name={name}>
-        </accordion>
+        </listview>
     </div>
 
     <script>

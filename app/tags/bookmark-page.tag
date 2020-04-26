@@ -18,7 +18,7 @@
         .bookmark-item {
             color:royalblue;
         }
-        
+
         .acdn-menu-container {
             width: 100%;
             height: calc(100% - var(--menubar-height) - 5px);
@@ -27,13 +27,13 @@
     </style>    
 
     <aside class="sidebar">
-        <accordion class="content"
+        <listview class="content"
             title="ブックマーク" 
             expand={true} 
             obs={obs_accordion}
             icon_class={icon_class}
             name={name}>
-        </accordion>
+        </listview>
     </aside>
 
     <script>

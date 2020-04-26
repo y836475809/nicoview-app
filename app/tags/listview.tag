@@ -1,4 +1,4 @@
-<accordion>
+<listview>
     <style scoped>
         :scope {
             --menubar-height: 30px;
@@ -273,4 +273,4 @@
             });            
         });
     </script>
-</accordion>
+</listview>

@@ -8,12 +8,12 @@
     </style>
 
     <div class="nico-mylist-sidebar">
-        <accordion 
+        <listview 
             title="マイリスト" 
             expand={true} 
             obs={obs_accordion}
             name={name}>
-        </accordion>
+        </listview>
     </div>
 
     <script>

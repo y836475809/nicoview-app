@@ -2,7 +2,6 @@
     <style scoped>
         :scope {
             --main-sidebar-width: 75px;
-            --page-margin: 1px;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -18,7 +17,7 @@
         .page-container.left > * {
             position: absolute;
             height: 100%;
-            width: calc(100% - var(--main-sidebar-width) * 2 - var(--page-margin)); 
+            width: calc(100% - var(--main-sidebar-width) * 2); 
             overflow-x: hidden;          
         }
         .page-container.right > * {

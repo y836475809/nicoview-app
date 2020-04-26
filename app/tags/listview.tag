@@ -4,7 +4,7 @@
             --menubar-height: 30px;
         }
 
-        .acdn-menubar {
+        .listview-menubar {
             display: block;
             position: relative;
             height: var(--menubar-height);
@@ -18,7 +18,7 @@
             border-bottom: 1px solid lightgrey;
         }
 
-        .acdn-list {
+        .listview-list {
             display: table;
             width: 100%;
             margin: 0;
@@ -27,7 +27,7 @@
             list-style: none;
         }
 
-        .acdn-item {
+        .listview-item {
             display: flex;
             height: 30px;
             padding: 5px 0 5px 10px;
@@ -38,22 +38,21 @@
             overflow: hidden;
         }
 
-        .acdn-item:hover {
+        .listview-item:hover {
             background-color: #6190cd6b;
         }
 
-        .acdn-item.selected {
+        .listview-item.selected {
             color: white;
             background-color: #0f468d6b; 
         }
 
-        .icont-item {
+        .listview-item-icon {
             margin-right: 5px;
         }
 
-        .acdn-menu-container {
+        .listview-menu-container {
             width: 100%;
-            /* height: calc(50vh - var(--menubar-height) - 5px); */
             overflow: auto;
         }
 
@@ -62,30 +61,27 @@
             transition-duration: 300ms;
         }
         
-        .query-input {
+        .listview-input {
             height: 30px;
             width: calc(100% - 4px);
             margin: 0 2px 0 2px;
             padding: 2px;
             border: solid 1px #ccc;
             border-radius: 2px;
-        }     
-        .search-container {
-            display: flex;
         }
 
-        .acdn-item-ghost-class {
+        .listview-item-ghost-class {
             background-color: #C8EBFB;
         }
     </style>
 
-    <label class="acdn-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
-    <input class="query-input" type="search" placeholder="検索" 
+    <label class="listview-menubar" onclick={this.onclickMenubar}>{opts.title}</label>
+    <input class="listview-input" type="search" placeholder="検索" 
         onkeydown={onkeydownSearchInput}>
-    <div class="acdn-menu-container">
+    <div class="listview-menu-container">
         <div class="toggle-menu">
-            <ul class="acdn-list">
-                <li class="acdn-item" data-id={i} each={ item, i in this.items }
+            <ul class="listview-list">
+                <li class="listview-item" data-id={i} each={ item, i in this.items }
                     title={item.title}
                     onclick={this.onclickItem.bind(this,item)} 
                     ondblclick={this.ondblclickItem.bind(this,item)}
@@ -128,7 +124,7 @@
         });
 
         obs.on("deleteList", () => {
-            const elms = this.root.querySelectorAll(".acdn-item");
+            const elms = this.root.querySelectorAll(".listview-item");
             this.items = this.items.filter((item, index) => {
                 return elms[index].classList.contains("selected")===false;
             });
@@ -158,7 +154,7 @@
         };
 
         const filter = (query) => {
-            const elms = this.root.querySelectorAll(".acdn-item");
+            const elms = this.root.querySelectorAll(".listview-item");
             elms.forEach((elm, index) => {
                 if (query == "") {
                     elm.style.display ="";
@@ -195,7 +191,7 @@
             if(icon_name === undefined){
                 return ""; 
             }
-            return `center-hv icont-item ${icon_name} ${this.opts.name}-item`; 
+            return `center-hv listview-item-icon ${icon_name} ${this.opts.name}-item`; 
         };
 
         const getMenuElm = () => {
@@ -223,7 +219,7 @@
         };
 
         const setSelected = (target_elm, item) => {
-            const elms = this.root.querySelectorAll(".acdn-item");
+            const elms = this.root.querySelectorAll(".listview-item");
             elms.forEach((elm) => {
                 elm.classList.remove("selected");
             });
@@ -231,7 +227,7 @@
         };
 
         const getSelectedItems = () => {
-            const elms = this.root.querySelectorAll(".acdn-item");
+            const elms = this.root.querySelectorAll(".listview-item");
             return this.items.filter((item, index) => {
                 return elms[index].classList.contains("selected")===true;
             });
@@ -263,10 +259,10 @@
         };
 
         this.on("mount", () => {
-            const elm = this.root.querySelector(".acdn-list");
+            const elm = this.root.querySelector(".listview-list");
             sortable = Sortable.create(elm, {
-                ghostClass: "acdn-item-ghost-class",
-                draggable: ".acdn-item",
+                ghostClass: "listview-item-ghost-class",
+                draggable: ".listview-item",
                 onSort: (evt) => {
                     sortItems();
                 }

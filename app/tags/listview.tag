@@ -103,21 +103,21 @@
 
         let sortable = null;
         const menu_item_h = 30;
-        const obs_accordion = this.opts.obs;
+        const obs = this.opts.obs;
         const icon_class = this.opts.icon_class;
 
         const triggerChange = () => {
-            obs_accordion.trigger("changed", {items:this.items});
+            obs.trigger("changed", {items:this.items});
         };
 
-        obs_accordion.on("loadData", async (args) => {
+        obs.on("loadData", async (args) => {
             const { items } = args;
             this.items = items;
             this.update();
             chanegExpand(true);
         });
 
-        obs_accordion.on("addList", async (args) => {
+        obs.on("addList", async (args) => {
             const { items } = args;
             this.items = this.items.concat(items);
 
@@ -127,7 +127,7 @@
             triggerChange();
         });
 
-        obs_accordion.on("deleteList", () => {
+        obs.on("deleteList", () => {
             const elms = this.root.querySelectorAll(".acdn-item");
             this.items = this.items.filter((item, index) => {
                 return elms[index].classList.contains("selected")===false;
@@ -243,18 +243,18 @@
 
         this.onclickItem = (item, e) => {
             setSelected(e.target, item);
-            obs_accordion.trigger("item-clicked", item);
+            obs.trigger("item-clicked", item);
         };
 
         this.ondblclickItem = (item, e) => {
-            obs_accordion.trigger("item-dlbclicked", item);
+            obs.trigger("item-dlbclicked", item);
         };
 
         this.onmouseUp= (item, e) => {
             setSelected(e.target, item);
             if(e.button===2){
                 const items = getSelectedItems();
-                obs_accordion.trigger("show-contextmenu", e, { items });
+                obs.trigger("show-contextmenu", e, { items });
             }
         };
 

@@ -11,7 +11,7 @@
         <listview 
             title="ライブラリ検索" 
             expand={true} 
-            obs={obs_accordion}
+            obs={obs_listview}
             name={name}>
         </listview>
     </div>
@@ -23,16 +23,16 @@
         const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
-        this.obs_accordion = riot.observable();
+        this.obs_listview = riot.observable();
         this.name = "library-search";
 
         this.on("mount", async () => {
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
-            this.obs_accordion.trigger("loadData", { items });
+            this.obs_listview.trigger("loadData", { items });
         });
 
-        this.obs_accordion.on("changed", async (args) => {
+        this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
             await DataIpcRenderer.action("bookmark", "update", { name, items });
@@ -42,13 +42,13 @@
             return  Menu.buildFromTemplate([
                 { 
                     label: "削除", click() {
-                        self.obs_accordion.trigger("deleteList");
+                        self.obs_listview.trigger("deleteList");
                     }
                 }
             ]);
         };
         
-        this.obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_listview.on("show-contextmenu", (e) => {
             const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
@@ -57,10 +57,10 @@
             const items = [
                 { title: query, query: query }
             ];
-            this.obs_accordion.trigger("addList", { items });
+            this.obs_listview.trigger("addList", { items });
         });
 
-        this.obs_accordion.on("item-dlbclicked", (item) => {
+        this.obs_listview.on("item-dlbclicked", (item) => {
             obs.trigger("library-page:search-item-dlbclicked", item.query);
         });
     </script>

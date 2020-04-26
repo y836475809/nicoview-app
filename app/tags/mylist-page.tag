@@ -11,7 +11,7 @@
         <listview 
             title="マイリスト" 
             expand={true} 
-            obs={obs_accordion}
+            obs={obs_listview}
             name={name}>
         </listview>
     </div>
@@ -23,7 +23,7 @@
         const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
-        this.obs_accordion = riot.observable();
+        this.obs_listview = riot.observable();
         this.name = "mylist";
         let hasItem = (mylist_id) => false;
 
@@ -31,7 +31,7 @@
             // TODO error対応
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
-            this.obs_accordion.trigger("loadData", { items });
+            this.obs_listview.trigger("loadData", { items });
 
             hasItem = (mylist_id) => {
                 return items.some(value=>{
@@ -40,7 +40,7 @@
             };
         });
 
-        this.obs_accordion.on("changed", async (args) => {
+        this.obs_listview.on("changed", async (args) => {
             const { items } = args;
 
             hasItem = (mylist_id) => {
@@ -57,18 +57,18 @@
             const nemu_templete = [
                 { 
                     label: "削除", click() {
-                        self.obs_accordion.trigger("deleteList");
+                        self.obs_listview.trigger("deleteList");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
-        this.obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_listview.on("show-contextmenu", (e) => {
             const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        this.obs_accordion.on("item-dlbclicked", (item) => {
+        this.obs_listview.on("item-dlbclicked", (item) => {
             obs.trigger("mylist-page:item-dlbclicked", item);
         });
         
@@ -77,7 +77,7 @@
             const items = [
                 { title, mylist_id, creator, link }
             ];
-            this.obs_accordion.trigger("addList", { items });
+            this.obs_listview.trigger("addList", { items });
         });
 
         obs.on("mylist-page:sidebar:has-item", (args) => {

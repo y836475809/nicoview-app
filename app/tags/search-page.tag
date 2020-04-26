@@ -15,7 +15,7 @@
         <listview 
             title="ニコニコ動画検索" 
             expand={true} 
-            obs={obs_accordion}
+            obs={obs_listview}
             icon_class={icon_class}
             name={name}>
         </listview>
@@ -28,7 +28,7 @@
         const { DataIpcRenderer } = window.DataIpc;
 
         const obs = this.opts.obs; 
-        this.obs_accordion = riot.observable();
+        this.obs_listview = riot.observable();
         this.name = "nico-search";
         this.icon_class = {
             tag :  "fas fa-tag fa-lg"
@@ -37,10 +37,10 @@
         this.on("mount", async () => {
             const name = this.name;
             const items = await DataIpcRenderer.action("bookmark", "getData", { name });
-            this.obs_accordion.trigger("loadData", { items });
+            this.obs_listview.trigger("loadData", { items });
         });
 
-        this.obs_accordion.on("changed", async (args) => {
+        this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
             await DataIpcRenderer.action("bookmark", "update", { name, items });
@@ -50,19 +50,19 @@
             const nemu_templete = [
                 { 
                     label: "削除", click() {
-                        self.obs_accordion.trigger("deleteList");
+                        self.obs_listview.trigger("deleteList");
                     }
                 }
             ];
             return Menu.buildFromTemplate(nemu_templete);
         };
 
-        this.obs_accordion.on("show-contextmenu", (e) => {
+        this.obs_listview.on("show-contextmenu", (e) => {
             const context_menu = createMenu(this);
             context_menu.popup({window: remote.getCurrentWindow()}); 
         });
 
-        this.obs_accordion.on("item-dlbclicked", (item) => {
+        this.obs_listview.on("item-dlbclicked", (item) => {
             obs.trigger("search-page:item-dlbclicked", item.cond);
         });
 
@@ -70,7 +70,7 @@
             const items = [
                 { title: cond.query, type:cond.search_kind , cond: cond }
             ];
-            this.obs_accordion.trigger("addList", { items });
+            this.obs_listview.trigger("addList", { items });
         });
     </script>
 </search-sidebar>

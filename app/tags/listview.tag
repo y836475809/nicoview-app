@@ -52,7 +52,7 @@
 
         .listview-menu-container {
             width: 100%;
-            overflow: auto;
+            overflow: hidden;
         }
         
         .listview-input {

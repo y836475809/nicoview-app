@@ -12,6 +12,7 @@
     --control-color:whitesmoke;
     --control-border-color:gray;
     --window-titlebar-height:30px;
+    --right-sidebar-page-top:40px;
 }
 
 html, body {

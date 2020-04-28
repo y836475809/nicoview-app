@@ -16,17 +16,17 @@
 
         .page-container.left > * {
             position: absolute;
-            height: 100%;
+            height: calc(100% - var(--window-titlebar-height));
             width: calc(100% - var(--main-sidebar-width) * 2); 
             overflow-x: hidden;          
         }
         .page-container.right > * {
             position: absolute;
-            top: 40px;
+            top: calc(var(--window-titlebar-height) + var(--right-sidebar-page-top));
             right:  var(--main-sidebar-width);
+            height: calc(100% - var(--window-titlebar-height) - var(--right-sidebar-page-top) - 8px);
             overflow-x: hidden; 
             overflow-y: hidden; 
-            height: calc(100vh - 60px);
         }
         .page-container.right > div {
             border: 1px solid gray;

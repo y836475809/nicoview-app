@@ -174,7 +174,7 @@
 
         .search-grid-container {
             width: 100%;
-            height: calc(100vh - var(--window-titlebar-height) - 70px);
+            height: calc(100% - 70px);
             overflow: hidden;
         }
         

@@ -2,6 +2,7 @@
     <style scoped>
         :scope {
             --menubar-height: 30px;
+            --input-height: 30px;
         }
 
         .listview-menubar {
@@ -20,6 +21,7 @@
         .listview-list {
             display: table;
             width: 100%;
+            height: 100%;
             margin: 0;
             padding: 0;
             background: #f4f4f4;
@@ -52,11 +54,12 @@
 
         .listview-menu-container {
             width: 100%;
-            overflow: hidden;
+            height: calc(100% - var(--menubar-height) - var(--input-height));
+            overflow-x: hidden;
         }
         
         .listview-input {
-            height: 30px;
+            height: var(--input-height);
             width: calc(100% - 4px);
             margin: 0 2px 0 2px;
             padding: 2px;

@@ -98,11 +98,11 @@
 
         .mylist-container {
             display: flex;
-            margin-top: var(--margin);
         }
 
         .mylist-label {
-            margin-right: 5px;
+            margin-left: var(--margin);
+            margin-right: var(--margin);
             user-select: none;
         }
 

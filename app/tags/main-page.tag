@@ -2,6 +2,7 @@
     <style scoped>
         :scope {
             --main-sidebar-width: 75px;
+            --margin: 5px;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -18,15 +19,17 @@
             position: absolute;
             height: calc(100% - var(--window-titlebar-height));
             width: calc(100% - var(--main-sidebar-width) * 2); 
-            overflow-x: hidden;          
+            overflow-x: hidden;
+            padding: var(--margin);
         }
         .page-container.right > * {
             position: absolute;
             top: calc(var(--window-titlebar-height) + var(--right-sidebar-page-top));
-            right:  var(--main-sidebar-width);
+            right: calc(var(--main-sidebar-width) + var(--margin));
             height: calc(100% - var(--window-titlebar-height) - var(--right-sidebar-page-top) - 8px);
             overflow-x: hidden; 
             overflow-y: hidden; 
+            padding: var(--margin);
         }
         .page-container.right > div {
             border: 1px solid gray;
@@ -197,14 +200,18 @@
             select_page(page_name);
         };
 
-        this.onclickShowPage = (page_name, e) => {
-            const page = this.root.querySelector(`.${page_name}-page`);
-            const page_zIndex = page.style.zIndex;
-
+        const hideRightPage = ()=>{ 
             Array.from(this.root.querySelectorAll(".page-container.right > *"), 
                 (elm) => {
                     elm.style.zIndex = -1;
                 });
+        };
+
+        this.onclickShowPage = (page_name, e) => {
+            const page = this.root.querySelector(`.${page_name}-page`);
+            const page_zIndex = page.style.zIndex;
+
+            hideRightPage();
 
             if(page_zIndex > 0){
                 page.style.zIndex = -1;
@@ -215,6 +222,7 @@
 
         this.on("mount", async () => {
             select_page("library");
+            hideRightPage();
 
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
             this.donwnload_item_num = video_ids.length;

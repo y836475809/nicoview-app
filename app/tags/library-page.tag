@@ -72,6 +72,11 @@
             height: 100%;
             --search-input-width: 200px;
             --search-button-size: 30px;
+            --margin: 5px;
+        }
+
+        .library-controls-container {
+            margin-bottom: var(--margin);
         }
 
         .library-controls-container,
@@ -87,7 +92,6 @@
         }
         .library-controls-container .search-container {
             margin-left: auto;
-            margin-bottom: 4px;
         }
         
         .library-controls-container .search-input {
@@ -138,7 +142,7 @@
 
         .library-grid-container {
             width: 100%;
-            height: calc(100% - var(--search-button-size) - 4px);
+            height: calc(100% - var(--search-button-size) - var(--margin));
             overflow: hidden;
         }
 

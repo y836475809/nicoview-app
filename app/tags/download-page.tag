@@ -21,7 +21,6 @@
             display: flex;
             width: 100%;
             height: var(--control-height);
-            padding: 3px;
             background-color: var(--control-color);         
         }
         

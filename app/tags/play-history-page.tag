@@ -8,7 +8,7 @@
         .history-grid-container {
             background-color: var(--control-color);
             width: 100%;
-            height: 100%;
+            height: calc(100% - var(--window-titlebar-height));
             overflow: hidden;
         }
     </style>

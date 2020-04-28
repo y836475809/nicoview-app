@@ -155,8 +155,8 @@
 
         .mylist-grid-container {
             width: 100%;
-            height: calc(100vh - var(--description-height) 
-                - var(--control-height) - var(--margin) * 2);
+            height: calc(100vh - var(--window-titlebar-height) - var(--description-height) 
+                - var(--control-height) - var(--margin) * 3);
             overflow: hidden;
         }
     </style>      

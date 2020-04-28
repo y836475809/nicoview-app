@@ -128,6 +128,7 @@ function createWindow() {
         contextIsolation: false,
         preload: preload_main_path,
     };
+    state.frame = false;
     main_win = new BrowserWindow(state);
     if (state.maximized) {
         main_win.maximize();
@@ -551,6 +552,7 @@ const createPlayerWindow = () => {
             contextIsolation: false,
             preload: preload_player_path,
         };
+        state.frame = false;
         player_win = new BrowserWindow(state);
         if (state.maximized) {
             player_win.maximize();

@@ -11,6 +11,7 @@
 :root {
     --control-color:whitesmoke;
     --control-border-color:gray;
+    --window-titlebar-height:30px;
 }
 
 html, body {

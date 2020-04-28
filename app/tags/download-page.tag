@@ -37,7 +37,7 @@
 
         .download-grid-container {
             width: 100%;
-            height: calc(100vh - var(--control-height));
+            height: calc(100vh - var(--window-titlebar-height) - var(--control-height));
             background-color: var(--control-color);
             overflow: hidden;
         }

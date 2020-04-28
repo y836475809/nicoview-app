@@ -10,6 +10,7 @@
     </head>
 
     <body>
+        <window-titlebar></window-titlebar>
         <main-page></main-page>
     </body>
     <script src="../../node_modules/riot/riot+compiler.min.js"></script>
@@ -25,6 +26,7 @@
     <script type="riot/tag" src="../tags/setting-page.tag"></script>
     <script type="riot/tag" src="../tags/mylist-page.tag"></script>
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
+    <script type="riot/tag" src="../tags/window-titlebar.tag"></script>
     <script>
         /* globals riot */
         const { ipcRenderer } = window.electron;
@@ -81,6 +83,10 @@
             });
         }
 
+        riot.mount("window-titlebar", {
+            obs:obs, title:"test", window_name:"main"
+        });
+        
         // mount main-page in main.js
     </script>
 </html>

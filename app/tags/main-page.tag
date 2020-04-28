@@ -181,39 +181,6 @@
 
         this.donwnload_item_num = 0;
 
-        let template = [];
-        if(process.env.NODE_ENV == "DEBUG"){
-            template.push({
-                label: "ツール",
-                submenu: [
-                    { role: "reload" },
-                    { role: "forcereload" },
-                    { role: "toggledevtools" },
-                ]
-            });
-        }else{
-            template.push({
-                label: "ツール",
-                submenu: [
-                    { role: "toggledevtools" },
-                ]
-            });
-        }
-        template.push({
-            label: "ログ",
-            submenu: [
-                { label: "ログファイルを開く", click() {
-                    shell.openExternal(logger.getPath());
-                }},
-                { label: "ログの場所を開く", click() {
-                    shell.showItemInFolder(logger.getPath());
-                }}
-            ]
-        });
-        
-        const menu = Menu.buildFromTemplate(template);
-        remote.getCurrentWindow().setMenu(menu);
-
         const select_page = (page_name)=>{
             Array.from(this.root.querySelectorAll(".page-container.left > *"), 
                 (elm) => {
@@ -252,6 +219,28 @@
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
             this.donwnload_item_num = video_ids.length;
             this.update();
+
+            const menu_templete = [
+                { label: "ログ",
+                    submenu: [
+                        { label: "ログファイルを開く", click() {
+                            shell.openExternal(logger.getPath());
+                        }},
+                        { label: "ログの場所を開く", click() {
+                            shell.showItemInFolder(logger.getPath());
+                        }}
+                    ]
+                },                
+                { label: "ヘルプ",  
+                    submenu: [
+                        { role: "reload" },
+                        { role: "forcereload" },
+                        { role: "toggledevtools" },
+                    ]
+                },
+            ];
+            const menu = Menu.buildFromTemplate(menu_templete);
+            this.obs.trigger("main-window-titlebar:set-menu", {menu});
         });
 
         this.obs.on("main-page:select-page", (page_name)=>{

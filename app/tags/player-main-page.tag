@@ -2,7 +2,7 @@
     <style scoped>
         :scope {
             display: flex;
-            height: 100%;
+            height: calc(100% - var(--window-titlebar-height));
             --right-width: 300px;
             overflow: hidden;
         }
@@ -90,91 +90,6 @@
             gutter_move = false;
         };
 
-        const resizeVideo = (size) => { 
-            const h = this.refs.player_frame.getTagsPanelHeight() 
-                    + this.refs.player_frame.getControlPanelHeight();
-            const pf_elm = document.getElementById("player-frame");
-
-            const dh = size.height + h - pf_elm.offsetHeight;
-            const new_height = window.outerHeight + dh;
-
-            const dw = size.width - pf_elm.offsetWidth;
-            const new_width = window.outerWidth + dw;
-
-            window.resizeTo(new_width, new_height);
-        };
-
-        let template = [
-            {
-                label: "表示",
-                submenu: [
-                    {
-                        label: "標準サイズ",
-                        click: () => {
-                            resizeVideo(this.player_default_size);
-                        }
-                    },
-                    {
-                        label: "標準サイズx1.5",
-                        click: () => {
-                            const size = this.player_default_size;
-                            resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
-                        }
-                    },
-                    {
-                        label: "動画のサイズ",
-                        click: () => {
-                            if(org_video_size){
-                                resizeVideo(org_video_size);
-                            }
-                        }
-                    },
-                ]
-            },
-            {
-                label: "設定",
-                submenu: [
-                    {
-                        label: "NG設定",
-                        click: () => {
-                            obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_ng.getNG(),
-                                selected_tab: "comment-ng"
-                            });
-                        }
-                    },
-                    {
-                        label: "コメント表示",
-                        click: () => {
-                            obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_ng.getNG(),
-                                selected_tab: "comment-display"
-                            });
-                        }
-                    }
-                ]
-            }           
-        ];
-        if(process.env.NODE_ENV == "DEBUG"){
-            template.push({
-                label: "ツール",
-                submenu: [
-                    { role: "reload" },
-                    { role: "forcereload" },
-                    { role: "toggledevtools" },
-                ]
-            });
-        }else{
-            template.push({
-                label: "ツール",
-                submenu: [
-                    { role: "toggledevtools" },
-                ]
-            });
-        }
-        const menu = Menu.buildFromTemplate(template);
-        remote.getCurrentWindow().setMenu(menu);
-
         let filter_comment_func = null; 
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
@@ -203,7 +118,9 @@
             filter_comment_func = filterCommentsFunc(comments, play_time_sec);
             const filtered_comments = await filter_comment_func(comment_ng);
 
-            document.title = `${video.title}[${video.video_id}][${video.video_type}]`;            
+            const title = `${video.title}[${video.video_id}][${video.video_type}]`;
+            document.title = title;
+            obs.trigger("player-window-titlebar:set-title", {title});
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
                 video_data: video_data,
@@ -460,6 +377,80 @@
             });
         });
 
+        const resizeVideo = (size) => { 
+            const h = this.refs.player_frame.getTagsPanelHeight() 
+                    + this.refs.player_frame.getControlPanelHeight();
+            const pf_elm = document.getElementById("player-frame");
+
+            const dh = size.height + h - pf_elm.offsetHeight;
+            const new_height = window.outerHeight + dh;
+
+            const dw = size.width - pf_elm.offsetWidth;
+            const new_width = window.outerWidth + dw;
+
+            window.resizeTo(new_width, new_height);
+        };
+
+        const menu_template = [
+            {
+                label: "表示",
+                submenu: [
+                    {
+                        label: "標準サイズ",
+                        click: () => {
+                            resizeVideo(this.player_default_size);
+                        }
+                    },
+                    {
+                        label: "標準サイズx1.5",
+                        click: () => {
+                            const size = this.player_default_size;
+                            resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
+                        }
+                    },
+                    {
+                        label: "動画のサイズ",
+                        click: () => {
+                            if(org_video_size){
+                                resizeVideo(org_video_size);
+                            }
+                        }
+                    },
+                ]
+            },
+            {
+                label: "設定",
+                submenu: [
+                    {
+                        label: "NG設定",
+                        click: () => {
+                            obs.trigger("comment-setting-dialog:show", {
+                                ng_items : comment_ng.getNG(),
+                                selected_tab: "comment-ng"
+                            });
+                        }
+                    },
+                    {
+                        label: "コメント表示",
+                        click: () => {
+                            obs.trigger("comment-setting-dialog:show", {
+                                ng_items : comment_ng.getNG(),
+                                selected_tab: "comment-display"
+                            });
+                        }
+                    }
+                ]
+            },
+            {
+                label: "ヘルプ",
+                submenu: [
+                    { role: "reload" },
+                    { role: "forcereload" },
+                    { role: "toggledevtools" },
+                ]
+            }         
+        ];
+
         this.on("mount", async () => {
             const params = await DataIpcRenderer.action("config", "get", 
                 { 
@@ -490,6 +481,9 @@
                     message: error.message,
                 });
             }
+
+            const menu = Menu.buildFromTemplate(menu_template);
+            obs.trigger("player-window-titlebar:set-menu", {menu});
 
             ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);
         });   

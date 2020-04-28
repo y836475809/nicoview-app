@@ -124,7 +124,7 @@
 
         .comment-grid-container {
             width: 100%;
-            height: calc(100vh - var(--video-panel-height)
+            height: calc(100vh - var(--window-titlebar-height) - var(--video-panel-height)
                 - var(--user-icon-panel-height) - var(--user-panel-height) - var(--description-panel-height)
                 - var(--controls-container-height) - 4px);
         }

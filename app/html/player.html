@@ -9,6 +9,7 @@
 </head>
 
 <body>
+    <window-titlebar></window-titlebar>
     <player-main-page></player-main-page>
 </body>
 <script src="../../node_modules/riot/riot+compiler.min.js"></script>
@@ -25,6 +26,7 @@
 <script type="riot/tag" src="../tags/comment-ng-setting.tag"></script>
 <script type="riot/tag" src="../tags/comment-display-setting.tag"></script>
 <script type="riot/tag" src="../tags/open-video-form.tag"></script>
+<script type="riot/tag" src="../tags/window-titlebar.tag"></script>
 
 <script>
     /* globals riot */
@@ -42,6 +44,9 @@
         toast_wrapper = new window.ToastWrapper();
     };
 
+    riot.mount("window-titlebar", {
+        obs:obs, title:"", window_name:"player"
+    });
     riot.mount("player-main-page", {obs});
 
     if(process.env.NODE_ENV == "DEBUG"){

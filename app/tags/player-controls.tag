@@ -3,8 +3,8 @@
         :scope{
             display:grid;
             grid-template-columns: 50px 1fr 100px;
+            grid-template-areas: "area1 area2 area3";
             --margin-value: 2px;
-            --control-margin-value: 4px;
             margin : var(--margin-value);
             width: calc(100% - var(--margin-value) * 2);
             height: calc(100% - var(--margin-value) * 2);
@@ -12,12 +12,10 @@
             border: 1px solid var(--control-border-color);
         }
         .play-btn{
-            grid-column: 1 / 2;
-            margin-top: var(--control-margin-value);
+            grid-area: area1;
         }
         .play-btn > button{
-            position: relative;
-            left: 4px;
+            margin-left: 5px;
             width: 30px;
             height: 30px;
         }
@@ -25,22 +23,26 @@
             color: gray;           
         }
         .seek{
-            grid-column: 2 / 3;
-            margin-top: var(--control-margin-value);
+            grid-area: area2;
         }
         .volume{
-            grid-column: 3 / 4;
-            margin-top: var(--control-margin-value);
+            grid-area: area3;
+            margin-left: 10px;
+            margin-right: 5px;
         }    
     </style>
 
-    <div class="play-btn">
-        <button disabled={this.play_disabled} class="center-hv" onclick={play}>
-            <span class={this.button_class}></span></button>
+    <div class="center-v play-btn">
+        <button disabled={this.play_disabled} onclick={play}>
+            <span class={this.button_class}></span>
+        </button>
     </div>
-    <player-seek obs={opts.obs} ref="seek" class="seek"></player-seek>
-    <player-volume obs={opts.obs} class="volume"></player-volume>
-
+    <div class="center-v seek">
+        <player-seek obs={opts.obs} ref="seek"></player-seek>
+    </div>
+    <div class="center-v volume">
+        <player-volume obs={opts.obs}></player-volume>
+    </div>
     <script>
         const obs = this.opts.obs; 
 

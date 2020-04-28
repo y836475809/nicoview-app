@@ -98,6 +98,7 @@
             padding: 2px;
             width: 100%;
             height: calc(100% - var(--user-panel-height) - var(--toggle-icon-margin) * 2);  
+            border-top: 1px solid var(--control-border-color);
             overflow-x: auto;
             overflow-y: auto;         
         }
@@ -216,7 +217,6 @@
                 <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
                 <div class="description-user-name">投稿者: {this.user_nickname}</div>
             </div>
-            <hr>
             <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
         </div>
     </div>

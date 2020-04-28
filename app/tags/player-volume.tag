@@ -10,10 +10,7 @@
             position: relative;
             top: 10px;
             left: 0px;
-            width: calc(100% - 25px);
             height: 10px;
-            margin-left: 10px;
-            margin-right: 10px;
             border-radius:5px;
         }
         .picker {

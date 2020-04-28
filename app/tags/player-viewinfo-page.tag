@@ -364,17 +364,28 @@
         const watchLinkClick = (e) => {
             e.preventDefault(); 
             e.stopPropagation();
+
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
+
+            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                video_id: video_id,
+                time: 0
+            }); 
+            
+            return false;
+        };
+
+        const watchLinkMouseUp = (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            const paths = e.target.href.split("/");
+            const video_id = paths.pop();
+            
             if(e.button === 2){
                 createWatchLinkMenu(video_id).popup({window: remote.getCurrentWindow()}); 
-            }else{
-                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
-                    video_id: video_id,
-                    time: 0
-                }); 
             }
-            
             return false;
         };
 
@@ -398,7 +409,7 @@
                 a_tags.forEach(value=>{
                     if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
                         value.onclick = watchLinkClick;
-                        value.onmouseup = watchLinkClick;
+                        value.onmouseup = watchLinkMouseUp;
                     }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
                         value.onclick = mylistLinkClick;
                     }else{

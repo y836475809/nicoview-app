@@ -69,7 +69,7 @@
             height: calc(100% - var(--user-icon-panel-height));
             border: 1px solid var(--control-border-color);
         }
-        .description-container-extend {
+        .description-container-popup {
             position: absolute;
             top: 0px;
             border: solid 1px #aaa;
@@ -77,20 +77,16 @@
             background-color: white; 
             box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3);
             z-index: 999;
+            padding: 5px;
         }
-        .description-container-normal .description-user-thumbnail
-        {
-            display: none;
+        .description-container-popup .icon-button {
+            margin-left: auto;
         }
-        .description-container-extend .description-user-thumbnail
-        {
-            visibility: visible; 
-        }
-        .description-container-normal .description-user-name  {
+        .description-container-popup .description-user-name  {
             height: 20px; 
             line-height: 20px; 
         }
-        .description-container-extend .description-user-name  {
+        .description-container-popup .description-user-name  {
             height: var(--user-thumbnail-size); 
             line-height: var(--user-thumbnail-size); 
         }
@@ -212,10 +208,22 @@
                 </div>
             </div>         
         </div>
-        <div class="description-container {this.description_container_class}">
-            <div style="display: flex;" title="ダブルクリックで拡大、縮小" ondblclick={this.onclickExtDescription}>
+        <div class="description-container description-container-normal">
+            <div style="display: flex;" class="center-v">
+                <div class="description-user-name">投稿者: {this.user_nickname}</div>
+                <div class="icon-button center-hv" onclick={this.onclickPopupDescription}>
+                    <i title="ポップアップ表示" class="far fa-comment-alt"></i>
+                </div>
+            </div>
+            <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
+        </div>
+        <div style="display: none;" class="description-container description-container-popup">
+            <div style="display: flex;">
                 <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
                 <div class="description-user-name">投稿者: {this.user_nickname}</div>
+                <div class="icon-button center-hv" onclick={this.onclickCloseDescription}>
+                    <i title="閉じる" class="fas fa-times"></i>
+                </div>
             </div>
             <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
         </div>
@@ -270,7 +278,6 @@
         this.mylist_counter = 0;
         this.user_thumbnail_url = "";
         
-        this.description_container_class = "description-container-normal";
         this.description_content_class = "description-content-text";
 
         let sync_comment_scroll = new SyncCommentScroll();
@@ -398,56 +405,52 @@
             return false;
         };
 
-        const setDescription = (content_elm, description) => {
-            content_elm.innerHTML = description;
+        const setDescription = (content_elms, description) => {
+            content_elms.forEach(content_elm => {    
+                content_elm.innerHTML = description;
 
-            if(content_elm.childElementCount==0){
-                this.description_content_class = "description-content-text";
-            }else{
-                this.description_content_class = "description-content-html";
-                const a_tags = content_elm.querySelectorAll("a");
-                a_tags.forEach(value=>{
-                    if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
-                        value.onclick = watchLinkClick;
-                        value.onmouseup = watchLinkMouseUp;
-                    }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
-                        value.onclick = mylistLinkClick;
-                    }else{
-                        value.onclick = (e) =>{
-                            e.preventDefault();
-                            return false;
-                        };
-                    }
-                });
-            }
-        };
-
-        const setDescriptionContainerClass = (class_name) => {
-            this.description_container_class = class_name;
-            this.update();
-
-            if(class_name=="description-container-extend"){
-                const parent_elm = this.root.querySelector(".viewinfo-description-panel");
-                const elm = this.root.querySelector(".description-container");
-                const css_style = getComputedStyle(this.root);
-                const panel_height = parseInt(css_style.getPropertyValue("--user-icon-panel-height"));
-                
-                const container_width = elm.clientWidth; 
-                const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
-                elm.style.top = parent_elm.offsetTop + panel_height + "px";
-                elm.style.left = left + "px";
-            }
-        };
-
-        this.onclickExtDescription = (e) => {
-            if(this.description_container_class=="description-container-extend"){
-                setDescriptionContainerClass("description-container-normal");
-            }else{
-                if(this.user_thumbnail_url != this.user_icon_url){
-                    this.user_thumbnail_url = this.user_icon_url;
+                if(content_elm.childElementCount==0){
+                    this.description_content_class = "description-content-text";
+                }else{
+                    this.description_content_class = "description-content-html";
+                    const a_tags = content_elm.querySelectorAll("a");
+                    a_tags.forEach(value=>{
+                        if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
+                            value.onclick = watchLinkClick;
+                            value.onmouseup = watchLinkMouseUp;
+                        }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
+                            value.onclick = mylistLinkClick;
+                        }else{
+                            value.onclick = (e) =>{
+                                e.preventDefault();
+                                return false;
+                            };
+                        }
+                    });
                 }
-                setDescriptionContainerClass("description-container-extend");
+            });
+        };
+
+        this.onclickPopupDescription = (e) => {
+            const elm = this.root.querySelector(".description-container-popup");
+            elm.style.display = "";
+
+            if(this.user_thumbnail_url != this.user_icon_url){
+                this.user_thumbnail_url = this.user_icon_url;
             }
+            const parent_elm = this.root.querySelector(".viewinfo-description-panel");
+            const css_style = getComputedStyle(this.root);
+            const panel_height = parseInt(css_style.getPropertyValue("--user-icon-panel-height"));
+            
+            const container_width = elm.clientWidth; 
+            const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
+            elm.style.top = parent_elm.offsetTop + panel_height + "px";
+            elm.style.left = left + "px";
+        };
+
+        this.onclickCloseDescription = (e) => {
+            const elm = this.root.querySelector(".description-container-popup");
+            elm.style.display = "none";
         };
 
         const popupDescriptionMenu = (type, text) => {
@@ -593,8 +596,7 @@
             this.user_nickname = owner.nickname;
             this.user_icon_url = owner.iconURL;
             
-            setDescription(this.root.querySelector(".description-content"), description);
-            setDescriptionContainerClass("description-container-normal");
+            setDescription(this.root.querySelectorAll(".description-content"), description);
 
             setComments(comments);
             

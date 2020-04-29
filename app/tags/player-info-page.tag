@@ -431,13 +431,12 @@
             });
         };
 
-        this.onclickPopupDescription = (e) => {
+        const adjustPopupDescriptionPos = () => {
             const elm = this.root.querySelector(".description-container-popup");
-            elm.style.display = "";
-
-            if(this.user_thumbnail_url != this.user_icon_url){
-                this.user_thumbnail_url = this.user_icon_url;
+            if(elm.style.display == "none"){
+                return;
             }
+
             const parent_elm = this.root.querySelector(".viewinfo-description-panel");
             const css_style = getComputedStyle(this.root);
             const panel_height = parseInt(css_style.getPropertyValue("--user-icon-panel-height"));
@@ -446,6 +445,17 @@
             const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
             elm.style.top = parent_elm.offsetTop + panel_height + "px";
             elm.style.left = left + "px";
+        };
+
+        this.onclickPopupDescription = (e) => {
+            const elm = this.root.querySelector(".description-container-popup");
+            elm.style.display = "";
+
+            if(this.user_thumbnail_url != this.user_icon_url){
+                this.user_thumbnail_url = this.user_icon_url;
+            }
+
+            adjustPopupDescriptionPos();
         };
 
         this.onclickCloseDescription = (e) => {
@@ -655,6 +665,7 @@
         
         obs.on("window-resized", ()=> {
             resizeCommentList();
+            adjustPopupDescriptionPos();
         });
 
         obs.on("player-info-page:split-resized", ()=> {

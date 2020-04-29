@@ -30,8 +30,8 @@
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
-        <player-viewinfo-page obs={this.opts.obs} ref="viewinfo_frame" sync_comment_checked={this.sync_comment_checked}>
-        </player-viewinfo-page>
+        <player-info-page obs={this.opts.obs} sync_comment_checked={this.sync_comment_checked}>
+        </player-info-page>
     </div>
 
     <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
@@ -78,7 +78,7 @@
         this.mouseup = async (e) => {
             if(gutter_move){
                 obs.trigger("player-video:reset-comment-timelime");
-                obs.trigger("player-viewinfo-page:split-resized");
+                obs.trigger("player-info-page:split-resized");
 
                 const ve = this.root.querySelector("#viewinfo-frame");
                 await DataIpcRenderer.action("config", "set", { 
@@ -129,7 +129,7 @@
                 state: state
             });
             obs.trigger("player-tag:set-tags", thumb_info.tags);
-            obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
+            obs.trigger("player-info-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
                 comments: filtered_comments,
                 state: state
@@ -320,7 +320,7 @@
             const filtered_comments = await filter_comment_func(comment_ng);
 
             obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
-            obs.trigger("player-viewinfo-page:set-viewinfo-data", { 
+            obs.trigger("player-info-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
                 comments: filtered_comments 
             });   
@@ -342,7 +342,7 @@
 
             const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
-            obs.trigger("player-viewinfo-page:update-comments", comments);
+            obs.trigger("player-info-page:update-comments", comments);
         });
 
         obs.on("player-main-page:delete-comment-ng", async (args) => {
@@ -356,13 +356,13 @@
 
             const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
-            obs.trigger("player-viewinfo-page:update-comments", comments);
+            obs.trigger("player-info-page:update-comments", comments);
         });
 
         obs.on("player-main-page:update-comment-display-limit", async (args) => {
             const comments = await filter_comment_func(comment_ng);
             obs.trigger("player-video:update-comments", comments);
-            obs.trigger("player-viewinfo-page:update-comments", comments);
+            obs.trigger("player-info-page:update-comments", comments);
         });
 
         obs.on("player-main-page:update-comment-display-params", (args) => {
@@ -467,7 +467,7 @@
                 ve.style.width = vw + "px";
             }
 
-            obs.trigger("player-viewinfo-page:sync-comment-checked", params.sync_comment);
+            obs.trigger("player-info-page:sync-comment-checked", params.sync_comment);
 
             try {
                 const data_dir = await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" });

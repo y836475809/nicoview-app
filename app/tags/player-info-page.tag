@@ -1,4 +1,4 @@
-<player-viewinfo-page>
+<player-info-page>
     <style scoped>
         :scope {
             display: grid;
@@ -548,17 +548,17 @@
             grid_table.scrollToTop();
         };
 
-        obs.on("player-viewinfo-page:update-comments", (args)=> {
+        obs.on("player-info-page:update-comments", (args)=> {
             const comments = args;
             setComments(comments);
         });
 
-        obs.on("player-viewinfo-page:sync-comment-checked", (args)=> {
+        obs.on("player-info-page:sync-comment-checked", (args)=> {
             sync_comment_checked = args;
             updateSyncCommentCheckBox();
         });
 
-        obs.on("player-viewinfo-page:set-viewinfo-data", (args)=> {
+        obs.on("player-info-page:set-viewinfo-data", (args)=> {
             resizeCommentList();
 
             const { viewinfo, comments, state } = args;
@@ -603,7 +603,7 @@
             this.update();
         });
 
-        obs.on("player-viewinfo-page:seek-update", (current_sec)=> {
+        obs.on("player-info-page:seek-update", (current_sec)=> {
             if(!sync_comment_checked){
                 return;
             }
@@ -657,8 +657,8 @@
             resizeCommentList();
         });
 
-        obs.on("player-viewinfo-page:split-resized", ()=> {
+        obs.on("player-info-page:split-resized", ()=> {
             resizeCommentList();
         });
     </script>
-</player-viewinfo-page>
+</player-info-page>

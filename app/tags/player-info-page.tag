@@ -1,168 +1,107 @@
 <player-info-page>
     <style scoped>
         :scope {
-            display: grid;
-            --panel-padding: 4px;
-            --video-panel-height: 100px;
-            --user-icon-panel-height: 30px;
-            --user-panel-height: 30px;
-            --user-thumbnail-size: 50px;
-            --description-panel-height: 100px;
-            grid-template-rows: 
-                var(--video-panel-height) 
-                calc(var(--user-icon-panel-height) + var(--user-panel-height) + var(--description-panel-height)) 
-                1fr;
-            grid-template-columns: 1fr 1fr;  
-            width: 100%;
-            height: 100%;
+            --video-container-height: 100px;
+            --video-controls-container-height: 30px;
+            --user-container-height: 130px;
+            --comment-controls-container-height: 30px;
             overflow-x: hidden;
             overflow-y: hidden;
-            --controls-container-height: 30px;
-            --toggle-icon-size: 15px;
-            --toggle-icon-margin: 2px;
         }    
-        .viewinfo-panel{
+
+        .info-container {
+            padding: 5px;;
             width: 100%;
-            height: 100%;
-            padding: var(--panel-padding);
+            height: 100%; 
         }
 
-        .viewinfo-video-panel{
-            grid-row: 1 / 2;
-            grid-column: 1 / 3; 
-            display: flex; 
+        .video-container {
+            height: calc(var(--video-container-height) 
+                + var(--video-controls-container-height));
         } 
-        .video-thumbnail{
+        .video-thumbnail {
             user-select: none;
-            margin-left: calc(0px - var(--panel-padding));
             width: 130px;
             height: 100px;
         }
-        .video-info{
+        .video-info {
             user-select: none;
-            margin-left: 5px;
             white-space: nowrap;
-        }
-        
-        .viewinfo-description-panel{
-            grid-row: 2 / 3;
-            grid-column: 1 / 3; 
-            /* border: 1px solid var(--control-border-color); */
-            border-radius: 2px;
-            margin-right:  5px;
-        } 
-        .description-user-thumbnail{
-            user-select: none;
-            padding-top: 5px;
-            padding-left: 5px;
-            width: var(--user-thumbnail-size); 
-            height: var(--user-thumbnail-size); 
-        }
-        .description-user-name{
-            user-select: none;
-            vertical-align: middle;
-            padding-left: 5px;
-        }
-        .description-container-normal {
-            width: 100%;
-            /* height: 100%; */
-            height: calc(100% - var(--user-icon-panel-height));
-            border: 1px solid var(--control-border-color);
-        }
-        .description-container-popup {
-            position: absolute;
-            top: 0px;
-            border: solid 1px #aaa;
-            border-radius: 3px;
-            background-color: white; 
-            box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3);
-            z-index: 999;
-            padding: 5px;
-        }
-        .description-container-popup .icon-button {
-            margin-left: auto;
-        }
-        .description-container-popup .description-user-name  {
-            height: 20px; 
-            line-height: 20px; 
-        }
-        .description-container-popup .description-user-name  {
-            height: var(--user-thumbnail-size); 
-            line-height: var(--user-thumbnail-size); 
-        }
-        .description-content {
-            padding: 2px;
-            width: 100%;
-            height: calc(100% - var(--user-panel-height) - var(--toggle-icon-margin) * 2);  
-            border-top: 1px solid var(--control-border-color);
-            overflow-x: auto;
-            overflow-y: auto;         
-        }
-        .description-content-html {
-            white-space:nowrap;  
-        } 
-        .description-content-text {
-            white-space: normal;
-        } 
-
-        .viewinfo-comments-panel{
-            grid-row: 3 / 4;
-            grid-column: 1 / 3; 
-            background-color: var(--control-color);
-        }   
-
-        .viewinfo-controls-container {
-            height: var(--controls-container-height);
-        }
-        .comment-checkbox{
-            height: 25px;
-            vertical-align:middle;
-        }
-
-        .comment-grid-container {
-            width: 100%;
-            height: calc(100% - var(--controls-container-height));
-        }
-
-        .icon-panel {
-            height: var(--user-icon-panel-height);
-            display: flex;
-        }
-        .icon-contain{
-            display: flex;
-            margin-left: auto;
-        }
-        .icon-button{
-            font-size: 20px;
-            height: 30px;
-            width: 30px;
             margin-left: 5px;
         }
-        .icon-button:hover{
-            cursor: pointer;
-            background-color: lightgray; 
-        }
-        .icon-button[data-state="false"]{
-            pointer-events: none;
-            opacity: 0.2;
-        }
-
         .video-info > .content {
             display: flex
         }
         .video-info > .content > .label {
             min-width: calc(5em + 3px);
         }
-        .notice-deleted {
+        .video-info > .content > .notice-deleted {
             font-weight: bold;
             color: red;
         }
-
-        .icon-layer1{
-            left: -5px;
+        .video-controls-container {
+            width: 100%;
+            height: var(--video-controls-container-height);
+            display: flex;  
         }
 
-        .icon-layer2{
+        .user-container {
+            height: var(--user-container-height);
+            width: 100%;
+        } 
+
+        .comments-container {
+            height: calc(100% 
+                - var(--video-container-height) - var(--video-controls-container-height)
+                - var(--user-container-height));
+            background-color: var(--control-color);
+        }
+        .comments-controls-container {
+            height: var(--comment-controls-container-height);
+            display: flex;
+        }
+        .comments-controls-container > label {
+            user-select: none;
+        }
+        .comment-checkbox {
+            height: 25px;
+            vertical-align:middle;
+        }
+        .comment-checkbox + label + .icon {
+            margin-left: 10px;
+        }
+        .comment-grid-container {
+            width: 100%;
+            height: calc(100% - var(--comment-controls-container-height));
+        }
+
+        .icon {
+            font-size: 20px;
+            color: gray;
+        }
+        .icon:hover {
+            color: black;
+        }
+        .icon[data-state="false"]{
+            pointer-events: none;
+            opacity: 0.3;
+        }
+        .icon.fa-stack {
+            font-size: 18px;
+        }
+        .icon-button {
+            height: 30px;
+            width: 30px;
+            margin-left: 5px;
+        }
+        .icon-button.move-right {
+            margin-left: auto;
+            margin-right: 5px;
+        }
+        .icon-layer1 {
+            left: -5px;
+        }
+        .icon-layer2 {
             position: relative;
             left: 25%;
             top: 25%;
@@ -170,76 +109,56 @@
         }
     </style>
     
-    <div class="viewinfo-panel viewinfo-video-panel">
-        <div>
-            <img src={this.video_thumbnail_url} class="video-thumbnail">
-        </div>
-        <div class="video-info">
-            <div class="content">
-                <div class="label">投稿日</div>: {this.first_retrieve}
+    <div class="info-container">
+        <div class="video-container">
+            <div style="display: flex;">
+                <div class="video-thumbnail">
+                    <img src={this.video_thumbnail_url} class="video-thumbnail">
+                </div>
+                <div class="video-info">
+                    <div class="content">
+                        <div class="label">投稿日</div>: {this.first_retrieve}
+                    </div>
+                    <div class="content">
+                        <div class="label">再生</div>: {this.view_counter.toLocaleString()}
+                    </div>
+                    <div class="content">
+                        <div class="label">コメント</div>: {this.comment_counter.toLocaleString()}
+                    </div>
+                    <div class="content">
+                        <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
+                    </div>
+                    <div class="content">
+                        {this.videoStateOnline()} {this.videoStateLocal()}
+                    </div>
+                    <div class="content">
+                        <div class="notice-deleted">{this.videoStateDeleted()}</div>
+                    </div>
+                </div>
             </div>
-            <div class="content">
-                <div class="label">再生</div>: {this.view_counter.toLocaleString()}
-            </div>
-            <div class="content">
-                <div class="label">コメント</div>: {this.comment_counter.toLocaleString()}
-            </div>
-            <div class="content">
-                <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
-            </div>
-            <div class="content">
-                {this.videoStateOnline()} {this.videoStateLocal()}
-            </div>
-            <div class="content">
-                <div class="notice-deleted">{this.videoStateDeleted()}</div>
-            </div>
-        </div>
-    </div>
-    <div class="viewinfo-description-panel">   
-        <div class="icon-panel">
-            <div class="icon-contain">
-                <div title="動画情報更新" class="center-hv">
-                    <span class="icon-button center-hv fa-stack" 
+            <div class="video-controls-container">
+                <div title="動画情報更新" class="icon-button center-v move-right">
+                    <span class="icon center-hv fa-stack" 
                         data-state={String(this.enableUpdateData())} 
                         onclick={this.onclickUpdateThumbInfo}>
                         <i class="icon-layer1 fas fa-info fa-stack-1x"></i>
                         <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
-                      </span>
+                    </span>
                 </div>
-            </div>         
+            </div> 
         </div>
-        <div class="description-container description-container-normal">
-            <div style="display: flex;" class="center-v">
-                <div class="description-user-name">投稿者: {this.user_nickname}</div>
-                <div class="icon-button center-hv" onclick={this.onclickPopupDescription}>
-                    <i title="ポップアップ表示" class="far fa-comment-alt"></i>
-                </div>
-            </div>
-            <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
+        <div class="user-container">
+            <player-user obs={this.opts.obs}></player-user>
         </div>
-        <div style="display: none;" class="description-container description-container-popup">
-            <div style="display: flex;">
-                <img class="description-user-thumbnail" src={this.user_thumbnail_url}>
-                <div class="description-user-name">投稿者: {this.user_nickname}</div>
-                <div class="icon-button center-hv" onclick={this.onclickCloseDescription}>
-                    <i title="閉じる" class="fas fa-times"></i>
-                </div>
-            </div>
-            <div class="description-content {this.description_content_class}" onmouseup={oncontextmenu_description}></div>
-        </div>
-    </div>
-    <div class="viewinfo-panel viewinfo-comments-panel">
-        <div style="display: flex;">
-            <div class="viewinfo-controls-container">
+        <div class="comments-container">
+            <div class="comments-controls-container">
                 <input class="comment-checkbox" type="checkbox" 
-                    onclick={this.onclickSyncCommentCheck} /><label>同期</label>
-            </div>
-            <span class="icon-button center-hv" onclick={this.onclickToggleComment}>
-                <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i>
-            </span>
-            <div class="icon-contain">
-                <div title="コメント更新" class="center-hv">
-                    <span class="icon-button center-hv fa-stack" 
+                    onclick={this.onclickSyncCommentCheck} /><label class="center-v">同期</label>
+                <span class="icon center-hv" onclick={this.onclickToggleComment}>
+                    <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i>
+                </span>
+                <div title="コメント更新" class="icon-button center-v move-right">
+                    <span class="icon center-hv fa-stack" 
                         data-state={String(this.enableUpdateData())} 
                         onclick={this.onclickUpdateComment}>
                         <i class="icon-layer1 far fa-comment-dots fa-stack-1x"></i>
@@ -247,20 +166,19 @@
                     </span>
                 </div>
             </div>
-        </div>
-        <div class="comment-grid-container">
-            <div class="comment-grid"></div>
+            <div class="comment-grid-container">
+                <div class="comment-grid"></div>
+            </div>
         </div>
     </div>
     
     <script>
         /* globals logger */
-        const { remote, clipboard, ipcRenderer } = window.electron;
+        const { remote } = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
         const SyncCommentScroll = window.SyncCommentScroll;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
 
@@ -276,9 +194,6 @@
         this.view_counter = 0;
         this.comment_counter = 0;
         this.mylist_counter = 0;
-        this.user_thumbnail_url = "";
-        
-        this.description_content_class = "description-content-text";
 
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = this.opts.sync_comment_checked;
@@ -348,168 +263,6 @@
         const updateSyncCommentCheckBox = () => {
             let ch_elm = this.root.querySelector(".comment-checkbox");
             ch_elm.checked = sync_comment_checked;
-        };
-
-        const createWatchLinkMenu = (video_id) => {
-            const nemu_templete = [
-                { label: "再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
-                        video_id: video_id,
-                        time: 0
-                    }); 
-                }},
-                { label: "オンラインで再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
-                        video_id: video_id,
-                        time: 0
-                    });
-                }},
-            ];
-            return Menu.buildFromTemplate(nemu_templete);
-        };
-
-        const watchLinkClick = (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-
-            const paths = e.target.href.split("/");
-            const video_id = paths.pop();
-
-            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
-                video_id: video_id,
-                time: 0
-            }); 
-            
-            return false;
-        };
-
-        const watchLinkMouseUp = (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-
-            const paths = e.target.href.split("/");
-            const video_id = paths.pop();
-            
-            if(e.button === 2){
-                createWatchLinkMenu(video_id).popup({window: remote.getCurrentWindow()}); 
-            }
-            return false;
-        };
-
-        const mylistLinkClick = (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-            const paths = e.target.href.split("/");
-            const mylist_id = paths.pop();
-            obs.trigger("player-main-page:load-mylist", mylist_id);
-            return false;
-        };
-
-        const setDescription = (content_elms, description) => {
-            content_elms.forEach(content_elm => {    
-                content_elm.innerHTML = description;
-
-                if(content_elm.childElementCount==0){
-                    this.description_content_class = "description-content-text";
-                }else{
-                    this.description_content_class = "description-content-html";
-                    const a_tags = content_elm.querySelectorAll("a");
-                    a_tags.forEach(value=>{
-                        if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
-                            value.onclick = watchLinkClick;
-                            value.onmouseup = watchLinkMouseUp;
-                        }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
-                            value.onclick = mylistLinkClick;
-                        }else{
-                            value.onclick = (e) =>{
-                                e.preventDefault();
-                                return false;
-                            };
-                        }
-                    });
-                }
-            });
-        };
-
-        const adjustPopupDescriptionPos = () => {
-            const elm = this.root.querySelector(".description-container-popup");
-            if(elm.style.display == "none"){
-                return;
-            }
-
-            const parent_elm = this.root.querySelector(".viewinfo-description-panel");
-            const css_style = getComputedStyle(this.root);
-            const panel_height = parseInt(css_style.getPropertyValue("--user-icon-panel-height"));
-            
-            const container_width = elm.clientWidth; 
-            const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
-            elm.style.top = parent_elm.offsetTop + panel_height + "px";
-            elm.style.left = left + "px";
-        };
-
-        this.onclickPopupDescription = (e) => {
-            const elm = this.root.querySelector(".description-container-popup");
-            elm.style.display = "";
-
-            if(this.user_thumbnail_url != this.user_icon_url){
-                this.user_thumbnail_url = this.user_icon_url;
-            }
-
-            adjustPopupDescriptionPos();
-        };
-
-        this.onclickCloseDescription = (e) => {
-            const elm = this.root.querySelector(".description-container-popup");
-            elm.style.display = "none";
-        };
-
-        const popupDescriptionMenu = (type, text) => {
-            let menu_template = null;
-            if(type=="watch"){
-                const video_id = text;
-                menu_template = createWatchLinkMenu(video_id);
-            }
-            if(type=="mylist"){
-                const mylist_id = text;
-                const menu_templete = [
-                    { label: "mylistを開く", click() {
-                        obs.trigger("player-main-page:load-mylist", mylist_id);
-                    }}
-                ];
-                menu_template = Menu.buildFromTemplate(menu_templete);
-            }
-            if(type=="text"){
-                const menu_templete = [
-                    { label: "コピー", click() {
-                        clipboard.writeText(text);
-                    }}
-                ];
-                menu_template = Menu.buildFromTemplate(menu_templete);    
-            }   
-            menu_template.popup({window: remote.getCurrentWindow()});
-        };
-        this.oncontextmenu_description = (e) => {
-            if(e.button !== 2){
-                return;
-            }
-            
-            const text = document.getSelection().toString();
-            if(text==""){
-                return;
-            }
-
-            if(/^sm\d+/.test(text)){
-                const video_id = text.match(/sm\d+/)[0];
-                popupDescriptionMenu("watch", video_id);
-                return;
-            }
-            if(/^mylist\/\d+/.test(text)){
-                const mylist_id = text.match(/\d+/)[0]; 
-                popupDescriptionMenu("mylist", mylist_id);
-                return;
-            }
-
-            popupDescriptionMenu("text", text);
         };
 
         this.toggle_comment_class = "far fa-comment-dots";
@@ -603,10 +356,15 @@
             this.view_counter = video.viewCount;
             this.comment_counter = thread.commentCount;
             this.mylist_counter = video.mylistCount;
-            this.user_nickname = owner.nickname;
-            this.user_icon_url = owner.iconURL;
             
-            setDescription(this.root.querySelectorAll(".description-content"), description);
+            const user_nickname = owner.nickname;
+            const user_icon_url = owner.iconURL;
+            
+            obs.trigger("player-user:set-data", {
+                user_nickname,
+                user_icon_url, 
+                description
+            });
 
             setComments(comments);
             
@@ -665,7 +423,6 @@
         
         obs.on("window-resized", ()=> {
             resizeCommentList();
-            adjustPopupDescriptionPos();
         });
 
         obs.on("player-info-page:split-resized", ()=> {

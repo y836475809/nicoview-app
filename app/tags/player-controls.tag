@@ -4,12 +4,9 @@
             display:grid;
             grid-template-columns: 50px 1fr 100px;
             grid-template-areas: "area1 area2 area3";
-            --margin-value: 2px;
-            margin : var(--margin-value);
-            width: calc(100% - var(--margin-value) * 2);
-            height: calc(100% - var(--margin-value) * 2);
-            background-color: var(--control-color);
-            border: 1px solid var(--control-border-color);
+            width: 100%;
+            height: 100%;
+            padding: 2px;
         }
         .play-btn{
             grid-area: area1;

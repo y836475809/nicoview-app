@@ -1,13 +1,9 @@
 <player-tags>
     <style scoped>
          :scope {
-            --border-width: 1px;
-            --margin-value: 2px;
-            --total-margin: calc((var(--border-width) * 2 + var(--margin-value)));
-            width: calc(100% - var(--total-margin));
-            height: calc(100% - var(--total-margin));
-            border: var(--border-width) solid var(--control-border-color);
-            margin: var(--margin-value);
+            width: 100%;
+            height: 100%;
+            padding: 2px;
             display:block;
             overflow: auto;
         }

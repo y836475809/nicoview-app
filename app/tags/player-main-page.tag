@@ -26,7 +26,7 @@
     </style>
 
     <div id="player-frame" class="split left">
-        <player-page obs={this.opts.obs} ref="player_frame"></player-page>
+        <player-page obs={this.opts.obs}></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div id="viewinfo-frame" class="split right">
@@ -378,17 +378,13 @@
         });
 
         const resizeVideo = (size) => { 
-            const h = this.refs.player_frame.getTagsPanelHeight() 
-                    + this.refs.player_frame.getControlPanelHeight();
-            const pf_elm = document.getElementById("player-frame");
+            obs.trigger("player-page:get-video-size-callback", (args) => {
+                const { width, height } = args;
 
-            const dh = size.height + h - pf_elm.offsetHeight;
-            const new_height = window.outerHeight + dh;
-
-            const dw = size.width - pf_elm.offsetWidth;
-            const new_width = window.outerWidth + dw;
-
-            window.resizeTo(new_width, new_height);
+                const dw = size.width - width;
+                const dh = size.height - height;
+                window.resizeBy(dw, dh);
+            });
         };
 
         const menu_template = [
@@ -496,7 +492,6 @@
                 resize_begin = true;
                 obs.trigger("player-video:resize-begin");
             }
-            obs.trigger("player-page:window-resizing");
 
             clearTimeout(timer);
             timer = setTimeout(() => {

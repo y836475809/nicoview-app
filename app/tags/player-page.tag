@@ -1,54 +1,53 @@
 <player-page>
     <style scoped>
         :scope {
-            display: grid;
+            --tags-height: 60px;
+            --controls-height: 50px;
+            background-color: var(--control-color);
+        }
+        .player-container {
             margin: 0;
             width: 100%;
             height: 100%;
-            --tags-height: 60px;
-            --controls-height: 50px;
-            grid-template-rows: var(--tags-height) 1fr var(--controls-height);
-            grid-template-columns: 1fr 1fr;  
-            background-color: var(--control-color);
         }
         #player-tags-content{
-            grid-row: 1 / 2;
-            grid-column: 1 / 3; 
+            height: var(--tags-height);
             outline: none;
         }  
         #player-video-content{
-            grid-row: 2 / 3;
-            grid-column: 1 / 3; 
+            height: calc(100% - var(--tags-height) - var(--controls-height));
             background-color: black;
             outline: none;
         }  
         #player-controls-content{
-            grid-row: 3 / 4;
-            grid-column: 1 / 3; 
+            height: var(--controls-height);
             outline: none;
         }  
         #player-video {
+            width: 100%;
+            height: 100%;
             overflow: hidden; 
             object-fit: contain;
             object-position: center center;
-            width: 100%;        
         }
     </style>
 
-    <div id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
-        <player-tags obs={opts.obs}></player-tags>
-    </div>
-    <div id="player-video-content" tabIndex="-1" 
-        onkeyup={this.onkeyupTogglePlay}
-        onmouseup={oncontextmenu}>
-        <div id="player-video">
-            <player-video obs={opts.obs}></player-video>
+    <div class="player-container">
+        <div class="center-hv" id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+            <player-tags obs={opts.obs}></player-tags>
         </div>
+        <div id="player-video-content" tabIndex="-1" 
+            onkeyup={this.onkeyupTogglePlay}
+            onmouseup={oncontextmenu}>
+            <div id="player-video">
+                <player-video obs={opts.obs}></player-video>
+            </div>
+        </div>
+        <div class="center-hv" id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+            <player-controls obs={opts.obs}></player-controls>
+        </div>
+        <open-video-form obs={opts.obs}></open-video-form>
     </div>
-    <div id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
-        <player-controls obs={opts.obs}></player-controls>
-    </div>
-    <open-video-form obs={opts.obs}></open-video-form>
 
     <script>
         /* globals */
@@ -60,27 +59,7 @@
         
         const obs = this.opts.obs; 
 
-        let tags_height = 0;
-        let controls_height = 0;
-        this.video_size = null;
-
         let play_data = null;
-
-        const adjustPlayerVideoSize = () => {
-            const ch = this.root.clientHeight;
-            const h = ch - (tags_height + controls_height);
-            document.getElementById("player-video").style.height = h + "px";
-        };
-
-        this.getTagsPanelHeight = () => {
-            const css_style = getComputedStyle(this.root);
-            return parseInt(css_style.getPropertyValue("--tags-height"));
-        };
-
-        this.getControlPanelHeight = () => {
-            const css_style = getComputedStyle(this.root);
-            return parseInt(css_style.getPropertyValue("--controls-height"));
-        };
 
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {
@@ -192,16 +171,12 @@
             }
         };
 
-        this.on("mount", () => {
-            const css_style = getComputedStyle(this.root);
-            tags_height = parseInt(css_style.getPropertyValue("--tags-height"));
-            controls_height = parseInt(css_style.getPropertyValue("--controls-height"));
-
-            adjustPlayerVideoSize();
-        });
-
-        obs.on("player-page:window-resizing", () => { 
-            adjustPlayerVideoSize();       
+        obs.on("player-page:get-video-size-callback", (cb) => { 
+            const elm = this.root.querySelector("#player-video-content");
+            cb({ 
+                width: elm.offsetWidth,
+                height: elm.offsetHeight 
+            });
         });
 
         this.onkeyupTogglePlay = (e) => {
@@ -209,6 +184,5 @@
                 obs.trigger("player-controls:play");
             }
         };
-    </script>  
-      
+    </script>    
 </player-page>

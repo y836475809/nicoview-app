@@ -21,7 +21,7 @@
     </style>
 
     <div id="player-video-screen" onmousedown={mousedown} onmouseup={oncontextmenu}>
-        <video ref="player_video" id="player" autoplay preload="metadata">
+        <video id="player" autoplay preload="metadata">
         </video>
     </div>
 

@@ -38,7 +38,7 @@
         </button>
     </div>
     <div class="center-v seek">
-        <player-seek obs={opts.obs} ref="seek"></player-seek>
+        <player-seek obs={opts.obs}></player-seek>
     </div>
     <div class="center-v volume">
         <player-volume obs={opts.obs}></player-volume>
@@ -120,7 +120,7 @@
             setPlayEnable(false);
 
             obs.on("window-resized", () => { 
-                this.refs.seek.redraw();
+                obs.trigger("player-seek:redraw");
             });
         });
     </script>

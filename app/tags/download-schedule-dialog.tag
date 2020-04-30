@@ -49,17 +49,17 @@
         }   
     </style>
 
-    <dialog class="download-schedule-dialog dialog-shadow">
+    <dialog class="download-schedule-dialog dialog-shadow" oncancel={this.oncancel}>
         <div class="container">
             <div class="params-container center-hv">
-                <input type="checkbox" class="schedule-enable-check" checked={this.enable} name="schedule-enable">
+                <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
                 <div class="label">毎日</div>
                 <select class="hour-select">
-                    <option each={hour in hours} value={hour} selected={sc_hour==hour}>{hour}</option>
+                    <option each={hour in hours} value={hour}>{hour}</option>
                 </select>
                 <div class="label"> : </div>
                 <select class="minute-select">
-                    <option each={minute in minutes} value={minute} selected={sc_minute==minute}>{minute}</option>
+                    <option each={minute in minutes} value={minute}>{minute}</option>
                 </select>
                 <div class="label">にダウンロード開始</div>
             </div>
@@ -71,6 +71,8 @@
     </dialog>
 
     <script> 
+        const obs =  this.opts.obs;
+
         this.hours = [];
         this.minutes = [];
         for (let index = 0; index < 24; index++) {
@@ -80,17 +82,19 @@
             this.minutes.push(index);
         }
 
-        this.showModal = (date, enable, cb) => {
-            this.sc_hour = date.hour;
-            this.sc_minute = date.minute;
-            this.enable = enable==true?"checked":"";
+        obs.on("show", async (args) => {
+            const { date, enable, cb } = args;
+
+            this.root.querySelector(".hour-select").options[date.hour].selected = true;
+            this.root.querySelector(".minute-select").options[date.minute].selected = true;
+            this.root.querySelector(".schedule-enable-check").checked = enable;
             this.cb = cb;
 
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
-        };
+        });
 
-        this.close = () => {
+        const close = () => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();
         };
@@ -112,7 +116,7 @@
                     enable:enable
                 });
             }
-            this.close();
+            close();
         };
 
         this.oncancel = (e) => {

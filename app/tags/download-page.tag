@@ -62,10 +62,10 @@
     <div class="download-grid-container">
         <div class="download-grid"></div>
     </div>
-    <download-schedule-dialog ref="schedule-dialog" ></download-schedule-dialog>
+    <download-schedule-dialog obs={obs_schedule_dialog}></download-schedule-dialog>
 
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const EventEmitter = window.EventEmitter;
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
@@ -78,6 +78,7 @@
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
+        this.obs_schedule_dialog = riot.observable();
 
         let download_schedule = null;
 
@@ -167,9 +168,14 @@
         this.onclickScheduleDialog = () => {
             const date = download_schedule.date;
             const enable = download_schedule.enable;
-            this.refs["schedule-dialog"].showModal(date, enable, result=>{
-                if(result.type=="ok"){
-                    // TODO check
+
+            this.obs_schedule_dialog.trigger("show", {
+                date: date,
+                enable: enable,
+                cb: result => {
+                    if(result.type!="ok"){
+                        return;
+                    }
                     DataIpcRenderer.action("config", "set", { 
                         key:"download.schedule", 
                         value: {
@@ -192,7 +198,7 @@
 
                     updateDonwloadScheduleLabel();
                 }
-            });            
+            });
         };
 
         const resizeGridTable = () => {

@@ -28,6 +28,9 @@
                         - 20px - 50px - 20px);
             margin: 3px;
         }
+        .open-form input:focus {
+            outline: none;
+        }
         .open-form .play-button {
             width: 50px;
             margin: 2px 0 2px 0;      

@@ -28,6 +28,11 @@
             width: 50px;
         }
 
+        .hour-select:focus,
+        .minute-select:focus {
+            outline: none;
+        }
+
         .download-schedule-dialog .params-container {
             grid-area: item1;
             display: flex;

@@ -107,9 +107,9 @@
         }
 
         .mylist-input {
+            width: 200px;
             font-size: 1.2em;
             border-width: 1px;
-            border-right-width: 0px !important;
             border-style: solid;
             border-color: gray;
         }
@@ -128,12 +128,6 @@
         .update-button {
             width: var(--control-height);
             height: var(--control-height);
-            background-color: white; 
-
-            border-width: 1px;
-            border-left-width: 0px !important;
-            border-style: solid;
-            border-color: gray;
         }
 
         .add-mylist-button {
@@ -166,8 +160,8 @@
         <div class="update-button center-hv" title="更新", onclick={onclickUpdateMylist}>
             <i class="fas fa-redo-alt"></i>
         </div>
-        <div class="add-mylist-button center-hv" title="マイリストを保存" onclick={onclickAddMylist}>
-            <i class="fas fa-plus"></i>
+        <div class="add-mylist-button center-hv" title="マイリストを保存" onclick={onclickSaveMylist}>
+            <i class="far fa-star"></i>
         </div>
     </div>
     <div class="mylist-description">{this.mylist_description}</div>
@@ -514,7 +508,7 @@
             this.obs_modal_dialog.trigger("close");
         };
 
-        this.onclickAddMylist = (e) => {
+        this.onclickSaveMylist = (e) => {
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
             getImageCache();

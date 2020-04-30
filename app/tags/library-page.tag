@@ -172,14 +172,11 @@
         <div class="item-info center-v">項目数 {this.num_filtered_items.toLocaleString()}/{this.num_items.toLocaleString()}</div>
         <div class="search-container">
             <input class="search-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput} />
-            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
-                <i class="fas fa-search"></i>
+            <div class="clear-button center-hv" title="全て表示" onclick={onclickShowAll}>
+                <i class="fas fa-times-circle"></i>
             </div>
-            <div class="clear-button center-hv" title="検索条件クリア" onclick={onclickClear}>
-                <i class="fas fa-ban"></i>
-            </div>
-            <div class="add-button center-hv" title="検索条件を保存" onclick={onclickAdd}>
-                <i class="fas fa-plus"></i>
+            <div class="add-button center-hv" title="検索条件を保存" onclick={onclickSaveSearch}>
+                <i class="far fa-star"></i>
             </div>
         </div>
     </div>
@@ -298,13 +295,13 @@
             }
         };
 
-        this.onclickClear = (e) => {
+        this.onclickShowAll = (e) => {
             const search_elm = getSearchInputElm();
             search_elm.value = "";
             filterItems(""); 
         };
     
-        this.onclickAdd = () => {
+        this.onclickSaveSearch = () => {
             const search_elm = getSearchInputElm();
             const param = search_elm.value;
             if(!param){

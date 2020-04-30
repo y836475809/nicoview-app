@@ -66,6 +66,9 @@
             border: solid 1px #ccc;
             border-radius: 2px;
         }
+        .listview-input:focus {
+            outline: none;
+        }
 
         .listview-item-ghost-class {
             background-color: #C8EBFB;

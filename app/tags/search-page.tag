@@ -129,12 +129,12 @@
         }
 
         .search-query-container input {
-            width: 150px;
+            margin-left: 30px;
+            width: 200px;
             height: 30px;
             font-size: 1.2em;
             
             border-width: 1px;
-            border-right-width: 0px !important;
             border-style: solid;
             border-color: gray;
         }
@@ -201,11 +201,8 @@
         </div>
         <div class="search-query-container">
             <input class="query-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput}>
-            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
-                <i class="fas fa-search"></i>
-            </div>
-            <div class="add-search-cond-button center-hv" title="検索条件を保存" onclick={onclickAddNicoSearchCond}>
-                <i class="fas fa-plus"></i>
+            <div class="add-search-cond-button center-hv" title="検索条件を保存" onclick={onclickSaveSearch}>
+                <i class="far fa-star"></i>
             </div>
         </div>      
     </div>
@@ -487,7 +484,7 @@
             }
         };
 
-        this.onclickAddNicoSearchCond = (e) => {
+        this.onclickSaveSearch = (e) => {
             const elm = getSearchInputElm();
             const cond = {
                 query: elm.value,

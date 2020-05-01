@@ -25,11 +25,11 @@
         }
     </style>
 
-    <div id="player-frame" class="split left">
+    <div class="player-frame split left">
         <player-page obs={this.opts.obs}></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
-    <div id="viewinfo-frame" class="split right">
+    <div class="info-frame split right">
         <player-info-page obs={this.opts.obs} sync_comment_checked={this.sync_comment_checked}>
         </player-info-page>
     </div>
@@ -63,8 +63,8 @@
         this.mousemove = (e) => {
             if(gutter){   
                 gutter_move = true;  
-                let pe = document.getElementById("player-frame");
-                let ve = document.getElementById("viewinfo-frame");
+                let pe = this.root.querySelector(".player-frame");
+                let ve = this.root.querySelector(".info-frame");
                 const mw = this.root.offsetWidth - e.clientX;
                 ve.style.width = mw + "px";
                 pe.style.width = `calc(100% - ${mw}px)`;
@@ -80,7 +80,7 @@
                 obs.trigger("player-video:reset-comment-timelime");
                 obs.trigger("player-info-page:split-resized");
 
-                const ve = this.root.querySelector("#viewinfo-frame");
+                const ve = this.root.querySelector(".info-frame");
                 await DataIpcRenderer.action("config", "set", { 
                     key:"player.infoview_width",
                     value: parseInt(ve.offsetWidth)
@@ -457,8 +457,8 @@
             this.sync_comment_checked = params.sync_comment;
             const vw = params.infoview_width;
             if(vw){
-                let pe = document.getElementById("player-frame");
-                let ve = document.getElementById("viewinfo-frame");
+                let pe = this.root.querySelector(".player-frame");
+                let ve = this.root.querySelector(".info-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px";
             }

@@ -3,11 +3,11 @@
         :scope { 
             position: relative;
         }
-        #player-video-screen {
+        .video-screen {
             width: 100%;
             height: 100%;   
-        }      
-        #player {
+        }    
+        .video-screen >  video {
             width: 100%;
             height: 100%;         
         }
@@ -20,8 +20,8 @@
         }
     </style>
 
-    <div id="player-video-screen" onmouseup={oncontextmenu}>
-        <video id="player" autoplay preload="metadata">
+    <div class="video-screen" onmouseup={oncontextmenu}>
+        <video autoplay preload="metadata">
         </video>
     </div>
 
@@ -40,7 +40,7 @@
         const createTimeLine = (comments)=>{
             const row_num = 12;
             const  { duration_sec, fps } = comment_params;
-            const parent = this.root.querySelector("#player-video-screen");
+            const parent = this.root.querySelector(".video-screen");
 
             const nico_script = new NicoScript();
 
@@ -94,7 +94,7 @@
                     }
                 });
             
-            video_elm = this.root.querySelector("#player");
+            video_elm = this.root.querySelector(".video-screen > video");
 
             video_elm.addEventListener("loadedmetadata", (event) => {
                 const video_size = {

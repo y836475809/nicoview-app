@@ -10,20 +10,20 @@
             width: 100%;
             height: 100%;
         }
-        #player-tags-content{
+        .tags-container {
             height: var(--tags-height);
             outline: none;
         }  
-        #player-video-content{
+        .video-container {
             height: calc(100% - var(--tags-height) - var(--controls-height));
             background-color: black;
             outline: none;
         }  
-        #player-controls-content{
+        .controls-container {
             height: var(--controls-height);
             outline: none;
         }  
-        #player-video {
+        .video-container > div {
             width: 100%;
             height: 100%;
             overflow: hidden; 
@@ -33,17 +33,17 @@
     </style>
 
     <div class="player-container">
-        <div class="center-hv" id="player-tags-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+        <div class="center-hv tags-container" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
             <player-tags obs={opts.obs}></player-tags>
         </div>
-        <div id="player-video-content" tabIndex="-1" 
+        <div class="video-container" tabIndex="-1" 
             onkeyup={this.onkeyupTogglePlay}
             onmouseup={oncontextmenu}>
-            <div id="player-video">
+            <div>
                 <player-video obs={opts.obs}></player-video>
             </div>
         </div>
-        <div class="center-hv" id="player-controls-content" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+        <div class="center-hv controls-container" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
             <player-controls obs={opts.obs}></player-controls>
         </div>
         <open-video-form obs={opts.obs}></open-video-form>
@@ -172,7 +172,7 @@
         };
 
         obs.on("player-page:get-video-size-callback", (cb) => { 
-            const elm = this.root.querySelector("#player-video-content");
+            const elm = this.root.querySelector(".video-container");
             cb({ 
                 width: elm.offsetWidth,
                 height: elm.offsetHeight 

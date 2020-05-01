@@ -14,10 +14,10 @@
         .close-button {
             font-size: 15px;
             float: right;
+            color: gray;
         }
         .close-button:hover {
-            cursor: pointer;
-            background-color: lightgray; 
+            color: black;
         }
 
         .tab-area {
@@ -68,11 +68,10 @@
     </style>
 
     <dialog class="dialog-shadow">
-        <i class="close-button fas fa-times" onclick={onclickClose}></i>
+        <i class="close-button fas fa-times" title="閉じる" onclick={onclickClose}></i>
         <div class="tab-area">
             <label onclick="{onclickSelect.bind(this,0)}">NG設定</label>
             <label onclick="{onclickSelect.bind(this,1)}">コメント表示</label>
-            <label onclick="{onclickSelect.bind(this,2)}">tab3</label>
         </div>
         <div class="panel-area">
             <div class="tab-panel">
@@ -80,9 +79,6 @@
             </div>
             <div class="tab-panel">
                 <comment-display-setting obs={opts.obs}></comment-display-setting>
-            </div>
-            <div class="tab-panel">
-                <p>panel3</p>
             </div>
         </div>
     </dialog>

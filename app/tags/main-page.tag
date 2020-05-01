@@ -173,6 +173,12 @@
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
             const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            const elm = this.root.querySelector(".download-badge > .item-num");
+            if(video_ids.length === 0){
+                elm.style.display = "none";
+            }else{
+                elm.style.display = "";
+            }
             this.donwnload_item_num = video_ids.length;
             this.update();
         });

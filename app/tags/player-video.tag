@@ -20,7 +20,7 @@
         }
     </style>
 
-    <div id="player-video-screen" onmousedown={mousedown} onmouseup={oncontextmenu}>
+    <div id="player-video-screen" onmouseup={oncontextmenu}>
         <video id="player" autoplay preload="metadata">
         </video>
     </div>

@@ -40,14 +40,14 @@
         }   
     </style>
 
-    <dialog class="dialog-shadow" oncancel={this.oncancel}>
+    <dialog class="dialog-shadow" oncancel={oncancel}>
         <div class="container">
             <div class="center-hv">
-                <p class="message">{this.message}</p>
+                <p class="message">{message}</p>
             </div>
             <div class="button-container">
-                <div show={this.showok} class="button" onclick="{this.onclickButton.bind(this,'ok')}">ok</div>
-                <div show={this.showcancel} class="button" onclick="{this.onclickButton.bind(this,'cancel')}">cancel</div>
+                <div show={showok} class="button" onclick="{onclickButton.bind(this,'ok')}">ok</div>
+                <div show={showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">cancel</div>
             </div>
         </div>
     </dialog>

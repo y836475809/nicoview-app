@@ -169,7 +169,7 @@
     </style>
 
     <div class="library-controls-container">
-        <div class="item-info center-v">項目数 {this.num_filtered_items.toLocaleString()}/{this.num_items.toLocaleString()}</div>
+        <div class="item-info center-v">項目数 {num_filtered_items.toLocaleString()}/{num_items.toLocaleString()}</div>
         <div class="search-container">
             <input class="search-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput} />
             <div class="clear-button center-hv" title="全て表示" onclick={onclickShowAll}>

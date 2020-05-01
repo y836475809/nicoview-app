@@ -33,17 +33,17 @@
     </style>
 
     <div class="player-container">
-        <div class="center-hv tags-container" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+        <div class="center-hv tags-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
             <player-tags obs={opts.obs}></player-tags>
         </div>
         <div class="video-container" tabIndex="-1" 
-            onkeyup={this.onkeyupTogglePlay}
+            onkeyup={onkeyupTogglePlay}
             onmouseup={oncontextmenu}>
             <div>
                 <player-video obs={opts.obs}></player-video>
             </div>
         </div>
-        <div class="center-hv controls-container" tabIndex="-1" onkeyup={this.onkeyupTogglePlay}>
+        <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
             <player-controls obs={opts.obs}></player-controls>
         </div>
         <open-video-form obs={opts.obs}></open-video-form>

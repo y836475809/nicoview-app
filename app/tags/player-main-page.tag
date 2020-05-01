@@ -26,16 +26,16 @@
     </style>
 
     <div class="player-frame split left">
-        <player-page obs={this.opts.obs}></player-page>
+        <player-page obs={opts.obs}></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div class="info-frame split right">
-        <player-info-page obs={this.opts.obs} sync_comment_checked={this.sync_comment_checked}>
+        <player-info-page obs={opts.obs} sync_comment_checked={sync_comment_checked}>
         </player-info-page>
     </div>
 
-    <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
-    <comment-setting-dialog obs={this.opts.obs}></comment-setting-dialog>
+    <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
+    <comment-setting-dialog obs={opts.obs}></comment-setting-dialog>
 
     <script>
         /* globals riot logger */

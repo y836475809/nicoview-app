@@ -68,18 +68,18 @@
     </style>
 
     <dialog class="dialog-shadow">
-        <i class="close-button fas fa-times" onclick={this.onclickClose}></i>
+        <i class="close-button fas fa-times" onclick={onclickClose}></i>
         <div class="tab-area">
-            <label onclick="{this.onclickSelect.bind(this,0)}">NG設定</label>
-            <label onclick="{this.onclickSelect.bind(this,1)}">コメント表示</label>
-            <label onclick="{this.onclickSelect.bind(this,2)}">tab3</label>
+            <label onclick="{onclickSelect.bind(this,0)}">NG設定</label>
+            <label onclick="{onclickSelect.bind(this,1)}">コメント表示</label>
+            <label onclick="{onclickSelect.bind(this,2)}">tab3</label>
         </div>
         <div class="panel-area">
             <div class="tab-panel">
-                <comment-ng-setting obs={this.opts.obs}></comment-ng-setting>
+                <comment-ng-setting obs={opts.obs}></comment-ng-setting>
             </div>
             <div class="tab-panel">
-                <comment-display-setting obs={this.opts.obs}></comment-display-setting>
+                <comment-display-setting obs={opts.obs}></comment-display-setting>
             </div>
             <div class="tab-panel">
                 <p>panel3</p>

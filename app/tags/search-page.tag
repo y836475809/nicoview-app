@@ -185,17 +185,17 @@
 
     <div class="search-cond-container">
         <div class="search-sort-container">
-            <label class="label" each="{item, i in this.sort_items}">
+            <label class="label" each="{item, i in sort_items}">
                 <input class="radio-input" type="radio" name="sort" checked={item.select} 
-                    onclick="{ this.onclickSort.bind(this, i) }"> 
+                    onclick="{ onclickSort.bind(this, i) }"> 
                 <span class="radio-label center-hv">{item.title}
                     <i class="fas fa-fw fa-{item.order=='+'?'caret-up':'caret-down'}"></i></span>
             </label>
         </div>
         <div class="search-target-container">
-            <label class="label" each="{item, i in this.search_items}">
+            <label class="label" each="{item, i in search_items}">
                 <input class="radio-input" type="radio" name="target" checked={item.select} 
-                    onclick="{ this.onclickSearchTarget.bind(this, i) }"> 
+                    onclick="{ onclickSearchTarget.bind(this, i) }"> 
                 <span class="radio-label center-hv">{item.title}</span>
             </label>
         </div>
@@ -211,7 +211,7 @@
         <div class="search-grid"></div>
     </div>
 
-    <modal-dialog obs={obs_modal_dialog} oncancel={this.onCancelSearch}></modal-dialog>
+    <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
 
     <script>
         /* globals riot */

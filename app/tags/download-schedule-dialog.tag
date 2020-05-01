@@ -54,7 +54,7 @@
         }   
     </style>
 
-    <dialog class="download-schedule-dialog dialog-shadow" oncancel={this.oncancel}>
+    <dialog class="download-schedule-dialog dialog-shadow" oncancel={oncancel}>
         <div class="container">
             <div class="params-container center-hv">
                 <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
@@ -69,8 +69,8 @@
                 <div class="label">にダウンロード開始</div>
             </div>
             <div class="button-container">
-                <div class="button" onclick="{this.onclickButton.bind(this,'ok')}">ok</div>
-                <div class="button" onclick="{this.onclickButton.bind(this,'cancel')}">cancel</div>
+                <div class="button" onclick="{onclickButton.bind(this,'ok')}">ok</div>
+                <div class="button" onclick="{onclickButton.bind(this,'cancel')}">cancel</div>
             </div>
         </div>
     </dialog>

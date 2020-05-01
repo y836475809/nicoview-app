@@ -30,8 +30,8 @@
     </style>
 
     <div class="center-v play-btn">
-        <button disabled={this.play_disabled} onclick={play}>
-            <span class={this.button_class}></span>
+        <button disabled={play_disabled} onclick={play}>
+            <span class={button_class}></span>
         </button>
     </div>
     <div class="center-v seek">

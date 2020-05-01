@@ -36,13 +36,13 @@
         }
     </style>
 
-    <div class="navi center-hv" onclick={this.onclickBack}><i class="fas fa-chevron-left"></i></div>
+    <div class="navi center-hv" onclick={onclickBack}><i class="fas fa-chevron-left"></i></div>
     <div class="page-input-container center-hv">
-        <input type="tel" value={this.current_page} onkeypress={this.onkeypress}/>
-        <div class="label center-hv"> / {this.total_pages}</div>
+        <input type="tel" value={current_page} onkeypress={onkeypress}/>
+        <div class="label center-hv"> / {total_pages}</div>
     </div>
-    <div class="navi center-hv" onclick={this.onclickForward}><i class="fas fa-chevron-right"></i></div>
-    <div class="label center-hv">ヒット件数: {this.total_count.toLocaleString()}</div>
+    <div class="navi center-hv" onclick={onclickForward}><i class="fas fa-chevron-right"></i></div>
+    <div class="label center-hv">ヒット件数: {total_count.toLocaleString()}</div>
 
     <script>
         const pagination_obs = this.opts.obs;

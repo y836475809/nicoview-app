@@ -44,7 +44,7 @@
     <div class="param-container">
         <div class="param-label center-v">コメント表示数</div>
         <input class="comment-do-limit-checkbox" type="checkbox" 
-        onclick={this.onclickLimitCommentCheck} /><label>表示数を制限</label>
+        onclick={onclickLimitCommentCheck} /><label>表示数を制限</label>
     </div>
     <script>
         /* globals */

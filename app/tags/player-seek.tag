@@ -54,9 +54,9 @@
     <div class="slider" onmousedown={mousedown}>
         <div class="picker"></div>
     </div>
-    <div class="current">{this.fmt_current}</div>
+    <div class="current">{fmt_current}</div>
     <div class="slash">/</div>
-    <div class="duration">{this.fmt_duration}</div>
+    <div class="duration">{fmt_duration}</div>
 
     <script>
         /* globals */

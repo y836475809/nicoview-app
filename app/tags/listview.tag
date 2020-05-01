@@ -80,12 +80,12 @@
         onkeydown={onkeydownSearchInput}>
     <div class="listview-menu-container">
         <ul class="listview-list">
-            <li class="listview-item" data-id={i} each={ item, i in this.items }
+            <li class="listview-item" data-id={i} each={ item, i in items }
                 title={item.title}
-                onclick={this.onclickItem.bind(this,item)} 
-                ondblclick={this.ondblclickItem.bind(this,item)}
-                onmouseup={this.onmouseUp.bind(this,item)}
-                onmousedown={this.onmouseDown.bind(this,item)}>
+                onclick={onclickItem.bind(this,item)} 
+                ondblclick={ondblclickItem.bind(this,item)}
+                onmouseup={onmouseUp.bind(this,item)}
+                onmousedown={onmouseDown.bind(this,item)}>
                 <i class={getIconClass(item)}></i>
                 {item.title}
             </li>

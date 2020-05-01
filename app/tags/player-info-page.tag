@@ -113,34 +113,34 @@
         <div class="video-container">
             <div style="display: flex;">
                 <div class="video-thumbnail">
-                    <img src={this.video_thumbnail_url} class="video-thumbnail">
+                    <img src={video_thumbnail_url} class="video-thumbnail">
                 </div>
                 <div class="video-info">
                     <div class="content">
-                        <div class="label">投稿日</div>: {this.first_retrieve}
+                        <div class="label">投稿日</div>: {first_retrieve}
                     </div>
                     <div class="content">
-                        <div class="label">再生</div>: {this.view_counter.toLocaleString()}
+                        <div class="label">再生</div>: {view_counter.toLocaleString()}
                     </div>
                     <div class="content">
-                        <div class="label">コメント</div>: {this.comment_counter.toLocaleString()}
+                        <div class="label">コメント</div>: {comment_counter.toLocaleString()}
                     </div>
                     <div class="content">
-                        <div class="label">マイリスト</div>: {this.mylist_counter.toLocaleString()}
+                        <div class="label">マイリスト</div>: {mylist_counter.toLocaleString()}
                     </div>
                     <div class="content">
-                        {this.videoStateOnline()} {this.videoStateLocal()}
+                        {videoStateOnline()} {videoStateLocal()}
                     </div>
                     <div class="content">
-                        <div class="notice-deleted">{this.videoStateDeleted()}</div>
+                        <div class="notice-deleted">{videoStateDeleted()}</div>
                     </div>
                 </div>
             </div>
             <div class="video-controls-container">
                 <div title="動画情報更新" class="icon-button center-v move-right">
                     <span class="icon center-hv fa-stack" 
-                        data-state={String(this.enableUpdateData())} 
-                        onclick={this.onclickUpdateThumbInfo}>
+                        data-state={String(enableUpdateData())} 
+                        onclick={onclickUpdateThumbInfo}>
                         <i class="icon-layer1 fas fa-info fa-stack-1x"></i>
                         <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
                     </span>
@@ -148,19 +148,19 @@
             </div> 
         </div>
         <div class="user-container">
-            <player-user obs={this.opts.obs}></player-user>
+            <player-user obs={opts.obs}></player-user>
         </div>
         <div class="comments-container">
             <div class="comments-controls-container">
                 <input class="comment-checkbox" type="checkbox" 
-                    onclick={this.onclickSyncCommentCheck} /><label class="center-v">同期</label>
-                <span class="icon center-hv" onclick={this.onclickToggleComment}>
-                    <i title="コメント表示/非表示切り替え" class={this.toggle_comment_class}></i>
+                    onclick={onclickSyncCommentCheck} /><label class="center-v">同期</label>
+                <span class="icon center-hv" onclick={onclickToggleComment}>
+                    <i title="コメント表示/非表示切り替え" class={toggle_comment_class}></i>
                 </span>
                 <div title="コメント更新" class="icon-button center-v move-right">
                     <span class="icon center-hv fa-stack" 
-                        data-state={String(this.enableUpdateData())} 
-                        onclick={this.onclickUpdateComment}>
+                        data-state={String(enableUpdateData())} 
+                        onclick={onclickUpdateComment}>
                         <i class="icon-layer1 far fa-comment-dots fa-stack-1x"></i>
                         <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
                     </span>

@@ -164,7 +164,7 @@
             <i class="far fa-star"></i>
         </div>
     </div>
-    <div class="mylist-description">{this.mylist_description}</div>
+    <div class="mylist-description">{mylist_description}</div>
     <div class="mylist-grid-container">
         <div class="mylist-grid"></div>
     </div>

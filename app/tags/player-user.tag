@@ -90,22 +90,22 @@
     <div class="user-container">   
         <div class="user-container-normal">
             <div style="display: flex;" class="center-v">
-                <div class="user-name">投稿者: {this.user_nickname}</div>
-                <div class="icon-button center-hv" onclick={this.onclickPopupDescription}>
+                <div class="user-name">投稿者: {user_nickname}</div>
+                <div class="icon-button center-hv" onclick={onclickPopupDescription}>
                     <i title="ポップアップ表示" class="icon far fa-comment-alt"></i>
                 </div>
             </div>
-            <div class="user-description {this.user_description_class}" onmouseup={oncontextmenu}></div>
+            <div class="user-description {user_description_class}" onmouseup={oncontextmenu}></div>
         </div>
         <div style="display:none;" class="user-container-popup">
             <div style="display: flex;">
-                <img class="user-thumbnail" src={this.user_thumbnail_url}>
-                <div class="user-name">投稿者: {this.user_nickname}</div>
-                <div class="icon-button center-hv" onclick={this.onclickCloseDescription}>
+                <img class="user-thumbnail" src={user_thumbnail_url}>
+                <div class="user-name">投稿者: {user_nickname}</div>
+                <div class="icon-button center-hv" onclick={onclickCloseDescription}>
                     <i title="閉じる" class="icon fas fa-times"></i>
                 </div>
             </div>
-            <div class="user-description {this.user_description_class}" onmouseup={oncontextmenu}></div>
+            <div class="user-description {user_description_class}" onmouseup={oncontextmenu}></div>
         </div>
     </div>
     

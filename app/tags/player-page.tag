@@ -129,7 +129,7 @@
                 },
                 { 
                     id: "show-open-video-form",
-                    label: "IDを指定して再生", click() {
+                    label: "動画IDを指定して再生", click() {
                         obs.trigger("open-video-form:show");
                     }
                 },               

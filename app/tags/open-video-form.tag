@@ -2,10 +2,9 @@
     <style scoped>
         :scope {
             --form-width: 300px;
-            --form-height: 30px;
-        }
-        .open-form-none {
-            display: none;
+            --form-height: 40px;
+            --label-width: 40px;
+            --btn-width: 30px;
         }
         .open-form {
             display: flex;
@@ -14,41 +13,41 @@
             height: var(--form-height);
             left: calc(50% - var(--form-width));
             top: calc(50% - var(--form-height));
-            background-color: rgba(209, 203, 203);
+            background-color:white;
             border-radius: 2px;
+            border: 1px solid gray;
             z-index: 10;
+            padding: 5px;
         }
-        .open-form .label {
-            width: 20px;
-            margin: 5px;    
+        .open-form > .label {
+            width: var(--label-width);
             user-select: none;
         }
-        .open-form input {
-            width: calc(var(--form-width) 
-                        - 20px - 50px - 20px);
-            margin: 3px;
+        .open-form > input {
+            width: calc(100% - var(--label-width) - var(--btn-width) * 2);
+            margin-left: 5px;
         }
-        .open-form input:focus {
+        .open-form > input:focus {
             outline: none;
         }
-        .open-form .play-button {
-            width: 50px;
-            margin: 2px 0 2px 0;      
-        }
-        .open-form .close-button {
-            width: 20px;
-            margin: 2px;   
-            cursor: pointer;   
+        .open-form > .button {
+            width: var(--btn-width);
+            color: gray;
             user-select: none;
+        }
+        .open-form > .button:hover {
+            color: black;
         }
     </style>
 
-    <div class="{video_id_form_display}">
-        <div class="open-form">
-            <div class="label center-hv">ID</div>
-            <input type="text" onkeydown={onkeydownPlay}>
-            <button class="play-button" onclick={onclickPlay}>再生</button>
-            <div class="close-button center-hv" title="閉じる" onclick={onclickClose}>x</div>
+    <div class="open-form">
+        <div class="label center-hv">動画ID</div>
+        <input type="text" onkeydown={onkeydownPlay}>
+        <div class="button center-hv" title="再生" onclick={onclickPlay}>
+            <i class="fas fa-play"></i>
+        </div>
+        <div class="button center-hv" title="閉じる" onclick={onclickClose}>
+            <i class="fas fa-times"></i>
         </div>
     </div>
 
@@ -59,11 +58,17 @@
 
         const obs = this.opts.obs; 
 
-        this.video_id_form_display = "open-form-none";
+        const formVisible = (visible) => {
+            const elm = this.root.querySelector(".open-form");
+            elm.style.display = visible===true?"":"none";
+        };
 
         const playByVideoID = () => {
-            const elm = this.root.querySelector(".open-form input");
+            const elm = this.root.querySelector(".open-form > input");
             const video_id = elm.value;
+            if(!video_id) {
+                return;
+            }
             ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
                 video_id: video_id,
                 time: 0
@@ -81,16 +86,18 @@
         };
 
         this.onclickClose = (e) => {
-            this.video_id_form_display = "open-form-none";
+            formVisible(false);
         };
 
         obs.on("open-video-form:show", () => {
-            this.video_id_form_display = "";
-            this.update();
+            formVisible(true);
 
-            const elm = this.root.querySelector(".open-form input");
+            const elm = this.root.querySelector(".open-form > input");
             elm.focus();
         });
 
+        this.on("mount", () => {
+            formVisible(false);
+        });
     </script>    
 </open-video-form>  

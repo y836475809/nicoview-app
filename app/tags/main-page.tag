@@ -167,7 +167,7 @@
         const { remote, ipcRenderer, shell } = window.electron;
         const {Menu} = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         this.obs = this.opts.obs;
 

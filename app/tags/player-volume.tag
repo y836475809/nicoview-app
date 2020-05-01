@@ -31,7 +31,7 @@
 
     <script>
         /* globals */
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs = this.opts.obs; 
 

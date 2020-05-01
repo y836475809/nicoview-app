@@ -48,7 +48,7 @@
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RemoteDailog;
         const { NicoVideoData } = window.NicoVideoData;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();

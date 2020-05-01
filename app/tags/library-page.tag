@@ -19,7 +19,7 @@
         /* globals riot */
         const { remote } = window.electron;
         const {Menu} = remote;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -196,7 +196,7 @@
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
         const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 

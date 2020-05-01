@@ -68,7 +68,7 @@
         /* globals */
         const { remote } = window.electron;
         const { BrowserWindow } = remote;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs = this.opts.obs;
         this.title = this.opts.title;

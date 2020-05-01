@@ -142,7 +142,7 @@
         const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;

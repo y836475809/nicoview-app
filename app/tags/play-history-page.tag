@@ -24,7 +24,7 @@
         const { GridTable } = window.GridTable;
         const { BookMark } = window.BookMark;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs = this.opts.obs; 
         

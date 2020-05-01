@@ -48,7 +48,7 @@
     </div>
     <script>
         /* globals */
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
 
         const obs_dialog = this.opts.obs;
 

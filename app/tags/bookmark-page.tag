@@ -41,7 +41,7 @@
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
         const { BookMark } = window.BookMark;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { DataIpcRenderer } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
 

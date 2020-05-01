@@ -1,5 +1,5 @@
 
-const { DataIpcMain } = require("./data-ipc");
+const { DataIpcMain } = require("./ipc");
 
 class BookMarkIpcMain extends DataIpcMain {
     constructor(){

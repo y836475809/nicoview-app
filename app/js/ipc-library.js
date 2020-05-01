@@ -1,6 +1,6 @@
 const path = require("path");
 const { LibraryDB } = require("./db");
-const { DataIpcMain } = require("./data-ipc");
+const { DataIpcMain } = require("./ipc");
 
 class LibraryIpcMain extends DataIpcMain {
     constructor(){

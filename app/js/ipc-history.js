@@ -1,4 +1,4 @@
-const { DataIpcMain } = require("./data-ipc");
+const { DataIpcMain } = require("./ipc");
 
 class HistoryIpcMain extends DataIpcMain {
     constructor(){

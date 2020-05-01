@@ -4,11 +4,11 @@ const fsPromises = fs.promises;
 const path = require("path");
 
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
-const { ConfigIpcMain } = require("./app/js/config");
-const { LibraryIpcMain } = require("./app/js/library");
-const { BookMarkIpcMain } = require("./app/js/bookmark");
-const { HistoryIpcMain } = require("./app/js/history");
-const { DownloadItemIpcMain } = require("./app/js/download-item");
+const { ConfigIpcMain } = require("./app/js/ipc-config");
+const { LibraryIpcMain } = require("./app/js/ipc-library");
+const { BookMarkIpcMain } = require("./app/js/ipc-bookmark");
+const { HistoryIpcMain } = require("./app/js/ipc-history");
+const { DownloadItemIpcMain } = require("./app/js/ipc-download-item");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");

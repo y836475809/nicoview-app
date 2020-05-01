@@ -3,7 +3,7 @@ const { dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { DataIpcMain } = require("./data-ipc");
+const { DataIpcMain } = require("./ipc");
 const { deepCopy } = require("./deepcopy");
 const logger = require("./logger");
 

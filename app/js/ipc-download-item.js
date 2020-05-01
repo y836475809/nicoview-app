@@ -1,4 +1,4 @@
-const { DataIpcMain } = require("./data-ipc");
+const { DataIpcMain } = require("./ipc");
 
 class DownloadItemIpcMain extends DataIpcMain {
     constructor(){

@@ -1,5 +1,5 @@
 const test = require("ava");
-const { ConfigIpcMain } = require("../app/js/config");
+const { ConfigIpcMain } = require("../app/js/ipc-config");
 
 class TestConfiIpcgMain extends ConfigIpcMain {
     setup(){}

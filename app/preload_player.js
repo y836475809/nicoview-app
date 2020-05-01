@@ -41,7 +41,7 @@ window.addEventListener("load", () => {
     require("slickgrid/plugins/slick.autotooltips");
     // global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
-    global.DataIpc = require(`${root_dir}/app/js/data-ipc`);
+    global.DataIpc = require(`${root_dir}/app/js/ipc`);
     global.RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);
     global.Niconico = require(`${root_dir}/app/js/niconico`); //TODO
@@ -49,7 +49,7 @@ window.addEventListener("load", () => {
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
-    global.BookMark = require(`${root_dir}/app/js/bookmark`);
+    global.BookMark = require(`${root_dir}/app/js/ipc-bookmark`);
     global.SyncCommentScroll = require(`${root_dir}/app/js/sync-comment-scroll`);
     global.ToastWrapper = require(`${root_dir}/app/js/toast-wrapper`);
 });

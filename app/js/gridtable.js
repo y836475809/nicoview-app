@@ -84,6 +84,7 @@ class GridTable {
         this.on_dblclick = (e, data)=>{};
         this.on_context_menu = (e)=>{};
         this.filter = (column_id, value, word) => { return true; };
+        this.target_column_ids = [];
     }
 
     init(container){
@@ -190,7 +191,7 @@ class GridTable {
     setData(data){
         this.dataView.beginUpdate();
         this.dataView.setItems(data);
-        this.dataView.setFilter(this._filter);
+        this.dataView.setFilter(this._filter, this.target_column_ids);
         this.dataView.endUpdate();
 
         this._loadState();
@@ -251,12 +252,17 @@ class GridTable {
         this.dataView.updateItem(id, item);
     }
 
-    setFilter(filter){
+    setFilter(filter, target_column_ids){
         this.filter = filter;
+        this.target_column_ids = target_column_ids;
     }
 
     filterData(word){
-        this.dataView.setFilterArgs({searchString: word, filter: this.filter});
+        this.dataView.setFilterArgs({
+            filter: this.filter,
+            target_column_ids: this.target_column_ids,
+            searchString: word, 
+        });
         this.dataView.refresh();
     }
 
@@ -273,12 +279,15 @@ class GridTable {
         }
         //空白区切りのand検索
         const words = splitBySpace(args.searchString);
-        return words.every(word=>{        
-            for(let column_id in item){
+        const column_ids = 
+            args.target_column_ids.length==0?Object.keys(item):args.target_column_ids;
+        return words.every(word=>{
+            for (let index = 0; index < column_ids.length; index++) {
+                const column_id = column_ids[index];
                 const value = String(item[column_id]);
                 if(args.filter(column_id, value, word)){
                     return true;
-                }
+                }   
             }
             return false;
         });

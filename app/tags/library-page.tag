@@ -280,6 +280,7 @@
             grid_table.clearSelected();
 
             this.num_filtered_items = grid_table.dataView.getLength();
+            this.update();
         };
 
         this.onclickSearch = (e) => {
@@ -649,15 +650,12 @@
             grid_table.init(this.root.querySelector(".library-grid"));
     
             grid_table.setFilter((column_id, value, word) => { 
-                if(column_id=="thumb_img"){
-                    //画像のパスは対象外
-                    return false;
-                }
                 if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
                     return true;
                 }   
                 return false; 
-            });
+            // TODO configに出す? 
+            },["video_name", "id", "tags", "video_type"]);
     
             grid_table.onDblClick(async (e, data)=>{
                 logger.debug("library onDblClick data=", data);

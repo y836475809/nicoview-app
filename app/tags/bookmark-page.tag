@@ -41,7 +41,7 @@
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
         const { BookMark } = window.BookMark;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
 
@@ -57,14 +57,14 @@
         this.on("mount", async () => {
             // TODO error対応
             const name = this.name;
-            const items = await DataIpcRenderer.action("bookmark", "getData", { name });
+            const items = await IPCClient.action("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
-            await DataIpcRenderer.action("bookmark", "update", { name, items });
+            await IPCClient.action("bookmark", "update", { name, items });
         });
 
         const getMenuEnable = (type, items) => {
@@ -124,7 +124,7 @@
 
                         const video_id = items[0].data.video_id;
                         (async ()=>{
-                            const exist = await DataIpcRenderer.action("library", "existItem", {video_id});
+                            const exist = await IPCClient.action("library", "existItem", {video_id});
                             if(exist===true){
                                 obs.trigger("main-page:select-page", "library");
                                 obs.trigger("library-page:scrollto", video_id);     

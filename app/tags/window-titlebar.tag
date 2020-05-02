@@ -68,7 +68,7 @@
         /* globals */
         const { remote } = window.electron;
         const { BrowserWindow } = remote;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs;
         this.title = this.opts.title;
@@ -79,7 +79,7 @@
         this.max_restore = "maximize";
 
         this.on("mount", async () => {
-            maximized = await DataIpcRenderer.action("config", "get", 
+            maximized = await IPCClient.action("config", "get", 
                 { key:`${window_name}.window.state.maximized`, value:false });
             this.max_restore = maximized === true?"restore":"maximize";
             this.update();

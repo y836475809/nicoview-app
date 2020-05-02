@@ -17,17 +17,17 @@ const channel_map = {
     config: IPC_CHANNEL.CONFIG_ACITON,
 };
 
-class DataIpcRenderer {
+class IPCClient {
     static async action(name, method, args) {
         const channel = channel_map[name];
         if (channel===undefined) {
-            throw new Error(`DataIpcRenderer action: ${name} is not find`);
+            throw new Error(`IPCClient action: ${name} is not find`);
         }   
         return await ipcRenderer.invoke(channel, {method, args});
     }
 }
 
-class DataIpcMain extends EventEmitter {
+class IPCServer extends EventEmitter {
     constructor(name){
         super();
         this.name = name;
@@ -36,7 +36,7 @@ class DataIpcMain extends EventEmitter {
     handle(){  
         this.channel = channel_map[this.name];
         if (this.channel===undefined) {
-            throw new Error(`DataIpcMain, ${this.name} is not find`);
+            throw new Error(`IPCServer, ${this.name} is not find`);
         }   
 
         ipcMain.removeHandler(this.channel);
@@ -53,7 +53,6 @@ class DataIpcMain extends EventEmitter {
 }
 
 module.exports = {
-    // IPC_CHANNEL,
-    DataIpcRenderer,
-    DataIpcMain,
+    IPCClient,
+    IPCServer,
 };

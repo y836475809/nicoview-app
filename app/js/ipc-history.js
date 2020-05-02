@@ -1,6 +1,6 @@
-const { DataIpcMain } = require("./data-ipc");
+const { IPCServer } = require("./ipc");
 
-class HistoryIpcMain extends DataIpcMain {
+class HistoryIPCServer extends IPCServer {
     constructor(){
         super("history");
     }
@@ -61,5 +61,5 @@ class HistoryIpcMain extends DataIpcMain {
 }
 
 module.exports = {
-    HistoryIpcMain,
+    HistoryIPCServer,
 };

@@ -74,7 +74,7 @@
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
@@ -176,7 +176,7 @@
                     if(result.type!="ok"){
                         return;
                     }
-                    DataIpcRenderer.action("config", "set", { 
+                    IPCClient.action("config", "set", { 
                         key:"download.schedule", 
                         value: {
                             date:result.date,
@@ -219,7 +219,7 @@
                     state: state
                 };
             });
-            await DataIpcRenderer.action("downloaditem", "updateData", {items});
+            await IPCClient.action("downloaditem", "updateData", {items});
         };
 
         const addDownloadItems = async (items) => {
@@ -290,10 +290,10 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await DataIpcRenderer.action("config", "get", { key:"download.dir", value:"" });
+            const download_dir = await IPCClient.action("config", "get", { key:"download.dir", value:"" });
             event_em.emit("download-start");
 
-            let wait_time = await DataIpcRenderer.action("config", "get", { key:"download.wait_time", value:10 });
+            let wait_time = await IPCClient.action("config", "get", { key:"download.wait_time", value:10 });
             if(!wait_time || wait_time <= 0){
                 wait_time = 10;
             }
@@ -353,7 +353,7 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const download_item = nico_down.getDownloadedItem();
-                        await DataIpcRenderer.action("library", "addDownloadedItem", {download_item});
+                        await IPCClient.action("library", "addDownloadedItem", {download_item});
                         
                         const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
@@ -410,7 +410,7 @@
         });
 
         this.on("mount", async () => {
-            download_schedule = await DataIpcRenderer.action("config", "get", { 
+            download_schedule = await IPCClient.action("config", "get", { 
                 key:"download.schedule", 
                 value:  {
                     date: {hour:0, minute:0},
@@ -431,7 +431,7 @@
                         time : 0
                     });
                 });
-                const items = await DataIpcRenderer.action("downloaditem", "getData");
+                const items = await IPCClient.action("downloaditem", "getData");
                 grid_table_dl.setData(items);
             } catch (error) {
                 logger.error("download item load error: ", error);

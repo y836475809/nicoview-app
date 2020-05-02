@@ -31,13 +31,13 @@
         /* globals riot */
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
         var logger = window.logger; // eslint-disable-line
         let toast_wrapper = null;
 
         const obs = riot.observable();
 
-        DataIpcRenderer.action("config", "set", 
+        IPCClient.action("config", "set", 
             { key:"download.wait_time", value:10 }).then();
 
         obs.on("main-page:toastr", (args) => {
@@ -77,7 +77,7 @@
             const mylist_mock = new NicoMylistMocks();
             mylist_mock.mylist({delay:2000});
 
-            DataIpcRenderer.action("config", "set", 
+            IPCClient.action("config", "set", 
                 { key:"download.wait_time", value:1 }).then();
 
             obs.on("main-page:cancel-download", () => {

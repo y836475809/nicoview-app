@@ -19,7 +19,7 @@
         /* globals riot */
         const { remote } = window.electron;
         const {Menu} = remote;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -29,7 +29,7 @@
         this.on("mount", async () => {
             // TODO error対応
             const name = this.name;
-            const items = await DataIpcRenderer.action("bookmark", "getData", { name });
+            const items = await IPCClient.action("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
 
             hasItem = (mylist_id) => {
@@ -49,7 +49,7 @@
             };
 
             const name = this.name;
-            await DataIpcRenderer.action("bookmark", "update", { name, items });
+            await IPCClient.action("bookmark", "update", { name, items });
         });
 
         const createMenu = (self) => {
@@ -181,20 +181,20 @@
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox, showMessageBox } = window.RemoteDailog;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
+                item.saved = await IPCClient.action("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -362,7 +362,7 @@
         };
 
         this.on("mount", async () => {
-            const mylist_dir = path.join(await DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }), "mylist");
+            const mylist_dir = path.join(await IPCClient.action("config", "get", { key:"data_dir", value:"" }), "mylist");
             image_cache = new CacheStore(mylist_dir, "image-cache.json");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
 
@@ -370,7 +370,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await DataIpcRenderer.action("library", "getItem", {video_id}))===true){
+                if(needConvertVideo(await IPCClient.action("library", "getItem", {video_id}))===true){
                     const result = await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
                     if(result!==0){
@@ -391,7 +391,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await DataIpcRenderer.action("library", "getItem", {video_id}))===true){
+                if(needConvertVideo(await IPCClient.action("library", "getItem", {video_id}))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -430,11 +430,11 @@
         };
 
         const setData = async (mylist_items) => {
-            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
-                item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
+                item.saved = await IPCClient.action("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);     
             }
             grid_table.setData(mylist_items);

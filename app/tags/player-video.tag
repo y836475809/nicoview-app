@@ -28,7 +28,7 @@
     <script>
         /* globals logger */
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
-        const { DataIpcRenderer } = window.DataIpc;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
 
@@ -84,7 +84,7 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await DataIpcRenderer.action("config", "get", 
+            comment_params = await IPCClient.action("config", "get", 
                 { 
                     key:"comment", 
                     value: {

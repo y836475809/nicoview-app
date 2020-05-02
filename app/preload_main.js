@@ -6,7 +6,7 @@ process.once("loaded", () => {
     global.path = require("path");
     global.EventEmitter = require("events");
     global.IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
-    global.DataIpc = require(`${root_dir}/app/js/data-ipc`);
+    global.IPC = require(`${root_dir}/app/js/ipc`);
     global.logger = require(`${root_dir}/app/js/logger`);
 
     if (process.env.NODE_ENV == "DEBUG") {
@@ -51,7 +51,6 @@ window.addEventListener("load", () => {
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);
     global.NicoMylist = require(`${root_dir}/app/js/nico-mylist`);
     global.NicoUpdate = require(`${root_dir}/app/js/nico-update`);
-    global.History = require(`${root_dir}/app/js/history`);
     global.JsonStore = require(`${root_dir}/app/js/json-store`);
     global.BookMark = require(`${root_dir}/app/js/bookmark`);
     global.CacheStore = require(`${root_dir}/app/js/cache-store`);

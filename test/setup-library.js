@@ -1,8 +1,8 @@
-const { DataIpcRenderer } = require("../app/js/data-ipc");
+const { IPCClient } = require("../app/js/ipc");
 
 const setupLibrary = (func) => {
-    DataIpcRenderer.action("config", "get", { key:"data_dir", value:"" }).then((data_dir)=>{
-        DataIpcRenderer.action("library", "load", {data_dir}).then(()=>{
+    IPCClient.action("config", "get", { key:"data_dir", value:"" }).then((data_dir)=>{
+        IPCClient.action("library", "load", {data_dir}).then(()=>{
             func();
         });
     });

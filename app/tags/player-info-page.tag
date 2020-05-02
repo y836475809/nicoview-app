@@ -67,8 +67,8 @@
             height: 25px;
             vertical-align:middle;
         }
-        .comment-checkbox + label + .icon {
-            margin-left: 10px;
+        .comment-checkbox + label  {
+            margin-right: 10px;
         }
         .comment-grid-container {
             width: 100%;
@@ -152,11 +152,10 @@
         </div>
         <div class="comments-container">
             <div class="comments-controls-container">
-                <input class="comment-checkbox" type="checkbox" 
+                <input class="comment-checkbox sync-comment" type="checkbox" 
                     onclick={onclickSyncCommentCheck} /><label class="center-v">同期</label>
-                <span class="icon center-hv" onclick={onclickToggleComment}>
-                    <i title="コメント表示/非表示切り替え" class={toggle_comment_class}></i>
-                </span>
+                <input class="comment-checkbox comment-visible" type="checkbox" 
+                    onclick={onclickCommentVisibleCheck} /><label class="center-v">表示</label>
                 <div title="コメント更新" class="icon-button center-v move-right">
                     <span class="icon center-hv fa-stack" 
                         data-state={String(enableUpdateData())} 
@@ -261,24 +260,13 @@
         };
 
         const updateSyncCommentCheck = (is_checked) => {
-            let ch_elm = this.root.querySelector(".comment-checkbox");
+            let ch_elm = this.root.querySelector(".comment-checkbox.sync-comment");
             ch_elm.checked = is_checked;
             sync_comment_checked = is_checked;
         };
 
-        this.toggle_comment_class = "far fa-comment-dots";
-        this.onclickToggleComment = (e) => {
-            let comment_visible = true;
-            
-            if(/dots/.test(this.toggle_comment_class)){
-                this.toggle_comment_class = "fas fa-comment-slash";
-                comment_visible = false;
-            }else{
-                this.toggle_comment_class = "far fa-comment-dots";
-                comment_visible = true;
-            }
-            this.update();
-
+        this.onclickCommentVisibleCheck = (e) => {
+            const comment_visible = e.target.checked;
             obs.trigger("player-video:change-comment-visible", comment_visible);
         };
 
@@ -424,6 +412,9 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
+
+            const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");
+            ch_elm.checked = true;
 
             resizeCommentList();
         });

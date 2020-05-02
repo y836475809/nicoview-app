@@ -81,7 +81,7 @@
                 obs.trigger("player-info-page:split-resized");
 
                 const ve = this.root.querySelector(".info-frame");
-                await IPCClient.action("config", "set", { 
+                await IPCClient.request("config", "set", { 
                     key:"player.infoview_width",
                     value: parseInt(ve.offsetWidth)
                 });
@@ -94,7 +94,7 @@
         const filterCommentsFunc = (comments, play_time_sec) => {
             const _comments = JSON.parse(JSON.stringify(comments));
             return async (comment_ng) => {
-                const do_limit = await IPCClient.action("config", "get", { key:"comment.do_limit", value:true });
+                const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
                 if(do_limit===true){
                     const comment_display = new CommentDisplayAmount();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
@@ -371,7 +371,7 @@
 
         obs.on("player-main-page:sync-comment-checked", async (args) => {
             const checked = args;
-            await IPCClient.action("config", "set", { 
+            await IPCClient.request("config", "set", { 
                 key:"player.sync_comment",
                 value: checked
             });
@@ -448,7 +448,7 @@
         ];
 
         this.on("mount", async () => {
-            const params = await IPCClient.action("config", "get", 
+            const params = await IPCClient.request("config", "get", 
                 { 
                     key:"player", 
                     value:{ sync_comment: false, infoview_width: 200 } 
@@ -466,7 +466,7 @@
             obs.trigger("player-info-page:sync-comment-checked", params.sync_comment);
 
             try {
-                const data_dir = await IPCClient.action("config", "get", { key:"data_dir", value:"" });
+                const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
                 comment_ng = new CommentNG(path.join(data_dir, "nglist.json"));
                 comment_ng.load();
             } catch (error) {

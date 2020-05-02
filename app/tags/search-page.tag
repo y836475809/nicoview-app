@@ -35,14 +35,14 @@
 
         this.on("mount", async () => {
             const name = this.name;
-            const items = await IPCClient.action("bookmark", "getData", { name });
+            const items = await IPCClient.request("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
-            await IPCClient.action("bookmark", "update", { name, items });
+            await IPCClient.request("bookmark", "update", { name, items });
         });
 
         const createMenu = (self) => {
@@ -235,13 +235,13 @@
         });
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await IPCClient.action("library", "existItem", {video_id});
+                item.saved = await IPCClient.request("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -396,11 +396,11 @@
                 page_num, total_page_num, total_count
             });
 
-            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             const items = await Promise.all(
                 search_result.data.map(async value => {
                     const video_id = value.contentId;
-                    const saved = await IPCClient.action("library", "existItem", {video_id});
+                    const saved = await IPCClient.request("library", "existItem", {video_id});
                     const reg_download = video_ids.includes(video_id);
                     return createItem(value, saved, reg_download);
                 })

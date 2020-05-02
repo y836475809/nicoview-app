@@ -172,7 +172,7 @@
         this.obs = this.opts.obs;
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             const elm = this.root.querySelector(".download-badge > .item-num");
             if(video_ids.length === 0){
                 elm.style.display = "none";
@@ -230,7 +230,7 @@
             select_page("library");
             hideRightPage();
 
-            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             this.donwnload_item_num = video_ids.length;
             this.update();
 
@@ -290,7 +290,7 @@
             });
             
             if(result.state == "ok" || result.state == "404"){
-                const video_item = await IPCClient.action("library", "getItem", {video_id});
+                const video_item = await IPCClient.request("library", "getItem", {video_id});
                 ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
             } 
         });

@@ -156,7 +156,7 @@
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            await IPCClient.action("config", "set", { key:"data_dir", value:dir });
+            await IPCClient.request("config", "set", { key:"data_dir", value:dir });
         };
 
         this.onclickSelectDownloadDir = async e => {
@@ -165,11 +165,11 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            await IPCClient.action("config", "set", { key:"download.dir", value:dir });
+            await IPCClient.request("config", "set", { key:"download.dir", value:dir });
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await IPCClient.action("config", "get", { key:"app_setting_dir", value:"" });
+            const dir = await IPCClient.request("config", "get", { key:"app_setting_dir", value:"" });
             shell.openItem(dir);
         };
 
@@ -179,7 +179,7 @@
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            await IPCClient.action("config", "set", { key:"ffmpeg_path", value:file_path });
+            await IPCClient.request("config", "set", { key:"ffmpeg_path", value:file_path });
         };
 
         
@@ -189,7 +189,7 @@
                 return;
             }
             setInputValue(".css-path-input", file_path);
-            await IPCClient.action("config", "set", { key:"css_path", value:file_path });
+            await IPCClient.request("config", "set", { key:"css_path", value:file_path });
         };
 
         this.onclickReloadCss = async e => {
@@ -200,7 +200,7 @@
 
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
-            await IPCClient.action("config", "set", { key:"check_window_close", value:ch_elm.checked });
+            await IPCClient.request("config", "set", { key:"check_window_close", value:ch_elm.checked });
         };
 
         this.onclickCheckLogLevelDebug = async (e) => {
@@ -209,7 +209,7 @@
             if(ch_elm.checked === true){
                 value = "debug";
             }
-            await IPCClient.action("config", "set", { key:"log.level", value:value });
+            await IPCClient.request("config", "set", { key:"log.level", value:value });
             await ipcRenderer.invoke(IPC_CHANNEL.LOG_LEVEL, { level:value });
         };
 
@@ -234,17 +234,17 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await IPCClient.action("config", "get", { key:"app_setting_dir", value:"" })); 
+            setInputValue(".app-setting-dir-input", await IPCClient.request("config", "get", { key:"app_setting_dir", value:"" })); 
             
             const css_path = await getDefaultCSSPath();
-            setInputValue(".css-path-input", await IPCClient.action("config", "get", { key:"css_path", value:css_path }));   
+            setInputValue(".css-path-input", await IPCClient.request("config", "get", { key:"css_path", value:css_path }));   
             
-            setInputValue(".data-dir-input", await IPCClient.action("config", "get",{ key:"data_dir", value:""}));  
-            setInputValue(".download-dir-input", await IPCClient.action("config", "get",{ key:"download.dir", value:""}));
-            setInputValue(".ffmpeg-path-input", await IPCClient.action("config", "get",{ key:"ffmpeg_path", value:""}));
-            setCheckValue(".check-window-close", await IPCClient.action("config", "get",{ key:"check_window_close", value:true}));
+            setInputValue(".data-dir-input", await IPCClient.request("config", "get",{ key:"data_dir", value:""}));  
+            setInputValue(".download-dir-input", await IPCClient.request("config", "get",{ key:"download.dir", value:""}));
+            setInputValue(".ffmpeg-path-input", await IPCClient.request("config", "get",{ key:"ffmpeg_path", value:""}));
+            setCheckValue(".check-window-close", await IPCClient.request("config", "get",{ key:"check_window_close", value:true}));
         
-            const log_level = await IPCClient.action("config", "get",{ key:"log.level", value:"info"});
+            const log_level = await IPCClient.request("config", "get",{ key:"log.level", value:"info"});
             setCheckValue(".check-loglevel-debug", log_level=="debug");
         });
 
@@ -302,7 +302,7 @@
                 try {
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
-                    await IPCClient.action("library", "addItem", { item });
+                    await IPCClient.request("library", "addItem", { item });
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     logger.error(error);

@@ -56,7 +56,7 @@
             const volume = pos / slider.clientWidth;
 
             // TODO check
-            IPCClient.action("config", "set", { key:"player.volume", value:volume}).then();
+            IPCClient.request("config", "set", { key:"player.volume", value:volume}).then();
 
             obs.trigger("player-video:volume-changed", volume); 
         };
@@ -64,7 +64,7 @@
         this.on("mount", async ()=> {
             let picker = this.root.querySelector("div.picker");
             let slider = this.root.querySelector("div.slider");   
-            const volume = await IPCClient.action("config", "get", { key:"player.volume", value:0.5 });
+            const volume = await IPCClient.request("config", "get", { key:"player.volume", value:0.5 });
             picker.style.left = volume * slider.clientWidth - 5 + "px";
 
             obs.trigger("player-video:volume-changed", volume); 

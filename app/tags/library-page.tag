@@ -27,14 +27,14 @@
 
         this.on("mount", async () => {
             const name = this.name;
-            const items = await IPCClient.action("bookmark", "getData", { name });
+            const items = await IPCClient.request("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
-            await IPCClient.action("bookmark", "update", { name, items });
+            await IPCClient.request("bookmark", "update", { name, items });
         });
 
         const createMenu = (self) => {
@@ -368,12 +368,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await IPCClient.action("library", "getItem", {video_id:item.id});
+                        const video_item = await IPCClient.request("library", "getItem", {video_id:item.id});
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                            await IPCClient.action("library", "update", {video_id, props});
+                            await IPCClient.request("library", "update", {video_id, props});
                             if(update_thumbnail){
-                                const updated_video_item = await IPCClient.action("library", "getItem", {video_id});
+                                const updated_video_item = await IPCClient.request("library", "getItem", {video_id});
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -446,7 +446,7 @@
 
                     grid_table.updateCell(item.id, "state", "変換中");
                     try {
-                        const video_item = await IPCClient.action("library", "getItem", {video_id:item.id});
+                        const video_item = await IPCClient.request("library", "getItem", {video_id:item.id});
                         if(video_item.data_type == "json"){
                             const cnv_nico = new JsonDataConverter(video_item);
                             await cnv_nico.convertThumbInfo();
@@ -529,9 +529,9 @@
             };
 
             try {
-                const video_item = await IPCClient.action("library", "getItem", {video_id});
+                const video_item = await IPCClient.request("library", "getItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
-                const ffmpeg_path = await IPCClient.action("config", "get", { key:"ffmpeg_path", value:"" });
+                const ffmpeg_path = await IPCClient.request("config", "get", { key:"ffmpeg_path", value:"" });
 
                 const cnv_mp4 = new ConvertMP4();
 
@@ -553,7 +553,7 @@
                 await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
                 const props = {video_type:"mp4"};
-                await IPCClient.action("library", "update", {video_id, props});
+                await IPCClient.request("library", "update", {video_id, props});
 
                 await showMessageBox("info", "変換完了");
                 updateState("変換完了");  
@@ -692,8 +692,8 @@
             resizeGridTable();
             
             try {
-                const data_dir = await IPCClient.action("config", "get", { key:"data_dir", value:"" });
-                await IPCClient.action("library", "load", {data_dir});
+                const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
+                await IPCClient.request("library", "load", {data_dir});
             } catch (error) {
                 logger.error(error);
                 obs.trigger("main-page:toastr", {
@@ -712,7 +712,7 @@
         
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await IPCClient.action("library", "getItem", {video_id});
+            const video_item = await IPCClient.request("library", "getItem", {video_id});
             if(video_item===null){
                 return;
             }
@@ -722,7 +722,7 @@
                 play_count : video_item.play_count + 1
             };
             logger.debug("update library video_id=", video_id, ", props=", props);
-            await IPCClient.action("library", "update", {video_id, props});
+            await IPCClient.request("library", "update", {video_id, props});
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 
@@ -737,7 +737,7 @@
         obs.on("library-page:update-data", async (args) => { 
             const { video_id, update_target, cb } = args;
             try {
-                const video_item = await IPCClient.action("library", "getItem", {video_id});
+                const video_item = await IPCClient.request("library", "getItem", {video_id});
                 this.nico_update = new NicoUpdate(video_item);
                 
                 if(update_target=="thumbinfo"){

@@ -37,7 +37,7 @@
 
         const obs = riot.observable();
 
-        IPCClient.action("config", "set", 
+        IPCClient.request("config", "set", 
             { key:"download.wait_time", value:10 }).then();
 
         obs.on("main-page:toastr", (args) => {
@@ -77,7 +77,7 @@
             const mylist_mock = new NicoMylistMocks();
             mylist_mock.mylist({delay:2000});
 
-            IPCClient.action("config", "set", 
+            IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();
 
             obs.on("main-page:cancel-download", () => {

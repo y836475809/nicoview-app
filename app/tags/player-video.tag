@@ -84,7 +84,7 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await IPCClient.action("config", "get", 
+            comment_params = await IPCClient.request("config", "get", 
                 { 
                     key:"comment", 
                     value: {

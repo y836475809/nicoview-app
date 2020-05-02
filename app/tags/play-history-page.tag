@@ -106,7 +106,7 @@
             resizeGridTable();
 
             try {
-                const items = await IPCClient.action("history", "getData");
+                const items = await IPCClient.request("history", "getData");
                 grid_table.setData(items);
             } catch (error) {
                 logger.error(error);
@@ -121,8 +121,8 @@
 
         ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{
             const { history_item } = args;
-            await IPCClient.action("history", "add", { history_item });
-            const items = await IPCClient.action("history", "getData");
+            await IPCClient.request("history", "add", { history_item });
+            const items = await IPCClient.request("history", "getData");
             grid_table.setData(items);
         });
     </script>

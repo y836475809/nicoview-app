@@ -1,27 +1,19 @@
 const { ipcRenderer, ipcMain } = require("electron");
 const EventEmitter = require("events");
 
-const IPC_CHANNEL = Object.freeze({
-    LIBRARY_ACITON: "ipc-library-action",
-    BOOKMARK_ACITON: "ipc-bookmark-action",
-    HISTORY_ACITON: "ipc-history-action",
-    DOWNLOADITEM_ACITON: "ipc-downloaditem-action",
-    CONFIG_ACITON: "ipc-config-action",
-});
-
 const channel_map = {
-    library: IPC_CHANNEL.LIBRARY_ACITON,
-    bookmark: IPC_CHANNEL.BOOKMARK_ACITON,
-    history: IPC_CHANNEL.HISTORY_ACITON,
-    downloaditem: IPC_CHANNEL.DOWNLOADITEM_ACITON,
-    config: IPC_CHANNEL.CONFIG_ACITON,
+    library: "ipc-library-request",
+    bookmark: "ipc-bookmark-request",
+    history: "ipc-history-request",
+    downloaditem: "ipc-downloaditem-request",
+    config: "ipc-config-request",
 };
 
 class IPCClient {
-    static async action(name, method, args) {
+    static async request(name, method, args) {
         const channel = channel_map[name];
         if (channel===undefined) {
-            throw new Error(`IPCClient action: ${name} is not find`);
+            throw new Error(`IPCClient request: ${name} is not find`);
         }   
         return await ipcRenderer.invoke(channel, {method, args});
     }

@@ -79,7 +79,7 @@
         this.max_restore = "maximize";
 
         this.on("mount", async () => {
-            maximized = await IPCClient.action("config", "get", 
+            maximized = await IPCClient.request("config", "get", 
                 { key:`${window_name}.window.state.maximized`, value:false });
             this.max_restore = maximized === true?"restore":"maximize";
             this.update();

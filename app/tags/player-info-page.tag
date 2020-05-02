@@ -196,7 +196,7 @@
         this.mylist_counter = 0;
 
         let sync_comment_scroll = new SyncCommentScroll();
-        let sync_comment_checked = this.opts.sync_comment_checked;
+        let sync_comment_checked = false;
 
         this.enableDonwload = () => {
             return this.is_deleted === false && this.is_saved === false;
@@ -251,7 +251,7 @@
 
         this.onclickSyncCommentCheck = (e) => {
             const checked = e.target.checked;
-            sync_comment_checked = checked;
+            updateSyncCommentCheck(checked);
             obs.trigger("player-main-page:sync-comment-checked", checked);
         };
 
@@ -260,9 +260,10 @@
             grid_table.resizeFitContainer(container);
         };
 
-        const updateSyncCommentCheckBox = () => {
+        const updateSyncCommentCheck = (is_checked) => {
             let ch_elm = this.root.querySelector(".comment-checkbox");
-            ch_elm.checked = sync_comment_checked;
+            ch_elm.checked = is_checked;
+            sync_comment_checked = is_checked;
         };
 
         this.toggle_comment_class = "far fa-comment-dots";
@@ -317,8 +318,8 @@
         });
 
         obs.on("player-info-page:sync-comment-checked", (args)=> {
-            sync_comment_checked = args;
-            updateSyncCommentCheckBox();
+            const sync_comment_checked = args;
+            updateSyncCommentCheck(sync_comment_checked);
         });
 
         obs.on("player-info-page:set-viewinfo-data", (args)=> {

@@ -30,7 +30,7 @@
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div class="info-frame split right">
-        <player-info-page obs={opts.obs} sync_comment_checked={sync_comment_checked}>
+        <player-info-page obs={opts.obs}>
         </player-info-page>
     </div>
 
@@ -454,7 +454,6 @@
                     value:{ sync_comment: false, infoview_width: 200 } 
                 });
             this.player_default_size = { width: 854 ,height: 480 };
-            this.sync_comment_checked = params.sync_comment;
             const vw = params.infoview_width;
             if(vw){
                 let pe = this.root.querySelector(".player-frame");

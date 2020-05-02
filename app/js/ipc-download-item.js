@@ -1,6 +1,6 @@
-const { DataIpcMain } = require("./ipc");
+const { IPCServer } = require("./ipc");
 
-class DownloadItemIpcMain extends DataIpcMain {
+class DownloadItemIPCServer extends IPCServer {
     constructor(){
         super("downloaditem");
     }
@@ -32,5 +32,5 @@ class DownloadItemIpcMain extends DataIpcMain {
 }
 
 module.exports = {
-    DownloadItemIpcMain
+    DownloadItemIPCServer
 };

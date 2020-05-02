@@ -24,7 +24,7 @@
         /* globals riot */
         const { remote } = window.electron;
         const {Menu} = remote;
-        const { DataIpcRenderer } = window.IPC;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -35,14 +35,14 @@
 
         this.on("mount", async () => {
             const name = this.name;
-            const items = await DataIpcRenderer.action("bookmark", "getData", { name });
+            const items = await IPCClient.action("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
-            await DataIpcRenderer.action("bookmark", "update", { name, items });
+            await IPCClient.action("bookmark", "update", { name, items });
         });
 
         const createMenu = (self) => {
@@ -221,7 +221,7 @@
         const { NicoSearchParams, NicoSearch } = window.NicoSearch;
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
-        const { DataIpcRenderer } = window.IPC;
+        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
@@ -235,13 +235,13 @@
         });
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await DataIpcRenderer.action("library", "existItem", {video_id});
+                item.saved = await IPCClient.action("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -396,11 +396,11 @@
                 page_num, total_page_num, total_count
             });
 
-            const video_ids = await DataIpcRenderer.action("downloaditem", "getIncompleteIDs");
+            const video_ids = await IPCClient.action("downloaditem", "getIncompleteIDs");
             const items = await Promise.all(
                 search_result.data.map(async value => {
                     const video_id = value.contentId;
-                    const saved = await DataIpcRenderer.action("library", "existItem", {video_id});
+                    const saved = await IPCClient.action("library", "existItem", {video_id});
                     const reg_download = video_ids.includes(video_id);
                     return createItem(value, saved, reg_download);
                 })

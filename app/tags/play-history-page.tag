@@ -24,7 +24,7 @@
         const { GridTable } = window.GridTable;
         const { BookMark } = window.BookMark;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { DataIpcRenderer } = window.IPC;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         
@@ -106,7 +106,7 @@
             resizeGridTable();
 
             try {
-                const items = await DataIpcRenderer.action("history", "getData");
+                const items = await IPCClient.action("history", "getData");
                 grid_table.setData(items);
             } catch (error) {
                 logger.error(error);
@@ -121,8 +121,8 @@
 
         ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{
             const { history_item } = args;
-            await DataIpcRenderer.action("history", "add", { history_item });
-            const items = await DataIpcRenderer.action("history", "getData");
+            await IPCClient.action("history", "add", { history_item });
+            const items = await IPCClient.action("history", "getData");
             grid_table.setData(items);
         });
     </script>

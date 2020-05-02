@@ -1,6 +1,6 @@
-const { DataIpcMain } = require("./ipc");
+const { IPCServer } = require("./ipc");
 
-class BookMarkIpcMain extends DataIpcMain {
+class BookMarkIPCServer extends IPCServer {
     constructor(){
         super("bookmark");
     }
@@ -20,5 +20,5 @@ class BookMarkIpcMain extends DataIpcMain {
 }
 
 module.exports = {
-    BookMarkIpcMain
+    BookMarkIPCServer
 };

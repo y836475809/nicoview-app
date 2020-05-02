@@ -4,11 +4,11 @@ const fsPromises = fs.promises;
 const path = require("path");
 
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
-const { ConfigIpcMain } = require("./app/js/ipc-config");
-const { LibraryIpcMain } = require("./app/js/ipc-library");
-const { BookMarkIpcMain } = require("./app/js/ipc-bookmark");
-const { HistoryIpcMain } = require("./app/js/ipc-history");
-const { DownloadItemIpcMain } = require("./app/js/ipc-download-item");
+const { ConfigIPCServer } = require("./app/js/ipc-config");
+const { LibraryIPCServer } = require("./app/js/ipc-library");
+const { BookMarkIPCServer } = require("./app/js/ipc-bookmark");
+const { HistoryIPCServer } = require("./app/js/ipc-history");
+const { DownloadItemIPCServer } = require("./app/js/ipc-download-item");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const JsonStore = require("./app/js/json-store");
@@ -17,11 +17,11 @@ const { CmdLineParser } = require("./app/js/main-util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-const config_ipc_main = new ConfigIpcMain();
-const library_ipc_main = new LibraryIpcMain();
-const bookmark_ipc_main = new BookMarkIpcMain();
-const history_ipc_main = new HistoryIpcMain();
-const downloaditem_ipc_main = new DownloadItemIpcMain();
+const config_ipc_server = new ConfigIPCServer();
+const library_ipc_server = new LibraryIPCServer();
+const bookmark_ipc_server = new BookMarkIPCServer();
+const history_ipc_server = new HistoryIPCServer();
+const downloaditem_ipc_server = new DownloadItemIPCServer();
 const cmdline_parser = new CmdLineParser(process.argv);
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -63,7 +63,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const loadJson = async (name, default_value) => {
-    const data_dir = await config_ipc_main.get({ key:"data_dir", value:"" });
+    const data_dir = await config_ipc_server.get({ key:"data_dir", value:"" });
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         await fsPromises.stat(file_path);
@@ -87,7 +87,7 @@ const loadJson = async (name, default_value) => {
 };
 
 const saveJson = async (name, items) => {
-    const data_dir = await config_ipc_main.get({ key: "data_dir", value:"" });
+    const data_dir = await config_ipc_server.get({ key: "data_dir", value:"" });
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         const json_store = new JsonStore(file_path);
@@ -122,7 +122,7 @@ const setLogLevel = (level) => {
 
 function createWindow() {
     // ブラウザウィンドウの作成
-    const state = config_ipc_main.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
+    const state = config_ipc_server.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
     state.webPreferences =  {
         nodeIntegration: false,
         contextIsolation: false,
@@ -135,7 +135,7 @@ function createWindow() {
     }
 
     main_win.webContents.on("did-finish-load", async () => {
-        const file_path = config_ipc_main.get({ key: "css_path", value:"" });
+        const file_path = config_ipc_server.get({ key: "css_path", value:"" });
         if(file_path){
             try {
                 await fs.promises.stat(file_path);
@@ -167,7 +167,7 @@ function createWindow() {
             return;
         }
 
-        if(config_ipc_main.get({ key: "check_window_close", value:true})){
+        if(config_ipc_server.get({ key: "check_window_close", value:true})){
             const ret = dialog.showMessageBoxSync({
                 type: "info", 
                 buttons: ["OK", "Cancel"],
@@ -181,8 +181,8 @@ function createWindow() {
         }
 
         try {
-            config_ipc_main.set({ key:"main.window.state", value:getWindowState(main_win) });
-            await config_ipc_main.save();
+            config_ipc_server.set({ key:"main.window.state", value:getWindowState(main_win) });
+            await config_ipc_server.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -196,7 +196,7 @@ function createWindow() {
         }
         
         try {
-            await library_ipc_main.save(false);
+            await library_ipc_server.save(false);
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -229,9 +229,9 @@ function createWindow() {
 app.on("ready", async ()=>{
     try {
         const config_path = path.join(app.getPath("userData"), config_fiiename);
-        config_ipc_main.handle();
-        config_ipc_main.setup(config_path);
-        await config_ipc_main.load();
+        config_ipc_server.handle();
+        config_ipc_server.setup(config_path);
+        await config_ipc_server.load();
     } catch (error) {
         const ret = await dialog.showMessageBox({
             type: "error",
@@ -239,7 +239,7 @@ app.on("ready", async ()=>{
             message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
         });
         if(ret===0){ //OK
-            config_ipc_main.clear();
+            config_ipc_server.clear();
         }else{ //Cancel
             do_app_quit = true;
             app.quit();
@@ -247,8 +247,8 @@ app.on("ready", async ()=>{
         }
     }
     try {
-        await config_ipc_main.configFolder("data_dir", "データ");
-        await config_ipc_main.configFolder("download.dir", "動画");
+        await config_ipc_server.configFolder("data_dir", "データ");
+        await config_ipc_server.configFolder("download.dir", "動画");
     } catch (error) {
         await dialog.showMessageBox({
             type: "error",
@@ -261,7 +261,7 @@ app.on("ready", async ()=>{
         return;
     }
 
-    const log_level = config_ipc_main.get({ key: "log.level", value:"info"});
+    const log_level = config_ipc_server.get({ key: "log.level", value:"info"});
     setLogLevel(log_level);
 
     ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
@@ -277,7 +277,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library_ipc_main.getItem({video_id});
+        const video_item = library_ipc_server.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
             video_id,
             video_item,
@@ -290,8 +290,8 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        if(library_ipc_main.existItem({video_id})){
-            const video_item = library_ipc_main.getItem({video_id});
+        if(library_ipc_server.existItem({video_id})){
+            const video_item = library_ipc_server.getItem({video_id});
             player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
                 video_id,
                 video_item,
@@ -311,7 +311,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, time} = args;
-        const video_item = library_ipc_main.getItem({video_id});
+        const video_item = library_ipc_server.getItem({video_id});
         player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
             video_id,
             video_item,
@@ -338,7 +338,7 @@ app.on("ready", async ()=>{
 
         const { history_item } = args;
         const video_id = history_item.id;
-        const video_item = library_ipc_main.getItem({video_id});
+        const video_item = library_ipc_server.getItem({video_id});
         if(video_item===null){
             return;
         }
@@ -347,7 +347,7 @@ app.on("ready", async ()=>{
             last_play_date : new Date().getTime(),
             play_count : video_item.play_count + 1
         };
-        library_ipc_main.update({video_id, props});
+        library_ipc_server.update({video_id, props});
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
@@ -380,7 +380,7 @@ app.on("ready", async ()=>{
 
     ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {
         const { db_file_path } = args;
-        const data_dir = config_ipc_main.get({ key:"data_dir", value:"" });
+        const data_dir = config_ipc_server.get({ key:"data_dir", value:"" });
 
         if(data_dir == ""){
             return {
@@ -391,12 +391,12 @@ app.on("ready", async ()=>{
 
         try {
             const { path_data_list, video_data_list } = await importNNDDDB(db_file_path);
-            library_ipc_main.setData({
+            library_ipc_server.setData({
                 data_dir, 
                 path_data_list, 
                 video_data_list
             }); 
-            await library_ipc_main.save();
+            await library_ipc_server.save();
         } catch (error) {
             return {
                 result : false,
@@ -413,7 +413,7 @@ app.on("ready", async ()=>{
     ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, async (event, args) => {
         const { video_id } = args;
 
-        const video_item = library_ipc_main.getItem({video_id});
+        const video_item = library_ipc_server.getItem({video_id});
         if(video_item===null){
             return {
                 success:false,
@@ -422,7 +422,7 @@ app.on("ready", async ()=>{
         }
 
         try {
-            await library_ipc_main.delete({ video_id });
+            await library_ipc_server.delete({ video_id });
         } catch (error) {
             return {
                 success:false,
@@ -479,43 +479,43 @@ app.on("ready", async ()=>{
         main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
     });
 
-    library_ipc_main.on("libraryInitialized", ()=>{  
+    library_ipc_server.on("libraryInitialized", ()=>{  
         main_win.webContents.send("libraryInitialized", {
-            items:library_ipc_main.getItems()
+            items:library_ipc_server.getItems()
         });
     });
-    library_ipc_main.on("libraryItemUpdated", (args)=>{  
+    library_ipc_server.on("libraryItemUpdated", (args)=>{  
         main_win.webContents.send("libraryItemUpdated", args);
     });
-    library_ipc_main.on("libraryItemAdded", (args)=>{  
+    library_ipc_server.on("libraryItemAdded", (args)=>{  
         main_win.webContents.send("libraryItemAdded", args);
     });
-    library_ipc_main.on("libraryItemDeleted", (args)=>{  
+    library_ipc_server.on("libraryItemDeleted", (args)=>{  
         main_win.webContents.send("libraryItemDeleted", args);
     });
         
-    bookmark_ipc_main.setup(async (args)=>{
+    bookmark_ipc_server.setup(async (args)=>{
         const { name } = args;
         return await loadJson(name, []);
     });  
-    bookmark_ipc_main.on("bookmarkItemUpdated", async (args)=>{  
+    bookmark_ipc_server.on("bookmarkItemUpdated", async (args)=>{  
         const { name, items } = args;
         await saveJson(name, items);    
     });
 
     const history_max = 50;
     const items = await loadJson("history", []);
-    history_ipc_main.setup(history_max);  
-    history_ipc_main.setData({ items });
+    history_ipc_server.setup(history_max);  
+    history_ipc_server.setData({ items });
 
-    history_ipc_main.on("historyItemUpdated", async (args)=>{  
-        const items = history_ipc_main.getData();
+    history_ipc_server.on("historyItemUpdated", async (args)=>{  
+        const items = history_ipc_server.getData();
         await saveJson("history", items);    
     });
 
-    downloaditem_ipc_main.handle();
-    downloaditem_ipc_main.setData({items:await loadJson("download", [])});
-    downloaditem_ipc_main.on("updated", async (args)=>{  
+    downloaditem_ipc_server.handle();
+    downloaditem_ipc_server.setData({items:await loadJson("download", [])});
+    downloaditem_ipc_server.on("updated", async (args)=>{  
         main_win.webContents.send("downloadItemUpdated");
 
         const { items }  = args;
@@ -546,7 +546,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = config_ipc_main.get({ key:"player.window.state", value:{ width: 800, height: 600 } });
+        const state = config_ipc_server.get({ key:"player.window.state", value:{ width: 800, height: 600 } });
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
@@ -563,7 +563,7 @@ const createPlayerWindow = () => {
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
-                config_ipc_main.set({ key:"player.window.state", value:getWindowState(player_win) });
+                config_ipc_server.set({ key:"player.window.state", value:getWindowState(player_win) });
                 player_win = null;
             });
 

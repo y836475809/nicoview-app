@@ -380,6 +380,12 @@
             grid_table.scrollRow(comment_index);
         });
 
+        obs.on("player-info-page:reset-comment-scroll", ()=> {
+            if(sync_comment_scroll){
+                sync_comment_scroll.reset();
+            }
+        });
+
         const triggerAddCommentNG = (args) => {
             obs.trigger("player-main-page:add-comment-ng", args);
         };

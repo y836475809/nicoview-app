@@ -168,6 +168,15 @@
             
             obs.on("player-video:play", () => {
                 logger.debug("player play");
+                if(video_elm.currentTime == video_elm.duration){
+                    // currentTime==durationは動画が最後まで再生されたということ
+                    // この場合に再生するときは最初から再生するための処理を行う
+                    logger.debug("player play restart");
+                    obs.trigger("player-info-page:reset-comment-scroll"); 
+                    video_elm.currentTime = 0;
+                    comment_tl.pause();
+                    comment_tl.seek(0);
+                }      
                 video_elm.play();
             });
             obs.on("player-video:pause", () => {

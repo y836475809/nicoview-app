@@ -30,8 +30,10 @@ let main_win = null;
 let player_win = null;
 let do_app_quit = false;
 
-const main_html_path = `${__dirname}/${cmdline_parser.get("--main", "app/html/index.html")}`;
-const player_html_path = `${__dirname}/${cmdline_parser.get("--player", "app/html/player.html")}`;
+const main_html = cmdline_parser.get("--main", "app/html/index.html");
+const player_html = cmdline_parser.get("--player", "app/html/player.html");
+const main_html_path = `${__dirname}/${main_html}`;
+const player_html_path = `${__dirname}/${player_html}`;
 const preload_main_path = `${__dirname}/app/preload_main.js`;
 const preload_player_path = `${__dirname}/app/preload_player.js`;
 const config_fiiename = cmdline_parser.get("--config", "config.json");
@@ -39,6 +41,7 @@ const is_debug = cmdline_parser.get("--debug", false);
 if(is_debug===true){
     process.env.NODE_ENV = "DEBUG";
 }
+const window_frame = main_html != "app/html/index.html";
 
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);
@@ -128,7 +131,7 @@ function createWindow() {
         contextIsolation: false,
         preload: preload_main_path,
     };
-    state.frame = false;
+    state.frame = window_frame;
     main_win = new BrowserWindow(state);
     if (state.maximized) {
         main_win.maximize();
@@ -151,7 +154,7 @@ function createWindow() {
             }
         }
 
-        await main_win.webContents.executeJavaScript('riot.mount("main-page", {obs});');
+        main_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
     });
 
     // アプリケーションのindex.htmlの読み込み

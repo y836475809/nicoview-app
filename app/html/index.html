@@ -50,6 +50,10 @@
             toast_wrapper[type](title, message);
         });
 
+        ipcRenderer.on(IPC_CHANNEL.MAIN_HTML_LOADED, (event)=>{
+            riot.mount("main-page", {obs});
+        });
+
         window.onload = () => {
             toast_wrapper = new window.ToastWrapper();
         };
@@ -86,7 +90,5 @@
         riot.mount("window-titlebar", {
             obs:obs, title:"test", window_name:"main"
         });
-        
-        // mount main-page in main.js
     </script>
 </html>

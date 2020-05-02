@@ -119,6 +119,12 @@
             });
             video_elm.addEventListener("pause", () => {
                 logger.debug("pauseによるイベント発火");
+                if(video_elm.currentTime == video_elm.duration){
+                    // currentTime==durationは動画の最後ということ
+                    // この場合コメントは流したままにする
+                    return;
+                }
+
                 if(comment_tl){
                     comment_tl.pause();
                 }

@@ -41,7 +41,7 @@ window.addEventListener("load", () => {
     require("slickgrid/plugins/slick.autotooltips");
     // global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
-    global.IPC = require(`${root_dir}/app/js/ipc`);
+    global.IPC = require(`${root_dir}/app/js/ipc-client-server`);
     global.RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);
     global.Niconico = require(`${root_dir}/app/js/niconico`); //TODO

@@ -1,6 +1,6 @@
 const path = require("path");
 const { LibraryDB } = require("./db");
-const { IPCServer } = require("./ipc");
+const { IPCServer } = require("./ipc-client-server");
 
 class LibraryIPCServer extends IPCServer {
     constructor(){

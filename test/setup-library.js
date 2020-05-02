@@ -1,4 +1,4 @@
-const { IPCClient } = require("../app/js/ipc");
+const { IPCClient } = require("../app/js/ipc-client-server");
 
 const setupLibrary = (func) => {
     IPCClient.action("config", "get", { key:"data_dir", value:"" }).then((data_dir)=>{

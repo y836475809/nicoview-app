@@ -1,4 +1,4 @@
-const { IPCServer } = require("./ipc");
+const { IPCServer } = require("./ipc-client-server");
 
 class DownloadItemIPCServer extends IPCServer {
     constructor(){

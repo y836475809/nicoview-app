@@ -386,7 +386,7 @@
                 { label: "コメントをNGリストに登録", click() {
                     const items = grid_table.getSelectedDatas();
                     const texts = items.map(item=>{
-                        return item.text;
+                        return item.content;
                     });
                     triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
                 }},

@@ -55,7 +55,7 @@
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -80,7 +80,7 @@
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }}
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         obs.on("window-resized", ()=> {

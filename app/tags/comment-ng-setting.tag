@@ -79,14 +79,14 @@
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 {
                     label: "削除", click() {
                         deleteSelectedItems();
                     }
                 }
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
         
         const resizeGridTable = () => {

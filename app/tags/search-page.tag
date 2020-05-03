@@ -46,14 +46,14 @@
         });
 
         const createMenu = (self) => {
-            const nemu_templete = [
+            const menu_templete = [
                 { 
                     label: "削除", click() {
                         self.obs_listview.trigger("deleteList");
                     }
                 }
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         this.obs_listview.on("show-contextmenu", (e) => {
@@ -545,7 +545,7 @@
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
@@ -595,7 +595,7 @@
                     obs.trigger("bookmark-page:add-items", [bk_item]);
                 }},
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
         const context_menu = createMenu();
         this.on("mount", () => {

@@ -121,7 +121,7 @@
         this.user_description_class = "text";
 
         const createWatchLinkMenu = (video_id) => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "再生", click() {
                     ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
                         video_id: video_id,
@@ -135,7 +135,7 @@
                     });
                 }},
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         const watchLinkClick = (e) => {

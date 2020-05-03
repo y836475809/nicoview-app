@@ -53,14 +53,14 @@
         });
 
         const createMenu = (self) => {
-            const nemu_templete = [
+            const menu_templete = [
                 { 
                     label: "削除", click() {
                         self.obs_listview.trigger("deleteList");
                     }
                 }
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
         this.obs_listview.on("show-contextmenu", (e) => {
             const context_menu = createMenu(this);
@@ -304,7 +304,7 @@
         const grid_table = new GridTable("mylist-grid", columns, options);
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -347,18 +347,18 @@
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }}
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         const createConvertVideoMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "mp4に変換", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
                     obs.trigger("library-page:convert-video", video_id); 
                 }}
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         this.on("mount", async () => {

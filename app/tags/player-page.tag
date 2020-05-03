@@ -87,7 +87,7 @@
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { 
                     id: "add-bookmark",
                     label: "ブックマーク", click() {
@@ -156,7 +156,7 @@
                     }
                 },
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
     
         const context_menu = createMenu();

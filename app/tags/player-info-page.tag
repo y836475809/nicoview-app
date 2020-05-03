@@ -382,7 +382,7 @@
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "コメントをNGリストに登録", click() {
                     const items = grid_table.getSelectedDatas();
                     const texts = items.map(item=>{
@@ -398,7 +398,7 @@
                     triggerAddCommentNG({ ng_matching_texts: [], ng_user_ids: user_ids });
                 }},
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         this.on("mount", () => {  

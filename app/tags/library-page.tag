@@ -573,7 +573,7 @@
         };
 
         const createConvertMenu = (self) => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "mp4に変換", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -582,11 +582,11 @@
                     })();
                 }}
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
 
         const createMenu = () => {
-            const nemu_templete = [
+            const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
@@ -644,7 +644,7 @@
                     await deleteLibraryData(video_ids);
                 }}
             ];
-            return Menu.buildFromTemplate(nemu_templete);
+            return Menu.buildFromTemplate(menu_templete);
         };
         this.on("mount", async () => {    
             grid_table.init(this.root.querySelector(".library-grid"));

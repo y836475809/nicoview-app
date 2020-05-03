@@ -153,9 +153,11 @@
         <div class="comments-container">
             <div class="comments-controls-container">
                 <input class="comment-checkbox sync-comment" type="checkbox" 
-                    onclick={onclickSyncCommentCheck} /><label class="center-v">同期</label>
+                    onclick={onclickSyncCommentCheck} />
+                    <label class="center-v" title="コメントリストのスクロールと再生を同期させる">同期</label>
                 <input class="comment-checkbox comment-visible" type="checkbox" 
-                    onclick={onclickCommentVisibleCheck} /><label class="center-v">表示</label>
+                    onclick={onclickCommentVisibleCheck} />
+                    <label class="center-v" title="コメントの表示/非表示">表示</label>
                 <div title="コメント更新" class="icon-button center-v move-right">
                     <span class="icon center-hv fa-stack" 
                         data-state={String(enableUpdateData())} 

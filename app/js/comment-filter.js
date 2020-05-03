@@ -1,6 +1,6 @@
 const JsonStore = require("./json-store");
 
-class CommentNG {
+class NGComment {
     constructor(file_path){
         this._store = new JsonStore(file_path);
         this._ng_texts = [];
@@ -21,31 +21,35 @@ class CommentNG {
         });
     }
 
-    addNG(args){
-        const { ng_texts, ng_user_ids } = args;
-        ng_texts.forEach(text => {
+    addNGTexts(texts){
+        texts.forEach(text => {
             if(!this._ng_texts.includes(text)){
                 this._ng_texts.push(text);
             }
         });
-        ng_user_ids.forEach(user_id => {
+    }
+
+    addNGUserIDs(user_ids){
+        user_ids.forEach(user_id => {
             if(!this._ng_user_ids.includes(user_id)){
                 this._ng_user_ids.push(user_id);
             }
         });
     }
 
-    deleteNG(args){
-        const { ng_texts, ng_user_ids } = args;
+    deleteNGTexts(texts){
         this._ng_texts = this._ng_texts.filter(text => {
-            return !ng_texts.includes(text);
-        });
-        this._ng_user_ids = this._ng_user_ids.filter(user_id => {
-            return !ng_user_ids.includes(user_id);
+            return !texts.includes(text);
         });
     }
 
-    getNG(){
+    deleteNGUserIDs(user_ids){
+        this._ng_user_ids = this._ng_user_ids.filter(user_id => {
+            return !user_ids.includes(user_id);
+        });
+    }
+
+    getNGItems(){
         return {
             ng_texts: this._ng_texts, 
             ng_user_ids: this._ng_user_ids
@@ -194,6 +198,6 @@ class CommentDisplayAmount {
 }
 
 module.exports = {
-    CommentNG,
+    NGComment,
     CommentDisplayAmount
 };

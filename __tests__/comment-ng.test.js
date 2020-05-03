@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentNG } = require("../app/js/comment-filter");
+const { NGComment } = require("../app/js/comment-filter");
 
 const mkComments = () => {
     return [
@@ -10,19 +10,17 @@ const mkComments = () => {
     ];
 };
 
-class TestCommentNG extends CommentNG{
+class TestNGComment extends NGComment{
     load(){}
     save(){}
 }
 
 test.beforeEach(t => {
-    t.context.cf = new TestCommentNG();
+    t.context.cf = new TestNGComment();
 
-    t.context.delete_cf = new TestCommentNG();
-    t.context.delete_cf.addNG({ 
-        ng_texts: ["text1", "text2", "text3"], 
-        ng_user_ids :["id1", "id2", "id3"] 
-    });
+    t.context.delete_cf = new TestNGComment();
+    t.context.delete_cf.addNGTexts(["text1", "text2", "text3"]);
+    t.context.delete_cf.addNGUserIDs(["id1", "id2", "id3"]);
 });
 
 test("add ng words, ng user ids", t => {
@@ -31,23 +29,28 @@ test("add ng words, ng user ids", t => {
     t.deepEqual(cf._ng_texts, []);
     t.deepEqual(cf._ng_user_ids, []);
 
-    cf.addNG({ ng_texts: ["a"], ng_user_ids: [] });
+    cf.addNGTexts(["a"]);
+    cf.addNGUserIDs([]);
     t.deepEqual(cf._ng_texts, ["a"]);
     t.deepEqual(cf._ng_user_ids, []);
 
-    cf.addNG({ ng_texts: ["a"], ng_user_ids: [] });
+    cf.addNGTexts(["a"]);
+    cf.addNGUserIDs([]);
     t.deepEqual(cf._ng_texts, ["a"]);
     t.deepEqual(cf._ng_user_ids, []);
 
-    cf.addNG({ ng_texts: [], ng_user_ids: ["b"] });
+    cf.addNGTexts([]);
+    cf.addNGUserIDs(["b"]);
     t.deepEqual(cf._ng_texts, ["a"]);
     t.deepEqual(cf._ng_user_ids, ["b"]);
     
-    cf.addNG({ ng_texts: [], ng_user_ids: ["b"] });
+    cf.addNGTexts([]);
+    cf.addNGUserIDs(["b"]);
     t.deepEqual(cf._ng_texts, ["a"]);
     t.deepEqual(cf._ng_user_ids, ["b"]);
 
-    cf.addNG({ ng_texts: ["a", "b"], ng_user_ids: ["a", "b"] });
+    cf.addNGTexts(["a", "b"]);
+    cf.addNGUserIDs(["a", "b"]);
     t.deepEqual(cf._ng_texts, ["a", "b"]);
     t.deepEqual(cf._ng_user_ids, ["b", "a"]);
 });
@@ -55,19 +58,23 @@ test("add ng words, ng user ids", t => {
 test("delete ng words, ng user ids", t => {
     const cf = t.context.delete_cf;
 
-    cf.deleteNG({ ng_texts: ["text1"], ng_user_ids: [] });
+    cf.deleteNGTexts(["text1"]);
+    cf.deleteNGUserIDs([]);
     t.deepEqual(cf._ng_texts, ["text2", "text3"]);
     t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
 
-    cf.deleteNG({ ng_texts: ["text3"], ng_user_ids: [] });
+    cf.deleteNGTexts(["text3"]);
+    cf.deleteNGUserIDs([]);
     t.deepEqual(cf._ng_texts, ["text2"]);
     t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
 
-    cf.deleteNG({ ng_texts: [], ng_user_ids: ["id1"] });
+    cf.deleteNGTexts([]);
+    cf.deleteNGUserIDs(["id1"]);
     t.deepEqual(cf._ng_texts, ["text2"]);
     t.deepEqual(cf._ng_user_ids, ["id2", "id3"]);
 
-    cf.deleteNG({ ng_texts: [], ng_user_ids: ["id3"] });
+    cf.deleteNGTexts([]);
+    cf.deleteNGUserIDs(["id3"]);
     t.deepEqual(cf._ng_texts, ["text2"]);
     t.deepEqual(cf._ng_user_ids, ["id2"]);   
 });
@@ -75,7 +82,8 @@ test("delete ng words, ng user ids", t => {
 test("delete some ng words, ng user ids", t => {
     const cf = t.context.delete_cf;
 
-    cf.deleteNG({ ng_texts: ["text1", "text3"], ng_user_ids: ["id1", "id3"] });
+    cf.deleteNGTexts(["text1", "text3"]);
+    cf.deleteNGUserIDs(["id1", "id3"]);
     t.deepEqual(cf._ng_texts, ["text2"]);
     t.deepEqual(cf._ng_user_ids, ["id2"]);
 });
@@ -83,13 +91,13 @@ test("delete some ng words, ng user ids", t => {
 test("delete empty ng words, ng user ids", t => {
     const cf = t.context.delete_cf;
 
-    cf.deleteNG({ 
-        ng_texts: ["text1", "text2", "text3"], 
-        ng_user_ids: ["id1", "id2", "id3"] });
+    cf.deleteNGTexts(["text1", "text2", "text3"]);
+    cf.deleteNGUserIDs(["id1", "id2", "id3"]);
     t.deepEqual(cf._ng_texts, []);
     t.deepEqual(cf._ng_user_ids, []);
     
-    cf.deleteNG({ ng_texts: ["text1"], ng_user_ids: ["id1"] });
+    cf.deleteNGTexts(["text1"]);
+    cf.deleteNGUserIDs(["id1"]);
     t.deepEqual(cf._ng_texts, []);
     t.deepEqual(cf._ng_user_ids, []);
 });
@@ -97,7 +105,8 @@ test("delete empty ng words, ng user ids", t => {
 test("delete not exist ng words, ng user ids", t => {
     const cf = t.context.delete_cf;
 
-    cf.deleteNG({ ng_texts: ["text100"], ng_user_ids: ["id100"] });
+    cf.deleteNGTexts(["text100"]);
+    cf.deleteNGUserIDs(["id100"]);
     t.deepEqual(cf._ng_texts, ["text1", "text2", "text3"]);
     t.deepEqual(cf._ng_user_ids, ["id1", "id2", "id3"]);
 });
@@ -113,7 +122,8 @@ test("no filtering", t => {
 test("ng words", t => {
     const cf = t.context.cf;
 
-    cf.addNG({ ng_texts: ["comment11"], ng_user_ids: [] });
+    cf.addNGTexts(["comment11"]);
+    cf.addNGUserIDs([]);
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
         { no: 1, vpos: 1, user_id: "aa", content: "comment22" },
@@ -124,7 +134,8 @@ test("ng words", t => {
 test("ng user ids", t => {
     const cf = t.context.cf;
 
-    cf.addNG({ ng_texts: [], ng_user_ids: ["aa"] });
+    cf.addNGTexts([]);
+    cf.addNGUserIDs(["aa"]);
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
         { no: 2, vpos: 2, user_id: "aab", content: "comment11" },
@@ -135,7 +146,8 @@ test("ng user ids", t => {
 test("ng words, ng user ids", t => {
     const cf = t.context.cf;
 
-    cf.addNG({ ng_texts: ["comment22"], ng_user_ids: ["c"] });
+    cf.addNGTexts(["comment22"]);
+    cf.addNGUserIDs(["c"]);
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, [
         { no: 0, vpos: 0, user_id: "aa", content: "comment11" },
@@ -147,7 +159,8 @@ test("not exist ng words", t => {
     const cf = t.context.cf;
 
     const exp_comments = mkComments();
-    cf.addNG({ ng_texts: ["aaaaaa"], ng_user_ids: [] });
+    cf.addNGTexts(["aaaaaa"]);
+    cf.addNGUserIDs([]);
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, exp_comments);
 });
@@ -156,7 +169,8 @@ test("not exist ng user ids", t => {
     const cf = t.context.cf;
 
     const exp_comments = mkComments();
-    cf.addNG({ ng_texts: [], ng_user_ids: ["1000"] });
+    cf.addNGTexts([]);
+    cf.addNGUserIDs(["1000"]);
     const comments = cf.getComments(mkComments());
     t.deepEqual(comments, exp_comments);
 });

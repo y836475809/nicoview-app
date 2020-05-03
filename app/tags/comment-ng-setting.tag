@@ -60,7 +60,7 @@
                 return;
             }
 
-            const ng_matching_texts = items.filter(item => {
+            const ng_texts = items.filter(item => {
                 return item.type=="text";
             }).map(item => {
                 return item.value;
@@ -71,8 +71,8 @@
                 return item.value;
             });
 
-            obs_dialog.trigger("player-main-page:delete-comment-ng", { 
-                ng_matching_texts, ng_user_ids 
+            obs_dialog.trigger("player-main-page:delete-ng-comment", { 
+                ng_texts, ng_user_ids 
             });
 
             grid_table.deleteItems(items);
@@ -104,8 +104,8 @@
                 });
             }
             
-            const { ng_matching_texts, ng_user_ids } = ng_items;
-            const items1 = ng_matching_texts.map((text, index) => {
+            const { ng_texts, ng_user_ids } = ng_items;
+            const items1 = ng_texts.map((text, index) => {
                 return {
                     id: index,
                     title: "コメント",
@@ -114,7 +114,7 @@
                 };
             });
 
-            const base_index = ng_matching_texts.length;
+            const base_index = ng_texts.length;
             const items2 = ng_user_ids.map((user_id, index) => {
                 return {
                     id: index + base_index,

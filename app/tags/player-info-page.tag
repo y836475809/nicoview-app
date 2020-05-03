@@ -377,8 +377,8 @@
             }
         });
 
-        const triggerAddCommentNG = (args) => {
-            obs.trigger("player-main-page:add-comment-ng", args);
+        const triggerAddNGComment = (args) => {
+            obs.trigger("player-main-page:add-ng-comment", args);
         };
 
         const createMenu = () => {
@@ -388,14 +388,14 @@
                     const texts = items.map(item=>{
                         return item.text;
                     });
-                    triggerAddCommentNG({ ng_matching_texts: texts, ng_user_ids: [] });
+                    triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
                 }},
                 { label: "ユーザーIDをNGリストに登録", click() {
                     const items = grid_table.getSelectedDatas();
                     const user_ids = items.map(item=>{
                         return item.user_id;
                     });
-                    triggerAddCommentNG({ ng_matching_texts: [], ng_user_ids: user_ids });
+                    triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
                 }},
             ];
             return Menu.buildFromTemplate(menu_templete);

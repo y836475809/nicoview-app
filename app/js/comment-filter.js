@@ -3,13 +3,13 @@ const JsonStore = require("./json-store");
 class CommentNG {
     constructor(file_path){
         this._store = new JsonStore(file_path);
-        this._ng_matching_texts = [];
+        this._ng_texts = [];
         this._ng_user_ids = [];
     }
 
     getComments(comments){
         return comments.filter(comment=>{
-            const has_ng_text = this._ng_matching_texts.includes(comment.content);
+            const has_ng_text = this._ng_texts.includes(comment.content);
             if(has_ng_text){
                 return false;
             }
@@ -22,10 +22,10 @@ class CommentNG {
     }
 
     addNG(args){
-        const { ng_matching_texts, ng_user_ids } = args;
-        ng_matching_texts.forEach(text => {
-            if(!this._ng_matching_texts.includes(text)){
-                this._ng_matching_texts.push(text);
+        const { ng_texts, ng_user_ids } = args;
+        ng_texts.forEach(text => {
+            if(!this._ng_texts.includes(text)){
+                this._ng_texts.push(text);
             }
         });
         ng_user_ids.forEach(user_id => {
@@ -36,9 +36,9 @@ class CommentNG {
     }
 
     deleteNG(args){
-        const { ng_matching_texts, ng_user_ids } = args;
-        this._ng_matching_texts = this._ng_matching_texts.filter(text => {
-            return !ng_matching_texts.includes(text);
+        const { ng_texts, ng_user_ids } = args;
+        this._ng_texts = this._ng_texts.filter(text => {
+            return !ng_texts.includes(text);
         });
         this._ng_user_ids = this._ng_user_ids.filter(user_id => {
             return !ng_user_ids.includes(user_id);
@@ -47,18 +47,18 @@ class CommentNG {
 
     getNG(){
         return {
-            ng_matching_texts: this._ng_matching_texts, 
+            ng_texts: this._ng_texts, 
             ng_user_ids: this._ng_user_ids
         };
     }
 
     load(){
         try {
-            const { ng_matching_texts, ng_user_ids } = this._store.load();
-            this._ng_matching_texts = ng_matching_texts;
+            const { ng_texts, ng_user_ids } = this._store.load();
+            this._ng_texts = ng_texts;
             this._ng_user_ids = ng_user_ids;
         } catch (error) {
-            this._ng_matching_texts = [];
+            this._ng_texts = [];
             this._ng_user_ids = [];
             throw error;
         }
@@ -67,7 +67,7 @@ class CommentNG {
     save(){
         this._store.save(
             {
-                ng_matching_texts: this._ng_matching_texts, 
+                ng_texts: this._ng_texts, 
                 ng_user_ids: this._ng_user_ids
             });
     }

@@ -331,7 +331,7 @@
             logger.info("player main update video_id=", video_id);
         });
 
-        obs.on("player-main-page:add-comment-ng", async (args) => {
+        obs.on("player-main-page:add-ng-comment", async (args) => {
             comment_ng.addNG(args);
             try {
                 comment_ng.save();
@@ -345,7 +345,7 @@
             obs.trigger("player-info-page:update-comments", comments);
         });
 
-        obs.on("player-main-page:delete-comment-ng", async (args) => {
+        obs.on("player-main-page:delete-ng-comment", async (args) => {
             comment_ng.deleteNG(args);
             try {
                 comment_ng.save();

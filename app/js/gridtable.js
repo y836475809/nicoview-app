@@ -193,6 +193,7 @@ class GridTable {
         this.dataView.setItems(data);
         this.dataView.setFilter(this._filter, this.target_column_ids);
         this.dataView.endUpdate();
+        this.grid.invalidate();
 
         this._loadState();
     }
@@ -208,14 +209,12 @@ class GridTable {
         });
         this.clearSelected();
         this.grid.invalidate();
-        this.grid.render();
     }
 
     deleteItemById(id){
         this.dataView.deleteItem(id);
         this.clearSelected();
         this.grid.invalidate();
-        this.grid.render();
     }
 
     // TODO id, itemの並びに修正する

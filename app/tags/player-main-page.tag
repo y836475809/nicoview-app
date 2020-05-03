@@ -398,13 +398,6 @@
                         }
                     },
                     {
-                        label: "標準サイズx1.5",
-                        click: () => {
-                            const size = this.player_default_size;
-                            resizeVideo({width: size.width * 1.5, height: size.height * 1.5});
-                        }
-                    },
-                    {
                         label: "動画のサイズ",
                         click: () => {
                             if(org_video_size){
@@ -415,7 +408,7 @@
                 ]
             },
             {
-                label: "設定",
+                label: "コメント設定",
                 submenu: [
                     {
                         label: "NG設定",

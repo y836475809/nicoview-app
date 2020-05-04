@@ -88,7 +88,7 @@ class NGComment {
 // 100comment/1minute
 // 10minute => 1000+900=1900
 
-class CommentDisplayAmount {
+class CommentNumLimit {
     constructor(num_per_min=100){
         this.num_per_min = num_per_min;
     }
@@ -199,5 +199,5 @@ class CommentDisplayAmount {
 
 module.exports = {
     NGComment,
-    CommentDisplayAmount
+    CommentNumLimit
 };

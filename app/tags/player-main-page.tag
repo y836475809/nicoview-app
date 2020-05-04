@@ -44,7 +44,7 @@
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { NicoPlay } = window.NicoPlay;
-        const { NGComment, CommentDisplayAmount } = window.CommentFilter;
+        const { NGComment, CommentNumLimit } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RemoteDailog;
         const { NicoVideoData } = window.NicoVideoData;
@@ -96,7 +96,7 @@
             return async (ng_comment) => {
                 const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
                 if(do_limit===true){
-                    const comment_display = new CommentDisplayAmount();
+                    const comment_display = new CommentNumLimit();
                     const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
                     return ng_comment.getComments(dp_comments); 
                 }else{

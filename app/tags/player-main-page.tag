@@ -44,7 +44,7 @@
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { NicoPlay } = window.NicoPlay;
-        const { NGComment, CommentNumLimit } = window.CommentFilter;
+        const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RemoteDailog;
         const { NicoVideoData } = window.NicoVideoData;
@@ -53,7 +53,7 @@
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
 
-        let ng_comment = null;
+        let comment_filter = null;
         let nico_play = null;
 
         let org_video_size = null;
@@ -90,21 +90,6 @@
             gutter_move = false;
         };
 
-        let filter_comment_func = null; 
-        const filterCommentsFunc = (comments, play_time_sec) => {
-            const _comments = JSON.parse(JSON.stringify(comments));
-            return async (ng_comment) => {
-                const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
-                if(do_limit===true){
-                    const comment_display = new CommentNumLimit();
-                    const dp_comments = comment_display.getComments(_comments, play_time_sec); 
-                    return ng_comment.getComments(dp_comments); 
-                }else{
-                    return ng_comment.getComments(_comments); 
-                }
-            };
-        };
-
         const play_by_video_data = async (video_data, viewinfo, comments, state) => { 
             
             if(!/mp4/.test(video_data.type)){
@@ -115,8 +100,9 @@
             const video = thumb_info.video;
             const play_time_sec = toTimeSec(video.duration);
 
-            filter_comment_func = filterCommentsFunc(comments, play_time_sec);
-            const filtered_comments = await filter_comment_func(ng_comment);
+            comment_filter.setComments(comments);
+            comment_filter.setPlayTime(play_time_sec);
+            const filtered_comments = comment_filter.getCommnets();          
 
             const title = `${video.title}[${video.video_id}][${video.video_type}]`;
             document.title = title;
@@ -315,9 +301,10 @@
             }; 
             const play_time_sec = video_item.play_time;
 
-            const comments = video_data.getComments();              
-            filter_comment_func = filterCommentsFunc(comments, play_time_sec);
-            const filtered_comments = await filter_comment_func(ng_comment);
+            const comments = video_data.getComments();
+            comment_filter.setComments(comments);
+            comment_filter.setPlayTime(play_time_sec);
+            const filtered_comments = comment_filter.getCommnets();
 
             obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
             obs.trigger("player-info-page:set-viewinfo-data", { 
@@ -333,38 +320,43 @@
 
         obs.on("player-main-page:add-ng-comment", async (args) => {
             const { ng_texts, ng_user_ids } = args;
-            ng_comment.addNGTexts(ng_texts);
-            ng_comment.addNGUserIDs(ng_user_ids);
+
+            comment_filter.ng_comment.addNGTexts(ng_texts);
+            comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
             try {
-                ng_comment.save();
+                comment_filter.ng_comment.save();
             } catch (error) {
-                logger.error("player main save comment ng", error);
+                logger.error("player main save ng comment", error);
                 await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
             }
 
-            const comments = await filter_comment_func(ng_comment);
+            const comments = comment_filter.getCommnets();
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-info-page:update-comments", comments);
         });
 
         obs.on("player-main-page:delete-ng-comment", async (args) => {
             const { ng_texts, ng_user_ids } = args;
-            ng_comment.deleteNGTexts(ng_texts);
-            ng_comment.deleteNGUserIDs(ng_user_ids);
+
+            comment_filter.ng_comment.deleteNGTexts(ng_texts);
+            comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
             try {
-                ng_comment.save();
+                comment_filter.ng_comment.save();
             } catch (error) {
                 logger.error("player main save comment ng", error);
                 await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
             }
 
-            const comments = await filter_comment_func(ng_comment);
+            const comments = comment_filter.getCommnets();
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-info-page:update-comments", comments);
         });
 
-        obs.on("player-main-page:update-comment-display-limit", async (args) => {
-            const comments = await filter_comment_func(ng_comment);
+        obs.on("player-main-page:update-comment-display-limit", (args) => {
+            const { do_limit } = args;
+
+            comment_filter.setLimit(do_limit);
+            const comments = comment_filter.getCommnets();
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-info-page:update-comments", comments);
         });
@@ -418,7 +410,7 @@
                         label: "NG設定",
                         click: () => {
                             obs.trigger("comment-setting-dialog:show", {
-                                ng_items : ng_comment.getNGItems(),
+                                ng_items : comment_filter.ng_comment.getNGItems(),
                                 selected_tab: "comment-ng"
                             });
                         }
@@ -427,7 +419,7 @@
                         label: "コメント表示",
                         click: () => {
                             obs.trigger("comment-setting-dialog:show", {
-                                ng_items : ng_comment.getNGItems(),
+                                ng_items : comment_filter.ng_comment.getNGItems(),
                                 selected_tab: "comment-display"
                             });
                         }
@@ -463,10 +455,12 @@
 
             try {
                 const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
-                ng_comment = new NGComment(path.join(data_dir, "nglist.json"));
-                ng_comment.load();
+                const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
+                comment_filter = new CommentFilter(path.join(data_dir, "nglist.json"));
+                comment_filter.setLimit(do_limit);
+                comment_filter.ng_comment.load();
             } catch (error) {
-                logger.error("player main load comment ng", error);
+                logger.error("player main load ng comment", error);
                 obs.trigger("player-page:toastr", {
                     type: "error",
                     title: "NGコメントリストの読み込み失敗",

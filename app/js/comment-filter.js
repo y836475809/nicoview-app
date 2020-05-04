@@ -197,7 +197,39 @@ class CommentNumLimit {
     }
 }
 
+class CommentFilter {
+    constructor(nglist_path, num_per_min=100){
+        this.ng_comment = new NGComment(nglist_path);
+        this._comment_num_limit = new CommentNumLimit(num_per_min);
+        this._comments = [];
+        this._do_limit = true;
+    }
+
+    setComments(commnets){
+        this._comments =  JSON.parse(JSON.stringify(commnets));
+    }
+
+    setLimit(do_limit){
+        this._do_limit = do_limit;
+    }
+
+    setPlayTime(play_time_sec){
+        this._play_time_sec = play_time_sec;
+    }
+
+    getCommnets(){
+        if(this._do_limit===true){
+            const limit_comments = 
+                this._comment_num_limit.getComments(this._comments, this._play_time_sec); 
+            return this.ng_comment.getComments(limit_comments); 
+        }else{
+            return this.ng_comment.getComments(this._comments); 
+        }
+    }
+}
+
 module.exports = {
     NGComment,
-    CommentNumLimit
+    CommentNumLimit,
+    CommentFilter
 };

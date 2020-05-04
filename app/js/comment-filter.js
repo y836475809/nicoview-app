@@ -93,7 +93,7 @@ class CommentNumLimit {
         this.num_per_min = num_per_min;
     }
 
-    getDisplayed(comments, play_time_sec){
+    getComments(comments, play_time_sec){
         this._sortDescByPostDate(comments);
         const {owner_comments, user_comments} = this._splitByUserID(comments);
         const start_post_date = comments[comments.length-1].date;

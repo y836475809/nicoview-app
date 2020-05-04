@@ -97,7 +97,7 @@
                 const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
                 if(do_limit===true){
                     const comment_display = new CommentNumLimit();
-                    const dp_comments = comment_display.getDisplayed(_comments, play_time_sec); 
+                    const dp_comments = comment_display.getComments(_comments, play_time_sec); 
                     return ng_comment.getComments(dp_comments); 
                 }else{
                     return ng_comment.getComments(_comments); 

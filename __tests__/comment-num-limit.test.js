@@ -123,7 +123,7 @@ test("comments get each", t => {
     ]);
 });
 
-test("comments getDisplayed", t => {
+test("comments getComments", t => {
     const comments = [
         {no: 0, vpos: 10, date: 15.0},
         {no: 1, vpos: 9, date: 14.5},
@@ -146,7 +146,7 @@ test("comments getDisplayed", t => {
 
     const time_sec = 20*60;
     const cnl = new TestCommentNumLimit(2, 3);
-    const cmts = cnl.getDisplayed(comments, time_sec);
+    const cmts = cnl.getComments(comments, time_sec);
 
     const exp_cmt = [
         {no: 9, vpos: 1, date: 7.0},
@@ -185,7 +185,7 @@ test("comments splitByUserID", t => {
     ]);
 });
 
-test("comments getDisplayed include owner", t => {
+test("comments getComments include owner", t => {
     const comments = [
         {no: 0, vpos: 10, date: 15.0},
         {no: 1, vpos: 9, date: 14.5},
@@ -208,7 +208,7 @@ test("comments getDisplayed include owner", t => {
 
     const time_sec = 20*60;
     const cnl = new TestCommentNumLimit(1, 1);
-    const cmts = cnl.getDisplayed(comments, time_sec);
+    const cmts = cnl.getComments(comments, time_sec);
 
     const exp_cmts = [
         {no: 9, vpos: 1, date: 7.0},

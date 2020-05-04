@@ -186,9 +186,9 @@
     <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals logger */
-        const {remote, ipcRenderer, shell } = window.electron;
-        const {Menu, MenuItem} = remote;
+        /* globals riot logger */
+        const {remote, ipcRenderer } = window.electron;
+        const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const { NicoUpdate } = window.NicoUpdate;
         const { BookMark } = window.BookMark;

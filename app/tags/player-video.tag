@@ -13,9 +13,7 @@
         }
         .comment{
             float:left;
-            /* color: white; */
             font-weight: bold;
-            /* border: 1px solid #FF6600; */
             text-shadow: 1px 1px 0px black, 1px 1px 0px black;
         }
     </style>

@@ -27,9 +27,6 @@
         const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
-        
-        const row_img_width = 130/2;
-        const row_hight = 100/2;
 
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;

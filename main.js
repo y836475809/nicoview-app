@@ -576,16 +576,3 @@ const createPlayerWindow = () => {
         player_win.loadURL(player_html_path);
     });  
 };
-
-app.on("login", function(event, webContents, request, authInfo, callback) {
-    if(authInfo.isProxy){
-        event.preventDefault();
-        try {
-            const f = path.join(app.getPath("userData"), "proxy.json");
-            const p = JSON.parse(fs.readFileSync(f));
-            callback(p.name, p.pass);      
-        } catch (error) {
-            callback(null, null);
-        }
-    }
-});

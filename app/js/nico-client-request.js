@@ -98,29 +98,27 @@ class NicoClientRequest {
         }
         this.stream = null;
 
+        const json_str = JSON.stringify(json);
         const options = this._getOptions(url, "POST");
-        options.headers = { "content-type": "application/json" };
+        options.headers = { 
+            "Content-Type": "application/json",
+            "Content-Length": json_str.length
+        };
         this._res_json = true;
 
         return this._request(url, options, (req)=>{
-            req.write(JSON.stringify(json));
+            req.write(json_str);
         });
     }
 
-    options(url, {json=null, timeout_msec=10*1000}={}){
+    options(url, {timeout_msec=10*1000}={}){
         this._resetParams();
 
         this.timeout_msec = timeout_msec;
 
-        if(!json){
-            throw new Error(`options: json=${json}`);
-        }
-        this.stream = null;
         const options = this._getOptions(url, "OPTIONS");
 
-        return this._request(url, options, (req)=>{
-            req.write(JSON.stringify(json));
-        });
+        return this._request(url, options);
     }
 
     getNicoCookie(){

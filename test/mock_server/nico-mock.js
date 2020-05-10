@@ -473,7 +473,7 @@ class NicoMylistMocks {
         const headers = {
             "Content-Type": "application/xml",
         };
-        const host = "http://www.nicovideo.jp";
+        const host = "https://www.nicovideo.jp";
         this.myist_nock = nock(host);
         this.myist_nock
             .get(/mylist\/\d+/)

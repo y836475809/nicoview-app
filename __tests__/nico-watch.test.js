@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoWatch, getCookies } = require("../app/js/niconico");
+const { NicoWatch } = require("../app/js/niconico");
 const { NicoMocks, TestData } = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");
 
@@ -30,13 +30,13 @@ test("watch get cookie", async (t) => {
     nico_mocks.watch();
 
     const nico_watch = new NicoWatch();
-    const { cookie_jar, api_data } = await nico_watch.watch(TestData.video_id);
-    t.deepEqual(getCookies(cookie_jar, TestData.video_id),[
+    const { nico_cookie, api_data } = await nico_watch.watch(TestData.video_id);
+    t.deepEqual(nico_cookie.getSesstionCookies(),[
         {
             url: "https://www.nicovideo.jp",
             name: "nicohistory",
             value: `${TestData.video_id}%3A123456789`,
-            domain: "nicovideo.jp",
+            domain: ".nicovideo.jp",
             path: "/",
             secure: false
         },
@@ -44,7 +44,7 @@ test("watch get cookie", async (t) => {
             url: "https://www.nicovideo.jp",
             name: "nicosid",
             value: "123456.789",
-            domain: "nicovideo.jp",
+            domain: ".nicovideo.jp",
             path: "/",
             secure: false
         }
@@ -95,7 +95,7 @@ test("watch cancel 2", async(t) => {
 test("watch timetout", async (t) => {
     t.plan(3);
 
-    nico_mocks.watch(6000);
+    nico_mocks.watch(11*1000);
         
     try {
         const nico_watch = new NicoWatch();

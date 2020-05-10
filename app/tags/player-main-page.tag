@@ -170,9 +170,9 @@
                     throw error;
                 });
 
-                const {is_deleted, nico_cookies, comments, thumb_info, video_url} = 
+                const {is_deleted, cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = await ipcRenderer.invoke(IPC_CHANNEL.SET_COOKIE, nico_cookies);
+                const ret = await ipcRenderer.invoke(IPC_CHANNEL.SET_COOKIE, cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 

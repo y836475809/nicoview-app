@@ -91,7 +91,7 @@ test("update cancel", async(t) => {
 test("update timetout", async (t) => {
     t.plan(4);
 
-    nico_mocks.watch({delay:6000});
+    nico_mocks.watch({delay:11*1000});
     nico_mocks.comment();
     nico_mocks.thumbnail();
         

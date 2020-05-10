@@ -58,7 +58,7 @@ test("mylist timetout", async (t) => {
     t.plan(3);
 
     const id = "10";
-    nico_mylist_mocks.mylist(id, 6000);
+    nico_mylist_mocks.mylist(id, 11*1000);
         
     const nico_mylist = new NicoMylist();
     try {

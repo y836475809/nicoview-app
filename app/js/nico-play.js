@@ -1,5 +1,5 @@
 const EventEmitter = require("events");
-const { NicoWatch, NicoVideo, NicoComment, getCookies } = require("./niconico");
+const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
 const NicoDataParser = require("./nico-data-parser");
 
 class NicoPlay extends EventEmitter {
@@ -35,7 +35,7 @@ class NicoPlay extends EventEmitter {
             try {
                 this.emit("changeState", "startWatch");
                 this.nico_watch = new NicoWatch();
-                const { cookie_jar, api_data } = await this.nico_watch.watch(video_id); 
+                const { nico_cookie, api_data } = await this.nico_watch.watch(video_id); 
                 const is_deleted = api_data.video.isDeleted;
                 this.emit("changeState", "finishWatch");
 
@@ -50,12 +50,12 @@ class NicoPlay extends EventEmitter {
                 if(this.force_smile || !this.nico_video.isDmc())
                 {
                     this.emit("changeState", "startPlaySmile");
-                    const nico_cookies = getCookies(cookie_jar);
+                    const cookies = nico_cookie.getSesstionCookies();
                     const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                     const video_url = this.nico_video.SmileUrl;
                     resolve({
                         is_deleted: is_deleted,
-                        nico_cookies: nico_cookies,
+                        cookies: cookies,
                         comments: cnved_comments,
                         thumb_info: thumb_info,
                         video_url: video_url
@@ -76,12 +76,12 @@ class NicoPlay extends EventEmitter {
                 });
 
                 this.emit("changeState", "startPlayVideo");
-                const nico_cookies = getCookies(cookie_jar);
+                const cookies = nico_cookie.getSesstionCookies();
                 const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 resolve({
                     is_deleted: is_deleted,
-                    nico_cookies: nico_cookies,
+                    cookies: cookies,
                     comments: cnved_comments,
                     thumb_info: thumb_info,
                     video_url: dmc_video_url

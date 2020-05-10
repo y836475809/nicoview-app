@@ -75,7 +75,7 @@ class TestNicoDownloader extends NicoDownloader {
 }
 
 test("downloader timeout watch", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {watch_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {watch_delay:11*1000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -84,7 +84,7 @@ test("downloader timeout watch", async (t) => {
     t.deepEqual(log, [
         DonwloadProgMsg.start_watch]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "ESOCKETTIMEDOUT");  
+    t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
 test("downloader timeout dmc_session", async (t) => {
@@ -116,7 +116,7 @@ test("downloader timeout comment", async (t) => {
 });
 
 test("downloader timeout thumbnail", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:11*1000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -127,7 +127,7 @@ test("downloader timeout thumbnail", async (t) => {
         DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "ESOCKETTIMEDOUT");  
+    t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
 test("downloader timeout dmc_hb", async (t) => {
@@ -147,7 +147,7 @@ test("downloader timeout dmc_hb", async (t) => {
 });
 
 test("downloader timeout dmc_video", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {video_delay:11*1000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -159,11 +159,11 @@ test("downloader timeout dmc_video", async (t) => {
         DonwloadProgMsg.start_dmc, DonwloadProgMsg.stop_hb
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "ESOCKETTIMEDOUT");  
+    t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
 test("downloader timeout smile_video", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:6000});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:11*1000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -175,7 +175,7 @@ test("downloader timeout smile_video", async (t) => {
         DonwloadProgMsg.start_smile
     ]); 
     t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "ESOCKETTIMEDOUT");  
+    t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
 test("downloader network error watch 404", async (t) => {

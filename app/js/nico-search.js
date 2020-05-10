@@ -1,4 +1,5 @@
-const { NicoRequest } = require("./nico-request");
+const { NicoClientRequest } = require("./nico-client-request");
+const querystring = require("querystring");
 
 const sortkinds = [
     "viewCounter",
@@ -116,62 +117,48 @@ class NicoSearchParams {
     }
 }
 
-class NicoSearch extends NicoRequest {
-    constructor(host="https://api.search.nicovideo.jp") { 
-        super();
-        this.host = host;
-        this.req = null;
+class NicoSearch {
+    constructor() { 
+        this._req = null;
     }
 
     cancel(){   
-        if (this.req) {
-            this._cancel();
-            this.req.abort();
+        if (this._req) {
+            this._req.cancel();
         }
     }
 
-    search(params){
+    search(params){   
         const service = params._service;
         const query_json = params.get();
-        const url = `${this.host}/api/v2/${service}/contents/search`;
+        const host = "https://api.search.nicovideo.jp";
+        const url = `${host}/api/v2/${service}/contents/search`;
         const page = params._page;
         
-        return new Promise((resolve, reject) => {
-            const options = {
-                method: "GET",
-                uri: url, 
-                qs: query_json,
-                headers: {
-                    "User-Agent": "node request module"
-                },
-                timeout: 5 * 1000
-            };
-            this.req = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    if(error.status){
-                        let message = `status=${error.status}, エラー`;
-                        if(error.status === 400){
-                            message = `status=${error.status}, 不正なパラメータです`; 
-                        }
-                        else if(error.status === 404){
-                            message = `status=${error.status}, ページが見つかりません`; 
-                        }
-                        else if(error.status === 500){
-                            message = `status=${error.status}, 検索サーバの異常です`; 
-                        }
-                        else if(error.status === 503){
-                            message = `status=${error.status}, サービスがメンテナンス中です`; 
-                        }    
-                        reject(new Error(message));                     
-                    }else{
-                        reject(error);     
-                    }
-                    return;
-                }
+        return new Promise(async (resolve, reject) => {
+            this._req = new NicoClientRequest();
+            try {
+                const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
                 const result = JSON.parse(body);
                 result.meta.page = page;
-                resolve(result); 
-            });       
+                resolve(result);       
+            } catch (error) {
+                if(error.status){
+                    let message = `status=${error.status}, エラー`;
+                    if(error.status === 400){
+                        message = `status=${error.status}, 不正なパラメータです`; 
+                    }else if(error.status === 404){
+                        message = `status=${error.status}, ページが見つかりません`; 
+                    }else if(error.status === 500){
+                        message = `status=${error.status}, 検索サーバの異常です`; 
+                    }else if(error.status === 503){
+                        message = `status=${error.status}, サービスがメンテナンス中です`; 
+                    }    
+                    reject(new Error(message));                     
+                }else{
+                    reject(error);     
+                }
+            }    
         });
     }
 }

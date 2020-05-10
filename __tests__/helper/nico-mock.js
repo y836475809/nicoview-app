@@ -522,7 +522,7 @@ class NicoMylistMocks {
         const headers = {
             "Content-Type": "application/xml",
         };
-        this.myist_nock = nock("http://www.nicovideo.jp");
+        this.myist_nock = nock("https://www.nicovideo.jp");
         this.myist_nock
             .get(`/mylist/${id}`)
             .query({ rss: "2.0", numbers: 1, sort:1 })

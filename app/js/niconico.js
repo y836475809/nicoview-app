@@ -1,5 +1,6 @@
 const cheerio = require("cheerio");
 const { NicoRequest } = require("./nico-request");
+const { NicoClientRequest } = require("./nico-client-request");
 const logger = require("./logger");
 
 const nicovideo_url = "https://www.nicovideo.jp";
@@ -10,46 +11,35 @@ const getNicoURL = (video_id) => {
     return `${nicovideo_url}/watch/${video_id}`;
 };
 
-class NicoWatch extends NicoRequest{
+class NicoWatch {
     constructor() { 
-        super();
-        this.watch_url = `${nicovideo_url}/watch`;
-        this.req = null;
+        this._req = null;
     }
 
     cancel(){   
-        if (this.req) {
-            this._cancel();
-            this.req.abort();
+        if (this._req) {
+            this._req.cancel();
         }
     }
 
     watch(video_id){
-        return new Promise((resolve, reject) => {
-            const uri = `${this.watch_url}/${video_id}`;
-            const options = {
-                method: "GET",
-                uri: uri, 
-                timeout: 5 * 1000
-            };
-            this.req = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                    return;
-                }
-
-                const cookie_jar = this.getCookie(res.headers, uri);
-                let $ = cheerio.load(body);
+        return new Promise(async (resolve, reject) => {
+            const url = `${nicovideo_url}/watch/${video_id}`;
+            this._req = new NicoClientRequest();
+            try {
+                const body = await this._req.get(url);
+                const $ = cheerio.load(body);
                 const data_json = $("#js-initial-watch-data").attr("data-api-data");
-                // const data_elm = new JSDOM(body).window.document.getElementById("js-initial-watch-data");
-                // const data_json = data_elm.getAttribute("data-api-data");
                 if(!data_json){
-                    reject(new Error("not find data-api-data")); 
-                }else{                     
-                    const api_data = JSON.parse(data_json);
-                    resolve({ cookie_jar, api_data }); 
+                    reject(new Error("not find data-api-data"));
+                    return; 
                 }
-            });       
+                const api_data = JSON.parse(data_json);
+                const nico_cookie = this._req.getNicoCookie();
+                resolve({ nico_cookie, api_data }); 
+            } catch (error) {
+                reject(error);
+            }      
         });
     }
 }
@@ -444,60 +434,19 @@ class NicoComment extends NicoRequest {
     }
 }
 
-class NicoThumbnail extends NicoRequest {
+class NicoThumbnail {
     constructor() { 
-        super();
-        this.req = null;
+        this._req = null;
     }
     cancel(){
-        if (this.req) {
-            this._cancel();
-            this.req.abort();
+        if (this._req) {
+            this._req.cancel();
         }
     }  
-    getThumbImg(uri){
-        return new Promise((resolve, reject) => {
-            const options = {
-                method: "GET",
-                uri: uri, 
-                encoding: null,
-                timeout: 5 * 1000
-            };
-            this.req = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                    return;
-                }
-                resolve(body);
-            });  
-        });       
+    getThumbImg(url){
+        this._req = new NicoClientRequest();
+        return this._req.get(url, {encoding:"binary"});   
     }
-}
-
-function getCookies(cookie_jar) {  
-    const cookies = cookie_jar.getCookies(`${nicovideo_url}`);
-    const cookie_jsons = cookies.map(value=>{
-        return value.toJSON();
-    });  
-    const keys = ["nicohistory", "nicosid"];
-    const nico_cookies = keys.map(key=>{
-        const cookie = cookie_jsons.find((item) => {
-            return item.key == key;
-        });
-        if (!cookie) {
-            throw new Error(`not find ${key}`);
-        }
-        // cookie.expires
-        return {
-            url: nicovideo_url,
-            name: cookie.key,
-            value: cookie.value,
-            domain: cookie.domain,
-            path: cookie.path,
-            secure: cookie.secure==undefined?false:true
-        };        
-    });
-    return nico_cookies;
 }
 
 module.exports = {
@@ -505,6 +454,5 @@ module.exports = {
     NicoVideo: NicoVideo,
     NicoComment: NicoComment,
     NicoThumbnail: NicoThumbnail,
-    getCookies: getCookies,
     getNicoURL
 };

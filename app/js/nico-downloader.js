@@ -1,15 +1,11 @@
 const fs = require("fs");
 const util = require("util");
 const path = require("path");
-const request = require("request");
 const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
+const { NicoClientRequest } = require("./nico-client-request");
 const { NicoJsonFile } = require("./nico-data-file");
 const  NicoDataParser = require("./nico-data-parser");
 const logger = require("./logger");
-
-const validateStatus = (status) => {
-    return status >= 200 && status < 300;
-};
 
 const convertMB = (size_byte) => {
     const mb = 1024**2;
@@ -30,80 +26,42 @@ const DonwloadProgMsg =  Object.freeze({
 });
 
 class DownloadRequest {
-    constructor(url, cookie){
-        this.url = url;
-        this.cookie = cookie;
-        this.req = null;
-        this.canceled = false;
+    /**
+     * 
+     * @param {String} url 
+     * @param {NicoCookie} nico_cookie 
+     */
+    constructor(url, nico_cookie){
+        this._url = url;
+        this._nico_cookie = nico_cookie;
+        this._req = null;
     }
 
     cancel(){
-        if(this.req){
-            this.canceled = true;
-            this.req.abort();
+        if(this._req){
+            this._req.cancel();
         }
     }
 
     download(stream, on_progress=(state)=>{}){
-        this.canceled = false;
         return new Promise(async (resolve, reject) => {
-            let content_len = 0;
-            let current = 0 ;
-            let error_obj = null;
-            const closeWithError = (error) => {
-                error_obj = error;
-                stream.close();
-            };
-            const options = {
-                method: "GET",
-                uri: this.url, 
-                jar: this.cookie,
-                timeout: 5 * 1000
-            };
-            this.req = request(options, (error, res, body) => {
-                if(error){
-                    closeWithError(error);
-                }
-                else if(!validateStatus(res.statusCode)){
-                    closeWithError(new Error(`${res.statusCode}:${this.url}`));
-                }
-            }).on("error", (error) => {
-                closeWithError(error);
-            }).on("response", (res) => {
-                if(validateStatus(res.statusCode)){
-                    content_len = res.headers["content-length"];
-                }else{
-                    closeWithError(new Error(`${res.statusCode}:${this.url}`));
-                }
-            }).on("data", (chunk) => {
-                if(content_len > 0){
-                    const pre_per = Math.floor((current/content_len)*100);
-                    current += chunk.length;
-                    const cur_per = Math.floor((current/content_len)*100);
-                    if(cur_per > pre_per){
-                        on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
-                    }
-                }
-            }).on("abort", () => {
-                if(this.canceled){
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    closeWithError(error);
-                }
-            });
-
-            stream.on("error", (error) => { 
+            this._req = new NicoClientRequest();
+            try {
+                await this._req.get(this._url, 
+                    {
+                        encoding:"binary",
+                        nico_cookie:this._nico_cookie, 
+                        stream:stream,
+                        on_progress:(current, content_len)=>{
+                            const cur_per = Math.floor((current/content_len)*100);
+                            on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
+                        }
+                    });
+                on_progress(DonwloadProgMsg.complete);
+                resolve();
+            } catch (error) {
                 reject(error);
-            }).on("close", () => {
-                if(error_obj!=null){
-                    reject(error_obj);
-                }else{
-                    on_progress(DonwloadProgMsg.complete);
-                    resolve();
-                }
-            });
-
-            this.req.pipe(stream);
+            }
         });
     }
 }
@@ -139,8 +97,7 @@ class NicoDownloader {
             this.nico_comment.cancel();
         }  
         if(this.img_request){
-            this.img_reuqest_canceled = true;
-            this.img_request.abort();
+            this.img_request.cancel();
         }         
         if(this.video_download){
             this.video_download.cancel();
@@ -182,6 +139,7 @@ class NicoDownloader {
 
             const tmp_video_path = this._getTmpVideoPath();
             const stream = this._createStream(tmp_video_path);
+            stream.setDefaultEncoding("binary");
             if(this.videoinfo.server=="dmc"){
                 on_progress(DonwloadProgMsg.start_dmc);
                 await this._getVideoDmc(stream, on_progress);
@@ -258,31 +216,14 @@ class NicoDownloader {
         const api_data = this.watch_data.api_data;
         const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
 
-        this.img_reuqest_canceled = false;
-
         return new Promise(async (resolve, reject) => {
-            const options = {
-                method: "GET", 
-                uri: thumbnail_url, 
-                timeout: 5 * 1000,
-                encoding: null
-            };
-
-            this.img_request = request(options, (error, response, body)=>{
-                if(error){
-                    reject(error);
-                }else if(validateStatus(response.statusCode)){
-                    resolve({ thumbImg_data: body, thumbnail_size: thumbnail_size });
-                } else {
-                    reject(new Error(`${response.statusCode}:${thumbnail_url}`));
-                }
-            }).on("abort", () => {
-                if(this.img_reuqest_canceled){
-                    const error = new Error("cancel");
-                    error.cancel = true;
-                    reject(error);
-                }
-            });
+            try {
+                this.img_request = new NicoClientRequest();
+                const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
+                resolve({ thumbImg_data: body, thumbnail_size: thumbnail_size });    
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
@@ -298,10 +239,10 @@ class NicoDownloader {
             throw error;
         });
 
-        const { cookie_jar } = this.watch_data;
+        const { nico_cookie } = this.watch_data;
         const video_url = this.nico_video.DmcContentUri;
 
-        this.video_download = new DownloadRequest(video_url, cookie_jar);
+        this.video_download = new DownloadRequest(video_url, nico_cookie);
         try {
             await this.video_download.download(stream, on_progress);
         } catch (error) {
@@ -314,10 +255,9 @@ class NicoDownloader {
 
     async _getVideoSmile(stream, on_progress){
         //cancel
-        const { cookie_jar, api_data } = this.watch_data;
+        const { nico_cookie, api_data } = this.watch_data;
         const url = api_data.video.smileInfo.url;
-
-        this.video_download = new DownloadRequest(url, cookie_jar);
+        this.video_download = new DownloadRequest(url, nico_cookie);
         await this.video_download.download(stream, on_progress);
     }   
 

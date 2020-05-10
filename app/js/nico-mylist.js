@@ -1,12 +1,11 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
-const { NicoRequest } = require("./nico-request");
+const { NicoClientRequest } = require("./nico-client-request");
 
-class NicoMylist extends NicoRequest {
+class NicoMylist {
     constructor(){
-        super();
-        this.req = null;
+        this._req = null;
 
         this.reader = new NicoMylistReader();
         this.mylist = null;
@@ -14,9 +13,8 @@ class NicoMylist extends NicoRequest {
     }
 
     cancel(){   
-        if (this.req) {
-            this._cancel();
-            this.req.abort();
+        if (this._req) {
+            this._req.cancel();
         }
     }
 
@@ -33,26 +31,12 @@ class NicoMylist extends NicoRequest {
     }
 
     _requestXML(id){
+        const host = "https://www.nicovideo.jp";
         const sort = 1;
-        const url = `http://www.nicovideo.jp/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
-        
-        return new Promise((resolve, reject) => {
-            const options = {
-                method: "GET",
-                uri: url, 
-                headers: {
-                    "User-Agent": "node request module"
-                },
-                timeout: 5 * 1000
-            };
-            this.req = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                }else{
-                    resolve(body); 
-                }
-            });       
-        });
+        const url = `${host}/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
+
+        this._req = new NicoClientRequest();
+        return this._req.get(url);
     }
 
     /**

@@ -146,7 +146,7 @@ test("nico search cancel", async t => {
 
 test("nico search timeout", async t => {
     const word = "test";
-    nico_mocks.search(word, 200, 6*1000);
+    nico_mocks.search(word, 200, 11*1000);
 
     const pramas = default_params();
     pramas.query(word);

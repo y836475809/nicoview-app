@@ -126,6 +126,10 @@ class NicoClientRequest {
     }
 
     cancel(){
+        if(!this.req){
+            return;
+        }
+
         const error = new Error("cancel");
         error.cancel = true;
         this.req.destroy(error);

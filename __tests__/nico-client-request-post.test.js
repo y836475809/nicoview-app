@@ -11,7 +11,7 @@ const test_url = `${test_host}${test_path}`;
 const json_data = {key1:"data1"};
 
 let post_count = 0;
-const nock_post = (delay=1, code=200) => {
+const nock_post = ({delay=1, code=200, res_json={key:"ok"}}={}) => {
     post_count = 0;
     nock(test_host)
         .post(test_path)
@@ -19,7 +19,7 @@ const nock_post = (delay=1, code=200) => {
         .times(Infinity)
         .reply((uri, reqbody)=>{
             post_count++;
-            return [code, "ok"];
+            return [code, res_json];
         });
 };
 
@@ -50,7 +50,18 @@ test("post", async (t) => {
 
     const req = new NicoClientRequest();
     const ret = await req.post(test_url, {json:json_data});
-    t.is(ret, "ok");
+    t.deepEqual(ret, {key:"ok"});
+});
+
+test("post json error", async (t) => {
+    nock_post({res_json:"ok"});
+    try {
+        const req = new NicoClientRequest();
+        await req.post(test_url, {json:json_data});
+    } catch (error) {
+        t.is(error.cancel, undefined);
+        t.regex(error.message, /response json parse error/i);
+    }
 });
 
 test("post repeat", async (t) => {
@@ -76,7 +87,7 @@ test.cb("post repeat check async", (t) => {
     setTimeout(()=>{
         clearInterval(int_id);
         t.is(post_count, 2);
-        t.deepEqual(log, ["log1", "ok", "ok"]);
+        t.deepEqual(log, ["log1", {key:"ok"}, {key:"ok"}]);
         t.end();
     },2500);
 
@@ -105,7 +116,7 @@ test("post repeat stop", async (t) => {
 test("post timeout", async (t) => {
     t.plan(3);
 
-    nock_post(3000);
+    nock_post({delay:3000});
 
     try {
         const req = new NicoClientRequest();
@@ -120,7 +131,7 @@ test("post timeout", async (t) => {
 test("post page not find", async t => {
     t.plan(3);
 
-    nock_post(1, 404);
+    nock_post({delay:1, code:404});
         
     try {
         const req = new NicoClientRequest();

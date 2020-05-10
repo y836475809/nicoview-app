@@ -147,7 +147,7 @@ test("get comment illegal param", async (t) => {
 test("get comment timeout", async (t) => {
     t.plan(3);
 
-    nico_mocks.comment(6000);
+    nico_mocks.comment(11*1000);
 
     const nico_comment = new NicoComment(data_api_data);
     try {
@@ -155,7 +155,7 @@ test("get comment timeout", async (t) => {
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
-        t.regex(error.message, /time/i);
+        t.regex(error.message, /timeout\s*:\s*https/i);
     }
 });
 

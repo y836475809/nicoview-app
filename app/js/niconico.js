@@ -237,20 +237,17 @@ class NicoVideo extends NicoRequest {
     }
 }
 
-class NicoComment extends NicoRequest {
+class NicoComment {
     constructor(api_data) {
-        super();
-        this.nmsg_ur = `${niconmsg_url}`;
         this.api_data = api_data;
         this.r_no = 0;
         this.p_no = 0;
-        this.req = null;
+        this._req = null;
     }
 
     cancel() {
-        if (this.req) {
-            this._cancel();
-            this.req.abort();
+        if (this._req) {
+            this._req.cancel();
         }
     }
 
@@ -284,25 +281,8 @@ class NicoComment extends NicoRequest {
     }
 
     _post(post_data){
-        return new Promise(async (resolve, reject) => {
-            const uri = `${this.nmsg_ur}`;
-            const json = post_data;
-            const options = {
-                method: "POST",
-                uri: uri, 
-                headers: { "content-type": "application/json" },
-                json: json,
-                timeout: 5 * 1000
-            };
-            this.req = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                    return;
-                }
-                const comment_data = body;
-                resolve(comment_data);    
-            });
-        });
+        this._req = new NicoClientRequest();
+        return this._req.post(niconmsg_url, {json:post_data});
     }
 
     hasOwnerComment() {

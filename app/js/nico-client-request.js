@@ -100,6 +100,7 @@ class NicoClientRequest {
 
         const options = this._getOptions(url, "POST");
         options.headers = { "content-type": "application/json" };
+        this._res_json = true;
 
         return this._request(url, options, (req)=>{
             req.write(JSON.stringify(json));
@@ -137,6 +138,7 @@ class NicoClientRequest {
         this.stream = null;
         this.res_nico_cookie = null;
         this.on_progress = null;
+        this._res_json = false;
     }
 
     _getOptions(url, method){
@@ -215,7 +217,17 @@ class NicoClientRequest {
                         if(is_binary===true){
                             resolve(Buffer.concat(binary_data));
                         }else{
-                            resolve(str_data);
+                            if(this._res_json===true){
+                                try {
+                                    const json_data = JSON.parse(str_data);
+                                    resolve(json_data);
+                                } catch (error) {
+                                    error.message = `response json parse error:${error.message},url=${url},`;
+                                    reject(error);
+                                }   
+                            }else{
+                                resolve(str_data);
+                            }
                         }    
                     });
                 }

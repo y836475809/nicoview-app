@@ -103,6 +103,24 @@ test("get req cookie", async (t) => {
     t.is(body, "ok");
 });
 
+test.cb("get cancel", (t) => {
+    t.plan(1);
+
+    nock_get(2*1000);
+
+    const req = new NicoClientRequest();
+    setTimeout(()=>{
+        req.cancel();
+    }, 1000);
+
+    req.get(test_url)
+        .then()
+        .catch(error=>{
+            t.truthy(error.cancel);
+            t.end();
+        });
+});
+
 test("get stream", async (t) => {
     nock_get();
 

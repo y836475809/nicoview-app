@@ -53,6 +53,24 @@ test("post", async (t) => {
     t.deepEqual(ret, {key:"ok"});
 });
 
+test.cb("post cancel", (t) => {
+    t.plan(1);
+
+    nock_post({delay:2*1000});
+
+    const req = new NicoClientRequest();
+    setTimeout(()=>{
+        req.cancel();
+    }, 1000);
+
+    req.post(test_url, {json:json_data})
+        .then()
+        .catch(error=>{
+            t.truthy(error.cancel);
+            t.end();
+        });
+});
+
 test("post json error", async (t) => {
     nock_post({res_json:"ok"});
     try {

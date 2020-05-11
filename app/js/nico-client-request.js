@@ -15,21 +15,21 @@ class NicoCookie {
      * @param {Array} headers 
      */
     constructor(url, headers){
-        this.url = new URL(url);
-        this.keys = ["nicohistory", "nicosid"];
-        this.cookie_headers = getValue(headers, "set-cookie");
+        this._url = new URL(url);
+        this._keys = ["nicohistory", "nicosid"];
+        this._cookie_headers = getValue(headers, "set-cookie");
     }
 
     getCookieHeaders(){
-        if(!this.cookie_headers){
-            throw new Error(`nico cookie headers is ${this.cookie_headers}`);
+        if(!this._cookie_headers){
+            throw new Error(`nico cookie headers is ${this._cookie_headers}`);
         }
-        if (!Array.isArray(this.cookie_headers)) {
+        if (!Array.isArray(this._cookie_headers)) {
             throw new Error(`nico cookie headers is not array`);
         }
 
-        return this.cookie_headers.filter(value => {
-            return this.keys.some(key => value.includes(key));
+        return this._cookie_headers.filter(value => {
+            return this._keys.some(key => value.includes(key));
         });
     }
 
@@ -37,12 +37,12 @@ class NicoCookie {
         const sc = [];
         const objs = this._parse(this.getCookieHeaders());
         objs.forEach(value => {
-            for (let index = 0; index < this.keys.length; index++) {
-                const key = this.keys[index];
+            for (let index = 0; index < this._keys.length; index++) {
+                const key = this._keys[index];
                 if(value.hasOwnProperty(key)===true){
                     // cookie.expires
                     sc.push({
-                        url: this.url.origin,
+                        url: this._url.origin,
                         name: key,
                         value: value[key],
                         domain: value.domain,
@@ -73,10 +73,10 @@ class NicoClientRequest {
     get(url, {nico_cookie=null, stream=null, on_progress=null, timeout_msec=10*1000, encoding="utf8"}={}){
         this._resetParams();
  
-        this.stream = stream;
-        this.on_progress = on_progress;
-        this.timeout_msec = timeout_msec;
-        this.encoding = encoding;
+        this._stream = stream;
+        this._on_progress = on_progress;
+        this._timeout_msec = timeout_msec;
+        this._encoding = encoding;
 
         const options = this._getOptions(url, "GET");
         if(nico_cookie){
@@ -91,12 +91,11 @@ class NicoClientRequest {
     post(url, {json=null, timeout_msec=10*1000}={}){
         this._resetParams();
 
-        this.timeout_msec = timeout_msec;
+        this._timeout_msec = timeout_msec;
 
         if(!json){
             throw new Error(`post: json=${json}`);
         }
-        this.stream = null;
 
         const json_str = JSON.stringify(json);
         const options = this._getOptions(url, "POST");
@@ -114,7 +113,7 @@ class NicoClientRequest {
     options(url, {timeout_msec=10*1000}={}){
         this._resetParams();
 
-        this.timeout_msec = timeout_msec;
+        this._timeout_msec = timeout_msec;
 
         const options = this._getOptions(url, "OPTIONS");
 
@@ -122,24 +121,24 @@ class NicoClientRequest {
     }
 
     getNicoCookie(){
-        return this.res_nico_cookie;
+        return this._res_nico_cookie;
     }
 
     cancel(){
-        if(!this.req){
+        if(!this._req){
             return;
         }
 
         const error = new Error("cancel");
         error.cancel = true;
-        this.req.destroy(error);
+        this._req.destroy(error);
     } 
 
     _resetParams(){
-        this.encoding = "utf8";
-        this.stream = null;
-        this.res_nico_cookie = null;
-        this.on_progress = null;
+        this._encoding = "utf8";
+        this._stream = null;
+        this._res_nico_cookie = null;
+        this._on_progress = null;
         this._res_json = false;
     }
 
@@ -161,12 +160,12 @@ class NicoClientRequest {
         return new Promise((resolve, reject) => {
             let str_data = "";
             let binary_data = [];
-            const is_binary = this.encoding == "binary";
+            const is_binary = this._encoding == "binary";
 
             let current = 0 ;
             let content_len = 0;
 
-            this.req = https.request(options, (res) => {
+            this._req = https.request(options, (res) => {
                 // console.log('STATUS: ' + res.statusCode);
                 // console.log('HEADERS: ' + JSON.stringify(res.headers));
 
@@ -182,12 +181,12 @@ class NicoClientRequest {
                     content_len = 0;
                 }
 
-                res.setEncoding(this.encoding);
-                this.res_nico_cookie = new NicoCookie(url, res.headers);
+                res.setEncoding(this._encoding);
+                this._res_nico_cookie = new NicoCookie(url, res.headers);
                
-                if(this.stream){
-                    res.pipe(this.stream);
-                    if(this.on_progress){
+                if(this._stream){
+                    res.pipe(this._stream);
+                    if(this._on_progress){
                         res.on("data", (chunk) => {
                             if(content_len === 0){
                                 return;
@@ -197,14 +196,14 @@ class NicoClientRequest {
                             current += chunk.length;
                             const cur_per = Math.floor((current/content_len)*100);
                             if(cur_per > pre_per){
-                                this.on_progress(current, content_len);
+                                this._on_progress(current, content_len);
                             }
                         });
                     }
                     res.on("end", () => {
                         resolve();
                     });
-                    this.stream.on("error", (error) => { 
+                    this._stream.on("error", (error) => { 
                         reject(error);
                     });
                 }else{
@@ -235,21 +234,21 @@ class NicoClientRequest {
                 }
             });
 
-            this.req.on("error", (e) => {
-                if(this.stream){
-                    this.stream.destroy();
+            this._req.on("error", (e) => {
+                if(this._stream){
+                    this._stream.destroy();
                 }
 
                 reject(e);
             });
-            this.req.on("timeout", () => {
-                this.req.destroy(new Error(`timeout : ${url}`));
+            this._req.on("timeout", () => {
+                this._req.destroy(new Error(`timeout : ${url}`));
             });
 
-            this.req.setTimeout(this.timeout_msec);
-            set_data_func(this.req);
+            this._req.setTimeout(this._timeout_msec);
+            set_data_func(this._req);
             
-            this.req.end();
+            this._req.end();
         });
     }
 }

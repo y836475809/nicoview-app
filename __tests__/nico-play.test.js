@@ -242,7 +242,7 @@ test("nico play dmc error hb_post", async (t) => {
         + "errorHeartBeat:");
     t.is(nico_mocks.hb_options_count, 1);
     t.is(nico_mocks.hb_post_count, 0);
-    t.is(nico_play.nico_video.heart_beat_id, null);
+    t.is(nico_play.nico_video._heart_beat_id, null);
 });
 
 test("nico play smile", async (t) => {

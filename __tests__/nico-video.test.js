@@ -114,7 +114,7 @@ test("nico dmc heart beat", async (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
 
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
     nico_video.postHeartBeat();
 
     await new Promise(resolve => setTimeout(resolve, 3000));
@@ -133,7 +133,7 @@ test("nico stop dmc heart beat", async (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
 
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
     nico_video.postHeartBeat();
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -154,7 +154,7 @@ test("stop by cancel dmc heart beat", async (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
   
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 2);   
@@ -215,7 +215,7 @@ test.cb("timeout dmc heart beat post",  (t) => {
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat();
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 10*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 10*1000;
     nico_video.postHeartBeat((error)=>{
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -272,7 +272,7 @@ test.cb("stop by hb post error 403 dmc heart beat", (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
   
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 0); 
@@ -294,7 +294,7 @@ test.cb("stop by hb post error 500 dmc heart beat", (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
   
-    nico_video.dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 0); 

@@ -45,11 +45,11 @@ class NicoWatch {
 
 class NicoVideo {
     constructor(api_data, heart_beat_rate=0.9) {
-        this.api_data = api_data;  
-        this.dmcInfo = api_data.video.dmcInfo;
+        this._api_data = api_data;  
+        this._dmcInfo = api_data.video.dmcInfo;
 
-        this.heart_beat_rate = heart_beat_rate;
-        this.heart_beat_id = null;
+        this._heart_beat_rate = heart_beat_rate;
+        this._heart_beat_id = null;
 
         this._req_session = null;
         this._req_hb_options = null;
@@ -73,18 +73,18 @@ class NicoVideo {
     }
 
     get SmileUrl() {
-        return this.api_data.video.smileInfo.url;
+        return this._api_data.video.smileInfo.url;
     }
 
     isDmc() {
-        return this.dmcInfo != null;
+        return this._dmcInfo != null;
     }
 
     get DmcSession() {
         if (!this.isDmc()) {
             return null;
         }
-        const session_api = this.dmcInfo.session_api;
+        const session_api = this._dmcInfo.session_api;
         return {
             session: {
                 recipe_id: session_api.recipe_id,
@@ -146,7 +146,7 @@ class NicoVideo {
                 reject(error);
             }  
 
-            const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
+            const url = `${this._dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
             try {
                 this._req_session = new NicoClientRequest();
@@ -167,7 +167,7 @@ class NicoVideo {
         this.stopHeartBeat();
 
         const id = this.dmc_session.session.id;
-        const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        const url = `${this._dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
         
         this._req_hb_options = new NicoClientRequest();
         return this._req_hb_options.options(url);
@@ -177,9 +177,9 @@ class NicoVideo {
         this.stopHeartBeat();
 
         const id = this.dmc_session.session.id;
-        const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        const url = `${this._dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
         const session = this.dmc_session;
-        const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;   
+        const interval_ms = this._dmcInfo.session_api.heartbeat_lifetime * this._heart_beat_rate;   
         
         this._req_hb_post = new NicoClientRequest();
         this.heart_beat_id = setInterval(async () => {              
@@ -205,9 +205,9 @@ class NicoVideo {
 
 class NicoComment {
     constructor(api_data) {
-        this.api_data = api_data;
-        this.r_no = 0;
-        this.p_no = 0;
+        this._api_data = api_data;
+        this._r_no = 0;
+        this._p_no = 0;
         this._req = null;
     }
 
@@ -233,16 +233,16 @@ class NicoComment {
 
     _get_comment_json(){
         const josn = this.hasOwnerComment() ? 
-            this.makeJsonOwner(this.r_no, this.p_no):this.makeJsonNoOwner(this.r_no, this.p_no); 
-        this.r_no += 1;
-        this.p_no += josn.length;
+            this.makeJsonOwner(this._r_no, this._p_no):this.makeJsonNoOwner(this._r_no, this._p_no); 
+        this._r_no += 1;
+        this._p_no += josn.length;
         return josn;       
     }
 
     _get_comment_diff_json(res_from){
-        const josn = this.makeJsonDiff(this.r_no, this.p_no, res_from);
-        this.r_no += 1;
-        this.p_no += josn.length;
+        const josn = this.makeJsonDiff(this._r_no, this._p_no, res_from);
+        this._r_no += 1;
+        this._p_no += josn.length;
         return josn;       
     }
 
@@ -252,7 +252,7 @@ class NicoComment {
     }
 
     hasOwnerComment() {
-        const comment_composite = this.api_data.commentComposite;
+        const comment_composite = this._api_data.commentComposite;
         return comment_composite.threads[0].isActive;
     }
 
@@ -272,10 +272,10 @@ class NicoComment {
 
     makeJsonNoOwner(r_no, p_no) {
         //no owner
-        const comment_composite = this.api_data.commentComposite;
+        const comment_composite = this._api_data.commentComposite;
         const thread = comment_composite.threads[1].id;
         const fork = comment_composite.threads[1].fork;
-        const content_len = this._getContentLen(this.api_data.video.duration);
+        const content_len = this._getContentLen(this._api_data.video.duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
@@ -308,12 +308,12 @@ class NicoComment {
 
     makeJsonOwner(r_no, p_no) {
         //owner
-        const comment_composite = this.api_data.commentComposite;
+        const comment_composite = this._api_data.commentComposite;
         const thread0 = comment_composite.threads[0].id;
         const fork0 = comment_composite.threads[0].fork;
         const thread1 = comment_composite.threads[1].id;
         const fork1 = comment_composite.threads[1].fork;
-        const content_len = this._getContentLen(this.api_data.video.duration);
+        const content_len = this._getContentLen(this._api_data.video.duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
@@ -357,7 +357,7 @@ class NicoComment {
     }
 
     makeJsonDiff(r_no, p_no, res_from) {
-        const comment_composite = this.api_data.commentComposite;
+        const comment_composite = this._api_data.commentComposite;
         const thread1 = comment_composite.threads[1].id;
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
@@ -396,9 +396,9 @@ class NicoThumbnail {
 }
 
 module.exports = {
-    NicoWatch: NicoWatch,
-    NicoVideo: NicoVideo,
-    NicoComment: NicoComment,
-    NicoThumbnail: NicoThumbnail,
+    NicoWatch,
+    NicoVideo,
+    NicoComment,
+    NicoThumbnail,
     getNicoURL
 };

@@ -104,7 +104,7 @@ test.cb("nico play dmc cancel hb", (t) => {
     nico_mocks.watch();
     nico_mocks.comment();
     nico_mocks.dmc_session();
-    nico_mocks.dmc_hb();
+    nico_mocks.dmc_hb(1, 0.8*1000); // 3回目のhbの途中でcancelするようにdelay調整
 
     const nico_play = createNicoPlay(hb_1s_rate);
 

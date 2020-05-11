@@ -77,14 +77,14 @@ test("nico dmc session error", async (t) => {
 test("nico dmc session timeout", async (t) => {
     t.plan(2);
 
-    nico_mocks.dmc_session(6000);
+    nico_mocks.dmc_session(11*1000);
 
     const nico_video = new NicoVideo(data_api_data);
     try {
         await nico_video.postDmcSession();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
+        t.regex(error.message, /timeout\s*:\s*https/i);
     }    
 });
 
@@ -148,7 +148,7 @@ test("nico stop dmc heart beat", async (t) => {
 test("stop by cancel dmc heart beat", async (t) => {
     t.plan(3);
     
-    nico_mocks.dmc_hb();
+    nico_mocks.dmc_hb(1, 1*1000);
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };
@@ -193,7 +193,7 @@ test("cancel dmc heart beat options", async (t) => {
 test("timeout dmc heart beat options", async (t) => {
     t.plan(3);
 
-    nico_mocks.dmc_hb(6000);
+    nico_mocks.dmc_hb(11*1000);
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };
@@ -202,7 +202,7 @@ test("timeout dmc heart beat options", async (t) => {
         await nico_video.optionsHeartBeat();
     } catch (error) {
         t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
+        t.regex(error.message, /timeout\s*:\s*https/i);
         t.is(nico_mocks.hb_post_count, 0);  
     }
 });
@@ -210,7 +210,7 @@ test("timeout dmc heart beat options", async (t) => {
 test.cb("timeout dmc heart beat post",  (t) => {
     t.plan(4);
 
-    nico_mocks.dmc_hb(1, 6000);
+    nico_mocks.dmc_hb(1, 11*1000);
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };

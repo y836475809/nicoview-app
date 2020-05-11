@@ -1,5 +1,4 @@
 const cheerio = require("cheerio");
-const { NicoRequest } = require("./nico-request");
 const { NicoClientRequest } = require("./nico-client-request");
 const logger = require("./logger");
 
@@ -44,34 +43,30 @@ class NicoWatch {
     }
 }
 
-class NicoVideo extends NicoRequest {
+class NicoVideo {
     constructor(api_data, heart_beat_rate=0.9) {
-        super();
         this.api_data = api_data;  
         this.dmcInfo = api_data.video.dmcInfo;
 
         this.heart_beat_rate = heart_beat_rate;
         this.heart_beat_id = null;
 
-        this.req_session = null;
-        this.req_hb_options = null;
-        this.req_hb_post = null;
+        this._req_session = null;
+        this._req_hb_options = null;
+        this._req_hb_post = null;
     }
 
     cancel() {
-        if (this.req_session) {
-            this._cancel();
-            this.req_session.abort();
+        if (this._req_session) {
+            this._req_session.cancel();
         }
         
-        if (this.req_hb_options) {
-            this._cancel();
-            this.req_hb_options.abort();
+        if (this._req_hb_options) {
+            this._req_hb_options.cancel();
         }
 
-        if (this.req_hb_post) {
-            this._cancel();
-            this.req_hb_post.abort();
+        if (this._req_hb_post) {
+            this._req_hb_post.cancel();
         }
 
         this.stopHeartBeat();
@@ -145,32 +140,22 @@ class NicoVideo extends NicoRequest {
     }
 
     postDmcSession() {
-        this.canceled = false;
         return new Promise(async (resolve, reject) => {
             if (!this.DmcSession) {
-                const error = new Error("dmc info is null");
+                const error = new Error(`dmc info is ${this.DmcSession}`);
                 reject(error);
-                return;
-            }
+            }  
 
             const url = `${this.dmcInfo.session_api.urls[0].url}?_format=json`;
             const json = this.DmcSession;
-            
-            const options = {
-                method: "POST",
-                uri: url, 
-                headers: { "content-type": "application/json" },
-                json: json,
-                timeout: 5 * 1000
-            };
-            this.req_session = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                    return;
-                }
+            try {
+                this._req_session = new NicoClientRequest();
+                const body = await this._req_session.post(url, {json:json});
                 this.dmc_session = body.data;
-                resolve(this.dmc_session);
-            });
+                resolve(this.dmc_session);      
+            } catch (error) {
+                reject(error);
+            }
         });
     }
 
@@ -179,26 +164,13 @@ class NicoVideo extends NicoRequest {
     }
 
     optionsHeartBeat() {
-        this.canceled = false;
-        return new Promise(async (resolve, reject) => {
-            this.stopHeartBeat();
+        this.stopHeartBeat();
 
-            const id = this.dmc_session.session.id;
-            const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
-
-            const options = {
-                method: "OPTIONS",
-                uri: url, 
-                timeout: 5 * 1000
-            };
-            this.req_hb_options = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    reject(error);
-                    return;
-                }
-                resolve();
-            });
-        });
+        const id = this.dmc_session.session.id;
+        const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        
+        this._req_hb_options = new NicoClientRequest();
+        return this._req_hb_options.options(url);
     }
     
     postHeartBeat(on_error) {
@@ -208,22 +180,16 @@ class NicoVideo extends NicoRequest {
         const url = `${this.dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
         const session = this.dmc_session;
         const interval_ms = this.dmcInfo.session_api.heartbeat_lifetime * this.heart_beat_rate;   
-        this.canceled = false;
-        const options = {
-            method: "POST",
-            uri: url, 
-            headers: { "content-type": "application/json" },
-            json: session,
-            timeout: 5 * 1000
-        };
-        this.heart_beat_id = setInterval(() => {  
-            this.req_hb_post = this._reuqest(options, (error, res, body)=>{
-                if(error){
-                    this.stopHeartBeat();
-                    on_error(error);
-                }
-            });
-
+        
+        this._req_hb_post = new NicoClientRequest();
+        this.heart_beat_id = setInterval(async () => {              
+            try {
+                await this._req_hb_post.post(url, {json:session});
+            } catch (error) {
+                this.stopHeartBeat();
+                on_error(error);
+            }
+            
             logger.debug("nico video HeartBeat");
         }, interval_ms);
     }

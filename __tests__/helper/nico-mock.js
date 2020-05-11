@@ -144,7 +144,12 @@ class NicoMocks {
             .times(50)
             .reply((uri, reqbody)=>{
                 this.hb_post_count++;
-                return [200, "ok"];
+                return [200, {    
+                    meta: {
+                        status: 200,
+                        message: "ok"
+                    }
+                }];
             });
     } 
 

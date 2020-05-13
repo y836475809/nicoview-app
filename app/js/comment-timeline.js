@@ -211,7 +211,7 @@ class CommentTimeLine {
      * @param {Number} duration_sec 
      * @param {Number} row_num 
      */
-    constructor(parent_elm, duration_sec, row_num){
+    constructor(parent_elm, duration_sec, row_num, on_complete=()=>{}){
         this.parent_elm = parent_elm;
         this.duration_sec = duration_sec;
         this.row_num = row_num;
@@ -224,10 +224,17 @@ class CommentTimeLine {
         this.enable = true;
 
         this._paused = true;
+        
+        this._ended = false;
+        this._on_complete = on_complete;
     }
 
     get paused(){
         return this._paused;
+    }
+
+    get ended(){
+        return this._ended;
     }
 
     setFPS(fps){
@@ -238,10 +245,19 @@ class CommentTimeLine {
      * @param {Array} comments 
      */
     create(comments) {
+        this._ended = false;
         this._createCanvas();
-
         this.clear();
-        this.timeLine = new TimelineMax({ paused: true });
+
+        this.timeLine = new TimelineMax(
+            { 
+                onComplete:()=>{
+                    this._ended = true;
+                    this.pause();
+                    this._on_complete();
+                },
+                paused: true 
+            });
         
         const [flow_comments,
             fixed_top_comments,
@@ -361,6 +377,8 @@ class CommentTimeLine {
     }
 
     seek(seek_sec){
+        this._ended = false;
+
         if(this.enable!==true){
             return;
         }

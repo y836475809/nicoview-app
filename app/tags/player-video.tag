@@ -45,17 +45,36 @@
             if(comment_tl){
                 comment_tl.clear();
             }
-            comment_tl = new CommentTimeLine(parent, duration_sec, row_num);
+            comment_tl = new CommentTimeLine(parent, duration_sec, row_num, ()=>{
+                obs.trigger("player-controls:set-state", "pause"); 
+            });
             comment_tl.create(nico_script.getApplied(comments));
             comment_tl.setFPS(fps);
         };
 
         const seek = (current) => {
-            if(video_elm.paused){
+            if(comment_tl.enable === false){
+                // コメント非表示では動画の現在位置設定
                 video_elm.currentTime = current;
-                if(comment_tl){
-                    comment_tl.seek(current);
-                }
+                return;
+            }
+
+            if(comment_tl.ended === true){
+                // コメント表示が終了している場合は動画とコメントタイムラインの現在位置設定
+                video_elm.currentTime = current;
+                comment_tl.seek(current);
+                return;
+            }
+
+            // 動画終了後もコメントが流れている場合があるため
+            // 動画が終了している場合はコメントタイムラインのpause状態
+            // 動画が終了していない場合はvideoのpause状態
+            // でpause状態を判定してシーク後の動作を切り替える
+            const paused = video_elm.currentTime == video_elm.duration ?
+                comment_tl.paused : video_elm.paused;
+            if(paused === true){
+                video_elm.currentTime = current;
+                comment_tl.seek(current);
             }else{
                 video_elm.pause();
                 video_elm.currentTime = current;
@@ -66,7 +85,7 @@
                         clearInterval(wait_timer);
                     }       
                 }, 100);
-            } 
+            }  
         };
 
         obs.on("player-video:set-play-data", (data) => {
@@ -161,25 +180,34 @@
 
             video_elm.addEventListener("ended", () => {
                 logger.debug("endedによるイベント発火");
-                obs.trigger("player-controls:set-state", "pause"); 
+
+                if(comment_tl.enable === false){
+                    obs.trigger("player-controls:set-state", "pause"); 
+                }
             });
             
             obs.on("player-video:play", () => {
                 logger.debug("player play");
                 if(video_elm.currentTime == video_elm.duration){
-                    // currentTime==durationは動画が最後まで再生されたということ
-                    // この場合に再生するときは最初から再生するための処理を行う
-                    logger.debug("player play restart");
-                    obs.trigger("player-info-page:reset-comment-scroll"); 
-                    video_elm.currentTime = 0;
-                    comment_tl.pause();
-                    comment_tl.seek(0);
+                    if(comment_tl.enable === true && comment_tl.ended === false){
+                        comment_tl.play();
+                        return;
+                    }else{
+                        // currentTime==durationは動画が最後まで再生されたということ
+                        // この場合に再生するときは最初から再生するための処理を行う
+                        logger.debug("player play restart");
+                        obs.trigger("player-info-page:reset-comment-scroll"); 
+                        video_elm.currentTime = 0;
+                        comment_tl.pause();
+                        comment_tl.seek(0);
+                    }
                 }      
                 video_elm.play();
             });
             obs.on("player-video:pause", () => {
                 logger.debug("player pause");
                 video_elm.pause();
+                comment_tl.pause();
             });
 
             obs.on("player-video:seek", (current) => {  

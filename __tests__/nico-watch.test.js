@@ -103,7 +103,7 @@ test("watch timetout", async (t) => {
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
-        t.regex(error.message, /time/i);
+        t.regex(error.message, /timeout\s*:\s*https/i);
     }
 });
 

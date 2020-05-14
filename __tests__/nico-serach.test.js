@@ -152,7 +152,7 @@ test("nico search timeout", async t => {
     pramas.query(word);
     const nico_search = new NicoSearch();
     const error = await t.throwsAsync(nico_search.search(pramas));
-    t.regex(error.message, /time/i);
+    t.regex(error.message, /timeout\s*:\s*https/i);
 });
 
 test("nico search status error", async t => {

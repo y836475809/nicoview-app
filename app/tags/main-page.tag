@@ -172,7 +172,7 @@
 
         this.obs = this.opts.obs;
 
-        ipcRenderer.on("downloadItemUpdated", async (event) => {
+        const updateDownloadBadge = async () => {
             const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             const elm = this.root.querySelector(".download-badge > .item-num");
             if(video_ids.length === 0){
@@ -182,6 +182,10 @@
             }
             this.donwnload_item_num = video_ids.length;
             this.update();
+        }
+
+        ipcRenderer.on("downloadItemUpdated", async (event) => {
+            await updateDownloadBadge();
         });
 
         ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
@@ -231,9 +235,7 @@
             select_page("library");
             hideRightPage();
 
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
-            this.donwnload_item_num = video_ids.length;
-            this.update();
+            await updateDownloadBadge();
 
             const menu_templete = [
                 { label: "ログ",

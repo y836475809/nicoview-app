@@ -88,6 +88,7 @@
             height: 20px;
             border-radius: 50%;
             background-color: red;
+            user-select: none;
         }
     </style>
 

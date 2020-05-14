@@ -90,3 +90,11 @@ html, body {
   overflow-wrap: break-word;
   white-space: pre-wrap;
 }
+
+input::placeholder {
+  user-select: none;
+}
+
+button {
+  user-select: none;
+}

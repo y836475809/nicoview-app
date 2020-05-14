@@ -16,6 +16,7 @@
             background: #f4f4f4;
             font-size: 1.5em;
             border-bottom: 1px solid lightgrey;
+            user-select: none;
         }
 
         .listview-list {
@@ -37,6 +38,7 @@
             border-bottom: 1px solid lightgrey;
             white-space: nowrap; 
             overflow: hidden;
+            user-select: none;
         }
 
         .listview-item:hover {

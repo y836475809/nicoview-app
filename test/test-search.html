@@ -34,6 +34,15 @@
 
         riot.mount("search-page", {obs});
     });
+
+    const timeout = 200;
+    let timer;
+    window.addEventListener("resize", () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            obs.trigger("window-resized");
+        }, timeout);
+    });
 </script>
 
 </html>

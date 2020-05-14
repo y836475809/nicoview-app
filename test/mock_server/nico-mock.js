@@ -521,9 +521,9 @@ const setupNicoDownloadNock = (target_nock, {
 };
 
 module.exports = {
-    NicoVideoMocks: NicoVideoMocks,
-    NicoDownLoadMocks: NicoDownLoadMocks,
-    NicoSearchMocks: NicoSearchMocks,
-    setupNicoDownloadNock: setupNicoDownloadNock,
-    NicoMylistMocks: NicoMylistMocks
+    NicoVideoMocks,
+    NicoDownLoadMocks,
+    NicoSearchMocks,
+    setupNicoDownloadNock,
+    NicoMylistMocks
 };

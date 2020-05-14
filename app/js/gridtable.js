@@ -341,5 +341,5 @@ class GridTable {
 }
 
 module.exports = {
-    GridTable: GridTable,
+    GridTable,
 };

@@ -44,4 +44,6 @@ class SyncCommentScroll {
     }
 }
 
-module.exports = SyncCommentScroll;
+module.exports = {
+    SyncCommentScroll
+};

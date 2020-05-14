@@ -179,7 +179,7 @@
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
-        const SyncCommentScroll = window.SyncCommentScroll;
+        const { SyncCommentScroll } = window.SyncCommentScroll;
 
         const obs = this.opts.obs; 
 

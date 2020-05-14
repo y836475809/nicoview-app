@@ -54,5 +54,5 @@ class ScheduledTask extends EventEmitter{
 }
 
 module.exports = {
-    ScheduledTask: ScheduledTask
+    ScheduledTask
 };

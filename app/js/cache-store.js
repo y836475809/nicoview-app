@@ -62,5 +62,5 @@ class CacheStore {
 }
 
 module.exports = {
-    CacheStore: CacheStore
+    CacheStore
 };

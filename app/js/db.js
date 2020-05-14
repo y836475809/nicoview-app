@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { deepCopy } = require("./deepcopy");
-const logger = require("./logger");
+const { logger } = require("./logger");
 
 class MapDB {
     constructor({ filename = "./db.json", autonum = 10, use_log = true } = {}) {

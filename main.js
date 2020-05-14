@@ -11,8 +11,8 @@ const { HistoryIPCServer } = require("./app/js/ipc-history");
 const { DownloadItemIPCServer } = require("./app/js/ipc-download-item");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
-const JsonStore = require("./app/js/json-store");
-const logger = require("./app/js/logger");
+const { JsonStore } = require("./app/js/json-store");
+const { logger } = require("./app/js/logger");
 const { CmdLineParser } = require("./app/js/main-util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");

@@ -21,7 +21,7 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e;
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.error(msg);
+    global.logger.logger.error(msg);
 
     try {
         await global.RemoteDailog.showMessageBox("error", msg);
@@ -31,7 +31,7 @@ window.addEventListener( "error", async e => {
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.error(e.reason);
+    global.logger.logger.error(e.reason);
    
     try {
         await global.RemoteDailog.showMessageBox("error", e.reason.message);
@@ -51,7 +51,6 @@ window.addEventListener("load", () => {
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);
     global.NicoMylist = require(`${root_dir}/app/js/nico-mylist`);
     global.NicoUpdate = require(`${root_dir}/app/js/nico-update`);
-    global.JsonStore = require(`${root_dir}/app/js/json-store`);
     global.BookMark = require(`${root_dir}/app/js/bookmark`);
     global.CacheStore = require(`${root_dir}/app/js/cache-store`);
     global.VideoConverter = require(`${root_dir}/app/js/video-converter`);

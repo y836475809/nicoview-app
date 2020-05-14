@@ -1,5 +1,5 @@
 const test = require("ava");
-const FixedComment = require("../app/js/fixed-comment");
+const { FixedComment } = require("../app/js/fixed-comment");
 
 test("calc fix fill", (t) => {
     const num = 3;

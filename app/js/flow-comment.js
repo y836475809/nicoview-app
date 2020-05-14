@@ -103,4 +103,6 @@ class FlowComment {
     }
 }
 
-module.exports = FlowComment;
+module.exports = {
+    FlowComment
+};

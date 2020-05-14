@@ -536,19 +536,21 @@ class NicoMylistMocks {
     }
 }
 
+const TestData = {
+    video_id,
+    no_owner_comment,
+    owner_comment,
+    data_api_data,
+    dmc_session,
+    dmc_session_low
+};
+
 module.exports = {
-    NicoMocks: NicoMocks,
-    NicoDownLoadMocks: NicoDownLoadMocks,
-    NicoMylistMocks: NicoMylistMocks,
-    MockNicoUitl: MockNicoUitl,
-    writeBufStream: writeBufStream,
-    setupNicoDownloadNock: setupNicoDownloadNock,
-    TestData : {
-        video_id : video_id,
-        no_owner_comment: no_owner_comment,
-        owner_comment: owner_comment,
-        data_api_data: data_api_data,
-        dmc_session: dmc_session,
-        dmc_session_low: dmc_session_low
-    }
+    NicoMocks,
+    NicoDownLoadMocks,
+    NicoMylistMocks,
+    MockNicoUitl,
+    writeBufStream,
+    setupNicoDownloadNock,
+    TestData
 };

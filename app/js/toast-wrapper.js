@@ -78,4 +78,6 @@ class ToastWrapper {
     }
 }
 
-module.exports = ToastWrapper;
+module.exports = {
+    ToastWrapper
+};

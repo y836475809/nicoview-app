@@ -21,4 +21,6 @@ class JsonStore {
     }
 }
 
-module.exports = JsonStore;
+module.exports = {
+    JsonStore
+};

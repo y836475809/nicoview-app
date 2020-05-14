@@ -5,7 +5,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const { IPCServer } = require("./ipc-client-server");
 const { deepCopy } = require("./deepcopy");
-const logger = require("./logger");
+const { logger } = require("./logger");
 
 class ConfigIPCServer extends IPCServer {
     constructor() {

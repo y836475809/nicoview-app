@@ -32,7 +32,7 @@
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
-        var logger = window.logger; // eslint-disable-line
+        var { logger } = window.logger; // eslint-disable-line
         let toast_wrapper = null;
 
         const obs = riot.observable();
@@ -55,7 +55,8 @@
         });
 
         window.onload = () => {
-            toast_wrapper = new window.ToastWrapper();
+            const { ToastWrapper } = window.ToastWrapper;
+            toast_wrapper = new ToastWrapper();
         };
 
         if(process.env.NODE_ENV == "DEBUG"){

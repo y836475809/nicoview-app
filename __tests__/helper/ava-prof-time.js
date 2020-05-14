@@ -39,5 +39,5 @@ class ProfTime {
 }
 
 module.exports = {
-    ProfTime: ProfTime
+    ProfTime
 };

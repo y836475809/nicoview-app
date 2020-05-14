@@ -94,5 +94,5 @@ class NicoPlay extends EventEmitter {
 }
 
 module.exports = {
-    NicoPlay: NicoPlay
+    NicoPlay
 };

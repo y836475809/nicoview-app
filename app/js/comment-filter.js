@@ -1,4 +1,4 @@
-const JsonStore = require("./json-store");
+const { JsonStore } = require("./json-store");
 
 class NGComment {
     constructor(file_path){

@@ -145,7 +145,7 @@ class NicoMylistStore {
 }
 
 module.exports = {
-    NicoMylist: NicoMylist,
-    NicoMylistReader: NicoMylistReader,
-    NicoMylistStore: NicoMylistStore
+    NicoMylist,
+    NicoMylistReader,
+    NicoMylistStore
 };

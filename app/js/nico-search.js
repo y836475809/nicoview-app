@@ -164,6 +164,6 @@ class NicoSearch {
 }
 
 module.exports = {
-    NicoSearchParams: NicoSearchParams,
-    NicoSearch: NicoSearch
+    NicoSearchParams,
+    NicoSearch
 };

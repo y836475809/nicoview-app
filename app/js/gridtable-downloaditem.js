@@ -282,5 +282,5 @@ class GridTableDownloadItem {
 }
 
 module.exports = {
-    GridTableDownloadItem: GridTableDownloadItem
+    GridTableDownloadItem
 };

@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const { NicoClientRequest } = require("./nico-client-request");
-const logger = require("./logger");
+const { logger } = require("./logger");
 
 const nicovideo_url = "https://www.nicovideo.jp";
 const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";

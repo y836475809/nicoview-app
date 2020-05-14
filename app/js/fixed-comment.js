@@ -76,4 +76,6 @@ class FixedComment{
     }
 }
 
-module.exports = FixedComment;
+module.exports = {
+    FixedComment
+};

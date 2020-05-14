@@ -5,7 +5,7 @@ const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
 const { NicoClientRequest } = require("./nico-client-request");
 const { NicoJsonFile } = require("./nico-data-file");
 const  NicoDataParser = require("./nico-data-parser");
-const logger = require("./logger");
+const { logger } = require("./logger");
 
 const convertMB = (size_byte) => {
     const mb = 1024**2;
@@ -333,6 +333,6 @@ class NicoDownloader {
 }
 
 module.exports = {
-    DonwloadProgMsg: DonwloadProgMsg,
-    NicoDownloader: NicoDownloader
+    DonwloadProgMsg,
+    NicoDownloader
 };

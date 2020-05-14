@@ -17,7 +17,7 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e;
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.error(msg);
+    global.logger.logger.error(msg);
     
     try {
         await global.RemoteDailog.showMessageBox("error", msg);
@@ -27,7 +27,7 @@ window.addEventListener( "error", async e => {
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.error(e.reason);
+    global.logger.logger.error(e.reason);
    
     try {
         await global.RemoteDailog.showMessageBox("error", e.reason.message);
@@ -39,7 +39,6 @@ window.addEventListener( "unhandledrejection", async e => {
 window.addEventListener("load", () => {
     window.$ = window.jQuery = require("jquery");
     require("slickgrid/plugins/slick.autotooltips");
-    // global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
     global.IPC = require(`${root_dir}/app/js/ipc-client-server`);
     global.RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);

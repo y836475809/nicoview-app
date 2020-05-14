@@ -31,7 +31,8 @@
 
 <script>
     /* globals riot */
-    var logger = window.logger; // eslint-disable-line
+    var { logger } = window.logger; // eslint-disable-line
+    
     let toast_wrapper = null;
 
     const obs = riot.observable();
@@ -42,7 +43,8 @@
     });
     
     window.onload = () => {
-        toast_wrapper = new window.ToastWrapper();
+        const { ToastWrapper } = window.ToastWrapper;
+        toast_wrapper = new ToastWrapper();
     };
 
     riot.mount("window-titlebar", {

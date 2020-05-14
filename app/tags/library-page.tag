@@ -603,6 +603,7 @@
                         time: 0
                     });
                 }},
+                { type: "separator" },
                 { label: "コメント更新", click() {
                     const items = grid_table.getSelectedDatas();
                     updateNicoData(items, async (nico_update)=>{
@@ -621,6 +622,7 @@
                         await nico_update.update();
                     });
                 }},
+                { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {

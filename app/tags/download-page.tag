@@ -263,16 +263,18 @@
                         time: 0
                     });
                 }},
-                { label: "削除", async click() {
-                    const deleted_ids = grid_table_dl.deleteSelectedItems();
-                    await deleteDownloadItems(deleted_ids);
-                }},
+                { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {
                         return BookMark.createVideoItem(item.name, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
+                }},
+                { type: "separator" },
+                { label: "削除", async click() {
+                    const deleted_ids = grid_table_dl.deleteSelectedItems();
+                    await deleteDownloadItems(deleted_ids);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);

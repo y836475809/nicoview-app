@@ -566,6 +566,7 @@
                         time: 0
                     });
                 }},
+                { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
@@ -581,6 +582,7 @@
                     });
                     obs.trigger("download-page:delete-download-items", video_ids);
                 }},
+                { type: "separator" },
                 { label: "動画をブックマーク", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";

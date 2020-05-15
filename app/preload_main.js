@@ -21,7 +21,7 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e;
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.logger.error(msg);
+    global.logger.error(msg);
 
     try {
         await global.RemoteDailog.showMessageBox("error", msg);
@@ -31,7 +31,7 @@ window.addEventListener( "error", async e => {
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.logger.error(e.reason);
+    global.logger.error(e.reason);
    
     try {
         await global.RemoteDailog.showMessageBox("error", e.reason.message);

@@ -4,7 +4,6 @@ process.once("loaded", () => {
     global.process = process;
     global.electron = require("electron");
     global.path = require("path");
-    // global.module = module;
     global.EventEmitter = require("events");
     global.IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
     global.logger = require(`${root_dir}/app/js/logger`);
@@ -17,7 +16,7 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e;
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.logger.error(msg);
+    global.logger.error(msg);
     
     try {
         await global.RemoteDailog.showMessageBox("error", msg);
@@ -27,7 +26,7 @@ window.addEventListener( "error", async e => {
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.logger.error(e.reason);
+    global.logger.error(e.reason);
    
     try {
         await global.RemoteDailog.showMessageBox("error", e.reason.message);

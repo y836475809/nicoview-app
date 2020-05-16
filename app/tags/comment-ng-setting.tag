@@ -121,6 +121,9 @@
             });
             const items = items1.concat(items2);
             grid_table.setData(items);
+
+            const container = this.root.querySelector(".comment-ng-grid-container");
+            grid_table.resizeGrid(container.clientWidth, container.clientHeight); 
         };
 
         this.onclickDelete = (e) => {

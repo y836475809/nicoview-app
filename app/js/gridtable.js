@@ -149,7 +149,15 @@ class GridTable {
         this.grid.registerPlugin(this.resizer);
     }
 
-    resizeGrid(){
+    resizeGrid(width, height){
+        if(width && height){
+            const  container = $(this.grid.getContainerNode());
+            container.width(width);
+            container.height(height);      
+            this.grid.resizeCanvas();
+            return; 
+        }
+
         this.resizer.resizeGrid();
     }
 

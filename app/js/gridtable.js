@@ -5,7 +5,7 @@ require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
 const time_format = require("./time-format");
 
-/* globals $ */
+/* globals $ Slick */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
     if(!value){

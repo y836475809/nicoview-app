@@ -88,9 +88,9 @@ class GridTable {
     }
 
     init(container){
-        this.container = $(container);
+        // this.container = $(container);
         this.dataView = new Slick.Data.DataView();
-        this.grid = new Slick.Grid(this.container, this.dataView, this.columns, this.options);
+        this.grid = new Slick.Grid(container, this.dataView, this.columns, this.options);
         this.grid.onSort.subscribe((e, args) => {
             const comparer = (a, b) => {
                 return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;

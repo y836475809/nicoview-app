@@ -92,7 +92,7 @@
         const setup = (ng_items) => {
             if (grid_table == null) {
                 grid_table = new GridTable("comment-ng-grid", columns, options);
-                grid_table.init(this.root.querySelector(".comment-ng-grid"));
+                grid_table.init(".comment-ng-grid");
                 grid_table.setupResizer(".comment-ng-grid-container");
                 const context_menu = createMenu();
                 grid_table.onContextMenu((e) => {

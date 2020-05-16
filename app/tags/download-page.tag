@@ -415,8 +415,7 @@
                 }
             });
 
-            grid_table_dl = new GridTableDownloadItem(
-                this.root.querySelector(".download-grid"), htmlFormatter);
+            grid_table_dl = new GridTableDownloadItem(".download-grid", htmlFormatter);
             
             const context_menu = createMenu();
             try {

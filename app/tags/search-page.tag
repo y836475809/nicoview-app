@@ -595,7 +595,7 @@
         };
         const context_menu = createMenu();
         this.on("mount", () => {
-            grid_table.init(this.root.querySelector(".search-grid"));
+            grid_table.init(".search-grid");
             grid_table.setupResizer(".search-grid-container");
 
             grid_table.onDblClick((e, data)=>{

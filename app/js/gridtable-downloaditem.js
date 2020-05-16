@@ -9,7 +9,7 @@ const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
 }; 
 
 class GridTableDownloadItem {
-    constructor(parent_elm, state_formatter){
+    constructor(container, state_formatter){
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130, behavior: "selectAndMove"},
             {id: "name", name: "名前", behavior: "selectAndMove"},
@@ -23,7 +23,7 @@ class GridTableDownloadItem {
             _saveColumnWidth: true
         };
         this.grid_table = new GridTable("download-item-grid", columns, options);
-        this.grid_table.init(parent_elm);
+        this.grid_table.init(container);
             
         this.grid_table.dataView.onRowCountChanged.subscribe((e, args) => {
             this.grid_table.grid.updateRowCount();

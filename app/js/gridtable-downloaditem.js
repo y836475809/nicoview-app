@@ -131,10 +131,6 @@ class GridTableDownloadItem {
         });
     }
 
-    resizeFitContainer(container){
-        this.grid_table.resizeFitContainer(container);
-    }
-
     hasItem(id){
         return this.grid_table.dataView.getRowById(id) !== undefined;
     }

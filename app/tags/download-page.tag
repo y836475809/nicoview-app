@@ -201,11 +201,6 @@
             });
         };
 
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".download-grid-container");
-            grid_table_dl.resizeFitContainer(container);
-        };
-
         const onChangeDownloadItem = async () => {
             const items = grid_table_dl.getData().map(value => {
                 let state = download_state.complete;
@@ -433,6 +428,7 @@
                         time : 0
                     });
                 });
+                grid_table_dl.grid_table.setupResizer(".download-grid-container");
                 const items = await IPCClient.request("downloaditem", "getData");
                 grid_table_dl.setData(items);
             } catch (error) {
@@ -446,8 +442,6 @@
 
             // await onChangeDownloadItem();
 
-            resizeGridTable();
-
             scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
                 startDownload();
             });
@@ -456,10 +450,6 @@
             }
 
             updateDonwloadScheduleLabel();
-        });
-
-        obs.on("window-resized", ()=> {
-            resizeGridTable();
         });
     </script>
 </download-page>

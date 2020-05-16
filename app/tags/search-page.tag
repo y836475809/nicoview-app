@@ -343,7 +343,6 @@
             }
             
             this.obs_modal_dialog.trigger("close");
-            resizeGridTable(); //only first?
 
             const elm = getSearchInputElm();
             elm.focus();
@@ -539,11 +538,6 @@
             await this.search();
         });
 
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".search-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
-
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
@@ -602,6 +596,7 @@
         const context_menu = createMenu();
         this.on("mount", () => {
             grid_table.init(this.root.querySelector(".search-grid"));
+            grid_table.setupResizer(".search-grid-container");
 
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
@@ -615,14 +610,7 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
-
-            resizeGridTable();
         });
-
-        obs.on("window-resized", ()=>{
-            resizeGridTable();
-        });
-        
     </script>
 </search-content>
 

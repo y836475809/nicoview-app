@@ -369,6 +369,7 @@
             nico_mylist_store = new NicoMylistStore(mylist_dir);
 
             grid_table.init(this.root.querySelector(".mylist-grid"));
+            grid_table.setupResizer(".mylist-grid-container");
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
@@ -399,19 +400,13 @@
                     context_menu.popup({window: remote.getCurrentWindow()});
                 }
             });
-
-            resizeGridTable();
+            
             try {
                 image_cache.load();
             } catch (error) {
                 logger.error(error);
             }   
         });
-
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".mylist-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
 
         const getMylistID = () => {
             const elm = this.root.querySelector(".mylist-input");
@@ -542,10 +537,6 @@
                     await showMessageBox("error", error.message);
                 } 
             }   
-        });
-
-        obs.on("window-resized", ()=> {
-            resizeGridTable();
         });
 
         window.onbeforeunload = (e) => {

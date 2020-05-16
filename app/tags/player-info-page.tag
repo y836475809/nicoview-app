@@ -256,11 +256,6 @@
             obs.trigger("player-main-page:sync-comment-checked", checked);
         };
 
-        const resizeCommentList = () => {
-            const container = this.root.querySelector(".comment-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
-
         const updateSyncCommentCheck = (is_checked) => {
             let ch_elm = this.root.querySelector(".comment-checkbox.sync-comment");
             ch_elm.checked = is_checked;
@@ -313,7 +308,7 @@
         });
 
         obs.on("player-info-page:set-viewinfo-data", (args)=> {
-            resizeCommentList();
+            grid_table.resizeGrid();
 
             const { viewinfo, comments, state } = args;
 
@@ -402,8 +397,9 @@
         };
 
         this.on("mount", () => {  
-            grid_table.init(this.root.querySelector(".comment-grid"));
+            grid_table.init(this.root.querySelector(".comment-grid"));          
             grid_table.grid.registerPlugin(new Slick.AutoTooltips());
+            grid_table.setupResizer(".comment-grid-container");
 
             grid_table.onDblClick(async (e, data)=>{
                 const sec = data.vpos * 10 / 1000;
@@ -416,17 +412,11 @@
             });
 
             const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");
-            ch_elm.checked = true;
-
-            resizeCommentList();
-        });
-        
-        obs.on("window-resized", ()=> {
-            resizeCommentList();
+            ch_elm.checked = true;          
         });
 
         obs.on("player-info-page:split-resized", ()=> {
-            resizeCommentList();
+            grid_table.resizeGrid();
         });
     </script>
 </player-info-page>

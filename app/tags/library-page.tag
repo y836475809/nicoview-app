@@ -650,6 +650,7 @@
         };
         this.on("mount", async () => {    
             grid_table.init(this.root.querySelector(".library-grid"));
+            grid_table.setupResizer(".library-grid-container");
     
             grid_table.setFilter((column_id, value, word) => { 
                 if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
@@ -690,8 +691,6 @@
                     converter_context_menu.popup({window: remote.getCurrentWindow()});
                 }
             });
-            
-            resizeGridTable();
             
             try {
                 const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
@@ -765,15 +764,6 @@
             if(this.nico_update){
                 this.nico_update.cancel();
             }
-        });
-    
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".library-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
-    
-        obs.on("window-resized", ()=> {
-            resizeGridTable();
         });
     </script>
 </library-content>

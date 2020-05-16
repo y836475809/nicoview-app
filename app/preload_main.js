@@ -43,6 +43,7 @@ window.addEventListener( "unhandledrejection", async e => {
 window.addEventListener("load", () => {
     window.$ = window.jQuery = require("jquery");
     require("slickgrid/plugins/slick.autotooltips");
+    require("slickgrid/plugins/slick.resizer");
     global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
     global.RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);

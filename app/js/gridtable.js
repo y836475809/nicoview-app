@@ -138,6 +138,21 @@ class GridTable {
         }); 
     }
 
+    setupResizer(container){
+        this.resizer = new Slick.Plugins.Resizer({
+            container: container,
+            rightPadding: 0,
+            bottomPadding: 5,
+            minHeight: 100,
+            minWidth: 100,
+        });
+        this.grid.registerPlugin(this.resizer);
+    }
+
+    resizeGrid(){
+        this.resizer.resizeGrid();
+    }
+
     onDblClick(on_dblclick){
         this.on_dblclick = on_dblclick;
     }
@@ -166,22 +181,6 @@ class GridTable {
 
     getRowsByIds(ids){   
         return this.dataView.mapIdsToRows(ids);
-    }
-
-    resize(new_size){
-        this.container.height(new_size.height);
-        this.container.width(new_size.width);
-        this.grid.resizeCanvas();
-    }
-
-    resizeFitContainer(container){
-        const new_height = container.clientHeight;
-        const new_width = container.clientWidth;
-        const new_szie = {
-            height: new_height,
-            width: new_width
-        };
-        this.resize(new_szie);
     }
 
     scrollRow(row, dopaging=false){

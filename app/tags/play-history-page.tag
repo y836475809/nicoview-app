@@ -46,11 +46,6 @@
         }; 
         const grid_table = new GridTable("history-grid", columns, options);
 
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".history-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
-
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
@@ -80,13 +75,9 @@
             return Menu.buildFromTemplate(menu_templete);
         };
 
-        obs.on("window-resized", ()=> {
-            resizeGridTable();
-        });
-
         this.on("mount", async () => {
             grid_table.init(this.root.querySelector(".history-grid"));
-
+            grid_table.setupResizer(".history-grid-container");
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
@@ -99,8 +90,6 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });           
-
-            resizeGridTable();
 
             try {
                 const items = await IPCClient.request("history", "getData");

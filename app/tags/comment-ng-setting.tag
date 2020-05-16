@@ -88,16 +88,12 @@
             ];
             return Menu.buildFromTemplate(menu_templete);
         };
-        
-        const resizeGridTable = () => {
-            const container = this.root.querySelector(".comment-ng-grid-container");
-            grid_table.resizeFitContainer(container);
-        };
 
         const setup = (ng_items) => {
             if (grid_table == null) {
                 grid_table = new GridTable("comment-ng-grid", columns, options);
                 grid_table.init(this.root.querySelector(".comment-ng-grid"));
+                grid_table.setupResizer(".comment-ng-grid-container");
                 const context_menu = createMenu();
                 grid_table.onContextMenu((e) => {
                     context_menu.popup({ window: remote.getCurrentWindow() });
@@ -125,8 +121,6 @@
             });
             const items = items1.concat(items2);
             grid_table.setData(items);
-
-            resizeGridTable();
         };
 
         this.onclickDelete = (e) => {

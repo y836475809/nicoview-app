@@ -39,13 +39,13 @@
 
         .user-container-popup {
             position: absolute;
-            top: 0px;
+            right: 5px; 
             border: solid 1px #aaa;
             border-radius: 3px;
             background-color: white; 
             box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 0 3px 14px 2px rgba(0,0,0,0.12), 0 5px 5px -3px rgba(0,0,0,0.3);
             z-index: 999;
-            padding: 5px;
+            padding: 5px;          
         }
         .user-container-popup .user-name {
             height: var(--user-thumbnail-size); 
@@ -72,6 +72,9 @@
         .user-description.text {
             height: calc(100% - var(--user-name-height));
             white-space: normal;
+
+            /* TODO 外部に出す？ */
+            max-width: 300px;
         } 
 
         .icon {
@@ -203,27 +206,16 @@
             });
         };
 
-        const adjustPopupDescriptionPos = () => {
-            const elm = this.root.querySelector(".user-container-popup");
-            if(elm.style.display == "none"){
-                return;
-            }
-
-            const parent_elm = this.root.querySelector(".user-container");
-            const container_width = elm.clientWidth; 
-            const left = parent_elm.offsetLeft - (container_width-parent_elm.offsetWidth);
-            elm.style.top = parent_elm.offsetTop + "px";
-            elm.style.left = left + "px";
-        };
-
         this.onclickPopupDescription = (e) => {
             const elm = this.root.querySelector(".user-container-popup");
             elm.style.display = "";
 
+            const rect = this.root.querySelector(".user-container").getBoundingClientRect();
+            elm.style.top = (rect.top + 5)+ "px";
+
             if(this.user_thumbnail_url != this.user_icon_url){
                 this.user_thumbnail_url = this.user_icon_url;
             }
-            adjustPopupDescriptionPos();
         };
 
         this.onclickCloseDescription = (e) => {
@@ -291,10 +283,6 @@
             setDescription(description);
 
             this.update();
-        });
-        
-        obs.on("window-resized", ()=> {
-            adjustPopupDescriptionPos();
         });
     </script>
 </player-user>

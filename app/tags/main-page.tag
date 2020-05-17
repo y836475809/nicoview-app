@@ -311,14 +311,5 @@
         ipcRenderer.on(IPC_CHANNEL.MAIN_CSS_LOADED, (event)=>{
             this.obs.trigger("css-loaded");
         });
-
-        const timeout = 200;
-        let timer;
-        window.addEventListener("resize", () => {
-            clearTimeout(timer);
-            timer = setTimeout(() => {
-                this.obs.trigger("window-resized");
-            }, timeout);
-        });
     </script>
 </main-page>

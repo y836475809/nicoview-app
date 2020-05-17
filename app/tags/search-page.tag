@@ -537,6 +537,10 @@
 
             await this.search();
         });
+        
+        obs.on("css-loaded", () => {
+            grid_table.resizeGrid();
+        });
 
         const createMenu = () => {
             const menu_templete = [

@@ -406,6 +406,10 @@
             await deleteDownloadItems(video_ids);
         });
 
+        obs.on("css-loaded", () => {
+            grid_table_dl.grid_table.resizeGrid();
+        });
+
         this.on("mount", async () => {
             download_schedule = await IPCClient.request("config", "get", { 
                 key:"download.schedule", 

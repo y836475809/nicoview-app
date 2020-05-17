@@ -309,7 +309,7 @@
         });
 
         ipcRenderer.on(IPC_CHANNEL.MAIN_CSS_LOADED, (event)=>{
-            this.obs.trigger("window-resized");
+            this.obs.trigger("css-loaded");
         });
 
         const timeout = 200;

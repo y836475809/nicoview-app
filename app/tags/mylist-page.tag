@@ -539,6 +539,10 @@
             }   
         });
 
+        obs.on("css-loaded", () => {
+            grid_table.resizeGrid();
+        });
+
         window.onbeforeunload = (e) => {
             image_cache.save();
         };

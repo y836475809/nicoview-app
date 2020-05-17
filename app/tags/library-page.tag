@@ -765,6 +765,10 @@
                 this.nico_update.cancel();
             }
         });
+
+        obs.on("css-loaded", () => {
+            grid_table.resizeGrid();
+        });
     </script>
 </library-content>
 

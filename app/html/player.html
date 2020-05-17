@@ -31,6 +31,8 @@
 
 <script>
     /* globals riot */
+    const { ipcRenderer } = window.electron;
+    const { IPC_CHANNEL } = window.IPC_CHANNEL;
     var { logger } = window.logger; // eslint-disable-line
     
     let toast_wrapper = null;
@@ -50,7 +52,15 @@
     riot.mount("window-titlebar", {
         obs:obs, title:"", window_name:"player"
     });
-    riot.mount("player-main-page", {obs});
+
+    ipcRenderer.on(IPC_CHANNEL.MAIN_TOASTR, (event, args)=>{
+        const { type, title, message } = args;
+        toast_wrapper[type](title, message);
+    });
+
+    ipcRenderer.on(IPC_CHANNEL.MAIN_HTML_LOADED, (event)=>{
+        riot.mount("player-main-page", {obs});
+    });
 
     if(process.env.NODE_ENV == "DEBUG"){
         const { NicoVideoMocks } = window.NicoMock;

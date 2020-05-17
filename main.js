@@ -14,6 +14,7 @@ const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const { JsonStore } = require("./app/js/json-store");
 const { logger } = require("./app/js/logger");
 const { CmdLineParser } = require("./app/js/main-util");
+const { CSSLoader } = require("./app/js/css-loader");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -23,6 +24,7 @@ const bookmark_ipc_server = new BookMarkIPCServer();
 const history_ipc_server = new HistoryIPCServer();
 const downloaditem_ipc_server = new DownloadItemIPCServer();
 const cmdline_parser = new CmdLineParser(process.argv);
+const css_loader = new CSSLoader();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -123,6 +125,40 @@ const setLogLevel = (level) => {
     logger.setLevel(level);
 };
 
+const loadCSS = async (file_path) => {
+    if(!file_path){
+        return;
+    }
+    try {
+        await css_loader.load(file_path);
+    } catch (error) {
+        logger.error(error);
+        await dialog.showMessageBox({
+            type: "error",
+            buttons: ["OK"],
+            title: `${path.basename(file_path)}の読み込みに失敗`,
+            message: error.message
+        });
+    }
+};
+
+const applyCSS = (win) => {
+    try {
+        const css = css_loader.CSS;
+        if(!css){
+            return;
+        }
+        win.webContents.insertCSS(css);
+    } catch (error) {
+        logger.error(error);
+        win.webContents.send(IPC_CHANNEL.MAIN_TOASTR, {
+            type: "error",
+            title: "CSSの適用に失敗",
+            message: error.message,
+        });
+    }
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config_ipc_server.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
@@ -137,23 +173,8 @@ function createWindow() {
         main_win.maximize();
     }
 
-    main_win.webContents.on("did-finish-load", async () => {
-        const file_path = config_ipc_server.get({ key: "css_path", value:"" });
-        if(file_path){
-            try {
-                await fs.promises.stat(file_path);
-                const css_data = await fs.promises.readFile(file_path, "utf8");
-                main_win.webContents.insertCSS(css_data);
-            } catch (error) {
-                logger.error(error);
-                main_win.webContents.send(IPC_CHANNEL.MAIN_TOASTR, {
-                    type: "error",
-                    title: `${path.basename(file_path)}の読み込みに失敗しました`,
-                    message: error.message,
-                });
-            }
-        }
-
+    main_win.webContents.on("did-finish-load", async () => { 
+        applyCSS(main_win);
         main_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
     });
 
@@ -474,12 +495,12 @@ app.on("ready", async ()=>{
 
     ipcMain.handle(IPC_CHANNEL.RELOAD_CSS, async (event, args) => {
         const { file_path } = args;
-        if(!file_path){
-            return;
-        }
-        const css_data = await fs.promises.readFile(file_path, "utf8");
-        main_win.webContents.insertCSS(css_data);
+        await loadCSS(file_path);
+
+        applyCSS(main_win);
         main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
+
+        applyCSS(player_win);
     });
 
     library_ipc_server.on("libraryInitialized", ()=>{  
@@ -525,6 +546,8 @@ app.on("ready", async ()=>{
         await saveJson("download", items);
     });
 
+    await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
+
     createWindow();
 });
 
@@ -557,6 +580,11 @@ const createPlayerWindow = () => {
         };
         state.frame = false;
         player_win = new BrowserWindow(state);
+        player_win.webContents.on("did-finish-load", async () => {
+            applyCSS(player_win);
+            player_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
+        });
+
         if (state.maximized) {
             player_win.maximize();
         }

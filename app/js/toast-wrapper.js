@@ -9,7 +9,7 @@ class ToastWrapper {
     constructor(){
         iziToast.settings({
             theme: "dark",
-            backgroundColor: "rgb(0, 0, 0, 0.8)",
+            backgroundColor: "rgb(50, 50, 50)",
             titleColor:"white",
             messageColor:"white",
             progressBar:false,

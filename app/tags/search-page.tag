@@ -272,10 +272,39 @@
             {title: "タグ", kind:'tag'},
             {title: "キーワード", kind:'keyword'},
         ];
-        const default_sort_item = this.sort_order_items[0];
-        const default_search_kind_item = this.search_kind_items[0];
-        this.sort_order = default_sort_item.title;
-        this.search_kind = default_search_kind_item.title;
+
+        const loadSearchCond = async () => {
+            const { sort_order, search_kind } = await IPCClient.request("config", "get", 
+                { key:"search.condition", 
+                    value:{
+                        sort_order:{ kind:"startTime", order:"-" },
+                        search_kind:{ kind:"tag" }
+                    } 
+                });
+                
+            const sort_item = this.sort_order_items.find(item => {
+                return item.kind == sort_order.kind 
+                    && item.order == sort_order.order;
+            });
+            const search_kind_item = this.search_kind_items.find(item => {
+                return item.kind == search_kind.kind;
+            });
+
+            return { sort_item, search_kind_item };
+        };
+
+        const saveSearchCond = async () => {
+            const sort_name = nico_search_params._sort_name;
+            const sort_order = nico_search_params._sort_order;
+            const search_kind = nico_search_params.search_kind;
+            await IPCClient.request("config", "set", 
+                { key: "search.condition", 
+                    value: { 
+                        sort_order:{ kind:sort_name, order:sort_order },
+                        search_kind:{ kind:search_kind } 
+                    }
+                });
+        };
 
         this.onclickToggleMenu = (e) => {
             const elm = this.root.querySelector(".cond-menu-container1");
@@ -290,6 +319,9 @@
 
             nico_search_params.sortTarget(kind);
             nico_search_params.sortOder(order);
+
+            saveSearchCond();
+
             await this.search();
         };
 
@@ -300,6 +332,9 @@
             this.update();
 
             nico_search_params.cond(kind);
+
+            saveSearchCond();
+
             await this.search();
         };
 
@@ -336,11 +371,6 @@
         const search_offset = 1600;
         const search_limit = 32;
         const nico_search_params = new NicoSearchParams(search_limit);
-        nico_search_params.page(0);
-        nico_search_params.sortTarget("startTime");
-        nico_search_params.sortOder("-");
-        nico_search_params.cond("tag");
-
         const nico_search = new NicoSearch();
 
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -624,7 +654,7 @@
             return Menu.buildFromTemplate(menu_templete);
         };
         const context_menu = createMenu();
-        this.on("mount", () => {
+        this.on("mount", async () => {
             const elm = this.root.querySelector(".cond-menu-container1");
             elm.addEventListener("transitionend", (event) => {
                 if(event.propertyName == "height") {
@@ -646,6 +676,16 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
+
+            const { sort_item, search_kind_item } = await loadSearchCond();
+            this.sort_order = sort_item.title;
+            this.search_kind = search_kind_item.title;
+            nico_search_params.page(0);
+            nico_search_params.sortTarget(sort_item.kind);
+            nico_search_params.sortOder(sort_item.order);
+            nico_search_params.cond(search_kind_item.kind);
+
+            this.update();
         });
     </script>
 </search-content>

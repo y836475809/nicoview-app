@@ -2,7 +2,6 @@
     <style scoped>
         :scope {
             display: flex;
-            margin: 5px 0 5px 20px;
         }
 
         .label {

@@ -82,54 +82,13 @@
             background-color: var(--control-color);
         }
 
-        .search-cond-container .radio-input[type=radio] {
-            display: none; 
-        }
-        .search-cond-container .radio-input[type=radio]:checked + .radio-label {
-            background: gray;
-            color: lightgray;
-        }
-
-        .search-cond-container,
-        .search-cond-container > * {
+        .input-container {
             display: flex;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
-        .search-cond-container {
-            overflow-x: hidden;
-        }
-
-        .search-cond-container .label {   
-            height: 30px;
-            width: 100px;
-            user-select: none;
-        }
-        .search-cond-container .radio-label {
-            border: 1px solid gray;
-            border-radius: 2px;
-            height: 100%;
-            width: 100%;
-        }
-        .search-cond-container .label + .label {
-            border-left: none;  
-            margin-left: -1px;
-        }
-
-        .search-sort-container i.fa-caret-up {
-            font-size: 25px;
-        }
-        .search-sort-container i.fa-caret-down {
-            font-size: 25px;
-        }
-        .search-cond-container .label:hover{
-            cursor: pointer; 
-        }  
-
-        .search-target-container {
-            margin-left: 30px;
-        }
-
-        .search-query-container input {
-            margin-left: 30px;
+        .input-container > input {
+            margin-left: 5px;
             width: 200px;
             height: 30px;
             font-size: 1.2em;
@@ -138,73 +97,146 @@
             border-style: solid;
             border-color: gray;
         }
-        .search-query-container input:focus {
+        .input-container > input:focus {
             outline: none;
         }
-
-        .search-query-container > .search-button {
-            width: 30px;
-            height: 30px;
-
-            background-color: white;
-            border-width: 1px;  
-            border-left-width: 0px !important;
-            border-style: solid;
-            border-color: gray;
-        }
-        .search-query-container > .search-button > i  {
-            font-size: 20px;
-            color: gray;   
-        }
-        .search-query-container > .search-button > i:hover {
-            color: black;
-        }
-
-        .search-query-container > .add-search-cond-button {
+        .input-container > .add-button {
             width: 30px;
             height: 30px;
         }
-        .search-query-container > .add-search-cond-button > i {
+        .input-container > .add-button > i {
             font-size: 20px;
             color: gray;
         }
-        .search-query-container > .add-search-cond-button > i:hover {
+        .input-container > .add-button > i:hover {
             color: black;
+        }
+
+        .selected-container {
+            display: flex;
+            margin-left: 5px;
+            width: 250px;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+        .selected-container > div {
+            user-select: none;
+        }
+        .selected-container > .title {
+            height: 30px;
+            border: 1px solid gray;
+            border-radius: 3px;
+            padding-left: 5px;
+            padding-right: 5px;      
+            margin-left: 5px;
+            cursor: pointer;
+        }
+
+        .cond-menu-container1 {
+            display: flex;
+            height: 0px;
+            overflow: hidden;
+            transition: height 0.5s;
+        }
+        .cond-menu-container2 {
+            display: flex;
+            background-color: white;
+            overflow: hidden;
+            margin: 0 5px 5px 5px;
+            padding: 5px;
+            border: 1px solid gray;
+            border-radius: 3px;
+            transition: height 0.5s;
+        }
+        .cond-menu-container-expand {
+            height: 160px;
+        }
+
+        .cond-menu-list {
+            margin-right: 50px;
+        }
+        .cond-menu-list > .title {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        .cond-menu-list > .item {
+            color: black;
+            cursor: pointer;
+        }
+        .cond-menu-list > .item:hover {
+            text-decoration: underline;
+        }
+        .cond-menu-list > div {
+            user-select: none;
+        }
+
+        .cond-menu-container2 > .close-btn {
+            font-weight: bold;
+            color: gray;
+            user-select: none;
+            cursor: pointer;
+        }
+        .cond-menu-container2 > .close-btn:hover {
+            font-weight: bold;
+            color: black;
+        }
+
+        pagination {
+            width: 300px;
+            margin: 0 0 5px 0;
         }
 
         .search-grid-container {
             width: 100%;
-            height: calc(100% - 70px);
+            height: calc(100% - 20px); 
             overflow: hidden;
         }
-        
+
         .label-tag {
             background-color: lightpink
         }
     </style>
-
-    <div class="search-cond-container">
-        <div class="search-sort-container">
-            <label class="label" each="{item, i in sort_items}">
-                <input class="radio-input" type="radio" name="sort" checked={item.select} 
-                    onclick="{ onclickSort.bind(this, i) }"> 
-                <span class="radio-label center-hv">{item.title}
-                    <i class="fas fa-fw fa-{item.order=='+'?'caret-up':'caret-down'}"></i></span>
-            </label>
+    
+    <div style="display: flex;">
+        <div class="selected-container center-v">
+            <div>検索条件</div>
+            <div class="title center-v" onclick="{onclickToggleMenu}">
+                {sort_order}
+            </div>
+            <div class="title center-v" onclick="{onclickToggleMenu}">
+                {search_kind}
+            </div>
         </div>
-        <div class="search-target-container">
-            <label class="label" each="{item, i in search_items}">
-                <input class="radio-input" type="radio" name="target" checked={item.select} 
-                    onclick="{ onclickSearchTarget.bind(this, i) }"> 
-                <span class="radio-label center-hv">{item.title}</span>
-            </label>
-        </div>
-        <div class="search-query-container">
-            <input class="query-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput}>
-            <div class="add-search-cond-button center-hv" title="検索条件を保存" onclick={onclickSaveSearch}>
+        <div class="input-container center-v">
+            <input type="search" placeholder="検索" onkeydown={onkeydownInput}>
+            <div class="add-button center-hv" title="検索条件を保存" onclick={onclickAddSearch}>
                 <i class="far fa-star"></i>
             </div>
-        </div>      
+        </div> 
+    </div>
+    <div class="cond-menu-container1">
+        <div class="cond-menu-container2">
+            <div class="cond-menu-list">
+                <div class="title">並び替え</div>
+                <div class="item" each={index in [0,1,2]} 
+                    onclick={onchangeSort.bind(this,sort_order_items[index])}>
+                    {sort_order_items[index].title}
+                </div>
+                <div class="sc-separator" >&nbsp;</div>
+                <div class="item" each={index in [3,4,5]} 
+                    onclick={onchangeSort.bind(this,sort_order_items[index])}>
+                    {sort_order_items[index].title}
+                </div>
+            </div>
+            <div class="cond-menu-list">
+                <div class="title">種類</div>
+                <div class="item" each={item, i in search_kind_items} 
+                    onclick={onchangeKind.bind(this,item)}>
+                    {item.title}
+                </div>
+            </div>
+            <div class="close-btn" title="閉じる", onclick={onclickToggleMenu}>X</div>
+        </div>
     </div>
     <pagination obs={pagination_obs}></pagination>
     <div class="search-grid-container">
@@ -227,6 +259,49 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
         this.pagination_obs = riot.observable();
+
+        this.sort_order_items = [
+            {title: "投稿日が新しい順", kind:'startTime',order:'-'},
+            {title: "再生数が多い順", kind:'viewCounter',order:'-'},
+            {title: "コメントが多い順", kind:'commentCounter',order:'-'},
+            {title: "投稿日が古い順", kind:'startTime',order:'+'},
+            {title: "再生数が少ない順", kind:'viewCounter',order:'+'},
+            {title: "コメントが少ない順", kind:'commentCounter',order:'+'}
+        ];        
+        this.search_kind_items = [
+            {title: "タグ", kind:'tag'},
+            {title: "キーワード", kind:'keyword'},
+        ];
+        const default_sort_item = this.sort_order_items[0];
+        const default_search_kind_item = this.search_kind_items[0];
+        this.sort_order = default_sort_item.title;
+        this.search_kind = default_search_kind_item.title;
+
+        this.onclickToggleMenu = (e) => {
+            const elm = this.root.querySelector(".cond-menu-container1");
+            elm.classList.toggle("cond-menu-container-expand");
+        };
+
+        this.onchangeSort = async (item, e) => {
+            const { title, kind, order } = item;
+
+            this.sort_order = title;
+            this.update();
+
+            nico_search_params.sortTarget(kind);
+            nico_search_params.sortOder(order);
+            await this.search();
+        };
+
+        this.onchangeKind = async (item, e) => {
+            const { title, kind } = item;
+
+            this.search_kind = title;
+            this.update();
+
+            nico_search_params.cond(kind);
+            await this.search();
+        };
 
         this.pagination_obs.on("move-page", async args => {
             const { page_num } = args;
@@ -257,16 +332,6 @@
             const { video_id } = args;
             grid_table.updateCells(video_id, { saved:false });
         });
-
-        this.sort_items = [
-            { kind: "startTime",    order:"-", select: true, title:"投稿日" },
-            { kind: "commentCounter", order:"-", select: false, title:"コメント数" },
-            { kind: "viewCounter",    order:"-", select: false, title:"再生数" }
-        ];
-        this.search_items = [
-            { kind: "keyword", select: false, title:"キーワード" },
-            { kind: "tag",     select: true,  title:"タグ" }
-        ];
 
         const search_offset = 1600;
         const search_limit = 32;
@@ -318,7 +383,7 @@
         const grid_table = new GridTable("search-grid", columns, options);
 
         const getSearchInputElm = () => {
-            return this.root.querySelector(".search-query-container > .query-input");
+            return this.root.querySelector(".input-container > input");
         };
 
         this.search = async () => {
@@ -411,61 +476,22 @@
 
         const setSearchCondState = (sort_kind, sort_order, search_kind) => {
             if(sort_kind){
-                const index = this.sort_items.findIndex(value=>{
-                    return value.kind == sort_kind;
+                const result = this.sort_order_items.find(item => {
+                    return item.kind == sort_kind && item.order == sort_order;
                 });
-                if(index!==-1){
-                    this.sort_items.forEach((value) => {
-                        value.select = false;
-                    });
-
-                    this.sort_items[index].select = true;
-                    this.sort_items[index].order = sort_order;
+                if(result){
+                    this.sort_order = result.title;
                 }
             }     
             if(search_kind){
-                const index = this.search_items.findIndex(value=>{
-                    return value.kind == search_kind;
+                const result = this.search_kind_items.find(item => {
+                    return item.kind == search_kind;
                 });
-                if(index!==-1){
-                    this.search_items.forEach((value) => {
-                        value.select = false;
-                    });
-                    this.search_items[index].select = true;
-                    this.search_items[index].kind = search_kind;
+                if(result){
+                    this.search_kind = result.title;
                 }
             }
             this.update();
-        };
-
-        this.onclickSort = (index, e) => {
-            const pre_selected = this.sort_items.findIndex(value=>{
-                return value.select === true;
-            });
-
-            this.sort_items.forEach((value) => {
-                value.select = false;
-            });
-            this.sort_items[index].select = true;
-
-            if(pre_selected===index){
-                const pre_order = this.sort_items[index].order; 
-                this.sort_items[index].order = pre_order=="+"?"-":"+";
-            }
-
-            nico_search_params.sortTarget(this.sort_items[index].kind);
-            nico_search_params.sortOder(this.sort_items[index].order);
-
-            this.update();
-        };
-        
-        this.onclickSearchTarget = (index, e) => {
-            this.search_items.forEach((value) => {
-                value.select = false;
-            });
-            this.search_items[index].select = true; 
-
-            nico_search_params.cond(this.search_items[index].kind);
         };
 
         this.onclickSearch = async (e) => {
@@ -475,7 +501,7 @@
             await this.search();
         };
 
-        this.onkeydownSearchInput = async (e) =>{
+        this.onkeydownInput = async (e) =>{
             if(e.keyCode===13){
                 const param = e.target.value;
                 nico_search_params.query(param);
@@ -483,7 +509,7 @@
             }
         };
 
-        this.onclickSaveSearch = (e) => {
+        this.onclickAddSearch = (e) => {
             const elm = getSearchInputElm();
             const cond = {
                 query: elm.value,
@@ -599,9 +625,15 @@
         };
         const context_menu = createMenu();
         this.on("mount", () => {
+            const elm = this.root.querySelector(".cond-menu-container1");
+            elm.addEventListener("transitionend", (event) => {
+                if(event.propertyName == "height") {
+                    grid_table.resizeGrid();
+                }
+            });
+
             grid_table.init(".search-grid");
             grid_table.setupResizer(".search-grid-container");
-
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 if(video_id){

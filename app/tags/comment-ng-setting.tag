@@ -33,7 +33,8 @@
     <div class="comment-ng-grid-container">
         <div class="comment-ng-grid"></div>
     </div>
-    <button type="button" class="delete-button" onclick={onclickDelete}>Delete</button>
+    <button type="button" class="delete-button" title="選択された項目を削除" 
+        onclick={onclickDelete}>削除</button>
 
     <script>
         /* globals */

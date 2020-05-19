@@ -11,8 +11,8 @@ const pre_fields =
 const default_params = () => {
     const params = new NicoSearchParams();
     params.query("test");
-    params.cond("keyword");
-    params.sortTarget("startTime");
+    params.target("keyword");
+    params.sortName("startTime");
     params.sortOder("-");
     params.page(1);
     return params;
@@ -58,7 +58,7 @@ test("nico search params", t => {
         t.deepEqual(params.get(), act_params);
     }
     {
-        params.sortTarget("commentCounter");
+        params.sortName("commentCounter");
         const act_params = get_act_params();
         act_params._sort = "+commentCounter";
         t.deepEqual(params.get(), act_params);
@@ -71,7 +71,7 @@ test("nico search params", t => {
         t.deepEqual(params.get(), act_params);
     }
     {
-        params.cond("tag");
+        params.target("tag");
         params.query("test");
         const act_params = get_act_params();
         act_params.targets = "tagsExact";
@@ -89,7 +89,7 @@ test("nico search params error", t => {
     }
     {
         const params = default_params();
-        params.sortTarget("dummy");
+        params.sortName("dummy");
         const error = t.throws(() => { params.get(); });
         t.is(error.message, "dummyはソートの対象外");
     }

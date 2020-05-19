@@ -30,7 +30,7 @@ class BookMark {
             query: nico_search_params._query,
             sort_order: nico_search_params._sort_order,
             sort_name: nico_search_params._sort_name,
-            search_kind: nico_search_params.search_kind,
+            search_target: nico_search_params.search_target,
             page: nico_search_params._page
         };
         return {

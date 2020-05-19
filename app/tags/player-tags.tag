@@ -36,7 +36,7 @@
             const tag = item.name;
             obs.trigger("player-main-page:search-tag", {
                 query: tag,
-                search_kind:"tag"
+                search_target:"tag"
             });
         };
 

@@ -1,7 +1,7 @@
 const { NicoClientRequest } = require("./nico-client-request");
 const querystring = require("querystring");
 
-const sortkinds = [
+const sortNames = [
     "viewCounter",
     "mylistCounter",
     "commentCounter",
@@ -52,8 +52,8 @@ class NicoSearchParams {
         return this._query.length === 0;
     }
 
-    cond(kind){
-        this.search_kind = kind;
+    target(kind){
+        this.search_target = kind;
         if(kind=="keyword"){
             this._targets = ["title", "description", "tags"];
             this._resetParams();
@@ -69,7 +69,7 @@ class NicoSearchParams {
         this._page = num;
     }
     
-    sortTarget(name){
+    sortName(name){
         this._sort_name = name;
         this._resetParams();
     }
@@ -87,7 +87,7 @@ class NicoSearchParams {
         if(this._query == ""){
             msgs.push("検索語が空");
         }
-        if(!sortkinds.includes(this._sort_name)){
+        if(!sortNames.includes(this._sort_name)){
             msgs.push(`${this._sort_name}はソートの対象外`);
         }
         if(this._targets.length==0){

@@ -67,7 +67,7 @@
 
         obs.on("search-page:sidebar:add-item", (cond) => {
             const items = [
-                { title: cond.query, type:cond.search_kind , cond: cond }
+                { title: cond.query, type:cond.search_target , cond: cond }
             ];
             this.obs_listview.trigger("addList", { items });
         });
@@ -204,7 +204,7 @@
                 {sort_order}
             </div>
             <div class="title center-v" onclick="{onclickToggleMenu}">
-                {search_kind}
+                {search_target}
             </div>
         </div>
         <div class="input-container center-v">
@@ -230,8 +230,8 @@
             </div>
             <div class="cond-menu-list">
                 <div class="title">種類</div>
-                <div class="item" each={item, i in search_kind_items} 
-                    onclick={onchangeKind.bind(this,item)}>
+                <div class="item" each={item, i in search_target_items} 
+                    onclick={onchangeTarget.bind(this,item)}>
                     {item.title}
                 </div>
             </div>
@@ -261,47 +261,47 @@
         this.pagination_obs = riot.observable();
 
         this.sort_order_items = [
-            {title: "投稿日が新しい順", kind:'startTime',order:'-'},
-            {title: "再生数が多い順", kind:'viewCounter',order:'-'},
-            {title: "コメントが多い順", kind:'commentCounter',order:'-'},
-            {title: "投稿日が古い順", kind:'startTime',order:'+'},
-            {title: "再生数が少ない順", kind:'viewCounter',order:'+'},
-            {title: "コメントが少ない順", kind:'commentCounter',order:'+'}
+            {title: "投稿日が新しい順", name:'startTime',order:'-'},
+            {title: "再生数が多い順", name:'viewCounter',order:'-'},
+            {title: "コメントが多い順", name:'commentCounter',order:'-'},
+            {title: "投稿日が古い順", name:'startTime',order:'+'},
+            {title: "再生数が少ない順", name:'viewCounter',order:'+'},
+            {title: "コメントが少ない順", name:'commentCounter',order:'+'}
         ];        
-        this.search_kind_items = [
-            {title: "タグ", kind:'tag'},
-            {title: "キーワード", kind:'keyword'},
+        this.search_target_items = [
+            {title: "タグ", target:'tag'},
+            {title: "キーワード", target:'keyword'},
         ];
 
         const loadSearchCond = async () => {
-            const { sort_order, search_kind } = await IPCClient.request("config", "get", 
+            const { sort_order, search_target } = await IPCClient.request("config", "get", 
                 { key:"search.condition", 
                     value:{
-                        sort_order:{ kind:"startTime", order:"-" },
-                        search_kind:{ kind:"tag" }
+                        sort_order:{ name:"startTime", order:"-" },
+                        search_target:{ target:"tag" }
                     } 
                 });
                 
             const sort_item = this.sort_order_items.find(item => {
-                return item.kind == sort_order.kind 
+                return item.name == sort_order.name 
                     && item.order == sort_order.order;
             });
-            const search_kind_item = this.search_kind_items.find(item => {
-                return item.kind == search_kind.kind;
+            const search_target_item = this.search_target_items.find(item => {
+                return item.target == search_target.target;
             });
 
-            return { sort_item, search_kind_item };
+            return { sort_item, search_target_item };
         };
 
         const saveSearchCond = async () => {
             const sort_name = nico_search_params._sort_name;
             const sort_order = nico_search_params._sort_order;
-            const search_kind = nico_search_params.search_kind;
+            const search_target = nico_search_params.search_target;
             await IPCClient.request("config", "set", 
                 { key: "search.condition", 
                     value: { 
-                        sort_order:{ kind:sort_name, order:sort_order },
-                        search_kind:{ kind:search_kind } 
+                        sort_order:{ name:sort_name, order:sort_order },
+                        search_target:{ target:search_target } 
                     }
                 });
         };
@@ -312,12 +312,12 @@
         };
 
         this.onchangeSort = async (item, e) => {
-            const { title, kind, order } = item;
+            const { title, name, order } = item;
 
             this.sort_order = title;
             this.update();
 
-            nico_search_params.sortTarget(kind);
+            nico_search_params.sortName(name);
             nico_search_params.sortOder(order);
 
             saveSearchCond();
@@ -325,13 +325,13 @@
             await this.search();
         };
 
-        this.onchangeKind = async (item, e) => {
-            const { title, kind } = item;
+        this.onchangeTarget = async (item, e) => {
+            const { title, target } = item;
 
-            this.search_kind = title;
+            this.search_target = title;
             this.update();
 
-            nico_search_params.cond(kind);
+            nico_search_params.target(target);
 
             saveSearchCond();
 
@@ -504,21 +504,21 @@
             grid_table.scrollToTop();  
         };
 
-        const setSearchCondState = (sort_kind, sort_order, search_kind) => {
-            if(sort_kind){
+        const setSearchCondState = (sort_name, sort_order, search_target) => {
+            if(sort_name){
                 const result = this.sort_order_items.find(item => {
-                    return item.kind == sort_kind && item.order == sort_order;
+                    return item.name == sort_name && item.order == sort_order;
                 });
                 if(result){
                     this.sort_order = result.title;
                 }
             }     
-            if(search_kind){
-                const result = this.search_kind_items.find(item => {
-                    return item.kind == search_kind;
+            if(search_target){
+                const result = this.search_target_items.find(item => {
+                    return item.target == search_target;
                 });
                 if(result){
-                    this.search_kind = result.title;
+                    this.search_target = result.title;
                 }
             }
             this.update();
@@ -545,7 +545,7 @@
                 query: elm.value,
                 sort_order: nico_search_params._sort_order,
                 sort_name: nico_search_params._sort_name,
-                search_kind: nico_search_params.search_kind,
+                search_target: nico_search_params.search_target,
                 page: 1
             };
             
@@ -555,40 +555,40 @@
             const cond = item;
             const elm = getSearchInputElm();
             elm.value = cond.query;
-            nico_search_params.cond(cond.search_kind);
+            nico_search_params.target(cond.search_target);
             nico_search_params.query(cond.query);
             nico_search_params.page(cond.page); //TODO move last?
-            nico_search_params.sortTarget(cond.sort_name);
+            nico_search_params.sortName(cond.sort_name);
             nico_search_params.sortOder(cond.sort_order);
 
-            setSearchCondState(cond.sort_name, cond.sort_order, cond.search_kind);
+            setSearchCondState(cond.sort_name, cond.sort_order, cond.search_target);
 
             await this.search();
         });
 
         obs.on("search-page:search-tag", async (args)=> {
-            const { query, search_kind } = args;
+            const { query, search_target } = args;
             const elm = getSearchInputElm();
             elm.value = query;
-            nico_search_params.cond(search_kind);
+            nico_search_params.target(search_target);
             nico_search_params.query(query);
             
-            setSearchCondState(null, null, search_kind);
+            setSearchCondState(null, null, search_target);
 
             await this.search();
         });
 
         obs.on("search-page:search", async (args)=> {
-            const { query, sort_order, sort_name, search_kind, page } = args;
+            const { query, sort_order, sort_name, search_target, page } = args;
             const elm = getSearchInputElm();
             elm.value = query;
-            nico_search_params.cond(search_kind);
+            nico_search_params.target(search_target);
             nico_search_params.query(query);
-            nico_search_params.sortTarget(sort_name);
+            nico_search_params.sortName(sort_name);
             nico_search_params.sortOder(sort_order);
             nico_search_params.page(page);
             
-            setSearchCondState(sort_name, sort_order, search_kind);
+            setSearchCondState(sort_name, sort_order, search_target);
             this.pagination_obs.trigger("set-page-num", { page_num:page });
 
             await this.search();
@@ -677,13 +677,13 @@
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
 
-            const { sort_item, search_kind_item } = await loadSearchCond();
+            const { sort_item, search_target_item } = await loadSearchCond();
             this.sort_order = sort_item.title;
-            this.search_kind = search_kind_item.title;
+            this.search_target = search_target_item.title;
             nico_search_params.page(0);
-            nico_search_params.sortTarget(sort_item.kind);
+            nico_search_params.sortName(sort_item.name);
             nico_search_params.sortOder(sort_item.order);
-            nico_search_params.cond(search_kind_item.kind);
+            nico_search_params.target(search_target_item.target);
 
             this.update();
         });

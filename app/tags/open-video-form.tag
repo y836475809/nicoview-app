@@ -34,6 +34,7 @@
             width: var(--btn-width);
             color: gray;
             user-select: none;
+            cursor: pointer;
         }
         .open-form > .button:hover {
             color: black;

@@ -106,6 +106,7 @@
                         });
                     }
                 },
+                { type: "separator" },
                 { 
                     id: "add-download",
                     label: "ダウンロードに追加", click() {
@@ -119,6 +120,7 @@
                         obs.trigger("player-main-page:add-download-item", item);
                     }
                 },   
+                { type: "separator" },
                 { 
                     id: "copy-url",
                     label: "urlをコピー", click() {
@@ -127,15 +129,14 @@
                         clipboard.writeText(url);
                     }
                 },
+                { type: "separator" },
                 { 
                     id: "show-open-video-form",
                     label: "動画IDを指定して再生", click() {
                         obs.trigger("open-video-form:show");
                     }
                 },               
-                { 
-                    type: "separator" 
-                },
+                { type: "separator" },
                 { 
                     id: "reload",
                     label: "再読み込み", click() {

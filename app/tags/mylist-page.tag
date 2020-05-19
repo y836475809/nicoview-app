@@ -9,7 +9,6 @@
 
     <div class="nico-mylist-sidebar">
         <listview 
-            title="マイリスト" 
             obs={obs_listview}
             name={name}>
         </listview>

@@ -13,7 +13,6 @@
 
     <div class="nico-search-sidebar">
         <listview 
-            title="検索条件" 
             obs={obs_listview}
             icon_class={icon_class}
             name={name}

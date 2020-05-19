@@ -1,22 +1,7 @@
 <listview>
     <style scoped>
         :scope {
-            --menubar-height: 30px;
             --input-height: 30px;
-        }
-
-        .listview-menubar {
-            display: block;
-            position: relative;
-            height: var(--menubar-height);
-            margin: 0;
-            padding: 5px;
-            line-height: 1;
-            color: #111111;
-            background: #f4f4f4;
-            font-size: 1.5em;
-            border-bottom: 1px solid lightgrey;
-            user-select: none;
         }
 
         .listview-list {
@@ -56,7 +41,7 @@
 
         .listview-menu-container {
             width: 100%;
-            height: calc(100% - var(--menubar-height) - var(--input-height));
+            height: calc(100% - var(--input-height));
             overflow-x: hidden;
         }
         
@@ -76,8 +61,7 @@
             background-color: #C8EBFB;
         }
     </style>
-
-    <label class="listview-menubar">{opts.title}</label>
+    
     <input class="listview-input" type="search" placeholder="検索" 
         onkeydown={onkeydownSearchInput}>
     <div class="listview-menu-container">

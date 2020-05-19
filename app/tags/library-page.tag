@@ -9,7 +9,6 @@
 
     <div class="library-sidebar">
         <listview 
-            title="検索条件" 
             obs={obs_listview}
             name={name}>
         </listview>

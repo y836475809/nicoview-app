@@ -76,7 +76,7 @@
         }
 
         .icon {
-            font-size: 20px;
+            font-size: 18px;
             color: gray;
         }
         .icon:hover {
@@ -101,6 +101,7 @@
         }
         .icon-layer1 {
             left: -5px;
+            font-size: 18px;
         }
         .icon-layer2 {
             position: relative;

@@ -46,8 +46,8 @@
                 <p class="message">{message}</p>
             </div>
             <div class="button-container">
-                <div show={showok} class="button" onclick="{onclickButton.bind(this,'ok')}">ok</div>
-                <div show={showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">cancel</div>
+                <div show={showok} class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
+                <div show={showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
             </div>
         </div>
     </dialog>

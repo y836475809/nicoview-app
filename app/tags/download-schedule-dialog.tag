@@ -69,8 +69,8 @@
                 <div class="label">にダウンロード開始</div>
             </div>
             <div class="button-container">
-                <div class="button" onclick="{onclickButton.bind(this,'ok')}">ok</div>
-                <div class="button" onclick="{onclickButton.bind(this,'cancel')}">cancel</div>
+                <div class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
+                <div class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
             </div>
         </div>
     </dialog>

@@ -201,10 +201,10 @@
         <div class="selected-container center-v">
             <div>検索条件</div>
             <div class="title center-v" onclick="{onclickToggleMenu}">
-                {sort_order}
+                {sort_title}
             </div>
             <div class="title center-v" onclick="{onclickToggleMenu}">
-                {search_target}
+                {search_target_title}
             </div>
         </div>
         <div class="input-container center-v">
@@ -219,13 +219,13 @@
             <div class="cond-menu-list">
                 <div class="title">並び替え</div>
                 <div class="item" each={index in [0,1,2]} 
-                    onclick={onchangeSort.bind(this,sort_order_items[index])}>
-                    {sort_order_items[index].title}
+                    onclick={onchangeSort.bind(this,sort_items[index])}>
+                    {sort_items[index].title}
                 </div>
                 <div class="sc-separator" >&nbsp;</div>
                 <div class="item" each={index in [3,4,5]} 
-                    onclick={onchangeSort.bind(this,sort_order_items[index])}>
-                    {sort_order_items[index].title}
+                    onclick={onchangeSort.bind(this,sort_items[index])}>
+                    {sort_items[index].title}
                 </div>
             </div>
             <div class="cond-menu-list">
@@ -260,7 +260,7 @@
         this.obs_modal_dialog = riot.observable();
         this.pagination_obs = riot.observable();
 
-        this.sort_order_items = [
+        this.sort_items = [
             {title: "投稿日が新しい順", name:'startTime',order:'-'},
             {title: "再生数が多い順", name:'viewCounter',order:'-'},
             {title: "コメントが多い順", name:'commentCounter',order:'-'},
@@ -274,17 +274,17 @@
         ];
 
         const loadSearchCond = async () => {
-            const { sort_order, search_target } = await IPCClient.request("config", "get", 
+            const { sort, search_target } = await IPCClient.request("config", "get", 
                 { key:"search.condition", 
                     value:{
-                        sort_order:{ name:"startTime", order:"-" },
+                        sort:{ name:"startTime", order:"-" },
                         search_target:{ target:"tag" }
                     } 
                 });
                 
-            const sort_item = this.sort_order_items.find(item => {
-                return item.name == sort_order.name 
-                    && item.order == sort_order.order;
+            const sort_item = this.sort_items.find(item => {
+                return item.name == sort.name 
+                    && item.order == sort.order;
             });
             const search_target_item = this.search_target_items.find(item => {
                 return item.target == search_target.target;
@@ -300,7 +300,7 @@
             await IPCClient.request("config", "set", 
                 { key: "search.condition", 
                     value: { 
-                        sort_order:{ name:sort_name, order:sort_order },
+                        sort:{ name:sort_name, order:sort_order },
                         search_target:{ target:search_target } 
                     }
                 });
@@ -314,7 +314,7 @@
         this.onchangeSort = async (item, e) => {
             const { title, name, order } = item;
 
-            this.sort_order = title;
+            this.sort_title = title;
             this.update();
 
             nico_search_params.sortName(name);
@@ -328,7 +328,7 @@
         this.onchangeTarget = async (item, e) => {
             const { title, target } = item;
 
-            this.search_target = title;
+            this.search_target_title = title;
             this.update();
 
             nico_search_params.target(target);
@@ -506,11 +506,11 @@
 
         const setSearchCondState = (sort_name, sort_order, search_target) => {
             if(sort_name){
-                const result = this.sort_order_items.find(item => {
+                const result = this.sort_items.find(item => {
                     return item.name == sort_name && item.order == sort_order;
                 });
                 if(result){
-                    this.sort_order = result.title;
+                    this.sort_title = result.title;
                 }
             }     
             if(search_target){
@@ -518,7 +518,7 @@
                     return item.target == search_target;
                 });
                 if(result){
-                    this.search_target = result.title;
+                    this.search_target_title = result.title;
                 }
             }
             this.update();
@@ -678,8 +678,8 @@
             });
 
             const { sort_item, search_target_item } = await loadSearchCond();
-            this.sort_order = sort_item.title;
-            this.search_target = search_target_item.title;
+            this.sort_title = sort_item.title;
+            this.search_target_title = search_target_item.title;
             nico_search_params.page(0);
             nico_search_params.sortName(sort_item.name);
             nico_search_params.sortOder(sort_item.order);

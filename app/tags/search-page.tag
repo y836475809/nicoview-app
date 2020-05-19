@@ -294,9 +294,7 @@
         };
 
         const saveSearchCond = async () => {
-            const sort_name = nico_search_params._sort_name;
-            const sort_order = nico_search_params._sort_order;
-            const search_target = nico_search_params.search_target;
+            const { sort_name, sort_order, search_target } = nico_search_params.getParams();
             await IPCClient.request("config", "set", 
                 { key: "search.condition", 
                     value: { 
@@ -541,11 +539,12 @@
 
         this.onclickAddSearch = (e) => {
             const elm = getSearchInputElm();
+            const { sort_name, sort_order, search_target } = nico_search_params.getParams();
             const cond = {
                 query: elm.value,
-                sort_order: nico_search_params._sort_order,
-                sort_name: nico_search_params._sort_name,
-                search_target: nico_search_params.search_target,
+                sort_name: sort_name,
+                sort_order: sort_order,
+                search_target: search_target,
                 page: 1
             };
             

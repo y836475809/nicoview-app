@@ -26,13 +26,7 @@ class BookMark {
      * @param { NicoSearchParams } search_params 
      */
     static createSearchItem(nico_search_params){
-        const cond = {
-            query: nico_search_params._query,
-            sort_order: nico_search_params._sort_order,
-            sort_name: nico_search_params._sort_name,
-            search_target: nico_search_params.search_target,
-            page: nico_search_params._page
-        };
+        const cond = nico_search_params.getParams();
         return {
             title: `検索: ${cond.query}, ページ${cond.page}`,
             type: BookMarkType.SEARCH,

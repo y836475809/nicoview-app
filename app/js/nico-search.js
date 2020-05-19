@@ -39,6 +39,16 @@ class NicoSearchParams {
         };
     }
 
+    getParams(){
+        return {
+            query: this._query,
+            sort_name: this._sort_name,
+            sort_order: this._sort_order,
+            search_target: this._search_target,
+            page: this._page
+        };
+    }
+
     service(name){
         this._service = name;
     }
@@ -53,7 +63,7 @@ class NicoSearchParams {
     }
 
     target(kind){
-        this.search_target = kind;
+        this._search_target = kind;
         if(kind=="keyword"){
             this._targets = ["title", "description", "tags"];
             this._resetParams();

@@ -11,6 +11,21 @@ const sortNames = [
 ];
 const sortOrders = [ "+","-"];
 
+const searchItems = Object.freeze({
+    sortItems: [
+        {title: "投稿日が新しい順", name:"startTime",order:"-"},
+        {title: "再生数が多い順", name:"viewCounter",order:"-"},
+        {title: "コメントが多い順", name:"commentCounter",order:"-"},
+        {title: "投稿日が古い順", name:"startTime",order:"+"},
+        {title: "再生数が少ない順", name:"viewCounter",order:"+"},
+        {title: "コメントが少ない順", name:"commentCounter",order:"+"}
+    ],       
+    searchTargetItems: [
+        {title: "タグ", target:"tag"},
+        {title: "キーワード", target:"keyword"},
+    ]
+});
+
 class NicoSearchParams {
     constructor(limit=32){
         this._service = "video";
@@ -175,5 +190,6 @@ class NicoSearch {
 
 module.exports = {
     NicoSearchParams,
-    NicoSearch
+    NicoSearch,
+    searchItems
 };

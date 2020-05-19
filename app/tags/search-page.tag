@@ -16,7 +16,8 @@
             title="検索条件" 
             obs={obs_listview}
             icon_class={icon_class}
-            name={name}>
+            name={name}
+            gettooltip={getTooltip}>
         </listview>
     </div>
 
@@ -25,12 +26,28 @@
         const { remote } = window.electron;
         const {Menu} = remote;
         const { IPCClient } = window.IPC;
+        const { searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "nico-search";
         this.icon_class = {
             tag :  "fas fa-tag fa-lg"
+        };
+
+        const sort_map = new Map();
+        const search_target_map = new Map();
+        searchItems.sortItems.forEach(item => {
+            sort_map.set(`${item.name}${item.order}`, item.title);
+        });
+        searchItems.searchTargetItems.forEach(item => {
+            search_target_map.set(item.target, item.title);
+        });
+        this.getTooltip = (item) => {
+            const cond = item.cond;
+            const sort = sort_map.get(`${cond.sort_name}${cond.sort_order}`);
+            const target = search_target_map.get(cond.search_target);
+            return `${item.title}\n並び順: ${sort}\n種類: ${target}`;
         };
 
         this.on("mount", async () => {
@@ -250,7 +267,7 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
-        const { NicoSearchParams, NicoSearch } = window.NicoSearch;
+        const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
@@ -260,18 +277,8 @@
         this.obs_modal_dialog = riot.observable();
         this.pagination_obs = riot.observable();
 
-        this.sort_items = [
-            {title: "投稿日が新しい順", name:'startTime',order:'-'},
-            {title: "再生数が多い順", name:'viewCounter',order:'-'},
-            {title: "コメントが多い順", name:'commentCounter',order:'-'},
-            {title: "投稿日が古い順", name:'startTime',order:'+'},
-            {title: "再生数が少ない順", name:'viewCounter',order:'+'},
-            {title: "コメントが少ない順", name:'commentCounter',order:'+'}
-        ];        
-        this.search_target_items = [
-            {title: "タグ", target:'tag'},
-            {title: "キーワード", target:'keyword'},
-        ];
+        this.sort_items = searchItems.sortItems;
+        this.search_target_items = searchItems.searchTargetItems;
 
         const loadSearchCond = async () => {
             const { sort, search_target } = await IPCClient.request("config", "get", 

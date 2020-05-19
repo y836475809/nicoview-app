@@ -83,7 +83,7 @@
     <div class="listview-menu-container">
         <ul class="listview-list">
             <li class="listview-item" data-id={i} each={ item, i in items }
-                title={item.title}
+                title={getTooltip(item)}
                 onclick={onclickItem.bind(this,item)} 
                 ondblclick={ondblclickItem.bind(this,item)}
                 onmouseup={onmouseUp.bind(this,item)}
@@ -100,6 +100,12 @@
         let sortable = null;
         const obs = this.opts.obs;
         const icon_class = this.opts.icon_class;
+        this.getTooltip = this.opts.gettooltip;
+        if(!this.getTooltip){
+            this.getTooltip = (item) => {
+                return item.title;
+            };
+        }
 
         const triggerChange = () => {
             obs.trigger("changed", {items:this.items});

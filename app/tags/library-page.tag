@@ -142,6 +142,11 @@
             background-color: rgba(0, 0, 0, 0);
         }
 
+        .clear-button,
+        .add-button {
+            cursor: pointer;
+        }
+
         .library-grid-container {
             width: 100%;
             height: calc(100% - var(--search-button-size) - var(--margin));

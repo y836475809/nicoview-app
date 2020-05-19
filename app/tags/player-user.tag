@@ -87,6 +87,7 @@
         .icon-button {
             height: 30px;
             width: 30px;
+            cursor: pointer;
         }
     </style>
 

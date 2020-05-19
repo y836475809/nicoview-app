@@ -135,6 +135,11 @@
             background-color: rgba(0, 0, 0, 0);
         }
 
+        .update-button,
+        .add-mylist-button {
+            cursor: pointer;
+        }
+
         .mylist-description {
             width: calc(100% - 10px);
             height: var(--description-height);

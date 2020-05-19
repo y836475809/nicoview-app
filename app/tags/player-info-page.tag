@@ -93,6 +93,7 @@
             height: 30px;
             width: 30px;
             margin-left: 5px;
+            cursor: pointer;
         }
         .icon-button.move-right {
             margin-left: auto;

@@ -57,6 +57,7 @@
             width: 70px;
             height: 60px;   
             display: block;
+            cursor: pointer;
         }
         .main-sidebar .button-label {
             margin: 2px;

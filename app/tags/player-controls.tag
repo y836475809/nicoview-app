@@ -15,6 +15,7 @@
             margin-left: 5px;
             width: 30px;
             height: 30px;
+            cursor: pointer;
         }
         .play-btn > button > span{
             color: gray;           
@@ -26,7 +27,12 @@
             grid-area: area3;
             margin-left: 10px;
             margin-right: 5px;
-        }    
+        }   
+        
+        player-seek > .slider, 
+        player-volume > .slider {
+            cursor: pointer;
+        }
     </style>
 
     <div class="center-v play-btn">

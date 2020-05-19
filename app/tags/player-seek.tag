@@ -9,7 +9,6 @@
             margin: 0;
             font-family: "Meiryo";
             user-select: none;
-            cursor: default;
         } 
         .slider{
             grid-row: 2 / 3;

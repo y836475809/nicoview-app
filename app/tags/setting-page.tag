@@ -56,6 +56,10 @@
             line-height: 25px;
             user-select: none;
         }
+
+        .setting-page button {
+            cursor: pointer;
+        }
     </style>
 
     <div class="setting-page">

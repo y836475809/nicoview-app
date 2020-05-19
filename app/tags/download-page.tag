@@ -11,6 +11,7 @@
             width: 80px;
             height: 30px;
             margin-right: 5px;
+            cursor: pointer;
         }
 
         .download-button.clear {
@@ -52,7 +53,7 @@
     <div class="download-control-container">
         <button class="download-button" disabled={dl_disabled} onclick={onclickStartDownload}>開始</button>
         <button class="download-button" onclick={onclickStopDownload}>停止</button>
-        <button class="download-button clear" onclick={onclickClearDownloadedItems}>クリア</button>
+        <button class="download-button clear" title="ダウンロード済みをクリア" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container">
             <div class="label center-hv">{download_schedule_label}</div>
             <button class="download-button" disabled={dl_disabled} title="ダウンロードの定期実行日時を設定する" 

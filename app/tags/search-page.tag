@@ -119,6 +119,7 @@
         .input-container > .add-button {
             width: 30px;
             height: 30px;
+            cursor: pointer;
         }
         .input-container > .add-button > i {
             font-size: 20px;

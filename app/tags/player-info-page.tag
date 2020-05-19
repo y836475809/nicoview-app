@@ -160,6 +160,9 @@
                 <input class="comment-checkbox comment-visible" type="checkbox" 
                     onclick={onclickCommentVisibleCheck} />
                     <label class="center-v" title="コメントの表示/非表示">表示</label>
+                <div title="コメント設定" class="icon-button center-hv">                      
+                    <span class="icon fas fa-cog" onclick={onclickShowCommentSetting}></span> 
+                </div>        
                 <div title="コメント更新" class="icon-button center-v move-right">
                     <span class="icon center-hv fa-stack" 
                         data-state={String(enableUpdateData())} 
@@ -286,6 +289,10 @@
         this.onclickUpdateComment = (e) => {
             logger.debug("player video info update video_id=", this.video_id);
             obs.trigger("player-main-page:update-data", this.video_id, "comment");
+        };
+
+        this.onclickShowCommentSetting = (e) => {
+            obs.trigger("player-main-page:show-comment-setting-dialog");
         };
 
         const setComments = (comments) => {

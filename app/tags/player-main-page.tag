@@ -373,6 +373,13 @@
             });
         });
 
+        obs.on("player-main-page:show-comment-setting-dialog", () => {
+            obs.trigger("comment-setting-dialog:show", {
+                ng_items : comment_filter.ng_comment.getNGItems(),
+                selected_tab: "comment-ng"
+            });
+        });
+
         const resizeVideo = (size) => { 
             obs.trigger("player-page:get-video-size-callback", (args) => {
                 const { width, height } = args;
@@ -401,29 +408,6 @@
                             }
                         }
                     },
-                ]
-            },
-            {
-                label: "コメント設定",
-                submenu: [
-                    {
-                        label: "NG設定",
-                        click: () => {
-                            obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_filter.ng_comment.getNGItems(),
-                                selected_tab: "comment-ng"
-                            });
-                        }
-                    },
-                    {
-                        label: "コメント表示",
-                        click: () => {
-                            obs.trigger("comment-setting-dialog:show", {
-                                ng_items : comment_filter.ng_comment.getNGItems(),
-                                selected_tab: "comment-display"
-                            });
-                        }
-                    }
                 ]
             },
             {

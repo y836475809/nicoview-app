@@ -134,6 +134,9 @@
             border-style: solid;
             border-color: gray;
         }
+        .search-container > .clear-button > i {
+            font-size: 1.2em;
+        }
 
         .search-container > .add-button {
             background-color: rgba(0, 0, 0, 0);

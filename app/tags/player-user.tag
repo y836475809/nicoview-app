@@ -2,7 +2,7 @@
     <style scoped>
         :scope {
             --user-name-height: 30px;
-            --user-thumbnail-size: 50px;
+            --user-thumbnail-size: 60px;
             overflow-x: hidden;
             overflow-y: hidden;
         }    
@@ -15,8 +15,7 @@
         } 
         .user-thumbnail {
             user-select: none;
-            padding-top: 5px;
-            padding-left: 5px;
+            margin: 5px 0 5px 5px; 
             width: var(--user-thumbnail-size); 
             height: var(--user-thumbnail-size); 
         }
@@ -221,7 +220,7 @@
                 elm.style.height = max_height + "px";
 
                 const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
-                const new_height = max_height - elm_user_name.clientHeight - 10;
+                const new_height = max_height - elm_user_name.clientHeight - 20;
                 const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
                 elm_description.style.height = new_height + "px";
             }

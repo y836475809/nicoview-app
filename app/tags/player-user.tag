@@ -73,7 +73,7 @@
             white-space: normal;
 
             /* TODO 外部に出す？ */
-            max-width: 300px;
+            max-width: 400px;
         } 
 
         .icon {

@@ -214,6 +214,18 @@
             const rect = this.root.querySelector(".user-container").getBoundingClientRect();
             elm.style.top = (rect.top + 5)+ "px";
 
+            // ポップアップの高さをwindow内に収める
+            const popup_height = elm.clientHeight;
+            const max_height = window.innerHeight - rect.top - 30;
+            if(popup_height > max_height){
+                elm.style.height = max_height + "px";
+
+                const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
+                const new_height = max_height - elm_user_name.clientHeight - 10;
+                const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
+                elm_description.style.height = new_height + "px";
+            }
+
             if(this.user_thumbnail_url != this.user_icon_url){
                 this.user_thumbnail_url = this.user_icon_url;
             }

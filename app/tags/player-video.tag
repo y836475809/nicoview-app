@@ -46,7 +46,10 @@
                 comment_tl.clear();
             }
             comment_tl = new CommentTimeLine(parent, duration_sec, row_num, ()=>{
-                obs.trigger("player-controls:set-state", "pause"); 
+                if(video_elm.currentTime == video_elm.duration){
+                    // 動画終了後にコメントが流れる場合はコメント完了後にpauseにする
+                    obs.trigger("player-controls:set-state", "pause"); 
+                }
             });
             comment_tl.create(nico_script.getApplied(comments));
             comment_tl.setFPS(fps);
@@ -181,7 +184,8 @@
             video_elm.addEventListener("ended", () => {
                 logger.debug("endedによるイベント発火");
 
-                if(comment_tl.enable === false){
+                if(comment_tl.enable === false || comment_tl.ended === true){
+                    // コメント非表示またはコメントが完了している場合は動画終了でpauseにする
                     obs.trigger("player-controls:set-state", "pause"); 
                 }
             });

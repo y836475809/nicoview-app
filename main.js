@@ -13,7 +13,7 @@ const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const { JsonStore } = require("./app/js/json-store");
 const { logger } = require("./app/js/logger");
-const { CmdLineParser } = require("./app/js/main-util");
+const { CmdLineParser } = require("./app/js/cmd-line-parser");
 const { CSSLoader } = require("./app/js/css-loader");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");

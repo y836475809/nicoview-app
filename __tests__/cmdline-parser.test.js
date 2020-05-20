@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CmdLineParser } = require("../app/js/main-util");
+const { CmdLineParser } = require("../app/js/cmd-line-parser");
 
 test("parse no option", t => {
     const clp = new CmdLineParser([

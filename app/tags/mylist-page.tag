@@ -438,6 +438,7 @@
                 item.saved = await IPCClient.request("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);     
             }
+            grid_table.clearSelected();
             grid_table.setData(mylist_items);
             grid_table.scrollToTop();   
         };

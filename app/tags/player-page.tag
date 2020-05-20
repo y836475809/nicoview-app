@@ -46,11 +46,11 @@
         <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
             <player-controls obs={opts.obs}></player-controls>
         </div>
-        <open-video-form obs={opts.obs}></open-video-form>
+        <open-video-form obs={obs_open_video_form}></open-video-form>
     </div>
 
     <script>
-        /* globals */
+        /* globals riot */
         const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { BookMark } = window.BookMark;
@@ -58,6 +58,7 @@
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         
         const obs = this.opts.obs; 
+        this.obs_open_video_form = riot.observable();
 
         let play_data = null;
 
@@ -86,7 +87,7 @@
             return true;
         };
 
-        const createMenu = () => {
+        const createMenu = (self) => {
             const menu_templete = [
                 { 
                     id: "add-bookmark",
@@ -133,7 +134,7 @@
                 { 
                     id: "show-open-video-form",
                     label: "動画IDを指定して再生", click() {
-                        obs.trigger("open-video-form:show");
+                        self.obs_open_video_form.trigger("show");
                     }
                 },               
                 { type: "separator" },
@@ -160,7 +161,7 @@
             return Menu.buildFromTemplate(menu_templete);
         };
     
-        const context_menu = createMenu();
+        const context_menu = createMenu(this);
         this.oncontextmenu = async (e) => {
             if(e.button===2){
                 play_data = await getPlayData();

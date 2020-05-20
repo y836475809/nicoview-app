@@ -90,7 +90,7 @@
             formVisible(false);
         };
 
-        obs.on("open-video-form:show", () => {
+        obs.on("show", () => {
             formVisible(true);
 
             const elm = this.root.querySelector(".open-form > input");

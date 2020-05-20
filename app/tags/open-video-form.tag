@@ -94,6 +94,7 @@
             formVisible(true);
 
             const elm = this.root.querySelector(".open-form > input");
+            elm.value = "";
             elm.focus();
         });
 

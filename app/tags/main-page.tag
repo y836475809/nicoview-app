@@ -163,15 +163,17 @@
             </div>
         </div>
     </div>
+    <open-video-form obs={obs_open_video_form}></open-video-form>
 
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const { remote, ipcRenderer, shell } = window.electron;
         const {Menu} = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
 
         this.obs = this.opts.obs;
+        this.obs_open_video_form = riot.observable();
 
         const updateDownloadBadge = async () => {
             const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
@@ -232,13 +234,14 @@
             }
         };
 
-        this.on("mount", async () => {
-            select_page("library");
-            hideRightPage();
-
-            await updateDownloadBadge();
-
+        const createMenu = (self) => {
             const menu_templete = [
+                { 
+                    label: "動画IDを指定して再生", 
+                    click: () => {
+                        self.obs_open_video_form.trigger("show");
+                    }
+                }, 
                 { label: "ログ",
                     submenu: [
                         { label: "ログファイルを開く", click() {
@@ -257,7 +260,16 @@
                     ]
                 },
             ];
-            const menu = Menu.buildFromTemplate(menu_templete);
+            return Menu.buildFromTemplate(menu_templete);
+        };
+
+        this.on("mount", async () => {
+            select_page("library");
+            hideRightPage();
+
+            await updateDownloadBadge();
+
+            const menu = createMenu(this);
             this.obs.trigger("main-window-titlebar:set-menu", {menu});
         });
 

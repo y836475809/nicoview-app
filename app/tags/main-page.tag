@@ -26,7 +26,7 @@
             position: absolute;
             top: calc(var(--window-titlebar-height) + var(--right-sidebar-page-top));
             right: calc(var(--main-sidebar-width) + var(--margin));
-            height: calc(100% - var(--window-titlebar-height) - var(--right-sidebar-page-top) - 8px);
+            /* max-height: calc(100% - var(--window-titlebar-height) - var(--right-sidebar-page-top) - 8px); */
             overflow-x: hidden; 
             overflow-y: hidden; 
             padding: var(--margin);

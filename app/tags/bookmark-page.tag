@@ -6,24 +6,18 @@
 
         .sidebar {
             width: var(--page-width);
-            height: 100%;
+            max-height: calc(100vh 
+                - var(--window-titlebar-height) 
+                - var(--right-sidebar-page-top) - 30px);
         }
 
         .content {
             width: 100%;
-            height: 100%;
             background-color: var(--control-color);
         }
 
         .bookmark-item {
             color:royalblue;
-        }
-
-        .listview-menu-container {
-            width: 100%;
-            height: calc(100% - var(--menubar-height) - var(--input-height));
-            overflow-y: auto;
-            overflow-x: hidden;
         }
     </style>    
 
@@ -53,17 +47,30 @@
             search : "fas fa-search fa-lg fa-fw"
         };
 
+        const resizeHeight = (items) => {
+            const sidebar = this.root.querySelector(".sidebar");
+            const content = this.root.querySelector(".content");
+            const item_height = 30;
+            const new_height = items.length*item_height;
+            sidebar.style.height = (new_height + 30) + "px";
+            content.style.height = new_height + "px";
+        };
+
         this.on("mount", async () => {
             // TODO error対応
             const name = this.name;
             const items = await IPCClient.request("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
+
+            resizeHeight(items);
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             const name = this.name;
             await IPCClient.request("bookmark", "update", { name, items });
+
+            resizeHeight(items);
         });
 
         const getMenuEnable = (type, items) => {

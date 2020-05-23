@@ -281,6 +281,10 @@
             ipcRenderer.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
         });
 
+        obs.on("player-main-page:add-stack-items", (args) => {
+            ipcRenderer.send(IPC_CHANNEL.ADD_STACK_ITEMS, args);
+        });
+
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             logger.debug("player main update video_id=", video_id);
             this.obs_modal_dialog.trigger("show", {

@@ -390,6 +390,10 @@ app.on("ready", async ()=>{
         main_win.webContents.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
     });
 
+    ipcMain.on(IPC_CHANNEL.ADD_STACK_ITEMS, (event, args) => {
+        main_win.webContents.send(IPC_CHANNEL.ADD_STACK_ITEMS, args);
+    });
+
     ipcMain.handle(IPC_CHANNEL.SET_COOKIE, async (event, args) => {
         const cookies = args;
         try {

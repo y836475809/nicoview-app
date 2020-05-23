@@ -107,6 +107,17 @@
                         });
                     }
                 },
+                { label: "後で見る", click() {
+                    const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
+                    obs.trigger("player-main-page:add-stack-items", 
+                        {
+                            items:[{
+                                id: video_id,
+                                name: title, 
+                                thumb_img:thumbnailURL
+                            }]
+                        });
+                }},
                 { type: "separator" },
                 { 
                     id: "add-download",

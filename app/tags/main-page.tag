@@ -153,12 +153,21 @@
             <div class="bookmark-page dialog-shadow">
                 <bookmark-page obs={obs}></bookmark-page>
             </div>
+            <div class="play-stack-page dialog-shadow">
+                <play-stack-page obs={obs}></play-stack-page>
+            </div>
         </div>
         <div class="main-sidebar right">
             <div class="button center-hv" onclick="{onclickShowPage.bind(this,'bookmark')}">
                 <div class="button">
                     <i class="fas fa-bookmark"></i>
                     <div class="button-label">ブックマーク</div>
+                </div>
+            </div>
+            <div class="button center-hv" onclick="{onclickShowPage.bind(this,'play-stack')}">
+                <div class="button">
+                    <i class="fas fa-folder-plus"></i>
+                    <div class="button-label">後で見る</div>
                 </div>
             </div>
         </div>
@@ -290,6 +299,10 @@
         ipcRenderer.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args)=>{
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
+        });
+
+        ipcRenderer.on(IPC_CHANNEL.ADD_STACK_ITEMS, (event, args)=>{
+            this.obs.trigger("play-stack-page:add-items", args);
         });
 
         ipcRenderer.on(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {

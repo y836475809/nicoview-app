@@ -64,6 +64,18 @@
                         time: 0
                     });
                 }},
+                { label: "後で見る", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const stack_items = items.map(item => {
+                        return {
+                            id: item.id,
+                            name: item.name, 
+                            thumb_img:item.thumb_img
+                        };
+                    });
+                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                }},
+                { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {

@@ -11,6 +11,7 @@ const IPC_CHANNEL =  Object.freeze({
     ADD_DOWNLOAD_ITEM: "ipc-add-download-item",
     ADD_PLAY_HISTORY: "ipc-add-play-history",
     ADD_BOOKMARK: "ipc-add-bookmark",
+    ADD_STACK_ITEMS: "ipc-add-stack-items",
 
     UPDATE_DATA: "ipc-update-data",
     RETURN_UPDATE_DATA: "ipc-return-update-data",

@@ -5,6 +5,7 @@ const { NicoClientRequest } = require("../app/js/nico-client-request");
 
 const prof_time = new ProfTime();
 
+const mock_timeout = 121*1000;
 const test_host = "https://www.nock.test-options";
 const test_path = "/options/";
 const test_url = `${test_host}${test_path}`;
@@ -67,11 +68,11 @@ test.cb("options cancel", (t) => {
 test("options timeout", async (t) => {
     t.plan(3);
 
-    nock_options(3000);
+    nock_options(mock_timeout);
 
     try {
         const req = new NicoClientRequest();
-        await req.options(test_url, {timeout_msec:1*1000});
+        await req.options(test_url);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

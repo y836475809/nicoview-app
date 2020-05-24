@@ -6,6 +6,7 @@ const { NicoClientRequest, NicoCookie } = require("../app/js/nico-client-request
 
 const prof_time = new ProfTime();
 
+const mock_timeout = 121*1000;
 const test_host = "https://www.nock.test-get";
 const test_path = "/get/";
 const test_url = `${test_host}${test_path}`;
@@ -184,11 +185,11 @@ test("cancel twice", async(t) => {
 test("timetout", async (t) => {
     t.plan(3);
 
-    nock_get(3000);
+    nock_get(mock_timeout);
         
     try {
         const req = new NicoClientRequest();
-        await req.get(test_url, {timeout_msec:1*1000});
+        await req.get(test_url);
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

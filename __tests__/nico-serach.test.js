@@ -3,6 +3,7 @@ const { NicoSearchParams, NicoSearch } = require("../app/js/nico-search");
 const { NicoMocks } = require("./helper/nico-mock");
 
 const nico_mocks = new NicoMocks();
+const mock_timeout = 121*1000;
 
 const pre_fields = 
     "contentId,title,description,tags,"
@@ -146,7 +147,7 @@ test("nico search cancel", async t => {
 
 test("nico search timeout", async t => {
     const word = "test";
-    nico_mocks.search(word, 200, 11*1000);
+    nico_mocks.search(word, 200, mock_timeout);
 
     const pramas = default_params();
     pramas.query(word);

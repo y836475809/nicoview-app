@@ -5,6 +5,8 @@ const { ProfTime } = require("./helper/ava-prof-time");
 
 const prof_time = new ProfTime();
 const nico_mylist_mocks = new NicoMylistMocks();
+const mock_timeout = 121*1000;
+
 const getMylisID = (id) => {
     return `mylist/${id}`;
 };
@@ -58,7 +60,7 @@ test("mylist timetout", async (t) => {
     t.plan(3);
 
     const id = "10";
-    nico_mylist_mocks.mylist(id, 11*1000);
+    nico_mylist_mocks.mylist(id, mock_timeout);
         
     const nico_mylist = new NicoMylist();
     try {

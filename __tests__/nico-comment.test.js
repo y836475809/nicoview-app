@@ -7,6 +7,7 @@ const data_api_data = TestData.data_api_data;
 
 const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
+const mock_timeout = 121*1000;
 
 test.before(t => {
     prof_time.clear();
@@ -147,7 +148,7 @@ test("get comment illegal param", async (t) => {
 test("get comment timeout", async (t) => {
     t.plan(3);
 
-    nico_mocks.comment(11*1000);
+    nico_mocks.comment(mock_timeout);
 
     const nico_comment = new NicoComment(data_api_data);
     try {

@@ -5,6 +5,7 @@ const NicoDataParser = require("../app/js/nico-data-parser");
 const { NicoUpdate } = require("../app/js/nico-update");
 
 const nico_mocks = new NicoDownLoadMocks();
+const mock_timeout = 121*1000;
 
 class TestNicoUpdate extends NicoUpdate {
     constructor(video_item){
@@ -91,7 +92,7 @@ test("update cancel", async(t) => {
 test("update timetout", async (t) => {
     t.plan(4);
 
-    nico_mocks.watch({delay:11*1000});
+    nico_mocks.watch({delay:mock_timeout});
     nico_mocks.comment();
     nico_mocks.thumbnail();
         

@@ -7,6 +7,7 @@ const data_api_data = TestData.data_api_data;
 
 const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
+const mock_timeout = 121*1000;
 
 test.before(t => {
     prof_time.clear();
@@ -77,7 +78,7 @@ test("nico dmc session error", async (t) => {
 test("nico dmc session timeout", async (t) => {
     t.plan(2);
 
-    nico_mocks.dmc_session(11*1000);
+    nico_mocks.dmc_session(mock_timeout);
 
     const nico_video = new NicoVideo(data_api_data);
     try {
@@ -193,7 +194,7 @@ test("cancel dmc heart beat options", async (t) => {
 test("timeout dmc heart beat options", async (t) => {
     t.plan(3);
 
-    nico_mocks.dmc_hb(11*1000);
+    nico_mocks.dmc_hb(mock_timeout);
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };
@@ -210,7 +211,7 @@ test("timeout dmc heart beat options", async (t) => {
 test.cb("timeout dmc heart beat post",  (t) => {
     t.plan(4);
 
-    nico_mocks.dmc_hb(1, 11*1000);
+    nico_mocks.dmc_hb(1, mock_timeout);
 
     const nico_video = new NicoVideo(data_api_data);
     nico_video.dmc_session = { session: { id:"12345678" } };

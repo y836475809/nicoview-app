@@ -5,6 +5,7 @@ const { ProfTime } = require("./helper/ava-prof-time");
 
 const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
+const mock_timeout = 121*1000;
 
 test.before(t => {
     prof_time.clear();
@@ -95,7 +96,7 @@ test("watch cancel 2", async(t) => {
 test("watch timetout", async (t) => {
     t.plan(3);
 
-    nico_mocks.watch(11*1000);
+    nico_mocks.watch(mock_timeout);
         
     try {
         const nico_watch = new NicoWatch();

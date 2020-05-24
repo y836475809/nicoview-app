@@ -1,5 +1,7 @@
 const https = require("https");
 
+const timeout_msec = 120*1000;
+
 const getValue = (headers, key) => {
     for (const prop in headers) {
         if(prop.toLowerCase() == key.toLowerCase()){
@@ -70,7 +72,7 @@ class NicoCookie {
 }
 
 class NicoClientRequest {
-    get(url, {nico_cookie=null, stream=null, on_progress=null, timeout_msec=10*1000, encoding="utf8"}={}){
+    get(url, {nico_cookie=null, stream=null, on_progress=null, encoding="utf8"}={}){
         this._resetParams();
  
         this._stream = stream;
@@ -88,7 +90,7 @@ class NicoClientRequest {
         return this._request(url, options);
     }
 
-    post(url, {json=null, timeout_msec=10*1000}={}){
+    post(url, {json=null}={}){
         this._resetParams();
 
         this._timeout_msec = timeout_msec;
@@ -110,7 +112,7 @@ class NicoClientRequest {
         });
     }
 
-    options(url, {timeout_msec=10*1000}={}){
+    options(url){
         this._resetParams();
 
         this._timeout_msec = timeout_msec;

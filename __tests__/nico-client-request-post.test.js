@@ -5,6 +5,7 @@ const { NicoClientRequest } = require("../app/js/nico-client-request");
 
 const prof_time = new ProfTime();
 
+const mock_timeout = 121*1000;
 const test_host = "https://www.nock.test-json";
 const test_path = "/json/";
 const test_url = `${test_host}${test_path}`;
@@ -134,11 +135,11 @@ test("post repeat stop", async (t) => {
 test("post timeout", async (t) => {
     t.plan(3);
 
-    nock_post({delay:3000});
+    nock_post({delay:mock_timeout});
 
     try {
         const req = new NicoClientRequest();
-        await req.post(test_url, {json:json_data, timeout_msec:1*1000});
+        await req.post(test_url, {json:json_data});
     } catch (error) {
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");

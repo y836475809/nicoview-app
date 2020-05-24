@@ -8,6 +8,7 @@ const dist_dir = __dirname;
 const log = [];
 
 const nico_download_mocks = new NicoDownLoadMocks();
+const mock_timeout = 121*1000;
 
 test.before(t => {
 });
@@ -75,7 +76,7 @@ class TestNicoDownloader extends NicoDownloader {
 }
 
 test("downloader timeout watch", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {watch_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {watch_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -88,7 +89,7 @@ test("downloader timeout watch", async (t) => {
 });
 
 test("downloader timeout dmc_session", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {dmc_session_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {dmc_session_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -101,7 +102,7 @@ test("downloader timeout dmc_session", async (t) => {
 });
 
 test("downloader timeout comment", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {comment_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {comment_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -116,7 +117,7 @@ test("downloader timeout comment", async (t) => {
 });
 
 test("downloader timeout thumbnail", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {thumbnail_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -131,7 +132,7 @@ test("downloader timeout thumbnail", async (t) => {
 });
 
 test("downloader timeout dmc_hb", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {hb_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {hb_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -147,7 +148,7 @@ test("downloader timeout dmc_hb", async (t) => {
 });
 
 test("downloader timeout dmc_video", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {video_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{
@@ -163,7 +164,7 @@ test("downloader timeout dmc_video", async (t) => {
 });
 
 test("downloader timeout smile_video", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:11*1000});
+    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
     const result = await nico_down.download((state)=>{

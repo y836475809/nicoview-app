@@ -43,21 +43,32 @@
             height: 100%;
             background-color: #1e2229;
         }
-        .main-sidebar input[type=radio] {
-            display: none; 
-        }
-        .main-sidebar input[type=radio]:checked + .button{
-            border-left: 3px solid #2C7CFF;
-        }
         .main-sidebar .button {
-            padding-top: 10px;
-            margin: 2px;
+            margin-bottom: 5px;
             text-align: center;
             box-sizing: border-box;
-            width: 70px;
+            width: 100%;
             height: 60px;   
-            display: block;
+            display: flex;
             cursor: pointer;
+        }
+        .select-button {
+            background-color: #303030 !important;
+        }
+        .main-sidebar .button-border {
+            height: 100%;
+            width: 3px;
+            background-color: #2C7CFF;
+            opacity: 0;
+        }
+        .select-button-border {
+            opacity: 1 !important;
+        }
+        .main-sidebar .button-border + div {
+            width: 100%;
+        }
+        .main-sidebar .button > div {
+            pointer-events: none;
         }
         .main-sidebar .button-label {
             margin: 2px;
@@ -67,8 +78,12 @@
             user-select: none;
         }
         .main-sidebar .fas {
+            padding-top: 10px; 
             font-size: 24px;
             color: grey;
+        }
+        .select-icon {
+            color: lightgray !important;
         }
         .main-sidebar.right {
             margin-left: auto;
@@ -95,51 +110,51 @@
 
     <div class="main-container">
         <div class="main-sidebar left">
-            <label class="label">
-                <input type="radio" name="page_select" class="library-radio" onclick="{onclickPageSelect.bind(this,'library')}"> 
-                <div class="button">
-                    <span class="center-hv fas fa-book"></span>
+            <div class="button center-v library-button" onclick="{onclickPageSelect.bind(this,'library')}">
+                <div class="button-border"></div>
+                <div>
+                    <i class="center-hv fas fa-book"></i>
                     <div class="button-label">ライブラリ</div>
                 </div>
-            </label>
-            <label class="label">
-                <input type="radio" name="page_select" class="search-radio" onclick="{onclickPageSelect.bind(this,'search')}"> 
-                <div class="button">
-                    <span class="center-hv fas fa-search"></span> 
+            </div>
+            <div class="button center-v search-button" onclick="{onclickPageSelect.bind(this,'search')}">
+                <div class="button-border"></div>
+                <div>
+                    <i class="center-hv fas fa-search"></i> 
                     <div class="button-label">検索</div>
                 </div>
-            </label>
-            <label class="label">
-                <input type="radio" name="page_select" class="mylist-radio" onclick="{onclickPageSelect.bind(this,'mylist')}">
-                <div class="button"> 
-                    <span class="center-hv fas fa-list"></span> 
+            </div>
+            <div class="button center-v mylist-button" onclick="{onclickPageSelect.bind(this,'mylist')}"> 
+                <div class="button-border"></div>
+                <div>
+                    <i class="center-hv fas fa-list"></i> 
                     <div class="button-label">マイリスト</div>
                 </div>
-            </label>
-            <label class="label">
-                <input type="radio" name="page_select" class="download-radio" onclick="{onclickPageSelect.bind(this,'download')}"> 
-                <div class="button"> 
+            </div>
+            <div class="button center-v download-button" onclick="{onclickPageSelect.bind(this,'download')}"> 
+                <div class="button-border"></div>
+                <div>
                     <span class="download-badge center-hv">
-                        <span class="fas fa-download"></span>
+                        <i class="fas fa-download"></i>
                         <span class="item-num">{donwnload_item_num}</span>
                     </span> 
                     <div class="button-label">ダウンロード</div>
                 </div>
-            </label>
-            <label class="label">
-                <input type="radio" name="page_select" class="play-history-radio" onclick="{onclickPageSelect.bind(this,'play-history')}"> 
-                <div class="button"> 
-                    <span class="center-hv fas fa-history"></span> 
+            </div>
+            <div class="button center-v play-history-button" onclick="{onclickPageSelect.bind(this,'play-history')}"> 
+                <div class="button-border"></div>
+                <div>
+                    <i class="center-hv fas fa-history"></i> 
                     <div class="button-label">履歴</div>
                 </div>
-            </label>
-            <label class="label">
-                <input type="radio" name="page_select" class="setting-radio" onclick="{onclickPageSelect.bind(this,'setting')}">
-                <div class="button">  
-                    <span class="center-hv fas fa-cog"></span> 
+            </div>
+            <div class="button center-v setting-button" onclick="{onclickPageSelect.bind(this,'setting')}">  
+                <div class="button-border"></div>
+                <div>
+                    <i class="center-hv fas fa-cog"></i> 
                     <div class="button-label">設定</div>
                 </div>
-            </label>     
+            </div>
         </div>
         <div class="page-container left">
             <library-page obs={obs}></library-page>
@@ -158,14 +173,16 @@
             </div>
         </div>
         <div class="main-sidebar right">
-            <div class="button center-hv" onclick="{onclickShowPage.bind(this,'bookmark')}">
-                <div class="button">
+            <div class="button bookmark-button center-hv" onclick="{onclickTogglePage.bind(this,'bookmark')}">
+                <div class="button-border"></div>
+                <div>
                     <i class="fas fa-bookmark"></i>
                     <div class="button-label">ブックマーク</div>
                 </div>
             </div>
-            <div class="button center-hv" onclick="{onclickShowPage.bind(this,'play-stack')}">
-                <div class="button">
+            <div class="button play-stack-button center-hv" onclick="{onclickTogglePage.bind(this,'play-stack')}">
+                <div class="button-border"></div>
+                <div>
                     <i class="fas fa-folder-plus"></i>
                     <div class="button-label">後で見る</div>
                 </div>
@@ -207,6 +224,15 @@
 
         this.donwnload_item_num = 0;
 
+        const changeClass = (remove_query, add_query, class_name) => {
+            const elms = this.root.querySelectorAll(remove_query);
+            elms.forEach(elm => {
+                elm.classList.remove(class_name);
+            });
+            const elm = this.root.querySelector(add_query);
+            elm.classList.add(class_name);
+        };
+
         const select_page = (page_name)=>{
             Array.from(this.root.querySelectorAll(".page-container.left > *"), 
                 (elm) => {
@@ -215,8 +241,20 @@
             const page = this.root.querySelector(`${page_name}-page`);
             page.style.zIndex = 1;
 
-            const radio = this.root.querySelector(`.${page_name}-radio`);
-            radio.checked = true;
+            changeClass(
+                ".main-sidebar.left > .button", 
+                `.${page_name}-button`, 
+                "select-button");
+
+            changeClass(
+                ".main-sidebar.left i.fas", 
+                `.${page_name}-button i.fas`, 
+                "select-icon");
+
+            changeClass(
+                ".main-sidebar.left .button-border", 
+                `.${page_name}-button > .button-border`, 
+                "select-button-border");
         };
 
         this.onclickPageSelect = (page_name, e) => {
@@ -230,7 +268,19 @@
                 });
         };
 
-        this.onclickShowPage = (page_name, e) => {
+        const toggleRightSidebarClass = (elm, toggle_class, select_class) => {
+            if(elm.classList.contains(toggle_class)===true){
+                elm.classList.remove(toggle_class); 
+            }else{
+                const buttons = this.root.querySelectorAll(`.main-sidebar.right ${select_class}`);
+                buttons.forEach(btn => {
+                    btn.classList.remove(toggle_class); 
+                });
+                elm.classList.add(toggle_class); 
+            } 
+        };
+
+        this.onclickTogglePage = (page_name, e) => {
             const page = this.root.querySelector(`.${page_name}-page`);
             const page_zIndex = page.style.zIndex;
 
@@ -241,6 +291,14 @@
             }else{
                 page.style.zIndex = 2;
             }
+
+            toggleRightSidebarClass(e.target, "select-button", ".button");
+
+            const icon_elm = this.root.querySelector(`.${page_name}-button i.fas`);
+            toggleRightSidebarClass(icon_elm, "select-icon", "i.fas");
+
+            const border_elm = this.root.querySelector(`.${page_name}-button > .button-border`);
+            toggleRightSidebarClass(border_elm, "select-button-border", ".button-border");
         };
 
         const createMenu = (self) => {

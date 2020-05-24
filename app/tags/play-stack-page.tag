@@ -5,6 +5,7 @@
             --item-height: 80px;
             --thumb-size: 80px;
             --icon-size: 20px;
+            --item-duration: 300ms;
         }
 
         .stack-container {
@@ -21,10 +22,15 @@
             height: var(--item-height);
             border-bottom: 1px solid lightgrey;
             cursor: pointer;
+            overflow: hidden;
+            transition: height var(--item-duration);  
         }
         .stack-item-hide { 
             height: 0;  
         } 
+        .stack-item-show {
+            height: var(--item-height);
+        }
         .stack-item:hover {
             background-color: #6190cd6b;
         }
@@ -68,7 +74,7 @@
     </style>
 
     <div class="stack-container">
-        <div class="stack-item center-v" data-id={i} each={ item, i in items }>
+        <div class="stack-item center-v {item.state}" data-id={i} each={ item, i in items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
                 <div class="title" title={item.name} >
@@ -88,12 +94,31 @@
 
         const obs = this.opts.obs;
         this.items = [];
+        let item_duration = 300;
+
+        this.on("mount", () => {
+            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
+            item_duration = parseInt(prop);
+        });
 
         obs.on("play-stack-page:add-items", async (args) => {
             const { items } = args;
-
+            items.forEach(item => {
+                item.state = "stack-item-hide";
+            });
             this.items = items.concat(this.items);
             this.update();
+
+            setTimeout(() => { 
+                const elms = this.root.querySelectorAll(".stack-item-hide");
+                elms.forEach(elm => {
+                    elm.classList.add("stack-item-show"); 
+                });
+                elms.forEach(elm => {
+                    elm.classList.remove("stack-item-hide"); 
+                    elm.classList.remove("stack-item-show"); 
+                });
+            }, 50);
         });
 
         this.onclickItem = (item, e) => {
@@ -104,8 +129,12 @@
         };
 
         this.onclickDelete = (i, e) => {
-            this.items.splice(i, 1);
-            this.update();
+            const elms = this.root.querySelectorAll(".stack-item");
+            elms[i].classList.add("stack-item-hide"); 
+            setTimeout(() => { 
+                this.items.splice(i, 1);
+                this.update();
+            }, item_duration);   
         };
     </script>
 </play-stack-page>

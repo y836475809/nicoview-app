@@ -2,6 +2,8 @@
     <style scoped>
         :scope {
             --input-height: 30px;
+            --item-height: 30px;
+            --item-duration: 300ms;
         }
 
         .listview-list {
@@ -16,14 +18,16 @@
 
         .listview-item {
             display: flex;
-            height: 30px;
+            height: var(--item-height);
             padding: 5px 0 5px 10px;
-            transition: all 0.5s;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;
             white-space: nowrap; 
             overflow: hidden;
             user-select: none;
+            transition: height var(--item-duration), 
+                padding var(--item-duration),
+                border-bottom var(--item-duration);
         }
 
         .listview-item:hover {
@@ -33,6 +37,16 @@
         .listview-item.selected {
             color: white;
             background-color: #0f468d6b; 
+        }
+        .listview-item-hide { 
+            height: 0;
+            padding: 0 0 0 10px;
+            border-bottom: 0px;
+        } 
+        .listview-item-show {
+            height: var(--item-height);
+            padding: 5px 0 5px 10px;
+            border-bottom: 1px solid lightgrey;
         }
 
         .listview-item-icon {
@@ -66,7 +80,7 @@
         onkeydown={onkeydownSearchInput}>
     <div class="listview-menu-container">
         <ul class="listview-list">
-            <li class="listview-item" data-id={i} each={ item, i in items }
+            <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
                 title={getTooltip(item)}
                 onclick={onclickItem.bind(this,item)} 
                 ondblclick={ondblclickItem.bind(this,item)}
@@ -80,7 +94,7 @@
 
     <script>
         const Sortable = window.Sortable;
-
+        let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;
         const icon_class = this.opts.icon_class;
@@ -92,6 +106,10 @@
         }
 
         const triggerChange = () => {
+            this.items.map(item=>{
+                delete item.state;
+                return item;
+            });
             obs.trigger("changed", {items:this.items});
         };
 
@@ -103,22 +121,45 @@
 
         obs.on("addList", async (args) => {
             const { items } = args;
+
+            items.forEach(item => {
+                item.state = "listview-item-hide";
+            });
             this.items = this.items.concat(items);
+            this.update();
 
-            const query = getInputValue();
-            filter(query);
+            setTimeout(() => { 
+                const elms = this.root.querySelectorAll(".listview-item-hide");
+                elms.forEach(elm => {
+                    elm.classList.add("listview-item-show"); 
+                });
+                elms.forEach(elm => {
+                    elm.classList.remove("listview-item-hide"); 
+                    elm.classList.remove("listview-item-show"); 
+                });
 
-            triggerChange();
+                const query = getInputValue();
+                filter(query);
+                triggerChange();
+            }, 50);
         });
 
         obs.on("deleteList", () => {
             const elms = this.root.querySelectorAll(".listview-item");
-            this.items = this.items.filter((item, index) => {
-                return elms[index].classList.contains("selected")===false;
-            });
-            this.update();
 
-            triggerChange();
+            elms.forEach(elm => {
+                if(elm.classList.contains("selected")===true){
+                    elm.classList.add("listview-item-hide"); 
+                }
+            });
+
+            setTimeout(() => { 
+                this.items = this.items.filter((item, index) => {
+                    return elms[index].classList.contains("selected")===false;
+                });
+                this.update();
+                triggerChange();
+            }, item_duration);
         });
 
         const sortItems = () => {
@@ -216,6 +257,9 @@
         };
 
         this.on("mount", () => {
+            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
+            item_duration = parseInt(prop);
+
             const elm = this.root.querySelector(".listview-list");
             sortable = Sortable.create(elm, {
                 ghostClass: "listview-item-ghost-class",

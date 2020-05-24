@@ -14,6 +14,10 @@
   width: var(--left-width);
   overflow: auto;
 }
+.split-page > .left > * > div {
+  width: calc(100%  - 5px);
+  height: 100%;
+}
 .split-page > .right{
   background-color: var(--control-color);
   width: calc(100% - var(--left-width));

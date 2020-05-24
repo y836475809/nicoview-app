@@ -52,7 +52,7 @@
             const content = this.root.querySelector(".content");
             const item_height = 30;
             const new_height = items.length*item_height;
-            sidebar.style.height = (new_height + 30) + "px";
+            sidebar.style.height = (new_height + 35) + "px";
             content.style.height = new_height + "px";
         };
 

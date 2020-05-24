@@ -84,14 +84,14 @@
 
         .listview-menu-container {
             width: 100%;
-            height: calc(100% - var(--input-height));
+            height: calc(100% - var(--input-height) - 5px);
             overflow-x: hidden;
         }
         
         .listview-input {
             height: var(--input-height);
-            width: calc(100% - 4px);
-            margin: 0 2px 0 2px;
+            width: 100%;
+            margin-bottom: 5px;
             padding: 2px;
             border: solid 1px #ccc;
             border-radius: 2px;

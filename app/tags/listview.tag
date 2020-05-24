@@ -4,10 +4,10 @@
             --input-height: 30px;
             --item-height: 30px;
             --item-duration: 300ms;
+            --icon-size: 12px;
         }
 
         .listview-list {
-            display: table;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -18,11 +18,11 @@
 
         .listview-item {
             display: flex;
+            width: 100%;
             height: var(--item-height);
-            padding: 5px 0 5px 10px;
+            padding: 5px 0 5px 5px;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;
-            white-space: nowrap; 
             overflow: hidden;
             user-select: none;
             transition: height var(--item-duration), 
@@ -40,17 +40,46 @@
         }
         .listview-item-hide { 
             height: 0;
-            padding: 0 0 0 10px;
+            padding: 0 0 0 5px;
             border-bottom: 0px;
         } 
         .listview-item-show {
             height: var(--item-height);
-            padding: 5px 0 5px 10px;
+            padding: 5px 0 5px 5px;
             border-bottom: 1px solid lightgrey;
+        }
+
+        .title-wraper {
+            width: calc(100% - var(--icon-size) - 25px);
+            height: 100%;
+        }
+        .title {
+            margin-left: 5px;
+            margin-right: 5px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+            pointer-events: none;
         }
 
         .listview-item-icon {
             margin-right: 5px;
+        }
+        .delete-button {
+            margin-right: 10px;
+            margin-left: auto;
+            opacity: 0;
+        }
+        .listview-item:hover > .delete-button {
+            opacity: 1;
+        }
+        .delete-button > i {
+            font-size: var(--icon-size);
+            color: gray;
+            pointer-events: none;
+        }
+        .delete-button > i:hover {
+            color: black;
         }
 
         .listview-menu-container {
@@ -81,13 +110,21 @@
     <div class="listview-menu-container">
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
-                title={getTooltip(item)}
-                onclick={onclickItem.bind(this,item)} 
-                ondblclick={ondblclickItem.bind(this,item)}
-                onmouseup={onmouseUp.bind(this,item)}
-                onmousedown={onmouseDown.bind(this,item)}>
+                title={getTooltip(item)}>
                 <i class={getIconClass(item)}></i>
-                {item.title}
+                <div class="title-wraper center-v"
+                    onclick={onclickItem.bind(this,item)} 
+                    ondblclick={ondblclickItem.bind(this,item)}
+                    onmouseup={onmouseUp.bind(this,item)}
+                    onmousedown={onmouseDown.bind(this,item)}>
+                    <div class="title">
+                        {item.title}
+                    </div> 
+                </div>
+                <div class="delete-button center-hv" title="削除"
+                    onclick={onclickDelete.bind(this,i)}>
+                    <i class="fas fa-times"></i>
+                </div>
             </li>
         </ul>
     </div>
@@ -236,7 +273,7 @@
         };
 
         this.onclickItem = (item, e) => {
-            setSelected(e.target, item);
+            setSelected(e.target.parentElement, item);
             obs.trigger("item-clicked", item);
         };
 
@@ -245,7 +282,7 @@
         };
 
         this.onmouseUp= (item, e) => {
-            setSelected(e.target, item);
+            setSelected(e.target.parentElement, item);
             if(e.button===2){
                 const items = getSelectedItems();
                 obs.trigger("show-contextmenu", e, { items });
@@ -253,7 +290,17 @@
         };
 
         this.onmouseDown= (item, e) => {
-            setSelected(e.target, item);
+            setSelected(e.target.parentElement, item);
+        };
+
+        this.onclickDelete = (i, e) => {
+            e.target.parentElement.classList.add("listview-item-hide"); 
+ 
+            setTimeout(() => { 
+                this.items.splice(i, 1);
+                this.update();
+                triggerChange();
+            }, item_duration);
         };
 
         this.on("mount", () => {

@@ -43,8 +43,8 @@
         this.sb_button_icon = "fas fa-chevron-left";
         this.name = "bookmark";
         this.icon_class = {
-            video :  "fas fa-bookmark fa-lg fa-fw",
-            search : "fas fa-search fa-lg fa-fw"
+            video :  "fas fa-bookmark fa-lg",
+            search : "fas fa-search fa-lg"
         };
 
         const resizeHeight = (items) => {

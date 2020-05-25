@@ -62,9 +62,6 @@
             pointer-events: none;
         }
 
-        .listview-item-icon {
-            margin-right: 5px;
-        }
         .delete-button {
             margin-right: 10px;
             margin-left: auto;

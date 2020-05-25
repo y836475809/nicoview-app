@@ -9,6 +9,9 @@
         .nico-search-item {
             color:royalblue;
         }
+        .nico-search-item-adjust {
+            margin-right: 4px;
+        }
     </style>
 
     <div class="nico-search-sidebar">
@@ -31,7 +34,8 @@
         this.obs_listview = riot.observable();
         this.name = "nico-search";
         this.icon_class = {
-            tag :  "fas fa-tag fa-lg"
+            tag :  "fas fa-tag fa-lg",
+            keyword: "fas fa-ellipsis-h nico-search-item-adjust",
         };
 
         const sort_map = new Map();

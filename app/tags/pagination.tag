@@ -9,14 +9,27 @@
             margin-left: 5px;
         }
 
-        .page-input-container {
+        .label.page {
+            width: 60px;
+            cursor: pointer;
+            border: 1px solid gray;
+            border-radius: 3px;
+            padding: 5px;
+        }
+
+        .page-container {
+            position: relative;
             display: flex;
         }
-        .page-input-container input {
-            width: 50px;
-            height: 25px;
-            text-align: right;
-            outline: 0;
+        .page-selector {
+            display: none;
+            position: absolute;
+            top: 30px;
+            left: 0px;
+            z-index: 999;
+        }
+        .page-selector-show {
+            display: block;
         }
 
         i[class^="fas fa-chevron"] {
@@ -37,15 +50,20 @@
     </style>
 
     <div class="navi center-hv" onclick={onclickBack}><i class="fas fa-chevron-left"></i></div>
-    <div class="page-input-container center-hv">
-        <input type="tel" value={current_page} onkeypress={onkeypress}/>
-        <div class="label center-hv"> / {total_pages}</div>
+    <div class="page-container center-hv" title="ページ選択">
+        <div class="label page center-hv" onclick={onclickTogglePageSelector}>
+            {current_page} / {total_pages}
+        </div>
+        <search-page-selector class="page-selector" obs={obs_page_selector}> 
+        </search-page-selector>
     </div>
     <div class="navi center-hv" onclick={onclickForward}><i class="fas fa-chevron-right"></i></div>
     <div class="label center-hv">ヒット件数: {total_count.toLocaleString()}</div>
 
     <script>
+        /* globals riot */
         const pagination_obs = this.opts.obs;
+        this.obs_page_selector = riot.observable();
 
         this.current_page = 1;
         this.total_pages = 0;
@@ -67,22 +85,6 @@
             this.update();
         });
 
-        this.onkeypress = (e) =>{
-            if(e.key=="Enter"){
-                const num = parseInt(e.target.value);
-                if(isNaN(num)){
-                    return;
-                }
-                this.current_page = num;
-
-                pagination_obs.trigger("move-page", { page_num: this.current_page });
-                return;
-            }
-            if(!/^[0-9]+$/.test(e.key)){
-                e.returnValue = false;
-            }
-        };
-
         this.onclickBack = () =>{
             if(this.current_page > 1){
                 this.current_page -= 1;
@@ -101,5 +103,28 @@
             }
         };
 
+        const changePageSelector = (name) => {
+            const elm = this.root.querySelector(".page-selector");
+            elm.classList[name]("page-selector-show"); 
+        };
+
+        this.onclickTogglePageSelector = () => {
+            changePageSelector("toggle");
+        };
+
+        this.obs_page_selector.on("selected", (num) => {
+            this.current_page = num;
+            this.update();
+
+            pagination_obs.trigger("move-page", { page_num: this.current_page });
+            changePageSelector("remove");
+        });
+
+        this.obs_page_selector.on("close", () => {
+            const elm = this.root.querySelector(".page-selector");
+            elm.classList.remove("page-selector-show"); 
+
+            changePageSelector("remove");
+        });
     </script>
 </pagination>

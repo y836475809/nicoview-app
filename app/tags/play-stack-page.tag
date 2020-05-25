@@ -83,7 +83,7 @@
             </div>
             <div class="delete-button center-hv" title="削除"
                 onclick={onclickDelete.bind(this,i)}>
-                <i class="fas fa-trash-alt"></i>
+                <i class="fas fa-times"></i>
             </div>
         </div>
     </div>

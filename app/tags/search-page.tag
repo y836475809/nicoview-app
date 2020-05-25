@@ -256,7 +256,9 @@
                     {item.title}
                 </div>
             </div>
-            <div class="close-btn" title="閉じる", onclick={onclickToggleMenu}>X</div>
+            <div class="close-btn" title="閉じる", onclick={onclickToggleMenu}>
+                <i class="fas fa-times"></i>
+            </div>
         </div>
     </div>
     <pagination obs={pagination_obs}></pagination>

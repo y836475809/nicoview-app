@@ -49,6 +49,10 @@
         .item:hover {
             background-color: lightgray;
         }
+        .item-disable {
+            color: lightgray;
+            pointer-events: none;
+        }
     </style>
 
     <div class="container dialog-shadow">
@@ -59,8 +63,9 @@
             </div>
         </div>
         <div class="item-container">
-            <div class="item center-hv" each={ item in items } onclick={onclickItem.bind(this,item)}>
-                {item}
+            <div class="item center-hv {item.class_name}" each={ item in items } 
+                onclick={onclickItem.bind(this,item)}>
+                {item.num}
             </div>
         </div>
     </div>
@@ -71,15 +76,32 @@
         this.items = [];
 
         for (let num = 1; num <= max_num; num++) {
-            this.items.push(num);
+            this.items.push({
+                num:num,
+                class_name:"item-disable"
+            });
         }
 
         this.onclickItem = (item, e) => {
-            obs.trigger("selected", item);
+            obs.trigger("selected", item.num);
         };
 
         this.onclickClose = e => {
             obs.trigger("close");
         };
+
+        obs.on("set-page-num", (args) => {
+            const page_num = args;
+
+            this.items = [];
+            for (let num = 1; num <= max_num; num++) {
+                this.items.push({
+                    num:num,
+                    class_name:num<=page_num?"":"item-disable"
+                });
+            }
+
+            this.update();
+        });
     </script>
 </search-page-selector>

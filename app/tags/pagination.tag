@@ -50,8 +50,8 @@
     </style>
 
     <div class="navi center-hv" onclick={onclickBack}><i class="fas fa-chevron-left"></i></div>
-    <div class="page-container center-hv" title="ページ選択">
-        <div class="label page center-hv" onclick={onclickTogglePageSelector}>
+    <div class="page-container center-hv" >
+        <div class="label page center-hv" title="ページ選択" onclick={onclickTogglePageSelector}>
             {current_page} / {total_pages}
         </div>
         <search-page-selector class="page-selector" obs={obs_page_selector}> 
@@ -83,6 +83,8 @@
             this.total_pages = total_page_num;
             this.total_count = total_count;
             this.update();
+
+            this.obs_page_selector.trigger("set-page-num", total_page_num);
         });
 
         this.onclickBack = () =>{

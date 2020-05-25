@@ -484,15 +484,15 @@
 
         const setData = async (search_result) => {     
             const page_num = search_result.meta.page;
-            const total_count = search_result.meta.totalCount;
+            const search_result_num = search_result.meta.totalCount;
             let total_page_num = 0;
-            if(total_count<search_offset+search_limit){
-                total_page_num = Math.ceil(total_count/search_limit);
+            if(search_result_num < search_offset+search_limit){
+                total_page_num = Math.ceil(search_result_num / search_limit);
             }else{
-                total_page_num = Math.ceil((search_offset+search_limit)/search_limit);
+                total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
             }
             this.pagination_obs.trigger("set-data", {
-                page_num, total_page_num, total_count
+                page_num, total_page_num, search_result_num
             });
 
             const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");

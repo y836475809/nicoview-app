@@ -72,10 +72,10 @@
 
     <script>
         const obs = this.opts.obs;
-        const max_num = 51;
+        const max_page_num = 51;
         this.items = [];
 
-        for (let num = 1; num <= max_num; num++) {
+        for (let num = 1; num <= max_page_num; num++) {
             this.items.push({
                 num:num,
                 class_name:"item-disable"
@@ -83,21 +83,21 @@
         }
 
         this.onclickItem = (item, e) => {
-            obs.trigger("selected", item.num);
+            obs.trigger("selected-page-num", { page_num:item.num });
         };
 
         this.onclickClose = e => {
             obs.trigger("close");
         };
 
-        obs.on("set-page-num", (args) => {
-            const page_num = args;
+        obs.on("set-data", (args) => {
+            const { total_page_num } = args;
 
             this.items = [];
-            for (let num = 1; num <= max_num; num++) {
+            for (let num = 1; num <= max_page_num; num++) {
                 this.items.push({
                     num:num,
-                    class_name:num<=page_num?"":"item-disable"
+                    class_name:num<=total_page_num?"":"item-disable"
                 });
             }
 

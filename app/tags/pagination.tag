@@ -52,56 +52,56 @@
     <div class="navi center-hv" onclick={onclickBack}><i class="fas fa-chevron-left"></i></div>
     <div class="page-container center-hv" >
         <div class="label page center-hv" title="ページ選択" onclick={onclickTogglePageSelector}>
-            {current_page} / {total_pages}
+            {page_num} / {total_page_num}
         </div>
         <search-page-selector class="page-selector" obs={obs_page_selector}> 
         </search-page-selector>
     </div>
     <div class="navi center-hv" onclick={onclickForward}><i class="fas fa-chevron-right"></i></div>
-    <div class="label center-hv">ヒット件数: {total_count.toLocaleString()}</div>
+    <div class="label center-hv">ヒット件数: {search_result_num.toLocaleString()}</div>
 
     <script>
         /* globals riot */
         const pagination_obs = this.opts.obs;
         this.obs_page_selector = riot.observable();
 
-        this.current_page = 1;
-        this.total_pages = 0;
-        this.total_count = 0;
+        this.page_num = 1;
+        this.total_page_num = 0;
+        this.search_result_num = 0;
 
         pagination_obs.on("set-page-num", (args) => {
             const { page_num } = args;
 
-            this.current_page = page_num;
+            this.page_num = page_num;
             this.update();
         });
 
         pagination_obs.on("set-data", (args) => {
-            const { page_num, total_page_num, total_count } = args;
+            const { page_num, total_page_num, search_result_num } = args;
 
-            this.current_page = page_num;
-            this.total_pages = total_page_num;
-            this.total_count = total_count;
+            this.page_num = page_num;
+            this.total_page_num = total_page_num;
+            this.search_result_num = search_result_num;
             this.update();
 
-            this.obs_page_selector.trigger("set-page-num", total_page_num);
+            this.obs_page_selector.trigger("set-data", { total_page_num });
         });
 
         this.onclickBack = () =>{
-            if(this.current_page > 1){
-                this.current_page -= 1;
+            if(this.page_num > 1){
+                this.page_num -= 1;
                 this.update();
 
-                pagination_obs.trigger("move-page", { page_num: this.current_page });
+                pagination_obs.trigger("move-page", { page_num: this.page_num });
             }
         };
 
         this.onclickForward = () =>{
-            if(this.current_page < this.total_pages){
-                this.current_page += 1;
+            if(this.page_num < this.total_page_num){
+                this.page_num += 1;
                 this.update();
 
-                pagination_obs.trigger("move-page", { page_num: this.current_page });
+                pagination_obs.trigger("move-page", { page_num: this.page_num });
             }
         };
 
@@ -114,11 +114,12 @@
             changePageSelector("toggle");
         };
 
-        this.obs_page_selector.on("selected", (num) => {
-            this.current_page = num;
+        this.obs_page_selector.on("selected-page-num", (args) => {
+            const { page_num } = args;
+            this.page_num = page_num;
             this.update();
 
-            pagination_obs.trigger("move-page", { page_num: this.current_page });
+            pagination_obs.trigger("move-page", { page_num: this.page_num });
             changePageSelector("remove");
         });
 

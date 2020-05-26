@@ -151,6 +151,7 @@
             padding-right: 5px;      
             margin-left: 5px;
             cursor: pointer;
+            background-color: white;
         }
 
         .cond-menu-container1 {

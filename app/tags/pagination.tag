@@ -15,6 +15,7 @@
             border: 1px solid gray;
             border-radius: 3px;
             padding: 5px;
+            background-color: white;
         }
 
         .page-container {

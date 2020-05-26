@@ -109,7 +109,7 @@
         }
         .input-container > input {
             margin-left: 5px;
-            width: 200px;
+            width: 250px;
             height: 30px;
             font-size: 1.2em;
             

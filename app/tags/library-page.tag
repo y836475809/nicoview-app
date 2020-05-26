@@ -69,7 +69,7 @@
         :scope {
             width: 100%;
             height: 100%;
-            --search-input-width: 200px;
+            --search-input-width: 250px;
             --search-button-size: 30px;
             --margin: 5px;
         }

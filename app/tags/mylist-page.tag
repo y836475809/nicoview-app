@@ -160,7 +160,7 @@
     </style>      
 
     <div class="mylist-container">
-        <div class="mylist-label center-hv">mylist/</div><input class="mylist-input" type="text"/>
+        <div class="mylist-label center-hv">mylist /</div><input class="mylist-input" type="text"/>
         <div class="update-button center-hv" title="更新", onclick={onclickUpdateMylist}>
             <i class="fas fa-redo-alt"></i>
         </div>
@@ -525,7 +525,7 @@
             if(!nico_mylist){
                 return;
             }
-            
+
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
             getImageCache();

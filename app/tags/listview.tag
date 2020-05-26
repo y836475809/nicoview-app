@@ -20,7 +20,7 @@
             display: flex;
             width: 100%;
             height: var(--item-height);
-            padding: 5px 0 5px 5px;
+            padding: 0 0 0 5px;
             cursor: pointer;
             border-bottom: 1px solid lightgrey;
             overflow: hidden;
@@ -50,8 +50,12 @@
         }
 
         .title-wraper {
+            padding: 5px 0 5px 0;
             width: calc(100% - var(--icon-size) - 25px);
             height: 100%;
+        }
+        .title-wraper > i {
+            pointer-events: none;
         }
         .title {
             margin-left: 5px;
@@ -107,13 +111,13 @@
     <div class="listview-menu-container">
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
-                title={getTooltip(item)}>
-                <i class={getIconClass(item)}></i>
+                title={getTooltip(item)}>              
                 <div class="title-wraper center-v"
                     onclick={onclickItem.bind(this,item)} 
                     ondblclick={ondblclickItem.bind(this,item)}
                     onmouseup={onmouseUp.bind(this,item)}
                     onmousedown={onmouseDown.bind(this,item)}>
+                    <i class={getIconClass(item)}></i>
                     <div class="title">
                         {item.title}
                     </div> 

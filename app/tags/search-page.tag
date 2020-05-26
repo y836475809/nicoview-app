@@ -553,6 +553,10 @@
 
         this.onclickAddSearch = (e) => {
             const elm = getSearchInputElm();
+            if(!elm.value){
+                return;
+            }
+
             const { sort_name, sort_order, search_target } = nico_search_params.getParams();
             const cond = {
                 query: elm.value,

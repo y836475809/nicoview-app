@@ -522,6 +522,10 @@
         };
 
         this.onclickSaveMylist = (e) => {
+            if(!nico_mylist){
+                return;
+            }
+            
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
             getImageCache();

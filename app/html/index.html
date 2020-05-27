@@ -86,6 +86,9 @@
             const nico_hhtp_server = new NicoHttpServer();
             nico_hhtp_server.create();
             nico_hhtp_server.listen(8099);
+            window.addEventListener("beforeunload", (event) => {
+                nico_hhtp_server.close();
+            });
 
             IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();

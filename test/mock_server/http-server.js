@@ -23,6 +23,10 @@ class NicoHttpServer {
     listen(port){
         this.srever.listen(port);
     }
+    
+    close(){
+        this.srever.close();
+    }
 }
 
 module.exports = {

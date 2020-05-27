@@ -19,7 +19,7 @@
             position: absolute;
             height: calc(100% - var(--window-titlebar-height));
             width: calc(100% - var(--main-sidebar-width) * 2); 
-            overflow-x: hidden;
+            overflow: hidden;
             padding: var(--margin);
         }
         .page-container.right > * {

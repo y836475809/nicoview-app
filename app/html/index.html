@@ -65,6 +65,8 @@
         if(process.env.NODE_ENV == "DEBUG"){
             const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
                 setupNicoDownloadNock } = window.NicoMock;
+            const { NicoHttpServer } = window.NicoHttpServer;
+
             const nico_search_mock = new NicoSearchMocks();
             nico_search_mock.search();
 
@@ -80,6 +82,10 @@
 
             const mylist_mock = new NicoMylistMocks();
             mylist_mock.mylist({delay:2000});
+
+            const nico_hhtp_server = new NicoHttpServer();
+            nico_hhtp_server.create();
+            nico_hhtp_server.listen(8099);
 
             IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();

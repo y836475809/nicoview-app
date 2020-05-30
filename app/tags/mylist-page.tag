@@ -23,31 +23,18 @@
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "mylist";
-        let hasItem = (mylist_id) => false;
+        this.items = [];
 
         this.on("mount", async () => {
             // TODO error対応
             const name = this.name;
-            const items = await IPCClient.request("bookmark", "getData", { name });
-            this.items = items;
-            this.obs_listview.trigger("loadData", { items });
-
-            hasItem = (mylist_id) => {
-                return items.some(value=>{
-                    return value.mylist_id == mylist_id;
-                });
-            };
+            this.items = await IPCClient.request("bookmark", "getData", { name });
+            this.obs_listview.trigger("loadData", { items:this.items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
             this.items = items;
-
-            hasItem = (mylist_id) => {
-                return items.some(value=>{
-                    return value.mylist_id == mylist_id;
-                });
-            };
 
             const name = this.name;
             await IPCClient.request("bookmark", "update", { name, items });
@@ -82,11 +69,6 @@
                 { title, mylist_id, creator, link }
             ];
             this.obs_listview.trigger("addList", { items });
-        });
-
-        obs.on("mylist-page:sidebar:has-item", (args) => {
-            const {mylist_id, cb} = args;
-            cb(hasItem(mylist_id));
         });
 
         obs.on("mylist-page:sidebar:get-items", (args) => {

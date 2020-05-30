@@ -151,6 +151,14 @@
             obs.trigger("changed", {items:this.items});
         };
 
+        const triggerDelete = (items) => {
+            items.map(item=>{
+                delete item.state;
+                return item;
+            });
+            obs.trigger("items-deleted", {items});
+        };
+
         obs.on("loadData", async (args) => {
             const { items } = args;
             this.items = items;
@@ -192,11 +200,16 @@
             });
 
             setTimeout(() => { 
+                const deleted_items = this.items.filter((item, index) => {
+                    return elms[index].classList.contains("selected")===true;
+                });
+
                 this.items = this.items.filter((item, index) => {
                     return elms[index].classList.contains("selected")===false;
                 });
                 this.update();
                 triggerChange();
+                triggerDelete(deleted_items);
             }, item_duration);
         });
 
@@ -298,9 +311,10 @@
             e.target.parentElement.classList.add("listview-item-hide"); 
  
             setTimeout(() => { 
-                this.items.splice(i, 1);
+                const deleted_items = this.items.splice(i, 1);
                 this.update();
                 triggerChange();
+                triggerDelete(deleted_items);
             }, item_duration);
         };
 

@@ -135,7 +135,14 @@ class NicoMylistStore {
         return this.reader.parse(xml);
     }
 
-    // TODO add delete file
+    delete(mylist_id){
+        try {
+            const file_path = this._getFilePath(mylist_id);
+            fs.unlinkSync(file_path);     
+        } catch (error) {
+            logger.debug(`NicoMylistStore: delete mylistid=${mylist_id}, ${error}`);
+        }
+    }
 
     save(mylist_id, xml){
         const path = this._getFilePath(mylist_id);
@@ -201,12 +208,6 @@ class NicoMylistImageCache {
 
     save(){
         this._map.forEach((cache_store, mylist_id) => {
-            if(this._existLocal(mylist_id) === false){
-                this._delete(mylist_id);
-            }   
-        });
-        
-        this._map.forEach((cache_store, mylist_id) => {
             try {
                 if(this._existLocal(mylist_id) === true){
                     cache_store.save();
@@ -215,6 +216,16 @@ class NicoMylistImageCache {
                 logger.debug(`NicoMylistImageCache: save mylistid=${mylist_id}, ${error}`);
             }
         });
+    }
+
+    delete(mylist_id){
+        this._map.delete(mylist_id);
+        try {
+            const file_path = path.join(this._dir_path,this._getFileName(mylist_id));
+            fs.unlinkSync(file_path);
+        } catch(error) {
+            logger.debug(`NicoMylistImageCache: delete mylistid=${mylist_id}, ${error}`);
+        }
     }
 
     _has(mylist_id, url){
@@ -253,21 +264,11 @@ class NicoMylistImageCache {
     }
 
     _createCacheStore(mylist_id){
-        return new CacheStore(this._dir_path, `mylist${mylist_id}-img.json`);
+        return new CacheStore(this._dir_path, this._getFileName(mylist_id));
     }
 
-    _delete(mylist_id){
-        if(this._has(mylist_id) === false){
-            return;
-        }
-
-        this._map.delete(mylist_id);
-        try {
-            const file_path = this._map.get(mylist_id).file_path;
-            fs.unlinkSync(file_path);
-        } catch(error) {
-            logger.debug(`NicoMylistImageCache: delete mylistid=${mylist_id}, ${error}`);
-        }
+    _getFileName(mylist_id){
+        return `mylist${mylist_id}-img.json`;
     }
 
     _existLocal(mylist_id){

@@ -72,6 +72,10 @@
             obs.trigger("mylist-page:item-dlbclicked", item);
         });
         
+        this.obs_listview.on("items-deleted", (args) => {
+            obs.trigger("mylist-page:items-deleted", args);
+        });
+
         obs.on("mylist-page:sidebar:add-item", (args) => {
             const { title, mylist_id, creator, link } = args;
             const items = [
@@ -458,7 +462,6 @@
             const elms = this.root.querySelectorAll(".mylist-img");
             elms.forEach(elm => {
                 nico_mylist_image_cache.setImage(mylist_id, elm);
-                console.log("cacheImage=", elm.src)
             });
         };
 
@@ -531,6 +534,15 @@
                     await showMessageBox("error", error.message);
                 } 
             }   
+        });
+
+        obs.on("mylist-page:items-deleted", (args)=> {
+            const { items } = args;
+            items.forEach(item => {
+                const mylist_id = item.mylist_id;
+                nico_mylist_store.delete(mylist_id);
+                nico_mylist_image_cache.delete(mylist_id);
+            }); 
         });
 
         obs.on("css-loaded", () => {

@@ -21,6 +21,7 @@
             width: calc(100% - var(--main-sidebar-width) * 2); 
             overflow: hidden;
             padding: var(--margin);
+            background-color: var(--control-color);
         }
         .page-container.right > * {
             position: absolute;
@@ -30,6 +31,7 @@
             overflow-x: hidden; 
             overflow-y: hidden; 
             padding: var(--margin);
+            background-color: var(--control-color);
         }
         .page-container.right > div {
             border: 1px solid gray;

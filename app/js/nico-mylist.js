@@ -2,6 +2,8 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
 const { NicoClientRequest } = require("./nico-client-request");
+const { CacheStore } = require("./cache-store");
+const { logger } = require("./logger");
 
 class NicoMylist {
     constructor(){
@@ -133,6 +135,8 @@ class NicoMylistStore {
         return this.reader.parse(xml);
     }
 
+    // TODO add delete file
+
     save(mylist_id, xml){
         const path = this._getFilePath(mylist_id);
         fs.writeFileSync(path, xml, "utf-8");
@@ -144,8 +148,149 @@ class NicoMylistStore {
     }
 }
 
+class NicoMylistImageCache {
+    constructor(dir_path){
+        this._dir_path = dir_path;
+
+        /** @type Map<string, CacheStore> */
+        this._map = new Map();
+        this._exist_local_id_list = [];
+    }
+
+    setExistLocalIDList(mylist_id_list){
+        this._exist_local_id_list = mylist_id_list;
+    }
+
+    getImageHtml(mylist_id, url){
+        if(this._existLocal(mylist_id)){
+            const image = new Image();
+            if(this._has(mylist_id, url)){
+                // TODO <img src="${url}" ?
+                image.src = this._map.get(mylist_id).get(url);
+            }else{
+                image.onload = (e) => {
+                    const data = this._getBase64(e.target);
+                    this._set(mylist_id, url, data);
+                };
+                image.src = url;
+            }
+            image.classList.add("gridtable-thumbnail", "mylist-img");
+            return image.outerHTML;
+        }else{
+            return `<img src="${url}" class="gridtable-thumbnail mylist-img"/>`;
+        }
+    }
+
+    setImage(mylist_id, img){
+        this.loadCache(mylist_id);
+
+        const url = img.src;
+        if(this._has(mylist_id, url) === true){
+            return;
+        }
+
+        if(img.naturalWidth > 0 && img.naturalHeight > 0){
+            if(this._map.has(mylist_id) === false){
+                const cache_store = this._createCacheStore(mylist_id);
+                this._map.set(mylist_id, cache_store);
+            }
+            const data = this._getBase64(img);
+            this._set(mylist_id, url, data);
+        }
+    }
+
+    save(){
+        this._map.forEach((cache_store, mylist_id) => {
+            if(this._existLocal(mylist_id) === false){
+                this._delete(mylist_id);
+            }   
+        });
+        
+        this._map.forEach((cache_store, mylist_id) => {
+            try {
+                if(this._existLocal(mylist_id) === true){
+                    cache_store.save();
+                }
+            } catch (error) {
+                logger.debug(`NicoMylistImageCache: save mylistid=${mylist_id}, ${error}`);
+            }
+        });
+    }
+
+    _has(mylist_id, url){
+        const has_mylist = this._map.has(mylist_id);
+        if(!url){
+            return has_mylist;
+        }
+
+        if(has_mylist === true){
+            return this._map.get(mylist_id).has(url);
+        }
+        
+        return false;
+    }
+
+    _set(mylist_id, url, data){
+        this._map.get(mylist_id).set(url, data);
+    }
+
+    loadCache(mylist_id){
+        if(this._existLocal(mylist_id) === false){
+            return;
+        }
+
+        if(this._map.has(mylist_id)===true){
+            return;
+        }
+
+        const cache_store = this._createCacheStore(mylist_id);
+        try {
+            cache_store.load();
+        } catch (error) { 
+            logger.debug(`NicoMylistImageCache: load mylistid=${mylist_id}, ${error}`);
+        }
+        this._map.set(mylist_id, cache_store);
+    }
+
+    _createCacheStore(mylist_id){
+        return new CacheStore(this._dir_path, `mylist${mylist_id}-img.json`);
+    }
+
+    _delete(mylist_id){
+        if(this._has(mylist_id) === false){
+            return;
+        }
+
+        this._map.delete(mylist_id);
+        try {
+            const file_path = this._map.get(mylist_id).file_path;
+            fs.unlinkSync(file_path);
+        } catch(error) {
+            logger.debug(`NicoMylistImageCache: delete mylistid=${mylist_id}, ${error}`);
+        }
+    }
+
+    _existLocal(mylist_id){
+        return this._exist_local_id_list.includes(mylist_id);
+    }
+
+    _getBase64(img){
+        const width = img.naturalWidth;
+        const height = img.naturalHeight;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, width, height);
+        const data = canvas.toDataURL("image/jpeg");
+        return data;
+    }
+}
+
 module.exports = {
     NicoMylist,
     NicoMylistReader,
-    NicoMylistStore
+    NicoMylistStore,
+    NicoMylistImageCache
 };

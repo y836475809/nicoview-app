@@ -29,6 +29,7 @@
             // TODO error対応
             const name = this.name;
             const items = await IPCClient.request("bookmark", "getData", { name });
+            this.items = items;
             this.obs_listview.trigger("loadData", { items });
 
             hasItem = (mylist_id) => {
@@ -40,6 +41,7 @@
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
+            this.items = items;
 
             hasItem = (mylist_id) => {
                 return items.some(value=>{
@@ -81,6 +83,11 @@
         obs.on("mylist-page:sidebar:has-item", (args) => {
             const {mylist_id, cb} = args;
             cb(hasItem(mylist_id));
+        });
+
+        obs.on("mylist-page:sidebar:get-items", (args) => {
+            const { cb } = args;
+            cb({items:this.items});
         });
     </script>
 </mylist-sidebar>
@@ -180,8 +187,7 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
-        const { NicoMylist, NicoMylistStore } = window.NicoMylist;
-        const { CacheStore } = window.CacheStore;
+        const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox, showMessageBox } = window.RemoteDailog;
@@ -215,58 +221,29 @@
             grid_table.updateCells(video_id, { saved:false });
         });
  
-
         this.mylist_description = "";
 
-        let image_cache = null;
+        let nico_mylist_image_cache = null;
         let nico_mylist_store = null;
         let nico_mylist = null;
 
-        let is_local_item = false;
-
-        const hasLocalItem = () => {
-            const mylist_id = getMylistID();
+        const getMylistIDList = () => {
             return new Promise( (resolve, reject) => {
-                const cb = (has) =>{
-                    resolve(has);
+                const cb = (args) =>{
+                    const { items } = args;
+                    const mylist_id_list = items.map(item => {
+                        return item.mylist_id;
+                    });
+                    resolve(mylist_id_list);
                 };
-                obs.trigger("mylist-page:sidebar:has-item", {mylist_id, cb});
-            });
-        };
-
-        const getBase64 = (img, width, height) => {
-            const canvas = document.createElement("canvas");
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext("2d");
-            // ctx.drawImage(img, 0, 0);
-            ctx.drawImage(img, 0, 0, width, height);
-            const data = canvas.toDataURL("image/jpeg");
-            return data;
+                obs.trigger("mylist-page:sidebar:get-items", { cb });
+            }); 
         };
 
         const imageCacheFormatter = (row, cell, value, columnDef, dataContext)=> {
-            if(is_local_item){
-                const image = new Image();
-                if(image_cache.has(value)){
-                    image.src = image_cache.get(value);    
-                }else{
-                    image.onload = (e) => {
-                        const org_width = e.target.width;
-                        const org_height = e.target.height;
-                        const width = 130;
-                        const height = org_height * (width / org_width);
-                        const data = getBase64(e.target, width, height);
-                        image_cache.set(value, data);     
-                    };
-                    image.src = value;
-                }
-                image.classList.add("gridtable-thumbnail", "mylist-img");
-                return image.outerHTML;
-            }else{
-                return `<img src="${value}" 
-                    class="gridtable-thumbnail mylist-img"/>`;
-            }
+            const mylist_id = dataContext.mylist_id;
+            const url = value;
+            return nico_mylist_image_cache.getImageHtml(mylist_id, url);
         };
 
         const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -380,8 +357,8 @@
 
         this.on("mount", async () => {
             const mylist_dir = path.join(await IPCClient.request("config", "get", { key:"data_dir", value:"" }), "mylist");
-            image_cache = new CacheStore(mylist_dir, "image-cache.json");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
+            nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
             grid_table.init(".mylist-grid");
             grid_table.setupResizer(".mylist-grid-container");
@@ -414,13 +391,7 @@
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 }
-            });
-            
-            try {
-                image_cache.load();
-            } catch (error) {
-                logger.error(error);
-            }   
+            });   
         });
 
         const getMylistID = () => {
@@ -433,21 +404,26 @@
             elm.value = id;
         };
 
-        const setMylist = (mylist) => {
+        const setMylist = async (mylist) => {
             this.mylist_description = mylist.description;
             this.update();
 
-            const items = mylist.items;
-            setData(items);
+            const mylist_id_list = await getMylistIDList();
+            nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
+            nico_mylist_image_cache.loadCache(mylist.mylist_id);
+
+            setData(mylist);
         };
 
-        const setData = async (mylist_items) => {
+        const setData = async (mylist) => {
+            const mylist_items = mylist.items;
             const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
                 item.saved = await IPCClient.request("library", "existItem", {video_id});
-                item.reg_download = video_ids.includes(video_id);     
+                item.reg_download = video_ids.includes(video_id);  
+                item.mylist_id = mylist.mylist_id;
             }
             grid_table.clearSelected();
             grid_table.setData(mylist_items);
@@ -457,7 +433,7 @@
         const updateMylist = async(mylist_id) => {
             nico_mylist = new NicoMylist();
             const mylist = await nico_mylist.getMylist(mylist_id);
-            setMylist(mylist);
+            await setMylist(mylist);
         };
 
         const addMylist = (mylist) => {
@@ -478,12 +454,11 @@
             nico_mylist_store.save(mylist_id, nico_mylist.xml);
         };
 
-        const getImageCache = () => {
+        const cacheImage = (mylist_id) => {
             const elms = this.root.querySelectorAll(".mylist-img");
             elms.forEach(elm => {
-                const src = elm.src;
-                const data = getBase64(elm);
-                image_cache.set(src, data);
+                nico_mylist_image_cache.setImage(mylist_id, elm);
+                console.log("cacheImage=", elm.src)
             });
         };
 
@@ -503,10 +478,11 @@
             });
             
             try {
-                is_local_item = await hasLocalItem();
                 const mylist_id = getMylistID();
                 await updateMylist(mylist_id);
-                if(is_local_item){
+
+                const mylist_id_list = await getMylistIDList();
+                if(mylist_id_list.includes(mylist_id)){
                     nico_mylist_store.save(mylist_id, nico_mylist.xml);
                 }
             } catch (error) {
@@ -528,17 +504,15 @@
 
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
-            getImageCache();
+            cacheImage(mylist.mylist_id);
         };
 
         obs.on("mylist-page:item-dlbclicked", async (item) => {
-            is_local_item = true;
-
             try {
                 const mylist_id = item.mylist_id;
                 const mylist = nico_mylist_store.load(mylist_id);
                 setMylistID(mylist_id);
-                setMylist(mylist); 
+                await setMylist(mylist); 
             } catch (error) {
                 logger.error(error);
                 await showMessageBox("error", error.message);
@@ -563,9 +537,11 @@
             grid_table.resizeGrid();
         });
 
-        window.onbeforeunload = (e) => {
-            image_cache.save();
-        };
+        window.addEventListener("beforeunload", async (event) => {
+            const mylist_id_list = await getMylistIDList();
+            nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
+            nico_mylist_image_cache.save();
+        });
     </script>
 </mylist-content>
 

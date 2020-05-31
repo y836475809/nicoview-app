@@ -51,7 +51,7 @@
 
         .title-wraper {
             padding: 5px 0 5px 0;
-            width: calc(100% - var(--icon-size) - 25px);
+            width: calc(100% - var(--icon-size) - 5px);
             height: 100%;
         }
         .title-wraper > i {

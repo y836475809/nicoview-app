@@ -10,7 +10,8 @@
     <div class="nico-mylist-sidebar">
         <listview 
             obs={obs_listview}
-            name={name}>
+            name={name}
+            confirm={confirm}>
         </listview>
     </div>
 
@@ -24,6 +25,7 @@
         this.obs_listview = riot.observable();
         this.name = "mylist";
         this.items = [];
+        this.confirm = ["delete"];
 
         this.on("mount", async () => {
             // TODO error対応

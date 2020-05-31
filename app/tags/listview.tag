@@ -132,6 +132,7 @@
 
     <script>
         const Sortable = window.Sortable;
+        const { showOKCancelBox } = window.RemoteDailog;
         let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;
@@ -142,6 +143,7 @@
                 return item.title;
             };
         }
+        const confirm = !this.opts.confirm?[]:this.opts.confirm;
 
         const triggerChange = () => {
             this.items.map(item=>{
@@ -157,6 +159,15 @@
                 return item;
             });
             obs.trigger("items-deleted", {items});
+        };
+
+        const deleteConfirm = async () => {
+            if(confirm.includes("delete") === false){
+                return true;
+            }
+
+            const result = await showOKCancelBox("info", "削除しますか?");
+            return result===0;
         };
 
         obs.on("loadData", async (args) => {
@@ -190,7 +201,10 @@
             }, 50);
         });
 
-        obs.on("deleteList", () => {
+        obs.on("deleteList", async () => {
+            if(await deleteConfirm() === false){
+                return;
+            }
             const elms = this.root.querySelectorAll(".listview-item");
 
             elms.forEach(elm => {
@@ -307,7 +321,11 @@
             setSelected(e.target.parentElement, item);
         };
 
-        this.onclickDelete = (i, e) => {
+        this.onclickDelete = async (i, e) => {
+            if(await deleteConfirm() === false){
+                return;
+            }
+
             e.target.parentElement.classList.add("listview-item-hide"); 
  
             setTimeout(() => { 

@@ -4,7 +4,7 @@
             --input-height: 30px;
             --item-height: 30px;
             --item-duration: 300ms;
-            --icon-size: 12px;
+            --icon-size: 15px;
         }
 
         .listview-list {
@@ -79,7 +79,7 @@
             color: gray;
             pointer-events: none;
         }
-        .delete-button > i:hover {
+        .delete-button:hover > i {
             color: black;
         }
 

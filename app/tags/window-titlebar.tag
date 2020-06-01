@@ -2,9 +2,10 @@
     <style scoped>
         :scope {
             display: flex;
-            background-color: #303030;
             width: 100%;
-            height: var(--window-titlebar-height);
+            height: calc(var(--window-titlebar-height) - 1px);
+            border-bottom: 1px solid var(--control-border-color);
+            background-color: var(--control-color);
         }
 
         .menu {
@@ -20,9 +21,10 @@
             -webkit-app-region: drag;
             user-select: none;
             width: 100%;
+            margin-left: 10px;
             margin-top: 3px;
             margin-bottom: 3px;
-            color: white;
+            color: black;
             text-overflow: ellipsis;
             white-space: nowrap;
             overflow: hidden;
@@ -41,7 +43,7 @@
             color: grey;
         }
         .buttons > div:hover { 
-            background-color: #404040;
+            background-color: lightgray;
         }
         .buttons .close:hover { 
             background-color: red;
@@ -51,7 +53,7 @@
     <div class="menu center-hv" title="メニュー" onclick={onclickMenu}>
         <i class="fas fa-bars"></i>
     </div>
-    <div class="center-hv title">{title}</div>
+    <div class="center-v title">{title}</div>
     <div class="buttons" >
         <div class="center-hv" title="" onclick={onclickMin}>
             <i class="far fa-window-minimize"></i>

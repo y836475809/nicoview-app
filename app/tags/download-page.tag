@@ -10,8 +10,11 @@
         .download-button { 
             width: 80px;
             height: 30px;
-            margin-right: 5px;
             cursor: pointer;
+        }
+
+        .download-button.start { 
+            margin-right: 5px;
         }
 
         .download-button.clear {
@@ -51,8 +54,8 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button" disabled={dl_disabled} onclick={onclickStartDownload}>開始</button>
-        <button class="download-button" onclick={onclickStopDownload}>停止</button>
+        <button class="download-button start" disabled={dl_disabled} onclick={onclickStartDownload}>開始</button>
+        <button class="download-button stop" onclick={onclickStopDownload}>停止</button>
         <button class="download-button clear" title="ダウンロード済みをクリア" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container">
             <div class="label center-hv">{download_schedule_label}</div>

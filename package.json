@@ -43,7 +43,8 @@
     },
     "files": [
       "./main.js",
-      "./app/**/*"
+      "./app/**/*",
+      "./icon/**/*"
     ],
     "extraResources": [
       {
@@ -52,6 +53,7 @@
       }
     ],
     "win": {
+      "icon": "./icon/icon.png",
       "target": "zip"
     }
   },

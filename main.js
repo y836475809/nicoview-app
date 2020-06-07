@@ -42,6 +42,14 @@ const config_fiiename = cmdline_parser.get("--config", "config.json");
 const is_debug = cmdline_parser.get("--debug", false);
 if(is_debug===true){
     process.env.NODE_ENV = "DEBUG";
+
+    const port = parseInt(cmdline_parser.get("--mock_server_port", null));
+    if(isNaN(port) === false){
+        process.env.MOCK_SERVER_PORT = port;
+        app.commandLine.appendSwitch("proxy-server", `http://localhost:${port}`);
+    }else{
+        console.log(`can't use local proxy, MOCK_PORT is ${port}`);
+    }
 }
 const window_frame = main_html != "app/html/index.html";
 

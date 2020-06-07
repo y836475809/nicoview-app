@@ -83,12 +83,18 @@
             const mylist_mock = new NicoMylistMocks();
             mylist_mock.mylist({delay:2000});
 
-            const nico_hhtp_server = new NicoHttpServer();
-            nico_hhtp_server.create();
-            nico_hhtp_server.listen(8099);
-            window.addEventListener("beforeunload", (event) => {
-                nico_hhtp_server.close();
-            });
+            const port = process.env.MOCK_SERVER_PORT;
+            const nico_http_server = new NicoHttpServer();
+            if(port){
+                console.log(`start mock server port=${port}`);
+                
+                nico_http_server.create();
+                nico_http_server.listen(port);
+
+                window.addEventListener("beforeunload", (event) => {
+                    nico_http_server.close();
+                });
+            }
 
             IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();

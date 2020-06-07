@@ -4,10 +4,10 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "test-main": "electron . --debug",
+    "test-main": "electron . --debug --mock_server_port 8098",
     "test-search": "electron . --debug --main test/test-search.html --config config-debug.json",
     "test-setting": "electron . --debug --main test/test-setting.html --config config-debug.json",
-    "test-mylist": "electron . --debug --main test/test-mylist.html --config config-debug.json",
+    "test-mylist": "electron . --debug --mock_server_port 8098 --main test/test-mylist.html --config config-debug.json",
     "test-nicoscript": "electron . --debug --main test/test-nicoscript.html --config config-debug.json",
     "test-tween": "electron . --debug --main test/test-tween.html --config config-debug.json",
     "main": "electron .",

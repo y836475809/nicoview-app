@@ -10,7 +10,7 @@ process.once("loaded", () => {
     global.logger = require(`${root_dir}/app/js/logger`);
 
     if (process.env.NODE_ENV == "DEBUG") {
-        global.NicoHttpServer = require(`${root_dir}/test/mock_server/http-server`);
+        global.NicoMockServer = require(`${root_dir}/test/mock_server/nico-mock-server`);
         global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
         global.TestComments = require(`${root_dir}/test/test-comments`);
         global.SetupLibrary = require(`${root_dir}/test/setup-library`);

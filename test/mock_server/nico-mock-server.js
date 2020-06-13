@@ -9,7 +9,7 @@ const options = {
     cert: fs.readFileSync(path.join(__dirname, "orecert.pem"))
 };
 
-class NicoHttpServer {
+class NicoMockServer {
     create(){ 
         this.nico_mock_res = new NicoMockResponse();
         this.srever = https.createServer(options, (req, res) => {
@@ -94,5 +94,5 @@ class NicoHttpServer {
 }
 
 module.exports = {
-    NicoHttpServer,
+    NicoMockServer,
 };

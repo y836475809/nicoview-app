@@ -22,14 +22,14 @@
 <script>
     /* globals riot */
     const { setupLibrary } = window.SetupLibrary;
-    const { NicoHttpServer } = window.NicoHttpServer;
+    const { NicoMockServer } = window.NicoMockServer;
     var { logger } = window.logger; // eslint-disable-line
 
     const obs = riot.observable();    // eslint-disable-line
-    
-    const nico_hhtp_server = new NicoHttpServer();
-    nico_hhtp_server.create();
-    nico_hhtp_server.listen();
+
+    const nico_mock_server = new NicoMockServer();
+    nico_mock_server.create();
+    nico_mock_server.listen();
 
     setupLibrary(()=>{
         riot.mount("mylist-page", {obs});

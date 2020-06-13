@@ -63,13 +63,13 @@
         };
 
         if(process.env.NODE_ENV == "DEBUG"){
-            const { NicoHttpServer } = window.NicoHttpServer;
+            const { NicoMockServer } = window.NicoMockServer;
             
-            const nico_http_server = new NicoHttpServer();
-            nico_http_server.create();
-            nico_http_server.listen();
+            const nico_mock_server = new NicoMockServer();
+            nico_mock_server.create();
+            nico_mock_server.listen();
             window.addEventListener("beforeunload", (event) => {
-                nico_http_server.close();
+                nico_mock_server.close();
             });
 
             IPCClient.request("config", "set", 

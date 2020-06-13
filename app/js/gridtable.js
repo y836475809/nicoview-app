@@ -4,6 +4,7 @@ require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
 const time_format = require("./time-format");
+const { IPCClient } = require("./ipc-client-server");
 
 /* globals $ Slick */
 
@@ -300,50 +301,53 @@ class GridTable {
     }
 
     _saveState(){
-        if(this.options._saveColumnWidth){
-            const width_state = {};
-            const columns = this.grid.getColumns();
-            columns.forEach(val=>{
-                width_state[val.id] = val.width;
-            });
-            localStorage.setItem(`${this.name}/columns/width`, JSON.stringify(width_state));
+        const width_state = {};
+        const columns = this.grid.getColumns();
+        columns.forEach(val=>{
+            width_state[val.id] = val.width;
+        });
+
+        const sort_state = {};
+        const sort = this.grid.getSortColumns();
+        if(sort.length>0){
+            sort_state["id"] = sort[0].columnId;
+            sort_state["sort_asc"] = sort[0].sortAsc;
         }
 
-        if(this.options._saveSort){
-            const sort = this.grid.getSortColumns();
-            if(sort.length>0){
-                const sort_state = { 
-                    id: sort[0].columnId, 
-                    sort_asc: sort[0].sortAsc 
-                };
-                localStorage.setItem(`${this.name}/columns/sort`, JSON.stringify(sort_state));
-            }
-        }
+        IPCClient.request("config", "set", { 
+            key:`gridtable.${this.name}.columns`, 
+            value:{
+                width: width_state,
+                sort: sort_state
+            } 
+        }).then();
     }
 
     _loadState(){
-        if(this.options._saveColumnWidth){
-            const width_value = localStorage.getItem(`${this.name}/columns/width`);
-            if(width_value){
-                const width_state = JSON.parse(width_value);
+        IPCClient.request("config", "get", { 
+            key:`gridtable.${this.name}.columns`, 
+            value:{
+                width: null,
+                sort: null
+            } 
+        }).then((value)=>{
+            if(value.width){
                 const columns = this.grid.getColumns();
                 columns.forEach(val=>{
                     const column_id = val.id;
-                    const width = width_state[column_id];
+                    const width = value.width[column_id];
                     val.width = width ? width : 80;
                 });
                 this.grid.setColumns(columns);
+            } 
+            if(value.sort){
+                const { id, sort_asc } = value.sort;
+                if(id){
+                    this.grid.setSortColumn(id, sort_asc); 
+                    this.dataView.fastSort(id, sort_asc); 
+                }
             }
-        }
-
-        if(this.options._saveSort){
-            const sort_value = localStorage.getItem(`${this.name}/columns/sort`);
-            if(sort_value){
-                const sort_state = JSON.parse(sort_value);
-                this.grid.setSortColumn(sort_state.id, sort_state.sort_asc); 
-                this.dataView.fastSort(sort_state.id, sort_state.sort_asc); 
-            }
-        }
+        });
     }
 }
 

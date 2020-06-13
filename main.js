@@ -45,10 +45,15 @@ if(is_debug===true){
 
     const port = parseInt(cmdline_parser.get("--mock_server_port", null));
     if(isNaN(port) === false){
-        process.env.MOCK_SERVER_PORT = port;
-        app.commandLine.appendSwitch("proxy-server", `http://localhost:${port}`);
+        process.env["mock_server_port"] = port;
+        app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
+        app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
+        app.commandLine.appendSwitch("ignore-certificate-errors", "true");
+        app.commandLine.appendSwitch("allow-insecure-localhost", "true");
+        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+        process.env["proxy_server"] = app.commandLine.getSwitchValue("proxy-server");
     }else{
-        console.log(`can't use local proxy, MOCK_PORT is ${port}`);
+        console.log(`can't use local proxy, mock_server_port is ${port}`);
     }
 }
 const window_frame = main_html != "app/html/index.html";

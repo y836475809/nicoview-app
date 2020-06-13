@@ -409,9 +409,6 @@
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
-                if(process.env.NODE_ENV == "DEBUG"){
-                    item.thumb_img = item.thumb_img.replace("https://", "http://");
-                }
                 item.saved = await IPCClient.request("library", "existItem", {video_id});
                 item.reg_download = video_ids.includes(video_id);  
                 item.mylist_id = mylist.mylist_id;

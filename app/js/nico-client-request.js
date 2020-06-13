@@ -1,5 +1,6 @@
 const https = require("https");
 
+const proxy_server = process.env["proxy_server"];
 const timeout_msec = 120*1000;
 
 const getValue = (headers, key) => {
@@ -145,6 +146,16 @@ class NicoClientRequest {
     }
 
     _getOptions(url, method){
+        if(proxy_server){
+            const proxy_url = new URL(proxy_server);
+            return {
+                hostname: proxy_url.hostname,
+                port: proxy_url.port,
+                path: url,
+                method: method,
+            }; 
+        }
+
         const _url = new URL(url);
         return {
             hostname: _url.hostname,

@@ -292,9 +292,6 @@
             const { user_nickname, user_icon_url, description } = args;
             this.user_nickname = user_nickname;
             this.user_icon_url = user_icon_url;
-            if(process.env.NODE_ENV == "DEBUG"){
-                this.user_icon_url = user_icon_url.replace("https://", "http://");
-            }
             setDescription(description);
 
             this.update();

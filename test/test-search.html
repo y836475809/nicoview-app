@@ -24,15 +24,16 @@
 <script>
     /* globals riot */
     const { setupLibrary } = window.SetupLibrary;
-    const { NicoSearchMocks } = window.NicoMock;
+    const { NicoHttpServer } = window.NicoHttpServer;
     var { logger } = window.logger; // eslint-disable-line
     
     const obs = riot.observable();  // eslint-disable-line
 
-    setupLibrary(()=>{
-        const nico_search_mock = new NicoSearchMocks();
-        nico_search_mock.search();
+    const nico_hhtp_server = new NicoHttpServer();
+    nico_hhtp_server.create();
+    nico_hhtp_server.listen();
 
+    setupLibrary(()=>{
         riot.mount("search-page", {obs});
     });
 </script>

@@ -7,10 +7,6 @@ process.once("loaded", () => {
     global.EventEmitter = require("events");
     global.IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
     global.logger = require(`${root_dir}/app/js/logger`);
-
-    if (process.env.NODE_ENV == "DEBUG") {
-        global.NicoMock = require(`${root_dir}/test/mock_server/nico-mock`);
-    }
 });
 
 window.addEventListener( "error", async e => {

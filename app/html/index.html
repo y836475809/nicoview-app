@@ -63,47 +63,17 @@
         };
 
         if(process.env.NODE_ENV == "DEBUG"){
-            const { NicoSearchMocks, NicoDownLoadMocks, NicoMylistMocks,
-                setupNicoDownloadNock } = window.NicoMock;
             const { NicoHttpServer } = window.NicoHttpServer;
-
-            const nico_search_mock = new NicoSearchMocks();
-            nico_search_mock.search();
-
-            const video_fs = [];
-            const lowq_set = new Set(["sm40"]);
-            const smile_set = new Set(["sm20"]);
-            const ids = ["sm10", "sm20", "sm30", "sm40", "sm50"];
-            ids.forEach(id => {
-                const dl_nock = new NicoDownLoadMocks(id, lowq_set, smile_set);
-                setupNicoDownloadNock(dl_nock, { comment_delay:3000 });
-                video_fs.push(dl_nock);
-            });
-
-            const mylist_mock = new NicoMylistMocks();
-            mylist_mock.mylist({delay:2000});
-
-            const port = process.env.MOCK_SERVER_PORT;
+            
             const nico_http_server = new NicoHttpServer();
-            if(port){
-                console.log(`start mock server port=${port}`);
-                
-                nico_http_server.create();
-                nico_http_server.listen(port);
-
-                window.addEventListener("beforeunload", (event) => {
-                    nico_http_server.close();
-                });
-            }
+            nico_http_server.create();
+            nico_http_server.listen();
+            window.addEventListener("beforeunload", (event) => {
+                nico_http_server.close();
+            });
 
             IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();
-
-            obs.on("main-page:cancel-download", () => {
-                video_fs.forEach(value => {
-                    value.closeStream();
-                });
-            });
         }
 
         riot.mount("window-titlebar", {

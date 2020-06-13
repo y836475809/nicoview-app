@@ -32,7 +32,7 @@
     <script type="riot/tag" src="../tags/window-titlebar.tag"></script>
     <script>
         /* globals riot */
-        const { ipcRenderer } = window.electron;
+        const { ipcRenderer, remote } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
         var { logger } = window.logger; // eslint-disable-line
@@ -77,7 +77,9 @@
         }
 
         riot.mount("window-titlebar", {
-            obs:obs, title:"test", window_name:"main"
+            obs:obs, 
+            title:`${remote.app.name} ${remote.app.getVersion()}`, 
+            window_name:"main"
         });
     </script>
 </html>

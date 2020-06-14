@@ -15,25 +15,48 @@ class LibraryIPCServer extends IPCServer {
 
     getItem(args){
         const { video_id } = args;
+
+        if(!this.library_db){
+            return null;
+        }
+
         return this.library_db.find(video_id);
     }
 
     getItems(){
+        if(!this.library_db){
+            return [];
+        }
+
         return this.library_db.findAll();
     }
 
     existItem(args){
         const { video_id } = args;
+
+        if(!this.library_db){
+            return false;
+        }
+
         return this.library_db.exist(video_id);
     }
 
     async update(args){
         const { video_id, props } = args;
+
+        if(!this.library_db){
+            return;
+        }
+
         await this.library_db.update(video_id, props);
         this.emit("libraryItemUpdated", {video_id, props});
     }
 
     async save(force=true){
+        if(!this.library_db){
+            return;
+        }
+
         await this.library_db.save(force);
     }
 
@@ -56,6 +79,11 @@ class LibraryIPCServer extends IPCServer {
 
     async addDownloadedItem(args){
         const { download_item } = args;
+
+        if(!this.library_db){
+            return;
+        }
+
         const video_item = Object.assign({}, download_item);
         video_item.common_filename = download_item.video_name;
         video_item.creation_date = new Date().getTime();
@@ -68,12 +96,22 @@ class LibraryIPCServer extends IPCServer {
     
     async addItem(args){
         const { item } = args;
+
+        if(!this.library_db){
+            return;
+        }
+
         await this.library_db.insert(item.dirpath, item);
         this.emit("libraryItemAdded", { video_item : item });
     }
     
     async delete(args){
         const { video_id } = args;
+
+        if(!this.library_db){
+            return;
+        }
+        
         await this.library_db.delete(video_id);
         this.emit("libraryItemDeleted", { video_id });
     }

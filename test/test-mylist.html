@@ -21,7 +21,6 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
-    const { setupLibrary } = window.SetupLibrary;
     const { NicoMockServer } = window.NicoMockServer;
     var { logger } = window.logger; // eslint-disable-line
 
@@ -31,9 +30,7 @@
     nico_mock_server.create();
     nico_mock_server.listen();
 
-    setupLibrary(()=>{
-        riot.mount("mylist-page", {obs});
-    });
+    riot.mount("mylist-page", {obs});
 </script>
 
 </html>

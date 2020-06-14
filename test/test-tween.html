@@ -39,6 +39,7 @@
             margin-right: 30px;
         }   
     </style>
+    <script src="./test-comments.js"></script>
 </head>
 
 <body>
@@ -62,13 +63,8 @@
 </body>
 
 <script>
-    const { setupLibrary } = window.SetupLibrary;
     const { CommentTimeLine } = window.CommentTimeLine;
-    const { randomComments, sampleComments, 
-        fixedSampleComments, randomfixedComments } = window.TestComments;  
     var { logger } = window.logger; // eslint-disable-line
-
-    setupLibrary(()=>{});
 
     const duration_sec = 4;
     let commnet_tl = null;

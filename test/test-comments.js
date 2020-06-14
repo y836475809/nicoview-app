@@ -1,15 +1,15 @@
 
-let getRandom = (min, max)=>{
+const _getRandom = (min, max)=>{
     return Math.floor(Math.random() * (max-min+1) + min);
 };
 
-let randomText = (min, max)=>{
+const _randomText = (min, max)=>{
     const s = "abcdefghijklmnopqrstuvwxyz0123456789()!?^あいうえおかきくけこさしすせそー";
     
     let cm = "";
-    const cm_len = getRandom(min, max);
+    const cm_len = _getRandom(min, max);
     for (let index = 0; index < cm_len; index++) {
-        cm += s[getRandom(0, s.length-1)];
+        cm += s[_getRandom(0, s.length-1)];
     }
 
     return cm;
@@ -21,11 +21,11 @@ const randomComments = (cm_num, interval_ms) => {
     const text_max = 30;
 
     let cms = [];
-    cms.push({ no: 1, vpos: 0, content: randomText(1, text_max), mail:"" });
+    cms.push({ no: 1, vpos: 0, content: _randomText(1, text_max), mail:"" });
 
     for (let index = 1; index < cm_num; index++) {
-        const text = randomText(1, text_max);
-        const interval = getRandom(interval_min, interval_max);
+        const text = _randomText(1, text_max);
+        const interval = _getRandom(interval_min, interval_max);
         const vpos = cms[cms.length-1].vpos + interval;
         cms.push({ no: index+1, vpos: vpos, content: text, mail:"" });
     }
@@ -72,22 +72,15 @@ const randomfixedComments = (cm_num, interval_ms) => {
     const text_max = 30;
 
     let cms = [];
-    cms.push({ no: 1, vpos: 0, content: randomText(1, text_max), mail:"ue" });
+    cms.push({ no: 1, vpos: 0, content: _randomText(1, text_max), mail:"ue" });
 
     for (let index = 1; index < cm_num; index++) {
-        const text = randomText(1, text_max);
-        const interval = getRandom(interval_min, interval_max);
+        const text = _randomText(1, text_max);
+        const interval = _getRandom(interval_min, interval_max);
         const vpos = cms[cms.length-1].vpos + interval;
-        const pos = getRandom(0, 1) < 0.5?"ue":"shita";
+        const pos = _getRandom(0, 1) < 0.5?"ue":"shita";
         cms.push({ no: index+1, vpos: vpos, content: text, mail:pos });
     }
 
     return cms;
-};
-
-module.exports = {
-    randomComments,
-    sampleComments,
-    fixedSampleComments,
-    randomfixedComments
 };

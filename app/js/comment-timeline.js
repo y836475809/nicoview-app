@@ -1,4 +1,4 @@
-const { TweenMax, TimelineMax } = require("gsap");
+const { gsap } = require("gsap/dist/gsap");
 const { FlowComment } = require("./flow-comment");
 const { FixedComment } = require("./fixed-comment");
 
@@ -238,7 +238,7 @@ class CommentTimeLine {
     }
 
     setFPS(fps){
-        TweenMax.ticker.fps(fps);
+        gsap.ticker.fps(fps);
     }
 
     /**
@@ -249,15 +249,16 @@ class CommentTimeLine {
         this._createCanvas();
         this.clear();
 
-        this.timeLine = new TimelineMax(
-            { 
+        this.timeLine = gsap.timeline(
+            {
                 onComplete:()=>{
                     this._ended = true;
                     this.pause();
                     this._on_complete();
                 },
                 paused: true 
-            });
+            }
+        );
         
         const [flow_comments,
             fixed_top_comments,
@@ -287,17 +288,18 @@ class CommentTimeLine {
     _createFlowTweenMax(params){
         params.forEach((param)=>{
             const { elm, left, delay } = param; 
-            const id = elm.id;
+
+            const id = elm.id;                     
             this.timeLine.add(
-                TweenMax.to(`#${id}`, this.duration_sec, {
+                gsap.to(`#${id}`, {
+                    duration: this.duration_sec,
                     x: left,
                     display : "block",
-                    ease: Linear.easeNone,
+                    ease: "none",
+                    onComplete:()=>{
+                        gsap.set(`#${id}`, {display : "none"});
+                    }
                 }), delay);
-            this.timeLine.add(
-                TweenMax.to(`#${id}`, 0.001, {
-                    display : "none"
-                }), delay + this.duration_sec);
         });
     }
 
@@ -327,17 +329,17 @@ class CommentTimeLine {
     _createFixedTweenMax(params){
         params.forEach((param)=>{
             const { elm, delay, duration } = param; 
+
             const id = elm.id;
             this.timeLine.add(
-                TweenMax.to(`#${id}`, duration, {
+                gsap.to(`#${id}`, {
+                    duration: duration,
                     alpha: 1, 
                     display : "block",
-                }), delay);
-            this.timeLine.add(
-                TweenMax.to(`#${id}`, 0.001 , {
-                    alpha: 0, 
-                    display : "none"
-                }), delay + duration);
+                    onComplete:()=>{
+                        gsap.set(`#${id}`, {display : "none"});
+                    }
+                }) ,delay );
         });
     }
 

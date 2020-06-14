@@ -249,7 +249,9 @@ function createWindow() {
         }
 
         // devtools閉じて終了
-        main_win.webContents.closeDevTools();
+        if(main_win){
+            main_win.webContents.closeDevTools();
+        }
     });
 
     // ウィンドウが閉じられた時に発行される
@@ -623,7 +625,9 @@ const createPlayerWindow = () => {
         player_win.loadURL(player_html_path);
 
         player_win.on("close", e => {
-            player_win.webContents.closeDevTools();
+            if(player_win){
+                player_win.webContents.closeDevTools();
+            }
         });
     });  
 };

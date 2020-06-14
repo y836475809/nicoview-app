@@ -226,8 +226,9 @@ function createWindow() {
                 buttons: ["OK", "Cancel"],
                 message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
             });
-            if(ret==0){
-                // OK, 終了する
+            if(ret!=0){
+                // cancel, 終了しない
+                e.preventDefault();
                 return;
             }
         }
@@ -240,14 +241,15 @@ function createWindow() {
                 buttons: ["OK", "Cancel"],
                 message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
             });
-            if(ret==0){
-                // OK, 終了する
+            if(ret!=0){
+                // cancel, 終了しない
+                e.preventDefault();
                 return;
             }
         }
 
-        // 終了しない
-        e.preventDefault();
+        // devtools閉じて終了
+        main_win.webContents.closeDevTools();
     });
 
     // ウィンドウが閉じられた時に発行される
@@ -619,5 +621,9 @@ const createPlayerWindow = () => {
         });
 
         player_win.loadURL(player_html_path);
+
+        player_win.on("close", e => {
+            player_win.webContents.closeDevTools();
+        });
     });  
 };

@@ -1,5 +1,5 @@
 {
-  "name": "riot_test",
+  "name": "nicoview-app",
   "version": "0.0.0",
   "description": "",
   "main": "main.js",
@@ -37,7 +37,7 @@
     "sql.js": "^0.5.0"
   },
   "build": {
-    "appId": "com.y836475809.riot_test",
+    "appId": "y836475809.app.nicoview-app",
     "directories": {
       "output": "./build"
     },

@@ -4,7 +4,7 @@
             --video-container-height: 100px;
             --video-controls-container-height: 30px;
             --user-container-height: 130px;
-            --comment-controls-container-height: 30px;
+            --comment-controls-container-height: 35px;
             overflow-x: hidden;
             overflow-y: hidden;
         }    
@@ -50,17 +50,11 @@
             width: 100%;
         } 
 
-        .comments-container {
-            height: calc(100% 
-                - var(--video-container-height) - var(--video-controls-container-height)
-                - var(--user-container-height));
-            background-color: var(--control-color);
-        }
-        .comments-controls-container {
+        .controls-container {
             height: var(--comment-controls-container-height);
             display: flex;
         }
-        .comments-controls-container > label {
+        .controls-container > label {
             user-select: none;
         }
         .comment-checkbox {
@@ -72,7 +66,10 @@
         }
         .comment-grid-container {
             width: 100%;
-            height: calc(100% - var(--comment-controls-container-height));
+            height: calc(100% 
+                - var(--video-container-height) - var(--video-controls-container-height)
+                - var(--user-container-height) - var(--comment-controls-container-height));
+            background-color: var(--control-color);
         }
 
         .icon {
@@ -95,7 +92,8 @@
             margin-left: 5px;
             cursor: pointer;
         }
-        .icon-button.move-right {
+        .move-right {
+            display: flex;
             margin-left: auto;
             margin-right: 5px;
         }
@@ -138,32 +136,30 @@
                     </div>
                 </div>
             </div>
-            <div class="video-controls-container">
-                <div title="動画情報更新" class="icon-button center-v move-right">
+        </div>
+        <div class="user-container">
+            <player-user obs={opts.obs}></player-user>
+        </div>
+        <div class="controls-container">
+            <input class="comment-checkbox sync-comment" type="checkbox" 
+                onclick={onclickSyncCommentCheck} />
+                <label class="center-v" title="コメントリストのスクロールと再生を同期させる">同期</label>
+            <input class="comment-checkbox comment-visible" type="checkbox" 
+                onclick={onclickCommentVisibleCheck} />
+                <label class="center-v" title="コメントの表示/非表示">表示</label>
+            <div title="コメント設定" class="icon-button center-hv">                      
+                <span class="icon fas fa-cog" onclick={onclickShowCommentSetting}></span> 
+            </div>
+            <div class="move-right">
+                <div title="動画情報更新" class="icon-button center-v">
                     <span class="icon center-hv fa-stack" 
                         data-state={String(enableUpdateData())} 
                         onclick={onclickUpdateThumbInfo}>
                         <i class="icon-layer1 fas fa-info fa-stack-1x"></i>
                         <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
                     </span>
-                </div>
-            </div> 
-        </div>
-        <div class="user-container">
-            <player-user obs={opts.obs}></player-user>
-        </div>
-        <div class="comments-container">
-            <div class="comments-controls-container">
-                <input class="comment-checkbox sync-comment" type="checkbox" 
-                    onclick={onclickSyncCommentCheck} />
-                    <label class="center-v" title="コメントリストのスクロールと再生を同期させる">同期</label>
-                <input class="comment-checkbox comment-visible" type="checkbox" 
-                    onclick={onclickCommentVisibleCheck} />
-                    <label class="center-v" title="コメントの表示/非表示">表示</label>
-                <div title="コメント設定" class="icon-button center-hv">                      
-                    <span class="icon fas fa-cog" onclick={onclickShowCommentSetting}></span> 
-                </div>        
-                <div title="コメント更新" class="icon-button center-v move-right">
+                </div>     
+                <div title="コメント更新" class="icon-button center-v">
                     <span class="icon center-hv fa-stack" 
                         data-state={String(enableUpdateData())} 
                         onclick={onclickUpdateComment}>
@@ -172,9 +168,9 @@
                     </span>
                 </div>
             </div>
-            <div class="comment-grid-container">
-                <div class="comment-grid"></div>
-            </div>
+        </div>
+        <div class="comment-grid-container">
+            <div class="comment-grid"></div>
         </div>
     </div>
     

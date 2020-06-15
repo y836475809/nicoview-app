@@ -398,6 +398,7 @@
             });
         };
 
+        let stop_resize_event = false;
         const toggleInfoview = async () => {
             const pe = this.root.querySelector(".player-frame");
             const ve = this.root.querySelector(".info-frame");
@@ -407,6 +408,10 @@
                 key:"player.infoview_show",
                 value: infoview_show
             });
+
+            // 動画情報の表示/非表示の切り替え時はウィンドウリサイズイベントを通知しない
+            // (動画表示部分のサイズは変更されないのでリサイズイベント不要)
+            stop_resize_event = true;
 
             if(infoview_show){
                 // 表示
@@ -421,8 +426,12 @@
 
                 setTimeout(() => {
                     // 動画サイズを可変に戻す
-                    ve.style.width = infoview_width + "px";   
-                    pe.style.width = `calc(100% - ${infoview_width}px)`;  
+                    ve.style.width = infoview_width + "px";
+                    pe.style.width = `calc(100% - ${infoview_width}px)`;
+
+                    // 非表示->表示の場合はコメントリストをリサイズする
+                    obs.trigger("player-info-page:split-resized");
+                    stop_resize_event = false;
                 },100); 
             }else{
                 // 非表示
@@ -432,7 +441,8 @@
 
                 ve.style.width = infoview_width + "px";
                 setTimeout(() => {    
-                    pe.style.width = `calc(100% - ${infoview_width}px)`;      
+                    pe.style.width = `calc(100% - ${infoview_width}px)`;
+                    stop_resize_event = false;
                 },100); 
             }
         };
@@ -516,6 +526,10 @@
         const timeout = 200;
         let timer;
         window.addEventListener("resize", () => {
+            if(stop_resize_event){
+                return;
+            }
+
             if(resize_begin===false){
                 resize_begin = true;
                 obs.trigger("player-video:resize-begin");

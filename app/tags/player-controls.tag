@@ -2,8 +2,8 @@
     <style scoped>
         :scope{
             display:grid;
-            grid-template-columns: 50px 1fr 100px;
-            grid-template-areas: "area1 area2 area3";
+            grid-template-columns: 50px 1fr 100px 50px;
+            grid-template-areas: "area1 area2 area3 area4";
             width: 100%;
             height: 100%;
             padding: 2px;
@@ -28,6 +28,19 @@
             margin-left: 10px;
             margin-right: 5px;
         }   
+        .toggle-info{
+            grid-area: area4;
+            margin-left: auto;
+            margin-right: 10px;
+        } 
+        .toggle-info > span {
+            font-size: 18px;
+            color: gray;
+            cursor: pointer;
+        }
+        .toggle-info > span:hover {
+            color: black;
+        }
         
         player-seek > .slider, 
         player-volume > .slider {
@@ -45,6 +58,9 @@
     </div>
     <div class="center-v volume">
         <player-volume obs={opts.obs}></player-volume>
+    </div>
+    <div class="center-v toggle-info" title="動画情報の表示/非表示">
+        <span class="fas fa-info" onclick={toggleInfoview}></span>
     </div>
     <script>
         const obs = this.opts.obs; 
@@ -104,6 +120,10 @@
                 obs.trigger("player-video:play");
                 updateState("play");
             }
+        };
+
+        this.toggleInfoview = () => {
+            obs.trigger("player-main-page:toggle-infoview");
         };
 
         obs.on("player-controls:play", ()=> {

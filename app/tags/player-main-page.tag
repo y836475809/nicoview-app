@@ -384,6 +384,10 @@
             });
         });
 
+        obs.on("player-main-page:toggle-infoview", async () => {
+            await toggleInfoview();
+        });
+
         const resizeVideo = (size) => { 
             obs.trigger("player-page:get-video-size-callback", (args) => {
                 const { width, height } = args;
@@ -392,6 +396,45 @@
                 const dh = size.height - height;
                 window.resizeBy(dw, dh);
             });
+        };
+
+        const toggleInfoview = async () => {
+            const pe = this.root.querySelector(".player-frame");
+            const ve = this.root.querySelector(".info-frame");
+
+            const infoview_show = parseInt(ve.style.width) == 0;
+            await IPCClient.request("config", "set", { 
+                key:"player.infoview_show",
+                value: infoview_show
+            });
+
+            if(infoview_show){
+                // 表示
+                const infoview_width = await IPCClient.request("config", "get", { 
+                    key:"player.infoview_width",
+                    value: 200
+                });
+                // 動画サイズがウィンドウサイズに合わせて変化しないように
+                // 動画の幅を固定してからウィンドウサイズ変更
+                pe.style.width = pe.offsetWidth + "px";  
+                window.resizeBy(infoview_width, 0);
+
+                setTimeout(() => {
+                    // 動画サイズを可変に戻す
+                    ve.style.width = infoview_width + "px";   
+                    pe.style.width = `calc(100% - ${infoview_width}px)`;  
+                },100); 
+            }else{
+                // 非表示
+                const infoview_width = 0;
+                pe.style.width = pe.clientWidth + "px";   
+                window.resizeBy(-parseInt(ve.style.width), 0);
+
+                ve.style.width = infoview_width + "px";
+                setTimeout(() => {    
+                    pe.style.width = `calc(100% - ${infoview_width}px)`;      
+                },100); 
+            }
         };
 
         const menu_template = [
@@ -413,43 +456,7 @@
             {
                 label: "動画情報の表示/非表示",
                 click: async () => {
-                    const pe = this.root.querySelector(".player-frame");
-                    const ve = this.root.querySelector(".info-frame");
-
-                    const infoview_show = parseInt(ve.style.width) == 0;
-                    await IPCClient.request("config", "set", { 
-                        key:"player.infoview_show",
-                        value: infoview_show
-                    });
-
-                    if(infoview_show){
-                        // 表示
-                        const infoview_width = await IPCClient.request("config", "get", { 
-                            key:"player.infoview_width",
-                            value: 200
-                        });
-
-                        // 動画サイズがウィンドウサイズに合わせて変化しないように
-                        // 動画の幅を固定してからウィンドウサイズ変更
-                        pe.style.width = pe.offsetWidth + "px";  
-                        window.resizeBy(infoview_width, 0);
-
-                        setTimeout(() => {
-                            // 動画サイズを可変に戻す
-                            ve.style.width = infoview_width + "px";   
-                            pe.style.width = `calc(100% - ${infoview_width}px)`;  
-                        },100); 
-                    }else{
-                        // 非表示
-                        const infoview_width = 0;
-                        pe.style.width = pe.clientWidth + "px";   
-                        window.resizeBy(-parseInt(ve.style.width), 0);
-
-                        ve.style.width = infoview_width + "px";
-                        setTimeout(() => {    
-                            pe.style.width = `calc(100% - ${infoview_width}px)`;      
-                        },100); 
-                    }
+                    await toggleInfoview();
                 }
             },
             { type: "separator" },

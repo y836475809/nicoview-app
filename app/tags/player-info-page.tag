@@ -1,8 +1,7 @@
 <player-info-page>
     <style scoped>
         :scope {
-            --video-container-height: 100px;
-            --video-controls-container-height: 30px;
+            --video-container-height: 130px;
             --user-container-height: 130px;
             --comment-controls-container-height: 35px;
             overflow-x: hidden;
@@ -16,13 +15,13 @@
         }
 
         .video-container {
-            height: calc(var(--video-container-height) 
-                + var(--video-controls-container-height));
+            height: var(--video-container-height);
         } 
         .video-thumbnail {
             user-select: none;
-            width: 130px;
-            height: 100px;
+            width: 160px;
+            height: calc(var(--video-container-height) - 5px);
+            object-fit: contain;
         }
         .video-info {
             user-select: none;
@@ -38,11 +37,6 @@
         .video-info > .content > .notice-deleted {
             font-weight: bold;
             color: red;
-        }
-        .video-controls-container {
-            width: 100%;
-            height: var(--video-controls-container-height);
-            display: flex;  
         }
 
         .user-container {
@@ -67,7 +61,7 @@
         .comment-grid-container {
             width: 100%;
             height: calc(100% 
-                - var(--video-container-height) - var(--video-controls-container-height)
+                - var(--video-container-height) 
                 - var(--user-container-height) - var(--comment-controls-container-height));
             background-color: var(--control-color);
         }

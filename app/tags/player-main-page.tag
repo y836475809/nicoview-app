@@ -411,8 +411,50 @@
                                 resizeVideo(org_video_size);
                             }
                         }
-                    },
+                    }
                 ]
+            },
+            {
+                label: "動画情報の表示/非表示",
+                click: async () => {
+                    const pe = this.root.querySelector(".player-frame");
+                    const ve = this.root.querySelector(".info-frame");
+
+                    const infoview_show = parseInt(ve.style.width) == 0;
+                    await IPCClient.request("config", "set", { 
+                        key:"player.infoview_show",
+                        value: infoview_show
+                    });
+
+                    if(infoview_show){
+                        // 表示
+                        const infoview_width = await IPCClient.request("config", "get", { 
+                            key:"player.infoview_width",
+                            value: 200
+                        });
+
+                        // 動画サイズがウィンドウサイズに合わせて変化しないように
+                        // 動画の幅を固定してからウィンドウサイズ変更
+                        pe.style.width = pe.offsetWidth + "px";  
+                        window.resizeBy(infoview_width, 0);
+
+                        setTimeout(() => {
+                            // 動画サイズを可変に戻す
+                            ve.style.width = infoview_width + "px";   
+                            pe.style.width = `calc(100% - ${infoview_width}px)`;  
+                        },100); 
+                    }else{
+                        // 非表示
+                        const infoview_width = 0;
+                        pe.style.width = pe.clientWidth + "px";   
+                        window.resizeBy(-parseInt(ve.style.width), 0);
+
+                        ve.style.width = infoview_width + "px";
+                        setTimeout(() => {    
+                            pe.style.width = `calc(100% - ${infoview_width}px)`;      
+                        },100); 
+                    }
+                }
             },
             {
                 label: "ヘルプ",
@@ -428,17 +470,21 @@
             const params = await IPCClient.request("config", "get", 
                 { 
                     key:"player", 
-                    value:{ sync_comment: false, infoview_width: 200 } 
+                    value:{ 
+                        sync_comment: false, 
+                        infoview_width: 200, 
+                        infoview_show: true 
+                    } 
                 });
-            this.player_default_size = { width: 854 ,height: 480 };
-            const vw = params.infoview_width;
-            if(vw){
-                let pe = this.root.querySelector(".player-frame");
-                let ve = this.root.querySelector(".info-frame");
-                pe.style.width = `calc(100% - ${vw}px)`;
-                ve.style.width = vw + "px";
-            }
+                
+            const vw = params.infoview_show ? params.infoview_width : 0;
+            const pe = this.root.querySelector(".player-frame");
+            const ve = this.root.querySelector(".info-frame");
+            pe.style.width = `calc(100% - ${vw}px)`;
+            ve.style.width = vw + "px"; 
 
+            this.player_default_size = { width: 854 ,height: 480 };
+            
             obs.trigger("player-info-page:sync-comment-checked", params.sync_comment);
 
             try {

@@ -395,25 +395,21 @@
         };
 
         const menu_template = [
-            {
-                label: "表示",
-                submenu: [
-                    {
-                        label: "標準サイズ",
-                        click: () => {
-                            resizeVideo(this.player_default_size);
-                        }
-                    },
-                    {
-                        label: "動画のサイズ",
-                        click: () => {
-                            if(org_video_size){
-                                resizeVideo(org_video_size);
-                            }
-                        }
-                    }
-                ]
+            {   
+                label: "標準サイズに変更",
+                click: () => {
+                    resizeVideo(this.player_default_size);
+                }
             },
+            {
+                label: "動画のサイズに変更",
+                click: () => {
+                    if(org_video_size){
+                        resizeVideo(org_video_size);
+                    }
+                }
+            },
+            { type: "separator" },
             {
                 label: "動画情報の表示/非表示",
                 click: async () => {
@@ -456,6 +452,7 @@
                     }
                 }
             },
+            { type: "separator" },
             {
                 label: "ヘルプ",
                 submenu: [

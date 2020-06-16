@@ -170,7 +170,7 @@
                     throw error;
                 });
 
-                const {is_deleted, cookies, comments, thumb_info, video_url} = 
+                const {is_economy, is_deleted, cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
                 const ret = await ipcRenderer.invoke(IPC_CHANNEL.SET_COOKIE, cookies);
                 if(ret!="ok"){
@@ -181,6 +181,7 @@
                     type: `video/${thumb_info.video.video_type}`,
                 };
                 const viewinfo = {
+                    is_economy: is_economy,
                     is_deleted: is_deleted,
                     thumb_info:thumb_info,
                 };
@@ -217,6 +218,7 @@
                     type: `video/${video_data.getVideoType()}`,
                 };
                 const viewinfo = {
+                    is_economy: video_data.getIsEconomy(),
                     is_deleted: video_data.getIsDeleted(),
                     thumb_info: video_data.getThumbInfo()      
                 };      
@@ -300,6 +302,7 @@
             const video_item = await ipcRenderer.invoke(IPC_CHANNEL.UPDATE_DATA, { video_id, update_target });
             const video_data = new NicoVideoData(video_item);
             const viewinfo = {
+                is_economy: video_data.getIsEconomy(),
                 is_deleted: video_data.getIsDeleted(),
                 thumb_info: video_data.getThumbInfo()      
             }; 

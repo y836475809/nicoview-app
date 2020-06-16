@@ -198,6 +198,7 @@ class NicoVideoData {
         nico_data.videoType = video_item.video_type;
         nico_data.thumbnailSize = video_item.thumbnail_size;
         nico_data.is_deleted = video_item.is_deleted;
+        nico_data.is_economy = video_item.is_economy;
         return nico_data;
     }
 
@@ -235,6 +236,10 @@ class NicoVideoData {
 
     getIsDeleted() {
         return this.nico_data.is_deleted;
+    }
+
+    getIsEconomy() {
+        return this.nico_data.is_economy;
     }
 }
 

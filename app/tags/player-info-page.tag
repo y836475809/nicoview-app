@@ -126,6 +126,9 @@
                         {videoStateOnline()} {videoStateLocal()}
                     </div>
                     <div class="content">
+                        {videoStateEconomy()}
+                    </div>
+                    <div class="content">
                         <div class="notice-deleted">{videoStateDeleted()}</div>
                     </div>
                 </div>
@@ -180,6 +183,7 @@
 
         const row_height = 25;
 
+        this.is_economy = false;
         this.is_deleted = false;
         this.is_online = false;
         this.is_saved = false;
@@ -214,6 +218,14 @@
             }else{
                 return "";
             }
+        };
+        this.videoStateEconomy = () => {
+            // if(this.is_economy === true){
+            //     return "エコノミー";
+            // }else{
+            //     return "";
+            // }
+            return this.is_economy ? "エコノミー" : "";
         };
         this.videoStateDeleted = () => {
             if(this.is_deleted === true){
@@ -311,6 +323,7 @@
 
             const { viewinfo, comments, state } = args;
 
+            this.is_economy = viewinfo.is_economy;
             this.is_deleted = viewinfo.is_deleted;
 
             if(state){
@@ -318,6 +331,9 @@
                 this.is_saved = state.is_saved;
             }
             
+            if(this.is_economy===undefined){
+                this.is_economy = false;
+            }
             if(this.is_deleted===undefined){
                 this.is_deleted = false;
             }

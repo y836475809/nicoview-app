@@ -181,19 +181,18 @@ class NicoDownloader {
     }
 
     async _getVideoInfo(){
-        const api_data = this.watch_data.api_data;
         this.nico_video = new NicoVideo(this.watch_data.api_data);
 
         if(this.nico_video.isDmc()){
-            const dmc_session = await this.nico_video.postDmcSession();
+            await this.nico_video.postDmcSession();
             this.videoinfo = {
                 server: "dmc",
-                maxQuality: this._isDMCMaxQuality(api_data, dmc_session)
+                maxQuality: this.nico_video.isDMCMaxQuality()
             };
         }else{
             this.videoinfo = {
                 server: "smile",
-                maxQuality: this._isSmileMaxQuality(api_data)
+                maxQuality: this.nico_video.isSmileMaxQuality()
             };
         }        
     }
@@ -306,29 +305,6 @@ class NicoDownloader {
 
     _writeBinary(file_path, data){
         fs.writeFileSync(file_path, data, "binary");
-    }
-
-    _isSmileMaxQuality(api_data){
-        const url = api_data.video.smileInfo.url;
-        return !/low/.test(url);
-    }
-
-    _isDMCMaxQuality(api_data, dmc_session){
-        const quality = api_data.video.dmcInfo.quality;
-        const max_quality = { 
-            video: quality.videos[0].id,
-            audio: quality.audios[0].id
-        };
-    
-        const src_id_to_mux = 
-            dmc_session.session.content_src_id_sets[0].content_src_ids[0].src_id_to_mux;
-        const session_quality = { 
-            video: src_id_to_mux.video_src_ids[0],
-            audio: src_id_to_mux.audio_src_ids[0]
-        };
-    
-        return max_quality.video == session_quality.video
-            && max_quality.audio == session_quality.audio;
     }
 }
 

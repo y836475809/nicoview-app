@@ -34,6 +34,29 @@ test("nico smile", t => {
     t.regex(nico_video.SmileUrl, /https:\/\/smile-cls\d\d.sl.nicovideo.jp\/smile\?m=\d+\.\d+/);
 });
 
+test("nico dmc quality check", (t) => {
+    const nico_video = new NicoVideo(data_api_data);
+
+    nico_video.dmc_session = TestData.dmc_session;
+    t.truthy(nico_video.isDMCMaxQuality());
+    
+    nico_video.dmc_session = TestData.dmc_session_low;
+    t.falsy(nico_video.isDMCMaxQuality());
+});
+
+test("nico smile quality check", (t) => {
+    const nico_video = new NicoVideo(data_api_data);
+    nico_video._dmcInfo = null;
+
+    const url = "https://smile-cls20.sl.nicovideo.jp/smile?m=12345678.67759";
+
+    nico_video._api_data.video.smileInfo.url = `${url}`;
+    t.truthy(nico_video.isSmileMaxQuality());
+    
+    nico_video._api_data.video.smileInfo.url = `${url}low`;
+    t.falsy(nico_video.isSmileMaxQuality());
+});
+
 test("nico session", t => {
     const nico_video = new NicoVideo(data_api_data);
     const dmc_session =  nico_video.DmcSession;

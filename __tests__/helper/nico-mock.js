@@ -113,7 +113,19 @@ class NicoMocks {
                     && data.session.priority !== undefined){
                     return [200, {
                         meta: { status: 201,message: "created" },
-                        data: { session: { id:"12345678" } }
+                        data: { 
+                            session: { 
+                                id:"12345678" ,
+                                content_src_id_sets: [{
+                                    content_src_ids:[{
+                                        src_id_to_mux:{
+                                            video_src_ids:["archive_h264_360p"],
+                                            audio_src_ids:["archive_aac_64kbps"]
+                                        }
+                                    }]
+                                }]
+                            } 
+                        }
                     }];                    
                 }
                 return [403, "fault 403"];

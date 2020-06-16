@@ -152,7 +152,7 @@ class NicoVideo {
                 this._req_session = new NicoClientRequest();
                 const body = await this._req_session.post(url, {json:json});
                 this.dmc_session = body.data;
-                resolve(this.dmc_session);      
+                resolve();      
             } catch (error) {
                 reject(error);
             }
@@ -201,21 +201,13 @@ class NicoVideo {
             this.heart_beat_id = null;
         }
     }
-
-    isMaxQuality(){
-        if(this.isDmc()){
-            return this._isDMCMaxQuality();
-        }else{
-            return this._isSmileMaxQuality();
-        }
-    }
     
-    _isSmileMaxQuality(){
+    isSmileMaxQuality(){
         const url = this._api_data.video.smileInfo.url;
         return !/low/.test(url);
     }
 
-    _isDMCMaxQuality(){
+    isDMCMaxQuality(){
         const quality = this._api_data.video.dmcInfo.quality;
         const max_quality = { 
             video: quality.videos[0].id,

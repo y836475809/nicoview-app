@@ -3,9 +3,6 @@ const path = require("path");
 const { DonwloadProgMsg, NicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 
-const data_api_data = TestData.data_api_data;
-const dmc_session_max = TestData.dmc_session;
-const dmc_session_low = TestData.dmc_session_low;
 const video_id = TestData.video_id;
 const dist_dir = __dirname;
 const log = [];
@@ -65,12 +62,6 @@ class TestNicoDownloader extends NicoDownloader {
         this.map.set(file_path, str);
     }
 }
-
-test("downloader quality check", (t) => {
-    const nico_down = new NicoDownloader();
-    t.truthy(nico_down._isDMCMaxQuality(data_api_data, dmc_session_max));
-    t.falsy(nico_down._isDMCMaxQuality(data_api_data, dmc_session_low));
-});
 
 test("downloader dmc", async (t) => {
     setupNicoDownloadNock(nico_download_mocks);

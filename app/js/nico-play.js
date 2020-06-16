@@ -53,7 +53,7 @@ class NicoPlay extends EventEmitter {
                     const cookies = nico_cookie.getSesstionCookies();
                     const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                     const video_url = this.nico_video.SmileUrl;
-                    const is_economy = !this.nico_video.isMaxQuality();
+                    const is_economy = !this.nico_video.isSmileMaxQuality();
                     resolve({
                         is_economy: is_economy,
                         is_deleted: is_deleted,
@@ -81,7 +81,7 @@ class NicoPlay extends EventEmitter {
                 const cookies = nico_cookie.getSesstionCookies();
                 const thumb_info = NicoDataParser.json_thumb_info(api_data); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
-                const is_economy = !this.nico_video.isMaxQuality();
+                const is_economy = !this.nico_video.isDMCMaxQuality();
                 resolve({
                     is_economy: is_economy,
                     is_deleted: is_deleted,

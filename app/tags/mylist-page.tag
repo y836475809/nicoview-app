@@ -155,7 +155,8 @@
     </style>      
 
     <div class="mylist-container">
-        <div class="mylist-label center-hv">mylist /</div><input class="mylist-input" type="text"/>
+        <div class="mylist-label center-hv">mylist /</div>
+        <input class="mylist-input" type="text" onkeydown={onkeydownUpdateMylist}/>
         <div class="update-button center-hv" title="更新", onclick={onclickUpdateMylist}>
             <i class="fas fa-redo-alt"></i>
         </div>
@@ -454,6 +455,12 @@
                 nico_mylist.cancel();
             }
         };
+
+        this.onkeydownUpdateMylist = async(e) => { 
+            if(e.target.value && e.keyCode===13){
+                await this.onclickUpdateMylist(e);
+            }
+        }; 
 
         this.onclickUpdateMylist = async(e) => {  
             this.obs_modal_dialog.trigger("show", {

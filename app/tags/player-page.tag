@@ -144,7 +144,7 @@
                 { type: "separator" },
                 { 
                     id: "show-open-video-form",
-                    label: "動画IDを指定して再生", click() {
+                    label: "動画ID/URLを指定して再生", click() {
                         self.obs_open_video_form.trigger("show");
                     }
                 },               

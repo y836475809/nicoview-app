@@ -46,6 +46,16 @@
         player-volume > .slider {
             cursor: pointer;
         }
+
+        .move-start {
+            font-size: 12px;
+            color: gray;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .move-start:hover {
+            color: black;
+        }
     </style>
 
     <div class="center-v play-btn">
@@ -54,6 +64,9 @@
         </button>
     </div>
     <div class="center-v seek">
+        <div class="move-start" title="最初に移動" onclick={moveStart}>
+            <i class="fas fa-circle"></i>
+        </div>
         <player-seek obs={opts.obs}></player-seek>
     </div>
     <div class="center-v volume">
@@ -124,6 +137,11 @@
 
         this.toggleInfoview = () => {
             obs.trigger("player-main-page:toggle-infoview");
+        };
+
+        this.moveStart = () => {
+            obs.trigger("player-info-page:reset-comment-scroll");
+            obs.trigger("player-video:seek", 0);
         };
 
         obs.on("player-controls:play", ()=> {

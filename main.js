@@ -289,7 +289,7 @@ app.on("ready", async ()=>{
         }
     }
     try {
-        await config_ipc_server.configFolder("data_dir", "データ");
+        await config_ipc_server.configFolder("data_dir", "DB,ブックマーク,履歴等");
         await config_ipc_server.configFolder("download.dir", "動画");
     } catch (error) {
         await dialog.showMessageBox({

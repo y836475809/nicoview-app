@@ -56,6 +56,9 @@ if(is_debug===true){
         console.log(`can't use local proxy, mock_server_port is ${port}`);
     }
 }
+
+process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
+
 const window_frame = main_html != "app/html/index.html";
 
 process.on("uncaughtException", (error) => {
@@ -569,6 +572,9 @@ app.on("ready", async ()=>{
     });
 
     await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
+
+    const user_agent = process.env["user_agent"];
+    session.defaultSession.setUserAgent(user_agent);
 
     createWindow();
 });

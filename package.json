@@ -60,6 +60,9 @@
   "ava": {
     "files": [
       "__tests__/*.test.js"
-    ]
+    ],
+    "environmentVariables": {
+      "user_agent": "unit test"
+    }
   }
 }

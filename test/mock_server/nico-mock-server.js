@@ -13,7 +13,9 @@ class NicoMockServer {
     create(){ 
         this.nico_mock_res = new NicoMockResponse();
         this.srever = https.createServer(options, (req, res) => {
-            console.log("mock server url=", req.url);
+            console.log(
+                "mock server url=", req.url, 
+                ", user-agent=", req.headers["user-agent"]);
 
             if(req.method.toLowerCase() == "post") {
                 let body = "";

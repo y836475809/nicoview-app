@@ -1,5 +1,6 @@
 const https = require("https");
 
+const user_agent = process.env["user_agent"];
 const proxy_server = process.env["proxy_server"];
 const timeout_msec = 120*1000;
 
@@ -83,9 +84,7 @@ class NicoClientRequest {
 
         const options = this._getOptions(url, "GET");
         if(nico_cookie){
-            options["headers"] = {
-                "Cookie": nico_cookie.getCookieHeaders()
-            };
+            options.headers["Cookie"] = nico_cookie.getCookieHeaders();
         }
 
         return this._request(url, options);
@@ -102,10 +101,9 @@ class NicoClientRequest {
 
         const json_str = JSON.stringify(json);
         const options = this._getOptions(url, "POST");
-        options.headers = { 
-            "Content-Type": "application/json",
-            "Content-Length": json_str.length
-        };
+        options.headers["Content-Type"] = "application/json";
+        options.headers["Content-Length"] = json_str.length;
+
         this._res_json = true;
 
         return this._request(url, options, (req)=>{
@@ -146,6 +144,10 @@ class NicoClientRequest {
     }
 
     _getOptions(url, method){
+        const headers = {
+            "user-agent": user_agent
+        };
+
         if(proxy_server){
             const proxy_url = new URL(proxy_server);
             return {
@@ -153,6 +155,7 @@ class NicoClientRequest {
                 port: proxy_url.port,
                 path: url,
                 method: method,
+                headers:headers
             }; 
         }
 
@@ -162,6 +165,7 @@ class NicoClientRequest {
             port: 443,
             path: `${_url.pathname}${_url.search}`,
             method: method,
+            headers:headers
         };   
     }
 

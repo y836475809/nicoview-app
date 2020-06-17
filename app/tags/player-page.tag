@@ -174,6 +174,10 @@
     
         const context_menu = createMenu(this);
         this.oncontextmenu = async (e) => {
+            if(e.button===0){
+                obs.trigger("player-controls:play");
+            }
+
             if(e.button===2){
                 play_data = await getPlayData();
                 context_menu.items.forEach(menu => {

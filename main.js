@@ -179,6 +179,7 @@ function createWindow() {
         nodeIntegration: false,
         contextIsolation: false,
         preload: preload_main_path,
+        spellcheck: false
     };
     state.frame = window_frame;
     main_win = new BrowserWindow(state);
@@ -598,6 +599,7 @@ const createPlayerWindow = () => {
             nodeIntegration: false,
             contextIsolation: false,
             preload: preload_player_path,
+            spellcheck: false
         };
         state.frame = false;
         player_win = new BrowserWindow(state);

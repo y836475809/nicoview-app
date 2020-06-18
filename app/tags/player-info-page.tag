@@ -253,7 +253,6 @@
         ];
         const options = {
             rowHeight: row_height,
-            _saveColumnWidth: true,
         };   
         const grid_table = new GridTable("comment-grid", columns, options);
 

@@ -50,7 +50,6 @@
         ];
         const options = {
             rowHeight: 25,
-            _saveColumnWidth: true,
         };
 
         let grid_table = null;

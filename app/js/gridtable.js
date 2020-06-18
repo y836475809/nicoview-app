@@ -72,8 +72,7 @@ class GridTable {
             enableCellNavigation: true,
             enableColumnReorder: false,
             fullWidthRows: true, 
-            _saveColumnWidth: false,
-            _saveSort: false,
+            id_click_as_dbclick:""
         };
         if(options===undefined){
             options = {};
@@ -112,6 +111,11 @@ class GridTable {
         this.grid.onClick.subscribe((e) => {
             const cell = this.grid.getCellFromEvent(e);
             this.grid.setSelectedRows([cell.row]);
+            
+            if(cell.cell == this.grid.getColumnIndex(this.options.id_click_as_dbclick)){
+                const data = this.dataView.getItem(cell.row);
+                this.on_dblclick(e, data);   
+            }
             e.stopPropagation();
         });
         this.grid.onDblClick.subscribe((e) => {

@@ -272,8 +272,7 @@
         ];
         const options = {
             rowHeight: 135,
-            _saveColumnWidth: true,
-            _saveSort: true,
+            id_click_as_dbclick:"thumb_img"
         };   
         const grid_table = new GridTable("library-grid", columns, options);
     

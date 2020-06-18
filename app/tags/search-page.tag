@@ -420,7 +420,7 @@
         ];
         const options = {
             rowHeight: 100,
-            _saveColumnWidth: true,
+            id_click_as_dbclick:"thumb_img"
         };   
         const grid_table = new GridTable("search-grid", columns, options);
 

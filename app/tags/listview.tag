@@ -49,13 +49,16 @@
             border-bottom: 1px solid lightgrey;
         }
 
+        .listview-item-default-icon {
+            font-size: var(--icon-size);
+            color: royalblue;
+            pointer-events: none;
+        }
+
         .title-wraper {
             padding: 5px 0 5px 0;
-            width: calc(100% - var(--icon-size) - 5px);
+            width: calc(100% - var(--icon-size) * 2 - 5px);
             height: 100%;
-        }
-        .title-wraper > i {
-            pointer-events: none;
         }
         .title {
             margin-left: 5px;
@@ -111,13 +114,19 @@
     <div class="listview-menu-container">
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
-                title={getTooltip(item)}>              
+                title={getTooltip(item)}>
+                <div class="center-hv" title="ダブルクリック動作"
+                    onclick={onclickItemAsdblclick.bind(this,item)} 
+                    ondblclick={ondblclickItem.bind(this,item)}
+                    onmouseup={onmouseUp.bind(this,item)}
+                    onmousedown={onmouseDown.bind(this,item)}>
+                    <i class={getIconClass(item)}></i>
+                </div>           
                 <div class="title-wraper center-v"
                     onclick={onclickItem.bind(this,item)} 
                     ondblclick={ondblclickItem.bind(this,item)}
                     onmouseup={onmouseUp.bind(this,item)}
                     onmousedown={onmouseDown.bind(this,item)}>
-                    <i class={getIconClass(item)}></i>
                     <div class="title">
                         {item.title}
                     </div> 
@@ -136,6 +145,8 @@
         let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;
+
+        const default_icon_class = "fas fa-square listview-item-default-icon";
         const icon_class = this.opts.icon_class;
         this.getTooltip = this.opts.gettooltip;
         if(!this.getTooltip){
@@ -276,13 +287,13 @@
         this.getIconClass = (item) => {
             const type = item.type;
             if(icon_class === undefined || type === undefined){
-                return ""; 
+                return default_icon_class; 
             }
             const icon_name = icon_class[type];
             if(icon_name === undefined){
-                return ""; 
+                return default_icon_class; 
             }
-            return `center-hv listview-item-icon ${icon_name} ${this.opts.name}-item`; 
+            return `center-hv ${icon_name} ${this.opts.name}-item`; 
         };
 
         const setSelected = (target_elm, item) => {
@@ -306,6 +317,11 @@
         };
 
         this.ondblclickItem = (item, e) => {
+            obs.trigger("item-dlbclicked", item);
+        };
+
+        this.onclickItemAsdblclick = (item, e) => {
+            setSelected(e.target.parentElement, item);
             obs.trigger("item-dlbclicked", item);
         };
 

@@ -153,38 +153,36 @@ class NicoSearch {
         }
     }
 
-    search(params){   
+    async search(params){   
         const service = params._service;
         const query_json = params.get();
         const host = "https://api.search.nicovideo.jp";
         const url = `${host}/api/v2/${service}/contents/search`;
         const page = params._page;
         
-        return new Promise(async (resolve, reject) => {
-            this._req = new NicoClientRequest();
-            try {
-                const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
-                const result = JSON.parse(body);
-                result.meta.page = page;
-                resolve(result);       
-            } catch (error) {
-                if(error.status){
-                    let message = `status=${error.status}, エラー`;
-                    if(error.status === 400){
-                        message = `status=${error.status}, 不正なパラメータです`; 
-                    }else if(error.status === 404){
-                        message = `status=${error.status}, ページが見つかりません`; 
-                    }else if(error.status === 500){
-                        message = `status=${error.status}, 検索サーバの異常です`; 
-                    }else if(error.status === 503){
-                        message = `status=${error.status}, サービスがメンテナンス中です`; 
-                    }    
-                    reject(new Error(message));                     
-                }else{
-                    reject(error);     
+        this._req = new NicoClientRequest();
+        try {
+            const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
+            const result = JSON.parse(body);
+            result.meta.page = page;
+            return result;
+        } catch (error) {
+            if(error.status){
+                let message = `status=${error.status}, エラー`;
+                if(error.status === 400){
+                    message = `status=${error.status}, 不正なパラメータです`; 
+                }else if(error.status === 404){
+                    message = `status=${error.status}, ページが見つかりません`; 
+                }else if(error.status === 500){
+                    message = `status=${error.status}, 検索サーバの異常です`; 
+                }else if(error.status === 503){
+                    message = `status=${error.status}, サービスがメンテナンス中です`; 
                 }
-            }    
-        });
+                throw new Error(message);                     
+            }else{
+                throw error;     
+            }
+        }
     }
 }
 

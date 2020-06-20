@@ -43,26 +43,19 @@ class DownloadRequest {
         }
     }
 
-    download(stream, on_progress=(state)=>{}){
-        return new Promise(async (resolve, reject) => {
-            this._req = new NicoClientRequest();
-            try {
-                await this._req.get(this._url, 
-                    {
-                        encoding:"binary",
-                        nico_cookie:this._nico_cookie, 
-                        stream:stream,
-                        on_progress:(current, content_len)=>{
-                            const cur_per = Math.floor((current/content_len)*100);
-                            on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
-                        }
-                    });
-                on_progress(DonwloadProgMsg.complete);
-                resolve();
-            } catch (error) {
-                reject(error);
-            }
-        });
+    async download(stream, on_progress=(state)=>{}){
+        this._req = new NicoClientRequest();
+        await this._req.get(this._url, 
+            {
+                encoding:"binary",
+                nico_cookie:this._nico_cookie, 
+                stream:stream,
+                on_progress:(current, content_len)=>{
+                    const cur_per = Math.floor((current/content_len)*100);
+                    on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
+                }
+            });
+        on_progress(DonwloadProgMsg.complete);
     }
 }
 
@@ -211,19 +204,13 @@ class NicoDownloader {
         };
     }
 
-    _getThumbImg(){
+    async _getThumbImg(){
         const api_data = this.watch_data.api_data;
         const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
 
-        return new Promise(async (resolve, reject) => {
-            try {
-                this.img_request = new NicoClientRequest();
-                const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
-                resolve({ thumbImg_data: body, thumbnail_size: thumbnail_size });    
-            } catch (error) {
-                reject(error);
-            }
-        });
+        this.img_request = new NicoClientRequest();
+        const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
+        return { thumbImg_data: body, thumbnail_size: thumbnail_size };
     }
 
     _createStream(dist_path){
@@ -244,11 +231,13 @@ class NicoDownloader {
         this.video_download = new DownloadRequest(video_url, nico_cookie);
         try {
             await this.video_download.download(stream, on_progress);
-        } catch (error) {
-            throw error;
-        }finally{
             this.nico_video.stopHeartBeat();
             on_progress(DonwloadProgMsg.stop_hb);
+        } catch (error) {
+            this.nico_video.stopHeartBeat();
+            on_progress(DonwloadProgMsg.stop_hb);
+
+            throw error;
         }
     }
 

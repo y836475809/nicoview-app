@@ -58,6 +58,10 @@
             padding: 2px;
             width: 100%;
             height: 100%;
+
+            /* TODO とりあえずwindow幅50% */
+            max-width: 50vw;
+            
             border-top: 1px solid var(--control-border-color);
             overflow-x: auto;
             overflow-y: auto;         
@@ -71,9 +75,6 @@
         .user-description.text {
             height: calc(100% - var(--user-name-height));
             white-space: normal;
-
-            /* TODO 外部に出す？ */
-            max-width: 400px;
         } 
 
         .icon {

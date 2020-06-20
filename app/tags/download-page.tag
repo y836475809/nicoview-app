@@ -369,25 +369,25 @@
                             state: download_state.complete,
                             thumb_img: thumb_img
                         });
-                        logger.info(`download complete id=${video_id}`);
+                        logger.debug(`download complete id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
                             state: download_state.wait
                         });
-                        logger.info(`download cancel id=${video_id}`);
+                        logger.debug(`download cancel id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.skip){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `スキップ: ${result.reason}`, 
                             state: download_state.wait
                         });
-                        logger.info(`download skip id=${video_id}: `, result.reason);
+                        logger.debug(`download skip id=${video_id}: `, result.reason);
                     }else if(result.type==NicoDownloader.ResultType.error){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `エラー: ${result.reason.message}`, 
                             state: download_state.error
                         });
-                        logger.error(`download id=${video_id}: `, result.reason);
+                        logger.debug(`download id=${video_id}: `, result.reason);
                     }
                
                     await onChangeDownloadItem();

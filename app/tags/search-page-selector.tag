@@ -49,6 +49,10 @@
         .item:hover {
             background-color: lightgray;
         }
+        .item-current-page {
+            border: 1px solid gray;
+            border-radius: 3px;
+        }
         .item-disable {
             color: lightgray;
             pointer-events: none;
@@ -91,13 +95,19 @@
         };
 
         obs.on("set-data", (args) => {
-            const { total_page_num } = args;
+            const { page_num, total_page_num } = args;
 
             this.items = [];
             for (let num = 1; num <= max_page_num; num++) {
+                let class_name = "";
+                if(page_num == num){
+                    class_name = "item-current-page";
+                }else if(num > total_page_num){
+                    class_name = "item-disable";
+                }
                 this.items.push({
                     num:num,
-                    class_name:num<=total_page_num?"":"item-disable"
+                    class_name:class_name
                 });
             }
 

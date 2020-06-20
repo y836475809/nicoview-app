@@ -85,7 +85,7 @@
             this.search_result_num = search_result_num;
             this.update();
 
-            this.obs_page_selector.trigger("set-data", { total_page_num });
+            this.obs_page_selector.trigger("set-data", { page_num, total_page_num });
         });
 
         this.onclickBack = () =>{

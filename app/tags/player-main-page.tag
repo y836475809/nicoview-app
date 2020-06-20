@@ -194,8 +194,8 @@
 
                 this.obs_modal_dialog.trigger("close");       
             } catch (error) {
-                logger.error(error);
                 if(!error.cancel){
+                    logger.error(error);
                     await showMessageBox("error", error.message);
                 }
 

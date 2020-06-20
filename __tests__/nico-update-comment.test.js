@@ -112,10 +112,10 @@ test("update no_owner+no_owner_data_diff", async(t) => {
     await nico_update._updateComment(null, {commentPath:""});
 
     const threads = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("thread");
+        return Object.prototype.hasOwnProperty.call(value, "thread");
     });
     const comments = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("chat");
+        return Object.prototype.hasOwnProperty.call(value, "chat");
     });
 
     t.is(threads.length, 1);
@@ -130,22 +130,22 @@ test("update no_owner+owner_data_diff", async(t) => {
     await nico_update._updateComment(null, {commentPath:""});
 
     const threads = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("thread");
+        return Object.prototype.hasOwnProperty.call(value, "thread");
     });
     const comments = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("chat");
+        return Object.prototype.hasOwnProperty.call(value, "chat");
     });
 
     t.is(threads.length, 2);
     t.is(comments.length, 4);
 
-    t.true(threads[0].thread.hasOwnProperty("fork"));
-    t.false(threads[1].thread.hasOwnProperty("fork"));
+    t.true(Object.prototype.hasOwnProperty.call(threads[0].thread, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(threads[1].thread, "fork"));
 
-    t.false(comments[0].chat.hasOwnProperty("fork"));
-    t.false(comments[1].chat.hasOwnProperty("fork"));
-    t.true(comments[2].chat.hasOwnProperty("fork"));
-    t.false(comments[3].chat.hasOwnProperty("fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[0].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[1].chat, "fork"));
+    t.true(Object.prototype.hasOwnProperty.call(comments[2].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[3].chat, "fork"));
 });
 
 test("update owner+owner_data_diff", async(t) => {
@@ -153,27 +153,27 @@ test("update owner+owner_data_diff", async(t) => {
     await nico_update._updateComment(null, {commentPath:""});
 
     const threads = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("thread");
+        return Object.prototype.hasOwnProperty.call(value, "thread");
     });
     const comments = nico_update.data.filter(value=>{
-        return value.hasOwnProperty("chat");
+        return Object.prototype.hasOwnProperty.call(value, "chat");
     });
 
     t.is(threads.length, 2);
     t.is(comments.length, 7);
 
-    t.true(threads[0].thread.hasOwnProperty("fork"));
-    t.false(threads[1].thread.hasOwnProperty("fork"));
+    t.true(Object.prototype.hasOwnProperty.call(threads[0].thread, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(threads[1].thread, "fork"));
 
     // update
     t.is(threads[0].thread.thread, "1");
     t.is(threads[1].thread.thread, "2");
 
-    t.true(comments[0].chat.hasOwnProperty("fork"));
-    t.true(comments[1].chat.hasOwnProperty("fork"));
-    t.false(comments[2].chat.hasOwnProperty("fork"));
-    t.false(comments[3].chat.hasOwnProperty("fork"));
-    t.false(comments[4].chat.hasOwnProperty("fork"));
-    t.true(comments[5].chat.hasOwnProperty("fork"));
-    t.false(comments[6].chat.hasOwnProperty("fork"));
+    t.true(Object.prototype.hasOwnProperty.call(comments[0].chat, "fork"));
+    t.true(Object.prototype.hasOwnProperty.call(comments[1].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[2].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[3].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[4].chat, "fork"));
+    t.true(Object.prototype.hasOwnProperty.call(comments[5].chat, "fork"));
+    t.false(Object.prototype.hasOwnProperty.call(comments[6].chat, "fork"));
 });

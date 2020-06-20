@@ -68,10 +68,10 @@ test("_convertComment", async (t) => {
 
     const comment_data = cnv_data._convertComment(owner_comment_xml, user_comment_xml);
     const threads = comment_data.filter(value => {
-        return value.hasOwnProperty("thread");
+        return Object.prototype.hasOwnProperty.call(value, "thread");
     });
     const comments = comment_data.filter(value => {
-        return value.hasOwnProperty("chat");
+        return Object.prototype.hasOwnProperty.call(value, "chat");
     });
 
     t.deepEqual(threads,[ 

@@ -197,13 +197,13 @@ const json_comment = (json_str) => {
     const json_data = JSON.parse(json_str);
     
     const threads = json_data.filter(value => {
-        return value.hasOwnProperty("thread");
+        return Object.prototype.hasOwnProperty.call(value, "thread");
     });
 
     const chats =  json_data.filter(value => {
-        return value.hasOwnProperty("chat");
+        return Object.prototype.hasOwnProperty.call(value, "chat");
     }).filter(value => {
-        return !value.chat.hasOwnProperty("deleted");
+        return !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
     });
 
     return threads.concat(chats);
@@ -211,12 +211,13 @@ const json_comment = (json_str) => {
 
 const makeComments = (comment_data) => {
     const comments = comment_data.filter(value => {
-        return value.hasOwnProperty("chat") && !value.chat.hasOwnProperty("deleted");
+        return Object.prototype.hasOwnProperty.call(value, "chat") 
+            && !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
     }).map(value => {
-        if(value.chat.hasOwnProperty("fork")){
+        if(Object.prototype.hasOwnProperty.call(value.chat, "fork")){
             value.chat.user_id = "owner";
         }
-        if(!value.chat.hasOwnProperty("mail")){
+        if(!Object.prototype.hasOwnProperty.call(value.chat, "mail")){
             value.chat.mail = "184";
         }
         return value.chat;

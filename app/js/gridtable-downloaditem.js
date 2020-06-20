@@ -225,11 +225,11 @@ class GridTableDownloadItem {
 
         Object.assign(item, prop);
         
-        if(prop.hasOwnProperty("state")){
+        if(Object.prototype.hasOwnProperty.call(prop, "state")){
             const column_index = this.grid_table.grid.getColumnIndex("state");
             this.grid_table.grid.updateCell(row_index, column_index);
         }
-        if(prop.hasOwnProperty("thumb_img")){
+        if(Object.prototype.hasOwnProperty.call(prop, "thumb_img")){
             const column_index = this.grid_table.grid.getColumnIndex("thumb_img");
             this.grid_table.grid.updateCell(row_index, column_index);
         }

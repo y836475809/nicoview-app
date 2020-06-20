@@ -118,28 +118,29 @@ class JsonDataConverter {
      */
     _convertComment(comment_json){
         const threads = comment_json.filter(value => {
-            return value.hasOwnProperty("thread");
+            return Object.prototype.hasOwnProperty.call(value, "thread");
         }).map(value => {
             return value.thread;
         });
         const comments = comment_json.filter(value => {
-            return value.hasOwnProperty("chat") && !value.chat.hasOwnProperty("deleted");
+            return Object.prototype.hasOwnProperty.call(value, "chat") 
+                && !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
         }).map(value => {
             return value.chat;
         });
 
         const owner_threads = threads.filter(value => {
-            return value.hasOwnProperty("fork");
+            return Object.prototype.hasOwnProperty.call(value, "fork");
         });
         const user_threads = threads.filter(value => {
-            return !value.hasOwnProperty("fork");
+            return !Object.prototype.hasOwnProperty.call(value, "fork");
         });
 
         const owner_comments = comments.filter(value => {
-            return value.hasOwnProperty("fork");
+            return Object.prototype.hasOwnProperty.call(value, "fork");
         });
         const user_comments = comments.filter(value => {
-            return !value.hasOwnProperty("fork");
+            return !Object.prototype.hasOwnProperty.call(value, "fork");
         });
 
         const user_thread = {

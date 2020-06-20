@@ -32,7 +32,7 @@ class NicoUpdate extends EventEmitter {
     _getChangedProps(org_item, updated_item){
         const updated_props = {};
         Object.keys(org_item).forEach(key=>{
-            if(!updated_item.hasOwnProperty(key)){
+            if(!Object.prototype.hasOwnProperty.call(updated_item, key)){
                 throw new Error(`${key} is not exist`);
             }
             const org_value = org_item[key];
@@ -122,7 +122,7 @@ class NicoUpdate extends EventEmitter {
     async _updateComment(api_data, nico_json){
         const cur_comment_data = this._getCurrentCommentData();
         const cur_comments = cur_comment_data.filter(value => {
-            return value.hasOwnProperty("chat");
+            return Object.prototype.hasOwnProperty.call(value, "chat");
         }).map(value => {
             return {
                 no: value.chat.no
@@ -162,16 +162,16 @@ class NicoUpdate extends EventEmitter {
 
     _getCommentDataProps(comment_data){
         const threads = comment_data.filter(value => {
-            return value.hasOwnProperty("thread");
+            return Object.prototype.hasOwnProperty.call(value, "thread");
         });
         const owner_threads = threads.filter(value => {
-            return value.thread.hasOwnProperty("fork");
+            return Object.prototype.hasOwnProperty.call(value.thread, "fork");
         });
         const user_threads = threads.filter(value => {
-            return !value.thread.hasOwnProperty("fork");
+            return !Object.prototype.hasOwnProperty.call(value.thread, "fork");
         });
         const comments = comment_data.filter(value => {
-            return value.hasOwnProperty("chat");
+            return Object.prototype.hasOwnProperty.call(value, "chat");
         });
 
         return {

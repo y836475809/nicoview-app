@@ -43,7 +43,7 @@ class NicoCookie {
         objs.forEach(value => {
             for (let index = 0; index < this._keys.length; index++) {
                 const key = this._keys[index];
-                if(value.hasOwnProperty(key)===true){
+                if(Object.prototype.hasOwnProperty.call(value, key)===true){
                     // cookie.expires
                     sc.push({
                         url: this._url.origin,

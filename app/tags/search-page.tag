@@ -270,7 +270,7 @@
     <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
 
     <script>
-        /* globals riot */
+        /* globals riot logger */
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
@@ -446,7 +446,10 @@
                 const search_result = await nico_search.search(nico_search_params);
                 setData(search_result);
             } catch (error) {
-                await showMessageBox("error", error.message);
+                if(!error.cancel){
+                    logger.error(error);
+                    await showMessageBox("error", error.message);
+                }
             }
             
             this.obs_modal_dialog.trigger("close");

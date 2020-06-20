@@ -4,6 +4,8 @@ const path = require("path");
 
 const { NicoMockResponse } = require("./nico-mock-response");
 
+const wait_msec = process.env["mock_server_wait_msec"];
+
 const options = { 
     key: fs.readFileSync(path.join(__dirname, "orekey.pem")),
     cert: fs.readFileSync(path.join(__dirname, "orecert.pem"))
@@ -12,7 +14,7 @@ const options = {
 class NicoMockServer {
     create(){ 
         this.nico_mock_res = new NicoMockResponse();
-        this.srever = https.createServer(options, (req, res) => {
+        this.srever = https.createServer(options, async (req, res) => {
             console.log(
                 "mock server url=", req.url, 
                 ", user-agent=", req.headers["user-agent"]);
@@ -22,7 +24,9 @@ class NicoMockServer {
                 req.on("data", (data) => {
                     body += data;
                 });
-                req.on("end", () => {
+                req.on("end", async () => {
+                    await new Promise(resolve => setTimeout(resolve, wait_msec));
+
                     if(req.url.startsWith("https://nmsg.nicovideo.jp/api.json/")){
                         console.log("mock server: comment");
                         this.nico_mock_res.comment(body, res);
@@ -35,17 +39,20 @@ class NicoMockServer {
                             console.log("mock server: dmcSession");
                             this.nico_mock_res.dmcSession(body, res);
                         }
-
                     }
                 });
             }
             if(req.method.toLowerCase() == "options") {
+                await new Promise(resolve => setTimeout(resolve, wait_msec));
+
                 if(req.url.startsWith("https://api.dmc.nico")){
                     console.log("mock server: options dmcHB");
                     this.nico_mock_res.dmcHB(res);
                 }
             }
             if(req.method.toLowerCase() == "get") {
+                await new Promise(resolve => setTimeout(resolve, wait_msec));
+                
                 if(req.url.startsWith("https://api.search.nicovideo.jp")){
                     console.log("mock server: search");
                     this.nico_mock_res.search(req.url, res);

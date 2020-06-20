@@ -17,6 +17,7 @@ class StartupConfig {
             this._params["debug"] = this._cmdline_parser.get("--debug", false);
             if(this._params["use_mock_server"]){
                 this._params["mock_server_port"] = startup_config["mock_server_port"];
+                this._params["mock_server_wait_msec"] = startup_config["mock_server_wait_msec"];
             }
         }else{
             this._params = {
@@ -63,6 +64,10 @@ class StartupConfig {
 
     get mock_server_port(){
         return this._params["mock_server_port"];
+    }
+
+    get mock_server_wait_msec(){
+        return this._params["mock_server_wait_msec"];
     }
 }
 

@@ -48,6 +48,8 @@ if(is_debug===true){
     if(startup_config.use_mock_server){
         const port = startup_config.mock_server_port;
         process.env["mock_server_port"] = port;
+        process.env["mock_server_wait_msec"] = startup_config.mock_server_wait_msec;
+
         app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
         app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
         app.commandLine.appendSwitch("ignore-certificate-errors", "true");

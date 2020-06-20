@@ -215,6 +215,7 @@
         let nico_mylist_image_cache = null;
         let nico_mylist_store = null;
         let nico_mylist = null;
+        let loaded_mylist_id = null;
 
         const getMylistIDList = () => {
             return new Promise( (resolve, reject) => {
@@ -405,6 +406,8 @@
         };
 
         const setData = async (mylist) => {
+            loaded_mylist_id = mylist.mylist_id;
+            
             const mylist_items = mylist.items;
             const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
             for (let i=0; i<mylist_items.length; i++) {
@@ -419,7 +422,7 @@
             grid_table.scrollToTop();   
         };
 
-        const updateMylist = async(mylist_id) => {
+        const getMylist = async(mylist_id) => {
             nico_mylist = new NicoMylist();
             const mylist = await nico_mylist.getMylist(mylist_id);
             await setMylist(mylist);
@@ -456,13 +459,7 @@
             }
         };
 
-        this.onkeydownUpdateMylist = async(e) => { 
-            if(e.target.value && e.keyCode===13){
-                await this.onclickUpdateMylist(e);
-            }
-        }; 
-
-        this.onclickUpdateMylist = async(e) => {  
+        const updateMylist = async () => {
             this.obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],
@@ -473,7 +470,7 @@
             
             try {
                 const mylist_id = getMylistID();
-                await updateMylist(mylist_id);
+                await getMylist(mylist_id);
 
                 const mylist_id_list = await getMylistIDList();
                 if(mylist_id_list.includes(mylist_id)){
@@ -491,6 +488,16 @@
             this.obs_modal_dialog.trigger("close");
         };
 
+        this.onkeydownUpdateMylist = async(e) => { 
+            if(e.target.value && e.keyCode===13){
+                await updateMylist();
+            }
+        }; 
+
+        this.onclickUpdateMylist = async(e) => {  
+            await updateMylist();
+        };
+
         this.onclickSaveMylist = (e) => {
             if(!nico_mylist){
                 return;
@@ -502,21 +509,25 @@
         };
 
         obs.on("mylist-page:item-dlbclicked", async (item) => {
-            try {
-                const mylist_id = item.mylist_id;
-                const mylist = nico_mylist_store.load(mylist_id);
-                setMylistID(mylist_id);
-                await setMylist(mylist); 
-            } catch (error) {
-                logger.error(error);
-                await showMessageBox("error", error.message);
+            const mylist_id = item.mylist_id;
+            if(loaded_mylist_id == mylist_id){
+                await updateMylist();
+            }else{
+                try {
+                    const mylist = nico_mylist_store.load(mylist_id);
+                    setMylistID(mylist_id);
+                    await setMylist(mylist); 
+                } catch (error) {
+                    logger.error(error);
+                    await showMessageBox("error", error.message);
+                }
             }
         });
 
         obs.on("mylist-page:load-mylist", async(mylist_id)=> {
             setMylistID(mylist_id);
             try {
-                await updateMylist(mylist_id);
+                await getMylist(mylist_id);
             } catch (error) {
                 if(error.cancel===true){
                     logger.info(`load mylist cancel id=${mylist_id}`);

@@ -1,5 +1,4 @@
 const test = require("ava");
-const nock = require("nock");
 const { DonwloadProgMsg, NicoDownloader } = require("../app/js/nico-downloader");
 const { NicoDownLoadMocks, writeBufStream, setupNicoDownloadNock, TestData } = require("./helper/nico-mock");
 

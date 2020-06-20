@@ -46,13 +46,9 @@ class CacheStore {
     }
 
     _load(){
-        try {
-            fs.accessSync(this.file_path);
-            const data = fs.readFileSync(this.file_path, "utf-8");
-            return JSON.parse(data);    
-        } catch (error) {
-            throw error;
-        }
+        fs.accessSync(this.file_path);
+        const data = fs.readFileSync(this.file_path, "utf-8");
+        return JSON.parse(data);
     }
 
     _save(obj){

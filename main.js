@@ -13,7 +13,7 @@ const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const { JsonStore } = require("./app/js/json-store");
 const { logger } = require("./app/js/logger");
-const { CmdLineParser } = require("./app/js/cmd-line-parser");
+const { StartupConfig } = require("./app/start-up-config");
 const { CSSLoader } = require("./app/js/css-loader");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -23,8 +23,10 @@ const library_ipc_server = new LibraryIPCServer();
 const bookmark_ipc_server = new BookMarkIPCServer();
 const history_ipc_server = new HistoryIPCServer();
 const downloaditem_ipc_server = new DownloadItemIPCServer();
-const cmdline_parser = new CmdLineParser(process.argv);
 const css_loader = new CSSLoader();
+
+const startup_config = new StartupConfig(__dirname, process.argv);
+startup_config.load();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -32,19 +34,19 @@ let main_win = null;
 let player_win = null;
 let do_app_quit = false;
 
-const main_html = cmdline_parser.get("--main", "app/html/index.html");
-const player_html = cmdline_parser.get("--player", "app/html/player.html");
-const main_html_path = `${__dirname}/${main_html}`;
-const player_html_path = `${__dirname}/${player_html}`;
-const preload_main_path = `${__dirname}/app/preload_main.js`;
-const preload_player_path = `${__dirname}/app/preload_player.js`;
-const config_fiiename = cmdline_parser.get("--config", "config.json");
-const is_debug = cmdline_parser.get("--debug", false);
+const main_html_path = startup_config.main_html_path;
+const player_html_path = startup_config.player_html_path;
+const preload_main_path = startup_config.preload_main_path;
+const preload_player_path = startup_config.preload_player_path;
+const config_fiiename = startup_config.config_fiiename;
+const window_frame = startup_config.window_frame;
+
+const is_debug = startup_config.debug;
 if(is_debug===true){
     process.env.NODE_ENV = "DEBUG";
 
-    const port = parseInt(cmdline_parser.get("--mock_server_port", null));
-    if(isNaN(port) === false){
+    if(startup_config.use_mock_server){
+        const port = startup_config.mock_server_port;
         process.env["mock_server_port"] = port;
         app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
         app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
@@ -52,14 +54,12 @@ if(is_debug===true){
         app.commandLine.appendSwitch("allow-insecure-localhost", "true");
         process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
         process.env["proxy_server"] = app.commandLine.getSwitchValue("proxy-server");
-    }else{
-        console.log(`can't use local proxy, mock_server_port is ${port}`);
+
+        console.log(`use local proxy, mock_server_port is ${port}`);
     }
 }
 
 process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
-
-const window_frame = main_html != "app/html/index.html";
 
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);

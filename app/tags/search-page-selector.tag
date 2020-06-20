@@ -11,7 +11,7 @@
             width: calc(var(--item-size) * 10 + var(--margin) * 2);
             border-radius: 5px;
             padding: var(--margin);
-            background-color: var(--control-color);
+            background-color: white;
         }
 
         .header {

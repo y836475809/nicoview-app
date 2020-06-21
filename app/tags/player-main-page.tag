@@ -322,7 +322,7 @@
             obs.trigger("player-video:update-comments", filtered_comments);
 
             this.obs_modal_dialog.trigger("close");
-            logger.info("player main update video_id=", video_id);
+            logger.debug("player main update video_id=", video_id);
         });
 
         obs.on("player-main-page:add-ng-comment", async (args) => {

@@ -476,12 +476,10 @@
                     nico_mylist_store.save(mylist_id, nico_mylist.xml);
                 }
             } catch (error) {
-                if(error.cancel===true){
-                    logger.info("update mylist cancel");
-                }else{
+                if(!error.cancel){
                     logger.error(error);
                     await showMessageBox("error", error.message);
-                } 
+                }
             }
 
             this.obs_modal_dialog.trigger("close");
@@ -528,12 +526,10 @@
             try {
                 await getMylist(mylist_id);
             } catch (error) {
-                if(error.cancel===true){
-                    logger.info(`load mylist cancel id=${mylist_id}`);
-                }else{
+                if(!error.cancel){
                     logger.error(error);
                     await showMessageBox("error", error.message);
-                } 
+                }
             }   
         });
 

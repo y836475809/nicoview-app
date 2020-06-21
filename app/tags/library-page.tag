@@ -390,7 +390,6 @@
                         grid_table.updateCell(item.id, "state", "更新完了");
                     } catch (error) {
                         if(error.cancel===true){   
-                            logger.info(`library update cancel id=${item.id}`);
                             grid_table.updateCell(item.id, "state", "更新キャンセル");
                             throw error;
                         }else{
@@ -464,7 +463,6 @@
                         }
                     } catch (error) {
                         if(error.cancel===true){   
-                            logger.info(`library update cancel id=${item.id}`);
                             grid_table.updateCell(item.id, "state", "変換キャンセル");
                             throw error;
                         }else{

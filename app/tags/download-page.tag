@@ -366,11 +366,9 @@
                         const download_item = nico_down.getDownloadedItem();
                         await IPCClient.request("library", "addDownloadedItem", {download_item});
                         
-                        const thumb_img = nico_down.nico_json.thumbImgPath;
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
-                            state: download_state.complete,
-                            thumb_img: thumb_img
+                            state: download_state.complete
                         });
                         logger.debug(`download complete id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.cancel){

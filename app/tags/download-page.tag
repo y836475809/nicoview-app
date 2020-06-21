@@ -76,7 +76,7 @@
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem } = window.GridTableDownloadItem;
         const { ScheduledTask } = window.ScheduledTask;
-        const { showMessageBox } = window.RemoteDailog;
+        const { showMessageBox, showOKCancelBox } = window.RemoteDailog;
         const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
@@ -279,6 +279,9 @@
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
+                    if(!await showOKCancelBox("info", "削除しますか?")){
+                        return;
+                    }
                     const deleted_ids = grid_table_dl.deleteSelectedItems();
                     await deleteDownloadItems(deleted_ids);
                 }}

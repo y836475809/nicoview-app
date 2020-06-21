@@ -35,7 +35,7 @@ class NicoSearchParams {
         this._limit = limit;
         this._targets = [];
         this._fields = [
-            "contentId","title","description","tags",
+            "contentId","title","tags",
             "viewCounter","commentCounter","startTime", 
             "thumbnailUrl","lengthSeconds"];
         this._context = context;

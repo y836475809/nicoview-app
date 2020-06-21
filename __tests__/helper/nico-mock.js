@@ -197,7 +197,7 @@ class NicoMocks {
 
     _search(text, code, delay, res_json){
         const fields = 
-            "contentId,title,description,tags,"
+            "contentId,title,tags,"
             + "viewCounter,commentCounter,startTime,"
             + "thumbnailUrl,lengthSeconds";
 

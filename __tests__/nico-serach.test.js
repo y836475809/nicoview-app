@@ -6,7 +6,7 @@ const nico_mocks = new NicoMocks();
 const mock_timeout = 121*1000;
 
 const pre_fields = 
-    "contentId,title,description,tags,"
+    "contentId,title,tags,"
     + "viewCounter,commentCounter,startTime,thumbnailUrl,lengthSeconds";
 
 const default_params = () => {

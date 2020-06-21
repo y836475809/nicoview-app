@@ -27,7 +27,7 @@ const searchItems = Object.freeze({
 });
 
 class NicoSearchParams {
-    constructor(limit=32){
+    constructor(limit=32, context="electron-app"){
         this._service = "video";
         this._query = "";
         this._sort = "";
@@ -38,6 +38,7 @@ class NicoSearchParams {
             "contentId","title","description","tags",
             "viewCounter","commentCounter","startTime", 
             "thumbnailUrl","lengthSeconds"];
+        this._context = context;
     }
 
     get(){
@@ -50,7 +51,7 @@ class NicoSearchParams {
             _sort: `${this._sort_order}${this._sort_name}`,
             _offset: this._calcOffset(),
             _limit: this._limit,
-            _context: "electron-app"
+            _context: this._context
         };
     }
 

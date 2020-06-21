@@ -382,7 +382,8 @@
 
         const search_offset = 1600;
         const search_limit = 32;
-        const nico_search_params = new NicoSearchParams(search_limit);
+        const search_context = `${remote.app.name}/${remote.app.getVersion()}`;
+        const nico_search_params = new NicoSearchParams(search_limit, search_context);
         const nico_search = new NicoSearch();
 
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {

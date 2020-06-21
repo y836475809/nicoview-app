@@ -76,7 +76,7 @@
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem } = window.GridTableDownloadItem;
         const { ScheduledTask } = window.ScheduledTask;
-        const { showMessageBox, showOKCancelBox } = window.RemoteDailog;
+        const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;

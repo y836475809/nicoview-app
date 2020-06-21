@@ -199,7 +199,7 @@
         const { GridTable } = window.GridTable;
         const { NicoUpdate } = window.NicoUpdate;
         const { BookMark } = window.BookMark;
-        const { showMessageBox, showOKCancelBox } = window.RemoteDailog;
+        const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;

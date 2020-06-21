@@ -275,7 +275,7 @@
         const { Menu } = remote;
         const { GridTable } = window.GridTable;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
-        const { showMessageBox } = window.RemoteDailog;
+        const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } =  window.IPC_CHANNEL;

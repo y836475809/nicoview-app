@@ -46,7 +46,7 @@
         const { NicoPlay } = window.NicoPlay;
         const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
-        const { showMessageBox } = window.RemoteDailog;
+        const { showMessageBox } = window.RendererDailog;
         const { NicoVideoData } = window.NicoVideoData;
         const { IPCClient } = window.IPC;
 

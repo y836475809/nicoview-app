@@ -147,7 +147,7 @@
         const path = window.path;
         const fs = window.fs;
         const { IPCClient } = window.IPC;
-        const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RemoteDailog;
+        const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RendererDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;
         

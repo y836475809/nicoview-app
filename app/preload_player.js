@@ -15,7 +15,7 @@ window.addEventListener( "error", async e => {
     global.logger.error(msg);
     
     try {
-        await global.RemoteDailog.showMessageBox("error", msg);
+        await global.RendererDailog.showMessageBox("error", msg);
     } catch (error) {
         alert(msg);
     }
@@ -25,7 +25,7 @@ window.addEventListener( "unhandledrejection", async e => {
     global.logger.error(e.reason);
    
     try {
-        await global.RemoteDailog.showMessageBox("error", e.reason.message);
+        await global.RendererDailog.showMessageBox("error", e.reason.message);
     } catch (error) {
         alert(e.reason.message);
     }
@@ -37,7 +37,7 @@ window.addEventListener("load", () => {
     require("slickgrid/plugins/slick.resizer");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
     global.IPC = require(`${root_dir}/app/js/ipc-client-server`);
-    global.RemoteDailog = require(`${root_dir}/app/js/remote-dialogs`);
+    global.RendererDailog = require(`${root_dir}/app/js/renderer-dialog`);
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);
     global.Niconico = require(`${root_dir}/app/js/niconico`); //TODO
     global.NicoPlay = require(`${root_dir}/app/js/nico-play`);

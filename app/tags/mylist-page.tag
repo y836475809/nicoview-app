@@ -179,7 +179,7 @@
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
-        const { showOKCancelBox, showMessageBox } = window.RemoteDailog;
+        const { showOKCancelBox, showMessageBox } = window.RendererDailog;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
 

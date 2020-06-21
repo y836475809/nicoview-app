@@ -141,7 +141,7 @@
 
     <script>
         const Sortable = window.Sortable;
-        const { showOKCancelBox } = window.RemoteDailog;
+        const { showOKCancelBox } = window.RendererDailog;
         let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;

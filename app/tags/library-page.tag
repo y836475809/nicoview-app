@@ -656,8 +656,7 @@
                 { label: "削除", async click() {
                     const items = grid_table.getSelectedDatas();
                     const video_ids = items.map(item => item.id);
-                    const result = await showOKCancelBox("info", "動画を削除しますか?");
-                    if(result!==0){
+                    if(!await showOKCancelBox("info", "動画を削除しますか?")){
                         return;
                     }
                     await deleteLibraryData(video_ids);
@@ -682,9 +681,8 @@
                 const video_id = data.id;
                 const video_type = data.video_type;
                 if(needConvertVideo(video_type)){
-                    const result = await showOKCancelBox("info", 
-                        `動画が${video_type}のため再生できません\nmp4に変換しますか?`);
-                    if(result!==0){
+                    if(!await showOKCancelBox("info", 
+                        `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
                         return;
                     }
                     await convertVideo(this, video_id);

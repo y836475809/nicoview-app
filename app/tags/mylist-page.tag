@@ -356,9 +356,8 @@
                 const video_id = data.id;
 
                 if(needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))===true){
-                    const result = await showOKCancelBox("info", 
-                        "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?");
-                    if(result!==0){
+                    if(!await showOKCancelBox("info", 
+                        "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
                         return;
                     }        
                     obs.trigger("library-page:convert-video", video_id);

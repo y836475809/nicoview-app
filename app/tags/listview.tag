@@ -176,9 +176,7 @@
             if(confirm.includes("delete") === false){
                 return true;
             }
-
-            const result = await showOKCancelBox("info", "削除しますか?");
-            return result===0;
+            return await showOKCancelBox("info", "削除しますか?");
         };
 
         obs.on("loadData", async (args) => {

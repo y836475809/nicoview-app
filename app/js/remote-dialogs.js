@@ -43,7 +43,7 @@ const showOKCancelBox = async (type, message) => {
         buttons: ["OK", "Cancel"],
         message: message
     });
-    return ret.response;
+    return ret.response == 0;
 };
 
 module.exports = {

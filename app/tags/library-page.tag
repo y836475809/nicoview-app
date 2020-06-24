@@ -254,9 +254,11 @@
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
             const video_type = dataContext.video_type;
+            const video_quality = dataContext.is_economy?"画質: エコノミー":"";
             return `<div>
                 ID: ${video_id}<br>
                 動画形式: ${video_type}<br>
+                ${video_quality}
                 </div>`;
         };       
         const columns = [
@@ -671,8 +673,14 @@
                     return true;
                 }   
                 return false; 
-            // TODO configに出す? 
-            },["video_name", "id", "tags", "video_type"]);
+            },
+            ["video_name", "id", "is_economy", "tags", "video_type"],
+            (item, column_id)=>{
+                if(column_id=="is_economy"){
+                    return item[column_id]?"エコノミー":"";
+                }
+                return String(item[column_id]);
+            });
     
             grid_table.onDblClick(async (e, data)=>{
                 logger.debug("library onDblClick data=", data);

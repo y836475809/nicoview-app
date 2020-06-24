@@ -263,9 +263,10 @@ class GridTable {
         this.dataView.updateItem(id, item);
     }
 
-    setFilter(filter, target_column_ids){
+    setFilter(filter, target_column_ids, toStringFunc=(item, column_id)=>{return String(item[column_id]);}){
         this.filter = filter;
         this.target_column_ids = target_column_ids;
+        this.toStringFunc = toStringFunc;
     }
 
     filterData(word){
@@ -273,6 +274,7 @@ class GridTable {
             filter: this.filter,
             target_column_ids: this.target_column_ids,
             searchString: word, 
+            toStringFunc: this.toStringFunc,
         });
         this.dataView.refresh();
     }
@@ -292,10 +294,11 @@ class GridTable {
         const words = splitBySpace(args.searchString);
         const column_ids = 
             args.target_column_ids.length==0?Object.keys(item):args.target_column_ids;
+        const toStringFunc = args.toStringFunc;
         return words.every(word=>{
             for (let index = 0; index < column_ids.length; index++) {
                 const column_id = column_ids[index];
-                const value = String(item[column_id]);
+                const value = toStringFunc(item, column_id);
                 if(args.filter(column_id, value, word)){
                     return true;
                 }   

@@ -15,6 +15,7 @@
             font-size: 15px;
             float: right;
             color: gray;
+            cursor: pointer;
         }
         .close-button:hover {
             color: black;

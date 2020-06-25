@@ -99,7 +99,7 @@
             </ul>        
         </div>
         <div class="content">
-            <label class="section-label">ffmpeg実行ファイルのパス(保存済みflv, swfをmp4の変換に使用)</label>
+            <label class="section-label">ffmpeg実行ファイルのパス(保存済みflv, swfを再生可能な形式に変換する)</label>
             <div style="display: flex;">
                 <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly>
                 <button class="input-button" title="ファイル選択" onclick={onclickSelectffmpegPath}>

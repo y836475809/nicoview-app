@@ -6,12 +6,14 @@ const { toTimeSec } = require("./time-format");
 
 class ImportLibrary {
     constructor(video_filepath){
+        this.video_filepath = video_filepath;
         this.dir = path.dirname(video_filepath);
         this.filename = path.basename(video_filepath);
         this.id = getIDFromFilename(this.filename);
         this.common_filename = getCommonNameFromFilename(this.filename);
     }
     async createLibraryItem(){        
+        const video_creation_time = await this._getCreationTime(this.video_filepath);
         const thumbnail_size = await this._getThumbnailSize();
         const data_type = await this._getDataType();
         const thumb_info = this._getThumbInfo(data_type);
@@ -25,7 +27,7 @@ class ImportLibrary {
             video_name: video.title,
             video_type: video.video_type,
             common_filename:this.common_filename,
-            creation_date: new Date().getTime(),
+            creation_date: video_creation_time.getTime(),
             last_play_date:-1,
             modification_date: -1,
             play_count: 0,     // TODO とりあえず再生回数0にする
@@ -90,6 +92,10 @@ class ImportLibrary {
         } catch (error) {
             return false;
         }
+    }
+    
+    async _getCreationTime(file_path){
+        return await (await fs.promises.stat(file_path)).birthtime;
     }
 }
 

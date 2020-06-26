@@ -761,7 +761,9 @@
             try {
                 const video_item = await IPCClient.request("library", "getItem", {video_id});
                 this.nico_update = new NicoUpdate(video_item);
-                
+                this.nico_update.on("updated", async (video_id, props, update_thumbnail) => {
+                    await IPCClient.request("library", "update", {video_id, props});
+                });
                 if(update_target=="thumbinfo"){
                     await this.nico_update.updateThumbInfo();
                 }else if(update_target=="comment"){

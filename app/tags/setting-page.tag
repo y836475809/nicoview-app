@@ -38,23 +38,17 @@
             border-radius: 2px;
         }
 
-        .import > ul {
-            padding-left: 0px;
-            margin-top: 0px;
-            margin-bottom: 0px;
+        .import {
+            display: flex;
         }
-        .import > ul li {
-            list-style: none;
-        }
-        .import > ul li:not(:first-child){
-            margin-top: 5px;
-        }
-        .import > ul li div {
+        .import > div {
             height: 25px;
-            width:220px;
             float: left; 
             line-height: 25px;
             user-select: none;
+        }
+        .import > button {
+            margin-left: 5px;
         }
 
         .setting-page button {
@@ -81,22 +75,20 @@
                 </button>
             </div>
         </div>
-        <div class="content import">
+        <div class="content">
             <label class="section-label">インポート</label>
-            <ul>
-                <li>
+                <div class="import">
                     <div>NNDDのDB(library.db)のインポート</div>
                     <button title="DB選択" onclick={onclickImport}>
                         <i class="far fa-file"></i>
                     </button>
-                </li>
-                <li>
-                    <div>動画のインポート</div>
+                </div>
+                <div class="import">
+                    <div>動画のインポート(ライブラリに登録済みの動画は無視)</div>
                     <button title="ファイル選択" onclick={onclickImportFiles}>
                         <i class="far fa-file"></i>
                     </button>
-                </li>
-            </ul>        
+                </div>
         </div>
         <div class="content">
             <label class="section-label">ffmpeg実行ファイルのパス(保存済みflv, swfを再生可能な形式に変換する)</label>
@@ -306,7 +298,11 @@
                 try {
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
-                    await IPCClient.request("library", "addItem", { item });
+                    const video_id = item.id;
+                    const exist = await IPCClient.request("library", "existItem", {video_id});
+                    if(!exist){
+                        await IPCClient.request("library", "addItem", { item });
+                    }
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     logger.error(error);

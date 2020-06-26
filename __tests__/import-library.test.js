@@ -15,6 +15,9 @@ class TestImportLibrary extends ImportLibrary {
         this.paths.push(file_path);
         return true;
     }
+    async _getCreationTime(file_path){
+        return new Date().getTime();
+    }
 }
 
 test("_getThumbInfo ", t => {

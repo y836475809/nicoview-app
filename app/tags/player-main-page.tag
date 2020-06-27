@@ -56,6 +56,7 @@
 
         let comment_filter = null;
         let nico_play = null;
+        let play_data = null;
 
         let org_video_size = null;
         let gutter = false;
@@ -100,6 +101,13 @@
             const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             const play_time_sec = toTimeSec(video.duration);
+
+            play_data = {
+                video_id: video.video_id, 
+                title: video.title,
+                thumbnailURL: video.thumbnailURL,
+                online: state.is_online
+            };
 
             comment_filter.setComments(comments);
             comment_filter.setPlayTime(play_time_sec);
@@ -239,6 +247,16 @@
   
         ipcRenderer.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
             const { video_id, online, time, video_item } = args;
+
+            play_data = { 
+                video_id: video_id, 
+                title: null,
+                thumbnailURL: null,
+                online: online
+            };
+
+            obs.trigger("player-window-titlebar:set-title", { title:video_id });
+
             if(!video_item || online){
                 const is_saved = video_item !== null;
                 await playVideoOnline(video_id, time, is_saved);
@@ -250,6 +268,10 @@
         ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
             const { level } = args;
             logger.setLevel(level);
+        });
+
+        obs.on("player-main-page:get-play-data-callback", (cb) => {
+            cb(play_data);
         });
 
         obs.on("player-main-page:metadata-loaded", (args) => {

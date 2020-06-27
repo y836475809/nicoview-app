@@ -60,39 +60,42 @@
         const obs = this.opts.obs; 
         this.obs_open_video_form = riot.observable();
 
-        let play_data = null;
-
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {
-                obs.trigger("player-video:get-play-data-callback", (play_data)=>{
-                    resolve(play_data);
+                obs.trigger("player-main-page:get-play-data-callback", (args)=>{
+                    resolve(args);
                 });
             });
         };
 
         const getMenuEnable = (menu_id, data) => {
+            const { title, thumbnailURL } = data;
+
             if(menu_id == "show-open-video-form"){
                 return true;
             }
 
-            if(!data) {
-                return false;
+            if(menu_id == "copy-url"){
+                return true;
             }
-            
-            const { state } = data;
-            if(menu_id=="add-download" && state.is_saved===true){
+
+            if(menu_id == "reload"){
+                return true;
+            }
+
+            if(!title || !thumbnailURL) {
                 return false;
             }
 
             return true;
         };
 
-        const createMenu = (self) => {
+        const createMenu = (self, play_data) => {
             const menu_templete = [
                 { 
                     id: "add-bookmark",
                     label: "ブックマーク", click() {
-                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
+                        const { video_id, title } = play_data;
                         const bk_item = BookMark.createVideoItem(title, video_id);
                         obs.trigger("player-main-page:add-bookmark", bk_item);
                     }
@@ -100,7 +103,7 @@
                 { 
                     id: "add-bookmark-time",
                     label: "ブックマーク(時間)", click() {
-                        const { video_id, title } = play_data.viewinfo.thumb_info.video;
+                        const { video_id, title } = play_data;
                         obs.trigger("player-video:get-current-time-callback", (current_time)=>{
                             const bk_item = BookMark.createVideoItem(title, video_id, current_time);
                             obs.trigger("player-main-page:add-bookmark", bk_item);                            
@@ -108,7 +111,7 @@
                     }
                 },
                 { label: "後で見る", click() {
-                    const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
+                    const { video_id, title, thumbnailURL } = play_data;
                     obs.trigger("player-main-page:add-stack-items", 
                         {
                             items:[{
@@ -122,7 +125,7 @@
                 { 
                     id: "add-download",
                     label: "ダウンロードに追加", click() {
-                        const { video_id, title, thumbnailURL } = play_data.viewinfo.thumb_info.video;
+                        const { video_id, title, thumbnailURL } = play_data;
                         const item = {
                             thumb_img: thumbnailURL,
                             id: video_id,
@@ -136,7 +139,7 @@
                 { 
                     id: "copy-url",
                     label: "urlをコピー", click() {
-                        const { video_id } = play_data.viewinfo.thumb_info.video;
+                        const { video_id } = play_data;
                         const url = getNicoURL(video_id);
                         clipboard.writeText(url);
                     }
@@ -152,12 +155,11 @@
                 { 
                     id: "reload",
                     label: "再読み込み", click() {
-                        const { viewinfo, state } = play_data;
-                        const { video_id } = viewinfo.thumb_info.video;
+                        const { video_id, online } = play_data;
                         ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                             video_id: video_id,
                             time: 0,
-                            online:state.is_online
+                            online:online
                         });
                     }
                 },
@@ -165,14 +167,14 @@
             return Menu.buildFromTemplate(menu_templete);
         };
     
-        const context_menu = createMenu(this);
         this.oncontextmenu = async (e) => {
             if(e.button===0){
                 obs.trigger("player-controls:play");
             }
 
             if(e.button===2){
-                play_data = await getPlayData();
+                const play_data = await getPlayData();
+                const context_menu = createMenu(this, play_data);
                 context_menu.items.forEach(menu => {
                     const id = menu.id;
                     menu.enabled = getMenuEnable(id, play_data); //play_data !== null;

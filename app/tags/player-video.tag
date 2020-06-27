@@ -298,9 +298,5 @@
         obs.on("player-video:get-current-time-callback", (cb) => { 
             cb(video_elm.currentTime);
         });
-
-        obs.on("player-video:get-play-data-callback", (cb) => { 
-            cb(play_data);
-        });
     </script>
 </player-video>

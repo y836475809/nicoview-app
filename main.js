@@ -311,58 +311,17 @@ app.on("ready", async ()=>{
     const log_level = config_ipc_server.get({ key: "log.level", value:"info"});
     setLogLevel(log_level);
 
-    ipcMain.handle(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
+    ipcMain.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
         await createPlayerWindow();
         player_win.show();
 
-        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, args);
-        return true;
-    });
-    
-    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, async (event, args) => {
-        await createPlayerWindow();
-        player_win.show();
-
-        const {video_id, time} = args;
+        const {video_id, online, time} = args;
         const video_item = library_ipc_server.getItem({video_id});
-        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
+        player_win.webContents.send(IPC_CHANNEL.PLAY_VIDEO, {
             video_id,
+            online,
+            time,
             video_item,
-            time
-        });
-    });
-
-    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_ID, async (event, args) => {
-        await createPlayerWindow();
-        player_win.show();
-
-        const {video_id, time} = args;
-        if(library_ipc_server.existItem({video_id})){
-            const video_item = library_ipc_server.getItem({video_id});
-            player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
-                video_id,
-                video_item,
-                time
-            });
-        }else{
-            player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
-                video_id:video_id,
-                video_item:null,
-                time:time
-            });
-        }
-    });
-
-    ipcMain.on(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, async (event, args) => {
-        await createPlayerWindow();
-        player_win.show();
-
-        const {video_id, time} = args;
-        const video_item = library_ipc_server.getItem({video_id});
-        player_win.webContents.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
-            video_id,
-            video_item,
-            time
         });
     });
 

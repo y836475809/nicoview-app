@@ -105,9 +105,11 @@
                             return;
                         }
                         const { video_id, time } = items[0].data;
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                        const online = false;
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                             video_id,
-                            time
+                            time,
+                            online
                         });
                     }
                 },
@@ -115,9 +117,11 @@
                     id: "play",
                     label: "オンラインで再生", click() {
                         const { video_id, time } = items[0].data;
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                        const online = true;
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                             video_id,
-                            time
+                            time,
+                            online
                         });
                     }
                 },
@@ -171,9 +175,11 @@
         this.obs_listview.on("item-dlbclicked", (item) => {  
             if(BookMark.isVideo(item)){
                 const { video_id, time } = item.data;
-                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                const online = false;
+                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                     video_id,
-                    time
+                    time,
+                    online
                 });
                 return;
             }

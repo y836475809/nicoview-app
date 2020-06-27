@@ -245,17 +245,19 @@
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id : video_id,
-                        time : 0
+                        time : 0,
+                        online: false
                     });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id: video_id,
-                        time: 0
+                        time: 0,
+                        online: true
                     });
                 }},
                 { label: "後で見る", click() {
@@ -438,9 +440,10 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id : data.id,
-                        time : 0
+                        time : 0,
+                        online: false
                     });
                 });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");

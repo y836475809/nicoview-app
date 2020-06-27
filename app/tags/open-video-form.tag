@@ -90,13 +90,10 @@
             }
             const params = {
                 video_id: video_id,
-                time: 0
+                time: 0,
+                online: isURL(elm.value)
             };
-            if(isURL(elm.value) === true){
-                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, params); 
-            }else{
-                ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, params); 
-            }
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, params); 
         };
 
         this.onkeydownPlay = (e) => {

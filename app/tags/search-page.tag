@@ -626,9 +626,10 @@
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id : video_id,
-                        time : 0
+                        time : 0,
+                        online: false
                     });
                 }},
                 { label: "オンラインで再生", click() {
@@ -636,9 +637,10 @@
                         return value.id!="";
                     });
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id: video_id,
-                        time: 0
+                        time: 0,
+                        online: true
                     });
                 }},
                 { label: "後で見る", click() {
@@ -699,9 +701,10 @@
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 if(video_id){
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id : video_id,
-                        time : 0
+                        time : 0,
+                        online: false
                     });
                 }
             });

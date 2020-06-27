@@ -122,9 +122,10 @@
         });
 
         this.onclickItem = (item, e) => {
-            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                 video_id: item.id,
-                time: 0
+                time: 0,
+                online: false
             });
         };
 

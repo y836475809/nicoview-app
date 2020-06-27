@@ -231,32 +231,30 @@
             }
         }; 
 
-        const playNiconicoOnline = async (video_id, video_item, time=0) => {
+        const playNiconicoOnline = async (video_id, time, is_saved) => {
             cancelPlay();
 
             const state = { 
                 is_online: true,
-                is_saved: video_item !== null,
+                is_saved: is_saved,
                 time: time
             };
             try {
-                play_by_video_id(video_id, state);               
+                await play_by_video_id(video_id, state);               
             } catch (error) {
                 logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
                 await showMessageBox("error", error.message);
             }
         }; 
-
-        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, async (event, args) => {
-            const { video_id, video_item, time } = args;
-
-            await playVideoItem(video_item, time);
-        });
-
-        ipcRenderer.on(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, (event, args) => {
-            const { video_id, video_item, time } = args;
-
-            playNiconicoOnline(video_id, video_item, time);
+  
+        ipcRenderer.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
+            const { video_id, online, time, video_item } = args;
+            if(!video_item || online){
+                const is_saved = video_item !== null;
+                await playNiconicoOnline(video_id, time, is_saved);
+            }else{
+                await playVideoItem(video_item, time);
+            }
         });
 
         ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {

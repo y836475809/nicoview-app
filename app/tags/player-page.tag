@@ -154,18 +154,11 @@
                     label: "再読み込み", click() {
                         const { viewinfo, state } = play_data;
                         const { video_id } = viewinfo.thumb_info.video;
-
-                        if(state.is_online===true){
-                            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
-                                video_id: video_id,
-                                time: 0
-                            }); 
-                        }else{
-                            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
-                                video_id: video_id,
-                                time: 0
-                            });
-                        }
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online:state.is_online
+                        });
                     }
                 },
             ];

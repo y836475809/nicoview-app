@@ -327,9 +327,10 @@
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {
             const video_id = item.video_id;
-            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                 video_id : video_id,
-                time : 0
+                time : 0,
+                online: false
             });     
         });
     
@@ -596,17 +597,19 @@
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id : video_id,
-                        time : 0
+                        time : 0,
+                        online: false
                     });
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
                     const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id: video_id,
-                        time: 0
+                        time: 0,
+                        online: true
                     });
                 }},
                 { label: "後で見る", click() {
@@ -693,10 +696,10 @@
                     }
                     await convertVideo(this, video_id);
                 }else{
-                    const time = 0;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_DATA, {
-                        video_id,
-                        time
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        video_id: video_id,
+                        time : 0,
+                        online: false,
                     });
                 }
             });

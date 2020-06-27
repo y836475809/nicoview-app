@@ -127,15 +127,17 @@
         const createWatchLinkMenu = (video_id) => {
             const menu_templete = [
                 { label: "再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id: video_id,
-                        time: 0
+                        time: 0,
+                        online: false
                     }); 
                 }},
                 { label: "オンラインで再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ONLINE, {
+                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                         video_id: video_id,
-                        time: 0
+                        time: 0,
+                        online: true
                     });
                 }},
             ];
@@ -149,9 +151,10 @@
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
 
-            ipcRenderer.send(IPC_CHANNEL.PLAY_BY_VIDEO_ID, {
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                 video_id: video_id,
-                time: 0
+                time: 0,
+                online: false
             }); 
             
             return false;

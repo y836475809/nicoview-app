@@ -755,39 +755,6 @@
             }
         });
 
-        this.nico_update = null;
-        obs.on("library-page:update-data", async (args) => { 
-            const { video_id, update_target, cb } = args;
-            try {
-                const video_item = await IPCClient.request("library", "getItem", {video_id});
-                this.nico_update = new NicoUpdate(video_item);
-                this.nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                    await IPCClient.request("library", "update", {video_id, props});
-                });
-                if(update_target=="thumbinfo"){
-                    await this.nico_update.updateThumbInfo();
-                }else if(update_target=="comment"){
-                    await this.nico_update.updateComment();
-                }
-
-                cb({ state:"ok", reason:null });
-            } catch (error) {
-                logger.error(error);
-                if(error.cancel===true){
-                    cb({ state:"cancel", reason:null });
-                }else if(/404:/.test(error.message)){
-                    cb({ state:"404", reason:error });
-                }else{
-                    cb({ state:"error", reason:error });
-                }
-            }
-        });  
-
-        obs.on("library-page:cancel-update-data", (args) => { 
-            if(this.nico_update){
-                this.nico_update.cancel();
-            }
-        });
 
         obs.on("css-loaded", () => {
             grid_table.resizeGrid();

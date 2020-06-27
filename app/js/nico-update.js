@@ -15,13 +15,19 @@ class NicoUpdate extends EventEmitter {
     constructor(video_item){
         super();
 
-        this.video_item = video_item;
-        this.org_video_item = deepCopy(video_item);
-        this.video_data = new NicoVideoData(this.video_item);
+        if(video_item){
+            this.setVideoItem(video_item);
+        }
 
         this.nico_watch = null;
         this.nico_comment = null;
         this.nico_thumbnail = null;
+    }
+
+    setVideoItem(video_item){
+        this.video_item = video_item;
+        this.org_video_item = deepCopy(video_item);
+        this.video_data = new NicoVideoData(this.video_item); 
     }
 
     _emitUpdated(update_thumbnail=false){
@@ -81,10 +87,10 @@ class NicoUpdate extends EventEmitter {
         this._updateThumbInfo(api_data, nico_json);
 
         if(!this._isDataTypeJson()){
-            this._convertComment(nico_xml, nico_json);
+            await this._convertComment(nico_xml, nico_json);
             this._setDataType("json");
         }else if(!await this._existPath(nico_json.commentPath)){
-            this._convertComment(nico_xml, nico_json);    
+            await this._convertComment(nico_xml, nico_json);    
         }
 
         this._emitUpdated();
@@ -109,11 +115,11 @@ class NicoUpdate extends EventEmitter {
         }
         
         if(!this._isDataTypeJson()){  
-            this._convertThumbInfo(nico_xml, nico_json);
+            await this._convertThumbInfo(nico_xml, nico_json);
             this._setTags(api_data.tags);
             this._setDataType("json");
         }else if(!await this._existPath(nico_json.thumbInfoPath)){ 
-            this._convertThumbInfo(nico_xml, nico_json);  
+            await this._convertThumbInfo(nico_xml, nico_json);  
         }
 
         this._emitUpdated();
@@ -304,14 +310,14 @@ class NicoUpdate extends EventEmitter {
         return await this.nico_thumbnail.getThumbImg(url);
     }
 
-    _convertComment(nico_xml, nico_json){
+    async _convertComment(nico_xml, nico_json){
         const cnv_data = new XMLDataConverter();
-        cnv_data.convertComment(nico_xml, nico_json); 
+        await cnv_data.convertComment(nico_xml, nico_json); 
     }
 
-    _convertThumbInfo(nico_xml, nico_json){
+    async _convertThumbInfo(nico_xml, nico_json){
         const cnv_data = new XMLDataConverter();
-        cnv_data.convertThumbInfo(nico_xml, nico_json);
+        await cnv_data.convertThumbInfo(nico_xml, nico_json);
     }
 
     _getCurrentComments(){

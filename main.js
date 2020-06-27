@@ -366,20 +366,6 @@ app.on("ready", async ()=>{
         });
     });
 
-    ipcMain.handle(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
-        const video_item = await new Promise( resolve => {
-            ipcMain.once(IPC_CHANNEL.RETURN_UPDATE_DATA, (event, data) => {
-                resolve(data);
-            });
-            main_win.webContents.send(IPC_CHANNEL.UPDATE_DATA, args);
-        });
-        return video_item;
-    });
-
-    ipcMain.on(IPC_CHANNEL.CANCEL_UPDATE_DATA, (event, args) => {
-        main_win.webContents.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, args);
-    });
-
     ipcMain.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args) => {
         main_win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
 

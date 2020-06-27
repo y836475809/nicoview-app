@@ -13,10 +13,6 @@ const IPC_CHANNEL =  Object.freeze({
     ADD_BOOKMARK: "ipc-add-bookmark",
     ADD_STACK_ITEMS: "ipc-add-stack-items",
 
-    UPDATE_DATA: "ipc-update-data",
-    RETURN_UPDATE_DATA: "ipc-return-update-data",
-    CANCEL_UPDATE_DATA: "ipc-cancel-update-data",
-
     SHOW_PLAYER: "ipc-show-player",
     READY_PLAYER: "ipc-ready-player",
     SET_COOKIE: "ipc-set-cookie",

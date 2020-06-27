@@ -44,6 +44,7 @@
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { NicoPlay } = window.NicoPlay;
+        const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RendererDailog;
@@ -286,43 +287,70 @@
         obs.on("player-main-page:add-stack-items", (args) => {
             ipcRenderer.send(IPC_CHANNEL.ADD_STACK_ITEMS, args);
         });
-
+  
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             logger.debug("player main update video_id=", video_id);
+            const nico_update = new NicoUpdate();
+
             this.obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],
                 cb: result=>{
-                    logger.debug("player main update cancel video_id=", video_id);
-                    ipcRenderer.send(IPC_CHANNEL.CANCEL_UPDATE_DATA, video_id);
-                    this.obs_modal_dialog.trigger("close");
+                    if(nico_update){
+                        nico_update.cancel();
+                    }
                 }
             });
 
-            const video_item = await ipcRenderer.invoke(IPC_CHANNEL.UPDATE_DATA, { video_id, update_target });
-            const video_data = new NicoVideoData(video_item);
-            const viewinfo = {
-                is_economy: video_data.getIsEconomy(),
-                is_deleted: video_data.getIsDeleted(),
-                thumb_info: video_data.getThumbInfo()      
-            }; 
-            const play_time_sec = video_item.play_time;
+            nico_update.on("updated", async (video_id, props, update_thumbnail) => {
+                try {
+                    await IPCClient.request("library", "update", {video_id, props});
+                    const updated_video_item = await IPCClient.request("library", "getItem", {video_id});
+                    const video_data = new NicoVideoData(updated_video_item);
+                    const viewinfo = {
+                        is_economy: video_data.getIsEconomy(),
+                        is_deleted: video_data.getIsDeleted(),
+                        thumb_info: video_data.getThumbInfo()
+                    };
 
-            const comments = video_data.getComments();
-            comment_filter.setComments(comments);
-            comment_filter.setPlayTime(play_time_sec);
-            const filtered_comments = comment_filter.getCommnets();
+                    comment_filter.setComments(video_data.getComments());
+                    comment_filter.setPlayTime(updated_video_item.play_time);
+                    const filtered_comments = comment_filter.getCommnets();
 
-            obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
-            obs.trigger("player-info-page:set-viewinfo-data", { 
-                viewinfo: viewinfo, 
-                comments: filtered_comments 
-            });   
+                    obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
+                    obs.trigger("player-info-page:set-viewinfo-data", {
+                        viewinfo: viewinfo, 
+                        comments: filtered_comments 
+                    });
 
-            obs.trigger("player-video:update-comments", filtered_comments);
+                    obs.trigger("player-video:update-comments", filtered_comments);
+                } catch (error) {
+                    if(!error.cancel){
+                        logger.error(error);
+                        await showMessageBox("error", error.message);
+                    }
+                }
+                this.obs_modal_dialog.trigger("close");
+            });
 
-            this.obs_modal_dialog.trigger("close");
-            logger.debug("player main update video_id=", video_id);
+            try {   
+                const video_item = await IPCClient.request("library", "getItem", {video_id});
+                nico_update.setVideoItem(video_item);
+
+                if(update_target=="thumbinfo"){
+                    await nico_update.updateThumbInfo();
+                }else if(update_target=="comment"){
+                    await nico_update.updateComment();
+                }else{
+                    throw new Error(`${update_target} is unknown`);
+                }
+            } catch (error) {
+                if(!error.cancel){
+                    logger.error(error);
+                    await showMessageBox("error", error.message);
+                }
+                this.obs_modal_dialog.trigger("close");
+            }
         });
 
         obs.on("player-main-page:add-ng-comment", async (args) => {

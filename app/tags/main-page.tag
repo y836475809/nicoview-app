@@ -365,30 +365,6 @@
             this.obs.trigger("play-stack-page:add-items", args);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.UPDATE_DATA, async (event, args) => {
-            const { video_id, update_target } = args;
-
-            const result = await new Promise((resolve, reject) => {
-                this.obs.trigger("library-page:update-data", { 
-                    video_id: video_id,
-                    update_target: update_target,
-                    cb: (result)=>{
-                        resolve(result);
-                    }
-                });
-            });
-            
-            if(result.state == "ok" || result.state == "404"){
-                const video_item = await IPCClient.request("library", "getItem", {video_id});
-                ipcRenderer.send(IPC_CHANNEL.RETURN_UPDATE_DATA, video_item);
-            } 
-        });
-
-        ipcRenderer.on(IPC_CHANNEL.CANCEL_UPDATE_DATA, (event, args)=>{
-            const video_id = args;
-            this.obs.trigger("library-page:cancel-update-data", video_id);
-        });
-
         ipcRenderer.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args)=>{
             const bk_item = args;
             this.obs.trigger("bookmark-page:add-items", [bk_item]);

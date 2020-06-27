@@ -147,18 +147,53 @@
             ["startHeartBeat", "HeartBeat開始"],
         ]);
 
-        const play_by_video_id = async (video_id, state) => {
-            nico_play = new NicoPlay();
+        const playVideoItem = async (video_item, time=0) => {
+            cancelPlay();
 
-            this.obs_modal_dialog.trigger("show", {
-                message: "...",
-                buttons: ["cancel"],
-                cb: result=>{
-                    nico_play.cancel();
-                }
-            });
+            const state = { 
+                is_online: false,
+                is_saved: true,
+                time: time
+            };
+            try {
+                const video_data = new NicoVideoData(video_item);
+                const video = {
+                    src: video_data.getVideoPath(),
+                    type: `video/${video_data.getVideoType()}`,
+                };
+                const viewinfo = {
+                    is_economy: video_data.getIsEconomy(),
+                    is_deleted: video_data.getIsDeleted(),
+                    thumb_info: video_data.getThumbInfo()      
+                };      
+                const comments = video_data.getComments();
+                await play_by_video_data(video, viewinfo, comments, state);
+            } catch (error) {
+                logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
+                await showMessageBox("error", error.message);
+            }
+        }; 
+
+        const playVideoOnline = async (video_id, time, is_saved) => {
+            cancelPlay();
+
+            const state = { 
+                is_online: true,
+                is_saved: is_saved,
+                time: time
+            };
 
             try {
+                nico_play = new NicoPlay();
+
+                this.obs_modal_dialog.trigger("show", {
+                    message: "...",
+                    buttons: ["cancel"],
+                    cb: result=>{
+                        cancelPlay();
+                    }
+                });
+
                 nico_play.on("changeState", (state)=>{
                     logger.debug("player main changeState state=", state);
                     const msg = play_msg_map.get(state);
@@ -191,67 +226,22 @@
                     if (a.vpos > b.vpos) return 1;
                     return 0;
                 });
-                await play_by_video_data(video_data, viewinfo, comments, state);
-
-                this.obs_modal_dialog.trigger("close");       
+                await play_by_video_data(video_data, viewinfo, comments, state);      
             } catch (error) {
                 if(!error.cancel){
-                    logger.error(error);
+                    logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
                     await showMessageBox("error", error.message);
                 }
-
-                this.obs_modal_dialog.trigger("close");
             }
-        }; 
 
-        const playVideoItem = async (video_item, time=0) => {
-            cancelPlay();
-
-            const state = { 
-                is_online: false,
-                is_saved: true,
-                time: time
-            };
-            try {
-                const video_data = new NicoVideoData(video_item);
-                const video = {
-                    src: video_data.getVideoPath(),
-                    type: `video/${video_data.getVideoType()}`,
-                };
-                const viewinfo = {
-                    is_economy: video_data.getIsEconomy(),
-                    is_deleted: video_data.getIsDeleted(),
-                    thumb_info: video_data.getThumbInfo()      
-                };      
-                const comments = video_data.getComments();
-                await play_by_video_data(video, viewinfo, comments, state);
-            } catch (error) {
-                logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                await showMessageBox("error", error.message);
-            }
-        }; 
-
-        const playNiconicoOnline = async (video_id, time, is_saved) => {
-            cancelPlay();
-
-            const state = { 
-                is_online: true,
-                is_saved: is_saved,
-                time: time
-            };
-            try {
-                await play_by_video_id(video_id, state);               
-            } catch (error) {
-                logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                await showMessageBox("error", error.message);
-            }
+            this.obs_modal_dialog.trigger("close");
         }; 
   
         ipcRenderer.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
             const { video_id, online, time, video_item } = args;
             if(!video_item || online){
                 const is_saved = video_item !== null;
-                await playNiconicoOnline(video_id, time, is_saved);
+                await playVideoOnline(video_id, time, is_saved);
             }else{
                 await playVideoItem(video_item, time);
             }

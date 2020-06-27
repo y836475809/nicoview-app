@@ -213,7 +213,7 @@
             }
             this.donwnload_item_num = video_ids.length;
             this.update();
-        }
+        };
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
             await updateDownloadBadge();

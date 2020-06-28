@@ -119,7 +119,6 @@
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
                 video_data: video_data,
-                viewinfo: viewinfo,
                 comments: filtered_comments,
                 state: state
             });

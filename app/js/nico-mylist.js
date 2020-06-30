@@ -34,7 +34,7 @@ class NicoMylist {
 
     _requestXML(id){
         const host = "https://www.nicovideo.jp";
-        const sort = 1;
+        const sort = 6; // 投稿が新しい順
         const url = `${host}/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
 
         this._req = new NicoClientRequest();

@@ -87,7 +87,7 @@
             height: 100%;
             --description-height: 100px;
             --control-height: 30px;
-            --margin: 5px;
+            --margin: 2px;
         }
 
         .mylist-container {
@@ -131,13 +131,15 @@
         }
 
         .mylist-description {
-            width: calc(100% - 10px);
+            width: calc(100% - var(--margin) * 2);
             height: var(--description-height);
             white-space: pre-wrap;
             overflow-y: scroll;
             padding: 3px;
             border: 1px solid var(--control-border-color);
-            margin: var(--margin);
+            margin-left: var(--margin);
+            margin-top: calc(var(--margin) * 2);
+            margin-bottom: calc(var(--margin) * 2);
             background-color: white;
         }
 

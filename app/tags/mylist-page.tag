@@ -94,13 +94,8 @@
             display: flex;
         }
 
-        .mylist-label {
-            margin-left: var(--margin);
-            margin-right: var(--margin);
-            user-select: none;
-        }
-
         .mylist-input {
+            margin-left: var(--margin);
             width: 200px;
             font-size: 1.2em;
             border-width: 1px;
@@ -155,7 +150,6 @@
     </style>      
 
     <div class="mylist-container">
-        <div class="mylist-label center-hv">mylist /</div>
         <input class="mylist-input" type="text" onkeydown={onkeydownUpdateMylist}/>
         <div class="update-button center-hv" title="更新", onclick={onclickUpdateMylist}>
             <i class="fas fa-redo-alt"></i>
@@ -388,8 +382,7 @@
 
         const getMylistID = () => {
             const elm = this.root.querySelector(".mylist-input");
-            const value = elm.value;
-            return value.replace("mylist/", "");
+            return elm.value;
         };
         const setMylistID = (id) => {
             const elm = this.root.querySelector(".mylist-input");

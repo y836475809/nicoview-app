@@ -27,26 +27,16 @@ class NicoMylist {
     }
 
     async requestXML(mylist_id){
-        const id = this._getID(mylist_id);
-        this.xml = await this._requestXML(id);
+        this.xml = await this._requestXML(mylist_id);
         return this.xml;
     }
 
     _requestXML(id){
         const host = "https://www.nicovideo.jp";
         const sort = 6; // 投稿が新しい順
-        const url = `${host}/mylist/${id}?rss=2.0&numbers=1&sort=${sort}`;
-
+        const url = `${host}/${id}?rss=2.0&numbers=1&sort=${sort}`;
         this._req = new NicoClientRequest();
         return this._req.get(url);
-    }
-
-    /**
-     * mylist/00000 -> 00000
-     * @param {string} mylist_id 
-     */
-    _getID(mylist_id){
-        return mylist_id.replace("mylist/", "");
     }
 }
 
@@ -82,7 +72,7 @@ class NicoMylistReader {
 
         const mylist = {
             title: title,
-            mylist_id: mylist_id,
+            mylist_id: `mylist/${mylist_id}`,
             link: link,
             creator: creator,
             description: description,
@@ -151,7 +141,8 @@ class NicoMylistStore {
 
     _getFilePath(mylist_id){
         const dir = this.get_dir_path;
-        return path.join(dir, `mylist${mylist_id}.xml`);
+        const fname = mylist_id.replace("/", "-");
+        return path.join(dir, `${fname}.xml`);
     }
 }
 
@@ -268,7 +259,8 @@ class NicoMylistImageCache {
     }
 
     _getFileName(mylist_id){
-        return `mylist${mylist_id}-img.json`;
+        const fname = mylist_id.replace("/", "-");
+        return `${fname}-img.json`;
     }
 
     _existLocal(mylist_id){

@@ -13,7 +13,7 @@ test("nico mylist parse xml", t => {
 
     t.deepEqual(mylist, {
         title: "マイリスト1",
-        mylist_id:"00000000",
+        mylist_id:"mylist/00000000",
         link: "http://www.nicovideo.jp/mylist/00000000",
         description: "説明\r\n動画マイリスト",
         creator: "user1",

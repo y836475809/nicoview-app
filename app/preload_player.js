@@ -43,6 +43,7 @@ window.addEventListener("load", () => {
     global.NicoPlay = require(`${root_dir}/app/js/nico-play`);
     global.NicoUpdate = require(`${root_dir}/app/js/nico-update`);
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);
+    global.NicoURL = require(`${root_dir}/app/js/nico-url`);
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
     global.BookMark = require(`${root_dir}/app/js/bookmark`);

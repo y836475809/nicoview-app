@@ -9,7 +9,7 @@ test.before(t => {
 
 test("nico mylist parse xml", t => {
     const mrd = new NicoMylistReader();
-    const mylist = mrd.parse(mylist_xml);
+    const mylist = mrd.parse("mylist/00000000", mylist_xml);
 
     t.deepEqual(mylist, {
         title: "マイリスト1",
@@ -60,12 +60,12 @@ test("nico mylist parse xml", t => {
 
 test("nico mylist error xml empty", t => {
     const mrd = new NicoMylistReader();
-    t.throws(() => { mrd.parse(""); });
+    t.throws(() => { mrd.parse("mylist/00000000", ""); });
 });
 
 test("nico mylist error parse xml", t => {
     const mrd = new NicoMylistReader();
-    t.throws(() => { mrd.parse(null); });
+    t.throws(() => { mrd.parse("mylist/00000000", null); });
 });
 
 test("nico mylist result is correct", t => {

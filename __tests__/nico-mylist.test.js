@@ -1,5 +1,6 @@
 const test = require("ava");
 const { NicoMylist } = require("../app/js/nico-mylist");
+const NicoUrl = require("../app/js/nico-url");
 const { NicoMylistMocks } = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");
 
@@ -27,6 +28,38 @@ test.beforeEach(t => {
 
 test.afterEach(t => {
     prof_time.end(t);
+});
+
+test("mylist getMylistID mylist", (t) => {
+    const url = "https://www.nicovideo.jp/mylist/123456789";
+    const mylist_id = NicoUrl.getMylistID(url);
+
+    t.is(mylist_id, "mylist/123456789");
+});
+
+test("mylist getMylistID userlist1", (t) => {
+    const url = "https://www.nicovideo.jp/user/123456789";
+    const mylist_id = NicoUrl.getMylistID(url);
+
+    t.is(mylist_id, "user/123456789");
+});
+
+test("mylist getMylistID userlist2", (t) => {
+    const url = "https://www.nicovideo.jp/user/123456789/mylist";
+    const mylist_id = NicoUrl.getMylistID(url);
+
+    t.is(mylist_id, "user/123456789");
+});
+
+test("mylist _getURL", (t) => {
+    const nico_mylist = new NicoMylist();
+    t.is(nico_mylist._getURL("mylist/123456789"), 
+        "https://www.nicovideo.jp/mylist/123456789?rss=2.0&numbers=1&sort=6");
+    t.is(nico_mylist._getURL("user/123456789"), 
+        "https://www.nicovideo.jp/user/123456789/video?rss=2.0&numbers=1&sort=6");
+
+    t.throws(() => { nico_mylist._getURL("123456789"); });
+    t.throws(() => { nico_mylist._getURL("user/123456789/mylist"); });
 });
 
 test("mylist get", async (t) => {

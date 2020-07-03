@@ -118,6 +118,7 @@
         const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const NicoURL = window.NicoURL;
 
         const obs = this.opts.obs; 
 
@@ -177,8 +178,7 @@
             e.preventDefault(); 
             e.stopPropagation();
             
-            const paths = e.target.href.split("/");
-            const mylist_id = paths.pop();
+            const mylist_id = NicoURL.getMylistID(e.target.href);
             obs.trigger("player-main-page:load-mylist", mylist_id);
             return false;
         };
@@ -198,6 +198,8 @@
                             value.onclick = watchLinkClick;
                             value.onmouseup = watchLinkMouseUp;
                         }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
+                            value.onclick = mylistLinkClick;
+                        }else if(/^https:\/\/www.nicovideo.jp\/user\//.test(value.href)){
                             value.onclick = mylistLinkClick;
                         }else{
                             value.onclick = (e) =>{
@@ -280,7 +282,7 @@
                 return;
             }
             if(/^mylist\/\d+/.test(text)){
-                const mylist_id = text.match(/\d+/)[0]; 
+                const mylist_id = text;
                 popupDescriptionMenu("mylist", mylist_id);
                 return;
             }

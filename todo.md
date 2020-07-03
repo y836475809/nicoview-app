@@ -4,7 +4,7 @@
 - [ ] 長いコメントは速すぎる場合があるのでdurationを長くする
 - [ ] viewfinfo
   - [ ] コメント数はローカルのコメント数を優先して表示する
-  - [ ] 説明のuserのリンクを有効にする
+  - [x] 説明のuser listのリンクを有効にする
   - [ ] 説明のシークのリンクを有効にする
   - [ ] 投稿者の画像をキャッシュする
   - [ ] 動画サムネイルで大きいサイズを取得する
@@ -23,7 +23,7 @@
 - [ ] accordion.tagでthis.items==undefinedの場合(データ型が不適切)を処理してない
 - [ ] histroty,searchでのデータの型チェックが必要
 - [ ] proxy認証「app.on("login", 」の場合に入力ダイアログを表示する
-- [ ] userlistページ追加
+- [x] userlistをmylistページに読み込む
 - [ ] timelineのclear時にtimeline.removeを入れておく
 - [ ] watchページが削除されていて404の場合がある
 - [ ] library pageのサムネイルサイズ(小)は空白ができるので背景色(黒？)を設定する

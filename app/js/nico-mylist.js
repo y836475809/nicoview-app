@@ -22,31 +22,41 @@ class NicoMylist {
 
     async getMylist(mylist_id){
         await this.requestXML(mylist_id);
-        this.mylist = this.reader.parse(this.xml);
+        this.mylist = this.reader.parse(mylist_id, this.xml);
         return this.mylist;
     }
 
     async requestXML(mylist_id){
-        this.xml = await this._requestXML(mylist_id);
+        const url = this._getURL(mylist_id);
+        this.xml = await this._requestXML(url);
         return this.xml;
     }
 
-    _requestXML(id){
-        const host = "https://www.nicovideo.jp";
-        const sort = 6; // 投稿が新しい順
-        const url = `${host}/${id}?rss=2.0&numbers=1&sort=${sort}`;
+    _requestXML(url){
         this._req = new NicoClientRequest();
         return this._req.get(url);
+    }
+
+    _getURL(mylist_id){
+        const host = "https://www.nicovideo.jp";
+        const sort = 6; // 投稿が新しい順
+        if(/^mylist\/\d+$/.test(mylist_id)){
+            return `${host}/${mylist_id}?rss=2.0&numbers=1&sort=${sort}`;
+        }
+        if(/^user\/\d+$/.test(mylist_id)){
+            return `${host}/${mylist_id}/video?rss=2.0&numbers=1&sort=${sort}`;
+        }
+
+        throw new Error(`fault NicoMylist._getURL mylist_id=${mylist_id}`);
     }
 }
 
 class NicoMylistReader {
-    parse(xml){
+    parse(mylist_id, xml){
         const $ = cheerio.load(xml, {xmlMode: true});
         
         const title = $("channel > title").text();
         const link = $("channel > link").text();
-        const mylist_id = link.match(/[^/]+$/)[0];
         const description = $("channel > description").text();
         const creator = $("channel > dc\\:creator").text();
 
@@ -72,7 +82,7 @@ class NicoMylistReader {
 
         const mylist = {
             title: title,
-            mylist_id: `mylist/${mylist_id}`,
+            mylist_id: mylist_id,
             link: link,
             creator: creator,
             description: description,
@@ -122,7 +132,7 @@ class NicoMylistStore {
     load(mylist_id){
         const path = this._getFilePath(mylist_id);
         const xml = fs.readFileSync(path, "utf-8");
-        return this.reader.parse(xml);
+        return this.reader.parse(mylist_id, xml);
     }
 
     delete(mylist_id){

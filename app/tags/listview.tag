@@ -236,6 +236,21 @@
             }, item_duration);
         });
 
+        obs.on("select-item-by-index", (args) => {
+            const { index } = args;
+            if(index < 0){
+                return;
+            }
+            const elms = this.root.querySelectorAll(".listview-item");
+            if(index >= elms.length){
+                return;
+            }
+            elms.forEach((elm) => {
+                elm.classList.remove("selected");
+            });
+            elms[index].classList.add("selected");  
+        });
+
         const sortItems = () => {
             const order = sortable.toArray().map(value=>Number(value));
             const sorted_items = [];

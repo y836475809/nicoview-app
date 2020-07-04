@@ -77,6 +77,18 @@
             const { cb } = args;
             cb({items:this.items});
         });
+
+        obs.on("mylist-page:sidebar:select-item", (args) => {
+            const { mylist_id } = args;
+            const index = this.items.findIndex(item => {
+                return item.mylist_id == mylist_id;
+            });
+
+            if(index < 0){
+                return;
+            }
+            this.obs_listview.trigger("select-item-by-index", { index });
+        });
     </script>
 </mylist-sidebar>
 
@@ -224,6 +236,11 @@
                 };
                 obs.trigger("mylist-page:sidebar:get-items", { cb });
             }); 
+        };
+
+        const existMylist = async (id) => {
+            const ids = await getMylistIDList();
+            return ids.includes(id);
         };
 
         const imageCacheFormatter = (row, cell, value, columnDef, dataContext)=> {
@@ -522,7 +539,12 @@
         obs.on("mylist-page:load-mylist", async(mylist_id)=> {
             setMylistID(mylist_id);
             try {
-                await getMylist(mylist_id);
+                if(await existMylist(mylist_id)){
+                    await setMylist(nico_mylist_store.load(mylist_id)); 
+                }else{
+                    await getMylist(mylist_id);
+                }
+                obs.trigger("mylist-page:sidebar:select-item", { mylist_id });
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);

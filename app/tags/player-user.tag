@@ -212,7 +212,7 @@
             const mylist_id = NicoURL.getMylistID(e.target.href);
             if(e.button === 2){
                 const menu_template = Menu.buildFromTemplate([
-                    { label: "開く", click() {
+                    { label: "マイリストで開く", click() {
                         obs.trigger("player-main-page:load-mylist", mylist_id);
                     }},
                     { label: "URLをコピー", click() {
@@ -324,23 +324,21 @@
             }
             if(type=="mylist" || type=="user"){
                 const mylist_id = text;
-                const menu_templete = [
-                    { label: "開く", click() {
+                menu_template = Menu.buildFromTemplate([
+                    { label: "マイリストで開く", click() {
                         obs.trigger("player-main-page:load-mylist", mylist_id);
                     }},
                     { label: "URLをコピー", click() {
                         clipboard.writeText(NicoURL.getMylistURL(mylist_id));
                     }}
-                ];
-                menu_template = Menu.buildFromTemplate(menu_templete);
+                ]);
             }
             if(type=="text"){
-                const menu_templete = [
+                menu_template = Menu.buildFromTemplate([
                     { label: "コピー", click() {
                         clipboard.writeText(text);
                     }}
-                ];
-                menu_template = Menu.buildFromTemplate(menu_templete);    
+                ]);    
             }   
             menu_template.popup({window: remote.getCurrentWindow()});
         };

@@ -37,6 +37,21 @@ const getMylistID = (url) => {
     throw new Error(`not find mylist id: url=${url}`);
 };
 
+/**
+ * mylist_id: mylist/* or user/*
+ * @param {string} mylist_id 
+ */
+const getMylistURL = (mylist_id) => {
+    if(/^mylist\/\d+/.test(mylist_id)){
+        return `${NICO_URL.VIDEO}/${mylist_id}`;
+    }
+    if(/^user\/\d+/.test(mylist_id)){
+        return `${NICO_URL.VIDEO}/${mylist_id}/video`;
+    }
+
+    throw new Error(`not find mylist id: url=${mylist_id}`);
+};
+
 const getWatchURL = (video_id) => {
     return `${NICO_URL.VIDEO}/watch/${video_id}`;
 };
@@ -44,6 +59,7 @@ const getWatchURL = (video_id) => {
 module.exports = {
     getURLKind,
     getMylistID,
+    getMylistURL,
     getWatchURL,
     NICO_URL,
 };

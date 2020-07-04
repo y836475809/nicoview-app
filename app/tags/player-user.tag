@@ -141,6 +141,9 @@
                         online: true
                     });
                 }},
+                { label: "URLをコピー", click() {
+                    clipboard.writeText(NicoURL.getWatchURL(video_id));
+                }}
             ];
             return Menu.buildFromTemplate(menu_templete);
         };
@@ -169,7 +172,26 @@
             const video_id = paths.pop();
             
             if(e.button === 2){
-                createWatchLinkMenu(video_id).popup({window: remote.getCurrentWindow()}); 
+                const menu_template = Menu.buildFromTemplate([
+                    { label: "再生", click() {
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online: false
+                        }); 
+                    }},
+                    { label: "オンラインで再生", click() {
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online: true
+                        });
+                    }},
+                    { label: "URLをコピー", click() {
+                        clipboard.writeText(e.target.href);
+                    }}
+                ]);
+                menu_template.popup({window: remote.getCurrentWindow()}); 
             }
             return false;
         };
@@ -180,6 +202,40 @@
             
             const mylist_id = NicoURL.getMylistID(e.target.href);
             obs.trigger("player-main-page:load-mylist", mylist_id);
+            return false;
+        };
+
+        const mylistLinkMouseUp = (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            const mylist_id = NicoURL.getMylistID(e.target.href);
+            if(e.button === 2){
+                const menu_template = Menu.buildFromTemplate([
+                    { label: "開く", click() {
+                        obs.trigger("player-main-page:load-mylist", mylist_id);
+                    }},
+                    { label: "URLをコピー", click() {
+                        clipboard.writeText(e.target.href);
+                    }}
+                ]);
+                menu_template.popup({window: remote.getCurrentWindow()}); 
+            }
+            return false;
+        };
+
+        const linkMouseUp = (e) => {
+            e.preventDefault(); 
+            e.stopPropagation();
+
+            if(e.button === 2){
+                const menu_template = Menu.buildFromTemplate([
+                    { label: "URLをコピー", click() {
+                        clipboard.writeText(e.target.href);
+                    }}
+                ]);
+                menu_template.popup({window: remote.getCurrentWindow()}); 
+            }
             return false;
         };
 
@@ -198,15 +254,15 @@
                         if(url_kind=="watch"){
                             value.onclick = watchLinkClick;
                             value.onmouseup = watchLinkMouseUp;
-                        }else if(url_kind=="mylist"){
+                        }else if(url_kind=="mylist" || url_kind=="user"){
                             value.onclick = mylistLinkClick;
-                        }else if(url_kind=="user"){
-                            value.onclick = mylistLinkClick;
+                            value.onmouseup = mylistLinkMouseUp;
                         }else{
                             value.onclick = (e) =>{
                                 e.preventDefault();
                                 return false;
                             };
+                            value.onmouseup = linkMouseUp;
                         }
                     });
                 }
@@ -246,13 +302,34 @@
             let menu_template = null;
             if(type=="watch"){
                 const video_id = text;
-                menu_template = createWatchLinkMenu(video_id);
+                menu_template = Menu.buildFromTemplate([
+                    { label: "再生", click() {
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online: false
+                        }); 
+                    }},
+                    { label: "オンラインで再生", click() {
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online: true
+                        });
+                    }},
+                    { label: "URLをコピー", click() {
+                        clipboard.writeText(NicoURL.getWatchURL(video_id));
+                    }}
+                ]);
             }
             if(type=="mylist" || type=="user"){
                 const mylist_id = text;
                 const menu_templete = [
                     { label: "開く", click() {
                         obs.trigger("player-main-page:load-mylist", mylist_id);
+                    }},
+                    { label: "URLをコピー", click() {
+                        clipboard.writeText(NicoURL.getMylistURL(mylist_id));
                     }}
                 ];
                 menu_template = Menu.buildFromTemplate(menu_templete);

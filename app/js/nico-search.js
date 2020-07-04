@@ -1,4 +1,5 @@
 const { NicoClientRequest } = require("./nico-client-request");
+const { NICO_URL } = require("./nico-url");
 const querystring = require("querystring");
 
 const sortNames = [
@@ -157,8 +158,7 @@ class NicoSearch {
     async search(params){   
         const service = params._service;
         const query_json = params.get();
-        const host = "https://api.search.nicovideo.jp";
-        const url = `${host}/api/v2/${service}/contents/search`;
+        const url = `${NICO_URL.SEARCH}/api/v2/${service}/contents/search`;
         const page = params._page;
         
         this._req = new NicoClientRequest();

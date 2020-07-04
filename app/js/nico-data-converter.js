@@ -1,6 +1,7 @@
 const fsPromises = require("fs").promises;
 const NicoDataParser = require("./nico-data-parser");
 const { NicoXMLFile, NicoJsonFile } = require("./nico-data-file");
+const { getWatchURL } = require("./nico-url");
 const { toTimeString } = require("./time-format");
 
 class XMLDataConverter {
@@ -258,6 +259,7 @@ class JsonDataConverter {
 
         const tags = this._convertTags(thumb_info.tags, "      ");
 
+        const watch_url = getWatchURL(video_id);
         const xml = [
             "<nicovideo_thumb_response status=\"ok\">",
             "  <thumb>",
@@ -274,7 +276,7 @@ class JsonDataConverter {
             `    <comment_num>${comment_num}</comment_num>`,
             `    <mylist_counter>${mylist_counter}</mylist_counter>`,
             "    <last_res_body></last_res_body>",
-            `    <watch_url>https://www.nicovideo.jp/watch/${video_id}</watch_url>`,
+            `    <watch_url>${watch_url}</watch_url>`,
             "    <thumb_type>video</thumb_type>",
             "    <embeddable>1</embeddable>",
             "    <no_live_play>0</no_live_play>",

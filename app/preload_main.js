@@ -47,6 +47,7 @@ window.addEventListener("load", () => {
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);
     global.NicoSearch = require(`${root_dir}/app/js/nico-search`);
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);
+    global.NicoURL = require(`${root_dir}/app/js/nico-url`);
     global.NicoMylist = require(`${root_dir}/app/js/nico-mylist`);
     global.NicoUpdate = require(`${root_dir}/app/js/nico-update`);
     global.BookMark = require(`${root_dir}/app/js/bookmark`);

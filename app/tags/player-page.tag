@@ -53,8 +53,8 @@
         /* globals riot */
         const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { BookMark } = window.BookMark;
-        const { getNicoURL } = window.Niconico;       
+        const { BookMark } = window.BookMark;   
+        const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         
         const obs = this.opts.obs; 
@@ -140,7 +140,7 @@
                     id: "copy-url",
                     label: "urlをコピー", click() {
                         const { video_id } = play_data;
-                        const url = getNicoURL(video_id);
+                        const url = getWatchURL(video_id);
                         clipboard.writeText(url);
                     }
                 },

@@ -61,6 +61,7 @@
         /* globals */
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { NICO_URL } = window.NicoURL;
 
         const obs = this.opts.obs; 
 
@@ -70,8 +71,7 @@
         };
 
         const isURL = (value) => {
-            return value.startsWith("https://www.nicovideo.jp") === true
-                || value.startsWith("http://www.nicovideo.jp") === true;
+            return value.startsWith(`${NICO_URL.VIDEO}/watch/`);
         };
 
         const getVideoID = (value) => {

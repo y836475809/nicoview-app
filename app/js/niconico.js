@@ -1,14 +1,7 @@
 const cheerio = require("cheerio");
 const { NicoClientRequest } = require("./nico-client-request");
+const { NICO_URL, getWatchURL } = require("./nico-url");
 const { logger } = require("./logger");
-
-const nicovideo_url = "https://www.nicovideo.jp";
-const niconmsg_url = "https://nmsg.nicovideo.jp/api.json/";
-
-
-const getNicoURL = (video_id) => {
-    return `${nicovideo_url}/watch/${video_id}`;
-};
 
 class NicoWatch {
     constructor() { 
@@ -22,7 +15,7 @@ class NicoWatch {
     }
 
     async watch(video_id){
-        const url = `${nicovideo_url}/watch/${video_id}`;
+        const url = getWatchURL(video_id);
         this._req = new NicoClientRequest();
         const body = await this._req.get(url);
         const $ = cheerio.load(body);
@@ -257,7 +250,7 @@ class NicoComment {
 
     _post(post_data){
         this._req = new NicoClientRequest();
-        return this._req.post(niconmsg_url, {json:post_data});
+        return this._req.post(`${NICO_URL.MSG}/api.json/`, {json:post_data});
     }
 
     hasOwnerComment() {
@@ -409,5 +402,4 @@ module.exports = {
     NicoVideo,
     NicoComment,
     NicoThumbnail,
-    getNicoURL
 };

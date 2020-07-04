@@ -194,12 +194,13 @@
                     this.user_description_class = "html";
                     const a_tags = content_elm.querySelectorAll("a");
                     a_tags.forEach(value=>{
-                        if(/^https:\/\/www.nicovideo.jp\/watch\//.test(value.href)){
+                        const url_kind = NicoURL.getURLKind(value.href);
+                        if(url_kind=="watch"){
                             value.onclick = watchLinkClick;
                             value.onmouseup = watchLinkMouseUp;
-                        }else if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(value.href)){
+                        }else if(url_kind=="mylist"){
                             value.onclick = mylistLinkClick;
-                        }else if(/^https:\/\/www.nicovideo.jp\/user\//.test(value.href)){
+                        }else if(url_kind=="user"){
                             value.onclick = mylistLinkClick;
                         }else{
                             value.onclick = (e) =>{

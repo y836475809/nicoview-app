@@ -2,6 +2,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
 const { NicoClientRequest } = require("./nico-client-request");
+const { NICO_URL } = require("./nico-url");
 const { CacheStore } = require("./cache-store");
 const { logger } = require("./logger");
 
@@ -38,13 +39,12 @@ class NicoMylist {
     }
 
     _getURL(mylist_id){
-        const host = "https://www.nicovideo.jp";
         const sort = 6; // 投稿が新しい順
         if(/^mylist\/\d+$/.test(mylist_id)){
-            return `${host}/${mylist_id}?rss=2.0&numbers=1&sort=${sort}`;
+            return `${NICO_URL.VIDEO}/${mylist_id}?rss=2.0&numbers=1&sort=${sort}`;
         }
         if(/^user\/\d+$/.test(mylist_id)){
-            return `${host}/${mylist_id}/video?rss=2.0&numbers=1&sort=${sort}`;
+            return `${NICO_URL.VIDEO}/${mylist_id}/video?rss=2.0&numbers=1&sort=${sort}`;
         }
 
         throw new Error(`fault NicoMylist._getURL mylist_id=${mylist_id}`);

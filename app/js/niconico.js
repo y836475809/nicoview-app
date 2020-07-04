@@ -21,25 +21,18 @@ class NicoWatch {
         }
     }
 
-    watch(video_id){
-        return new Promise(async (resolve, reject) => {
-            const url = `${nicovideo_url}/watch/${video_id}`;
-            this._req = new NicoClientRequest();
-            try {
-                const body = await this._req.get(url);
-                const $ = cheerio.load(body);
-                const data_json = $("#js-initial-watch-data").attr("data-api-data");
-                if(!data_json){
-                    reject(new Error("not find data-api-data"));
-                    return; 
-                }
-                const api_data = JSON.parse(data_json);
-                const nico_cookie = this._req.getNicoCookie();
-                resolve({ nico_cookie, api_data }); 
-            } catch (error) {
-                reject(error);
-            }      
-        });
+    async watch(video_id){
+        const url = `${nicovideo_url}/watch/${video_id}`;
+        this._req = new NicoClientRequest();
+        const body = await this._req.get(url);
+        const $ = cheerio.load(body);
+        const data_json = $("#js-initial-watch-data").attr("data-api-data");
+        if(!data_json){
+            throw new Error("not find data-api-data");
+        }
+        const api_data = JSON.parse(data_json);
+        const nico_cookie = this._req.getNicoCookie();
+        return { nico_cookie, api_data }; 
     }
 }
 
@@ -139,24 +132,17 @@ class NicoVideo {
         };
     }
 
-    postDmcSession() {
-        return new Promise(async (resolve, reject) => {
-            if (!this.DmcSession) {
-                const error = new Error(`dmc info is ${this.DmcSession}`);
-                reject(error);
-            }  
+    async postDmcSession() {
+        if (!this.DmcSession) {
+            throw new Error(`dmc info is ${this.DmcSession}`);
+        }  
 
-            const url = `${this._dmcInfo.session_api.urls[0].url}?_format=json`;
-            const json = this.DmcSession;
-            try {
-                this._req_session = new NicoClientRequest();
-                const body = await this._req_session.post(url, {json:json});
-                this.dmc_session = body.data;
-                resolve();      
-            } catch (error) {
-                reject(error);
-            }
-        });
+        const url = `${this._dmcInfo.session_api.urls[0].url}?_format=json`;
+        const json = this.DmcSession;
+
+        this._req_session = new NicoClientRequest();
+        const body = await this._req_session.post(url, {json:json});
+        this.dmc_session = body.data;
     }
 
     get DmcContentUri() {

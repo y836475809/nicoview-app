@@ -248,10 +248,10 @@
                 const video_id = text;
                 menu_template = createWatchLinkMenu(video_id);
             }
-            if(type=="mylist"){
+            if(type=="mylist" || type=="user"){
                 const mylist_id = text;
                 const menu_templete = [
-                    { label: "mylistを開く", click() {
+                    { label: "開く", click() {
                         obs.trigger("player-main-page:load-mylist", mylist_id);
                     }}
                 ];
@@ -285,6 +285,11 @@
             if(/^mylist\/\d+/.test(text)){
                 const mylist_id = text;
                 popupDescriptionMenu("mylist", mylist_id);
+                return;
+            }
+            if(/^user\/\d+/.test(text)){
+                const mylist_id = text;
+                popupDescriptionMenu("user", mylist_id);
                 return;
             }
 

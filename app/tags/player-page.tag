@@ -167,8 +167,10 @@
             return Menu.buildFromTemplate(menu_templete);
         };
     
+        let contextmenu_show = false;
         this.oncontextmenu = async (e) => {
-            if(e.button===0){
+            // コンテキストメニュー表示後の画面クリックでは再生/停止しない
+            if(e.button===0 && !contextmenu_show){   
                 obs.trigger("player-controls:play");
             }
 
@@ -177,7 +179,15 @@
                 const context_menu = createMenu(this, play_data);
                 context_menu.items.forEach(menu => {
                     const id = menu.id;
-                    menu.enabled = getMenuEnable(id, play_data); //play_data !== null;
+                    menu.enabled = getMenuEnable(id, play_data);
+                });
+                context_menu.addListener("menu-will-show", () => {
+                    contextmenu_show = true;
+                });
+                context_menu.addListener("menu-will-close", () => {
+                    setTimeout(()=>{
+                        contextmenu_show = false;
+                    }, 200); 
                 });
                 context_menu.popup({window: remote.getCurrentWindow()});
             }

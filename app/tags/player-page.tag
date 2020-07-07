@@ -91,8 +91,10 @@
             return true;
         };
 
-        const createMenu = (self, play_data) => {
-            const menu_templete = [
+        const createContextMenu = async (self) => {
+            const play_data = await getPlayData();
+
+            const menu_items = [
                 { 
                     id: "add-bookmark",
                     label: "ブックマーク", click() {
@@ -165,7 +167,13 @@
                     }
                 },
             ];
-            return Menu.buildFromTemplate(menu_templete);
+            
+            menu_items.forEach(menu_item => {
+                const id = menu_item.id;
+                menu_item.enabled = getMenuEnable(id, play_data);
+            });
+
+            return Menu.buildFromTemplate(menu_items);
         };
 
         const createVideoItemsContextMenu = async () => {
@@ -201,6 +209,18 @@
         };
     
         let contextmenu_show = false;
+        const popupContextMenu = (context_menu) => {
+            context_menu.addListener("menu-will-show", () => {
+                contextmenu_show = true;
+            });
+            context_menu.addListener("menu-will-close", () => {
+                setTimeout(()=>{
+                    contextmenu_show = false;
+                }, 200); 
+            });     
+            context_menu.popup({window: remote.getCurrentWindow()});
+        };
+
         this.oncontextmenu = async (e) => {
             // コンテキストメニュー表示後の画面クリックでは再生/停止しない
             if(e.button===0 && !contextmenu_show){   
@@ -209,34 +229,12 @@
 
             if(e.button === 1){
                 const context_menu = await createVideoItemsContextMenu();
-
-                context_menu.addListener("menu-will-show", () => {
-                    contextmenu_show = true;
-                });
-                context_menu.addListener("menu-will-close", () => {
-                    setTimeout(()=>{
-                        contextmenu_show = false;
-                    }, 200); 
-                });     
-                context_menu.popup({window: remote.getCurrentWindow()});
+                popupContextMenu(context_menu);
             }
 
             if(e.button===2){
-                const play_data = await getPlayData();
-                const context_menu = createMenu(this, play_data);
-                context_menu.items.forEach(menu => {
-                    const id = menu.id;
-                    menu.enabled = getMenuEnable(id, play_data);
-                });
-                context_menu.addListener("menu-will-show", () => {
-                    contextmenu_show = true;
-                });
-                context_menu.addListener("menu-will-close", () => {
-                    setTimeout(()=>{
-                        contextmenu_show = false;
-                    }, 200); 
-                });
-                context_menu.popup({window: remote.getCurrentWindow()});
+                const context_menu = await createContextMenu(this);
+                popupContextMenu(context_menu);
             }
         };
 

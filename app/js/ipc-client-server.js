@@ -7,6 +7,7 @@ const channel_map = {
     history: "ipc-history-request",
     downloaditem: "ipc-downloaditem-request",
     config: "ipc-config-request",
+    store_video_items: "ipc-store-video-items-request",
 };
 
 class IPCClient {

@@ -9,6 +9,7 @@ const { LibraryIPCServer } = require("./app/js/ipc-library");
 const { BookMarkIPCServer } = require("./app/js/ipc-bookmark");
 const { HistoryIPCServer } = require("./app/js/ipc-history");
 const { DownloadItemIPCServer } = require("./app/js/ipc-download-item");
+const { StoreVideoItemsIPCServer } = require("./app/js/ipc-store-video-items");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const { JsonStore } = require("./app/js/json-store");
@@ -23,6 +24,7 @@ const library_ipc_server = new LibraryIPCServer();
 const bookmark_ipc_server = new BookMarkIPCServer();
 const history_ipc_server = new HistoryIPCServer();
 const downloaditem_ipc_server = new DownloadItemIPCServer();
+const store_video_items_ipc_server = new StoreVideoItemsIPCServer();
 const css_loader = new CSSLoader();
 
 const startup_config = new StartupConfig(__dirname, process.argv);
@@ -475,6 +477,8 @@ app.on("ready", async ()=>{
         applyCSS(player_win);
     });
 
+    store_video_items_ipc_server.setup();
+
     library_ipc_server.on("libraryInitialized", ()=>{  
         main_win.webContents.send("libraryInitialized", {
             items:library_ipc_server.getItems()
@@ -503,10 +507,29 @@ app.on("ready", async ()=>{
     const items = await loadJson("history", []);
     history_ipc_server.setup(history_max);  
     history_ipc_server.setData({ items });
+    store_video_items_ipc_server.setData({
+        key:"history", 
+        items:items.map(item=>{
+            return {
+                video_id: item.id,
+                title: item.name
+            };
+        })
+    });
 
     history_ipc_server.on("historyItemUpdated", async (args)=>{  
         const items = history_ipc_server.getData();
-        await saveJson("history", items);    
+        await saveJson("history", items);
+        
+        store_video_items_ipc_server.setData({
+            key:"history", 
+            items:items.map(item=>{
+                return {
+                    video_id: item.id,
+                    title: item.name
+                };
+            })
+        });
     });
 
     downloaditem_ipc_server.handle();

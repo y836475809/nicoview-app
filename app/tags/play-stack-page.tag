@@ -91,6 +91,7 @@
     <script>
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs;
         this.items = [];
@@ -119,6 +120,16 @@
                     elm.classList.remove("stack-item-show"); 
                 });
             }, 50);
+
+            await IPCClient.request("store_video_items", "setData", {
+                key: "stack",
+                items: this.items.map(item=>{
+                    return {
+                        video_id: item.id,
+                        title: item.name
+                    };
+                })
+            });
         });
 
         this.onclickItem = (item, e) => {

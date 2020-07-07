@@ -56,6 +56,7 @@
         const { BookMark } = window.BookMark;   
         const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
+        const { IPCClient } = window.IPC;
         
         const obs = this.opts.obs; 
         this.obs_open_video_form = riot.observable();
@@ -166,12 +167,58 @@
             ];
             return Menu.buildFromTemplate(menu_templete);
         };
+
+        const createVideoItemsContextMenu = async () => {
+            const createMenuItems = (items) => {
+                return items.map(item=>{
+                    const { video_id, title } = item;
+                    return { 
+                        label: title, click() {
+                            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                                video_id: video_id,
+                                time: 0,
+                                online: false
+                            });
+                        }
+                    };
+                });
+            };
+            const getStoreVideoItems = async (key) => {
+                const items = await IPCClient.request("store_video_items", "getData", { key });
+                return items?items:[];
+            };
+
+            const size = 5;
+            const history_items = (await getStoreVideoItems("history")).slice(1, size+1);
+            const stack_items = (await getStoreVideoItems("stack")).slice(0, size);
+            
+            const menu_items = createMenuItems(history_items);
+            if(stack_items.length > 0){
+                menu_items.push({ type: "separator" });
+                Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
+            }
+            return Menu.buildFromTemplate(menu_items.concat());
+        };
     
         let contextmenu_show = false;
         this.oncontextmenu = async (e) => {
             // コンテキストメニュー表示後の画面クリックでは再生/停止しない
             if(e.button===0 && !contextmenu_show){   
                 obs.trigger("player-controls:play");
+            }
+
+            if(e.button === 1){
+                const context_menu = await createVideoItemsContextMenu();
+
+                context_menu.addListener("menu-will-show", () => {
+                    contextmenu_show = true;
+                });
+                context_menu.addListener("menu-will-close", () => {
+                    setTimeout(()=>{
+                        contextmenu_show = false;
+                    }, 200); 
+                });     
+                context_menu.popup({window: remote.getCurrentWindow()});
             }
 
             if(e.button===2){

@@ -420,7 +420,6 @@
         obs.on("player-main-page:show-player-setting-dialog", () => {
             obs.trigger("player-setting-dialog:show", {
                 ng_items : comment_filter.ng_comment.getNGItems(),
-                selected_tab: "comment-ng"
             });
         });
 

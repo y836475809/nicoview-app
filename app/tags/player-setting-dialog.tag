@@ -5,6 +5,7 @@
             border-radius: 5px;
             width: 500px;
             height: 400px;
+            padding-bottom: 2em;
         }
 
         dialog::backdrop {
@@ -12,6 +13,8 @@
         }
 
         .close-button {
+            margin-right: 4px;
+            margin-bottom: 10px;
             font-size: 15px;
             float: right;
             color: gray;
@@ -21,65 +24,45 @@
             color: black;
         }
 
-        .tab-area {
+        .setting-container {
             width: 100%;
-            height: 30px;
-            top: 20px;
-            position: relative;
+            height: calc(100% - 5px);
+            overflow: auto;
         }
-
-        .tab-area > label {
-            width: 100px;
-            height: 30px;
-            color: #999;
-            background:#fff;
-            display: table-cell;
-            font-size: 15px;
-            text-align: center;   
-            vertical-align: middle;
-            cursor: pointer;
+        .setting-container > .section {
+            width: calc(100% - 5px);
+            padding-bottom: 1em;
+        }
+        .setting-container > .section > .title {
             user-select: none;
+            font-size: 1.2em;
         }
-
-        .tab-area > label:hover {
-            opacity: 0.5;
-        }
-
-        .tab-area > label.active {
-            border-bottom: 4px solid var(--control-border-color);
-            color: #000;
-        }
-
-        .panel-area {
-            width: 100%;
-            height: calc(100% - 50px);
-            top: 60px;
-            background: #fff;
-        }
-
-        .tab-panel {
-            position: absolute;
-            top: 65px;
+        .setting-container > .section > .setting {
             background-color: var(--control-color);
         }
 
-        .tab-panel.active {
-            display: block;
+        .setting.ng-comment {
+            height: 300px;
+        }
+        .setting.display-comment {
+            height: 200px;
         }
     </style>
 
     <dialog class="dialog-shadow">
         <i class="close-button fas fa-times" title="閉じる" onclick={onclickClose}></i>
-        <div class="tab-area">
-            <label onclick="{onclickSelect.bind(this,0)}">NG設定</label>
-            <label onclick="{onclickSelect.bind(this,1)}">コメント表示</label>
-        </div>
-        <div class="panel-area">
-            <div class="tab-panel">
-                <setting-ng-comment obs={opts.obs}></setting-ng-comment>
+        <div class="setting-container">
+            <div class="section">
+                <div class="title">NGコメント</div>
+                <div class="setting ng-comment">
+                    <setting-ng-comment obs={opts.obs}></setting-ng-comment>
+                </div>
             </div>
-            <div class="tab-panel">
-                <setting-display-comment obs={opts.obs}></setting-display-comment>
+            <div class="section">
+                <div class="title">コメント表示</div>
+                <div class="setting display-comment">
+                    <setting-display-comment obs={opts.obs}></setting-display-comment>
+                </div>
             </div>
         </div>
     </dialog>
@@ -87,60 +70,16 @@
     <script>
         const obs_dialog = this.opts.obs;
 
-        const tab_map = new Map([
-            ["comment-ng", 0],
-            ["comment-display", 1]
-        ]);
-
-        const selectTab = (selected_index) => {
-            Array.from(this.root.querySelectorAll(".tab-area > label"), 
-                (elm, index) => {
-                    if(index===selected_index){
-                        if(!elm.classList.contains("active")){
-                            elm.classList.add("active");
-                        }
-                    }else{
-                        elm.classList.remove("active");
-                    }
-                });
-           
-            Array.from(this.root.querySelectorAll(".panel-area > .tab-panel"), 
-                (elm, index) => {
-                    if(index===selected_index){
-                        elm.style.zIndex = 1;
-                    }else{
-                        elm.style.zIndex = 0;
-                    } 
-                });
-        };
-
-        const setup = (selected_tab) => {
-            const panel_area = this.root.querySelector(".panel-area");
-            Array.from(this.root.querySelectorAll(".panel-area > .tab-panel"), 
-                (elm) => {
-                    elm.style.width = panel_area.clientWidth + "px";
-                    elm.style.height = panel_area.clientHeight + "px"; 
-                });
-
-            selectTab(tab_map.get(selected_tab));
-        };
-
-        this.onclickSelect = (index, e)=>{
-            selectTab(index);
-        };
-
         this.onclickClose = (e) => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();
         };
 
         obs_dialog.on("player-setting-dialog:show", (args) => {
-            const { ng_items, selected_tab } = args;
+            const { ng_items } = args;
 
             const dialog = this.root.querySelector("dialog");
             dialog.showModal();
-
-            setup(selected_tab);
 
             obs_dialog.trigger("setting-ng-comment:ng-items", ng_items);
         });

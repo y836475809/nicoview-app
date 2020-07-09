@@ -1,4 +1,4 @@
-<comment-display-setting>
+<setting-display-comment>
     <style scoped>
         :scope {
             font-size: 1.2em;
@@ -96,4 +96,4 @@
             ch_elm.checked = params.do_limit;
         });
     </script>
-</comment-display-setting>
+</setting-display-comment>

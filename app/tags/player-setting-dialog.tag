@@ -1,4 +1,4 @@
-<comment-setting-dialog>
+<player-setting-dialog>
     <style scoped>
         dialog {
             border: solid 1px #aaa;
@@ -76,10 +76,10 @@
         </div>
         <div class="panel-area">
             <div class="tab-panel">
-                <comment-ng-setting obs={opts.obs}></comment-ng-setting>
+                <setting-ng-comment obs={opts.obs}></setting-ng-comment>
             </div>
             <div class="tab-panel">
-                <comment-display-setting obs={opts.obs}></comment-display-setting>
+                <setting-display-comment obs={opts.obs}></setting-display-comment>
             </div>
         </div>
     </dialog>
@@ -134,7 +134,7 @@
             dialog.close();
         };
 
-        obs_dialog.on("comment-setting-dialog:show", (args) => {
+        obs_dialog.on("player-setting-dialog:show", (args) => {
             const { ng_items, selected_tab } = args;
 
             const dialog = this.root.querySelector("dialog");
@@ -142,7 +142,7 @@
 
             setup(selected_tab);
 
-            obs_dialog.trigger("comment-ng-setting:ng-items", ng_items);
+            obs_dialog.trigger("setting-ng-comment:ng-items", ng_items);
         });
     </script>
-</comment-setting-dialog>
+</player-setting-dialog>

@@ -144,8 +144,8 @@
             <input class="comment-checkbox comment-visible" type="checkbox" 
                 onclick={onclickCommentVisibleCheck} />
                 <label class="center-v" title="コメントの表示/非表示">表示</label>
-            <div title="コメント設定" class="icon-button center-hv">                      
-                <span class="icon fas fa-cog" onclick={onclickShowCommentSetting}></span> 
+            <div title="設定ダイアログ表示" class="icon-button center-hv">                      
+                <span class="icon fas fa-cog" onclick={onclickShowSettingDialog}></span> 
             </div>
             <div class="move-right">
                 <div title="動画情報更新" class="icon-button center-v">
@@ -292,8 +292,8 @@
             obs.trigger("player-main-page:update-data", this.video_id, "comment");
         };
 
-        this.onclickShowCommentSetting = (e) => {
-            obs.trigger("player-main-page:show-comment-setting-dialog");
+        this.onclickShowSettingDialog = (e) => {
+            obs.trigger("player-main-page:show-player-setting-dialog");
         };
 
         const setComments = (comments) => {

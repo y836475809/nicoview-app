@@ -1,4 +1,4 @@
-<comment-ng-setting>
+<setting-ng-comment>
     <style scoped>
         :scope {
             --control-height: 25px;
@@ -130,8 +130,8 @@
             deleteSelectedItems();
         };
 
-        obs_dialog.on("comment-ng-setting:ng-items", (args) => {
+        obs_dialog.on("setting-ng-comment:ng-items", (args) => {
             setup(args);
         });
     </script>
-</comment-ng-setting>
+</setting-ng-comment>

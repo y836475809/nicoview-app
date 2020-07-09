@@ -35,7 +35,7 @@
     </div>
 
     <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
-    <comment-setting-dialog obs={opts.obs}></comment-setting-dialog>
+    <player-setting-dialog obs={opts.obs}></player-setting-dialog>
 
     <script>
         /* globals riot logger */
@@ -417,8 +417,8 @@
             });
         });
 
-        obs.on("player-main-page:show-comment-setting-dialog", () => {
-            obs.trigger("comment-setting-dialog:show", {
+        obs.on("player-main-page:show-player-setting-dialog", () => {
+            obs.trigger("player-setting-dialog:show", {
                 ng_items : comment_filter.ng_comment.getNGItems(),
                 selected_tab: "comment-ng"
             });

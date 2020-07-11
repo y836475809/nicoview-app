@@ -3,7 +3,6 @@
         .setting-page {       
             width: 100%;
             height: 100%;
-            background-color: lightgray;
             overflow: auto;
         }
         
@@ -34,6 +33,7 @@
             margin: 10px;
             background-color: white;
             border-radius: 3px;
+            border: 1px solid darkgray;
         }
 
         .content {

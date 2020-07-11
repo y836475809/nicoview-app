@@ -125,29 +125,6 @@
         this.user_thumbnail_url = "";
         this.user_description_class = "text";
 
-        const createWatchLinkMenu = (video_id) => {
-            const menu_templete = [
-                { label: "再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: false
-                    }); 
-                }},
-                { label: "オンラインで再生", click() {
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
-                }},
-                { label: "URLをコピー", click() {
-                    clipboard.writeText(NicoURL.getWatchURL(video_id));
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         const watchLinkClick = (e) => {
             e.preventDefault(); 
             e.stopPropagation();

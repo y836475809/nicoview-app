@@ -1,133 +1,140 @@
 <setting-page>
     <style scoped>
-        .setting-page{       
+        .setting-page {       
             width: 100%;
             height: 100%;
-            background-color: var(--control-color);
+            background-color: lightgray;
+            overflow: auto;
         }
-
-        label, input[type='text'], button {
+        
+        label, button {
             height: 25px;
             user-select: none;
         }
 
-        .input-button {
+        button {
             margin-left: 5px;
+            cursor: pointer;
+        }
+
+        input[type='text'] {
+            width: 40vw;
+            height: 25px;
+            border: solid 1px #ccc;
+            border-radius: 2px;
+            user-select: none;
+        }
+
+        input[type='checkbox'] {
+            height: 25px;
+            vertical-align: middle;
+        }
+
+        .container {
+            margin: 10px;
+            background-color: white;
+            border-radius: 3px;
         }
 
         .content {
-            margin-bottom: 5px;
             padding: 10px;
-            background-color: white;
-            border-radius: 5px;
         }
 
-        .section-label {
-            display: block;
+        .title {
+            height: 30px;
+            border-radius: 3px 3px 0 0;
+            padding: 0 10px 0 10px;
+            vertical-align: middle;
+            background-color: lightblue;
+            user-select: none;
         }
 
-        .setting-checkbox{
-            height: 25px;
-            vertical-align:middle;
-        }
-
-        .input-path{
-            width: 40vw;
-            padding:2px;
-            border: solid 1px #ccc;
-            border-radius: 2px;
-        }
-
-        .import {
-            display: flex;
-        }
-        .import > div {
+        .label {
             height: 25px;
             float: left; 
             line-height: 25px;
             user-select: none;
         }
-        .import > button {
-            margin-left: 5px;
-        }
-
-        .setting-page button {
-            cursor: pointer;
-        }
     </style>
 
     <div class="setting-page">
-        <div class="content">
-            <label class="section-label">ブックマーク, 履歴, DB等の保存先</label>     
-            <div style="display: flex;">
-                <input disabled=true class="input-path data-dir-input" type="text" readonly>
-                <button class="input-button" title="フォルダ選択" onclick={onclickSelectDataDir}>
+        <div class="container">
+            <div class="center-v title">ブックマーク, 履歴, DB等の保存先</div> 
+            <div class="content" style="display: flex;">
+                <input disabled=true class="data-dir-input" type="text" readonly>
+                <button title="フォルダ選択" onclick={onclickSelectDataDir}>
                     <i class="far fa-folder-open"></i>
                 </button>
             </div>
         </div>
-        <div class="content">
-            <label class="section-label">動画の保存先</label>
-            <div style="display: flex;">
-                <input disabled=true class="input-path download-dir-input" type="text" readonly>
-                <button class="input-button" title="フォルダ選択" onclick={onclickSelectDownloadDir}>
+        <div class="container">
+            <div class="center-v title">動画の保存先</div>
+            <div class="content" style="display: flex;">
+                <input disabled=true class="download-dir-input" type="text" readonly>
+                <button title="フォルダ選択" onclick={onclickSelectDownloadDir}>
                     <i class="far fa-folder-open"></i>
                 </button>
             </div>
         </div>
-        <div class="content">
-            <label class="section-label">インポート</label>
-                <div class="import">
-                    <div>NNDDのDB(library.db)のインポート</div>
+        <div class="container">
+            <div class="center-v title">インポート</div>
+            <div class="content">
+                <div style="display:flex; margin-bottom:5px;">
+                    <div class="label">NNDDのDB(library.db)のインポート</div>
                     <button title="DB選択" onclick={onclickImport}>
                         <i class="far fa-file"></i>
                     </button>
                 </div>
-                <div class="import">
-                    <div>動画のインポート(ライブラリに登録済みの動画は無視)</div>
+                <div style="display:flex;">
+                    <div class="label">動画のインポート(ライブラリに登録済みの動画は無視)</div>
                     <button title="ファイル選択" onclick={onclickImportFiles}>
                         <i class="far fa-file"></i>
                     </button>
                 </div>
+            </div>
         </div>
-        <div class="content">
-            <label class="section-label">ffmpeg実行ファイルのパス(保存済みflv, swfを再生可能な形式に変換する)</label>
-            <div style="display: flex;">
-                <input disabled=true class="input-path ffmpeg-path-input" type="text" readonly>
-                <button class="input-button" title="ファイル選択" onclick={onclickSelectffmpegPath}>
+        <div class="container">
+            <div class="center-v title">ffmpeg実行ファイルのパス(保存済みflv, swfを再生可能な形式に変換する)</div>
+            <div class="content" style="display: flex;">
+                <input disabled=true class="ffmpeg-path-input" type="text" readonly>
+                <button title="ファイル選択" onclick={onclickSelectffmpegPath}>
                     <i class="far fa-file"></i>
                 </button>
             </div>
         </div>
-        <div class="content">
-            <label class="section-label">設定ファイル(config.json)のフォルダ</label>
-            <div style="display: flex;">
-                <input disabled=true class="input-path app-setting-dir-input" type="text" readonly}>
-                <button class="input-button" title="フォルダを開く" onclick={onclickOpenDir}>
+        <div class="container">
+            <div class="center-v title">設定ファイル(config.json)のフォルダ</div>
+            <div class="content" style="display: flex;">
+                <input disabled=true class="app-setting-dir-input" type="text" readonly}>
+                <button title="フォルダを開く" onclick={onclickOpenDir}>
                     <i class="far fa-folder-open"></i>
                 </button>
             </div>
         </div>
-        <div class="content">
-            <label class="section-label">CSS</label>
-            <div style="display: flex;">
-                <input disabled=true class="input-path css-path-input" type="text" readonly}>
-                <button class="input-button" title="ファイル選択" onclick={onclickSelectcCssPath}>
+        <div class="container">
+            <div class="center-v title">CSS</div>
+            <div class="content" style="display: flex;">
+                <input disabled=true class="css-path-input" type="text" readonly}>
+                <button title="ファイル選択" onclick={onclickSelectcCssPath}>
                     <i class="far fa-file"></i>
                 </button>
-                <button class="input-button" title="読み込み" onclick={onclickReloadCss}>
+                <button title="読み込み" onclick={onclickReloadCss}>
                     <i class="fas fa-redo-alt"></i>
                 </button>
             </div>
         </div>
-        <div class="content">
-            <input class="setting-checkbox check-window-close" type="checkbox" 
-            onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
+        <div class="container">
+            <div class="content">
+                <input class="check-window-close" type="checkbox" 
+                onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
+            </div>
         </div>
-        <div class="content">
-            <label class="section-label">ログ出力レベル設定</label>
-            <input class="setting-checkbox check-loglevel-debug" type="checkbox" 
-            onclick={onclickCheckLogLevelDebug} /><label>Debug</label>
+        <div class="container">
+            <div class="center-v title">ログ出力レベル設定</div>
+            <div class="content">
+                <input class="check-loglevel-debug" type="checkbox" 
+                onclick={onclickCheckLogLevelDebug} /><label>Debug</label>
+            </div>
         </div>
     </div>
     <modal-dialog obs={obs_msg_dialog}></modal-dialog>

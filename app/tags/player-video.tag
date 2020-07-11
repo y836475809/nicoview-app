@@ -79,11 +79,13 @@
                 video_elm.currentTime = current;
                 comment_tl.seek(current);
             }else{
+                comment_tl.pause();
                 video_elm.pause();
                 video_elm.currentTime = current;
+
+                const HAVE_ENOUGH_DATA = 4;
                 const wait_timer = setInterval(() => {
-                    if (video_elm.paused && video_elm.readyState === 4) {
-                        comment_tl.seek(current);
+                    if (video_elm.paused && video_elm.readyState === HAVE_ENOUGH_DATA) {
                         video_elm.play();
                         clearInterval(wait_timer);
                     }       
@@ -164,21 +166,34 @@
             video_elm.addEventListener("canplay", function(){
                 logger.debug("canplayによるイベント発火");
             }); 
-            video_elm.addEventListener("playing", () => {
+            video_elm.addEventListener("playing", async () => {
                 logger.debug("playingによるイベント発火");
 
-                if(comment_tl.paused===true){
-                    const pre_tiem = video_elm.currentTime;
-                    const wait_timer = setInterval(() => {
-                        const current = video_elm.currentTime;
-                        if(Math.abs(pre_tiem - current)>0){ 
-                            comment_tl.seek(current);
-                            comment_tl.play();
+                // 再生イベントが起こっても、実際に動画の再生が始まるまでラグがある
+                // なので実際に動画が再生されるまで待ち、それからコメントとの同期を行う
+                
+                // 再生イベントが始まった時の再生時間を保存
+                const pre_tiem = video_elm.currentTime;
 
-                            clearInterval(wait_timer);
-                        }      
-                    }, 100);
+                const interval_ms = 10;
+                const wait_time_ms = 10*1000; // 最大待ち時間
+                const wait_count = parseInt(wait_time_ms / interval_ms);
+                for (let index = 0; index < wait_count; index++) {
+                    // pre_tiemと現在の再生時間の差分を取得する
+                    // 差分があれば動画が再生されていることになるのでコメントとの同期を行い抜ける
+                    const current = video_elm.currentTime;
+                    if(Math.abs(pre_tiem - current)>0){ 
+                        comment_tl.seek(current);
+                        comment_tl.play();
+                        return;
+                    }  
+                    await new Promise(resolve => setTimeout(resolve, interval_ms));
                 }
+
+                // 最大待ち時間を超えてしまったら、コメントを一時停止にする
+                logger.debug("playing: over wait time[ms]=", wait_time_ms);
+                comment_tl.pause();
+                video_elm.pause();
             });
 
             video_elm.addEventListener("ended", () => {

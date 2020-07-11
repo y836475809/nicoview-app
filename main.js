@@ -479,6 +479,14 @@ app.on("ready", async ()=>{
         applyCSS(player_win);
     });
 
+    ipcMain.handle(IPC_CHANNEL.GET_APP_CACHE, async (event, args) => {     
+        return await session.defaultSession.getCacheSize();
+    });
+
+    ipcMain.handle(IPC_CHANNEL.CLEAR_APP_CACHE, async (event, args) => {     
+        await session.defaultSession.clearCache();
+    });
+
     store_video_items_ipc_server.setup();
 
     library_ipc_server.on("libraryInitialized", ()=>{  

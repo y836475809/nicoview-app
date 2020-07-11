@@ -55,6 +55,11 @@
             line-height: 25px;
             user-select: none;
         }
+
+        .cache-label {
+            min-width: 200px;
+            user-select: none;
+        }
     </style>
 
     <div class="setting-page">
@@ -130,6 +135,16 @@
             </div>
         </div>
         <div class="container">
+            <div class="center-v title">アプリのキャッシュ</div>
+            <div class="content">
+                <div style="display: flex;">
+                <div class="center-v cache-label">キャッシュサイズ {cache_size}</div>
+                    <button onclick={onclickGetCacheSize}>キャッシュサイズ取得</button>
+                    <button onclick={onclickclearCache}>キャッシュクリア</button>
+                </div>
+            </div>
+        </div>
+        <div class="container">
             <div class="center-v title">ログ出力レベル設定</div>
             <div class="content">
                 <input class="check-loglevel-debug" type="checkbox" 
@@ -152,6 +167,8 @@
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
+
+        this.cache_size = "--MB";
 
         this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
@@ -204,6 +221,31 @@
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
             await IPCClient.request("config", "set", { key:"check_window_close", value:ch_elm.checked });
+        };
+
+        const getCacheSizeLabel = async () => {
+            const size_byte = await ipcRenderer.invoke(IPC_CHANNEL.GET_APP_CACHE);
+            const mb = 1024**2;
+            return `${(size_byte/mb).toFixed(1)}MB`;
+        };
+
+        this.onclickGetCacheSize = async (e) => {
+            this.cache_size = await getCacheSizeLabel();
+            this.update();
+        };
+
+        this.onclickclearCache = async (e) => {
+            this.obs_msg_dialog.trigger("show", {
+                message: "キャッシュクリア中...",
+            });
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            await ipcRenderer.invoke(IPC_CHANNEL.CLEAR_APP_CACHE);
+
+            this.obs_msg_dialog.trigger("close");
+
+            this.cache_size = await getCacheSizeLabel();
+            this.update();
         };
 
         this.onclickCheckLogLevelDebug = async (e) => {

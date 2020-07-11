@@ -22,8 +22,6 @@
         .user-name {
             user-select: none;
             vertical-align: middle;
-            margin-top: 5px;
-            margin-left: 5px;
         }
         .userlist-link {
             margin-top: 5px;
@@ -38,6 +36,9 @@
             height: 100%;
             border: 1px solid var(--control-border-color);
         }
+        .user-container-normal .user-name {
+            margin-left: 5px;
+        }
 
         .user-container-popup {
             position: absolute;
@@ -49,7 +50,10 @@
             z-index: 999;
             padding: 5px;          
         }
-
+        .user-container-popup .user-name {
+            margin-top: 5px;
+            margin-left: 5px;
+        }
         .user-container-popup .icon-button {
             margin-left: auto;
         }

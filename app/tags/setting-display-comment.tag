@@ -1,18 +1,13 @@
 <setting-display-comment>
     <style scoped>
-        :scope {
-            font-size: 1.2em;
-            --control-height: 25px;
-        }
-        
         .param-container {
             width: 100%;
             height: 50px;
-            padding: 10px;
             user-select: none;
         }
 
         .param-label {
+            font-size: 1.2em;
             height: 30px;
         }
 
@@ -58,7 +53,7 @@
             duration_sec: 4,
             fps: 10,
             do_limit: true
-        }
+        };
 
         const changeParams = async (name, value) => {
             const params = await IPCClient.request("config", "get", { key: "comment", value: default_params });

@@ -196,9 +196,10 @@
                 return items?items:[];
             };
 
-            const size = 5;
-            const history_items = (await getStoreVideoItems("history")).slice(1, size+1);
-            const stack_items = (await getStoreVideoItems("stack")).slice(0, size);
+            const history_num = await IPCClient.request("config", "get", { key: "player.contextmenu.history_num", value: 5 });
+            const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
+            const history_items = (await getStoreVideoItems("history")).slice(1, history_num+1);
+            const stack_items = (await getStoreVideoItems("stack")).slice(0, stack_num);
             
             const menu_items = createMenuItems(history_items);
             if(stack_items.length > 0){

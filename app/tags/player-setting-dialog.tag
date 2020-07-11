@@ -43,9 +43,15 @@
 
         .setting.ng-comment {
             height: 300px;
+            padding: 10px;
         }
         .setting.display-comment {
             height: 200px;
+            padding: 10px;
+        }
+        .setting.contextmenu {
+            height: 150px;
+            padding: 10px;
         }
     </style>
 
@@ -62,6 +68,12 @@
                 <div class="title">コメント表示</div>
                 <div class="setting display-comment">
                     <setting-display-comment obs={opts.obs}></setting-display-comment>
+                </div>
+            </div>
+            <div class="section">
+                <div class="title">コンテキストメニュー</div>
+                <div class="setting contextmenu">
+                    <setting-player-contextmenu></setting-player-contextmenu>
                 </div>
             </div>
         </div>

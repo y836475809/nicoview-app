@@ -345,10 +345,12 @@ app.on("ready", async ()=>{
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
+        main_win.focus();
         main_win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
     });
 
     ipcMain.on(IPC_CHANNEL.LOAD_MYLIST, (event, args) => {
+        main_win.focus();
         main_win.webContents.send(IPC_CHANNEL.LOAD_MYLIST, args);
     });
 

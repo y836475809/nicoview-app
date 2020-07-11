@@ -22,18 +22,21 @@
         .user-name {
             user-select: none;
             vertical-align: middle;
-            padding-left: 5px;
-            margin-right: 10px;
+            margin-top: 5px;
+            margin-left: 5px;
+        }
+        .userlist-link {
+            margin-top: 5px;
+            margin-left: 5px;
+            color: blue;
+            text-decoration: underline;
+            cursor: pointer;
         }
 
         .user-container-normal {
             width: 100%;
             height: 100%;
             border: 1px solid var(--control-border-color);
-        }
-        .user-container-normal .user-name {
-            height: var(--user-name-height); 
-            line-height: var(--user-name-height); 
         }
 
         .user-container-popup {
@@ -46,10 +49,7 @@
             z-index: 999;
             padding: 5px;          
         }
-        .user-container-popup .user-name {
-            height: var(--user-thumbnail-size); 
-            line-height: var(--user-thumbnail-size); 
-        }
+
         .user-container-popup .icon-button {
             margin-left: auto;
         }
@@ -104,7 +104,10 @@
         <div style="display:none;" class="user-container-popup">
             <div style="display: flex;">
                 <img class="user-thumbnail" src={user_thumbnail_url}>
-                <div class="user-name">投稿者: {user_nickname}</div>
+                <div>
+                    <div class="user-name">投稿者: {user_nickname}</div>
+                    <div class="userlist-link" onclick={onclickUserListLink}>user/{user_id}</div>
+                </div>
                 <div class="icon-button center-hv" onclick={onclickCloseDescription}>
                     <i title="閉じる" class="icon fas fa-times"></i>
                 </div>
@@ -348,12 +351,18 @@
             popupDescriptionMenu("text", text);
         };
 
+        this.onclickUserListLink = (e) => {
+            obs.trigger("player-main-page:load-mylist", `user/${this.user_id}`);
+        };
+
         this.on("mount", () => {  
     
         });
 
         obs.on("player-user:set-data", args => {
-            const { user_nickname, user_icon_url, description } = args;
+            const { user_id, user_nickname, user_icon_url, description } = args;
+
+            this.user_id = user_id;
             this.user_nickname = user_nickname;
             this.user_icon_url = user_icon_url;
             setDescription(description);

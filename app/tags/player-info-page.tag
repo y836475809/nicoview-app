@@ -357,10 +357,12 @@
             this.comment_counter = thread.commentCount;
             this.mylist_counter = video.mylistCount;
             
+            const user_id = owner.id;
             const user_nickname = owner.nickname;
             const user_icon_url = owner.iconURL;
             
             obs.trigger("player-user:set-data", {
+                user_id,
                 user_nickname,
                 user_icon_url, 
                 description

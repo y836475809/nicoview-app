@@ -273,9 +273,15 @@
             }
         };
 
-        this.onclickCloseDescription = (e) => {
+        const closePopupDescription = () => {
             const elm = this.root.querySelector(".user-container-popup");
-            elm.style.display = "none";
+            if(elm){
+                elm.style.display = "none";
+            }
+        };
+
+        this.onclickCloseDescription = (e) => {
+            closePopupDescription();
         };
 
         const popupDescriptionMenu = (type, text) => {
@@ -361,6 +367,8 @@
 
         obs.on("player-user:set-data", args => {
             const { user_id, user_nickname, user_icon_url, description } = args;
+
+            closePopupDescription();
 
             this.user_id = user_id;
             this.user_nickname = user_nickname;

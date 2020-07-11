@@ -6,17 +6,18 @@
             overflow: auto;
         }
         
-        label, button {
+        .setting-page label, 
+        .setting-page button {
             height: 25px;
             user-select: none;
         }
 
-        button {
+        .setting-page button {
             margin-left: 5px;
             cursor: pointer;
         }
 
-        input[type='text'] {
+        .setting-page input[type='text'] {
             width: 40vw;
             height: 25px;
             border: solid 1px #ccc;
@@ -24,23 +25,23 @@
             user-select: none;
         }
 
-        input[type='checkbox'] {
+        .setting-page input[type='checkbox'] {
             height: 25px;
             vertical-align: middle;
         }
 
-        .container {
+        .setting-page .container {
             margin: 10px;
             background-color: white;
             border-radius: 3px;
             border: 1px solid darkgray;
         }
 
-        .content {
+        .setting-page .content {
             padding: 10px;
         }
 
-        .title {
+        .setting-page .title {
             height: 30px;
             border-radius: 3px 3px 0 0;
             padding: 0 10px 0 10px;
@@ -49,14 +50,14 @@
             user-select: none;
         }
 
-        .label {
+        .setting-page .label {
             height: 25px;
             float: left; 
             line-height: 25px;
             user-select: none;
         }
 
-        .cache-label {
+        .setting-page .cache-label {
             min-width: 200px;
             user-select: none;
         }

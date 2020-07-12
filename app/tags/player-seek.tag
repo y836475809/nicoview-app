@@ -4,7 +4,7 @@
             --seek-height: 50px;
             display:grid;
             grid-template-columns: 1fr 50px 10px 40px;
-            grid-template-areas: "slider current slash duration";
+            grid-template-areas: "seek current slash duration";
             width: 100%;
             height: var(--seek-height);
             margin: 0;
@@ -12,21 +12,24 @@
             user-select: none;
         } 
 
-        .slider-container {
-            grid-area: slider;
+        .seek-container {
+            grid-area: seek;
             position: relative;
             height: calc(var(--seek-height) - 20px);
             top: 50%;
             transform: translateY(-50%); 
             cursor: pointer;
         } 
-        .slider {
-            background-color: #797b80;
+        .seek-bar {
             position: relative;
             height: 10px;
             top: 50%;
             transform: translateY(-50%);
-            border-radius:5px;
+            background-color: lightgray;
+        }
+        .seek-value {
+            height: 100%;
+            background-color: #797b80;
         }
 
         .seek-timer {
@@ -44,22 +47,11 @@
         .duration {
             grid-area: duration;
         }
-
-        .picker {
-            position: relative;
-			top: -5px;
-            left: 0px;
-			width: 8px;
-			height: 20px;
-			background-color: #e7e7e7;
-			border-radius: 2px;
-            border: 1px solid #b8b8b8;
-        }
     </style>
 
-    <div class="slider-container" onmousedown={mousedown}>
-        <div class="slider">
-            <div class="picker"></div>
+    <div class="seek-container" onmousedown={mousedown}>
+        <div class="seek-bar">  
+            <div class="seek-value"></div>
         </div>
     </div>
     <div class="seek-timer current">{fmt_current}</div>
@@ -77,13 +69,11 @@
                 return;
             }
 
-            const picker = this.root.querySelector("div.picker");
+            const seek_container = this.root.querySelector(".seek-container");
             const left = e.layerX;
-            picker.style.left = left + "px";
-            
-            const slider = this.root.querySelector("div.slider");
-            const per = left / (slider.clientWidth-picker.clientWidth/2);
+            const per = left / seek_container.clientWidth;
             const current = per * this.duration;
+
             updateSeek(current);
 
             obs.trigger("player-video:seek", current);
@@ -93,9 +83,9 @@
             this.current = current;
             const per = this.current / this.duration;
 
-            const picker = this.root.querySelector("div.picker");
-            const slider = this.root.querySelector("div.slider");  
-            picker.style.left = (per * (slider.clientWidth - picker.clientWidth)) + "px";
+            const seek_container = this.root.querySelector(".seek-container");
+            const seek_value = this.root.querySelector(".seek-value");  
+            seek_value.style.width = per * seek_container.clientWidth + "px";
 
             this.fmt_current = time_format.toTimeString(this.current);
             this.fmt_duration = time_format.toTimeString(this.duration);

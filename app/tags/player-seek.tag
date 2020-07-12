@@ -1,43 +1,50 @@
 <player-seek>
     <style scoped>
         :scope {
+            --seek-height: 50px;
             display:grid;
-            grid-template-rows: 1fr 1fr 1fr;
             grid-template-columns: 1fr 50px 10px 40px;
+            grid-template-areas: "slider current slash duration";
             width: 100%;
-            height: 30px;
+            height: var(--seek-height);
             margin: 0;
             font-family: "Meiryo";
             user-select: none;
         } 
-        .slider{
-            grid-row: 2 / 3;
-            grid-column: 1 / 2;
+
+        .slider-container {
+            grid-area: slider;
+            position: relative;
+            height: calc(var(--seek-height) - 20px);
+            top: 50%;
+            transform: translateY(-50%); 
+            cursor: pointer;
+        } 
+        .slider {
             background-color: #797b80;
             position: relative;
             height: 10px;
+            top: 50%;
+            transform: translateY(-50%);
             border-radius:5px;
         }
-        .current {
-            grid-row: 2 / 3;
-            grid-column: 2 / 3;
+
+        .seek-timer {
             text-align: center;
-            line-height: 10px;
+            line-height: var(--seek-height);
+            font-size: 12px;
+        }
+        .current {
+            grid-area: current;
             margin-left: 10px;
         }
         .slash {
-            grid-row: 2 / 3;
-            grid-column: 3 / 4;
-            text-align: center;
-            line-height: 10px;
+            grid-area: slash;
         }  
         .duration {
-            grid-row: 2 / 3;
-            grid-column: 4 / 5;
-            text-align: center;
-            font-size: 12px;
-            line-height: 10px;
+            grid-area: duration;
         }
+
         .picker {
             position: relative;
 			top: -5px;
@@ -50,12 +57,14 @@
         }
     </style>
 
-    <div class="slider" onmousedown={mousedown}>
-        <div class="picker"></div>
+    <div class="slider-container" onmousedown={mousedown}>
+        <div class="slider">
+            <div class="picker"></div>
+        </div>
     </div>
-    <div class="current">{fmt_current}</div>
-    <div class="slash">/</div>
-    <div class="duration">{fmt_duration}</div>
+    <div class="seek-timer current">{fmt_current}</div>
+    <div class="seek-timer slash">/</div>
+    <div class="seek-timer duration">{fmt_duration}</div>
 
     <script>
         /* globals */

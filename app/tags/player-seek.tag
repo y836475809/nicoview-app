@@ -47,9 +47,24 @@
         .duration {
             grid-area: duration;
         }
+
+        .seek-tooltip {
+            position:absolute;
+            height: 30px;
+            width: 50px;
+            color: black;
+            background-color: white;
+            border: 1px solid darkgray;
+            border-radius: 2px;
+            display: none;
+        }
+        .seek-tooltip > .text {
+            height: 100%;
+        }
     </style>
 
-    <div class="seek-container" onmousedown={mousedown}>
+    <div class="seek-container" onmousedown={mousedown}
+            onmouseout={mouseOut} onmousemove={mouseOver}>
         <div class="seek-bar">  
             <div class="seek-value"></div>
         </div>
@@ -57,6 +72,7 @@
     <div class="seek-timer current">{fmt_current}</div>
     <div class="seek-timer slash">/</div>
     <div class="seek-timer duration">{fmt_duration}</div>
+    <div class="seek-tooltip"><div class="center-hv text"></div></div>
 
     <script>
         /* globals */
@@ -77,6 +93,41 @@
             updateSeek(current);
 
             obs.trigger("player-video:seek", current);
+        };
+
+        this.mouseOver = (e) => {
+            const left = e.layerX;
+
+            const seek_container = this.root.querySelector(".seek-container");
+            const rect = seek_container.getBoundingClientRect();
+            
+            const per = left / seek_container.clientWidth;
+            const current = per * this.duration;
+
+            const tp = this.root.querySelector(".seek-tooltip");
+            tp.style.display = "block";
+
+            const tp_text = this.root.querySelector(".seek-tooltip > .text");
+            tp_text.innerText = time_format.toTimeString(current);
+  
+            const tp_left = rect.left + left - tp.clientWidth / 2;
+
+            tp.style.top = (rect.top - 30) + "px";
+            tp.style.left = tp_left + "px";
+
+            e.stopPropagation();
+        };
+
+        this.mouseOut = (e) => {
+            if(!e.target.classList.contains("seek-container")){
+                e.stopPropagation();
+                return;
+            }
+
+            const tp = this.root.querySelector(".seek-tooltip");
+            tp.style.display = "none";
+
+            e.stopPropagation();
         };
 
         const updateSeek = (current)=>{

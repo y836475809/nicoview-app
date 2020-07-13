@@ -18,6 +18,8 @@
             height: calc(var(--seek-height) - 20px);
             top: 50%;
             transform: translateY(-50%); 
+            padding-left: 5px;
+            padding-right: 5px;
             cursor: pointer;
         } 
         .seek-bar {

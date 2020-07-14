@@ -18,8 +18,6 @@
             height: calc(var(--seek-height) - 20px);
             top: 50%;
             transform: translateY(-50%); 
-            padding-left: 5px;
-            padding-right: 5px;
             cursor: pointer;
         } 
         .seek-bar {
@@ -63,19 +61,21 @@
         .seek-tooltip > .text {
             height: 100%;
         }
+        .seek-container:hover + .seek-tooltip {
+            display: block;
+        }
     </style>
 
-    <div class="seek-container" onmousedown={mousedown}
-            onmouseout={mouseOut} onmousemove={mouseOver}>
+    <div class="seek-container" onmousedown={mousedown} onmousemove={mouseOver}>
         <div class="seek-bar">  
             <div class="seek-value"></div>
         </div>
     </div>
+    <div class="seek-tooltip"><div class="center-hv text"></div></div>
     <div class="seek-timer current">{fmt_current}</div>
     <div class="seek-timer slash">/</div>
     <div class="seek-timer duration">{fmt_duration}</div>
-    <div class="seek-tooltip"><div class="center-hv text"></div></div>
-
+    
     <script>
         /* globals */
         const time_format = window.TimeFormat;
@@ -107,27 +107,12 @@
             const current = per * this.duration;
 
             const tp = this.root.querySelector(".seek-tooltip");
-            tp.style.display = "block";
-
             const tp_text = this.root.querySelector(".seek-tooltip > .text");
             tp_text.innerText = time_format.toTimeString(current);
   
             const tp_left = rect.left + left - tp.clientWidth / 2;
-
             tp.style.top = (rect.top - 30) + "px";
             tp.style.left = tp_left + "px";
-
-            e.stopPropagation();
-        };
-
-        this.mouseOut = (e) => {
-            if(!e.target.classList.contains("seek-container")){
-                e.stopPropagation();
-                return;
-            }
-
-            const tp = this.root.querySelector(".seek-tooltip");
-            tp.style.display = "none";
 
             e.stopPropagation();
         };

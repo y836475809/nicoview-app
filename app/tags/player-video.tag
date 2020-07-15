@@ -162,6 +162,7 @@
             }); 
             video_elm.addEventListener("waiting", function(){
                 logger.debug("waitingによるイベント発火");
+                comment_tl.pause();
             }); 
             video_elm.addEventListener("canplay", function(){
                 logger.debug("canplayによるイベント発火");

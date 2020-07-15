@@ -1,4 +1,4 @@
-const { session, dialog, app, BrowserWindow, ipcMain, shell } = require("electron");
+const { session, dialog, app, BrowserWindow, ipcMain, shell, Menu } = require("electron");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
@@ -179,6 +179,37 @@ const applyCSS = (win) => {
     }
 };
 
+const popupInputContextMenu = (bwin, props) => {
+    const { inputFieldType, editFlags } = props;
+    if (inputFieldType === "plainText") {
+        const input_context_menu = Menu.buildFromTemplate([
+            {
+                id: "canCut",
+                label: "切り取り",
+                role: "cut",
+            }, {
+                id: "canCopy",
+                label: "コピー",
+                role: "copy",
+            }, {
+                id: "canPaste",
+                label: "貼り付け",
+                role: "paste",
+            }, {
+                type: "separator",
+            }, {
+                id: "canSelectAll",
+                label: "すべて選択",
+                role: "selectall",
+            },
+        ]);
+        input_context_menu.items.forEach(item => {
+            item.enabled = editFlags[item.id];
+        });
+        input_context_menu.popup(bwin);
+    }
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config_ipc_server.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
@@ -197,6 +228,10 @@ function createWindow() {
     main_win.webContents.on("did-finish-load", async () => { 
         applyCSS(main_win);
         main_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
+
+        main_win.webContents.on("context-menu", (e, props) => {
+            popupInputContextMenu(main_win, props);
+        });
     });
 
     // アプリケーションのindex.htmlの読み込み
@@ -592,6 +627,10 @@ const createPlayerWindow = () => {
         player_win.webContents.on("did-finish-load", async () => {
             applyCSS(player_win);
             player_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
+
+            player_win.webContents.on("context-menu", (e, props) => {
+                popupInputContextMenu(player_win, props);
+            });
         });
 
         if (state.maximized) {

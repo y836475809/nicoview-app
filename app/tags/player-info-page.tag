@@ -398,8 +398,7 @@
         };
 
         this.on("mount", () => {  
-            grid_table.init(".comment-grid");          
-            grid_table.grid.registerPlugin(new Slick.AutoTooltips());
+            grid_table.init(".comment-grid");
             grid_table.setupResizer(".comment-grid-container");
 
             grid_table.onDblClick(async (e, data)=>{

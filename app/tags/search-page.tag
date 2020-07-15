@@ -273,7 +273,7 @@
         /* globals riot logger */
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable } = window.GridTable;
+        const { GridTable, lineBreakFormatter } = window.GridTable;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
@@ -396,9 +396,7 @@
             }
             return content;
         };
-        const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
-            return `<div class="line-break">${value}</div>`;
-        };
+
         const tagsFormatter = (row, cell, value, columnDef, dataContext)=> {
             if(!value){
                 return "";

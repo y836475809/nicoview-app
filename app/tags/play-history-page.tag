@@ -21,7 +21,7 @@
         /* globals logger */
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { GridTable } = window.GridTable;
+        const { GridTable, lineBreakFormatter } = window.GridTable;
         const { BookMark } = window.BookMark;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
@@ -32,10 +32,10 @@
             const video_id = dataContext.id;
             return `ID: ${video_id}`;
         };
-
+        
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130},
-            {id: "name", name: "名前", sortable: true},
+            {id: "name", name: "名前", sortable: true, formatter:lineBreakFormatter},
             {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
             {id: "play_date", name: "再生日", sortable: true},
             {id: "url", name: "url", sortable: true}

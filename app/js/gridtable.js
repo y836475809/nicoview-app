@@ -3,6 +3,9 @@ require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
 require("slickgrid/plugins/slick.rowselectionmodel");
+require("slickgrid/plugins/slick.autotooltips");
+require("slickgrid/plugins/slick.resizer");
+
 const time_format = require("./time-format");
 const { IPCClient } = require("./ipc-client-server");
 
@@ -33,6 +36,9 @@ const numberFormatter = (row, cell, value, columnDef, dataContext)=> {
     return value.toLocaleString();
 };
 
+const lineBreakFormatter = (row, cell, value, columnDef, dataContext) => {
+    return `<div class="line-break">${value}</div>`;
+};
 
 const formatterMap = new Map([
     ["_img", imageFormatter],
@@ -141,6 +147,8 @@ class GridTable {
         this.grid.onColumnsResized.subscribe(() => {
             this._saveState();
         }); 
+
+        this.grid.registerPlugin(new Slick.AutoTooltips());
     }
 
     setupResizer(container){
@@ -360,4 +368,5 @@ class GridTable {
 
 module.exports = {
     GridTable,
+    lineBreakFormatter,
 };

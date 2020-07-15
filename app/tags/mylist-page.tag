@@ -183,7 +183,7 @@
         const path = window.path;
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable } = window.GridTable;
+        const { GridTable, lineBreakFormatter } = window.GridTable;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
@@ -249,13 +249,11 @@
             return nico_mylist_image_cache.getImageHtml(mylist_id, url);
         };
 
-        const lineBreakFormatter = (row, cell, value, columnDef, dataContext)=> {
-            return `<div class="line-break">${value}</div>`;
-        };
         const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
             const result = value.replace(/\r?\n/g, "<br>");
             return `<div>${result}</div>`;
         };
+        
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
             const view_count = dataContext.view_count;

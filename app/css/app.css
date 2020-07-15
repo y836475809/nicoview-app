@@ -62,9 +62,9 @@ html, body {
   height: 100px;
 }
 
-.line-break {
+.wrap-gridtable-cell {
   white-space: normal;
-  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 .state-content {

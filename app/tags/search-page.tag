@@ -273,7 +273,7 @@
         /* globals riot logger */
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable, lineBreakFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter } = window.GridTable;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
@@ -406,12 +406,12 @@
             value.split(" ").forEach(tag => {
                 content += `<div class='state-content label-tag'>${tag}</div>`;
             });
-            return `<div class='line-break'>${content}</div>`;
+            return `<div class='wrap-gridtable-cell'>${content}</div>`;
         };
 
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 130},
-            {id: "name", name: "名前", formatter:lineBreakFormatter},
+            {id: "name", name: "名前", formatter:wrapFormatter},
             {id: "info", name: "情報", formatter:htmlFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},

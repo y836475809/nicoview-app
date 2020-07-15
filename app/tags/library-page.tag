@@ -196,7 +196,7 @@
         /* globals riot logger */
         const {remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { GridTable, lineBreakFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter } = window.GridTable;
         const { NicoUpdate } = window.NicoUpdate;
         const { BookMark } = window.BookMark;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
@@ -263,7 +263,7 @@
         };       
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "video_name", name: "名前", sortable: true, formatter: lineBreakFormatter},
+            {id: "video_name", name: "名前", sortable: true, formatter: wrapFormatter},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},

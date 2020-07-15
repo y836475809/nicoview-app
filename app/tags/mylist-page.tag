@@ -183,7 +183,7 @@
         const path = window.path;
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable, lineBreakFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter } = window.GridTable;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
@@ -253,7 +253,7 @@
             const result = value.replace(/\r?\n/g, "<br>");
             return `<div>${result}</div>`;
         };
-        
+
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
             const view_count = dataContext.view_count;
@@ -273,7 +273,7 @@
         const columns = [
             {id: "no", name: "#"},
             {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
-            {id: "title", name: "名前", formatter:lineBreakFormatter},
+            {id: "title", name: "名前", formatter:wrapFormatter},
             {id: "info", name: "情報", formatter:infoFormatter},
             {id: "description", name: "説明", formatter:htmlFormatter},
             {id: "date", name: "投稿日"},

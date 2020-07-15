@@ -36,8 +36,8 @@ const numberFormatter = (row, cell, value, columnDef, dataContext)=> {
     return value.toLocaleString();
 };
 
-const lineBreakFormatter = (row, cell, value, columnDef, dataContext) => {
-    return `<div class="line-break">${value}</div>`;
+const wrapFormatter = (row, cell, value, columnDef, dataContext) => {
+    return `<div class="wrap-gridtable-cell">${value}</div>`;
 };
 
 const formatterMap = new Map([
@@ -368,5 +368,5 @@ class GridTable {
 
 module.exports = {
     GridTable,
-    lineBreakFormatter,
+    wrapFormatter,
 };

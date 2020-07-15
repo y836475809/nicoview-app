@@ -49,6 +49,7 @@
             display: flex;
         }
         .controls-container > label {
+            height: 32px;
             user-select: none;
         }
         .comment-checkbox {
@@ -73,12 +74,9 @@
         .icon:hover {
             color: black;
         }
-        .icon[data-state="false"]{
+        .icon[data-state="false"] {
             pointer-events: none;
             opacity: 0.3;
-        }
-        .icon.fa-stack {
-            font-size: 18px;
         }
         .icon-button {
             height: 30px;
@@ -89,17 +87,6 @@
         .move-right {
             display: flex;
             margin-left: auto;
-            margin-right: 5px;
-        }
-        .icon-layer1 {
-            left: -5px;
-            font-size: 18px;
-        }
-        .icon-layer2 {
-            position: relative;
-            left: 25%;
-            top: 25%;
-            font-size: 0.6em;
         }
     </style>
     
@@ -138,30 +125,28 @@
             <player-user obs={opts.obs}></player-user>
         </div>
         <div class="controls-container">
-            <input class="comment-checkbox sync-comment" type="checkbox" 
+            <input class="center-v comment-checkbox sync-comment" type="checkbox" 
                 onclick={onclickSyncCommentCheck} />
                 <label class="center-v" title="コメントリストのスクロールと再生を同期させる">同期</label>
-            <input class="comment-checkbox comment-visible" type="checkbox" 
+            <input class="center-v comment-checkbox comment-visible" type="checkbox" 
                 onclick={onclickCommentVisibleCheck} />
                 <label class="center-v" title="コメントの表示/非表示">表示</label>
             <div title="設定ダイアログ表示" class="icon-button center-hv">                      
                 <span class="icon fas fa-cog" onclick={onclickShowSettingDialog}></span> 
             </div>
             <div class="move-right">
-                <div title="動画情報更新" class="icon-button center-v">
-                    <span class="icon center-hv fa-stack" 
+                <div title="動画情報更新" class="icon-button center-hv">
+                    <span class="icon center-hv" 
                         data-state={String(enableUpdateData())} 
                         onclick={onclickUpdateThumbInfo}>
-                        <i class="icon-layer1 fas fa-info fa-stack-1x"></i>
-                        <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
+                        <i class="fas fa-info"></i>
                     </span>
                 </div>     
-                <div title="コメント更新" class="icon-button center-v">
-                    <span class="icon center-hv fa-stack" 
+                <div title="コメント更新" class="icon-button center-hv">
+                    <span class="icon center-hv" 
                         data-state={String(enableUpdateData())} 
                         onclick={onclickUpdateComment}>
-                        <i class="icon-layer1 far fa-comment-dots fa-stack-1x"></i>
-                        <i class="icon-layer2 fas fa-sync-alt fa-stack-1x"></i>
+                        <i class="far fa-comment-dots"></i>
                     </span>
                 </div>
             </div>

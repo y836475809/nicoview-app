@@ -125,7 +125,7 @@
         .search-button {            
             border-left-width: 0px !important;
             border-right-width: 0px !important;
-            width: calc(var(--serach-button-width) - 10px);
+            width: calc(var(--serach-button-width) - 5px);
         }
         .clear-button {            
             border-left-width: 0px !important;

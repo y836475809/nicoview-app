@@ -119,25 +119,20 @@
         .search-container > div > i:hover {
             color: black;
         }
-
+        .search-container > .search-button,
+        .search-container > .clear-button {
+            border: 1px solid gray;
+        }
         .search-container > .search-button {
-            border-width: 1px;
             border-left-width: 0px !important;
             border-right-width: 0px !important;
-            border-style: solid;
-            border-color: gray;
             width: 20px;
         }
-        .search-container > .search-button > i {
-            font-size: 1.2em;
-        }
-
         .search-container > .clear-button {
-            border-width: 1px;
             border-left-width: 0px !important;
-            border-style: solid;
-            border-color: gray;
+            width: 25px;
         }
+        .search-container > .search-button > i,
         .search-container > .clear-button > i {
             font-size: 1.2em;
         }

@@ -142,7 +142,7 @@
         .input-container > .search-button {
             border: 1px solid gray;
             border-left-width: 0px !important;
-            width: 20px;
+            width: 30px;
             height: 30px;
             background-color: white; 
             cursor: pointer;

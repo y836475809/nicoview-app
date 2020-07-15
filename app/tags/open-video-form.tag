@@ -3,7 +3,7 @@
         :scope {
             --form-width: 400px;
             --form-height: 80px;
-            --btn-width: 30px;
+            --btn-width: 20px;
         }
         .open-form {
             position: fixed;

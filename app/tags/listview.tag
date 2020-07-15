@@ -2,6 +2,7 @@
     <style scoped>
         :scope {
             --input-height: 30px;
+            --serach-button-width: 30px;
             --item-height: 30px;
             --item-duration: 300ms;
             --icon-size: 15px;
@@ -93,15 +94,32 @@
         }
         
         .listview-input {
-            height: var(--input-height);
-            width: 100%;
-            margin-bottom: 5px;
-            padding: 2px;
             border: solid 1px #ccc;
+            border-right-width: 0px !important;
             border-radius: 2px;
+            height: var(--input-height);
+            width: calc(100% - var(--serach-button-width));
+            margin-bottom: 5px;
+            padding: 2px;   
         }
         .listview-input:focus {
             outline: none;
+        }
+ 
+        .search-button > i {
+            font-size: 1.2em;
+            color: gray;
+        }
+        .search-button > i:hover {
+            color: black;
+        }
+        .search-button {            
+            border: 1px solid #ccc;
+            border-left-width: 0px !important;
+            background-color: white;
+            width: var(--serach-button-width);
+            height: var(--input-height);
+            cursor: pointer;
         }
 
         .listview-item-ghost-class {
@@ -109,8 +127,12 @@
         }
     </style>
     
-    <input class="listview-input" type="search" placeholder="検索" 
-        onkeydown={onkeydownSearchInput}>
+    <div style="display: flex;">
+        <input class="listview-input" placeholder="検索" onkeydown={onkeydownSearchInput}>
+        <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
+            <i class="fas fa-search"></i>
+        </div>
+    </div>
     <div class="listview-menu-container">
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
@@ -295,6 +317,11 @@
                 const query = getInputValue();
                 filter(query);
             }
+        };
+
+        this.onclickSearch = (e) => {
+            const query = getInputValue();
+            filter(query);
         };
 
         this.getIconClass = (item) => {

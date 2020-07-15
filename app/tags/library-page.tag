@@ -126,6 +126,10 @@
             border-right-width: 0px !important;
             border-style: solid;
             border-color: gray;
+            width: 20px;
+        }
+        .search-container > .search-button > i {
+            font-size: 1.2em;
         }
 
         .search-container > .clear-button {
@@ -142,6 +146,7 @@
             background-color: rgba(0, 0, 0, 0);
         }
 
+        .search-button,
         .clear-button,
         .add-button {
             cursor: pointer;
@@ -178,7 +183,10 @@
     <div class="library-controls-container">
         <div class="item-info center-v">項目数 {num_filtered_items.toLocaleString()}/{num_items.toLocaleString()}</div>
         <div class="search-container">
-            <input class="search-input" type="search" placeholder="検索" onkeydown={onkeydownSearchInput} />
+            <input class="search-input" placeholder="検索" onkeydown={onkeydownSearchInput} />
+            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
+                <i class="fas fa-search"></i>
+            </div>
             <div class="clear-button center-hv" title="全て表示" onclick={onclickShowAll}>
                 <i class="fas fa-times-circle"></i>
             </div>

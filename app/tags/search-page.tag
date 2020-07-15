@@ -109,6 +109,7 @@
         }
         .input-container > input {
             margin-left: 5px;
+            border-right-width: 0px !important;
             width: 250px;
             height: 30px;
             font-size: 1.2em;
@@ -125,12 +126,26 @@
             height: 30px;
             cursor: pointer;
         }
+        .input-container > .search-button > i,
         .input-container > .add-button > i {
             font-size: 20px;
             color: gray;
         }
+        .input-container > .search-button > i:hover,
         .input-container > .add-button > i:hover {
             color: black;
+        }
+
+        .input-container > .search-button > i {
+            font-size: 1.2em;
+        }
+        .input-container > .search-button {
+            border: 1px solid gray;
+            border-left-width: 0px !important;
+            width: 20px;
+            height: 30px;
+            background-color: white; 
+            cursor: pointer;
         }
 
         .selected-container {
@@ -230,7 +245,10 @@
             </div>
         </div>
         <div class="input-container center-v">
-            <input type="search" placeholder="検索" onkeydown={onkeydownInput}>
+            <input placeholder="検索" onkeydown={onkeydownInput}>
+            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
+                <i class="fas fa-search"></i>
+            </div>
             <div class="add-button center-hv" title="検索条件を保存" onclick={onclickAddSearch}>
                 <i class="far fa-star"></i>
             </div>

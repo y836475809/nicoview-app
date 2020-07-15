@@ -106,20 +106,30 @@
             outline: none;
         }
  
-        .search-button > i {
+        .search-button > i,
+        .clear-button > i {
             font-size: 1.2em;
             color: gray;
         }
-        .search-button > i:hover {
+        .search-button > i:hover,
+        .clear-button > i:hover {
             color: black;
         }
-        .search-button {            
+        .search-button,
+        .clear-button {
             border: 1px solid #ccc;
-            border-left-width: 0px !important;
             background-color: white;
-            width: var(--serach-button-width);
             height: var(--input-height);
-            cursor: pointer;
+            cursor: pointer;      
+        }
+        .search-button {            
+            border-left-width: 0px !important;
+            border-right-width: 0px !important;
+            width: calc(var(--serach-button-width) - 10px);
+        }
+        .clear-button {            
+            border-left-width: 0px !important;
+            width: var(--serach-button-width);
         }
 
         .listview-item-ghost-class {
@@ -131,6 +141,9 @@
         <input class="listview-input" placeholder="検索" onkeydown={onkeydownSearchInput}>
         <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
             <i class="fas fa-search"></i>
+        </div>
+        <div class="clear-button center-hv" title="全て表示" onclick={onclickShowAll}>
+            <i class="fas fa-times-circle"></i>
         </div>
     </div>
     <div class="listview-menu-container">
@@ -291,6 +304,11 @@
             return elm.value.toLowerCase();
         };
 
+        const setInputValue = (value) => {
+            const elm = this.root.querySelector(".listview-input");
+            elm.value = value;
+        };
+
         const filter = (query) => {
             const elms = this.root.querySelectorAll(".listview-item");
             elms.forEach((elm, index) => {
@@ -322,6 +340,11 @@
         this.onclickSearch = (e) => {
             const query = getInputValue();
             filter(query);
+        };
+
+        this.onclickShowAll = (e) => {
+            setInputValue("");
+            filter("");
         };
 
         this.getIconClass = (item) => {

@@ -93,7 +93,7 @@
     <div class="info-container">
         <div class="video-container">
             <div style="display: flex;">
-                <div class="video-thumbnail">
+                <div class="video-thumbnail" title={video_thumbnail_tooltip}>
                     <img src={video_thumbnail_url} class="video-thumbnail">
                 </div>
                 <div class="video-info">
@@ -180,6 +180,8 @@
         this.comment_counter = 0;
         this.mylist_counter = 0;
 
+        this.video_thumbnail_tooltip = "";
+
         let sync_comment_scroll = new SyncCommentScroll();
         let sync_comment_checked = false;
 
@@ -210,7 +212,7 @@
             // }else{
             //     return "";
             // }
-            return this.is_economy ? "エコノミー" : "";
+            return this.is_economy ? "エコノミー" : "高画質";
         };
         this.videoStateDeleted = () => {
             if(this.is_deleted === true){
@@ -341,6 +343,18 @@
             this.view_counter = video.viewCount;
             this.comment_counter = thread.commentCount;
             this.mylist_counter = video.mylistCount;
+
+            this.video_thumbnail_tooltip = 
+                `投稿日: ${this.first_retrieve}\n`
+                + `再生: ${this.view_counter.toLocaleString()}\n`
+                + `コメント: ${this.comment_counter.toLocaleString()}\n`
+                + `マイリスト: ${this.mylist_counter.toLocaleString()}\n`
+                + `状態: ${this.videoStateOnline()} ${this.videoStateLocal()}\n`
+                + `画質: ${this.videoStateEconomy()}`; 
+            const state_deleted = this.videoStateDeleted();
+            if(state_deleted){
+                this.video_thumbnail_tooltip += `\n${state_deleted}`;
+            }
             
             const user_id = owner.id;
             const user_nickname = owner.nickname;

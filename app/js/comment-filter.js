@@ -94,6 +94,10 @@ class CommentNumLimit {
     }
 
     getComments(comments, play_time_sec){
+        if(comments.length === 0){
+            return [];
+        }
+        
         this._sortDescByPostDate(comments);
         const {owner_comments, user_comments} = this._splitByUserID(comments);
         const start_post_date = comments[comments.length-1].date;

@@ -123,6 +123,14 @@ test("comments get each", t => {
     ]);
 });
 
+test("comments getComments comments=[]", t => {
+    const comments = [];
+    const time_sec = 20*60;
+    const cnl = new TestCommentNumLimit(2, 3);
+    const cmts = cnl.getComments(comments, time_sec);
+    t.deepEqual(cmts, []);
+});
+
 test("comments getComments", t => {
     const comments = [
         {no: 0, vpos: 10, date: 15.0},

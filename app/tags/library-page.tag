@@ -598,36 +598,56 @@
             return Menu.buildFromTemplate(menu_templete);
         };
 
+        const play = async (item, online) => {
+            const video_id = item.id;
+            const video_type = item.video_type;
+
+            if(!online && needConvertVideo(video_type)){
+                if(!await showOKCancelBox("info", 
+                    `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
+                    return;
+                }
+                await convertVideo(this, video_id);
+            }else{
+                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                    video_id: video_id,
+                    time : 0,
+                    online: online,
+                });
+            }
+        };
+
+        const addStackItems = (items) => {
+            const stack_items = items.map(item => {
+                return {
+                    id: item.id,
+                    title: item.title, 
+                    thumb_img:item.thumb_img
+                };
+            });
+            obs.trigger("play-stack-page:add-items", {items:stack_items});
+        };
+
+        const addBookmarkItems = (items) => {
+            const bk_items = items.map(item => {
+                return BookMark.createVideoItem(item.title, item.id);
+            });
+            obs.trigger("bookmark-page:add-items", bk_items);
+        };
+
         const createMenu = () => {
             const menu_templete = [
-                { label: "再生", click() {
+                { label: "再生", async click() {
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id : video_id,
-                        time : 0,
-                        online: false
-                    });
+                    await play(items[0], false);
                 }},
-                { label: "オンラインで再生", click() {
+                { label: "オンラインで再生", async click() {
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
+                    await play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    const stack_items = items.map(item => {
-                        return {
-                            id: item.id,
-                            title: item.title, 
-                            thumb_img:item.thumb_img
-                        };
-                    });
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems(items);
                 }},
                 { type: "separator" },
                 { label: "コメント更新", click() {
@@ -651,10 +671,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.title, item.id);
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems(items);
                 }},
                 { type: "separator" },
                 { label: "NNDD形式(XML)に変換", async click() {
@@ -693,57 +710,21 @@
     
             grid_table.onDblClick(async (e, data)=>{
                 logger.debug("library onDblClick data=", data);
-                const video_id = data.id;
-                const video_type = data.video_type;
-                if(needConvertVideo(video_type)){
-                    if(!await showOKCancelBox("info", 
-                        `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
-                        return;
-                    }
-                    await convertVideo(this, video_id);
-                }else{
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time : 0,
-                        online: false,
-                    });
-                }
+                await play(data, false);
             });
 
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    logger.debug("library onDblClick data=", data);
-                    const video_id = data.id;
-                    const video_type = data.video_type;
-                    if(needConvertVideo(video_type)){
-                        if(!await showOKCancelBox("info", 
-                            `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
-                            return;
-                        }
-                        await convertVideo(this, video_id);
-                    }else{
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                            video_id: video_id,
-                            time : 0,
-                            online: false,
-                        });
-                    }
+                    logger.debug("library onButtonClick data=", data);
+                    await play(data, false);
                 }
 
                 if(cmd_id == "stack"){
-                    const stack_items = [{
-                        id: data.id,
-                        title: data.title, 
-                        thumb_img:data.thumb_img
-                    }];
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems([data]);
                 }
 
                 if(cmd_id == "bookmark"){
-                    const bk_items = [
-                        BookMark.createVideoItem(data.title, data.id)
-                    ];
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems([data]);
                 }
             });
             

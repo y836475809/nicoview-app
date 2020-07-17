@@ -637,47 +637,60 @@
             grid_table.resizeGrid();
         });
 
+        const play = (item, online) => {
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                video_id : item.id,
+                time : 0,
+                online: online
+            });
+        };
+
+        const addStackItems = (items) => {
+            const stack_items = items.map(item => {
+                return {
+                    id: item.id,
+                    title: item.title, 
+                    thumb_img:item.thumb_img
+                };
+            });
+            obs.trigger("play-stack-page:add-items", {items:stack_items});
+        };
+
+        const addBookmarkItems = (items) => {
+            const bk_items = items.map(item => {
+                return BookMark.createVideoItem(item.title, item.id);
+            });
+            obs.trigger("bookmark-page:add-items", bk_items);
+        };
+
+        const addDownloadItems = (items) => {
+            obs.trigger("download-page:add-download-items", items);
+        };
+
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id : video_id,
-                        time : 0,
-                        online: false
-                    });
+                    play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
+                    play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    const stack_items = items.map(item => {
-                        return {
-                            id: item.id,
-                            title: item.title, 
-                            thumb_img:item.thumb_img
-                        };
-                    });
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems(items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    obs.trigger("download-page:add-download-items", items);
+                    addDownloadItems(items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
@@ -693,10 +706,7 @@
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.title, item.id);
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems(items);
                 }},
                 { label: "ページをブックマーク", click() {
                     const bk_item = BookMark.createSearchItem(nico_search_params);
@@ -728,37 +738,16 @@
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    const video_id = data.id;
-                    if(video_id){
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                            video_id : video_id,
-                            time : 0,
-                            online: false
-                        });
-                    }
+                    play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    const stack_items = [{
-                        id: data.id,
-                        title: data.title, 
-                        thumb_img:data.thumb_img
-                    }];
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems([data]);
                 }
                 if(cmd_id == "bookmark"){
-                    const bk_items = [
-                        BookMark.createVideoItem(data.title, data.id)
-                    ];
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems([data]);
                 }
                 if(cmd_id == "download"){
-                    const items = [{
-                        thumb_img: data.thumb_img,
-                        id: data.id,
-                        title: data.title,
-                        state: 0
-                    }];
-                    obs.trigger("download-page:add-download-items", items);
+                    addDownloadItems([data]);
                 }
             });
             grid_table.onContextMenu((e)=>{

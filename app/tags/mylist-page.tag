@@ -287,48 +287,71 @@
         };    
         const grid_table = new GridTable("mylist-grid", columns, options);
 
+        const play = async (item, online) => {
+            const video_id = item.id;
+            if(!online && needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))){
+                if(!await showOKCancelBox("info", 
+                    "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
+                    return;
+                }        
+                obs.trigger("library-page:convert-video", video_id);
+            }else{
+                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                    video_id: video_id,
+                    time: 0,
+                    online: online
+                });
+            }
+        };
+
+        const addStackItems = (items) => {
+            const stack_items = items.map(item => {
+                return {
+                    id: item.id,
+                    title: item.title, 
+                    thumb_img:item.thumb_img
+                };
+            });
+            obs.trigger("play-stack-page:add-items", {items:stack_items});
+        };
+
+        const addBookmarkItems = (items) => {
+            const bk_items = items.map(item => {
+                return BookMark.createVideoItem(item.title, item.id);
+            });
+            obs.trigger("bookmark-page:add-items", bk_items);
+        };
+
+        const addDownloadItems = (items) => {
+            const download_items = items.map(value => {
+                return {
+                    thumb_img: value.thumb_img,
+                    id: value.id,
+                    title: value.title,
+                    state: 0
+                };
+            });
+            obs.trigger("download-page:add-download-items", download_items);
+        };
+
         const createMenu = () => {
             const menu_templete = [
-                { label: "再生", click() {
+                { label: "再生", async click() {
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: false
-                    });
+                    await play(items[0], false);
                 }},
-                { label: "オンラインで再生", click() {
+                { label: "オンラインで再生", async click() {
                     const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
+                    await play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    const stack_items = items.map(item => {
-                        return {
-                            id: item.id,
-                            title: item.title, 
-                            thumb_img:item.thumb_img
-                        };
-                    });
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems(items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
-                    const items = grid_table.getSelectedDatas().map(value => {
-                        return {
-                            thumb_img: value.thumb_img,
-                            id: value.id,
-                            title: value.title,
-                            state: 0
-                        };
-                    });
-                    obs.trigger("download-page:add-download-items", items);
+                    const items = grid_table.getSelectedDatas();
+                    addDownloadItems(items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas();
@@ -340,10 +363,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.title, item.id);
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems(items);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);
@@ -386,43 +406,16 @@
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    const video_id = data.id;
-                    if(needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))===true){
-                        if(!await showOKCancelBox("info", 
-                            "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
-                            return;
-                        }        
-                        obs.trigger("library-page:convert-video", video_id);
-                    }else{
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                            video_id: video_id,
-                            time: 0,
-                            online: false
-                        });
-                    }
+                    await play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    const stack_items = [{
-                        id: data.id,
-                        title: data.title, 
-                        thumb_img:data.thumb_img
-                    }];
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems([data]);
                 }
                 if(cmd_id == "bookmark"){
-                    const bk_items = [
-                        BookMark.createVideoItem(data.title, data.id)
-                    ];
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems([data]);
                 }
                 if(cmd_id == "download"){
-                    const items = [{
-                        thumb_img: data.thumb_img,
-                        id: data.id,
-                        title: data.title,
-                        state: 0
-                    }];
-                    obs.trigger("download-page:add-download-items", items);
+                    addDownloadItems([data]);
                 }
             });
             

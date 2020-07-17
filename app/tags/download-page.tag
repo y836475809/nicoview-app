@@ -240,44 +240,50 @@
             await onChangeDownloadItem();
         };
 
+        const play = (item, online) => {
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                video_id : item.id,
+                time : 0,
+                online: online
+            });
+        };
+
+        const addStackItems = (items) => {
+            const stack_items = items.map(item => {
+                return {
+                    id: item.id,
+                    title: item.title, 
+                    thumb_img:item.thumb_img
+                };
+            });
+            obs.trigger("play-stack-page:add-items", {items:stack_items});
+        };
+
+        const addBookmarkItems = (items) => {
+            const bk_items = items.map(item => {
+                return BookMark.createVideoItem(item.title, item.id);
+            });
+            obs.trigger("bookmark-page:add-items", bk_items);
+        };
+
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id : video_id,
-                        time : 0,
-                        online: false
-                    });
+                    play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
+                    play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    const stack_items = items.map(item => {
-                        return {
-                            id: item.id,
-                            title: item.title, 
-                            thumb_img:item.thumb_img
-                        };
-                    });
-                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    addStackItems(items);
                 }},
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.title, item.id);
-                    });
-                    obs.trigger("bookmark-page:add-items", bk_items);
+                    addBookmarkItems(items);
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
@@ -440,33 +446,17 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                        video_id : data.id,
-                        time : 0,
-                        online: false
-                    });
+                    play(data, false);
                 });
                 grid_table_dl.onButtonClick((e, cmd_id, data)=>{
                     if(cmd_id == "play"){
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                            video_id : data.id,
-                            time : 0,
-                            online: false
-                        });
+                        play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        const stack_items = [{
-                            id: data.id,
-                            title: data.title, 
-                            thumb_img:data.thumb_img
-                        }];
-                        obs.trigger("play-stack-page:add-items", {items:stack_items});
+                        addStackItems([data]);
                     }
                     if(cmd_id == "bookmark"){
-                        const bk_items = [
-                            BookMark.createVideoItem(data.title, data.id)
-                        ];
-                        obs.trigger("bookmark-page:add-items", bk_items);
+                        addBookmarkItems([data]);
                     }
                 });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");

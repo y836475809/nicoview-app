@@ -210,7 +210,7 @@
                 return {
                     thumb_img: value.thumb_img,
                     id: value.id,
-                    name: value.name,
+                    title: value.title,
                     state: state
                 };
             });
@@ -265,7 +265,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.name, 
+                            title: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -275,7 +275,7 @@
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.name, item.id);
+                        return BookMark.createVideoItem(item.title, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }},
@@ -457,14 +457,14 @@
                     if(cmd_id == "stack"){
                         const stack_items = [{
                             id: data.id,
-                            name: data.name, 
+                            title: data.title, 
                             thumb_img:data.thumb_img
                         }];
                         obs.trigger("play-stack-page:add-items", {items:stack_items});
                     }
                     if(cmd_id == "bookmark"){
                         const bk_items = [
-                            BookMark.createVideoItem(data.name, data.id)
+                            BookMark.createVideoItem(data.title, data.id)
                         ];
                         obs.trigger("bookmark-page:add-items", bk_items);
                     }

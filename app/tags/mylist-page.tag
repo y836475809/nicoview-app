@@ -312,7 +312,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.title, 
+                            title: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -324,7 +324,7 @@
                         return {
                             thumb_img: value.thumb_img,
                             id: value.id,
-                            name: value.title,
+                            title: value.title,
                             state: 0
                         };
                     });
@@ -404,7 +404,7 @@
                 if(cmd_id == "stack"){
                     const stack_items = [{
                         id: data.id,
-                        name: data.title, 
+                        title: data.title, 
                         thumb_img:data.thumb_img
                     }];
                     obs.trigger("play-stack-page:add-items", {items:stack_items});
@@ -419,7 +419,7 @@
                     const items = [{
                         thumb_img: data.thumb_img,
                         id: data.id,
-                        name: data.title,
+                        title: data.title,
                         state: 0
                     }];
                     obs.trigger("download-page:add-download-items", items);

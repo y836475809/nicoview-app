@@ -623,7 +623,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.title, 
+                            title: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -733,7 +733,7 @@
                 if(cmd_id == "stack"){
                     const stack_items = [{
                         id: data.id,
-                        name: data.title, 
+                        title: data.title, 
                         thumb_img:data.thumb_img
                     }];
                     obs.trigger("play-stack-page:add-items", {items:stack_items});

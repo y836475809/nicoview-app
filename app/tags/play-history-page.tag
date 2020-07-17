@@ -35,7 +35,7 @@
 
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130},
-            {id: "name", name: "名前", sortable: true, formatter:wrapFormatter},
+            {id: "title", name: "名前", sortable: true, formatter:wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
@@ -73,7 +73,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.name, 
+                            title: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -83,7 +83,7 @@
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.name, item.id);
+                        return BookMark.createVideoItem(item.title, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }}
@@ -116,14 +116,14 @@
                 if(cmd_id == "stack"){
                     const stack_items = [{
                         id: data.id,
-                        name: data.name, 
+                        title: data.title, 
                         thumb_img:data.thumb_img
                     }];
                     obs.trigger("play-stack-page:add-items", {items:stack_items});
                 }
                 if(cmd_id == "bookmark"){
                     const bk_items = [
-                        BookMark.createVideoItem(data.name, data.id)
+                        BookMark.createVideoItem(data.title, data.id)
                     ];
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }
@@ -131,7 +131,7 @@
                     const items = [{
                         thumb_img: data.thumb_img,
                         id: data.id,
-                        name: data.name,
+                        title: data.title,
                         state: 0
                     }];
                     obs.trigger("download-page:add-download-items", items);

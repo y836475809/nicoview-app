@@ -77,8 +77,8 @@
         <div class="stack-item center-v {item.state}" data-id={i} each={ item, i in items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
-                <div class="title" title={item.name} >
-                    {item.name}
+                <div class="title" title={item.title} >
+                    {item.title}
                 </div> 
             </div>
             <div class="delete-button center-hv" title="削除"
@@ -126,7 +126,7 @@
                 items: this.items.map(item=>{
                     return {
                         video_id: item.id,
-                        title: item.name
+                        title: item.title
                     };
                 })
             });

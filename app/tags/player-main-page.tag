@@ -132,7 +132,7 @@
             const history_item = {
                 id: video.video_id, 
                 image: video.thumbnailURL, 
-                name: video.title, 
+                title: video.title, 
                 url: video_data.src
             };
             ipcRenderer.send(IPC_CHANNEL.ADD_PLAY_HISTORY, {history_item});

@@ -429,7 +429,7 @@
 
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 130},
-            {id: "name", name: "名前", formatter:wrapFormatter},
+            {id: "title", name: "名前", formatter:wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報", formatter:htmlFormatter},
@@ -485,7 +485,7 @@
             return {
                 thumb_img: value.thumbnailUrl,
                 id: value.contentId,
-                name: value.title,
+                title: value.title,
                 info: `ID:${value.contentId}<br>
                         再生:${value.viewCounter.toLocaleString()}<br>
                         コメント:${value.commentCounter.toLocaleString()}`,
@@ -501,7 +501,7 @@
             return {
                 thumb_img: "",
                 id: "",
-                name: "",
+                title: "",
                 info: "",
                 play_time: -1,
                 pub_date: -1,
@@ -666,7 +666,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.name, 
+                            title: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -694,7 +694,7 @@
                         return value.id!="";
                     });
                     const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.name, item.id);
+                        return BookMark.createVideoItem(item.title, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }},
@@ -740,19 +740,25 @@
                 if(cmd_id == "stack"){
                     const stack_items = [{
                         id: data.id,
-                        name: data.name, 
+                        title: data.title, 
                         thumb_img:data.thumb_img
                     }];
                     obs.trigger("play-stack-page:add-items", {items:stack_items});
                 }
                 if(cmd_id == "bookmark"){
                     const bk_items = [
-                        BookMark.createVideoItem(data.name, data.id)
+                        BookMark.createVideoItem(data.title, data.id)
                     ];
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }
                 if(cmd_id == "download"){
-                    obs.trigger("download-page:add-download-items", [data]);
+                    const items = [{
+                        thumb_img: data.thumb_img,
+                        id: data.id,
+                        title: data.title,
+                        state: 0
+                    }];
+                    obs.trigger("download-page:add-download-items", items);
                 }
             });
             grid_table.onContextMenu((e)=>{

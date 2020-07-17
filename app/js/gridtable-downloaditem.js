@@ -12,7 +12,7 @@ class GridTableDownloadItem {
     constructor(container, state_formatter){
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130, behavior: "selectAndMove"},
-            {id: "name", name: "名前", behavior: "selectAndMove", formatter:wrapFormatter},
+            {id: "title", name: "名前", behavior: "selectAndMove", formatter:wrapFormatter},
             {id: "command", name: "操作", behavior: "selectAndMove", 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
             {id: "info", name: "情報", behavior: "selectAndMove", formatter:infoFormatter},

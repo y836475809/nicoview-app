@@ -119,7 +119,7 @@
                         {
                             items:[{
                                 id: video_id,
-                                name: title, 
+                                title: title, 
                                 thumb_img:thumbnailURL
                             }]
                         });
@@ -132,7 +132,7 @@
                         const item = {
                             thumb_img: thumbnailURL,
                             id: video_id,
-                            name: title,
+                            title: title,
                             state: 0
                         };
                         obs.trigger("player-main-page:add-download-item", item);

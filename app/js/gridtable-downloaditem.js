@@ -1,7 +1,7 @@
 require("slickgrid/lib/jquery.event.drag-2.3.0");
 require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
-const { GridTable, wrapFormatter } = require("./gridtable");
+const { GridTable, wrapFormatter, buttonFormatter } = require("./gridtable");
 
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
     const video_id = dataContext.id;
@@ -13,6 +13,8 @@ class GridTableDownloadItem {
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130, behavior: "selectAndMove"},
             {id: "name", name: "名前", behavior: "selectAndMove", formatter:wrapFormatter},
+            {id: "command", name: "操作", behavior: "selectAndMove", 
+                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
             {id: "info", name: "情報", behavior: "selectAndMove", formatter:infoFormatter},
             {id: "state", name: "状態", behavior: "selectAndMove", formatter:state_formatter}
         ];
@@ -99,6 +101,11 @@ class GridTableDownloadItem {
 
         this.grid_table.onDblClick((e, data)=>{
             on_dbl_click(e, data);
+        });
+    }
+    onButtonClick(on_click){
+        this.grid_table.onButtonClick((e, cmd_id, data)=>{
+            on_click(e, cmd_id, data);
         });
     }
 

@@ -446,6 +446,29 @@
                         online: false
                     });
                 });
+                grid_table_dl.onButtonClick((e, cmd_id, data)=>{
+                    if(cmd_id == "play"){
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id : data.id,
+                            time : 0,
+                            online: false
+                        });
+                    }
+                    if(cmd_id == "stack"){
+                        const stack_items = [{
+                            id: data.id,
+                            name: data.name, 
+                            thumb_img:data.thumb_img
+                        }];
+                        obs.trigger("play-stack-page:add-items", {items:stack_items});
+                    }
+                    if(cmd_id == "bookmark"){
+                        const bk_items = [
+                            BookMark.createVideoItem(data.name, data.id)
+                        ];
+                        obs.trigger("bookmark-page:add-items", bk_items);
+                    }
+                });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");
                 const items = await IPCClient.request("downloaditem", "getData");
                 grid_table_dl.setData(items);

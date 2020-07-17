@@ -62,6 +62,23 @@ html, body {
   height: 100px;
 }
 
+.gridtable-button {
+  margin-top: 5px;
+  margin-right: 5px;
+  width: 25px;
+  height: 25px;
+}
+.gridtable-button,
+.gridtable-button > i {
+  font-size: 15px;
+  color: gray;
+  cursor: pointer;
+}
+.gridtable-button:hover > i,
+.gridtable-button > i:hover {
+  color: black;
+}
+
 .wrap-gridtable-cell {
   white-space: normal;
   overflow-wrap: break-word;

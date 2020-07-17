@@ -40,6 +40,30 @@ const wrapFormatter = (row, cell, value, columnDef, dataContext) => {
     return `<div class="wrap-gridtable-cell">${value}</div>`;
 };
 
+const buttonFormatter = (opts, row, cell, value, columnDef, dataContext)=> {
+    if(!dataContext.id){
+        return "";
+    }
+    
+    const map = new Map();
+    map.set("play", {title:"再生", icon:"fas fa-play"});
+    map.set("stack", {title:"後で見る", icon:"fas fa-stream"});
+    map.set("bookmark", {title:"ブックマーク", icon:"fas fa-bookmark"});
+    map.set("download", {title:"ダウンロードに追加", icon:"fas fa-download"});
+    
+    let buttons = "";
+    opts.forEach(opt => {
+        if(map.has(opt)){
+            const item = map.get(opt);
+            buttons +=         
+            `<button title=${item.title} data-cmdid=${opt} class="center-hv gridtable-button cmd-btn">
+                <i data-cmdid=${opt} class="${item.icon} cmd-btn"></i>
+            </button>`;
+        }
+    });
+    return `<div style="display:flex; flex-wrap: wrap;">${buttons}</div>`;
+};
+
 const formatterMap = new Map([
     ["_img", imageFormatter],
     ["_date", dateFormatter],
@@ -88,6 +112,7 @@ class GridTable {
         }
         
         this.on_dblclick = (e, data)=>{};
+        this.on_button_click = (e, data)=>{};
         this.on_context_menu = (e)=>{};
         this.filter = (column_id, value, word) => { return true; };
         this.target_column_ids = [];
@@ -116,6 +141,15 @@ class GridTable {
         this.grid.setSelectionModel(new Slick.RowSelectionModel());
         this.grid.onClick.subscribe((e) => {
             const cell = this.grid.getCellFromEvent(e);
+
+            if ($(e.target).hasClass("cmd-btn")) {
+                const data = this.dataView.getItem(cell.row);
+                this.on_button_click(e, e.target.dataset.cmdid, data);
+                e.stopImmediatePropagation();
+                e.stopPropagation();
+                return;
+            }
+            
             this.grid.setSelectedRows([cell.row]);
             
             if(cell.cell == this.grid.getColumnIndex(this.options.id_click_as_dbclick)){
@@ -176,6 +210,10 @@ class GridTable {
 
     onDblClick(on_dblclick){
         this.on_dblclick = on_dblclick;
+    }
+
+    onButtonClick(on_click){
+        this.on_button_click = on_click;
     }
 
     onContextMenu(on_context_menu){
@@ -369,4 +407,5 @@ class GridTable {
 module.exports = {
     GridTable,
     wrapFormatter,
+    buttonFormatter,
 };

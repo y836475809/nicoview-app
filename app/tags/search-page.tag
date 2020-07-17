@@ -291,7 +291,7 @@
         /* globals riot logger */
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
@@ -430,6 +430,8 @@
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 130},
             {id: "name", name: "名前", formatter:wrapFormatter},
+            {id: "command", name: "操作", sortable: false, 
+                formatter: buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報", formatter:htmlFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},
@@ -722,6 +724,35 @@
                         time : 0,
                         online: false
                     });
+                }
+            });
+            grid_table.onButtonClick(async (e, cmd_id, data)=>{
+                if(cmd_id == "play"){
+                    const video_id = data.id;
+                    if(video_id){
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id : video_id,
+                            time : 0,
+                            online: false
+                        });
+                    }
+                }
+                if(cmd_id == "stack"){
+                    const stack_items = [{
+                        id: data.id,
+                        name: data.name, 
+                        thumb_img:data.thumb_img
+                    }];
+                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                }
+                if(cmd_id == "bookmark"){
+                    const bk_items = [
+                        BookMark.createVideoItem(data.name, data.id)
+                    ];
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }
+                if(cmd_id == "download"){
+                    obs.trigger("download-page:add-download-items", [data]);
                 }
             });
             grid_table.onContextMenu((e)=>{

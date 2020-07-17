@@ -183,7 +183,7 @@
         const path = window.path;
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
@@ -274,6 +274,8 @@
             {id: "no", name: "#"},
             {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:wrapFormatter},
+            {id: "command", name: "操作", sortable: false, 
+                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報", formatter:infoFormatter},
             {id: "description", name: "説明", formatter:htmlFormatter},
             {id: "date", name: "投稿日"},
@@ -322,7 +324,7 @@
                         return {
                             thumb_img: value.thumb_img,
                             id: value.id,
-                            name: value.name,
+                            name: value.title,
                             state: 0
                         };
                     });
@@ -380,6 +382,47 @@
                         time: 0,
                         online: false
                     });
+                }
+            });
+            grid_table.onButtonClick(async (e, cmd_id, data)=>{
+                if(cmd_id == "play"){
+                    const video_id = data.id;
+                    if(needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))===true){
+                        if(!await showOKCancelBox("info", 
+                            "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
+                            return;
+                        }        
+                        obs.trigger("library-page:convert-video", video_id);
+                    }else{
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time: 0,
+                            online: false
+                        });
+                    }
+                }
+                if(cmd_id == "stack"){
+                    const stack_items = [{
+                        id: data.id,
+                        name: data.title, 
+                        thumb_img:data.thumb_img
+                    }];
+                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                }
+                if(cmd_id == "bookmark"){
+                    const bk_items = [
+                        BookMark.createVideoItem(data.title, data.id)
+                    ];
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }
+                if(cmd_id == "download"){
+                    const items = [{
+                        thumb_img: data.thumb_img,
+                        id: data.id,
+                        name: data.title,
+                        state: 0
+                    }];
+                    obs.trigger("download-page:add-download-items", items);
                 }
             });
             

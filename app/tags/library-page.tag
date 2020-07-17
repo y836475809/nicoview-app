@@ -199,7 +199,7 @@
         /* globals riot logger */
         const {remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoUpdate } = window.NicoUpdate;
         const { BookMark } = window.BookMark;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
@@ -264,9 +264,12 @@
                 ${video_quality}
                 </div>`;
         };       
+
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
             {id: "video_name", name: "名前", sortable: true, formatter: wrapFormatter},
+            {id: "command", name: "操作", sortable: false, 
+                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
             {id: "creation_date", name: "作成日", sortable: true},
             {id: "pub_date", name: "投稿日", sortable: true},
@@ -704,6 +707,43 @@
                         time : 0,
                         online: false,
                     });
+                }
+            });
+
+            grid_table.onButtonClick(async (e, cmd_id, data)=>{
+                if(cmd_id == "play"){
+                    logger.debug("library onDblClick data=", data);
+                    const video_id = data.id;
+                    const video_type = data.video_type;
+                    if(needConvertVideo(video_type)){
+                        if(!await showOKCancelBox("info", 
+                            `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
+                            return;
+                        }
+                        await convertVideo(this, video_id);
+                    }else{
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id: video_id,
+                            time : 0,
+                            online: false,
+                        });
+                    }
+                }
+
+                if(cmd_id == "stack"){
+                    const stack_items = [{
+                        id: data.id,
+                        name: data.video_name, 
+                        thumb_img:data.thumb_img
+                    }];
+                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                }
+
+                if(cmd_id == "bookmark"){
+                    const bk_items = [
+                        BookMark.createVideoItem(data.video_name, data.id)
+                    ];
+                    obs.trigger("bookmark-page:add-items", bk_items);
                 }
             });
             

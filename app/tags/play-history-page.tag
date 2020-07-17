@@ -21,7 +21,7 @@
         /* globals logger */
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { BookMark } = window.BookMark;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
@@ -36,6 +36,8 @@
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130},
             {id: "name", name: "名前", sortable: true, formatter:wrapFormatter},
+            {id: "command", name: "操作", sortable: false, 
+                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
             {id: "play_date", name: "再生日", sortable: true},
             {id: "url", name: "url", sortable: true}
@@ -99,6 +101,41 @@
                     time : 0,
                     online: false
                 });
+            });
+            grid_table.onButtonClick(async (e, cmd_id, data)=>{
+                if(cmd_id == "play"){
+                    const video_id = data.id;
+                    if(video_id){
+                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            video_id : video_id,
+                            time : 0,
+                            online: false
+                        });
+                    }
+                }
+                if(cmd_id == "stack"){
+                    const stack_items = [{
+                        id: data.id,
+                        name: data.name, 
+                        thumb_img:data.thumb_img
+                    }];
+                    obs.trigger("play-stack-page:add-items", {items:stack_items});
+                }
+                if(cmd_id == "bookmark"){
+                    const bk_items = [
+                        BookMark.createVideoItem(data.name, data.id)
+                    ];
+                    obs.trigger("bookmark-page:add-items", bk_items);
+                }
+                if(cmd_id == "download"){
+                    const items = [{
+                        thumb_img: data.thumb_img,
+                        id: data.id,
+                        name: data.name,
+                        state: 0
+                    }];
+                    obs.trigger("download-page:add-download-items", items);
+                }
             });
 
             const context_menu = createMenu();

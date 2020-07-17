@@ -39,7 +39,7 @@ test.beforeEach(t => {
         id: "sm10",
         dirpath_id: 1,
         dirpath: __dirname,
-        video_name: "test title",
+        title: "test title",
         common_filename: "test",
         video_type: "mp4",
         is_deleted: false,

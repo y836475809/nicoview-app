@@ -79,7 +79,7 @@ class DBConverter {
             const key = value[1];
             const uri = value[2];
             const dirpath_id = value[3];
-            const video_name = value[4];
+            const title = value[4];
             const is_economy = value[5] !== 0;
             const modification_date = value[6];
             const creation_date = value[7];
@@ -101,7 +101,7 @@ class DBConverter {
 
             const item = {
                 data_type,
-                video_name, video_type,
+                title, video_type,
                 dirpath_id, common_filename, thumbnail_size,
                 modification_date, creation_date, pub_date, last_play_date,
                 play_count, tags, is_economy, is_deleted

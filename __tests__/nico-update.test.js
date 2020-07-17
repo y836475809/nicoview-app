@@ -38,7 +38,7 @@ test.beforeEach(async t => {
         id: TestData.video_id,
         dirpath_id: 1,
         dirpath: "/data/",
-        video_name: "サンプル12345678",
+        title: "サンプル12345678",
         common_filename: TestData.video_id,
         video_type: "mp4",
         is_deleted: false,

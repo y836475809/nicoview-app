@@ -263,7 +263,7 @@ class NicoDownloader {
             data_type:"json", 
             dirpath: this.dist_dir,
             id: video_id,
-            video_name: api_data.video.title,
+            title: api_data.video.title,
             video_type: video_type,
             is_economy: !this.videoinfo.maxQuality,
             play_time: api_data.video.duration,

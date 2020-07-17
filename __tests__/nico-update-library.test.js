@@ -11,7 +11,7 @@ test.beforeEach(async t => {
             id: `sm${value}`,
             dirpath_id: 1,
             dirpath: "/data/",
-            video_name: `サンプル${value}`,
+            title: `サンプル${value}`,
             common_filename: `sm${value}`,
             video_type: "mp4",
             is_deleted: false,

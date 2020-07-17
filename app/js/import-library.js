@@ -24,7 +24,7 @@ class ImportLibrary {
             thumbnail_size: thumbnail_size,
             id: video.video_id, 
             dirpath: this.dir,
-            video_name: video.title,
+            title: video.title,
             video_type: video.video_type,
             common_filename:this.common_filename,
             creation_date: video_creation_time.getTime(),

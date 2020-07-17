@@ -54,7 +54,7 @@ test("sqlite db video", (t) => {
     t.is(sm4.id, "sm4");
     t.is(sm5.id, "sm5");
 
-    t.is(sm1.video_name, "サンプル1");
+    t.is(sm1.title, "サンプル1");
     t.is(sm1.common_filename, "サンプル1");
     t.is(sm1.video_type, "mp4");
 
@@ -76,7 +76,7 @@ test("sqlite db item", (t) => {
         data_type: "xml",
         dirpath_id: 1,
         id: "sm1",
-        video_name: "サンプル1",
+        title: "サンプル1",
         video_type: "mp4",
         common_filename: "サンプル1",
         is_economy: false,

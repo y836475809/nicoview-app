@@ -267,7 +267,7 @@
 
         const columns = [
             {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "video_name", name: "名前", sortable: true, formatter: wrapFormatter},
+            {id: "title", name: "名前", sortable: true, formatter: wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
             {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
@@ -423,7 +423,7 @@
                 obs.trigger("main-page:toastr", {
                     type: "error",
                     title: `${error_items.length}個が更新に失敗しました`,
-                    message: error_items.map(item => item.video_name).join("\n"),
+                    message: error_items.map(item => item.title).join("\n"),
                 });
             }else{
                 obs.trigger("main-page:toastr", {
@@ -496,7 +496,7 @@
                 obs.trigger("main-page:toastr", {
                     type: "error",
                     title: `${error_items.length}個がNNDD形式への変換に失敗しました`,
-                    message: error_items.map(item => item.video_name).join("\n"),
+                    message: error_items.map(item => item.title).join("\n"),
                 });
             }else{
                 obs.trigger("main-page:toastr", {
@@ -623,7 +623,7 @@
                     const stack_items = items.map(item => {
                         return {
                             id: item.id,
-                            name: item.video_name, 
+                            name: item.title, 
                             thumb_img:item.thumb_img
                         };
                     });
@@ -652,7 +652,7 @@
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     const bk_items = items.map(item => {
-                        return BookMark.createVideoItem(item.video_name, item.id);
+                        return BookMark.createVideoItem(item.title, item.id);
                     });
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }},
@@ -683,7 +683,7 @@
                 }   
                 return false; 
             },
-            ["video_name", "id", "is_economy", "tags", "video_type"],
+            ["title", "id", "is_economy", "tags", "video_type"],
             (item, column_id)=>{
                 if(column_id=="is_economy"){
                     return item[column_id]?"エコノミー":"";
@@ -733,7 +733,7 @@
                 if(cmd_id == "stack"){
                     const stack_items = [{
                         id: data.id,
-                        name: data.video_name, 
+                        name: data.title, 
                         thumb_img:data.thumb_img
                     }];
                     obs.trigger("play-stack-page:add-items", {items:stack_items});
@@ -741,7 +741,7 @@
 
                 if(cmd_id == "bookmark"){
                     const bk_items = [
-                        BookMark.createVideoItem(data.video_name, data.id)
+                        BookMark.createVideoItem(data.title, data.id)
                     ];
                     obs.trigger("bookmark-page:add-items", bk_items);
                 }

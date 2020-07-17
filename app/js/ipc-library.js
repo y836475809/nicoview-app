@@ -85,7 +85,7 @@ class LibraryIPCServer extends IPCServer {
         }
 
         const video_item = Object.assign({}, download_item);
-        video_item.common_filename = download_item.video_name;
+        video_item.common_filename = download_item.title;
         video_item.creation_date = new Date().getTime();
         video_item.last_play_date = -1;
         video_item.modification_date = -1;

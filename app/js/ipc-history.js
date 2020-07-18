@@ -35,7 +35,7 @@ class HistoryIPCServer extends IPCServer {
             this.history_items.unshift({
                 thumb_img: history_item.image,
                 id: history_item.id,
-                name: history_item.name,
+                title: history_item.title,
                 play_date: Date.now(), 
                 play_time: 0,
                 url: history_item.url                

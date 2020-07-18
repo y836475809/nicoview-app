@@ -22,7 +22,6 @@ class GridTableDownloadItem {
             rowHeight: 100,
             enableCellNavigation: true,
             enableColumnReorder: false,
-            id_click_as_dbclick:"thumb_img"
         };
         this.grid_table = new GridTable("download-item-grid", columns, options);
         this.grid_table.init(container);

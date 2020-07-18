@@ -283,7 +283,6 @@
         ];
         const options = {
             rowHeight: 100,
-            id_click_as_dbclick:"thumb_img"
         };    
         const grid_table = new GridTable("mylist-grid", columns, options);
 

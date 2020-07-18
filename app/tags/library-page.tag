@@ -280,7 +280,6 @@
         ];
         const options = {
             rowHeight: 135,
-            id_click_as_dbclick:"thumb_img"
         };   
         const grid_table = new GridTable("library-grid", columns, options);
     

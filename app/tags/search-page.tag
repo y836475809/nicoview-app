@@ -637,18 +637,12 @@
             grid_table.resizeGrid();
         });
 
-        const createMenu = () => {
+        const createMenu = (items) => {
             const menu_templete = [
                 { label: "再生", click() {
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
                     ButtonCommand.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
                     ButtonCommand.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
@@ -657,15 +651,9 @@
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
                     ButtonCommand.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
                     const video_ids = items.map(value => {
                         return value.id;
                     });
@@ -673,9 +661,6 @@
                 }},
                 { type: "separator" },
                 { label: "動画をブックマーク", click() {
-                    const items = grid_table.getSelectedDatas().filter(value => {
-                        return value.id!="";
-                    });
                     ButtonCommand.addBookmarkItems(obs, items);
                 }},
                 { label: "ページをブックマーク", click() {
@@ -685,7 +670,7 @@
             ];
             return Menu.buildFromTemplate(menu_templete);
         };
-        const context_menu = createMenu();
+        
         this.on("mount", async () => {
             const elm = this.root.querySelector(".cond-menu-container1");
             elm.addEventListener("transitionend", (event) => {
@@ -727,6 +712,7 @@
                 if(items.length===0){
                     return;
                 }
+                const context_menu = createMenu(items);
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
 

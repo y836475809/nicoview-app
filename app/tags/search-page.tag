@@ -721,6 +721,12 @@
                 }
             });
             grid_table.onContextMenu((e)=>{
+                const items = grid_table.getSelectedDatas().filter(value => {
+                    return value.id!="";
+                });
+                if(items.length===0){
+                    return;
+                }
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
 

@@ -135,6 +135,10 @@
         .listview-item-ghost-class {
             background-color: #C8EBFB;
         }
+        
+        .dblclick:hover > i {
+            color: red;
+        }
     </style>
     
     <div style="display: flex;">
@@ -150,7 +154,7 @@
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
                 title={getTooltip(item)}>
-                <div class="center-hv" title="ダブルクリック動作"
+                <div class="dblclick center-hv" title="ダブルクリック動作"
                     onclick={onclickItemAsdblclick.bind(this,item)} 
                     ondblclick={ondblclickItem.bind(this,item)}
                     onmouseup={onmouseUp.bind(this,item)}

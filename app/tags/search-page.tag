@@ -292,6 +292,7 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { ButtonCommand } = window.ButtonCommand;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
@@ -637,60 +638,30 @@
             grid_table.resizeGrid();
         });
 
-        const play = (item, online) => {
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                video_id : item.id,
-                time : 0,
-                online: online
-            });
-        };
-
-        const addStackItems = (items) => {
-            const stack_items = items.map(item => {
-                return {
-                    id: item.id,
-                    title: item.title, 
-                    thumb_img:item.thumb_img
-                };
-            });
-            obs.trigger("play-stack-page:add-items", {items:stack_items});
-        };
-
-        const addBookmarkItems = (items) => {
-            const bk_items = items.map(item => {
-                return BookMark.createVideoItem(item.title, item.id);
-            });
-            obs.trigger("bookmark-page:add-items", bk_items);
-        };
-
-        const addDownloadItems = (items) => {
-            obs.trigger("download-page:add-download-items", items);
-        };
-
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    play(items[0], false);
+                    ButtonCommand.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    play(items[0], true);
+                    ButtonCommand.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    addStackItems(items);
+                    ButtonCommand.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    addDownloadItems(items);
+                    ButtonCommand.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas().filter(value => {
@@ -706,7 +677,7 @@
                     const items = grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
-                    addBookmarkItems(items);
+                    ButtonCommand.addBookmarkItems(obs, items);
                 }},
                 { label: "ページをブックマーク", click() {
                     const bk_item = BookMark.createSearchItem(nico_search_params);
@@ -738,16 +709,16 @@
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    play(data, false);
+                    ButtonCommand.play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    addStackItems([data]);
+                    ButtonCommand.addStackItems(obs, [data]);
                 }
                 if(cmd_id == "bookmark"){
-                    addBookmarkItems([data]);
+                    ButtonCommand.addBookmarkItems(obs, [data]);
                 }
                 if(cmd_id == "download"){
-                    addDownloadItems([data]);
+                    ButtonCommand.addDownloadItems(obs, [data]);
                 }
             });
             grid_table.onContextMenu((e)=>{

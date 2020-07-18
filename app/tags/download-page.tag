@@ -71,15 +71,14 @@
     <script>
         /* globals riot logger */
         const EventEmitter = window.EventEmitter;
-        const { remote, ipcRenderer } = window.electron;
+        const { remote } = window.electron;
         const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem } = window.GridTableDownloadItem;
+        const { ButtonCommand } = window.ButtonCommand;
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
-        const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_schedule_dialog = riot.observable();
@@ -240,50 +239,24 @@
             await onChangeDownloadItem();
         };
 
-        const play = (item, online) => {
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                video_id : item.id,
-                time : 0,
-                online: online
-            });
-        };
-
-        const addStackItems = (items) => {
-            const stack_items = items.map(item => {
-                return {
-                    id: item.id,
-                    title: item.title, 
-                    thumb_img:item.thumb_img
-                };
-            });
-            obs.trigger("play-stack-page:add-items", {items:stack_items});
-        };
-
-        const addBookmarkItems = (items) => {
-            const bk_items = items.map(item => {
-                return BookMark.createVideoItem(item.title, item.id);
-            });
-            obs.trigger("bookmark-page:add-items", bk_items);
-        };
-
         const createMenu = () => {
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    play(items[0], false);
+                    ButtonCommand.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    play(items[0], true);
+                    ButtonCommand.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    addStackItems(items);
+                    ButtonCommand.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    addBookmarkItems(items);
+                    ButtonCommand.addBookmarkItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
@@ -446,17 +419,17 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    play(data, false);
+                    ButtonCommand.play(data, false);
                 });
                 grid_table_dl.onButtonClick((e, cmd_id, data)=>{
                     if(cmd_id == "play"){
-                        play(data, false);
+                        ButtonCommand.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        addStackItems([data]);
+                        ButtonCommand.addStackItems(obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        addBookmarkItems([data]);
+                        ButtonCommand.addBookmarkItems(obs, [data]);
                     }
                 });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");

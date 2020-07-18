@@ -184,8 +184,8 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { ButtonCommand } = window.ButtonCommand;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
-        const { BookMark } = window.BookMark;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox, showMessageBox } = window.RendererDailog;
         const { IPCClient } = window.IPC;
@@ -296,42 +296,8 @@
                 }        
                 obs.trigger("library-page:convert-video", video_id);
             }else{
-                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                    video_id: video_id,
-                    time: 0,
-                    online: online
-                });
+                ButtonCommand.play(item, online);
             }
-        };
-
-        const addStackItems = (items) => {
-            const stack_items = items.map(item => {
-                return {
-                    id: item.id,
-                    title: item.title, 
-                    thumb_img:item.thumb_img
-                };
-            });
-            obs.trigger("play-stack-page:add-items", {items:stack_items});
-        };
-
-        const addBookmarkItems = (items) => {
-            const bk_items = items.map(item => {
-                return BookMark.createVideoItem(item.title, item.id);
-            });
-            obs.trigger("bookmark-page:add-items", bk_items);
-        };
-
-        const addDownloadItems = (items) => {
-            const download_items = items.map(value => {
-                return {
-                    thumb_img: value.thumb_img,
-                    id: value.id,
-                    title: value.title,
-                    state: 0
-                };
-            });
-            obs.trigger("download-page:add-download-items", download_items);
         };
 
         const createMenu = () => {
@@ -346,12 +312,12 @@
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    addStackItems(items);
+                    ButtonCommand.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas();
-                    addDownloadItems(items);
+                    ButtonCommand.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas();
@@ -363,7 +329,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    addBookmarkItems(items);
+                    ButtonCommand.addBookmarkItems(obs, items);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);
@@ -409,13 +375,13 @@
                     await play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    addStackItems([data]);
+                    ButtonCommand.addStackItems(obs, [data]);
                 }
                 if(cmd_id == "bookmark"){
-                    addBookmarkItems([data]);
+                    ButtonCommand.addBookmarkItems(obs, [data]);
                 }
                 if(cmd_id == "download"){
-                    addDownloadItems([data]);
+                    ButtonCommand.addDownloadItems(obs, [data]);
                 }
             });
             

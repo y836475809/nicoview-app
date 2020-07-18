@@ -200,8 +200,8 @@
         const {remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { ButtonCommand } = window.ButtonCommand;
         const { NicoUpdate } = window.NicoUpdate;
-        const { BookMark } = window.BookMark;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
@@ -609,30 +609,8 @@
                 }
                 await convertVideo(this, video_id);
             }else{
-                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                    video_id: video_id,
-                    time : 0,
-                    online: online,
-                });
+                ButtonCommand.play(item, online);
             }
-        };
-
-        const addStackItems = (items) => {
-            const stack_items = items.map(item => {
-                return {
-                    id: item.id,
-                    title: item.title, 
-                    thumb_img:item.thumb_img
-                };
-            });
-            obs.trigger("play-stack-page:add-items", {items:stack_items});
-        };
-
-        const addBookmarkItems = (items) => {
-            const bk_items = items.map(item => {
-                return BookMark.createVideoItem(item.title, item.id);
-            });
-            obs.trigger("bookmark-page:add-items", bk_items);
         };
 
         const createMenu = () => {
@@ -647,7 +625,7 @@
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    addStackItems(items);
+                    ButtonCommand.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "コメント更新", click() {
@@ -671,7 +649,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    addBookmarkItems(items);
+                    ButtonCommand.addBookmarkItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "NNDD形式(XML)に変換", async click() {
@@ -720,11 +698,11 @@
                 }
 
                 if(cmd_id == "stack"){
-                    addStackItems([data]);
+                    ButtonCommand.addStackItems(obs, [data]);
                 }
 
                 if(cmd_id == "bookmark"){
-                    addBookmarkItems([data]);
+                    ButtonCommand.addBookmarkItems(obs, [data]);
                 }
             });
             

@@ -28,9 +28,40 @@
 
         const obs = this.opts.obs; 
 
+        ipcRenderer.on("downloadItemUpdated", async (event) => {
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const items = grid_table.dataView.getItems();
+
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
+                const video_id = item.id;
+                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.reg_download = video_ids.includes(video_id);
+                grid_table.dataView.updateItem(video_id, item);    
+            }
+        });
+
+        ipcRenderer.on("libraryItemAdded", async (event, args) => {
+            const {video_item} = args;
+            const video_id = video_item.id;
+            grid_table.updateCells(video_id, { saved:true });
+        });
+
+        ipcRenderer.on("libraryItemDeleted", async (event, args) => {
+            const { video_id } = args;
+            grid_table.updateCells(video_id, { saved:false });
+        });
+
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
-            return `ID: ${video_id}`;
+            let result = `<div>ID: ${video_id}</div>`;
+            if(dataContext.saved){
+                result += "<div class='state-content state-saved'>ローカル</div>";
+            }
+            if(dataContext.reg_download){
+                result += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
+            }
+            return result;
         };
 
         const columns = [
@@ -46,6 +77,18 @@
             rowHeight: 100,
         }; 
         const grid_table = new GridTable("history-grid", columns, options);
+
+        const setData = async (items) => {
+            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
+                const video_id = item.id;
+                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.reg_download = video_ids.includes(video_id);  
+            }
+            grid_table.clearSelected();
+            grid_table.setData(items);
+        };
 
         const createMenu = () => {
             const menu_templete = [
@@ -103,7 +146,7 @@
 
             try {
                 const items = await IPCClient.request("history", "getData");
-                grid_table.setData(items);
+                setData(items);
             } catch (error) {
                 logger.error(error);
                 obs.trigger("main-page:toastr", {
@@ -119,7 +162,7 @@
             const { history_item } = args;
             await IPCClient.request("history", "add", { history_item });
             const items = await IPCClient.request("history", "getData");
-            grid_table.setData(items);
+            setData(items);
         });
     </script>
 </play-history-page>

@@ -105,6 +105,18 @@
                     ButtonCommand.addStackItems(obs, items);
                 }},
                 { type: "separator" },
+                { label: "ダウンロードに追加", click() {
+                    const items = grid_table.getSelectedDatas();
+                    ButtonCommand.addDownloadItems(obs, items);
+                }},
+                { label: "ダウンロードから削除", click() {
+                    const items = grid_table.getSelectedDatas();
+                    const video_ids = items.map(value => {
+                        return value.id;
+                    });
+                    obs.trigger("download-page:delete-download-items", video_ids);
+                }},
+                { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
                     ButtonCommand.addBookmarkItems(obs, items);

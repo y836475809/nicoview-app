@@ -93,15 +93,18 @@ class GridTableDownloadItem {
         this.grid_table.grid.registerPlugin(moveRowsPlugin); 
     }
 
-    init(on_context_menu, on_dbl_click){
+    onContextMenu(on_context_menu){
         this.grid_table.onContextMenu((e)=>{
             on_context_menu(e);
         });
+    }
 
+    onDblClick(on_dbl_click){
         this.grid_table.onDblClick((e, data)=>{
             on_dbl_click(e, data);
         });
     }
+
     onButtonClick(on_click){
         this.grid_table.onButtonClick((e, cmd_id, data)=>{
             on_click(e, cmd_id, data);

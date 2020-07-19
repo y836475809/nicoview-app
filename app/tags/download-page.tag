@@ -416,9 +416,10 @@
             
             const context_menu = createMenu();
             try {
-                grid_table_dl.init((e)=>{
+                grid_table_dl.onContextMenu(e=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
-                },(e, data)=>{
+                });
+                grid_table_dl.onDblClick((e, data)=>{
                     Command.play(data, false);
                 });
                 grid_table_dl.onButtonClick((e, cmd_id, data)=>{

@@ -32,6 +32,13 @@ class Command {
     static addDownloadItems(obs, items) {
         obs.trigger("download-page:add-download-items", items);
     }
+
+    static deleteDownloadItems(obs, items) {
+        const video_ids = items.map(value => {
+            return value.id;
+        });
+        obs.trigger("download-page:delete-download-items", video_ids);
+    }
 }
 
 module.exports = {

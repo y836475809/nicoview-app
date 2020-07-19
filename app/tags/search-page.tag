@@ -654,10 +654,7 @@
                     Command.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
-                    const video_ids = items.map(value => {
-                        return value.id;
-                    });
-                    obs.trigger("download-page:delete-download-items", video_ids);
+                    Command.deleteDownloadItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "動画をブックマーク", click() {

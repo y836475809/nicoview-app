@@ -184,7 +184,7 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
-        const { ButtonCommand } = window.ButtonCommand;
+        const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox, showMessageBox } = window.RendererDailog;
@@ -295,7 +295,7 @@
                 }        
                 obs.trigger("library-page:convert-video", video_id);
             }else{
-                ButtonCommand.play(item, online);
+                Command.play(item, online);
             }
         };
 
@@ -311,12 +311,12 @@
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addStackItems(obs, items);
+                    Command.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addDownloadItems(obs, items);
+                    Command.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas();
@@ -328,7 +328,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addBookmarkItems(obs, items);
+                    Command.addBookmarkItems(obs, items);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);
@@ -374,13 +374,13 @@
                     await play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    ButtonCommand.addStackItems(obs, [data]);
+                    Command.addStackItems(obs, [data]);
                 }
                 if(cmd_id == "bookmark"){
-                    ButtonCommand.addBookmarkItems(obs, [data]);
+                    Command.addBookmarkItems(obs, [data]);
                 }
                 if(cmd_id == "download"){
-                    ButtonCommand.addDownloadItems(obs, [data]);
+                    Command.addDownloadItems(obs, [data]);
                 }
             });
             

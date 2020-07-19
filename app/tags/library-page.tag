@@ -200,7 +200,7 @@
         const {remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
-        const { ButtonCommand } = window.ButtonCommand;
+        const { Command } = window.Command;
         const { NicoUpdate } = window.NicoUpdate;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
@@ -608,7 +608,7 @@
                 }
                 await convertVideo(this, video_id);
             }else{
-                ButtonCommand.play(item, online);
+                Command.play(item, online);
             }
         };
 
@@ -624,7 +624,7 @@
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addStackItems(obs, items);
+                    Command.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "コメント更新", click() {
@@ -648,7 +648,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addBookmarkItems(obs, items);
+                    Command.addBookmarkItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "NNDD形式(XML)に変換", async click() {
@@ -697,11 +697,11 @@
                 }
 
                 if(cmd_id == "stack"){
-                    ButtonCommand.addStackItems(obs, [data]);
+                    Command.addStackItems(obs, [data]);
                 }
 
                 if(cmd_id == "bookmark"){
-                    ButtonCommand.addBookmarkItems(obs, [data]);
+                    Command.addBookmarkItems(obs, [data]);
                 }
             });
             

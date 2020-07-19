@@ -75,7 +75,7 @@
         const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem } = window.GridTableDownloadItem;
-        const { ButtonCommand } = window.ButtonCommand;
+        const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { IPCClient } = window.IPC;
@@ -243,20 +243,20 @@
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    ButtonCommand.play(items[0], false);
+                    Command.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    ButtonCommand.play(items[0], true);
+                    Command.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    ButtonCommand.addStackItems(obs, items);
+                    Command.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    ButtonCommand.addBookmarkItems(obs, items);
+                    Command.addBookmarkItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
@@ -419,17 +419,17 @@
                 grid_table_dl.init((e)=>{
                     context_menu.popup({window: remote.getCurrentWindow()});
                 },(e, data)=>{
-                    ButtonCommand.play(data, false);
+                    Command.play(data, false);
                 });
                 grid_table_dl.onButtonClick((e, cmd_id, data)=>{
                     if(cmd_id == "play"){
-                        ButtonCommand.play(data, false);
+                        Command.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        ButtonCommand.addStackItems(obs, [data]);
+                        Command.addStackItems(obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        ButtonCommand.addBookmarkItems(obs, [data]);
+                        Command.addBookmarkItems(obs, [data]);
                     }
                 });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");

@@ -22,7 +22,7 @@
         const { remote, ipcRenderer } = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
-        const { ButtonCommand } = window.ButtonCommand;
+        const { Command } = window.Command;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
 
@@ -94,20 +94,20 @@
             const menu_templete = [
                 { label: "再生", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.play(items[0], false);
+                    Command.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.play(items[0], true);
+                    Command.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addStackItems(obs, items);
+                    Command.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addDownloadItems(obs, items);
+                    Command.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const items = grid_table.getSelectedDatas();
@@ -119,7 +119,7 @@
                 { type: "separator" },
                 { label: "ブックマーク", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addBookmarkItems(obs, items);
+                    Command.addBookmarkItems(obs, items);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);
@@ -138,16 +138,16 @@
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    ButtonCommand.play(data, false);
+                    Command.play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    ButtonCommand.addStackItems(obs, [data]);
+                    Command.addStackItems(obs, [data]);
                 }
                 if(cmd_id == "bookmark"){
-                    ButtonCommand.addBookmarkItems(obs, [data]);
+                    Command.addBookmarkItems(obs, [data]);
                 }
                 if(cmd_id == "download"){
-                    ButtonCommand.addDownloadItems(obs, [data]);
+                    Command.addDownloadItems(obs, [data]);
                 }
             });
 

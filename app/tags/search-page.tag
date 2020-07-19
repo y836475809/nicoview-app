@@ -292,7 +292,7 @@
         const {remote, ipcRenderer} = window.electron;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
-        const { ButtonCommand } = window.ButtonCommand;
+        const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
         const { BookMark } = window.BookMark;
@@ -640,18 +640,18 @@
         const createMenu = (items) => {
             const menu_templete = [
                 { label: "再生", click() {
-                    ButtonCommand.play(items[0], false);
+                    Command.play(items[0], false);
                 }},
                 { label: "オンラインで再生", click() {
-                    ButtonCommand.play(items[0], true);
+                    Command.play(items[0], true);
                 }},
                 { label: "後で見る", click() {
                     const items = grid_table.getSelectedDatas();
-                    ButtonCommand.addStackItems(obs, items);
+                    Command.addStackItems(obs, items);
                 }},
                 { type: "separator" },
                 { label: "ダウンロードに追加", click() {
-                    ButtonCommand.addDownloadItems(obs, items);
+                    Command.addDownloadItems(obs, items);
                 }},
                 { label: "ダウンロードから削除", click() {
                     const video_ids = items.map(value => {
@@ -661,7 +661,7 @@
                 }},
                 { type: "separator" },
                 { label: "動画をブックマーク", click() {
-                    ButtonCommand.addBookmarkItems(obs, items);
+                    Command.addBookmarkItems(obs, items);
                 }},
                 { label: "ページをブックマーク", click() {
                     const bk_item = BookMark.createSearchItem(nico_search_params);
@@ -693,16 +693,16 @@
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
-                    ButtonCommand.play(data, false);
+                    Command.play(data, false);
                 }
                 if(cmd_id == "stack"){
-                    ButtonCommand.addStackItems(obs, [data]);
+                    Command.addStackItems(obs, [data]);
                 }
                 if(cmd_id == "bookmark"){
-                    ButtonCommand.addBookmarkItems(obs, [data]);
+                    Command.addBookmarkItems(obs, [data]);
                 }
                 if(cmd_id == "download"){
-                    ButtonCommand.addDownloadItems(obs, [data]);
+                    Command.addDownloadItems(obs, [data]);
                 }
             });
             grid_table.onContextMenu((e)=>{

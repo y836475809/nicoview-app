@@ -2,7 +2,7 @@ const { ipcRenderer } = require("electron");
 const { IPC_CHANNEL } = require("./ipc-channel");
 const { BookMark } = require("./bookmark");
 
-class ButtonCommand {
+class Command {
     static play(item, online) {
         ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
             video_id : item.id,
@@ -35,5 +35,5 @@ class ButtonCommand {
 }
 
 module.exports = {
-    ButtonCommand
+    Command
 };

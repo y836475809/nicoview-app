@@ -2,45 +2,31 @@
     <style scoped>
         .param-container {
             width: 100%;
-            height: 50px;
             user-select: none;
-        }
-
-        .param-label {
-            font-size: 1.2em;
-            height: 30px;
-        }
-
-        .param-space {
-            height: 10px;
         }
     </style>
 
-    <div class="param-container">
-        <div class="param-label center-v">コメント表示時間</div>
-        <div>
+    <div class="setting-section">
+        <div class="setting-params">
+            <div class="title">コメント表示</div>
+            <hr>
+            <div class="param-label center-v">表示時間</div>
             <label each={item in duration_items} >
                 <input type="radio" name="duration" value={item} 
                     onchange={onchangeDuration.bind(this,item)}>{item}秒
             </label>
-        </div>
-    </div>
-    <div class="param-space"></div>
-    <div class="param-container">
-        <div class="param-label center-v">コメントfps</div>
-        <div>
+            <hr>
+            <div class="param-label center-v">fps</div>
             <label each={item in fps_items} >
                 <input type="radio" name="fps" value={item} 
                     onchange={onchangeFPS.bind(this,item)}>{item}fps
             </label>
+            <hr>
+            <input class="comment-do-limit-checkbox" type="checkbox" 
+            onclick={onclickLimitCommentCheck} /><label>表示数を制限</label>
         </div>
     </div>
-    <div class="param-space"></div>
-    <div class="param-container">
-        <div class="param-label center-v">コメント表示数</div>
-        <input class="comment-do-limit-checkbox" type="checkbox" 
-        onclick={onclickLimitCommentCheck} /><label>表示数を制限</label>
-    </div>
+
     <script>
         /* globals */
         const { IPCClient } = window.IPC;

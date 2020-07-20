@@ -4,9 +4,13 @@
             --control-height: 25px;
         }
 
+        .setting-params {
+            height: 300px;
+        }
+
         .comment-ng-grid-container {
             width: 100%;
-            height: calc(100% - var(--control-height));
+            height: calc(100% - var(--title-height) - var(--control-height) * 2);
         }
 
         .delete-button {
@@ -30,11 +34,17 @@
         }
     </style>
 
-    <div class="comment-ng-grid-container">
-        <div class="comment-ng-grid"></div>
+    <div class="setting-section"> 
+        <div class="setting-params">
+            <div class="title">NGコメント</div>
+            <hr>
+            <div class="comment-ng-grid-container">
+                <div class="comment-ng-grid"></div>
+            </div>
+            <button type="button" class="delete-button" title="選択された項目を削除" 
+                onclick={onclickDelete}>削除</button>
+        </div>
     </div>
-    <button type="button" class="delete-button" title="選択された項目を削除" 
-        onclick={onclickDelete}>削除</button>
 
     <script>
         /* globals */

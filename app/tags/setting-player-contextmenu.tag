@@ -1,28 +1,23 @@
 <setting-player-contextmenu>
     <style scoped>
-        .param-label {
-            font-size: 1.2em;
-            height: 30px;
-        }
-        .param-space {
-            height: 10px;
-        }
     </style>
 
-    <div class="param-label center-v">履歴の表示数</div>
-    <div>
-        <label each={item in menu_num_items} >
-            <input type="radio" name="history_num" value={item} 
-                onchange={onchangeHistoryMenuItemNum.bind(this,item)}>{item}
-        </label>
-    </div>
-    <div class="param-space"></div>
-    <div class="param-label center-v">「後で見る」の表示数</div>
-    <div>
-        <label each={item in menu_num_items} >
-            <input type="radio" name="stack_num" value={item} 
-                onchange={onchangeStackMenuItemNum.bind(this,item)}>{item}
-        </label>
+    <div class="setting-section">
+        <div class="setting-params">
+            <div class="title">コンテキストメニュー</div>
+            <hr>
+            <div class="param-label center-v">履歴表示数</div>
+            <label each={item in menu_num_items} >
+                <input type="radio" name="history_num" value={item} 
+                    onchange={onchangeHistoryMenuItemNum.bind(this,item)}>{item}
+            </label>
+            <hr>
+            <div class="param-label center-v">「後で見る」表示数</div>
+            <label each={item in menu_num_items} >
+                <input type="radio" name="stack_num" value={item} 
+                    onchange={onchangeStackMenuItemNum.bind(this,item)}>{item}
+            </label>
+        </div>
     </div>
 
     <script>

@@ -26,7 +26,26 @@
             onclick={onclickLimitCommentCheck} /><label>表示数を制限</label>
         </div>
     </div>
-
+    <div class="setting-section">
+        <div class="setting-params">
+            <div class="title">コメント同期調整</div>
+            <hr>
+            <input class="auto-sync-checkbox" type="checkbox" 
+            onclick={onclickAutoSyncCheck} /><label>同期調整を行う</label>
+            <hr>
+            <div class="param-label center-v">以下の間隔で同期を調整する</div>
+            <label each={item in sync_interval_items} >
+                <input type="radio" name="sync_interval" value={item} 
+                    onchange={onchangeAutoSyncInterval.bind(this,item)}>{item}秒
+            </label>
+            <hr>
+            <div class="param-label center-v">コメントと動画のずれの閾値(これ以上ずれたら同期を調整する)</div>
+            <label each={item in sync_threshold_items} >
+                <input type="radio" name="sync_threshold" value={item} 
+                    onchange={onchangeAutoSyncThreshold.bind(this,item)}>{item}秒
+            </label>
+        </div>
+    </div>
     <script>
         /* globals */
         const { IPCClient } = window.IPC;
@@ -38,14 +57,22 @@
         const default_params = {
             duration_sec: 4,
             fps: 10,
-            do_limit: true
+            do_limit: true,
+            auto_sync_checked: true,
+            auto_sync_interval: 30,
+            auto_sync_threshold: 0.1
         };
 
-        const changeParams = async (name, value) => {
+        this.sync_interval_items = [10, 30, 60, 120];
+        this.sync_threshold_items = [0.05, 0.1];
+
+        const changeParams = async (name, value, is_trigger=true) => {
             const params = await IPCClient.request("config", "get", { key: "comment", value: default_params });
             params[name] = value;
             await IPCClient.request("config", "set", { key: `comment.${name}`, value: value });
-            obs_dialog.trigger("player-main-page:update-comment-display-params", params);
+            if(is_trigger){
+                obs_dialog.trigger("player-main-page:update-comment-display-params", params);
+            }
         };
 
         this.onchangeDuration = async (item, e) => {
@@ -62,6 +89,21 @@
             obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
         };
 
+        this.onclickAutoSyncCheck = async (e) => {
+            const checked = e.target.checked;
+            await changeParams("auto_sync_checked", checked, false);
+        };
+
+        this.onchangeAutoSyncInterval = async (item, e) => {
+            const interval = item;
+            await changeParams("auto_sync_interval", interval, false);
+        };
+
+        this.onchangeAutoSyncThreshold = async (item, e) => {
+            const threshold = item;
+            await changeParams("auto_sync_threshold", threshold, false);
+        };
+
         const setup = (name, items, value) => {
             const index = items.findIndex(item => item === value);
             const elms = this.root.querySelectorAll(`input[name='${name}']`);
@@ -70,11 +112,17 @@
 
         this.on("mount", async () => {
             const params = await IPCClient.request("config", "get", { key:"comment", value:default_params });
+            
             setup("duration", this.duration_items, params.duration_sec);
             setup("fps", this.fps_items, params.fps);
 
             const ch_elm = this.root.querySelector(".comment-do-limit-checkbox");
             ch_elm.checked = params.do_limit;
+
+            const auto_sync_ch_elm = this.root.querySelector(".auto-sync-checkbox");
+            auto_sync_ch_elm.checked = params.auto_sync_checked;
+            setup("sync_interval", this.sync_interval_items, params.auto_sync_interval);
+            setup("sync_threshold", this.sync_threshold_items, params.auto_sync_threshold);
         });
     </script>
 </setting-display-comment>

@@ -387,6 +387,10 @@ class CommentTimeLine {
         this.timeLine.time(seek_sec, false);
     }
 
+    getCurrentTime(){
+        return this.timeLine.time();
+    }
+
     _createCanvas(){
         if(this.ctx){
             return;

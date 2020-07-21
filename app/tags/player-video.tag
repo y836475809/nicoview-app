@@ -34,6 +34,7 @@
         let play_data = null;
         let comment_tl = null;
         let comment_params = null;
+        let comment_sync_id = null;
 
         const createTimeLine = (comments)=>{
             const row_num = 12;
@@ -53,6 +54,29 @@
             });
             comment_tl.create(nico_script.getApplied(comments));
             comment_tl.setFPS(fps);
+
+            if(comment_sync_id){
+                clearInterval(comment_sync_id);
+            }
+            if(comment_params.auto_sync_checked){
+                const interval_ms = comment_params.auto_sync_interval*1000;
+                const threshold_sec = comment_params.auto_sync_threshold;
+                comment_sync_id = setInterval(()=>{
+                    if(!comment_tl){
+                        if(comment_sync_id){
+                            clearInterval(comment_sync_id);
+                        } 
+                    }
+                    const ct = comment_tl.getCurrentTime();
+                    const vt = video_elm.currentTime;
+                    if(ct <= video_elm.duration){
+                        if(Math.abs(ct - vt) > threshold_sec){
+                            logger.debug("comment_sync ct=", ct, ", vt=", vt, "ct-vt=", ct - vt);
+                            comment_tl.seek(vt);
+                        }
+                    }
+                },interval_ms);
+            }
         };
 
         const seek = (current) => {
@@ -112,7 +136,10 @@
                     value: {
                         duration_sec: 4,
                         fps: 10,
-                        do_limit: true
+                        do_limit: true,
+                        auto_sync_checked: true,
+                        auto_sync_interval: 30,
+                        auto_sync_threshold: 0.1
                     }
                 });
             

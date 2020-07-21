@@ -66,6 +66,10 @@
         this.sync_interval_items = [10, 30, 60, 120];
         this.sync_threshold_items = [0.05, 0.1];
 
+        obs_dialog.on("setting-display-comment:get-default_params", (cb)=>{
+            cb(default_params);
+        });
+
         const changeParams = async (name, value, is_trigger=true) => {
             const params = await IPCClient.request("config", "get", { key: "comment", value: default_params });
             params[name] = value;

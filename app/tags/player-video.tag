@@ -130,18 +130,15 @@
         });
 
         this.on("mount", async () => {
-            comment_params = await IPCClient.request("config", "get", 
-                { 
-                    key:"comment", 
-                    value: {
-                        duration_sec: 4,
-                        fps: 10,
-                        do_limit: true,
-                        auto_sync_checked: true,
-                        auto_sync_interval: 30,
-                        auto_sync_threshold: 0.1
-                    }
+            const default_comment_params = await new Promise((resolve, reject) => {
+                obs.trigger("setting-display-comment:get-default_params", (default_params)=>{
+                    resolve(default_params);
                 });
+            });
+            comment_params = await IPCClient.request("config", "get", {
+                key: "comment", 
+                value: default_comment_params
+            });
             
             video_elm = this.root.querySelector(".video-screen > video");
 

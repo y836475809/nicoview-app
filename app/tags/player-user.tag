@@ -106,7 +106,7 @@
             <div class="user-description {user_description_class}" onmouseup={oncontextmenu}></div>
         </div>
         <div style="display:none;" class="user-container-popup">
-            <div style="display: flex;">
+            <div class="user-info", style="display: flex;">
                 <img class="user-thumbnail" src={user_thumbnail_url}>
                 <div>
                     <div class="user-name">投稿者: {user_nickname}</div>
@@ -260,6 +260,9 @@
             const rect = this.root.querySelector(".user-container").getBoundingClientRect();
             elm.style.top = (rect.top + 5)+ "px";
 
+            const user_info_elm = this.root.querySelector(".user-container-popup > .user-info");
+            const user_info_height = user_info_elm.clientHeight;
+
             // ポップアップの高さをwindow内に収める
             const popup_height = elm.clientHeight;
             const max_height = window.innerHeight - rect.top - 30;
@@ -267,7 +270,7 @@
                 elm.style.height = max_height + "px";
 
                 const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
-                const new_height = max_height - elm_user_name.clientHeight - 20;
+                const new_height = max_height - elm_user_name.clientHeight - user_info_height + 6;
                 const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
                 elm_description.style.height = new_height + "px";
             }

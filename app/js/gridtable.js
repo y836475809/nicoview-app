@@ -145,7 +145,6 @@ class GridTable {
             if ($(e.target).hasClass("cmd-btn")) {
                 const data = this.dataView.getItem(cell.row);
                 this.on_button_click(e, e.target.dataset.cmdid, data);
-                e.stopImmediatePropagation();
                 e.stopPropagation();
                 return;
             }

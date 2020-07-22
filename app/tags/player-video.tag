@@ -79,6 +79,13 @@
             }
         };
 
+        const playVideoAndComment = ()=> {
+            const current = video_elm.currentTime;
+            comment_tl.seek(current);
+            comment_tl.play();
+            video_elm.play();
+        };
+
         const seek = (current) => {
             if(comment_tl.enable === false){
                 // コメント非表示では動画の現在位置設定
@@ -110,7 +117,7 @@
                 const HAVE_ENOUGH_DATA = 4;
                 const wait_timer = setInterval(() => {
                     if (video_elm.paused && video_elm.readyState === HAVE_ENOUGH_DATA) {
-                        video_elm.play();
+                        playVideoAndComment();
                         clearInterval(wait_timer);
                     }       
                 }, 100);
@@ -162,6 +169,7 @@
             });
             video_elm.addEventListener("play", () => {
                 logger.debug("playによるイベント発火");
+                playVideoAndComment();
             });
             video_elm.addEventListener("pause", () => {
                 logger.debug("pauseによるイベント発火");
@@ -193,32 +201,7 @@
             }); 
             video_elm.addEventListener("playing", async () => {
                 logger.debug("playingによるイベント発火");
-
-                // 再生イベントが起こっても、実際に動画の再生が始まるまでラグがある
-                // なので実際に動画が再生されるまで待ち、それからコメントとの同期を行う
-                
-                // 再生イベントが始まった時の再生時間を保存
-                const pre_tiem = video_elm.currentTime;
-
-                const interval_ms = 10;
-                const wait_time_ms = 10*1000; // 最大待ち時間
-                const wait_count = parseInt(wait_time_ms / interval_ms);
-                for (let index = 0; index < wait_count; index++) {
-                    // pre_tiemと現在の再生時間の差分を取得する
-                    // 差分があれば動画が再生されていることになるのでコメントとの同期を行い抜ける
-                    const current = video_elm.currentTime;
-                    if(Math.abs(pre_tiem - current)>0){ 
-                        comment_tl.seek(current);
-                        comment_tl.play();
-                        return;
-                    }  
-                    await new Promise(resolve => setTimeout(resolve, interval_ms));
-                }
-
-                // 最大待ち時間を超えてしまったら、コメントを一時停止にする
-                logger.debug("playing: over wait time[ms]=", wait_time_ms);
-                comment_tl.pause();
-                video_elm.pause();
+                playVideoAndComment();
             });
 
             video_elm.addEventListener("ended", () => {

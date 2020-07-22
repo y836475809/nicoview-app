@@ -10,6 +10,8 @@ test("getURLKind", (t) => {
     t.is(NicoUrl.getURLKind("https://www.test.jp/dummy/12345"), "other");
     t.is(NicoUrl.getURLKind("http://www.test.jp/dummy/12345"), "other");
 
+    t.is(NicoUrl.getURLKind("#"), "pound");
+    
     t.throws(() => { NicoUrl.getURLKind("h://www.test.jp/dummy/12345"); });
 });
 

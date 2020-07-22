@@ -126,6 +126,7 @@
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const NicoURL = window.NicoURL;
+        const { toTimeSec } = window.TimeFormat;
 
         const obs = this.opts.obs; 
 
@@ -223,6 +224,14 @@
             return false;
         };
 
+        const poundLink = (e) => {
+            const elm = e.target;
+            if(elm.classList.contains("seekTime")){
+                const seek_time_sec = toTimeSec(e.target.dataset.seektime);
+                obs.trigger("player-video:seek", seek_time_sec);
+            }
+        };
+
         const setDescription = (description) => {
             const content_elms = this.root.querySelectorAll(".user-description");
             content_elms.forEach(content_elm => {    
@@ -234,13 +243,20 @@
                     this.user_description_class = "html";
                     const a_tags = content_elm.querySelectorAll("a");
                     a_tags.forEach(value=>{
-                        const url_kind = NicoURL.getURLKind(value.href);
+                        const href = value.getAttribute("href");
+                        const url_kind = NicoURL.getURLKind(href);
                         if(url_kind=="watch"){
                             value.onclick = watchLinkClick;
                             value.onmouseup = watchLinkMouseUp;
                         }else if(url_kind=="mylist" || url_kind=="user"){
                             value.onclick = mylistLinkClick;
                             value.onmouseup = mylistLinkMouseUp;
+                        }else if(url_kind=="pound"){
+                            value.onclick = (e) =>{
+                                e.preventDefault(); 
+                                e.stopPropagation();
+                                poundLink(e);
+                            };
                         }else{
                             value.onclick = (e) =>{
                                 e.preventDefault();

@@ -21,6 +21,9 @@ const getURLKind = (url) => {
     if(/^http:\/\//.test(url)){
         return "other";
     }
+    if(url == "#"){
+        return "pound";
+    }
 
     throw new Error(`unknown kind url=${url}`);
 };

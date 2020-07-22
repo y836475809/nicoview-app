@@ -3,20 +3,49 @@ require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
 const { GridTable, wrapFormatter, buttonFormatter } = require("./gridtable");
 
+const DownloadState = Object.freeze({
+    wait: 0,
+    downloading: 1,
+    complete: 2,
+    error: 3
+});
+
+const message_map = new Map([
+    [DownloadState.wait, "待機"],
+    [DownloadState.downloading, "ダウンロード中"],
+    [DownloadState.complete, "ダウンロード完了"],
+    [DownloadState.error, "ダウンロード失敗"],
+]);
+
+const getDlStateClass = (state) => {
+    if(state==DownloadState.complete){
+        return 'class="download-state-complete"'; // eslint-disable-line
+    }
+
+    return "";
+};
+
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
     const video_id = dataContext.id;
     return `ID: ${video_id}`;
 }; 
 
+const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
+    const msg = message_map.get(value);
+    const class_value = getDlStateClass(value);
+    const content = `<div ${class_value}>${msg}</div><div>${dataContext.progress}</div>`;
+    return content;
+};
+
 class GridTableDownloadItem {
-    constructor(container, state_formatter){
+    constructor(container){
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130, behavior: "selectAndMove"},
             {id: "title", name: "名前", behavior: "selectAndMove", formatter:wrapFormatter},
             {id: "command", name: "操作", behavior: "selectAndMove", 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
             {id: "info", name: "情報", behavior: "selectAndMove", formatter:infoFormatter},
-            {id: "state", name: "状態", behavior: "selectAndMove", formatter:state_formatter}
+            {id: "state", name: "状態", behavior: "selectAndMove", formatter:htmlFormatter}
         ];
         const options = {
             rowHeight: 100,
@@ -292,5 +321,6 @@ class GridTableDownloadItem {
 }
 
 module.exports = {
-    GridTableDownloadItem
+    GridTableDownloadItem,
+    DownloadState
 };

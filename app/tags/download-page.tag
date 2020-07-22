@@ -74,7 +74,7 @@
         const { remote } = window.electron;
         const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
-        const { GridTableDownloadItem } = window.GridTableDownloadItem;
+        const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
         const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
@@ -96,35 +96,6 @@
                 this.download_schedule_label = `ダウンロード実行 ${hour}:${minute}`;
             }      
             this.update();
-        };
-
-        const download_state = Object.freeze({
-            wait: 0,
-            downloading: 1,
-            complete: 2,
-            error: 3
-        });
-
-        const message_map = new Map([
-            [download_state.wait, "待機"],
-            [download_state.downloading, "ダウンロード中"],
-            [download_state.complete, "ダウンロード完了"],
-            [download_state.error, "ダウンロード失敗"],
-        ]);
-
-        const getDlStateClass = (state) => {
-            if(state==download_state.complete){
-                return 'class="download-state-complete"'; // eslint-disable-line
-            }
-
-            return "";
-        };
-
-        const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const msg = message_map.get(value);
-            const class_value = getDlStateClass(value);
-            const content = `<div ${class_value}>${msg}</div><div>${dataContext.progress}</div>`;
-            return content;
         };
 
         this.dl_disabled = "";
@@ -161,7 +132,7 @@
         };
 
         this.onclickClearDownloadedItems = async () => {
-            await clearDownloadItems(download_state.complete);
+            await clearDownloadItems(DownloadState.complete);
         }; 
 
         this.onclickScheduleDialog = () => {
@@ -202,9 +173,9 @@
 
         const onChangeDownloadItem = async () => {
             const items = grid_table_dl.getData().map(value => {
-                let state = download_state.complete;
-                if(value.state !== download_state.complete){
-                    state = download_state.wait;
+                let state = DownloadState.complete;
+                if(value.state !== DownloadState.complete){
+                    state = DownloadState.wait;
                 }
                 return {
                     thumb_img: value.thumb_img,
@@ -217,7 +188,7 @@
         };
 
         const addDownloadItems = async (items) => {
-            grid_table_dl.addItems(items, download_state.wait);
+            grid_table_dl.addItems(items, DownloadState.wait);
 
             await onChangeDownloadItem(); 
         };
@@ -301,7 +272,7 @@
 
                 video_id = first_item.id;
                 while(!cancel_download){
-                    if(!grid_table_dl.canDownload(video_id, [download_state.wait, download_state.error])){
+                    if(!grid_table_dl.canDownload(video_id, [DownloadState.wait, DownloadState.error])){
                         video_id = grid_table_dl.getNextVideoID(video_id);
                         if(video_id===undefined){
                             break;
@@ -316,7 +287,7 @@
                     }, (progress)=>{ 
                         grid_table_dl.updateItem(video_id, {
                             progress: progress, 
-                            state: download_state.wait
+                            state: DownloadState.wait
                         });
                     });
 
@@ -330,7 +301,7 @@
                     if(cancel_download){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
-                            state: download_state.wait
+                            state: DownloadState.wait
                         });
                         break;
                     }
@@ -339,7 +310,7 @@
                     const result = await nico_down.download((progress)=>{
                         grid_table_dl.updateItem(video_id, {
                             progress: `${progress}`, 
-                            state: download_state.downloading
+                            state: DownloadState.downloading
                         });
                     });
 
@@ -349,25 +320,25 @@
                         
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
-                            state: download_state.complete
+                            state: DownloadState.complete
                         });
                         logger.debug(`download complete id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.cancel){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
-                            state: download_state.wait
+                            state: DownloadState.wait
                         });
                         logger.debug(`download cancel id=${video_id}`);
                     }else if(result.type==NicoDownloader.ResultType.skip){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `スキップ: ${result.reason}`, 
-                            state: download_state.wait
+                            state: DownloadState.wait
                         });
                         logger.debug(`download skip id=${video_id}: `, result.reason);
                     }else if(result.type==NicoDownloader.ResultType.error){ 
                         grid_table_dl.updateItem(video_id, {
                             progress: `エラー: ${result.reason.message}`, 
-                            state: download_state.error
+                            state: DownloadState.error
                         });
                         logger.debug(`download id=${video_id}: `, result.reason);
                     }
@@ -412,7 +383,7 @@
                 }
             });
 
-            grid_table_dl = new GridTableDownloadItem(".download-grid", htmlFormatter);
+            grid_table_dl = new GridTableDownloadItem(".download-grid");
             
             const context_menu = createMenu();
             try {

@@ -167,7 +167,7 @@
                     onmouseup={onmouseUp.bind(this,item)}
                     onmousedown={onmouseDown.bind(this,item)}>
                     <div class="title">
-                        {item.title}
+                        {getTitle(item)}
                     </div> 
                 </div>
                 <div class="delete-button center-hv" title="削除"
@@ -190,6 +190,12 @@
         this.getTooltip = this.opts.gettooltip;
         if(!this.getTooltip){
             this.getTooltip = (item) => {
+                return item.title;
+            };
+        }
+        this.getTitle = this.opts.gettitle;
+        if(!this.getTitle){
+            this.getTitle = (item) => {
                 return item.title;
             };
         }

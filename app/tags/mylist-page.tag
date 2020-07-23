@@ -11,7 +11,9 @@
         <listview 
             obs={obs_listview}
             name={name}
-            confirm={confirm}>
+            confirm={confirm}
+            gettooltip={getTooltip}
+            gettitle={getTitle}>
         </listview>
     </div>
 
@@ -26,6 +28,16 @@
         this.name = "mylist";
         this.items = [];
         this.confirm = ["delete"];
+
+        this.getTooltip = (item) => {
+            const { title, creator } = item;
+            return `[${creator}] ${title}`;
+        };
+
+        this.getTitle = (item) => {
+            const { title, creator } = item;
+            return `[${creator}] ${title}`;
+        };
 
         this.on("mount", async () => {
             // TODO error対応
@@ -66,9 +78,9 @@
         });
 
         obs.on("mylist-page:sidebar:add-item", (args) => {
-            const { title, mylist_id, creator, link } = args;
+            const { title, mylist_id, creator } = args;
             const items = [
-                { title, mylist_id, creator, link }
+                { title, mylist_id, creator }
             ];
             this.obs_listview.trigger("addList", { items });
         });
@@ -442,15 +454,13 @@
             if(!mylist){
                 return;
             }
-            const title = `[${mylist.creator}] ${mylist.title}`;
+
             const mylist_id = mylist.mylist_id;
-            const creator = mylist.creator;
-            const link = mylist.link;   
+   
             const item = {
-                title,
-                mylist_id,
-                creator,
-                link
+                title: mylist.title,
+                mylist_id: mylist_id,
+                creator: mylist.creator
             };
             obs.trigger("mylist-page:sidebar:add-item", item);
             nico_mylist_store.save(mylist_id, nico_mylist.xml);

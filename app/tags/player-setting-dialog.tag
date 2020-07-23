@@ -57,6 +57,12 @@
         .setting-container input[type='radio']:hover {
             cursor: pointer;
         }
+        .setting-container input[type='checkbox'],
+        .setting-container input[type='radio'] {
+            position: relative;
+            top: 2px;
+            margin-left: 15px;
+        }  
     </style>
 
     <dialog class="dialog-shadow">

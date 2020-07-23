@@ -1,4 +1,4 @@
-<download-schedule-dialog>
+<setting-download-schedule>
     <style scoped>
         .download-schedule-container {
             display: flex;
@@ -101,4 +101,4 @@
             changeEnable(enable);
         });
     </script>
-</download-schedule-dialog>
+</setting-download-schedule>

@@ -52,7 +52,7 @@
         <button class="download-button stop" onclick={onclickStopDownload}>停止</button>
         <button class="download-button clear" title="ダウンロード済みをクリア" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container center-v">
-            <download-schedule-dialog obs={obs_schedule}></download-schedule-dialog>
+            <setting-download-schedule obs={obs_schedule}></setting-download-schedule>
         </div>
     </div>
     <div class="download-grid-container">

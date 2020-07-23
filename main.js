@@ -557,7 +557,7 @@ app.on("ready", async ()=>{
         items:items.map(item=>{
             return {
                 video_id: item.id,
-                title: item.name
+                title: item.title
             };
         })
     });
@@ -571,7 +571,7 @@ app.on("ready", async ()=>{
             items:items.map(item=>{
                 return {
                     video_id: item.id,
-                    title: item.name
+                    title: item.title
                 };
             })
         });

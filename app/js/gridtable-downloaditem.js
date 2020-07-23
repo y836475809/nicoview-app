@@ -170,25 +170,12 @@ class GridTableDownloadItem {
     }
 
     hasItem(id){
-        return this.grid_table.dataView.getRowById(id) !== undefined;
-    }
-
-    getItemByIdx(index){
-        if(this.grid_table.dataView.getLength() === 0){
-            return null;
+        const item = this.grid_table.dataView.getItemById(id);
+        if(!item){
+            return false;
         }
-        return this.grid_table.dataView.getItemByIdx(index);
-    }
 
-    getItemIDSet(){
-        const items = this.grid_table.dataView.getItems();
-        const id_set = new Set();
-        items.forEach(value => {
-            if(value.visible){
-                id_set.add(value.id);
-            }
-        });
-        return id_set;
+        return item.visible;
     }
 
     addItems(items, state){
@@ -216,28 +203,12 @@ class GridTableDownloadItem {
 
     deleteItems(video_ids){
         video_ids.forEach(video_id => {
-            if(this.hasItem(video_id)){
-                const item = this.grid_table.dataView.getItemById(video_id);
+            const item = this.grid_table.dataView.getItemById(video_id);
+            if(item){
                 item.visible = false;
             }
         });
         this.filterVisible();
-    }
-
-    deleteSelectedItems(){
-        const items = this.grid_table.getSelectedDatas();
-        items.forEach(value => {
-            const item = this.grid_table.dataView.getItemById(value.id);
-            item.visible = false;
-        });
-        this.filterVisible();
-        this.grid_table.grid.setSelectedRows([]);
-        this.grid_table.grid.resetActiveCell();
-
-        const deleted_ids = items.map(value => {
-            return value.id;
-        });
-        return deleted_ids;
     }
 
     clearItems(target_state){
@@ -278,45 +249,43 @@ class GridTableDownloadItem {
         }
     }
 
-    canDownload(video_id, target_states){
+    getNext(video_id){
         const items = this.grid_table.dataView.getItems();
-        const f = items.find(value=>{
-            return value.id == video_id;
-        });
-        if(f===undefined){
-            return false;
-        }
-        if(f.visible===false){
-            return false;
-        }
-        return target_states.includes(f.state);
-    }
 
-    getNextVideoID(video_id){
-        const items = this.grid_table.dataView.getItems();
-        let index = items.findIndex(value=>{
-            return value.id == video_id;
-        });
-        if(index===-1){
-            throw new Error(`not find ${video_id}`);
-        }
-        index++;
-        if(index >= items.length){
-            return undefined;
-        }
-
-        let next_item = items[index];
-        if(next_item.visible===false){
-            while(index < items.length){  
-                next_item = items[index];
-                if(next_item.visible===true){
-                    return next_item.id;
-                }
-                index++;
+        if(!video_id){
+            const find_index = items.findIndex(item=>{
+                return item.visible 
+                    && (item.state == DownloadState.wait || item.state == DownloadState.error); 
+            });
+            if(find_index<0){
+                return null;
             }
-            return undefined;
+            const item = this.grid_table.dataView.getItemByIdx(find_index);
+            return item.id;
         }
-        return next_item.id;
+
+        const index = this.grid_table.dataView.getIdxById(video_id);
+        if(!index){
+            const find_index = items.findIndex(item=>{
+                return item.visible 
+                    && (item.state == DownloadState.wait || item.state == DownloadState.error); 
+            });
+            if(find_index<0){
+                return null;
+            }
+            const item = this.grid_table.dataView.getItemByIdx(find_index);
+            return item.id;
+        }
+
+        let next_index = index + 1;
+        for (let index = next_index; index < items.length; index++) {
+            const item = this.grid_table.dataView.getItemByIdx(index);
+            if(item && item.visible){
+                return item.id;
+            }
+        }
+        
+        return null;
     }
 }
 

@@ -114,6 +114,18 @@
         let nico_down = null;
         let cancel_download = false;
 
+        const cancelDownload = () => {
+            if(nico_down){
+                try {
+                    nico_down.cancel();
+                } catch (error) {
+                    if(!error.cancel){
+                        throw error;
+                    }
+                }
+            }
+        };
+
         this.onclickStartDownload = async(e) => {
             scheduled_task.stop();
 
@@ -125,9 +137,7 @@
         };
 
         this.onclickStopDownload = (e) => {
-            if(nico_down){
-                nico_down.cancel();
-            }
+            cancelDownload();
             cancel_download = true;
         };
 
@@ -193,10 +203,14 @@
             await onChangeDownloadItem(); 
         };
 
-        const deleteDownloadItems = async (video_ids) => {
+        const deleteDownloadItems = async (items) => {
+            const video_ids = items.map(item => {
+                return item.id;
+            });
+
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){
-                    nico_down.cancel();
+                    cancelDownload();
                 }
             } 
             grid_table_dl.deleteItems(video_ids); 
@@ -234,8 +248,8 @@
                     if(!await showOKCancelBox("info", "削除しますか?")){
                         return;
                     }
-                    const deleted_ids = grid_table_dl.deleteSelectedItems();
-                    await deleteDownloadItems(deleted_ids);
+                    const items = grid_table_dl.grid_table.getSelectedDatas();
+                    await deleteDownloadItems(items);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);
@@ -264,22 +278,10 @@
             let video_id = null;
             try {
                 cancel_download = false;
-                const first_item = grid_table_dl.getItemByIdx(0);
-                if(!first_item){
-                    event_em.emit("download-end");
-                    return;
-                }
-
-                video_id = first_item.id;
                 while(!cancel_download){
-                    if(!grid_table_dl.canDownload(video_id, [DownloadState.wait, DownloadState.error])){
-                        video_id = grid_table_dl.getNextVideoID(video_id);
-                        if(video_id===undefined){
-                            break;
-                        }
-                        if(video_id===false){
-                            continue;
-                        }   
+                    video_id = grid_table_dl.getNext(video_id);
+                    if(!video_id){
+                        break;
                     }
 
                     await wait(wait_time, ()=>{ 
@@ -292,12 +294,9 @@
                     });
 
                     if(!grid_table_dl.hasItem(video_id)){
-                        video_id = grid_table_dl.getNextVideoID(video_id);
-                        if(video_id===undefined){
-                            break;
-                        }
                         continue;
                     }
+                    
                     if(cancel_download){
                         grid_table_dl.updateItem(video_id, {
                             progress: "キャンセル", 
@@ -344,15 +343,6 @@
                     }
                
                     await onChangeDownloadItem();
-
-                    if(cancel_download){
-                        break;
-                    }
-
-                    video_id = grid_table_dl.getNextVideoID(video_id);
-                    if(video_id===undefined){
-                        break;
-                    }
                 }
             } catch (error) {
                 logger.error(`download id=${video_id}: `, error);
@@ -415,8 +405,6 @@
                     message: error.message,
                 });
             }
-
-            // await onChangeDownloadItem();
 
             scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
                 startDownload();

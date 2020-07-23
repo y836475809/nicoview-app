@@ -29,13 +29,7 @@
         }
         
         .download-control-container .schedule-container {
-            display: flex;
             margin-left: auto;
-        }
-
-        .download-control-container .schedule-container .label {
-            margin-right: 10px;
-            user-select: none;
         }
 
         .download-grid-container {
@@ -57,16 +51,13 @@
         <button class="download-button start" disabled={dl_disabled} onclick={onclickStartDownload}>開始</button>
         <button class="download-button stop" onclick={onclickStopDownload}>停止</button>
         <button class="download-button clear" title="ダウンロード済みをクリア" onclick={onclickClearDownloadedItems}>クリア</button>
-        <div class="schedule-container">
-            <div class="label center-hv">{download_schedule_label}</div>
-            <button class="download-button" disabled={dl_disabled} title="ダウンロードの定期実行日時を設定する" 
-                onclick={onclickScheduleDialog}>設定</button>
+        <div class="schedule-container center-v">
+            <download-schedule-dialog obs={obs_schedule}></download-schedule-dialog>
         </div>
     </div>
     <div class="download-grid-container">
         <div class="download-grid"></div>
     </div>
-    <download-schedule-dialog obs={obs_schedule_dialog}></download-schedule-dialog>
 
     <script>
         /* globals riot logger */
@@ -81,22 +72,9 @@
         const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
-        this.obs_schedule_dialog = riot.observable();
+        this.obs_schedule = riot.observable();
 
         let download_schedule = null;
-
-        const updateDonwloadScheduleLabel = () =>{
-            const enable = download_schedule.enable;
-            if(enable==false){
-                this.download_schedule_label = "ダウンロード実行 なし";
-            }else{
-                const date = download_schedule.date;
-                const hour = ("0" + date.hour).slice(-2);
-                const minute = ("0" + date.minute).slice(-2);
-                this.download_schedule_label = `ダウンロード実行 ${hour}:${minute}`;
-            }      
-            this.update();
-        };
 
         this.dl_disabled = "";
         const event_em = new EventEmitter(); 
@@ -144,42 +122,6 @@
         this.onclickClearDownloadedItems = async () => {
             await clearDownloadItems(DownloadState.complete);
         }; 
-
-        this.onclickScheduleDialog = () => {
-            const date = download_schedule.date;
-            const enable = download_schedule.enable;
-
-            this.obs_schedule_dialog.trigger("show", {
-                date: date,
-                enable: enable,
-                cb: result => {
-                    if(result.type!="ok"){
-                        return;
-                    }
-                    IPCClient.request("config", "set", { 
-                        key:"download.schedule", 
-                        value: {
-                            date:result.date,
-                            enable:result.enable
-                        }
-                    }).then();
-                    download_schedule.date = result.date;
-                    download_schedule.enable = result.enable;
-                    
-                    if(download_schedule.enable==true){
-                        scheduled_task.stop();
-                        scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
-                            startDownload();
-                        });
-                        scheduled_task.start();
-                    }else{
-                        scheduled_task.stop();
-                    }
-
-                    updateDonwloadScheduleLabel();
-                }
-            });
-        };
 
         const onChangeDownloadItem = async () => {
             const items = grid_table_dl.getData().map(value => {
@@ -372,6 +314,31 @@
                     enable: false
                 }
             });
+            this.obs_schedule.trigger("set-params", download_schedule);
+            this.obs_schedule.on("change-params", (args) => {
+                const { date, enable } = args;
+
+                IPCClient.request("config", "set", { 
+                    key:"download.schedule", 
+                    value: {
+                        date: date,
+                        enable: enable
+                    }
+                }).then();
+
+                download_schedule.date = date;
+                download_schedule.enable = enable;
+
+                if(enable==true){
+                    scheduled_task.stop();
+                    scheduled_task = new ScheduledTask(download_schedule.date, () =>{
+                        startDownload();
+                    });
+                    scheduled_task.start();
+                }else{
+                    scheduled_task.stop();
+                }
+            });
 
             grid_table_dl = new GridTableDownloadItem(".download-grid");
             
@@ -412,8 +379,6 @@
             if(download_schedule.enable==true){
                 scheduled_task.start();
             }
-
-            updateDonwloadScheduleLabel();
         });
     </script>
 </download-page>

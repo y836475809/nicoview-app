@@ -1,30 +1,22 @@
 <download-schedule-dialog>
     <style scoped>
-        dialog {
-            border: solid 1px #aaa;
-            border-radius: 5px;
+        .download-schedule-container {
+            display: flex;
         }
 
-        dialog::backdrop {
-            opacity: 0;
-        }
-
-        .download-schedule-dialog .container {
-            width: 280px;
-            height: 150px;
-            display: grid;
-            grid-template-rows: 1fr 30px;
-            grid-template-areas: 
-                "item1"
-                "item2";
-        }
-
-        .download-schedule-dialog .label {
+        .download-schedule-container .label {
+            margin-left: 5px;
+            margin-right: 5px;
             user-select: none;
         } 
 
-        .download-schedule-dialog .hour-select,
-        .download-schedule-dialog .minute-select {
+        .download-schedule-container .label.disabled {
+            color: gray;
+        }
+
+        .download-schedule-container .hour-select,
+        .download-schedule-container .minute-select {
+            height: 25px;
             width: 50px;
         }
 
@@ -32,48 +24,21 @@
         .minute-select:focus {
             outline: none;
         }
-
-        .download-schedule-dialog .params-container {
-            grid-area: item1;
-            display: flex;
-        }
-
-        .download-schedule-dialog .button-container {
-            grid-area: item2;
-            margin: auto;
-        }
-        .download-schedule-dialog .button { 
-            display: inline-block;
-            text-align: center;
-            border: 1px solid #aaa;
-            width: 100px;
-            height: 30px;
-            line-height: 30px;
-            cursor: pointer; 
-            user-select: none;
-        }   
     </style>
-
-    <dialog class="download-schedule-dialog dialog-shadow" oncancel={oncancel}>
-        <div class="container">
-            <div class="params-container center-hv">
-                <input type="checkbox" class="schedule-enable-check" name="schedule-enable">
-                <div class="label">毎日</div>
-                <select class="hour-select">
-                    <option each={hour in hours} value={hour}>{hour}</option>
-                </select>
-                <div class="label"> : </div>
-                <select class="minute-select">
-                    <option each={minute in minutes} value={minute}>{minute}</option>
-                </select>
-                <div class="label">にダウンロード開始</div>
-            </div>
-            <div class="button-container">
-                <div class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
-                <div class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
-            </div>
-        </div>
-    </dialog>
+    
+    <div class="download-schedule-container center-hv">
+        <input type="checkbox" class="schedule-enable-check" name="schedule-enable"
+            onchange={onChangeParams}>
+        <div class="label">毎日</div>
+        <select class="hour-select" onchange={onChangeParams}>
+            <option each={hour in hours} value={hour}>{hour}</option>
+        </select>
+        <div class="label">:</div>
+        <select class="minute-select" onchange={onChangeParams}>
+            <option each={minute in minutes} value={minute}>{minute}</option>
+        </select>
+        <div class="label">にダウンロード開始</div>
+    </div>
 
     <script> 
         const obs =  this.opts.obs;
@@ -87,45 +52,53 @@
             this.minutes.push(index);
         }
 
-        obs.on("show", async (args) => {
-            const { date, enable, cb } = args;
+        const getParamElms = () => {
+            const h_elm = this.root.querySelector(".hour-select");
+            const m_elm = this.root.querySelector(".minute-select");
+            const ck_elm = this.root.querySelector(".schedule-enable-check");
+            return { h_elm, m_elm, ck_elm };
+        };
 
-            this.root.querySelector(".hour-select").options[date.hour].selected = true;
-            this.root.querySelector(".minute-select").options[date.minute].selected = true;
-            this.root.querySelector(".schedule-enable-check").checked = enable;
-            this.cb = cb;
+        const changeEnable = (enable) => {
+            const { h_elm, m_elm } = getParamElms();
 
-            const dialog = this.root.querySelector("dialog");
-            dialog.showModal();
+            h_elm.disabled = !enable;
+            m_elm.disabled = !enable;
+
+            const label_elms = this.root.querySelectorAll(".label");
+            label_elms.forEach(elm => {
+                if(enable){
+                    elm.classList.remove("disabled");
+                }else{
+                    elm.classList.add("disabled");
+                }   
+            });
+        };
+
+        this.onChangeParams = (e) =>{
+            const { h_elm, m_elm, ck_elm } = getParamElms();
+
+            const hour = parseInt(h_elm.value);
+            const minute = parseInt(m_elm.value);
+            const enable = ck_elm.checked;
+
+            changeEnable(enable);
+
+            obs.trigger("change-params", { 
+                date: { hour: hour, minute: minute },
+                enable: enable
+            });
+        };
+
+        obs.on("set-params", (args)=>{
+            const { date, enable } = args;
+            const { h_elm, m_elm, ck_elm } = getParamElms();
+                        
+            h_elm.options[date.hour].selected = true;
+            m_elm.options[date.minute].selected = true;
+            ck_elm.checked = enable;
+
+            changeEnable(enable);
         });
-
-        const close = () => {
-            const dialog = this.root.querySelector("dialog");
-            dialog.close();
-        };
-
-        this.onclickButton = (result, e) =>{
-            if(this.cb){
-                const h_elm = this.root.querySelector(".hour-select");
-                const hour = parseInt(h_elm.value);
-                
-                const m_elm = this.root.querySelector(".minute-select");
-                const minute = parseInt(m_elm.value);
-
-                const ck_elm = this.root.querySelector(".schedule-enable-check");
-                const enable = ck_elm.checked;
-                
-                this.cb({
-                    type: result,
-                    date: {hour: hour, minute: minute},
-                    enable:enable
-                });
-            }
-            close();
-        };
-
-        this.oncancel = (e) => {
-            e.preventDefault();
-        };
     </script>
 </download-schedule-dialog>

@@ -24,6 +24,12 @@
         .minute-select:focus {
             outline: none;
         }
+
+        .schedule-enable-check:hover,
+        .hour-select:hover,
+        .minute-select:hover {
+            cursor: pointer;
+        }
     </style>
     
     <div class="download-schedule-container center-hv">

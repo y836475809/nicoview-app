@@ -29,6 +29,9 @@
             height: 25px;
             vertical-align: middle;
         }
+        .setting-page input[type='checkbox']:hover {
+            cursor: pointer;
+        }
 
         .setting-page .container {
             margin: 10px;

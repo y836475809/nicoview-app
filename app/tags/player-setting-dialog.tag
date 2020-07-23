@@ -52,6 +52,11 @@
             font-size: 1.2em;
             height: 30px;
         }
+
+        .setting-container input[type='checkbox']:hover,
+        .setting-container input[type='radio']:hover {
+            cursor: pointer;
+        }
     </style>
 
     <dialog class="dialog-shadow">

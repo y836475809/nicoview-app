@@ -409,14 +409,6 @@
             obs.trigger("player-video:update-comment-display-params", args);
         });
 
-        obs.on("player-main-page:sync-comment-checked", async (args) => {
-            const checked = args;
-            await IPCClient.request("config", "set", { 
-                key:"player.sync_comment",
-                value: checked
-            });
-        });
-
         obs.on("player-main-page:show-player-setting-dialog", () => {
             obs.trigger("player-setting-dialog:show", {
                 ng_items : comment_filter.ng_comment.getNGItems(),
@@ -523,8 +515,7 @@
             const params = await IPCClient.request("config", "get", 
                 { 
                     key:"player", 
-                    value:{ 
-                        sync_comment: false, 
+                    value:{  
                         infoview_width: 200, 
                         infoview_show: true 
                     } 
@@ -538,8 +529,6 @@
 
             this.player_default_size = { width: 854 ,height: 480 };
             
-            obs.trigger("player-info-page:sync-comment-checked", params.sync_comment);
-
             try {
                 const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
                 const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });

@@ -128,9 +128,6 @@
             <player-user obs={opts.obs}></player-user>
         </div>
         <div class="controls-container">
-            <input class="center-v comment-checkbox sync-comment" type="checkbox" 
-                onclick={onclickSyncCommentCheck} />
-                <label class="center-v" title="コメントリストのスクロールと再生を同期させる">同期</label>
             <input class="center-v comment-checkbox comment-visible" type="checkbox" 
                 onclick={onclickCommentVisibleCheck} />
                 <label class="center-v" title="コメントの表示/非表示">表示</label>
@@ -186,7 +183,7 @@
         this.video_thumbnail_tooltip = "";
 
         let sync_comment_scroll = new SyncCommentScroll();
-        let sync_comment_checked = false;
+        let sync_comment_checked = true;
 
         this.enableDonwload = () => {
             return this.is_deleted === false && this.is_saved === false;
@@ -246,18 +243,6 @@
         };   
         const grid_table = new GridTable("comment-grid", columns, options);
 
-        this.onclickSyncCommentCheck = (e) => {
-            const checked = e.target.checked;
-            updateSyncCommentCheck(checked);
-            obs.trigger("player-main-page:sync-comment-checked", checked);
-        };
-
-        const updateSyncCommentCheck = (is_checked) => {
-            let ch_elm = this.root.querySelector(".comment-checkbox.sync-comment");
-            ch_elm.checked = is_checked;
-            sync_comment_checked = is_checked;
-        };
-
         this.onclickCommentVisibleCheck = (e) => {
             const comment_visible = e.target.checked;
             obs.trigger("player-video:change-comment-visible", comment_visible);
@@ -300,11 +285,6 @@
         obs.on("player-info-page:update-comments", (args)=> {
             const comments = args;
             setComments(comments);
-        });
-
-        obs.on("player-info-page:sync-comment-checked", (args)=> {
-            const sync_comment_checked = args;
-            updateSyncCommentCheck(sync_comment_checked);
         });
 
         obs.on("player-info-page:set-viewinfo-data", (args)=> {

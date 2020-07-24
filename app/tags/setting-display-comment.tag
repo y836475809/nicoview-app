@@ -39,7 +39,7 @@
                     onchange={onchangeAutoSyncInterval.bind(this,item)}>{item}秒
             </label>
             <hr>
-            <div class="param-label center-v">コメントと動画のずれの閾値(これ以上ずれたら同期を調整する)</div>
+            <div class="param-label center-v">以下の値より同期がずれたら調整を行う</div>
             <label each={item in sync_threshold_items} >
                 <input type="radio" name="sync_threshold" value={item} 
                     onchange={onchangeAutoSyncThreshold.bind(this,item)}>{item}秒

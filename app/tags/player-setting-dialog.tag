@@ -7,8 +7,10 @@
         dialog {
             border: solid 1px #aaa;
             border-radius: 5px;
-            width: 500px;
-            height: 400px;
+            min-width: 400px;
+            min-height: 300px;
+            width: 50vw;
+            height: 80vh;
             padding-bottom: 2em;
         }
 

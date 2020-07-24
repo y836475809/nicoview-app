@@ -126,6 +126,7 @@
             obs.trigger("player-info-page:set-viewinfo-data", { 
                 viewinfo: viewinfo, 
                 comments: filtered_comments,
+                all_comment_num: comments.length,
                 state: state
             });   
             
@@ -322,14 +323,16 @@
                         thumb_info: video_data.getThumbInfo()
                     };
 
-                    comment_filter.setComments(video_data.getComments());
+                    const comments = video_data.getComments();
+                    comment_filter.setComments(comments);
                     comment_filter.setPlayTime(updated_video_item.play_time);
                     const filtered_comments = comment_filter.getCommnets();
 
                     obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
                     obs.trigger("player-info-page:set-viewinfo-data", {
                         viewinfo: viewinfo, 
-                        comments: filtered_comments 
+                        comments: filtered_comments,
+                        all_comment_num: comments.length,
                     });
 
                     obs.trigger("player-video:update-comments", filtered_comments);

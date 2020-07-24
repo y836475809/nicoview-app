@@ -56,11 +56,16 @@
             cursor: pointer;
         }
         .comment-checkbox {
-            height: 25px;
+            height: 32px;
             vertical-align:middle;
         }
         .comment-checkbox + label  {
+            position: relative;
+            top: 3px;
             margin-right: 10px;
+        }
+        .comment-state {
+            user-select: none;
         }
         .comment-grid-container {
             width: 100%;
@@ -131,10 +136,13 @@
             <input class="center-v comment-checkbox comment-visible" type="checkbox" 
                 onclick={onclickCommentVisibleCheck} />
                 <label class="center-v" title="コメントの表示/非表示">表示</label>
-            <div title="設定ダイアログ表示" class="icon-button center-hv">                      
-                <span class="icon fas fa-cog" onclick={onclickShowSettingDialog}></span> 
+            <div class="comment-state center-v" title="表示制限、フィルタリングしたコメント数/全コメント数">
+                {comment_state}
             </div>
             <div class="move-right">
+                <div title="設定ダイアログ表示" class="icon-button center-hv">                      
+                    <span class="icon fas fa-cog" onclick={onclickShowSettingDialog}></span> 
+                </div>
                 <div title="動画情報更新" class="icon-button center-hv">
                     <span class="icon center-hv" 
                         data-state={String(enableUpdateData())} 
@@ -179,6 +187,7 @@
         this.view_counter = 0;
         this.comment_counter = 0;
         this.mylist_counter = 0;
+        this.comment_state = "";
 
         this.video_thumbnail_tooltip = "";
 
@@ -290,7 +299,7 @@
         obs.on("player-info-page:set-viewinfo-data", (args)=> {
             grid_table.resizeGrid();
 
-            const { viewinfo, comments, state } = args;
+            const { viewinfo, comments, all_comment_num, state } = args;
 
             this.is_economy = viewinfo.is_economy;
             this.is_deleted = viewinfo.is_deleted;
@@ -338,6 +347,9 @@
             if(state_deleted){
                 this.video_thumbnail_tooltip += `\n${state_deleted}`;
             }
+
+            this.comment_state = 
+                `${comments.length.toLocaleString()}/${all_comment_num.toLocaleString()}`;
             
             const user_id = owner.id;
             const user_nickname = owner.nickname;

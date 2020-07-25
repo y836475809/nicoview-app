@@ -77,18 +77,24 @@ class NGComment {
     }
 }
 
-// vpos 100ms
 
-// time=sec
-// time<1:00 100
-// time<5:00 250
-// time<10:00 500
-// time>10:00 1000
 
-// 100comment/1minute
-// 10minute => 1000+900=1900
-
+/**
+ * 表示するコメントを選択する(コメント数制限)
+ * vpos 100ms
+ * time=sec
+ * time<1:00 100
+ * time<5:00 250
+ * time<10:00 500
+ * time>10:00 1000
+ * 100comment/1minute
+ * 10minute => 1000+900=1900
+ */
 class CommentNumLimit {
+    /**
+     * 
+     * @param {Number} num_per_min 1分につき新着順に取得されるコメント数
+     */
     constructor(num_per_min=100){
         this.num_per_min = num_per_min;
     }
@@ -129,6 +135,10 @@ class CommentNumLimit {
         return {owner_comments, user_comments};
     }
 
+    /**
+     * コメントをvposで昇順ソート
+     * @param {Array} comments 
+     */
     _sortByVPos(comments){
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
@@ -137,6 +147,10 @@ class CommentNumLimit {
         });
     }
 
+    /**
+     * コメントを最新の投稿日順にソート
+     * @param {Array} comments 
+     */
     _sortDescByPostDate(comments){
         comments.sort((a, b) => {
             if (a.date < b.date) return 1;
@@ -145,6 +159,14 @@ class CommentNumLimit {
         });
     }
 
+    /**
+     * 動画の長さによる取得コメント数を返す
+     * play_time_sec<1:00 -> 100
+     * play_time_sec<5:00 -> 250
+     * play_time_sec<10:00 -> 500
+     * play_time_sec>10:00 -> 1000
+     * @param {Number} play_time_sec 動画時間
+     */
     _getMaxNum(play_time_sec){
         let max_num = 0;
         if(play_time_sec < 1*60){
@@ -161,6 +183,12 @@ class CommentNumLimit {
         return max_num;
     }
 
+    /**
+     * commentsをnumで分割して返す
+     * (動画の長さによるコメントと残りのコメントに分割する)
+     * @param {Array} comments 
+     * @param {Number} num 動画の長さによるコメント数
+     */
     _split(comments, num){
         if(comments.length <= num){
             return { main:comments, rest:[] };
@@ -170,6 +198,11 @@ class CommentNumLimit {
         return { main, rest };
     }
 
+    /**
+     * コメントをvposで動画時間の１分毎に分割して返す
+     * @param {Array} comments 
+     * @param {Number} play_time_sec 
+     */
     _splitParMinute(comments, play_time_sec){
         this._sortByVPos(comments);
 
@@ -183,6 +216,8 @@ class CommentNumLimit {
                 return (e1 <= pos_sec && pos_sec < e2);
             });
             if(dc.length > 0){
+                // 後で最新コメント順で取得する処理を行うので
+                // 投稿日で降順ソートしておく
                 this._sortDescByPostDate(dc);
                 ary.push(dc);
             }

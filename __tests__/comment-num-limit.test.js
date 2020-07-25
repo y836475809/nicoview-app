@@ -82,28 +82,27 @@ test("comments split", t => {
 test("comments split par min", t => {
     const comments = [
         {no: 0, vpos: 0, date: 15.0},
-        {no: 1, vpos: 0, date: 14.5},
-        {no: 2, vpos: 0, date: 14.1},
+        {no: 1, vpos: 10*1000/10, date: 14.5},
+        {no: 2, vpos: 50*1000/10, date: 14.1},
 
-        {no: 3, vpos: 0, date: 14.0},
+        {no: 3, vpos: 70*1000/10, date: 14.0},
 
-        {no: 4, vpos: 0, date: 12.0},
+        {no: 4, vpos: 120*1000/10, date: 12.0},
 
-        {no: 5, vpos: 0, date: 10.8},
-        {no: 6, vpos: 0, date: 10.7},
-        {no: 7, vpos: 0, date: 10.6},
-        {no: 8, vpos: 0, date: 10.5},
+        {no: 5, vpos: 190*1000/10, date: 10.8},
+        {no: 6, vpos: 191*1000/10, date: 10.7},
+        {no: 7, vpos: 192*1000/10, date: 10.6},
+        {no: 8, vpos: 193*1000/10, date: 10.5},
 
-        {no: 9, vpos: 0, date: 7.0},
+        {no: 9, vpos: 240*1000/10, date: 7.0},
     ].map(value=>{
         value.date = to_date(value.date);
         return value;
     });
 
-    const start_post_date = comments[comments.length-1].date;
     const time_sec = 20*60;
     const cnl = new CommentNumLimit();
-    const cmts= cnl._splitParMinute(comments, start_post_date, time_sec);
+    const cmts= cnl._splitParMinute(comments, time_sec);
 
     t.is(cmts.length, 5);
     t.is(cmts[0].length, 3);
@@ -133,20 +132,20 @@ test("comments getComments comments=[]", t => {
 
 test("comments getComments", t => {
     const comments = [
-        {no: 0, vpos: 10, date: 15.0},
-        {no: 1, vpos: 9, date: 14.5},
-        {no: 2, vpos: 8, date: 14.1},
+        {no: 0, vpos: 242*1000/10, date: 15.0},
+        {no: 1, vpos: 241*1000/10, date: 14.5},
+        {no: 2, vpos: 240*1000/10, date: 14.1},
 
-        {no: 3, vpos: 7, date: 14.0},
+        {no: 3, vpos: 180*1000/10, date: 14.0},
 
-        {no: 4, vpos: 6, date: 12.0},
+        {no: 4, vpos: 120*1000/10, date: 12.0},
 
-        {no: 5, vpos: 5, date: 10.8},
-        {no: 6, vpos: 4, date: 10.7},
-        {no: 7, vpos: 3, date: 10.6},
-        {no: 8, vpos: 2, date: 10.5},
+        {no: 5, vpos: 63*1000/10, date: 10.8},
+        {no: 6, vpos: 62*1000/10, date: 10.7},
+        {no: 7, vpos: 61*1000/10, date: 10.6},
+        {no: 8, vpos: 60*1000/10, date: 10.5},
 
-        {no: 9, vpos: 1, date: 7.0},
+        {no: 9, vpos: 1*1000/10, date: 7.0},
     ].map(value=>{
         value.date = to_date(value.date);
         return value;
@@ -157,14 +156,18 @@ test("comments getComments", t => {
     const cmts = cnl.getComments(comments, time_sec);
 
     const exp_cmt = [
-        {no: 9, vpos: 1, date: 7.0},
-        {no: 6, vpos: 4, date: 10.7},
-        {no: 5, vpos: 5, date: 10.8},
-        {no: 4, vpos: 6, date: 12.0},
-        {no: 3, vpos: 7, date: 14.0},
-        {no: 2, vpos: 8, date: 14.1},
-        {no: 1, vpos: 9, date: 14.5},
-        {no: 0, vpos: 10, date: 15.0},
+        {no: 9, vpos: 1*1000/10, date: 7.0},
+
+        {no: 6, vpos: 62*1000/10, date: 10.7},
+        {no: 5, vpos: 63*1000/10, date: 10.8},
+
+        {no: 4, vpos: 120*1000/10, date: 12.0},
+
+        {no: 3, vpos: 180*1000/10, date: 14.0},
+
+        {no: 2, vpos: 240*1000/10, date: 14.1},
+        {no: 1, vpos: 241*1000/10, date: 14.5},
+        {no: 0, vpos: 242*1000/10, date: 15.0},
     ].map(value=>{
         value.date = to_date(value.date);
         return value;
@@ -195,20 +198,20 @@ test("comments splitByUserID", t => {
 
 test("comments getComments include owner", t => {
     const comments = [
-        {no: 0, vpos: 10, date: 15.0},
-        {no: 1, vpos: 9, date: 14.5},
-        {no: 2, vpos: 8, date: 14.1, user_id:"owner"},
+        {no: 0, vpos: 242*1000/10, date: 15.0},
+        {no: 1, vpos: 241*1000/10, date: 14.5},
+        {no: 2, vpos: 240*1000/10, date: 14.1, user_id:"owner"},
 
-        {no: 3, vpos: 7, date: 14.0},
+        {no: 3, vpos: 180*1000/10, date: 14.0},
 
-        {no: 4, vpos: 6, date: 12.0},
+        {no: 4, vpos: 120*1000/10, date: 12.0},
 
-        {no: 5, vpos: 5, date: 10.8},
-        {no: 6, vpos: 4, date: 10.7, user_id:"owner"},
-        {no: 7, vpos: 3, date: 10.6},
-        {no: 8, vpos: 2, date: 10.5},
+        {no: 5, vpos: 63*1000/10, date: 10.8},
+        {no: 6, vpos: 62*1000/10, date: 10.7, user_id:"owner"},
+        {no: 7, vpos: 61*1000/10, date: 10.6},
+        {no: 8, vpos: 60*1000/10, date: 10.5},
 
-        {no: 9, vpos: 1, date: 7.0},
+        {no: 9, vpos: 1*1000/10, date: 7.0},
     ].map(value=>{
         value.date = to_date(value.date);
         return value;
@@ -219,14 +222,18 @@ test("comments getComments include owner", t => {
     const cmts = cnl.getComments(comments, time_sec);
 
     const exp_cmts = [
-        {no: 9, vpos: 1, date: 7.0},
-        {no: 6, vpos: 4, date: 10.7, user_id:"owner"},
-        {no: 5, vpos: 5, date: 10.8},
-        {no: 4, vpos: 6, date: 12.0},
-        {no: 3, vpos: 7, date: 14.0},
-        {no: 2, vpos: 8, date: 14.1, user_id:"owner"},
-        {no: 1, vpos: 9, date: 14.5},
-        {no: 0, vpos: 10, date: 15.0},
+        {no: 9, vpos: 1*1000/10, date: 7.0},
+
+        {no: 6, vpos: 62*1000/10, date: 10.7, user_id:"owner"},
+        {no: 5, vpos: 63*1000/10, date: 10.8},
+
+        {no: 4, vpos: 120*1000/10, date: 12.0},
+
+        {no: 3, vpos: 180*1000/10, date: 14.0},
+
+        {no: 2, vpos: 240*1000/10, date: 14.1, user_id:"owner"},
+        {no: 1, vpos: 241*1000/10, date: 14.5},
+        {no: 0, vpos: 242*1000/10, date: 15.0},
     ].map(value=>{
         value.date = to_date(value.date);
         return value;

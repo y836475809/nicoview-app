@@ -100,12 +100,11 @@ class CommentNumLimit {
         
         this._sortDescByPostDate(comments);
         const {owner_comments, user_comments} = this._splitByUserID(comments);
-        const start_post_date = comments[comments.length-1].date;
 
         const max_num = this._getMaxNum(play_time_sec);
         const { main, rest } = this._split(user_comments, max_num);
         const comments_par_min = this._getNumEach(
-            this._splitParMinute(rest, start_post_date, play_time_sec), 
+            this._splitParMinute(rest, play_time_sec), 
             this.num_per_min);
         const result = main.concat(comments_par_min).concat(owner_comments);
         this._sortByVPos(result);
@@ -171,18 +170,20 @@ class CommentNumLimit {
         return { main, rest };
     }
 
-    _splitParMinute(comments, start_post_date, play_time_sec){
-        const end_msec = start_post_date + play_time_sec*1000;
+    _splitParMinute(comments, play_time_sec){
+        this._sortByVPos(comments);
+
         let ary = [];
         const num = Math.floor(play_time_sec/60) + 1;
         for (let index = 0; index < num; index++) {
-            const e1 = end_msec - index*60*1000;
-            const e2 = e1 - 60*1000;
+            const e1 = index * 60;
+            const e2 = e1 + 60;
             const dc = comments.filter(value=>{
-                const post_date = value.date;
-                return (e2 < post_date && post_date <= e1);
+                const pos_sec = value.vpos/100;
+                return (e1 <= pos_sec && pos_sec < e2);
             });
             if(dc.length > 0){
+                this._sortDescByPostDate(dc);
                 ary.push(dc);
             }
         }

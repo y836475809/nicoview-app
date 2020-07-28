@@ -4,6 +4,7 @@ process.once("loaded", () => {
     global.process = process;
     global.electron = require("electron");
     global.path = require("path");
+    global.fs = require("fs");
     global.EventEmitter = require("events");
     global.IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
     global.IPC = require(`${root_dir}/app/js/ipc-client-server`);

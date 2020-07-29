@@ -86,16 +86,10 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">インポート</div>
+            <div class="center-v title">動画インポート</div>
             <div class="content">
-                <div style="display:flex; margin-bottom:5px;">
-                    <div class="label">NNDDのDB(library.db)のインポート</div>
-                    <button title="DB選択" onclick={onclickImport}>
-                        <i class="far fa-file"></i>
-                    </button>
-                </div>
                 <div style="display:flex;">
-                    <div class="label">動画のインポート(ライブラリに登録済みの動画は無視)</div>
+                    <div class="label">動画を選択して動画、コメント、サムネイル、動画情報をインポート</div>
                     <button title="ファイル選択" onclick={onclickImportFiles}>
                         <i class="far fa-file"></i>
                     </button>
@@ -398,26 +392,6 @@
             }
            
         });
-
-        this.onclickImport = async ()=>{
-            const db_file_path = await selectFileDialog("Sqlite db", ["db"]);
-            if(db_file_path == null){
-                return;
-            }
-
-            this.obs_msg_dialog.trigger("show", {
-                message: "インポート中...",
-            });
-
-            const ret = await ipcRenderer.invoke(IPC_CHANNEL.IMPORT_NNDD_DB, {db_file_path});
-            if(ret.result===true){
-                await showMessageBox("info", "インポート完了");
-            } else {
-                logger.error(ret.error);
-                await showMessageBox("error", `インポート失敗: ${ret.error.message}`);
-            }
-            this.obs_msg_dialog.trigger("close");
-        };
 
         this.onclickImportFiles = async ()=>{
             const result = await dialog.showOpenDialog(remote.getCurrentWindow(), {

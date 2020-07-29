@@ -53,10 +53,14 @@
             return `${item.title}\n並び順: ${sort}\n種類: ${target}`;
         };
 
-        this.on("mount", async () => {
+        const loadItems = async () => {
             const name = this.name;
             const items = await IPCClient.request("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items });
+        };
+
+        this.on("mount", async () => {
+            await loadItems();
         });
 
         this.obs_listview.on("changed", async (args) => {
@@ -90,6 +94,10 @@
                 { title: cond.query, type:cond.search_target , cond: cond }
             ];
             this.obs_listview.trigger("addList", { items });
+        });
+
+        obs.on("search-page:sidebar:reload-items", async () => {
+            await loadItems();
         });
     </script>
 </search-sidebar>

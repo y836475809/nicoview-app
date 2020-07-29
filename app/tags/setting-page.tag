@@ -103,6 +103,32 @@
             </div>
         </div>
         <div class="container">
+            <div class="center-v title">NNDDデータインポート</div>
+            <div class="content">
+                <div style="display:flex; flex-direction:column; margin-bottom:5px;">
+                    <div class="label">NNDDシステムフォルダのパス</div>
+                    <div style="display: flex;">
+                        <input disabled=true class="nndd-system-path-input" type="text" readonly}>
+                        <button title="NNDDシステムフォルダ選択" onclick={onclickNNDDSystemDir}>
+                            <i class="far fa-file"></i>
+                        </button>
+                    </div>
+                </div>
+                <div style="display:flex; flex-direction:column; margin-top:10px;">
+                    <div class="label" style="margin-bottom:-5px;">インポートする対象</div>
+                    <div style="display: flex;">
+                        <label style="margin-right: 10px;" each={item in import_items} >
+                            <input type="checkbox" class={item.name} name={item.name} 
+                                onclick={onclickCheckNNDDImportItem.bind(this,item)}/>{item.title}
+                        </label>
+                    </div>
+                    <button style="width:120px; margin-top:10px;" onclick={onclickExecNNDDImport}>
+                        インポート実行
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="container">
             <div class="center-v title">ffmpeg実行ファイルのパス(保存済みflv, swfを再生可能な形式に変換する)</div>
             <div class="content" style="display: flex;">
                 <input disabled=true class="ffmpeg-path-input" type="text" readonly>
@@ -168,11 +194,13 @@
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RendererDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;
+        const { ImportNNDDData } = window.ImportNNDDData;
         
         const obs = this.opts.obs; 
         this.obs_msg_dialog = riot.observable();
 
         this.cache_size = "--MB";
+        this.import_items = ImportNNDDData.getItems();
 
         this.onclickSelectDataDir = async e => {
             const dir = await selectFolderDialog();
@@ -262,6 +290,71 @@
             await ipcRenderer.invoke(IPC_CHANNEL.LOG_LEVEL, { level:value });
         };
 
+        this.onclickNNDDSystemDir = async (e) => {
+            const dir = await selectFolderDialog();
+            if(dir == null){
+                return; 
+            }
+            setInputValue(".nndd-system-path-input", dir);
+            await IPCClient.request("config", "set", { key:"nndd.system_path", value:dir });
+
+        };
+
+        this.onclickCheckNNDDImportItem = async (item, e) => {
+            const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
+            const checked = ch_elm.checked;
+            await IPCClient.request("config", "set", { key:`nndd.${item.name}`, value:checked });
+        };
+
+        this.onclickExecNNDDImport = async (e) => {
+            const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
+            const nndd_system_dir = await IPCClient.request("config", "get", { key:"nndd.system_path", value:"" });
+            try {
+                fs.statSync(data_dir);
+            } catch (error) {
+                await showMessageBox("error", `アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`);
+                return;
+            }
+
+            try {
+                fs.statSync(nndd_system_dir);
+            } catch (error) {
+                await showMessageBox("error", `NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`);
+                return;
+            }
+
+            const import_items = [];
+            this.import_items.forEach(item => {
+                const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
+                if(ch_elm.checked){
+                    import_items.push(item);
+                }
+            });
+
+            this.obs_msg_dialog.trigger("show", {
+                message: "インポート中...",
+            });
+            try {
+                const import_nndd = new ImportNNDDData(nndd_system_dir, data_dir);
+                for (let index = 0; index < import_items.length; index++) {
+                    const import_item = import_items[index];
+                    this.obs_msg_dialog.trigger("update-message", `${import_item.title}をインポート`);
+                    await import_nndd.call(import_item.name);
+                }
+
+                obs.trigger("search-page:sidebar:reload-items");
+                obs.trigger("play-history-page:reload-items");
+                obs.trigger("mylist-page:sidebar:reload-items");
+
+                await showMessageBox("info", "インポート完了");
+            } catch (error) {
+                logger.error(error);
+                await showMessageBox("error", `インポート失敗: ${error.message}`);
+            } finally {
+                this.obs_msg_dialog.trigger("close");
+            }            
+        };
+
         const setInputValue = (selector, value) => {          
             const elm = this.root.querySelector(selector);
             elm.value = value;
@@ -295,6 +388,15 @@
         
             const log_level = await IPCClient.request("config", "get",{ key:"log.level", value:"info"});
             setCheckValue(".check-loglevel-debug", log_level=="debug");
+            
+            setInputValue(".nndd-system-path-input", await IPCClient.request("config", "get",{ key:"nndd.system_path", value:""}));  
+            
+            for (let index = 0; index < this.import_items.length; index++) {
+                const import_item = this.import_items[index];
+                setCheckValue(`.${import_item.name}`, 
+                    await IPCClient.request("config", "get",{ key:`nndd.${import_item.name}`, value:false}));
+            }
+           
         });
 
         this.onclickImport = async ()=>{

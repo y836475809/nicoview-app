@@ -56,6 +56,7 @@ window.addEventListener("load", () => {
     global.GridTableDownloadItem = require(`${root_dir}/app/js/gridtable-downloaditem`);
     global.ScheduledTask = require(`${root_dir}/app/js/scheduled-task`);
     global.ImportLibrary = require(`${root_dir}/app/js/import-library`);
+    global.ImportNNDDData = require(`${root_dir}/app/js/import-nndd-data`);
     global.NicoDataConverter = require(`${root_dir}/app/js/nico-data-converter`);
     global.ToastWrapper = require(`${root_dir}/app/js/toast-wrapper`);
     global.Command = require(`${root_dir}/app/js/command`);

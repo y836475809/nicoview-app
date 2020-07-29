@@ -122,6 +122,20 @@
             return Menu.buildFromTemplate(menu_templete);
         };
 
+        const loadItems = async () => {
+            try {
+                const items = await IPCClient.request("history", "getData");
+                setData(items);
+            } catch (error) {
+                logger.error(error);
+                obs.trigger("main-page:toastr", {
+                    type: "error",
+                    title: "再生履歴の読み込み失敗",
+                    message: error.message,
+                });
+            }
+        };
+
         this.on("mount", async () => {
             grid_table.init(".history-grid");
             grid_table.setupResizer(".history-grid-container");
@@ -152,19 +166,12 @@
             grid_table.onContextMenu((e)=>{
                 context_menu.popup({window: remote.getCurrentWindow()});
             });           
-
-            try {
-                const items = await IPCClient.request("history", "getData");
-                setData(items);
-            } catch (error) {
-                logger.error(error);
-                obs.trigger("main-page:toastr", {
-                    type: "error",
-                    title: "再生履歴の読み込み失敗",
-                    message: error.message,
-                });
-                // grid_table.setData([]); 
-            }
+            
+            await loadItems();
+        });
+        
+        obs.on("play-history-page:reload-items", async ()=>{
+            await loadItems();
         });
 
         ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{

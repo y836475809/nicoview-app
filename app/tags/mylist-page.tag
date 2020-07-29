@@ -39,11 +39,14 @@
             return `[${creator}] ${title}`;
         };
 
-        this.on("mount", async () => {
-            // TODO error対応
+        const loadItems = async () => {
             const name = this.name;
             this.items = await IPCClient.request("bookmark", "getData", { name });
             this.obs_listview.trigger("loadData", { items:this.items });
+        };
+
+        this.on("mount", async () => {
+            await loadItems();
         });
 
         this.obs_listview.on("changed", async (args) => {
@@ -100,6 +103,10 @@
                 return;
             }
             this.obs_listview.trigger("select-item-by-index", { index });
+        });
+
+        obs.on("mylist-page:sidebar:reload-items", async () => {
+            await loadItems();
         });
     </script>
 </mylist-sidebar>

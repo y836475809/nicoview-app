@@ -37,7 +37,7 @@ class TestCommentNumLimit extends CommentNumLimit{
     }
 }
 
-test("comments sort", t => {
+test("comments sort by post date ", t => {
     const time = 30;
     const comments = mkComments(time);
 
@@ -45,6 +45,24 @@ test("comments sort", t => {
     cnl._sortDescByPostDate(comments);
     const last = comments[0].date;
     t.is(last, (time-1)*1000);
+});
+
+test("comments sort by vpos", t => {
+    const comments = [
+        { no: 2, vpos: 10 },
+        { no: 1, vpos: 10 },
+        { no: 4, vpos: 1 },
+        { no: 3, vpos: 1 },
+    ];
+
+    const cnl = new CommentNumLimit();
+    cnl._sortByVPos(comments);
+    t.deepEqual([
+        { no: 3, vpos: 1 },
+        { no: 4, vpos: 1 },
+        { no: 1, vpos: 10 },
+        { no: 2, vpos: 10 },
+    ], comments);
 });
 
 test("comments max num", t => {

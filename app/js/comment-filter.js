@@ -137,12 +137,16 @@ class CommentNumLimit {
 
     /**
      * コメントをvposで昇順ソート
+     * vposが同じの場合、noで昇順ソート
      * @param {Array} comments 
      */
     _sortByVPos(comments){
         comments.sort((a, b) => {
             if (a.vpos < b.vpos) return -1;
             if (a.vpos > b.vpos) return 1;
+
+            if (a.no < b.no) return -1;
+            if (a.no > b.no) return 1;    
             return 0;
         });
     }

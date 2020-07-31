@@ -93,7 +93,7 @@ test("flow comments", t => {
                 color: "#FFFFFF"
             });
         t.is(elm.id, "flow-comment-id0");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "flow"]);
         t.is(left, -400);
         t.is(delay, 0.1);
@@ -111,7 +111,7 @@ test("flow comments", t => {
                 color: "#FF0000"
             });
         t.is(elm.id, "flow-comment-id1");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "flow"]);
         t.is(left, -400);
         t.is(delay, 0.2);
@@ -167,7 +167,7 @@ test("fixed comments no option", t => {
                 color: "#FFFFFF"
             });
         t.is(elm.id, "fixed-ue-comment-id0");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.1);
         t.is(duration, 4);
@@ -185,7 +185,7 @@ test("fixed comments no option", t => {
                 color: "#FF0000"
             });
         t.is(elm.id, "fixed-ue-comment-id1");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.2);
         t.is(duration, 4);
@@ -204,7 +204,7 @@ test("fixed comments no option", t => {
                 color: "#FFFFFF"
             });
         t.is(elm.id, "fixed-shita-comment-id0");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.1);
         t.is(duration, 4);
@@ -222,7 +222,7 @@ test("fixed comments no option", t => {
                 color: "#FF0000"
             });
         t.is(elm.id, "fixed-shita-comment-id1");
-        t.is(elm.innerText, "text");
+        t.is(elm.innerHTML, "text");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.2);
         t.is(duration, 4);
@@ -267,7 +267,7 @@ test("nico scritp @number", t => {
     {  
         const { elm, left, delay } = ctl.flow_params[0];
         t.is(elm.id, "flow-comment-id0");
-        t.is(elm.innerText, "text-owner3");
+        t.is(elm.innerHTML, "text-owner3");
         t.deepEqual(elm.classes, ["comment", "flow"]);
         t.is(left, -400);
         t.is(delay, 0.3);
@@ -277,7 +277,7 @@ test("nico scritp @number", t => {
     {
         const { elm, delay, duration } = ctl.fixed_params[0];
         t.is(elm.id, "fixed-ue-comment-id0");
-        t.is(elm.innerText, "text-owner1");
+        t.is(elm.innerHTML, "text-owner1");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.1);
         t.is(duration, 5);
@@ -285,7 +285,7 @@ test("nico scritp @number", t => {
     {
         const { elm, delay, duration } = ctl.fixed_params[1];
         t.is(elm.id, "fixed-ue-comment-id1");
-        t.is(elm.innerText, "text-a");
+        t.is(elm.innerHTML, "text-a");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.3);
         t.is(duration, 4);
@@ -293,7 +293,7 @@ test("nico scritp @number", t => {
     {
         const { elm, delay, duration } = ctl.fixed_params[2];
         t.is(elm.id, "fixed-shita-comment-id0");
-        t.is(elm.innerText, "text-owner2");
+        t.is(elm.innerHTML, "text-owner2");
         t.deepEqual(elm.classes, ["comment", "fixed"]);
         t.is(delay, 0.2);
         t.is(duration, 10);

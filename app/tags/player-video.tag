@@ -12,6 +12,7 @@
             height: 100%;         
         }
         .comment{
+            font-family: 'MS PGothic','ＭＳ Ｐゴシック',monapo,Verdana,sans-serif;
             float:left;
             font-weight: bold;
             text-shadow: 1px 1px 0px black, 1px 1px 0px black;

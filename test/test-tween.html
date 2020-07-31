@@ -25,6 +25,8 @@
             color: #000000;
             border: 1px solid #FF6600;
             width: 60px;
+            font-weight: bold;
+            font-family: 'MS PGothic','ＭＳ Ｐゴシック',monapo,Verdana,sans-serif;
         }
 
         .test-btn{
@@ -49,6 +51,7 @@
             <button class="test-btn" type=button onclick="createFlowTL();">flow</button>
             <button class="test-btn" type=button onclick="createFixedTL();">fix</button>
             <button class="test-btn" type=button onclick="createMixedTL();">flow, fix</button>
+            <button class="test-btn" type=button onclick="createFixedAATL();">AA</button>
         </div>
         <div>   
             <button class="test-btn" type=button onclick="resume();">resume</button>
@@ -130,6 +133,21 @@
         // const fixed_commnets = randomfixedComments(4000, 500);
         const mixed = flow_commnets.concat(fixed_commnets);
         createTL(mixed);
+    };
+
+    const createFixedAATL = ()=>{
+        const commnets = [
+            { no: 1, vpos: 100, mail:"184 ue red small", content: 
+`┏━━━┓　 　 　 　 　 　 　 　 ┏┓┏━━━┓
+┗━━┓┃　 　 　 　 　 　 　 　 ┃┃┃┏━┓┃` },
+            { no: 2, vpos: 100, mail:"184 ue red small", content: 
+`　 　 　 ┃┃┏━━┓　 　 　 　 ┃┃┗┛┏┛┃
+　 　 ┏┛┃┗┓┃┃┏┳┳┓┗┛　 　 ┃┏┛`},
+            { no: 3, vpos: 100, mail:"184 ue red small", content: 
+`　 ┏┛┏┛　 ┃┣┛┗┻┫┃┏┓　 　 ┣┫　 ‌
+　 ┗━┛　 　 ┗┛　 　 　 ┗┛┗┛　 　 ┗┛　 `},
+        ];
+        createTL(commnets);
     };
 
     const resume = ()=>{

@@ -400,15 +400,22 @@ class CommentTimeLine {
     }
 
     _getTextWidth(text, font_size){
-        this.ctx.font = font_size + "px Verdana, Geneva, Tahoma, sans-serif";
-        return this.ctx.measureText(text).width;
+        this.ctx.font = font_size + "px 'MS PGothic','ＭＳ Ｐゴシック',monapo,Verdana,sans-serif";
+
+        // 改行で分割して一番長いものを採用
+        const lens = text.split(/\r\n|\n/).map(ar=>{
+            return this.ctx.measureText(ar).width;
+        });
+        return Math.max(...lens);
     }
 
     _createElm(comment, row_index, fragment){
         const elm = document.createElement("div");
         elm.classList.add("comment");
 
-        elm.innerText = comment.content;
+        elm.innerHTML = comment.content
+            .replace(/\x20/g,"&nbsp;")
+            .replace(/\r\n|\n/g, "<br>");
 
         elm.style.display = "none";
         elm.style.whiteSpace = "nowrap";

@@ -163,6 +163,9 @@ class CommentOptionParser {
         if(type!==null){
             return type[0].trim();
         }
+        if(mail=="ue" || mail=="naka" || mail=="shita"){
+            return mail;
+        }
         return null;
     }
 
@@ -174,6 +177,9 @@ class CommentOptionParser {
         const size = mail.match(/^big\s|\sbig\s|\sbig$|^middle\s|\smiddle\s|\smiddle$|^small\s|\ssmall\s|\ssmall$/gi);
         if(size!==null){
             return size[0].trim();
+        }
+        if(mail=="big" || mail=="middle" || mail=="small"){
+            return mail;
         }
         return null;
     }

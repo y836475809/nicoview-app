@@ -4,7 +4,47 @@ const { CommentOptionParser } = require("../app/js/comment-timeline");
 const user_id = "a";
 const owner_id = "owner";
 
-test("comment option parser naka ue shita big middle small", (t) => {
+test("comment option parser type", (t) => {
+    const cop = new CommentOptionParser();
+
+    t.is(null, cop._getType("middle white"));
+
+    t.is("naka", cop._getType("naka middle white"));
+    t.is("naka", cop._getType("middle naka white"));
+    t.is("naka", cop._getType("middle white naka"));
+
+    t.is("shita", cop._getType("shita middle white"));
+    t.is("shita", cop._getType("middle shita white"));
+    t.is("shita", cop._getType("middle white shita"));
+
+    t.is("ue", cop._getType("ue middle white"));
+    t.is("ue", cop._getType("middle ue white"));
+    t.is("ue", cop._getType("middle white ue"));
+
+    t.is("naka", cop._getType("naka middle blue"));
+    t.is("naka", cop._getType("middle naka blue"));
+    t.is("naka", cop._getType("middle blue naka"));
+});
+
+test("comment option parser font size", (t) => {
+    const cop = new CommentOptionParser();
+
+    t.is(null, cop._getFontSize("naka white"));
+
+    t.is("middle", cop._getFontSize("middle naka white"));
+    t.is("middle", cop._getFontSize("naka middle white"));
+    t.is("middle", cop._getFontSize("naka white middle"));
+
+    t.is("big", cop._getFontSize("big naka white"));
+    t.is("big", cop._getFontSize("naka big white"));
+    t.is("big", cop._getFontSize("naka white big"));
+
+    t.is("small", cop._getFontSize("small naka white"));
+    t.is("small", cop._getFontSize("naka small white"));
+    t.is("small", cop._getFontSize("naka white small"));
+});
+
+test("comment option parser", (t) => {
     const cop = new CommentOptionParser();
 
     t.deepEqual(cop.parse("naka middle white", user_id), {
@@ -23,6 +63,12 @@ test("comment option parser naka ue shita big middle small", (t) => {
         type: "shita",
         font_size:"small",
         color: "#FFFFFF"
+    });
+
+    t.deepEqual(cop.parse("naka small blue", user_id), {
+        type: "naka",
+        font_size:"small",
+        color: "#0000FF"
     });
 });
 

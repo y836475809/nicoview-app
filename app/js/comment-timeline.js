@@ -154,6 +154,35 @@ class CommentOptionParser {
         return null;
     }
 
+    /**
+     * 
+     * @param {String} mail 
+     */
+    _getType(mail){
+        const type = mail.match(/^ue\s|\sue\s|\sue$|^naka\s|\snaka\s|\snaka$|^shita\s|\sshita\s|\sshita$/gi);
+        if(type!==null){
+            return type[0].trim();
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param {String} mail 
+     */
+    _getFontSize(mail){
+        const size = mail.match(/^big\s|\sbig\s|\sbig$|^middle\s|\smiddle\s|\smiddle$|^small\s|\ssmall\s|\ssmall$/gi);
+        if(size!==null){
+            return size[0].trim();
+        }
+        return null;
+    }
+
+    /**
+     * 
+     * @param {String} mail 
+     * @param {String} user_id 
+     */
     parse(mail, user_id){
         const options = {
             type: "naka",
@@ -162,14 +191,14 @@ class CommentOptionParser {
         };
 
         if(mail){
-            const type = mail.match(/ue|shita/gi);
+            const type = this._getType(mail);
             if(type!==null){
-                options.type = type[0];
+                options.type = type;
             }
 
-            const size = mail.match(/big|small/gi);
+            const size = this._getFontSize(mail);
             if(size!==null){
-                options.font_size = size[0];
+                options.font_size = size;
             }
 
             if(user_id=="owner"){

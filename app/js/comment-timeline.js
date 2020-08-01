@@ -197,18 +197,20 @@ class CommentOptionParser {
         };
 
         if(mail){
-            const type = this._getType(mail);
+            const normalized_mail = mail.replace(/\u3000/g, "\x20");
+
+            const type = this._getType(normalized_mail);
             if(type!==null){
                 options.type = type;
             }
 
-            const size = this._getFontSize(mail);
+            const size = this._getFontSize(normalized_mail);
             if(size!==null){
                 options.font_size = size;
             }
 
             if(user_id=="owner"){
-                const duration = /\s*@\d+\s*/.exec(mail);
+                const duration = /\s*@\d+\s*/.exec(normalized_mail);
                 if(duration){
                     const sec = parseInt(duration[0].replace("@", ""));
                     Object.assign(options, { duration:sec*1000 });
@@ -216,20 +218,20 @@ class CommentOptionParser {
             }
 
             const p_color_code = this._getColorCode(
-                mail, this._p_color_map, this._p_color_regex);
+                normalized_mail, this._p_color_map, this._p_color_regex);
             if(p_color_code!==null){
                 options.color = p_color_code;
                 return options;
             }
 
             const u_color_code = this._getColorCode(
-                mail, this._u_color_map, this._u_color_regex);
+                normalized_mail, this._u_color_map, this._u_color_regex);
             if(u_color_code!==null){
                 options.color = u_color_code;
                 return options;
             }
 
-            const color_code = mail.match(/#[a-f0-9]{6}/ig);
+            const color_code = normalized_mail.match(/#[a-f0-9]{6}/ig);
             if(color_code!==null){
                 options.color = color_code[0];
                 return options;

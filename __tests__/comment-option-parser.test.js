@@ -72,6 +72,34 @@ test("comment option parser", (t) => {
     });
 });
 
+test("comment option parser zenkaku", (t) => {
+    const cop = new CommentOptionParser();
+
+    t.deepEqual(cop.parse("naka　middle　white", user_id), {
+        type: "naka",
+        font_size:"middle",
+        color: "#FFFFFF"
+    });
+
+    t.deepEqual(cop.parse("ue　big　white", user_id), {
+        type: "ue",
+        font_size:"big",
+        color: "#FFFFFF"
+    });
+
+    t.deepEqual(cop.parse("shita　small　white", user_id), {
+        type: "shita",
+        font_size:"small",
+        color: "#FFFFFF"
+    });
+
+    t.deepEqual(cop.parse("naka　small　blue", user_id), {
+        type: "naka",
+        font_size:"small",
+        color: "#0000FF"
+    });
+});
+
 test("comment option parser user color", (t) => {
     const cop = new CommentOptionParser();
 

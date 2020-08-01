@@ -55,7 +55,7 @@ test.beforeEach(t => {
     const parent = new McokElement("parent");
     const duration = 4;
     const row_num = 12;
-    t.context.ctl = new TestCommentTimeLine(parent, duration, row_num);
+    t.context.ctl = new TestCommentTimeLine(parent, duration, row_num, "");
 });
 
 test("flow comments", t => {

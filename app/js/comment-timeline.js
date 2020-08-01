@@ -210,11 +210,13 @@ class CommentTimeLine {
      * @param {HTMLElement} parent_elm 
      * @param {Number} duration_sec 
      * @param {Number} row_num 
+     * @param {String} comment_font_family 
      */
-    constructor(parent_elm, duration_sec, row_num, on_complete=()=>{}){
+    constructor(parent_elm, duration_sec, row_num, comment_font_family){
         this.parent_elm = parent_elm;
         this.duration_sec = duration_sec;
         this.row_num = row_num;
+        this.comment_font_family = comment_font_family;
         this.ctx = null;
         this.area_size = {
             height: parent_elm.clientHeight,
@@ -226,6 +228,10 @@ class CommentTimeLine {
         this._paused = true;
         
         this._ended = false;
+        this._on_complete = ()=>{};
+    }
+
+    onComplete(on_complete){
         this._on_complete = on_complete;
     }
 
@@ -400,8 +406,7 @@ class CommentTimeLine {
     }
 
     _getTextWidth(text, font_size){
-        this.ctx.font = font_size + "px 'MS PGothic','ＭＳ Ｐゴシック',monapo,Verdana,sans-serif";
-
+        this.ctx.font = `${font_size}px ${this.comment_font_family}`;
         // 改行で分割して一番長いものを採用
         const lens = text.split(/\r\n|\n/).map(ar=>{
             return this.ctx.measureText(ar).width;

@@ -12,7 +12,7 @@
             height: 100%;         
         }
         .comment{
-            font-family: 'MS PGothic','ＭＳ Ｐゴシック',monapo,Verdana,sans-serif;
+            font-family: var(--nico-comment-font-family);
             float:left;
             font-weight: bold;
             text-shadow: 1px 1px 0px black, 1px 1px 0px black;
@@ -37,8 +37,18 @@
         let comment_params = null;
         let comment_sync_id = null;
 
+        const getCommentFontFamily = () => {
+            let font_family = getComputedStyle(this.root).getPropertyValue("--nico-comment-font-family");
+            if(!font_family){
+                font_family = "Verdana,sans-serif";
+            }
+            logger.debug("コメントに使用するフォント: ", font_family);
+            return font_family;
+        };
+
         const createTimeLine = (comments)=>{
             const row_num = 12;
+            const comment_font_family = getCommentFontFamily();
             const  { duration_sec, fps } = comment_params;
             const parent = this.root.querySelector(".video-screen");
 
@@ -47,7 +57,8 @@
             if(comment_tl){
                 comment_tl.clear();
             }
-            comment_tl = new CommentTimeLine(parent, duration_sec, row_num, ()=>{
+            comment_tl = new CommentTimeLine(parent, duration_sec, row_num, comment_font_family);
+            comment_tl.onComplete(()=>{
                 if(video_elm.currentTime == video_elm.duration){
                     // 動画終了後にコメントが流れる場合はコメント完了後にpauseにする
                     obs.trigger("player-controls:set-state", "pause"); 

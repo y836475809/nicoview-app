@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
     <style type="text/css">
         html, body {
             height: 100%;
@@ -26,6 +27,7 @@
             color: #000000;
             border: 1px solid #FF6600;
             width: 60px;
+            font-family: var(--nico-comment-font-family);
         }
         .test-btn{
             width:80px;
@@ -52,7 +54,10 @@
     
     window.addEventListener("DOMContentLoaded", () => {
         const area_elm = document.getElementById("area");
-        commnet_tl = new CommentTimeLine(area_elm, duration_sec, 12);
+        const cm_style = getComputedStyle(document.documentElement);
+        const font_family = cm_style.getPropertyValue("--nico-comment-font-family");
+        console.log("nico script font_family=", font_family);
+        commnet_tl = new CommentTimeLine(area_elm, duration_sec, 12, font_family);
     });
 
     const default_comments = [

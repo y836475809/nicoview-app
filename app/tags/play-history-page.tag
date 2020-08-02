@@ -70,8 +70,7 @@
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
             {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
-            {id: "play_date", name: "再生日", sortable: true},
-            {id: "url", name: "url", sortable: true}
+            {id: "play_date", name: "再生日", sortable: true}
         ];
         const options = {
             rowHeight: 100,

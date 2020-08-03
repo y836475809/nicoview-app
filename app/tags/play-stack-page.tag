@@ -77,9 +77,12 @@
         <div class="stack-item center-v {item.state}" data-id={i} each={ item, i in items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
-                <div class="title" title={item.title} >
-                    {item.title}
-                </div> 
+                <div style="display:flex; flex-direction:column;">
+                    <div class="title" title={item.title} >
+                        {item.title}
+                    </div> 
+                    <div class="title">{getTime(item)}</div>
+                </div>
             </div>
             <div class="delete-button center-hv" title="削除"
                 onclick={onclickDelete.bind(this,i)}>
@@ -92,10 +95,16 @@
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
+        const { toTimeString } = window.TimeFormat;
 
         const obs = this.opts.obs;
         this.items = [];
         let item_duration = 300;
+
+        this.getTime = (item) => {
+            const time = item.time?item.time:0;
+            return toTimeString(time);
+        };
 
         this.on("mount", () => {
             const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
@@ -126,7 +135,8 @@
                 items: this.items.map(item=>{
                     return {
                         video_id: item.id,
-                        title: item.title
+                        title: item.title,
+                        time: item.time?item.time:0
                     };
                 })
             });
@@ -135,7 +145,7 @@
         this.onclickItem = (item, e) => {
             ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                 video_id: item.id,
-                time: 0,
+                time: item.time?item.time:0,
                 online: false
             });
         };

@@ -57,6 +57,7 @@
         const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
+        const { toTimeString } = window.TimeFormat;
         
         const obs = this.opts.obs; 
         this.obs_open_video_form = riot.observable();
@@ -64,6 +65,14 @@
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {
                 obs.trigger("player-main-page:get-play-data-callback", (args)=>{
+                    resolve(args);
+                });
+            });
+        };
+
+        const getCurrentPlayTime = async () => {
+            return await new Promise((resolve, reject) => {
+                obs.trigger("player-video:get-current-time-callback", (args)=>{
                     resolve(args);
                 });
             });
@@ -113,14 +122,16 @@
                         });
                     }
                 },
-                { label: "後で見る", click() {
+                { label: "後で見る", async click() {
                     const { video_id, title, thumbnailURL } = play_data;
+                    const time = await getCurrentPlayTime();
                     obs.trigger("player-main-page:add-stack-items", 
                         {
                             items:[{
                                 id: video_id,
                                 title: title, 
-                                thumb_img:thumbnailURL
+                                thumb_img:thumbnailURL,
+                                time: time
                             }]
                         });
                 }},
@@ -179,12 +190,13 @@
         const createVideoItemsContextMenu = async () => {
             const createMenuItems = (items) => {
                 return items.map(item=>{
-                    const { video_id, title } = item;
+                    const { video_id, title, time } = item;
+                    const menu_title = `${title} ${time?toTimeString(time):""}`;
                     return { 
-                        label: title, click() {
+                        label: menu_title, click() {
                             ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
                                 video_id: video_id,
-                                time: 0,
+                                time: time?time:0,
                                 online: false
                             });
                         }

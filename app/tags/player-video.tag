@@ -176,7 +176,7 @@
 
                 const { time } = play_data.state;
                 if(time>0){
-                    seek(time);
+                    video_elm.currentTime = time;
                 }
             });
             video_elm.addEventListener("play", () => {

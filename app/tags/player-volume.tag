@@ -66,8 +66,6 @@
             let slider = this.root.querySelector("div.slider");   
             const volume = await IPCClient.request("config", "get", { key:"player.volume", value:0.5 });
             picker.style.left = volume * slider.clientWidth - 5 + "px";
-
-            obs.trigger("player-video:volume-changed", volume); 
         });
     </script>
 </player-volume>

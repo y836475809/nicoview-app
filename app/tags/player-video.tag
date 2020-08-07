@@ -161,6 +161,8 @@
             
             video_elm = this.root.querySelector(".video-screen > video");
 
+            video_elm.volume = await IPCClient.request("config", "get", { key:"player.volume", value:0.5 });
+
             video_elm.addEventListener("loadedmetadata", (event) => {
                 const video_size = {
                     width: event.target.videoWidth,

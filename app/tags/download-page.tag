@@ -145,11 +145,7 @@
             await onChangeDownloadItem(); 
         };
 
-        const deleteDownloadItems = async (items) => {
-            const video_ids = items.map(item => {
-                return item.id;
-            });
-
+        const deleteDownloadItems = async (video_ids) => {
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){
                     cancelDownload();
@@ -191,7 +187,10 @@
                         return;
                     }
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    await deleteDownloadItems(items);
+                    const video_ids = items.map(value => {
+                        return value.id;
+                    });
+                    await deleteDownloadItems(video_ids);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);

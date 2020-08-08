@@ -145,11 +145,7 @@
             await onChangeDownloadItem(); 
         };
 
-        const deleteDownloadItems = async (items) => {
-            const video_ids = items.map(item => {
-                return item.id;
-            });
-
+        const deleteDownloadItems = async (video_ids) => {
             if(nico_down!=null){
                 if(video_ids.includes(nico_down.video_id)){
                     cancelDownload();

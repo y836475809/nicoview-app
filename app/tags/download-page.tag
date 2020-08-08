@@ -187,7 +187,10 @@
                         return;
                     }
                     const items = grid_table_dl.grid_table.getSelectedDatas();
-                    await deleteDownloadItems(items);
+                    const video_ids = items.map(value => {
+                        return value.id;
+                    });
+                    await deleteDownloadItems(video_ids);
                 }}
             ];
             return Menu.buildFromTemplate(menu_templete);

@@ -212,6 +212,7 @@ const popupInputContextMenu = (bwin, props) => {
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config_ipc_server.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
+    state.title = `${app.name} ${app.getVersion()}`;
     state.webPreferences =  {
         nodeIntegration: false,
         contextIsolation: false,

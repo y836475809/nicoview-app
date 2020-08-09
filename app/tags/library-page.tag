@@ -419,13 +419,13 @@
             this.obs_modal_dialog.trigger("close");
             
             if(error_items.length > 0){
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: `${error_items.length}個が更新に失敗しました`,
-                    message: error_items.map(item => item.title).join("\n"),
+                    message: "詳細はログを参照",
                 });
             }else{
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "info",
                     title: "",
                     message: `更新完了(${cur_update}/${items.length})`,
@@ -492,13 +492,13 @@
             this.obs_modal_dialog.trigger("close");
 
             if(error_items.length > 0){
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: `${error_items.length}個がNNDD形式への変換に失敗しました`,
-                    message: error_items.map(item => item.title).join("\n"),
+                    message: "詳細はログを参照",
                 });
             }else{
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "info",
                     title: "",
                     message: `NNDD形式への変換完了(${cur_update}/${items.length})`,
@@ -722,7 +722,7 @@
                 await IPCClient.request("library", "load", {data_dir});
             } catch (error) {
                 logger.error(error);
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: "ライブラリの読み込み失敗",
                     message: error.message,

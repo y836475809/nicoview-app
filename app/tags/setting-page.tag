@@ -449,10 +449,10 @@
             this.obs_msg_dialog.trigger("close");
 
             if(error_files.length>0){
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: `${error_files.length}個がインポートに失敗しました`,
-                    message: error_files.join("\n"),
+                    message: "詳細はログを参照",
                 });
             } 
         };

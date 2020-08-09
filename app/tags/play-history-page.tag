@@ -127,7 +127,7 @@
                 setData(items);
             } catch (error) {
                 logger.error(error);
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: "再生履歴の読み込み失敗",
                     message: error.message,

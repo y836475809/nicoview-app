@@ -170,10 +170,10 @@ const applyCSS = (win) => {
         win.webContents.insertCSS(css);
     } catch (error) {
         logger.error(error);
-        win.webContents.send(IPC_CHANNEL.MAIN_TOASTR, {
+        dialog.showMessageBoxSync({
             type: "error",
-            title: "CSSの適用に失敗",
-            message: error.message,
+            buttons: ["OK"],
+            message: `CSSの適用に失敗: ${error.message}`
         });
     }
 };
@@ -376,6 +376,16 @@ app.on("ready", async ()=>{
 
     const log_level = config_ipc_server.get({ key: "log.level", value:"info"});
     setLogLevel(log_level);
+
+    ipcMain.on(IPC_CHANNEL.SHOW_MESSAGE, (event, args) => {
+        const { type, title, message } = args;
+        dialog.showMessageBoxSync({
+            type: type,
+            title: title,
+            buttons: ["OK"],
+            message: message
+        });
+    });
 
     ipcMain.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
         await createPlayerWindow();

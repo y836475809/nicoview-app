@@ -490,7 +490,7 @@
                 comment_filter.ng_comment.load();
             } catch (error) {
                 logger.error("player main load ng comment", error);
-                obs.trigger("player-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: "NGコメントリストの読み込み失敗",
                     message: error.message,

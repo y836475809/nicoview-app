@@ -26,9 +26,10 @@ const IPC_CHANNEL =  Object.freeze({
     GET_APP_CACHE: "ipc-get-app-cache",
     CLEAR_APP_CACHE: "ipc-clear-app-cache",
 
-    MAIN_TOASTR: "ipc-main-toastr",
-
     MAIN_HTML_LOADED: "ipc-main-html-loaded",
+
+    SHOW_MESSAGE: "ipc-show-messgae",
+
 });
 
 module.exports = {

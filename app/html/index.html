@@ -39,30 +39,17 @@
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
         var { logger } = window.logger; // eslint-disable-line
-        let toast_wrapper = null;
 
         const obs = riot.observable();
 
         IPCClient.request("config", "set", 
             { key:"download.wait_time", value:10 }).then();
 
-        obs.on("main-page:toastr", (args) => {
-            const { type, title, message } = args;
-            toast_wrapper[type](title, message);
-        });
-
-        ipcRenderer.on(IPC_CHANNEL.MAIN_TOASTR, (event, args)=>{
-            const { type, title, message } = args;
-            toast_wrapper[type](title, message);
-        });
-
         ipcRenderer.on(IPC_CHANNEL.MAIN_HTML_LOADED, (event)=>{
             riot.mount("main-page", {obs});
         });
 
         window.onload = () => {
-            const { ToastWrapper } = window.ToastWrapper;
-            toast_wrapper = new ToastWrapper();
             window.document.title = `${remote.app.name} ${remote.app.getVersion()}`;
         };
 

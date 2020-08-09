@@ -62,7 +62,8 @@
     <script>
         /* globals riot logger */
         const EventEmitter = window.EventEmitter;
-        const { remote } = window.electron;
+        const { remote, ipcRenderer } = window.electron;
+        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
@@ -365,7 +366,7 @@
                 grid_table_dl.setData(items);
             } catch (error) {
                 logger.error("download item load error: ", error);
-                obs.trigger("main-page:toastr", {
+                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
                     type: "error",
                     title: "ダウンロードリストの読み込み失敗",
                     message: error.message,

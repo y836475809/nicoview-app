@@ -58,6 +58,5 @@ window.addEventListener("load", () => {
     global.ImportLibrary = require(`${root_dir}/app/js/import-library`);
     global.ImportNNDDData = require(`${root_dir}/app/js/import-nndd-data`);
     global.NicoDataConverter = require(`${root_dir}/app/js/nico-data-converter`);
-    global.ToastWrapper = require(`${root_dir}/app/js/toast-wrapper`);
     global.Command = require(`${root_dir}/app/js/command`);
 });

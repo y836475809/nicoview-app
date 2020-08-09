@@ -12,7 +12,6 @@
             width: var(--page-width);
             min-height: 80px;
             max-height: calc(100vh 
-                - var(--window-titlebar-height)
                 - var(--right-sidebar-page-top) - 30px);
             overflow-x: hidden;
         }

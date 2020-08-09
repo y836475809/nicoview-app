@@ -100,6 +100,13 @@
             return true;
         };
 
+        const resizeVideo = (org_size) => {
+            const elm = this.root.querySelector(".video-container");
+            const dw = org_size.width - elm.offsetWidth;
+            const dh = org_size.height - elm.offsetHeight;
+            window.resizeBy(dw, dh);
+        };
+
         const createContextMenu = async (self) => {
             const play_data = await getPlayData();
 
@@ -177,6 +184,25 @@
                         });
                     }
                 },
+                { type: "separator" },
+                {
+                    label: "動画のサイズに変更",
+                    click: () => {
+                        obs.trigger("player-video:get-video-size-callback",(args)=>{
+                            const org_size = args;
+                            resizeVideo(org_size);
+                        });
+                    }
+                },
+                { type: "separator" },
+                {
+                    label: "ヘルプ",
+                    submenu: [
+                        { role: "reload" },
+                        { role: "forcereload" },
+                        { role: "toggledevtools" },
+                    ]
+                } 
             ];
             
             menu_items.forEach(menu_item => {
@@ -250,14 +276,6 @@
                 popupContextMenu(context_menu);
             }
         };
-
-        obs.on("player-page:get-video-size-callback", (cb) => { 
-            const elm = this.root.querySelector(".video-container");
-            cb({ 
-                width: elm.offsetWidth,
-                height: elm.offsetHeight 
-            });
-        });
 
         this.onkeyupTogglePlay = (e) => {
             if (e.keyCode === 32) {

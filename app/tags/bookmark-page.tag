@@ -7,7 +7,6 @@
         .sidebar {
             width: var(--page-width);
             max-height: calc(100vh 
-                - var(--window-titlebar-height) 
                 - var(--right-sidebar-page-top) - 30px);
         }
 

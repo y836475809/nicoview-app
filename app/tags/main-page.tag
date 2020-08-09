@@ -17,7 +17,7 @@
 
         .page-container.left > * {
             position: absolute;
-            height: calc(100% - var(--window-titlebar-height));
+            height: 100%;
             width: calc(100% - var(--main-sidebar-width) * 2); 
             overflow: hidden;
             padding: var(--margin);
@@ -25,9 +25,8 @@
         }
         .page-container.right > * {
             position: absolute;
-            top: calc(var(--window-titlebar-height) + var(--right-sidebar-page-top));
+            top: var(--right-sidebar-page-top);
             right: calc(var(--main-sidebar-width) + var(--margin));
-            /* max-height: calc(100% - var(--window-titlebar-height) - var(--right-sidebar-page-top) - 8px); */
             overflow-x: hidden; 
             overflow-y: hidden; 
             padding: var(--margin);
@@ -303,47 +302,19 @@
             toggleRightSidebarClass(border_elm, "select-button-border", ".button-border");
         };
 
-        const createMenu = (self) => {
-            const menu_templete = [
-                { 
-                    label: "動画IDを指定して再生", 
-                    click: () => {
-                        self.obs_open_video_form.trigger("show");
-                    }
-                }, 
-                { label: "ログ",
-                    submenu: [
-                        { label: "ログファイルを開く", click() {
-                            shell.openExternal(logger.getPath());
-                        }},
-                        { label: "ログの場所を開く", click() {
-                            shell.showItemInFolder(logger.getPath());
-                        }}
-                    ]
-                },                
-                { label: "ヘルプ",  
-                    submenu: [
-                        { role: "reload" },
-                        { role: "forcereload" },
-                        { role: "toggledevtools" },
-                    ]
-                },
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         this.on("mount", async () => {
             select_page("library");
             hideRightPage();
 
             await updateDownloadBadge();
-
-            const menu = createMenu(this);
-            this.obs.trigger("main-window-titlebar:set-menu", {menu});
         });
 
         this.obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
+        });  
+
+        ipcRenderer.on("open-video-form", ()=>{
+            this.obs_open_video_form.trigger("show");
         });  
 
         ipcRenderer.on(IPC_CHANNEL.SEARCH_TAG, (event, args)=>{

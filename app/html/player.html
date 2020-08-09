@@ -15,7 +15,6 @@
 </head>
 
 <body>
-    <window-titlebar></window-titlebar>
     <player-main-page></player-main-page>
 </body>
 <script src="../../node_modules/riot/riot+compiler.min.js"></script>
@@ -34,7 +33,6 @@
 <script type="riot/tag" src="../tags/setting-display-comment.tag"></script>
 <script type="riot/tag" src="../tags/setting-player-contextmenu.tag"></script>
 <script type="riot/tag" src="../tags/open-video-form.tag"></script>
-<script type="riot/tag" src="../tags/window-titlebar.tag"></script>
 
 <script>
     /* globals riot */
@@ -55,10 +53,6 @@
         const { ToastWrapper } = window.ToastWrapper;
         toast_wrapper = new ToastWrapper();
     };
-
-    riot.mount("window-titlebar", {
-        obs:obs, title:"", window_name:"player"
-    });
 
     ipcRenderer.on(IPC_CHANNEL.MAIN_TOASTR, (event, args)=>{
         const { type, title, message } = args;

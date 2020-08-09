@@ -164,11 +164,6 @@
             video_elm.volume = await IPCClient.request("config", "get", { key:"player.volume", value:0.5 });
 
             video_elm.addEventListener("loadedmetadata", (event) => {
-                const video_size = {
-                    width: event.target.videoWidth,
-                    height: event.target.videoHeight
-                };
-                obs.trigger("player-main-page:metadata-loaded", video_size);
                 obs.trigger("player-seek:reload", video_elm.duration);
             });
 
@@ -334,6 +329,13 @@
 
         obs.on("player-video:get-current-time-callback", (cb) => { 
             cb(video_elm.currentTime);
+        });
+
+        obs.on("player-video:get-video-size-callback", (cb) => {
+            cb({
+                width: video_elm.videoWidth,
+                height: video_elm.videoHeight
+            });
         });
     </script>
 </player-video>

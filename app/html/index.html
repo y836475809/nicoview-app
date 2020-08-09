@@ -15,7 +15,6 @@
     </head>
 
     <body>
-        <window-titlebar></window-titlebar>
         <main-page></main-page>
     </body>
     <script src="../../node_modules/riot/riot+compiler.min.js"></script>
@@ -34,7 +33,6 @@
     <script type="riot/tag" src="../tags/bookmark-page.tag"></script>
     <script type="riot/tag" src="../tags/play-stack-page.tag"></script>
     <script type="riot/tag" src="../tags/open-video-form.tag"></script>
-    <script type="riot/tag" src="../tags/window-titlebar.tag"></script>
     <script>
         /* globals riot */
         const { ipcRenderer, remote } = window.electron;
@@ -65,6 +63,7 @@
         window.onload = () => {
             const { ToastWrapper } = window.ToastWrapper;
             toast_wrapper = new ToastWrapper();
+            window.document.title = `${remote.app.name} ${remote.app.getVersion()}`;
         };
 
         if(process.env.NODE_ENV == "DEBUG"){
@@ -80,11 +79,5 @@
             IPCClient.request("config", "set", 
                 { key:"download.wait_time", value:1 }).then();
         }
-
-        riot.mount("window-titlebar", {
-            obs:obs, 
-            title:`${remote.app.name} ${remote.app.getVersion()}`, 
-            window_name:"main"
-        });
     </script>
 </html>

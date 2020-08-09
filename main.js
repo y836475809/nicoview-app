@@ -41,7 +41,6 @@ const player_html_path = startup_config.player_html_path;
 const preload_main_path = startup_config.preload_main_path;
 const preload_player_path = startup_config.preload_player_path;
 const config_fiiename = startup_config.config_fiiename;
-const window_frame = startup_config.window_frame;
 
 const is_debug = startup_config.debug;
 if(is_debug===true){
@@ -219,11 +218,41 @@ function createWindow() {
         preload: preload_main_path,
         spellcheck: false
     };
-    state.frame = window_frame;
     main_win = new BrowserWindow(state);
     if (state.maximized) {
         main_win.maximize();
     }
+
+    const main_menu = () => {
+        const menu_templete = [
+            { label: "ファイル",
+                submenu: [
+                    { label: "動画IDを指定して再生", click: () => {
+                        main_win.webContents.send("open-video-form");
+                    }}
+                ]
+            }, 
+            { label: "ログ",
+                submenu: [
+                    { label: "ログファイルを開く", click() {
+                        shell.openExternal(logger.getPath());
+                    }},
+                    { label: "ログの場所を開く", click() {
+                        shell.showItemInFolder(logger.getPath());
+                    }}
+                ]
+            },                
+            { label: "ヘルプ",  
+                submenu: [
+                    { role: "reload" },
+                    { role: "forcereload" },
+                    { role: "toggledevtools" },
+                ]
+            },
+        ];
+        return Menu.buildFromTemplate(menu_templete);
+    };
+    main_win.setMenu(main_menu());
 
     main_win.webContents.on("did-finish-load", async () => { 
         applyCSS(main_win);
@@ -622,8 +651,8 @@ const createPlayerWindow = () => {
             preload: preload_player_path,
             spellcheck: false
         };
-        state.frame = false;
         player_win = new BrowserWindow(state);
+        player_win.removeMenu();
         player_win.webContents.on("did-finish-load", async () => {
             applyCSS(player_win);
             player_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);

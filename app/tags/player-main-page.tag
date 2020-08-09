@@ -2,7 +2,7 @@
     <style scoped>
         :scope {
             display: flex;
-            height: calc(100% - var(--window-titlebar-height));
+            height: 100%;
             --right-width: 300px;
             overflow: hidden;
         }
@@ -58,7 +58,6 @@
         let nico_play = null;
         let play_data = null;
 
-        let org_video_size = null;
         let gutter = false;
         let gutter_move = false;
 
@@ -115,7 +114,6 @@
 
             const title = `${video.title}[${video.video_id}][${video.video_type}]`;
             document.title = title;
-            obs.trigger("player-window-titlebar:set-title", {title});
             obs.trigger("player-controls:set-state", "play"); 
             obs.trigger("player-video:set-play-data", { 
                 video_data: video_data,
@@ -254,7 +252,7 @@
                 online: online
             };
 
-            obs.trigger("player-window-titlebar:set-title", { title:video_id });
+            document.title = video_id;
 
             if(!video_item || online){
                 const is_saved = video_item !== null;
@@ -271,10 +269,6 @@
 
         obs.on("player-main-page:get-play-data-callback", (cb) => {
             cb(play_data);
-        });
-
-        obs.on("player-main-page:metadata-loaded", (args) => {
-            org_video_size = args;
         });
 
         obs.on("player-main-page:search-tag", (args) => {
@@ -421,16 +415,6 @@
             await toggleInfoview();
         });
 
-        const resizeVideo = (size) => { 
-            obs.trigger("player-page:get-video-size-callback", (args) => {
-                const { width, height } = args;
-
-                const dw = size.width - width;
-                const dh = size.height - height;
-                window.resizeBy(dw, dh);
-            });
-        };
-
         let stop_resize_event = false;
         const toggleInfoview = async () => {
             const pe = this.root.querySelector(".player-frame");
@@ -480,39 +464,6 @@
             }
         };
 
-        const menu_template = [
-            {   
-                label: "標準サイズに変更",
-                click: () => {
-                    resizeVideo(this.player_default_size);
-                }
-            },
-            {
-                label: "動画のサイズに変更",
-                click: () => {
-                    if(org_video_size){
-                        resizeVideo(org_video_size);
-                    }
-                }
-            },
-            { type: "separator" },
-            {
-                label: "動画情報の表示/非表示",
-                click: async () => {
-                    await toggleInfoview();
-                }
-            },
-            { type: "separator" },
-            {
-                label: "ヘルプ",
-                submenu: [
-                    { role: "reload" },
-                    { role: "forcereload" },
-                    { role: "toggledevtools" },
-                ]
-            }         
-        ];
-
         this.on("mount", async () => {
             const params = await IPCClient.request("config", "get", 
                 { 
@@ -545,9 +496,6 @@
                     message: error.message,
                 });
             }
-
-            const menu = Menu.buildFromTemplate(menu_template);
-            obs.trigger("player-window-titlebar:set-menu", {menu});
 
             ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);
         });   

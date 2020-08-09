@@ -455,9 +455,7 @@ class CommentTimeLine {
         const elm = document.createElement("div");
         elm.classList.add("comment");
 
-        elm.innerHTML = comment.content
-            .replace(/\x20/g,"&nbsp;")
-            .replace(/\r\n|\n/g, "<br>");
+        elm.innerText = comment.content;
 
         elm.style.display = "none";
         elm.style.whiteSpace = "nowrap";

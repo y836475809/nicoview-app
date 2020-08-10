@@ -303,7 +303,6 @@
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
-        const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
@@ -667,10 +666,6 @@
                 { type: "separator" },
                 { label: "動画をブックマーク", click() {
                     Command.addBookmarkItems(obs, items);
-                }},
-                { label: "ページをブックマーク", click() {
-                    const bk_item = BookMark.createSearchItem(nico_search_params);
-                    obs.trigger("bookmark-page:add-items", [bk_item]);
                 }},
             ];
             return Menu.buildFromTemplate(menu_templete);

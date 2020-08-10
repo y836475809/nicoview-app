@@ -53,7 +53,6 @@
         /* globals riot */
         const { remote, clipboard, ipcRenderer } = window.electron;
         const { Menu } = remote;
-        const { BookMark } = window.BookMark;   
         const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { IPCClient } = window.IPC;
@@ -115,8 +114,11 @@
                     id: "add-bookmark",
                     label: "ブックマーク", click() {
                         const { video_id, title } = play_data;
-                        const bk_item = BookMark.createVideoItem(title, video_id);
-                        obs.trigger("player-main-page:add-bookmark", bk_item);
+                        obs.trigger("player-main-page:add-bookmark", {
+                            title: title,
+                            id: video_id,
+                            time: 0
+                        });
                     }
                 },
                 { 
@@ -124,8 +126,11 @@
                     label: "ブックマーク(時間)", click() {
                         const { video_id, title } = play_data;
                         obs.trigger("player-video:get-current-time-callback", (current_time)=>{
-                            const bk_item = BookMark.createVideoItem(title, video_id, current_time);
-                            obs.trigger("player-main-page:add-bookmark", bk_item);                            
+                            obs.trigger("player-main-page:add-bookmark", {
+                                title: title,
+                                id: video_id,
+                                time: current_time
+                            });
                         });
                     }
                 },

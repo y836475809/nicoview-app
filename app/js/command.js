@@ -1,6 +1,5 @@
 const { ipcRenderer } = require("electron");
 const { IPC_CHANNEL } = require("./ipc-channel");
-const { BookMark } = require("./bookmark");
 
 class Command {
     static play(item, online) {
@@ -24,7 +23,11 @@ class Command {
 
     static addBookmarkItems(obs, items) {
         const bk_items = items.map(item => {
-            return BookMark.createVideoItem(item.title, item.id);
+            return {
+                title: item.title,
+                id: item.id,
+                time: 0
+            };
         });
         obs.trigger("bookmark-page:add-items", bk_items);
     }

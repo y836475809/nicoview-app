@@ -32,7 +32,6 @@
         /* globals riot */
         const {remote, ipcRenderer} = window.electron;
         const {Menu} = remote;
-        const { BookMark } = window.BookMark;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
@@ -42,8 +41,7 @@
         this.sb_button_icon = "fas fa-chevron-left";
         this.name = "bookmark";
         this.icon_class = {
-            video :  "fas fa-bookmark fa-lg",
-            search : "fas fa-search fa-lg"
+            video :  "fas fa-bookmark fa-lg"
         };
 
         const resizeHeight = (items) => {
@@ -77,15 +75,10 @@
                 return false;
             }
 
-            const item = items[0];
-
-            if(type == "play" && BookMark.isVideo(item)){
+            if(type == "play"){
                 return true;
             }
-            if(type == "go-to-library" && BookMark.isVideo(item)){
-                return true;
-            }
-            if(type == "go-to-search" && BookMark.isSearch(item)){
+            if(type == "go-to-library"){
                 return true;
             }
             if(type == "delete"){
@@ -142,17 +135,6 @@
                     }
                 },
                 { 
-                    id: "go-to-search",
-                    label: "ニコニコ検索のページへ移動", click() {
-                        if(items.length==0){
-                            return;
-                        }
-                        const cond = items[0].data;
-                        obs.trigger("main-page:select-page", "search");
-                        obs.trigger("search-page:search", cond);
-                    }
-                },
-                { 
                     id: "delete",
                     label: "削除", click() {
                         self.obs_listview.trigger("deleteList");
@@ -172,32 +154,31 @@
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {  
-            if(BookMark.isVideo(item)){
-                const { video_id, time } = item.data;
-                const online = false;
-                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                    video_id,
-                    time,
-                    online
-                });
-                return;
-            }
-            if(BookMark.isSearch(item)){
-                const cond = item.data;
-                obs.trigger("main-page:select-page", "search");
-                obs.trigger("search-page:search", cond);
-                return;
-            }
+            const { video_id, time } = item.data;
+            const online = false;
+            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                video_id,
+                time,
+                online
+            });
         });
         
         obs.on("bookmark-page:add-items", items => {
-            items.forEach(item => {
-                const time = item.data.time;
-                if (time > 0) {
-                    item.title = `${item.title} ${time_format.toTimeString(time)}`;
+            const bk_items = items.map(item => {
+                let title = item.title;
+                if (item.time > 0) {
+                    title = `${item.title} ${time_format.toTimeString(item.time)}`;
                 }
+                return {
+                    title: title,
+                    type: "video",
+                    data: {
+                        video_id: item.id,
+                        time: item.time
+                    }
+                };
             });
-            this.obs_listview.trigger("addList", { items });
+            this.obs_listview.trigger("addList", { items:bk_items });
         });
     </script>
 </bookmark-page>

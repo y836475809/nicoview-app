@@ -44,6 +44,5 @@ window.addEventListener("load", () => {
     global.NicoURL = require(`${root_dir}/app/js/nico-url`);
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
-    global.BookMark = require(`${root_dir}/app/js/bookmark`);
     global.SyncCommentScroll = require(`${root_dir}/app/js/sync-comment-scroll`);
 });

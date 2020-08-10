@@ -444,9 +444,10 @@ app.on("ready", async ()=>{
     ipcMain.handle(IPC_CHANNEL.SET_COOKIE, async (event, args) => {
         const cookies = args;
         try {
-            cookies.forEach(async cookie=>{
+            for (let index = 0; index < cookies.length; index++) {
+                const cookie = cookies[index];
                 await session.defaultSession.cookies.set(cookie);
-            });
+            }
             return "ok";
         } catch (error) {
             return "error";

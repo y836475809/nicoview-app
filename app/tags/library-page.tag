@@ -515,21 +515,27 @@
                 }
             });
             
+            const error_ids = [];
             for (let index = 0; index < video_ids.length; index++) {
                 if(cancel===true){
                     break;
                 }
                 const video_id = video_ids[index];
                 this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
-                const result = await ipcRenderer.invoke(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, { video_id });
+                const result = await ipc.invoke("library:deleteItem", { video_id });
+                // await wait(3000);
                 // await wait(3000);
                 // const result =  {
                 //     success : true,
                 //     error : null
                 // };  
-                if(result.success===false){
-                    await showMessageBox("error", `失敗\n${result.error.message}`);
+                if(!result.success){
+                    logger.error(result.error);
+                    error_ids.push(video_id);
                 }
+            }
+            if(error_ids.length > 0){
+                await showMessageBox("error", `${error_ids.length}個の削除に失敗\n詳細はログを参照`);
             }
             this.obs_modal_dialog.trigger("close");
         };

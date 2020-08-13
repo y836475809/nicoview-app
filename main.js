@@ -447,38 +447,139 @@ app.on("ready", async ()=>{
         }
     });
 
-    ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {
-        const { db_file_path } = args;
-        const data_dir = library.dataDir;
-
-        if(data_dir == ""){
-            return {
-                result : false,
-                error : new Error("データを保存するフォルダが設定されていない")
-            };
+    ipcMain.handle(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+        const { level } = args;
+        setLogLevel(level);
+        main_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
+        if(player_win !== null){
+            player_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
         }
-
-        try {
-            const { path_data_list, video_data_list } = await importNNDDDB(db_file_path);
-            library.setData(
-                path_data_list, 
-                video_data_list
-            ); 
-            await library.save();
-        } catch (error) {
-            return {
-                result : false,
-                error : error
-            };   
-        }
-
-        return {
-            result : true,
-            error : null
-        };
     });
 
-    ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, async (event, args) => {
+    ipcMain.handle(IPC_CHANNEL.RELOAD_CSS, async (event, args) => {
+        const { file_path } = args;
+        await loadCSS(file_path);
+
+        applyCSS(main_win);
+        main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
+
+        applyCSS(player_win);
+    });
+
+    ipcMain.handle(IPC_CHANNEL.GET_APP_CACHE, async (event, args) => {     
+        return await session.defaultSession.getCacheSize();
+    });
+
+    ipcMain.handle(IPC_CHANNEL.CLEAR_APP_CACHE, async (event, args) => {     
+        await session.defaultSession.clearCache();
+    });
+
+    await loadCSS(config.get("css_path", ""));
+
+    const user_agent = process.env["user_agent"];
+    session.defaultSession.setUserAgent(user_agent);
+
+    const hname = [
+        "bookmark",
+        "library-search",
+        "mylist",
+        "nico-search",
+        "download",
+        "nglist",
+    ];
+    hname.forEach(name=>{
+        ipcMain.handle(`${name}:getItems`, async (event, args) => {
+            if(!store.has(name)){
+                store.setItems(name, await loadJson(name, []));
+            }
+            return store.getItems(name);
+        });  
+        ipcMain.handle(`${name}:updateItems`, async (event, args) => {
+            const { items } = args;
+            store.setItems(name, items);
+            await saveJson(name, items);
+            if(name=="download"){
+                main_win.webContents.send("downloadItemUpdated");
+            }
+        });  
+    });
+
+    // download
+    ipcMain.handle("download:getIncompleteIDs", async (event, args) => {
+        const name = "download";
+        if(!store.has(name)){
+            store.setItems(name, await loadJson(name, []));
+        }
+        const items = store.getItems(name);
+        if(!items){
+            return [];
+        }
+        const ids = [];
+        items.forEach(item => {
+            if(item.state != 2){
+                ids.push(item.id);
+            } 
+        });
+        return ids;
+    });
+
+    // history
+    const history_max = 50;
+    const items = await loadJson("history", []);
+    history.setup(history_max);  
+    history.setData(items);
+    ipcMain.handle("history:getItems", (event, args) => {
+        return history.getData("history");
+    });
+    ipcMain.handle("history:updateItems", async (event, args) => {
+        const { items } = args;
+        history.setData(items);
+        await saveJson("history", items);
+    });
+    ipcMain.handle("history:addItem", async (event, args) => {
+        const { item } = args;
+        history.add(item);
+
+        const items = history.getData();
+        await saveJson("history", items);
+    }); 
+
+    // stack
+    ipcMain.handle("stack:getItems", async (event, args) => {
+        return store.getItems("stack");
+    });  
+    ipcMain.handle("stack:updateItems", (event, args) => {
+        const { items } = args;
+        store.setItems("stack", items);
+    }); 
+
+    // library
+    const data_dir = config.get("data_dir", "");
+    library.setup(data_dir);
+    ipcMain.handle("library:addItem", async (event, args) => {
+        const { item } = args;
+        await library.addItem(item);
+    });
+    ipcMain.handle("library:addDownloadItem", async (event, args) => {
+        const { download_item } = args;
+        await library.addDownloadedItem(download_item);
+    });
+    ipcMain.handle("library:load", async (event, args) => {
+        await library.load();
+    });
+    ipcMain.handle("library:has", (event, args) => {
+        const { video_id } = args;
+        return library.has(video_id);
+    });
+    ipcMain.handle("library:updateItemProps", async (event, args) => {
+        const { video_id, props } = args;
+        await library.update(video_id, props);
+    });
+    ipcMain.handle("library:getItem", (event, args) => {
+        const { video_id } = args;
+        return library.getItem(video_id);
+    });
+    ipcMain.handle("library:deleteItem", async (event, args) => {
         const { video_id } = args;
 
         const video_item = library.getItem(video_id);
@@ -527,135 +628,35 @@ app.on("ready", async ()=>{
             error:null
         };
     });
+    ipcMain.handle("library:import-nndd-db", async (event, args) => {
+        const { db_file_path } = args;
+        const data_dir = library.dataDir;
 
-    ipcMain.handle(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
-        const { level } = args;
-        setLogLevel(level);
-        main_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
-        if(player_win !== null){
-            player_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
+        if(data_dir == ""){
+            return {
+                result : false,
+                error : new Error("データを保存するフォルダが設定されていない")
+            };
         }
-    });
 
-    ipcMain.handle(IPC_CHANNEL.RELOAD_CSS, async (event, args) => {
-        const { file_path } = args;
-        await loadCSS(file_path);
-
-        applyCSS(main_win);
-        main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
-
-        applyCSS(player_win);
-    });
-
-    ipcMain.handle(IPC_CHANNEL.GET_APP_CACHE, async (event, args) => {     
-        return await session.defaultSession.getCacheSize();
-    });
-
-    ipcMain.handle(IPC_CHANNEL.CLEAR_APP_CACHE, async (event, args) => {     
-        await session.defaultSession.clearCache();
-    });
-
-    await loadCSS(config.get("css_path", ""));
-
-    const user_agent = process.env["user_agent"];
-    session.defaultSession.setUserAgent(user_agent);
-
-    const hname = [
-        "bookmark",
-        "library-search",
-        "mylist",
-        // "stack",
-        "nico-search",
-        "download",
-        "nglist",
-    ];
-    hname.forEach(name=>{
-        ipcMain.handle(`${name}:getItems`, async (event, args) => {
-            if(!store.has(name)){
-                store.setItems(name, await loadJson(name, []));
-            }
-            return store.getItems(name);
-        });  
-        ipcMain.handle(`${name}:updateItems`, async (event, args) => {
-            const { items } = args;
-            store.setItems(name, items);
-            await saveJson(name, items);
-            if(name=="download"){
-                main_win.webContents.send("downloadItemUpdated");
-            }
-        });  
-    });
-
-    ipcMain.handle("download:getIncompleteIDs", async (event, args) => {
-        const name = "download";
-        if(!store.has(name)){
-            store.setItems(name, await loadJson(name, []));
+        try {
+            const { path_data_list, video_data_list } = await importNNDDDB(db_file_path);
+            library.setData(
+                path_data_list, 
+                video_data_list
+            ); 
+            await library.save();
+        } catch (error) {
+            return {
+                result : false,
+                error : error
+            };   
         }
-        const items = store.getItems(name);
-        if(!items){
-            return [];
-        }
-        const ids = [];
-        items.forEach(item => {
-            if(item.state != 2){
-                ids.push(item.id);
-            } 
-        });
-        return ids;
-    });
 
-    const history_max = 50;
-    const items = await loadJson("history", []);
-    history.setup(history_max);  
-    history.setData(items);
-    ipcMain.handle("history:getItems", (event, args) => {
-        return history.getData("history");
-    });
-    ipcMain.handle("history:updateItems", async (event, args) => {
-        const { items } = args;
-        history.setData(items);
-        await saveJson("history", items);
-    });
-    ipcMain.handle("history:addItem", async (event, args) => {
-        const { item } = args;
-        history.add(item);
-
-        const items = history.getData();
-        await saveJson("history", items);
-    }); 
-
-    ipcMain.handle("stack:getItems", async (event, args) => {
-        return store.getItems("stack");
-    });  
-    ipcMain.handle("stack:updateItems", (event, args) => {
-        const { items } = args;
-        store.setItems("stack", items);
-    }); 
-
-    const data_dir = config.get("data_dir", "");
-    library.setup(data_dir);
-    ipcMain.handle("library:addItem", async (event, args) => {
-        const { item } = args;
-        await library.addItem(item);
-    });
-    ipcMain.handle("library:addDownloadItem", async (event, args) => {
-        const { download_item } = args;
-        await library.addDownloadedItem(download_item);
-    });
-    ipcMain.handle("library:load", async (event, args) => {
-        await library.load();
-    });
-    ipcMain.handle("library:has", (event, args) => {
-        const { video_id } = args;
-        return library.has(video_id);
-    });
-    ipcMain.handle("library:updateItemProps", async (event, args) => {
-        const { video_id, props } = args;
-        await library.update(video_id, props);
-    });
-    ipcMain.handle("library:getItem", (event, args) => {
-        const { video_id } = args;
-        return library.getItem(video_id);
+        return {
+            result : true,
+            error : null
+        };
     });
     library.on("libraryInitialized", ()=>{  
         main_win.webContents.send("libraryInitialized", {
@@ -672,6 +673,7 @@ app.on("ready", async ()=>{
         main_win.webContents.send("libraryItemDeleted", args);
     });
 
+    // config
     ipcMain.handle("config:get", (event, args) => {
         const { key, value } = args;
         return config.get(key, value);

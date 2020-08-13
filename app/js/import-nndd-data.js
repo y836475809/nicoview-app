@@ -1,9 +1,7 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
-const { ipcRenderer } = require("electron");
 const ipc = require("electron").ipcRenderer;
-const { IPC_CHANNEL } = require("./ipc-channel");
 
 const import_items = {
     "librarydb": { title: "データベース", filename:"library.db"},
@@ -38,8 +36,7 @@ class ImportNNDDData {
 
     async librarydb(filename){
         const db_file_path = path.join(this.nndd_system_dir, filename);
-        const ret = await ipcRenderer.invoke(
-            IPC_CHANNEL.IMPORT_NNDD_DB, { db_file_path });
+        const ret = await ipc.invoke("library:import-nndd-db", { db_file_path });
         if(!ret.result){
             throw ret.error;
         }

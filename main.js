@@ -9,7 +9,6 @@ const { Library } = require("./app/js/library");
 const { History } = require("./app/js/history");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
-const { JsonStore } = require("./app/js/json-store");
 const { logger } = require("./app/js/logger");
 const { StartupConfig } = require("./app/start-up-config");
 const { CSSLoader } = require("./app/js/css-loader");
@@ -92,8 +91,8 @@ const loadJson = async (name, default_value) => {
     }
 
     try {
-        const json_store = new JsonStore(file_path);
-        return json_store.load();
+        const data = await fsPromises.readFile(file_path, "utf-8");
+        return JSON.parse(data);
     } catch (error) {
         logger.error(`loadJson ${name}`, error);
 
@@ -110,8 +109,8 @@ const saveJson = async (name, items) => {
     const data_dir = await config.get("data_dir", "");
     const file_path = path.join(data_dir, `${name}.json`);
     try {
-        const json_store = new JsonStore(file_path);
-        json_store.save(items);
+        const json = JSON.stringify(items, null, "  ");
+        await fsPromises.writeFile(file_path, json, "utf-8");
     } catch (error) {
         logger.error(`saveJson ${name}`, error);
 
@@ -121,7 +120,6 @@ const saveJson = async (name, items) => {
             message: `${file_path}の保存に失敗\n${error.message}`
         });
     }
-
 };
 
 const getWindowState = (w) => {

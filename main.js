@@ -4,7 +4,7 @@ const fsPromises = fs.promises;
 const path = require("path");
 
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
-const { ConfigIPCServer } = require("./app/js/ipc-config");
+const { Config } = require("./app/js/config");
 const { Library } = require("./app/js/library");
 const { History } = require("./app/js/history");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
@@ -17,7 +17,7 @@ const { Store } = require("./app/js/store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
-const config_ipc_server = new ConfigIPCServer();
+const config = new Config();
 const library = new Library();
 const history = new History();
 const css_loader = new CSSLoader();
@@ -83,7 +83,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const loadJson = async (name, default_value) => {
-    const data_dir = await config_ipc_server.get("data_dir","");
+    const data_dir = await config.get("data_dir","");
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         await fsPromises.stat(file_path);
@@ -107,7 +107,7 @@ const loadJson = async (name, default_value) => {
 };
 
 const saveJson = async (name, items) => {
-    const data_dir = await config_ipc_server.get("data_dir", "");
+    const data_dir = await config.get("data_dir", "");
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         const json_store = new JsonStore(file_path);
@@ -207,7 +207,7 @@ const popupInputContextMenu = (bwin, props) => {
 
 function createWindow() {
     // ブラウザウィンドウの作成
-    const state = config_ipc_server.get("main.window.state", { width: 1000, height: 600 });
+    const state = config.get("main.window.state", { width: 1000, height: 600 });
     state.title = `${app.name} ${app.getVersion()}`;
     state.webPreferences =  {
         nodeIntegration: false,
@@ -273,7 +273,7 @@ function createWindow() {
             return;
         }
 
-        if(config_ipc_server.get("check_window_close", true)){
+        if(config.get("check_window_close", true)){
             const ret = dialog.showMessageBoxSync({
                 type: "info", 
                 buttons: ["OK", "Cancel"],
@@ -287,8 +287,8 @@ function createWindow() {
         }
 
         try {
-            config_ipc_server.set("main.window.state", getWindowState(main_win));
-            await config_ipc_server.save();
+            config.set("main.window.state", getWindowState(main_win));
+            await config.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -339,9 +339,8 @@ function createWindow() {
 app.on("ready", async ()=>{
     try {
         const config_path = path.join(app.getPath("userData"), config_fiiename);
-        config_ipc_server.handle();
-        config_ipc_server.setup(config_path);
-        await config_ipc_server.load();
+        config.setup(config_path);
+        await config.load();
     } catch (error) {
         const ret = await dialog.showMessageBox({
             type: "error",
@@ -349,7 +348,7 @@ app.on("ready", async ()=>{
             message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
         });
         if(ret===0){ //OK
-            config_ipc_server.clear();
+            config.clear();
         }else{ //Cancel
             do_app_quit = true;
             app.quit();
@@ -357,8 +356,8 @@ app.on("ready", async ()=>{
         }
     }
     try {
-        await config_ipc_server.configFolder("data_dir", "DB,ブックマーク,履歴等");
-        await config_ipc_server.configFolder("download.dir", "動画");
+        await config.configFolder("data_dir", "DB,ブックマーク,履歴等");
+        await config.configFolder("download.dir", "動画");
     } catch (error) {
         await dialog.showMessageBox({
             type: "error",
@@ -371,7 +370,7 @@ app.on("ready", async ()=>{
         return;
     }
 
-    const log_level = config_ipc_server.get("log.level", "info");
+    const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
     ipcMain.on(IPC_CHANNEL.SHOW_MESSAGE, (event, args) => {
@@ -558,7 +557,7 @@ app.on("ready", async ()=>{
         await session.defaultSession.clearCache();
     });
 
-    await loadCSS(config_ipc_server.get("css_path", ""));
+    await loadCSS(config.get("css_path", ""));
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
@@ -634,7 +633,7 @@ app.on("ready", async ()=>{
         store.setItems("stack", items);
     }); 
 
-    const data_dir = config_ipc_server.get("data_dir", "");
+    const data_dir = config.get("data_dir", "");
     library.setup(data_dir);
     ipcMain.handle("library:addItem", async (event, args) => {
         const { item } = args;
@@ -674,6 +673,15 @@ app.on("ready", async ()=>{
         main_win.webContents.send("libraryItemDeleted", args);
     });
 
+    ipcMain.handle("config:get", (event, args) => {
+        const { key, value } = args;
+        return config.get(key, value);
+    });
+    ipcMain.handle("config:set", (event, args) => {
+        const { key, value } = args;
+        config.set(key, value);
+    });
+
     createWindow();
 });
 
@@ -698,7 +706,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = config_ipc_server.get("player.window.state", { width: 800, height: 600 });
+        const state = config.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
@@ -725,7 +733,7 @@ const createPlayerWindow = () => {
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
-                config_ipc_server.set("player.window.state", getWindowState(player_win));
+                config.set("player.window.state", getWindowState(player_win));
                 player_win = null;
             });
 

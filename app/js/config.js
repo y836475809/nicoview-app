@@ -3,15 +3,10 @@ const { dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { IPCServer } = require("./ipc-client-server");
 const { deepCopy } = require("./deepcopy");
 const { logger } = require("./logger");
 
-class ConfigIPCServer extends IPCServer {
-    constructor() {
-        super("config");
-    }
-
+class Config {
     setup(config_path){
         this.config_path = config_path;
         this._initJsonData();
@@ -135,5 +130,5 @@ class ConfigIPCServer extends IPCServer {
 }
 
 module.exports = {
-    ConfigIPCServer
+    Config
 };

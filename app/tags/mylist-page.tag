@@ -361,7 +361,7 @@
         };
 
         this.on("mount", async () => {
-            const mylist_dir = path.join(await IPCClient.request("config", "get", { key:"data_dir", value:"" }), "mylist");
+            const mylist_dir = path.join(await ipc.invoke("config:get", { key:"data_dir", value:"" }), "mylist");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
             nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 

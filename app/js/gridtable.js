@@ -6,8 +6,8 @@ require("slickgrid/plugins/slick.rowselectionmodel");
 require("slickgrid/plugins/slick.autotooltips");
 require("slickgrid/plugins/slick.resizer");
 
+const ipc = require("electron").ipcRenderer;
 const time_format = require("./time-format");
-const { IPCClient } = require("./ipc-client-server");
 
 /* globals $ Slick */
 
@@ -366,7 +366,7 @@ class GridTable {
             sort_state["sort_asc"] = sort[0].sortAsc;
         }
 
-        IPCClient.request("config", "set", { 
+        ipc.invoke("config:set", { 
             key:`gridtable.${this.name}.columns`, 
             value:{
                 width: width_state,
@@ -376,7 +376,7 @@ class GridTable {
     }
 
     _loadState(){
-        IPCClient.request("config", "get", { 
+        ipc.invoke("config:get", { 
             key:`gridtable.${this.name}.columns`, 
             value:{
                 width: null,

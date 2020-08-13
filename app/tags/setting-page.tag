@@ -185,7 +185,6 @@
         const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
-        const { IPCClient } = window.IPC;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RendererDailog;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;
@@ -203,7 +202,7 @@
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            await IPCClient.request("config", "set", { key:"data_dir", value:dir });
+            await ipc.invoke("config:set", { key:"data_dir", value:dir });
         };
 
         this.onclickSelectDownloadDir = async e => {
@@ -212,11 +211,11 @@
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            await IPCClient.request("config", "set", { key:"download.dir", value:dir });
+            await ipc.invoke("config:set", { key:"download.dir", value:dir });
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await IPCClient.request("config", "get", { key:"app_setting_dir", value:"" });
+            const dir = await ipc.invoke("config:get", { key:"app_setting_dir", value:"" });
             shell.openItem(dir);
         };
 
@@ -226,7 +225,7 @@
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            await IPCClient.request("config", "set", { key:"ffmpeg_path", value:file_path });
+            await ipc.invoke("config:set", { key:"ffmpeg_path", value:file_path });
         };
 
         
@@ -236,7 +235,7 @@
                 return;
             }
             setInputValue(".css-path-input", file_path);
-            await IPCClient.request("config", "set", { key:"css_path", value:file_path });
+            await ipc.invoke("config:set", { key:"css_path", value:file_path });
         };
 
         this.onclickReloadCss = async e => {
@@ -247,7 +246,7 @@
 
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
-            await IPCClient.request("config", "set", { key:"check_window_close", value:ch_elm.checked });
+            await ipc.invoke("config:set", { key:"check_window_close", value:ch_elm.checked });
         };
 
         const getCacheSizeLabel = async () => {
@@ -281,7 +280,7 @@
             if(ch_elm.checked === true){
                 value = "debug";
             }
-            await IPCClient.request("config", "set", { key:"log.level", value:value });
+            await ipc.invoke("config:set", { key:"log.level", value:value });
             await ipcRenderer.invoke(IPC_CHANNEL.LOG_LEVEL, { level:value });
         };
 
@@ -291,19 +290,19 @@
                 return; 
             }
             setInputValue(".nndd-system-path-input", dir);
-            await IPCClient.request("config", "set", { key:"nndd.system_path", value:dir });
+            await ipc.invoke("config:set", { key:"nndd.system_path", value:dir });
 
         };
 
         this.onclickCheckNNDDImportItem = async (item, e) => {
             const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
             const checked = ch_elm.checked;
-            await IPCClient.request("config", "set", { key:`nndd.${item.name}`, value:checked });
+            await ipc.invoke("config:set", { key:`nndd.${item.name}`, value:checked });
         };
 
         this.onclickExecNNDDImport = async (e) => {
-            const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
-            const nndd_system_dir = await IPCClient.request("config", "get", { key:"nndd.system_path", value:"" });
+            const data_dir = await ipc.invoke("config:get", { key:"data_dir", value:"" });
+            const nndd_system_dir = await ipc.invoke("config:get", { key:"nndd.system_path", value:"" });
             try {
                 fs.statSync(data_dir);
             } catch (error) {
@@ -371,25 +370,25 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await IPCClient.request("config", "get", { key:"app_setting_dir", value:"" })); 
+            setInputValue(".app-setting-dir-input", await ipc.invoke("config:get", { key:"app_setting_dir", value:"" })); 
             
             const css_path = await getDefaultCSSPath();
-            setInputValue(".css-path-input", await IPCClient.request("config", "get", { key:"css_path", value:css_path }));   
+            setInputValue(".css-path-input", await ipc.invoke("config:get", { key:"css_path", value:css_path }));   
             
-            setInputValue(".data-dir-input", await IPCClient.request("config", "get",{ key:"data_dir", value:""}));  
-            setInputValue(".download-dir-input", await IPCClient.request("config", "get",{ key:"download.dir", value:""}));
-            setInputValue(".ffmpeg-path-input", await IPCClient.request("config", "get",{ key:"ffmpeg_path", value:""}));
-            setCheckValue(".check-window-close", await IPCClient.request("config", "get",{ key:"check_window_close", value:true}));
+            setInputValue(".data-dir-input", await ipc.invoke("config:get", { key:"data_dir", value:""}));  
+            setInputValue(".download-dir-input", await ipc.invoke("config:get", { key:"download.dir", value:""}));
+            setInputValue(".ffmpeg-path-input", await ipc.invoke("config:get", { key:"ffmpeg_path", value:""}));
+            setCheckValue(".check-window-close", await ipc.invoke("config:get", { key:"check_window_close", value:true}));
         
-            const log_level = await IPCClient.request("config", "get",{ key:"log.level", value:"info"});
+            const log_level = await ipc.invoke("config:get", { key:"log.level", value:"info"});
             setCheckValue(".check-loglevel-debug", log_level=="debug");
             
-            setInputValue(".nndd-system-path-input", await IPCClient.request("config", "get",{ key:"nndd.system_path", value:""}));  
+            setInputValue(".nndd-system-path-input", await ipc.invoke("config:get", { key:"nndd.system_path", value:""}));  
             
             for (let index = 0; index < this.import_items.length; index++) {
                 const import_item = this.import_items[index];
                 setCheckValue(`.${import_item.name}`, 
-                    await IPCClient.request("config", "get",{ key:`nndd.${import_item.name}`, value:false}));
+                    await ipc.invoke("config:get", { key:`nndd.${import_item.name}`, value:false}));
             }
            
         });

@@ -302,7 +302,6 @@
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
-        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
@@ -313,7 +312,7 @@
         this.search_target_items = searchItems.searchTargetItems;
 
         const loadSearchCond = async () => {
-            const { sort, search_target } = await IPCClient.request("config", "get", 
+            const { sort, search_target } = await ipc.invoke("config:get", 
                 { key:"search.condition", 
                     value:{
                         sort:{ name:"startTime", order:"-" },
@@ -334,7 +333,7 @@
 
         const saveSearchCond = async () => {
             const { sort_name, sort_order, search_target } = nico_search_params.getParams();
-            await IPCClient.request("config", "set", 
+            await ipc.invoke("config:set",
                 { key: "search.condition", 
                     value: { 
                         sort:{ name:sort_name, order:sort_order },

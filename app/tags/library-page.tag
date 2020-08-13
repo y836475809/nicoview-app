@@ -543,7 +543,7 @@
             try {
                 const video_item = await ipc.invoke("library:getItem", {video_id});
                 const video_data = new NicoVideoData(video_item);
-                const ffmpeg_path = await IPCClient.request("config", "get", { key:"ffmpeg_path", value:"" });
+                const ffmpeg_path = await ipc.invoke("config:get", { key:"ffmpeg_path", value:"" });
 
                 const cnv_mp4 = new ConvertMP4();
 

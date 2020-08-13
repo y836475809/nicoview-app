@@ -56,7 +56,6 @@
         const { Menu } = remote;
         const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
         const { toTimeString } = window.TimeFormat;
         
         const obs = this.opts.obs; 
@@ -236,8 +235,8 @@
                 });
             };
 
-            const history_num = await IPCClient.request("config", "get", { key: "player.contextmenu.history_num", value: 5 });
-            const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
+            const history_num = await ipc.invoke("config:get", { key: "player.contextmenu.history_num", value: 5 });
+            const stack_num = await ipc.invoke("config:get", { key: "player.contextmenu.stack_num", value: 5 });
             const history_items = (await ipc.invoke("history:getItems")).slice(1, history_num+1);
             const stack_items = (await ipc.invoke("stack:getItems")).slice(0, stack_num);
             

@@ -21,14 +21,14 @@
     </div>
 
     <script>
-        const { IPCClient } = window.IPC;
+        const ipc = window.electron.ipcRenderer;
 
         this.menu_num_items = [5, 10, 20];
 
         const changeParams = async (name, value) => {
-            const params = await IPCClient.request("config", "get", { key: "player.contextmenu", value: 5 });
+            const params = await ipc.invoke("config:get", { key: "player.contextmenu", value: 5 });
             params[name] = value;
-            await IPCClient.request("config", "set", { key: `player.contextmenu.${name}`, value: value });
+            await ipc.invoke("config:set", { key: `player.contextmenu.${name}`, value: value });
         };
 
         const setRadioValue = (name, items, value) => {
@@ -38,7 +38,7 @@
         };
 
         const setupContextMenuSetting = async () => {
-            const params = await IPCClient.request("config", "get", 
+            const params = await ipc.invoke("config:get", 
                 { 
                     key:"player.contextmenu", 
                     value:{

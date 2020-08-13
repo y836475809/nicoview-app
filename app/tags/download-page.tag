@@ -210,10 +210,10 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await IPCClient.request("config", "get", { key:"download.dir", value:"" });
+            const download_dir = await ipc.invoke("config:get", { key:"download.dir", value:"" });
             event_em.emit("download-start");
 
-            let wait_time = await IPCClient.request("config", "get", { key:"download.wait_time", value:10 });
+            let wait_time = await ipc.invoke("config:get", { key:"download.wait_time", value:10 });
             if(!wait_time || wait_time <= 0){
                 wait_time = 10;
             }
@@ -308,7 +308,7 @@
         });
 
         this.on("mount", async () => {
-            download_schedule = await IPCClient.request("config", "get", { 
+            download_schedule = await ipc.invoke("config:get", { 
                 key:"download.schedule", 
                 value:  {
                     date: {hour:0, minute:0},
@@ -319,7 +319,7 @@
             this.obs_schedule.on("change-params", (args) => {
                 const { date, enable } = args;
 
-                IPCClient.request("config", "set", { 
+                ipc.invoke("config:set", { 
                     key:"download.schedule", 
                     value: {
                         date: date,

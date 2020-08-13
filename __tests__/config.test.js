@@ -1,19 +1,19 @@
 const test = require("ava");
-const { ConfigIPCServer } = require("../app/js/ipc-config");
+const { Config } = require("../app/js/config");
 
-class TestConfigIPCServer extends ConfigIPCServer {
+class TestConfig extends Config {
     setup(){}
 }
 
 test("getObj json_data empty", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     const json_data = {};
     t.is(config._getObj("test", json_data), undefined);
     t.deepEqual(json_data, {});
 });
 
 test("get default value", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     
     config.json_data = {};
     t.deepEqual(config.get(
@@ -29,7 +29,7 @@ test("get default value", t => {
 });
 
 test("getObj json_data has obj", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     const json_data = {test: {value1:10, value2:"val2", value3:{}}};
 
     t.deepEqual(config._getObj("test", json_data), {value1:10, value2:"val2", value3:{}});
@@ -43,7 +43,7 @@ test("getObj json_data has obj", t => {
 });
 
 test("setObj add", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     const json_data = {};
 
     config._setObj("test", 1, json_data);
@@ -69,7 +69,7 @@ test("setObj add", t => {
 });
 
 test("setObj replace obj", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     const json_data = {};
 
     config._setObj("test", {value:1}, json_data);
@@ -92,7 +92,7 @@ test("setObj replace obj", t => {
 });
 
 test("setObj replace num to obj, obj to num", t => {
-    const config = new TestConfigIPCServer();
+    const config = new TestConfig();
     const json_data = {};
 
     config._setObj("test", {value:1}, json_data);

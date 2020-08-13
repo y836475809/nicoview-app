@@ -37,12 +37,12 @@
         /* globals riot */
         const { ipcRenderer } = window.electron;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
+        const ipc = window.electron.ipcRenderer;
         var { logger } = window.logger; // eslint-disable-line
 
         const obs = riot.observable();
 
-        IPCClient.request("config", "set", 
+        ipc.invoke("config:set", 
             { key:"download.wait_time", value:10 }).then();
 
         ipcRenderer.on(IPC_CHANNEL.MAIN_HTML_LOADED, (event)=>{
@@ -59,7 +59,7 @@
                 nico_mock_server.close();
             });
 
-            IPCClient.request("config", "set", 
+            ipc.invoke("config:set", 
                 { key:"download.wait_time", value:1 }).then();
         }
     </script>

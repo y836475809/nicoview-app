@@ -48,7 +48,7 @@
     </div>
     <script>
         /* globals */
-        const { IPCClient } = window.IPC;
+        const ipc = window.electron.ipcRenderer;
 
         const obs_dialog = this.opts.obs;
 
@@ -71,9 +71,9 @@
         });
 
         const changeParams = async (name, value, is_trigger=true) => {
-            const params = await IPCClient.request("config", "get", { key: "comment", value: default_params });
+            const params = await ipc.invoke("config:get", { key: "comment", value: default_params });
             params[name] = value;
-            await IPCClient.request("config", "set", { key: `comment.${name}`, value: value });
+            await await ipc.invoke("config:set", { key: `comment.${name}`, value: value });
             if(is_trigger){
                 obs_dialog.trigger("player-main-page:update-comment-display-params", params);
             }
@@ -89,7 +89,7 @@
 
         this.onclickLimitCommentCheck = async (e) => {
             const do_limit = e.target.checked;
-            await IPCClient.request("config", "set", { key:"comment.do_limit", value:do_limit });
+            await ipc.invoke("config:set", { key:"comment.do_limit", value:do_limit });
             obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
         };
 
@@ -115,7 +115,7 @@
         };
 
         this.on("mount", async () => {
-            const params = await IPCClient.request("config", "get", { key:"comment", value:default_params });
+            const params = await ipc.invoke("config:get", { key:"comment", value:default_params });
             
             setup("duration", this.duration_items, params.duration_sec);
             setup("fps", this.fps_items, params.fps);

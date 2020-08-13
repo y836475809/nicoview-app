@@ -50,7 +50,6 @@
         const { toTimeSec } = window.TimeFormat;
         const { showMessageBox } = window.RendererDailog;
         const { NicoVideoData } = window.NicoVideoData;
-        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
@@ -83,7 +82,7 @@
                 obs.trigger("player-info-page:split-resized");
 
                 const ve = this.root.querySelector(".info-frame");
-                await IPCClient.request("config", "set", { 
+                await ipc.invoke("config:set", { 
                     key:"player.infoview_width",
                     value: parseInt(ve.offsetWidth)
                 });
@@ -422,7 +421,7 @@
             const ve = this.root.querySelector(".info-frame");
 
             const infoview_show = parseInt(ve.style.width) == 0;
-            await IPCClient.request("config", "set", { 
+            await ipc.invoke("config:set", { 
                 key:"player.infoview_show",
                 value: infoview_show
             });
@@ -433,7 +432,7 @@
 
             if(infoview_show){
                 // 表示
-                const infoview_width = await IPCClient.request("config", "get", { 
+                const infoview_width = await ipc.invoke("config:get", { 
                     key:"player.infoview_width",
                     value: 200
                 });
@@ -466,7 +465,7 @@
         };
 
         this.on("mount", async () => {
-            const params = await IPCClient.request("config", "get", 
+            const params = await ipc.invoke("config:get", 
                 { 
                     key:"player", 
                     value:{  
@@ -484,8 +483,8 @@
             this.player_default_size = { width: 854 ,height: 480 };
             
             try {
-                const data_dir = await IPCClient.request("config", "get", { key:"data_dir", value:"" });
-                const do_limit = await IPCClient.request("config", "get", { key:"comment.do_limit", value:true });
+                const data_dir = await ipc.invoke("config:get", { key:"data_dir", value:"" });
+                const do_limit = await ipc.invoke("config:get", { key:"comment.do_limit", value:true });
                 comment_filter = new CommentFilter(path.join(data_dir, "nglist.json"));
                 comment_filter.setLimit(do_limit);
                 comment_filter.ng_comment.load();

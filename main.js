@@ -430,33 +430,6 @@ app.on("ready", async ()=>{
         }
     });
 
-    ipcMain.handle(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
-        const { level } = args;
-        setLogLevel(level);
-        main_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
-        if(player_win !== null){
-            player_win.webContents.send(IPC_CHANNEL.LOG_LEVEL, args);
-        }
-    });
-
-    ipcMain.handle(IPC_CHANNEL.RELOAD_CSS, async (event, args) => {
-        const { file_path } = args;
-        await loadCSS(file_path);
-
-        applyCSS(main_win);
-        main_win.webContents.send(IPC_CHANNEL.MAIN_CSS_LOADED);
-
-        applyCSS(player_win);
-    });
-
-    ipcMain.handle(IPC_CHANNEL.GET_APP_CACHE, async (event, args) => {     
-        return await session.defaultSession.getCacheSize();
-    });
-
-    ipcMain.handle(IPC_CHANNEL.CLEAR_APP_CACHE, async (event, args) => {     
-        await session.defaultSession.clearCache();
-    });
-
     await loadCSS(config.get("css_path", ""));
 
     const user_agent = process.env["user_agent"];
@@ -677,6 +650,31 @@ app.on("ready", async ()=>{
     ipcMain.handle("config:set", (event, args) => {
         const { key, value } = args;
         config.set(key, value);
+    });
+
+    // setting
+    ipcMain.handle("setting:change-log-level", (event, args) => {
+        const { level } = args;
+        setLogLevel(level);
+        main_win.webContents.send("setting:on-change-log-level", args);
+        if(player_win !== null){
+            player_win.webContents.send("setting:on-change-log-level", args);
+        }
+    });
+    ipcMain.handle("setting:get-app-cache", async (event, args) => {     
+        return await session.defaultSession.getCacheSize();
+    });
+    ipcMain.handle("setting:clear-app-cache", async (event, args) => {     
+        await session.defaultSession.clearCache();
+    });
+    ipcMain.handle("setting:reload-css", async (event, args) => {
+        const { file_path } = args;
+        await loadCSS(file_path);
+
+        applyCSS(main_win);
+        main_win.webContents.send("setting:on-reload-css");
+
+        applyCSS(player_win);
     });
 
     createWindow();

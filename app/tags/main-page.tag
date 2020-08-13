@@ -218,7 +218,7 @@
             await updateDownloadBadge();
         });
 
-        ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+        ipc.on("setting:on-change-log-level", (event, args) => {
             const { level } = args;
             logger.setLevel(level);
         });
@@ -341,7 +341,7 @@
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.MAIN_CSS_LOADED, (event)=>{
+        ipc.on("setting:on-reload-css", (event)=>{
             this.obs.trigger("css-loaded");
         });
     </script>

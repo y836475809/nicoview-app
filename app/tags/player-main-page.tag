@@ -262,7 +262,7 @@
             }
         });
 
-        ipcRenderer.on(IPC_CHANNEL.LOG_LEVEL, (event, args) => {
+        ipcRenderer.on("setting:on-change-log-level", (event, args) => {
             const { level } = args;
             logger.setLevel(level);
         });

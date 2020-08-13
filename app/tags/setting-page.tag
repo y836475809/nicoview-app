@@ -250,7 +250,7 @@
         };
 
         const getCacheSizeLabel = async () => {
-            const size_byte = await ipcRenderer.invoke(IPC_CHANNEL.GET_APP_CACHE);
+            const size_byte = await ipc.invoke("setting:get-app-cache");
             const mb = 1024**2;
             return `${(size_byte/mb).toFixed(1)}MB`;
         };
@@ -266,7 +266,7 @@
             });
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            await ipcRenderer.invoke(IPC_CHANNEL.CLEAR_APP_CACHE);
+            await ipc.invoke("setting:clear-app-cache");
 
             this.obs_msg_dialog.trigger("close");
 
@@ -281,7 +281,7 @@
                 value = "debug";
             }
             await ipc.invoke("config:set", { key:"log.level", value:value });
-            await ipcRenderer.invoke(IPC_CHANNEL.LOG_LEVEL, { level:value });
+            await ipc.invoke("setting:change-log-level", { level:value });
         };
 
         this.onclickNNDDSystemDir = async (e) => {

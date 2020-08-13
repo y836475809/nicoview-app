@@ -5,7 +5,7 @@ const path = require("path");
 
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIPCServer } = require("./app/js/ipc-config");
-const { LibraryIPCServer } = require("./app/js/ipc-library");
+const { Library } = require("./app/js/library");
 const { History } = require("./app/js/history");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
@@ -18,7 +18,7 @@ const { Store } = require("./app/js/store");
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const config_ipc_server = new ConfigIPCServer();
-const library_ipc_server = new LibraryIPCServer();
+const library = new Library();
 const history = new History();
 const css_loader = new CSSLoader();
 const store = new Store();
@@ -303,7 +303,7 @@ function createWindow() {
         }
         
         try {
-            await library_ipc_server.save(false);
+            await library.save(false);
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
                 type: "error",
@@ -389,7 +389,7 @@ app.on("ready", async ()=>{
         player_win.show();
 
         const {video_id, online, time} = args;
-        const video_item = library_ipc_server.getItem({video_id});
+        const video_item = library.getItem(video_id);
         player_win.webContents.send(IPC_CHANNEL.PLAY_VIDEO, {
             video_id,
             online,
@@ -403,7 +403,7 @@ app.on("ready", async ()=>{
 
         const { history_item } = args;
         const video_id = history_item.id;
-        const video_item = library_ipc_server.getItem({video_id});
+        const video_item = library.getItem(video_id);
         if(video_item===null){
             return;
         }
@@ -412,7 +412,7 @@ app.on("ready", async ()=>{
             last_play_date : new Date().getTime(),
             play_count : video_item.play_count + 1
         };
-        library_ipc_server.update({video_id, props});
+        library.update(video_id, props);
     });
 
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
@@ -452,7 +452,7 @@ app.on("ready", async ()=>{
 
     ipcMain.handle(IPC_CHANNEL.IMPORT_NNDD_DB, async (event, args) => {
         const { db_file_path } = args;
-        const data_dir = config_ipc_server.get({ key:"data_dir", value:"" });
+        const data_dir = library.dataDir;
 
         if(data_dir == ""){
             return {
@@ -463,12 +463,11 @@ app.on("ready", async ()=>{
 
         try {
             const { path_data_list, video_data_list } = await importNNDDDB(db_file_path);
-            library_ipc_server.setData({
-                data_dir, 
+            library.setData(
                 path_data_list, 
                 video_data_list
-            }); 
-            await library_ipc_server.save();
+            ); 
+            await library.save();
         } catch (error) {
             return {
                 result : false,
@@ -485,7 +484,7 @@ app.on("ready", async ()=>{
     ipcMain.handle(IPC_CHANNEL.DELETE_LIBRARY_ITEMS, async (event, args) => {
         const { video_id } = args;
 
-        const video_item = library_ipc_server.getItem({video_id});
+        const video_item = library.getItem(video_id);
         if(video_item===null){
             return {
                 success:false,
@@ -494,7 +493,7 @@ app.on("ready", async ()=>{
         }
 
         try {
-            await library_ipc_server.delete({ video_id });
+            await library.delete(video_id);
         } catch (error) {
             return {
                 success:false,
@@ -557,21 +556,6 @@ app.on("ready", async ()=>{
 
     ipcMain.handle(IPC_CHANNEL.CLEAR_APP_CACHE, async (event, args) => {     
         await session.defaultSession.clearCache();
-    });
-
-    library_ipc_server.on("libraryInitialized", ()=>{  
-        main_win.webContents.send("libraryInitialized", {
-            items:library_ipc_server.getItems()
-        });
-    });
-    library_ipc_server.on("libraryItemUpdated", (args)=>{  
-        main_win.webContents.send("libraryItemUpdated", args);
-    });
-    library_ipc_server.on("libraryItemAdded", (args)=>{  
-        main_win.webContents.send("libraryItemAdded", args);
-    });
-    library_ipc_server.on("libraryItemDeleted", (args)=>{  
-        main_win.webContents.send("libraryItemDeleted", args);
     });
 
     await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
@@ -649,6 +633,46 @@ app.on("ready", async ()=>{
         const { items } = args;
         store.setItems("stack", items);
     }); 
+
+    const data_dir = config_ipc_server.get({ key:"data_dir", value:"" });
+    library.setup(data_dir);
+    ipcMain.handle("library:addItem", async (event, args) => {
+        const { item } = args;
+        await library.addItem(item);
+    });
+    ipcMain.handle("library:addDownloadItem", async (event, args) => {
+        const { download_item } = args;
+        await library.addDownloadedItem(download_item);
+    });
+    ipcMain.handle("library:load", async (event, args) => {
+        await library.load();
+    });
+    ipcMain.handle("library:has", (event, args) => {
+        const { video_id } = args;
+        return library.has(video_id);
+    });
+    ipcMain.handle("library:updateItemProps", async (event, args) => {
+        const { video_id, props } = args;
+        await library.update(video_id, props);
+    });
+    ipcMain.handle("library:getItem", (event, args) => {
+        const { video_id } = args;
+        return library.getItem(video_id);
+    });
+    library.on("libraryInitialized", ()=>{  
+        main_win.webContents.send("libraryInitialized", {
+            items:library.getItems()
+        });
+    });
+    library.on("libraryItemUpdated", (args)=>{  
+        main_win.webContents.send("libraryItemUpdated", args);
+    });
+    library.on("libraryItemAdded", (args)=>{  
+        main_win.webContents.send("libraryItemAdded", args);
+    });
+    library.on("libraryItemDeleted", (args)=>{  
+        main_win.webContents.send("libraryItemDeleted", args);
+    });
 
     createWindow();
 });

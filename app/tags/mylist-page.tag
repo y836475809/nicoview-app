@@ -219,7 +219,7 @@
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.saved = await ipc.invoke("library:has", {video_id});
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -306,7 +306,7 @@
 
         const play = async (item, online) => {
             const video_id = item.id;
-            if(!online && needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))){
+            if(!online && needConvertVideo(await ipc.invoke("library:getItem", {video_id}))){
                 if(!await showOKCancelBox("info", 
                     "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
                     return;
@@ -370,7 +370,7 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))===true){
+                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){
                     if(!await showOKCancelBox("info", 
                         "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
                         return;
@@ -405,7 +405,7 @@
                 const items = grid_table.getSelectedDatas();
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await IPCClient.request("library", "getItem", {video_id}))===true){
+                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){
                     context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
                 }else{
                     context_menu.popup({window: remote.getCurrentWindow()});
@@ -441,7 +441,7 @@
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
-                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.saved = await ipc.invoke("library:has", {video_id});
                 item.reg_download = video_ids.includes(video_id);  
                 item.mylist_id = mylist.mylist_id;
             }

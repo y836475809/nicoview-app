@@ -25,7 +25,6 @@
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
 
@@ -36,7 +35,7 @@
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.saved = await ipc.invoke("library:has", {video_id});
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
@@ -83,7 +82,7 @@
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await IPCClient.request("library", "existItem", {video_id});
+                item.saved = await ipc.invoke("library:has", {video_id});
                 item.reg_download = video_ids.includes(video_id);  
             }
             grid_table.clearSelected();

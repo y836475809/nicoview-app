@@ -258,7 +258,7 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const download_item = nico_down.getDownloadedItem();
-                        await IPCClient.request("library", "addDownloadedItem", {download_item});
+                        await ipc.invoke("library:addDownloadItem", {download_item});
                         
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 

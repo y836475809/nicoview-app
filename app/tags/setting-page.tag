@@ -181,6 +181,7 @@
     <script>
         /* globals riot logger */
         const { shell, ipcRenderer, remote } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
@@ -428,9 +429,9 @@
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
                     const video_id = item.id;
-                    const exist = await IPCClient.request("library", "existItem", {video_id});
+                    const exist = await ipc.invoke("library:has", {video_id});
                     if(!exist){
-                        await IPCClient.request("library", "addItem", { item });
+                        await ipc.invoke("library:addItem", { item });
                     }
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {

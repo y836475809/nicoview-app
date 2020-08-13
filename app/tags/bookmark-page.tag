@@ -33,7 +33,6 @@
         const {remote, ipcRenderer} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
 
@@ -124,7 +123,7 @@
 
                         const video_id = items[0].data.video_id;
                         (async ()=>{
-                            const exist = await IPCClient.request("library", "existItem", {video_id});
+                            const exist = await ipc.invoke("library:has", {video_id});
                             if(exist===true){
                                 obs.trigger("main-page:select-page", "library");
                                 obs.trigger("library-page:scrollto", video_id);     

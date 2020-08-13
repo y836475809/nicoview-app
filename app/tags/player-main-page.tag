@@ -41,6 +41,7 @@
         /* globals riot logger */
         const path = window.path;
         const { remote, ipcRenderer } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { NicoPlay } = window.NicoPlay;
@@ -307,8 +308,8 @@
 
             nico_update.on("updated", async (video_id, props, update_thumbnail) => {
                 try {
-                    await IPCClient.request("library", "update", {video_id, props});
-                    const updated_video_item = await IPCClient.request("library", "getItem", {video_id});
+                    await ipc.invoke("library:updateItemProps", {video_id, props});
+                    const updated_video_item = await ipc.invoke("library:getItem", {video_id});
                     const video_data = new NicoVideoData(updated_video_item);
                     const viewinfo = {
                         is_economy: video_data.getIsEconomy(),
@@ -339,7 +340,7 @@
             });
 
             try {   
-                const video_item = await IPCClient.request("library", "getItem", {video_id});
+                const video_item = await ipc.invoke("library:getItem", {video_id});
                 nico_update.setVideoItem(video_item);
 
                 if(update_target=="thumbinfo"){

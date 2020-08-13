@@ -1,21 +1,22 @@
 const path = require("path");
+const EventEmitter = require("events");
 const { LibraryDB } = require("./db");
-const { IPCServer } = require("./ipc-client-server");
 
-class LibraryIPCServer extends IPCServer {
+class Library extends EventEmitter {
     constructor(){
-        super("library");
-        this.setup();
+        super();
     }
 
-    setup(){
+    get dataDir(){
+        return this._data_dir;
+    }
+
+    setup(data_dir){
         this.library_db = null;
-        this.handle();
+        this._data_dir = data_dir;
     }
 
-    getItem(args){
-        const { video_id } = args;
-
+    getItem(video_id){
         if(!this.library_db){
             return null;
         }
@@ -31,9 +32,7 @@ class LibraryIPCServer extends IPCServer {
         return this.library_db.findAll();
     }
 
-    existItem(args){
-        const { video_id } = args;
-
+    has(video_id){
         if(!this.library_db){
             return false;
         }
@@ -41,9 +40,7 @@ class LibraryIPCServer extends IPCServer {
         return this.library_db.exist(video_id);
     }
 
-    async update(args){
-        const { video_id, props } = args;
-
+    async update(video_id, props){
         if(!this.library_db){
             return;
         }
@@ -60,26 +57,22 @@ class LibraryIPCServer extends IPCServer {
         await this.library_db.save(force);
     }
 
-    setData(args){
-        const { data_dir, path_data_list, video_data_list } = args;
+    setData(path_data_list, video_data_list){
         this.library_db = new LibraryDB(
-            {filename : path.join(data_dir, "library.json")});
+            {filename : path.join(this._data_dir, "library.json")});
         this.library_db.setPathData(path_data_list);
         this.library_db.setVideoData(video_data_list);
 
         this.emit("libraryInitialized");
     }
-    async load(args){
-        const { data_dir } = args;
+    async load(){
         this.library_db = new LibraryDB(
-            {filename : path.join(data_dir, "library.json")});
+            {filename : path.join(this._data_dir, "library.json")});
         await this.library_db.load();
         this.emit("libraryInitialized");
     }
 
-    async addDownloadedItem(args){
-        const { download_item } = args;
-
+    async addDownloadedItem(download_item){
         if(!this.library_db){
             return;
         }
@@ -94,9 +87,7 @@ class LibraryIPCServer extends IPCServer {
         this.emit("libraryItemAdded", {video_item});
     }
     
-    async addItem(args){
-        const { item } = args;
-
+    async addItem(item){
         if(!this.library_db){
             return;
         }
@@ -105,9 +96,7 @@ class LibraryIPCServer extends IPCServer {
         this.emit("libraryItemAdded", { video_item : item });
     }
     
-    async delete(args){
-        const { video_id } = args;
-
+    async delete(video_id){
         if(!this.library_db){
             return;
         }
@@ -119,5 +108,5 @@ class LibraryIPCServer extends IPCServer {
 }
 
 module.exports = {
-    LibraryIPCServer
+    Library
 };

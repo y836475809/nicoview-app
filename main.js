@@ -156,6 +156,10 @@ const loadCSS = async (file_path) => {
 };
 
 const applyCSS = (win) => {
+    if(!win){
+        return;
+    }
+    
     try {
         const css = css_loader.CSS;
         if(!css){

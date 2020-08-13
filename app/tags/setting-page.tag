@@ -241,7 +241,7 @@
         this.onclickReloadCss = async e => {
             const elm = this.root.querySelector(".css-path-input");
             const file_path = elm.value;
-            await ipcRenderer.invoke(IPC_CHANNEL.RELOAD_CSS, { file_path });
+            await ipc.invoke("setting:reload-css", { file_path });
         };
 
         this.onclickCheckWindowClose = async (e) => {

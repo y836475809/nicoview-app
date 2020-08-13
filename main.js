@@ -7,7 +7,6 @@ const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIPCServer } = require("./app/js/ipc-config");
 const { LibraryIPCServer } = require("./app/js/ipc-library");
 const { HistoryIPCServer } = require("./app/js/ipc-history");
-const { DownloadItemIPCServer } = require("./app/js/ipc-download-item");
 const { StoreVideoItemsIPCServer } = require("./app/js/ipc-store-video-items");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
@@ -22,7 +21,6 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 const config_ipc_server = new ConfigIPCServer();
 const library_ipc_server = new LibraryIPCServer();
 const history_ipc_server = new HistoryIPCServer();
-const downloaditem_ipc_server = new DownloadItemIPCServer();
 const store_video_items_ipc_server = new StoreVideoItemsIPCServer();
 const css_loader = new CSSLoader();
 const store = new Store();
@@ -609,15 +607,6 @@ app.on("ready", async ()=>{
         });
     });
 
-    downloaditem_ipc_server.handle();
-    downloaditem_ipc_server.setData({items:await loadJson("download", [])});
-    downloaditem_ipc_server.on("updated", async (args)=>{  
-        main_win.webContents.send("downloadItemUpdated");
-
-        const { items }  = args;
-        await saveJson("download", items);
-    });
-
     await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
 
     const user_agent = process.env["user_agent"];
@@ -629,6 +618,7 @@ app.on("ready", async ()=>{
         "mylist",
         // "stack",
         "nico-search",
+        "download",
     ];
     hname.forEach(name=>{
         ipcMain.handle(`${name}:getItems`, async (event, args) => {
@@ -641,7 +631,28 @@ app.on("ready", async ()=>{
             const { items } = args;
             store.setItems(name, items);
             await saveJson(name, items);
+            if(name=="download"){
+                main_win.webContents.send("downloadItemUpdated");
+            }
         });  
+    });
+
+    ipcMain.handle("download:getIncompleteIDs", async (event, args) => {
+        const name = "download";
+        if(!store.has(name)){
+            store.setItems(name, await loadJson(name, []));
+        }
+        const items = store.getItems(name);
+        if(!items){
+            return [];
+        }
+        const ids = [];
+        items.forEach(item => {
+            if(item.state != 2){
+                ids.push(item.id);
+            } 
+        });
+        return ids;
     });
 
     createWindow();

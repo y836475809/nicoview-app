@@ -20,6 +20,7 @@
     <script>
         /* globals logger */
         const { remote, ipcRenderer } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -29,7 +30,7 @@
         const obs = this.opts.obs; 
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
@@ -78,7 +79,7 @@
         const grid_table = new GridTable("history-grid", columns, options);
 
         const setData = async (items) => {
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;

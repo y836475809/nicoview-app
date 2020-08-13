@@ -63,6 +63,7 @@
         /* globals riot logger */
         const EventEmitter = window.EventEmitter;
         const { remote, ipcRenderer } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
@@ -137,7 +138,7 @@
                     state: state
                 };
             });
-            await IPCClient.request("downloaditem", "updateData", {items});
+            await ipc.invoke("download:updateItems", { items });
         };
 
         const addDownloadItems = async (items) => {
@@ -362,7 +363,7 @@
                     }
                 });
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");
-                const items = await IPCClient.request("downloaditem", "getData");
+                const items = await ipc.invoke("download:getItems");
                 grid_table_dl.setData(items);
             } catch (error) {
                 logger.error("download item load error: ", error);

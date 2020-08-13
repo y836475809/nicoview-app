@@ -199,6 +199,7 @@
         /* globals riot logger */
         const path = window.path;
         const {remote, ipcRenderer} = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -212,7 +213,7 @@
         this.obs_modal_dialog = riot.observable();
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
@@ -436,7 +437,7 @@
             loaded_mylist_id = mylist.mylist_id;
             
             const mylist_items = mylist.items;
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;

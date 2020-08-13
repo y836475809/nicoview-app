@@ -195,15 +195,15 @@
     <script>
         /* globals riot logger */
         const { remote, ipcRenderer, shell } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
 
         this.obs = this.opts.obs;
         this.obs_open_video_form = riot.observable();
 
         const updateDownloadBadge = async () => {
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const elm = this.root.querySelector(".download-badge > .item-num");
             if(video_ids.length === 0){
                 elm.style.display = "none";

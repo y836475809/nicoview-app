@@ -296,6 +296,7 @@
     <script>
         /* globals riot logger */
         const {remote, ipcRenderer} = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -381,7 +382,7 @@
         });
 
         ipcRenderer.on("downloadItemUpdated", async (event) => {
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
@@ -529,7 +530,7 @@
                 page_num, total_page_num, search_result_num
             });
 
-            const video_ids = await IPCClient.request("downloaditem", "getIncompleteIDs");
+            const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const items = await Promise.all(
                 search_result.data.map(async value => {
                     const video_id = value.contentId;

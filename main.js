@@ -83,7 +83,7 @@ process.on('unhandledRejection', (reason, p) => {
 });
 
 const loadJson = async (name, default_value) => {
-    const data_dir = await config_ipc_server.get({ key:"data_dir", value:"" });
+    const data_dir = await config_ipc_server.get("data_dir","");
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         await fsPromises.stat(file_path);
@@ -107,7 +107,7 @@ const loadJson = async (name, default_value) => {
 };
 
 const saveJson = async (name, items) => {
-    const data_dir = await config_ipc_server.get({ key: "data_dir", value:"" });
+    const data_dir = await config_ipc_server.get("data_dir", "");
     const file_path = path.join(data_dir, `${name}.json`);
     try {
         const json_store = new JsonStore(file_path);
@@ -207,7 +207,7 @@ const popupInputContextMenu = (bwin, props) => {
 
 function createWindow() {
     // ブラウザウィンドウの作成
-    const state = config_ipc_server.get({ key: "main.window.state", value:{ width: 1000, height: 600 } });
+    const state = config_ipc_server.get("main.window.state", { width: 1000, height: 600 });
     state.title = `${app.name} ${app.getVersion()}`;
     state.webPreferences =  {
         nodeIntegration: false,
@@ -273,7 +273,7 @@ function createWindow() {
             return;
         }
 
-        if(config_ipc_server.get({ key: "check_window_close", value:true})){
+        if(config_ipc_server.get("check_window_close", true)){
             const ret = dialog.showMessageBoxSync({
                 type: "info", 
                 buttons: ["OK", "Cancel"],
@@ -287,7 +287,7 @@ function createWindow() {
         }
 
         try {
-            config_ipc_server.set({ key:"main.window.state", value:getWindowState(main_win) });
+            config_ipc_server.set("main.window.state", getWindowState(main_win));
             await config_ipc_server.save();
         } catch (error) {
             const ret = dialog.showMessageBoxSync({
@@ -371,7 +371,7 @@ app.on("ready", async ()=>{
         return;
     }
 
-    const log_level = config_ipc_server.get({ key: "log.level", value:"info"});
+    const log_level = config_ipc_server.get("log.level", "info");
     setLogLevel(log_level);
 
     ipcMain.on(IPC_CHANNEL.SHOW_MESSAGE, (event, args) => {
@@ -558,7 +558,7 @@ app.on("ready", async ()=>{
         await session.defaultSession.clearCache();
     });
 
-    await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
+    await loadCSS(config_ipc_server.get("css_path", ""));
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
@@ -634,7 +634,7 @@ app.on("ready", async ()=>{
         store.setItems("stack", items);
     }); 
 
-    const data_dir = config_ipc_server.get({ key:"data_dir", value:"" });
+    const data_dir = config_ipc_server.get("data_dir", "");
     library.setup(data_dir);
     ipcMain.handle("library:addItem", async (event, args) => {
         const { item } = args;
@@ -698,7 +698,7 @@ const createPlayerWindow = () => {
             resolve();
             return;
         }
-        const state = config_ipc_server.get({ key:"player.window.state", value:{ width: 800, height: 600 } });
+        const state = config_ipc_server.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
@@ -725,7 +725,7 @@ const createPlayerWindow = () => {
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {
-                config_ipc_server.set({ key:"player.window.state", value:getWindowState(player_win) });
+                config_ipc_server.set("player.window.state", getWindowState(player_win));
                 player_win = null;
             });
 

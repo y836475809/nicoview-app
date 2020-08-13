@@ -17,49 +17,8 @@ class ConfigIPCServer extends IPCServer {
         this._initJsonData();
     }
 
-    _initJsonData(){
-        this.json_data = {};
-        this.json_data["app_setting_dir"] = path.dirname(this.config_path);
-        this.json_data.download = {};
-    }
-
-    getObj(key, json_data){
-        let obj = deepCopy(json_data);
-        const props = key.split(".");
-        props.some(prop => {
-            if(obj[prop] === undefined){
-                obj = obj[prop];
-                return true;
-            }
-            obj = obj[prop];
-        });
-        return obj;
-    }
-
-    setObj(key, value, json_data){
-        let obj = json_data;
-        const props = key.split(".");
-        for (let index = 0; index < props.length-1; index++) {
-            const prop = props[index];
-            if(obj[prop] === undefined){
-                obj[prop] = {};
-            }
-            if(typeof(obj[prop])!="object"){
-                obj[prop] = {};
-            }
-            obj = obj[prop];
-        }
-        const prop = props[props.length-1];
-        if(typeof(obj[prop])=="object" && typeof(value)=="object"){
-            Object.assign(obj[prop], value);
-        }else{
-            obj[prop] = value;
-        }
-    }
-
-    get(args) {
-        const { key, value } = args;
-        const obj = this.getObj(key, this.json_data);
+    get(key, value) {
+        const obj = this._getObj(key, this.json_data);
         if (obj === null || obj === undefined) {
             return value;
         }
@@ -73,9 +32,8 @@ class ConfigIPCServer extends IPCServer {
         return obj;
     }
 
-    set(args) {
-        const { key, value } = args;
-        this.setObj(key, value, this.json_data);
+    set(key, value) {
+        this._setObj(key, value, this.json_data);
     }
 
     clear() {
@@ -102,13 +60,53 @@ class ConfigIPCServer extends IPCServer {
     }
 
     async configFolder(key, label) {
-        const cfg_dir = this.get({key:key, value:undefined});
+        const cfg_dir = this.get(key, undefined);
         if (await this._checkDir(cfg_dir) !== true) {     
             const dir = await this._selectFolder(`${label}を保存するフォルダの選択`);
             if (dir === undefined) {
                 throw new Error(`${label}を保存するフォルダが選択されていない`);
             }
-            this.set({key:key, value:dir});
+            this.set(key, dir);
+        }
+    }
+
+    _initJsonData(){
+        this.json_data = {};
+        this.json_data["app_setting_dir"] = path.dirname(this.config_path);
+        this.json_data.download = {};
+    }
+
+    _getObj(key, json_data){
+        let obj = deepCopy(json_data);
+        const props = key.split(".");
+        props.some(prop => {
+            if(obj[prop] === undefined){
+                obj = obj[prop];
+                return true;
+            }
+            obj = obj[prop];
+        });
+        return obj;
+    }
+
+    _setObj(key, value, json_data){
+        let obj = json_data;
+        const props = key.split(".");
+        for (let index = 0; index < props.length-1; index++) {
+            const prop = props[index];
+            if(obj[prop] === undefined){
+                obj[prop] = {};
+            }
+            if(typeof(obj[prop])!="object"){
+                obj[prop] = {};
+            }
+            obj = obj[prop];
+        }
+        const prop = props[props.length-1];
+        if(typeof(obj[prop])=="object" && typeof(value)=="object"){
+            Object.assign(obj[prop], value);
+        }else{
+            obj[prop] = value;
         }
     }
 

@@ -26,8 +26,8 @@
     <script>
         /* globals riot */
         const { remote } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPCClient } = window.IPC;
         const { searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
@@ -54,8 +54,7 @@
         };
 
         const loadItems = async () => {
-            const name = this.name;
-            const items = await IPCClient.request("bookmark", "getData", { name });
+            const items = await ipc.invoke("nico-search:getItems");
             this.obs_listview.trigger("loadData", { items });
         };
 
@@ -65,8 +64,7 @@
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
-            const name = this.name;
-            await IPCClient.request("bookmark", "update", { name, items });
+            await ipc.invoke("nico-search:updateItems", { items });
         });
 
         const createMenu = (self) => {

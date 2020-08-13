@@ -31,6 +31,7 @@
     <script>
         /* globals riot */
         const {remote, ipcRenderer} = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
         const { IPCClient } = window.IPC;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
@@ -55,8 +56,7 @@
 
         this.on("mount", async () => {
             // TODO error対応
-            const name = this.name;
-            const items = await IPCClient.request("bookmark", "getData", { name });
+            const items = await ipc.invoke("bookmark:getItems");
             this.obs_listview.trigger("loadData", { items });
 
             resizeHeight(items);
@@ -64,9 +64,7 @@
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
-            const name = this.name;
-            await IPCClient.request("bookmark", "update", { name, items });
-
+            await ipc.invoke("bookmark:updateItems", { items });
             resizeHeight(items);
         });
 

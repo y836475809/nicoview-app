@@ -6,7 +6,6 @@ const path = require("path");
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIPCServer } = require("./app/js/ipc-config");
 const { LibraryIPCServer } = require("./app/js/ipc-library");
-const { BookMarkIPCServer } = require("./app/js/ipc-bookmark");
 const { HistoryIPCServer } = require("./app/js/ipc-history");
 const { DownloadItemIPCServer } = require("./app/js/ipc-download-item");
 const { StoreVideoItemsIPCServer } = require("./app/js/ipc-store-video-items");
@@ -16,16 +15,17 @@ const { JsonStore } = require("./app/js/json-store");
 const { logger } = require("./app/js/logger");
 const { StartupConfig } = require("./app/start-up-config");
 const { CSSLoader } = require("./app/js/css-loader");
+const { Store } = require("./app/js/store");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const config_ipc_server = new ConfigIPCServer();
 const library_ipc_server = new LibraryIPCServer();
-const bookmark_ipc_server = new BookMarkIPCServer();
 const history_ipc_server = new HistoryIPCServer();
 const downloaditem_ipc_server = new DownloadItemIPCServer();
 const store_video_items_ipc_server = new StoreVideoItemsIPCServer();
 const css_loader = new CSSLoader();
+const store = new Store();
 
 const startup_config = new StartupConfig(__dirname, process.argv);
 startup_config.load();
@@ -579,15 +579,6 @@ app.on("ready", async ()=>{
     library_ipc_server.on("libraryItemDeleted", (args)=>{  
         main_win.webContents.send("libraryItemDeleted", args);
     });
-        
-    bookmark_ipc_server.setup(async (args)=>{
-        const { name } = args;
-        return await loadJson(name, []);
-    });  
-    bookmark_ipc_server.on("bookmarkItemUpdated", async (args)=>{  
-        const { name, items } = args;
-        await saveJson(name, items);    
-    });
 
     const history_max = 50;
     const items = await loadJson("history", []);
@@ -631,6 +622,27 @@ app.on("ready", async ()=>{
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
+
+    const hname = [
+        "bookmark",
+        "library-search",
+        "mylist",
+        // "stack",
+        "nico-search",
+    ];
+    hname.forEach(name=>{
+        ipcMain.handle(`${name}:getItems`, async (event, args) => {
+            if(!store.has(name)){
+                store.setItems(name, await loadJson(name, []));
+            }
+            return store.getItems(name);
+        });  
+        ipcMain.handle(`${name}:updateItems`, async (event, args) => {
+            const { items } = args;
+            store.setItems(name, items);
+            await saveJson(name, items);
+        });  
+    });
 
     createWindow();
 });

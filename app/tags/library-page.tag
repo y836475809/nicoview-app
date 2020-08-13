@@ -17,23 +17,21 @@
     <script>
         /* globals riot */
         const { remote } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "library-search";
 
         this.on("mount", async () => {
-            const name = this.name;
-            const items = await IPCClient.request("bookmark", "getData", { name });
+            const items = await ipc.invoke("library-search:getItems");
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
-            const name = this.name;
-            await IPCClient.request("bookmark", "update", { name, items });
+            await ipc.invoke("library-search:updateItems", { items });
         });
 
         const createMenu = (self) => {

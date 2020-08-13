@@ -20,8 +20,8 @@
     <script>
         /* globals riot */
         const { remote } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -40,8 +40,7 @@
         };
 
         const loadItems = async () => {
-            const name = this.name;
-            this.items = await IPCClient.request("bookmark", "getData", { name });
+            this.items = await ipc.invoke("mylist:getItems");
             this.obs_listview.trigger("loadData", { items:this.items });
         };
 
@@ -53,8 +52,7 @@
             const { items } = args;
             this.items = items;
 
-            const name = this.name;
-            await IPCClient.request("bookmark", "update", { name, items });
+            await ipc.invoke("mylist:updateItems", { items });
         });
 
         const createMenu = (self) => {

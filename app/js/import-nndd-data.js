@@ -2,6 +2,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
 const { ipcRenderer } = require("electron");
+const ipc = require("electron").ipcRenderer;
 const { IPCClient } = require("./ipc-client-server");
 const { IPC_CHANNEL } = require("./ipc-channel");
 
@@ -58,10 +59,7 @@ class ImportNNDDData {
     async mylist(filename){
         const xml = await this._readNNDDFile(filename);
         const items = this._getMyList(xml);
-        await IPCClient.request("bookmark", "update", { 
-            name: "mylist", 
-            items: items
-        });
+        await ipc.invoke("mylist:updateItems", { items });
 
         const dest_mylist_dir = path.join(this.data_dir, "mylist");
         try {
@@ -83,19 +81,13 @@ class ImportNNDDData {
     async searchitems(filename){
         const xml = await this._readNNDDFile(filename);
         const items = this._getSearchItems(xml);
-        await IPCClient.request("bookmark", "update", { 
-            name: "nico-search", 
-            items: items
-        });
+        await ipc.invoke("nico-search:updateItems", { items });
     }
 
     async nglist(filename){
         const xml = await this._readNNDDFile(filename);
         const items = this._getNGList(xml);
-        await IPCClient.request("bookmark", "update", { 
-            name: "nglist", 
-            items: items
-        });
+        await ipc.invoke("nglist:updateItems", { items });
     }
     
     async _readNNDDFile(filename){

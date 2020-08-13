@@ -92,8 +92,8 @@
 
     <script>
         const { ipcRenderer } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
         const { toTimeString } = window.TimeFormat;
 
         const obs = this.opts.obs;
@@ -129,16 +129,7 @@
                 });
             }, 50);
 
-            await IPCClient.request("store_video_items", "setData", {
-                key: "stack",
-                items: this.items.map(item=>{
-                    return {
-                        video_id: item.id,
-                        title: item.title,
-                        time: item.time?item.time:0
-                    };
-                })
-            });
+            await ipc.invoke("stack:updateItems", { items:this.items });
         });
 
         this.onclickItem = (item, e) => {
@@ -155,6 +146,7 @@
             setTimeout(() => { 
                 this.items.splice(i, 1);
                 this.update();
+                ipc.invoke("stack:updateItems", { items:this.items }).then();
             }, item_duration);   
         };
     </script>

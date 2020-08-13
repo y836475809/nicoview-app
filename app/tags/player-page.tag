@@ -235,21 +235,17 @@
                     };
                 });
             };
-            const getStoreVideoItems = async (key) => {
-                const items = await IPCClient.request("store_video_items", "getData", { key });
-                return items?items:[];
-            };
 
             const history_num = await IPCClient.request("config", "get", { key: "player.contextmenu.history_num", value: 5 });
-            // const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
+            const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
             const history_items = (await ipc.invoke("history:getItems")).slice(1, history_num+1);
-            // const stack_items = (await getStoreVideoItems("stack")).slice(0, stack_num);
+            const stack_items = (await ipc.invoke("stack:getItems")).slice(0, stack_num);
             
             const menu_items = createMenuItems(history_items);
-            // if(stack_items.length > 0){
-            //     menu_items.push({ type: "separator" });
-            //     Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
-            // }
+            if(stack_items.length > 0){
+                menu_items.push({ type: "separator" });
+                Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
+            }
             return Menu.buildFromTemplate(menu_items.concat());
         };
     

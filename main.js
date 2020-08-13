@@ -7,7 +7,6 @@ const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIPCServer } = require("./app/js/ipc-config");
 const { LibraryIPCServer } = require("./app/js/ipc-library");
 const { History } = require("./app/js/history");
-const { StoreVideoItemsIPCServer } = require("./app/js/ipc-store-video-items");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
 const { JsonStore } = require("./app/js/json-store");
@@ -21,7 +20,6 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 const config_ipc_server = new ConfigIPCServer();
 const library_ipc_server = new LibraryIPCServer();
 const history = new History();
-const store_video_items_ipc_server = new StoreVideoItemsIPCServer();
 const css_loader = new CSSLoader();
 const store = new Store();
 
@@ -561,8 +559,6 @@ app.on("ready", async ()=>{
         await session.defaultSession.clearCache();
     });
 
-    store_video_items_ipc_server.setup();
-
     library_ipc_server.on("libraryInitialized", ()=>{  
         main_win.webContents.send("libraryInitialized", {
             items:library_ipc_server.getItems()
@@ -644,6 +640,14 @@ app.on("ready", async ()=>{
 
         const items = history.getData();
         await saveJson("history", items);
+    }); 
+
+    ipcMain.handle("stack:getItems", async (event, args) => {
+        return store.getItems("stack");
+    });  
+    ipcMain.handle("stack:updateItems", (event, args) => {
+        const { items } = args;
+        store.setItems("stack", items);
     }); 
 
     createWindow();

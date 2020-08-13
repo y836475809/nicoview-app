@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require("path");
 const { ipcRenderer } = require("electron");
 const ipc = require("electron").ipcRenderer;
-const { IPCClient } = require("./ipc-client-server");
 const { IPC_CHANNEL } = require("./ipc-channel");
 
 const import_items = {

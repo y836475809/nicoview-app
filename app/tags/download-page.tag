@@ -71,7 +71,6 @@
         const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
-        const { IPCClient } = window.IPC;
 
         const obs = this.opts.obs; 
         this.obs_schedule = riot.observable();

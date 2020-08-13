@@ -205,7 +205,6 @@
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
-        const { IPCClient } = window.IPC;
         const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 

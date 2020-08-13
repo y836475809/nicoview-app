@@ -127,12 +127,13 @@
                 state: state
             });   
             
-            const history_item = {
-                id: video.video_id, 
-                image: video.thumbnailURL, 
-                title: video.title, 
-            };
-            ipcRenderer.send(IPC_CHANNEL.ADD_PLAY_HISTORY, {history_item});
+            ipc.send("history:addItem", { 
+                item:{
+                    id: video.video_id, 
+                    image: video.thumbnailURL, 
+                    title: video.title,  
+                } 
+            });
         }; 
 
         const cancelPlay = () => {

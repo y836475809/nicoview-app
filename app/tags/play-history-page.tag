@@ -52,6 +52,11 @@
             grid_table.updateCells(video_id, { saved:false });
         });
 
+        ipcRenderer.on("history:onItemUpdated", async (event, args)=>{
+            const items = await ipc.invoke("history:getItems");
+            setData(items);
+        });
+
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
             let result = `<div>ID: ${video_id}</div>`;
@@ -171,13 +176,6 @@
         
         obs.on("play-history-page:reload-items", async ()=>{
             await loadItems();
-        });
-
-        ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{
-            const { history_item } = args;
-            await ipc.invoke("history:addItem", { item:history_item });
-            const items = await ipc.invoke("history:getItems");
-            setData(items);
         });
     </script>
 </play-history-page>

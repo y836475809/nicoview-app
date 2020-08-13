@@ -395,23 +395,6 @@ app.on("ready", async ()=>{
         });
     });
 
-    ipcMain.on(IPC_CHANNEL.ADD_PLAY_HISTORY, (event, args) => {
-        main_win.webContents.send(IPC_CHANNEL.ADD_PLAY_HISTORY, args);
-
-        const { history_item } = args;
-        const video_id = history_item.id;
-        const video_item = library.getItem(video_id);
-        if(video_item===null){
-            return;
-        }
-       
-        const props = { 
-            last_play_date : new Date().getTime(),
-            play_count : video_item.play_count + 1
-        };
-        library.update(video_id, props);
-    });
-
     ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
         main_win.focus();
         main_win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
@@ -536,12 +519,25 @@ app.on("ready", async ()=>{
         history.setData(items);
         await saveJson("history", items);
     });
-    ipcMain.handle("history:addItem", async (event, args) => {
+    ipcMain.on("history:addItem", async (event, args) => {
         const { item } = args;
         history.add(item);
 
         const items = history.getData();
         await saveJson("history", items);
+
+        main_win.webContents.send("history:onItemUpdated", args);
+
+        const video_id = item.id;
+        const video_item = library.getItem(video_id);
+        if(video_item===null){
+            return;
+        }
+        const props = { 
+            last_play_date : new Date().getTime(),
+            play_count : video_item.play_count + 1
+        };
+        library.update(video_id, props);
     }); 
 
     // stack

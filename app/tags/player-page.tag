@@ -52,6 +52,7 @@
     <script>
         /* globals riot */
         const { remote, clipboard, ipcRenderer } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { getWatchURL } = window.NicoURL;  
         const { IPC_CHANNEL } = window.IPC_CHANNEL;
@@ -221,12 +222,12 @@
         const createVideoItemsContextMenu = async () => {
             const createMenuItems = (items) => {
                 return items.map(item=>{
-                    const { video_id, title, time } = item;
+                    const { id, title, time } = item;
                     const menu_title = `${title} ${time?toTimeString(time):""}`;
                     return { 
                         label: menu_title, click() {
                             ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
-                                video_id: video_id,
+                                video_id: id,
                                 time: time?time:0,
                                 online: false
                             });
@@ -240,15 +241,15 @@
             };
 
             const history_num = await IPCClient.request("config", "get", { key: "player.contextmenu.history_num", value: 5 });
-            const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
-            const history_items = (await getStoreVideoItems("history")).slice(1, history_num+1);
-            const stack_items = (await getStoreVideoItems("stack")).slice(0, stack_num);
+            // const stack_num = await IPCClient.request("config", "get", { key: "player.contextmenu.stack_num", value: 5 });
+            const history_items = (await ipc.invoke("history:getItems")).slice(1, history_num+1);
+            // const stack_items = (await getStoreVideoItems("stack")).slice(0, stack_num);
             
             const menu_items = createMenuItems(history_items);
-            if(stack_items.length > 0){
-                menu_items.push({ type: "separator" });
-                Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
-            }
+            // if(stack_items.length > 0){
+            //     menu_items.push({ type: "separator" });
+            //     Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
+            // }
             return Menu.buildFromTemplate(menu_items.concat());
         };
     

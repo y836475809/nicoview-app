@@ -124,7 +124,7 @@
 
         const loadItems = async () => {
             try {
-                const items = await IPCClient.request("history", "getData");
+                const items = await ipc.invoke("history:getItems");
                 setData(items);
             } catch (error) {
                 logger.error(error);
@@ -176,8 +176,8 @@
 
         ipcRenderer.on(IPC_CHANNEL.ADD_PLAY_HISTORY, async (event, args)=>{
             const { history_item } = args;
-            await IPCClient.request("history", "add", { history_item });
-            const items = await IPCClient.request("history", "getData");
+            await ipc.invoke("history:addItem", { item:history_item });
+            const items = await ipc.invoke("history:getItems");
             setData(items);
         });
     </script>

@@ -6,7 +6,7 @@ const path = require("path");
 const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { ConfigIPCServer } = require("./app/js/ipc-config");
 const { LibraryIPCServer } = require("./app/js/ipc-library");
-const { HistoryIPCServer } = require("./app/js/ipc-history");
+const { History } = require("./app/js/history");
 const { StoreVideoItemsIPCServer } = require("./app/js/ipc-store-video-items");
 const { importNNDDDB } = require("./app/js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
@@ -20,7 +20,7 @@ app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const config_ipc_server = new ConfigIPCServer();
 const library_ipc_server = new LibraryIPCServer();
-const history_ipc_server = new HistoryIPCServer();
+const history = new History();
 const store_video_items_ipc_server = new StoreVideoItemsIPCServer();
 const css_loader = new CSSLoader();
 const store = new Store();
@@ -578,35 +578,6 @@ app.on("ready", async ()=>{
         main_win.webContents.send("libraryItemDeleted", args);
     });
 
-    const history_max = 50;
-    const items = await loadJson("history", []);
-    history_ipc_server.setup(history_max);  
-    history_ipc_server.setData({ items });
-    store_video_items_ipc_server.setData({
-        key:"history", 
-        items:items.map(item=>{
-            return {
-                video_id: item.id,
-                title: item.title
-            };
-        })
-    });
-
-    history_ipc_server.on("historyItemUpdated", async (args)=>{  
-        const items = history_ipc_server.getData();
-        await saveJson("history", items);
-        
-        store_video_items_ipc_server.setData({
-            key:"history", 
-            items:items.map(item=>{
-                return {
-                    video_id: item.id,
-                    title: item.title
-                };
-            })
-        });
-    });
-
     await loadCSS(config_ipc_server.get({ key: "css_path", value:"" }));
 
     const user_agent = process.env["user_agent"];
@@ -654,6 +625,26 @@ app.on("ready", async ()=>{
         });
         return ids;
     });
+
+    const history_max = 50;
+    const items = await loadJson("history", []);
+    history.setup(history_max);  
+    history.setData(items);
+    ipcMain.handle("history:getItems", (event, args) => {
+        return history.getData("history");
+    });
+    ipcMain.handle("history:updateItems", async (event, args) => {
+        const { items } = args;
+        history.setData(items);
+        await saveJson("history", items);
+    });
+    ipcMain.handle("history:addItem", async (event, args) => {
+        const { item } = args;
+        history.add(item);
+
+        const items = history.getData();
+        await saveJson("history", items);
+    }); 
 
     createWindow();
 });

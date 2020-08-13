@@ -49,11 +49,7 @@ class ImportNNDDData {
     async history(filename){
         const xml = await this._readNNDDFile(filename);
         const items = this._getHistory(xml);
-        await IPCClient.request("history", "setData", { items });
-        await IPCClient.request("bookmark", "update", { 
-            name: "history", 
-            items: items
-        });
+        await ipc.invoke("history:updateItems", { items });
     }
 
     async mylist(filename){

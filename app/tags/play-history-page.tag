@@ -24,7 +24,6 @@
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
 
@@ -132,7 +131,7 @@
                 setData(items);
             } catch (error) {
                 logger.error(error);
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: "再生履歴の読み込み失敗",
                     message: error.message,
@@ -145,7 +144,7 @@
             grid_table.setupResizer(".history-grid-container");
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
-                ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                ipc.send("app:play-video", {
                     video_id : video_id,
                     time : 0,
                     online: false

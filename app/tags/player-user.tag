@@ -122,9 +122,9 @@
     
     <script>
         /* globals */
-        const { remote, clipboard, ipcRenderer } = window.electron;
+        const { remote, clipboard } = window.electron;
+        const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
 
@@ -140,7 +140,7 @@
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
 
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+            ipc.send("app:play-video", {
                 video_id: video_id,
                 time: 0,
                 online: false
@@ -159,14 +159,14 @@
             if(e.button === 2){
                 const menu_template = Menu.buildFromTemplate([
                     { label: "再生", click() {
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id: video_id,
                             time: 0,
                             online: false
                         }); 
                     }},
                     { label: "オンラインで再生", click() {
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id: video_id,
                             time: 0,
                             online: true
@@ -313,14 +313,14 @@
                 const video_id = text;
                 menu_template = Menu.buildFromTemplate([
                     { label: "再生", click() {
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id: video_id,
                             time: 0,
                             online: false
                         }); 
                     }},
                     { label: "オンラインで再生", click() {
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id: video_id,
                             time: 0,
                             online: true

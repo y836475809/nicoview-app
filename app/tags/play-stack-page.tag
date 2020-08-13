@@ -91,9 +91,7 @@
     </div>
 
     <script>
-        const { ipcRenderer } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { toTimeString } = window.TimeFormat;
 
         const obs = this.opts.obs;
@@ -133,7 +131,7 @@
         });
 
         this.onclickItem = (item, e) => {
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+            ipc.send("app:play-video", {
                 video_id: item.id,
                 time: item.time?item.time:0,
                 online: false

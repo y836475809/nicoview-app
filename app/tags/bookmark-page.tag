@@ -30,10 +30,9 @@
 
     <script>
         /* globals riot */
-        const {remote, ipcRenderer} = window.electron;
+        const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
@@ -95,7 +94,7 @@
                         }
                         const { video_id, time } = items[0].data;
                         const online = false;
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id,
                             time,
                             online
@@ -107,7 +106,7 @@
                     label: "オンラインで再生", click() {
                         const { video_id, time } = items[0].data;
                         const online = true;
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id,
                             time,
                             online
@@ -153,7 +152,7 @@
         this.obs_listview.on("item-dlbclicked", (item) => {  
             const { video_id, time } = item.data;
             const online = false;
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+            ipc.send("app:play-video", {
                 video_id,
                 time,
                 online

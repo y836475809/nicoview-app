@@ -204,7 +204,6 @@
         const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 
@@ -330,7 +329,7 @@
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {
             const video_id = item.video_id;
-            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+            ipc.send("app:play-video", {
                 video_id : video_id,
                 time : 0,
                 online: false
@@ -418,13 +417,13 @@
             this.obs_modal_dialog.trigger("close");
             
             if(error_items.length > 0){
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: `${error_items.length}個が更新に失敗しました`,
                     message: "詳細はログを参照",
                 });
             }else{
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "info",
                     title: "",
                     message: `更新完了(${cur_update}/${items.length})`,
@@ -491,13 +490,13 @@
             this.obs_modal_dialog.trigger("close");
 
             if(error_items.length > 0){
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: `${error_items.length}個がNNDD形式への変換に失敗しました`,
                     message: "詳細はログを参照",
                 });
             }else{
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "info",
                     title: "",
                     message: `NNDD形式への変換完了(${cur_update}/${items.length})`,
@@ -726,7 +725,7 @@
                 await ipc.invoke("library:load");
             } catch (error) {
                 logger.error(error);
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: "ライブラリの読み込み失敗",
                     message: error.message,

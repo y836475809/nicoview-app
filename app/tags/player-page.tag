@@ -51,11 +51,10 @@
 
     <script>
         /* globals riot */
-        const { remote, clipboard, ipcRenderer } = window.electron;
+        const { remote, clipboard } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { getWatchURL } = window.NicoURL;  
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { toTimeString } = window.TimeFormat;
         
         const obs = this.opts.obs; 
@@ -182,7 +181,7 @@
                     id: "reload",
                     label: "再読み込み", click() {
                         const { video_id, online } = play_data;
-                        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                        ipc.send("app:play-video", {
                             video_id: video_id,
                             time: 0,
                             online:online
@@ -225,7 +224,7 @@
                     const menu_title = `${title} ${time?toTimeString(time):""}`;
                     return { 
                         label: menu_title, click() {
-                            ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                            ipc.send("app:play-video", {
                                 video_id: id,
                                 time: time?time:0,
                                 online: false

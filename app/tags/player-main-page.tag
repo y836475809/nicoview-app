@@ -213,7 +213,7 @@
 
                 const {is_economy, is_deleted, cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = await ipcRenderer.invoke(IPC_CHANNEL.SET_COOKIE, cookies);
+                const ret = await ipc.invoke("app:set-cookie", cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 
@@ -242,7 +242,7 @@
             this.obs_modal_dialog.trigger("close");
         }; 
   
-        ipcRenderer.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
+        ipc.on("app:play-video", async (event, args) => {
             const { video_id, online, time, video_item } = args;
 
             play_data = { 
@@ -272,23 +272,23 @@
         });
 
         obs.on("player-main-page:search-tag", (args) => {
-            ipcRenderer.send(IPC_CHANNEL.SEARCH_TAG, args);
+            ipc.send("app:search-tag", args);
         });
 
         obs.on("player-main-page:load-mylist", (args) => {
-            ipcRenderer.send(IPC_CHANNEL.LOAD_MYLIST, args);
+            ipc.send("app:load-mylist", args);
         });
 
         obs.on("player-main-page:add-bookmark", (args) => {
-            ipcRenderer.send(IPC_CHANNEL.ADD_BOOKMARK, args);
+            ipc.send("app:add-bookmark", args);
         });
 
         obs.on("player-main-page:add-download-item", (args) => {
-            ipcRenderer.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
+            ipc.send("app:add-download-item", args);
         });
 
         obs.on("player-main-page:add-stack-items", (args) => {
-            ipcRenderer.send(IPC_CHANNEL.ADD_STACK_ITEMS, args);
+            ipc.send("app:add-stack-items", args);
         });
   
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
@@ -494,7 +494,7 @@
                 comment_filter.setNGComments(ng_texts, ng_user_ids);
             } catch (error) {
                 logger.error("player main load ng comment", error);
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: "NGコメントリストの読み込み失敗",
                     message: error.message,

@@ -197,7 +197,6 @@
         const { remote, ipcRenderer, shell } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         this.obs = this.opts.obs;
         this.obs_open_video_form = riot.observable();
@@ -317,26 +316,26 @@
             this.obs_open_video_form.trigger("show");
         });  
 
-        ipcRenderer.on(IPC_CHANNEL.SEARCH_TAG, (event, args)=>{
+        ipc.on("app:search-tag", (event, args)=>{
             this.obs.trigger("main-page:select-page", "search");
             this.obs.trigger("search-page:search-tag", args);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.LOAD_MYLIST, (event, args)=>{
+        ipc.on("app:load-mylist", (event, args)=>{
             this.obs.trigger("main-page:select-page", "mylist");
             this.obs.trigger("mylist-page:load-mylist", args);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args)=>{
+        ipc.on("app:add-download-item", (event, args)=>{
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.ADD_STACK_ITEMS, (event, args)=>{
+        ipc.on("app:add-stack-items", (event, args)=>{
             this.obs.trigger("play-stack-page:add-items", args);
         });
 
-        ipcRenderer.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args)=>{
+        ipc.on("app:add-bookmark", (event, args)=>{
             const bk_item = args;
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });

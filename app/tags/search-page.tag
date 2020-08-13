@@ -302,7 +302,6 @@
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { showMessageBox } = window.RendererDailog;
-        const { IPC_CHANNEL } =  window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -682,7 +681,7 @@
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;
                 if(video_id){
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                    ipc.send("app:play-video", {
                         video_id : video_id,
                         time : 0,
                         online: false

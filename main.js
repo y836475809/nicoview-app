@@ -371,7 +371,12 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    ipcMain.on(IPC_CHANNEL.SHOW_MESSAGE, (event, args) => {
+    await loadCSS(config.get("css_path", ""));
+
+    const user_agent = process.env["user_agent"];
+    session.defaultSession.setUserAgent(user_agent);
+
+    ipcMain.on("app:show-message", (event, args) => {
         const { type, title, message } = args;
         dialog.showMessageBoxSync({
             type: type,
@@ -380,14 +385,14 @@ app.on("ready", async ()=>{
             message: message
         });
     });
-
-    ipcMain.on(IPC_CHANNEL.PLAY_VIDEO, async (event, args) => {
+    
+    ipcMain.on("app:play-video", async (event, args) => {
         await createPlayerWindow();
         player_win.show();
 
         const {video_id, online, time} = args;
         const video_item = library.getItem(video_id);
-        player_win.webContents.send(IPC_CHANNEL.PLAY_VIDEO, {
+        player_win.webContents.send("app:play-video", {
             video_id,
             online,
             time,
@@ -395,29 +400,7 @@ app.on("ready", async ()=>{
         });
     });
 
-    ipcMain.on(IPC_CHANNEL.SEARCH_TAG, (event, args) => {
-        main_win.focus();
-        main_win.webContents.send(IPC_CHANNEL.SEARCH_TAG, args);
-    });
-
-    ipcMain.on(IPC_CHANNEL.LOAD_MYLIST, (event, args) => {
-        main_win.focus();
-        main_win.webContents.send(IPC_CHANNEL.LOAD_MYLIST, args);
-    });
-
-    ipcMain.on(IPC_CHANNEL.ADD_BOOKMARK, (event, args) => {
-        main_win.webContents.send(IPC_CHANNEL.ADD_BOOKMARK, args);
-    });
-
-    ipcMain.on(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, (event, args) => {
-        main_win.webContents.send(IPC_CHANNEL.ADD_DOWNLOAD_ITEM, args);
-    });
-
-    ipcMain.on(IPC_CHANNEL.ADD_STACK_ITEMS, (event, args) => {
-        main_win.webContents.send(IPC_CHANNEL.ADD_STACK_ITEMS, args);
-    });
-
-    ipcMain.handle(IPC_CHANNEL.SET_COOKIE, async (event, args) => {
+    ipcMain.handle("app:set-cookie", async (event, args) => {
         const cookies = args;
         try {
             for (let index = 0; index < cookies.length; index++) {
@@ -430,10 +413,22 @@ app.on("ready", async ()=>{
         }
     });
 
-    await loadCSS(config.get("css_path", ""));
-
-    const user_agent = process.env["user_agent"];
-    session.defaultSession.setUserAgent(user_agent);
+    const app_msg_list = [
+        { name:"search-tag", focus:true },
+        { name:"load-mylist", focus:true },
+        { name:"add-bookmark", focus:false },
+        { name:"add-download-item", focus:false },
+        { name:"add-stack-items", focus:false },
+    ];
+    app_msg_list.forEach(msg=>{
+        const { name, focus } = msg;
+        ipcMain.on(`app:${name}`, (event, args) => {
+            if(focus){
+                main_win.focus();
+            }
+            main_win.webContents.send(`app:${name}`, args);
+        });
+    });
 
     const hname = [
         "bookmark",

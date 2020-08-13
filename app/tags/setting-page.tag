@@ -449,7 +449,7 @@
             this.obs_msg_dialog.trigger("close");
 
             if(error_files.length>0){
-                ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {
+                ipc.send("app:show-message", {
                     type: "error",
                     title: `${error_files.length}個がインポートに失敗しました`,
                     message: "詳細はログを参照",

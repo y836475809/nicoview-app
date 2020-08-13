@@ -1,9 +1,8 @@
-const { ipcRenderer } = require("electron");
-const { IPC_CHANNEL } = require("./ipc-channel");
+const ipc = require("electron").ipcRenderer;
 
 class Command {
     static play(item, online) {
-        ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+        ipc.send("app:play-video", {
             video_id : item.id,
             time : 0,
             online: online

@@ -206,7 +206,6 @@
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
         const { showOKCancelBox, showMessageBox } = window.RendererDailog;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -376,7 +375,7 @@
                     }        
                     obs.trigger("library-page:convert-video", video_id);
                 }else{
-                    ipcRenderer.send(IPC_CHANNEL.PLAY_VIDEO, {
+                    ipc.send("app:play-video", {
                         video_id: video_id,
                         time: 0,
                         online: false

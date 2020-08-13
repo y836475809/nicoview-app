@@ -39,7 +39,6 @@
 
     <script>
         /* globals riot logger */
-        const path = window.path;
         const { remote, ipcRenderer } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
@@ -364,7 +363,9 @@
             comment_filter.ng_comment.addNGTexts(ng_texts);
             comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
             try {
-                comment_filter.ng_comment.save();
+                await ipc.invoke("nglist:updateItems", {
+                    items:comment_filter.getNGComments()
+                });
             } catch (error) {
                 logger.error("player main save ng comment", error);
                 await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
@@ -381,7 +382,9 @@
             comment_filter.ng_comment.deleteNGTexts(ng_texts);
             comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
             try {
-                comment_filter.ng_comment.save();
+                await ipc.invoke("nglist:updateItems", {
+                    items:comment_filter.getNGComments()
+                });
             } catch (error) {
                 logger.error("player main save comment ng", error);
                 await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
@@ -483,11 +486,11 @@
             this.player_default_size = { width: 854 ,height: 480 };
             
             try {
-                const data_dir = await ipc.invoke("config:get", { key:"data_dir", value:"" });
                 const do_limit = await ipc.invoke("config:get", { key:"comment.do_limit", value:true });
-                comment_filter = new CommentFilter(path.join(data_dir, "nglist.json"));
+                const { ng_texts, ng_user_ids } = await ipc.invoke("nglist:getItems");
+                comment_filter = new CommentFilter();
                 comment_filter.setLimit(do_limit);
-                comment_filter.ng_comment.load();
+                comment_filter.setNGComments(ng_texts, ng_user_ids);
             } catch (error) {
                 logger.error("player main load ng comment", error);
                 ipcRenderer.send(IPC_CHANNEL.SHOW_MESSAGE, {

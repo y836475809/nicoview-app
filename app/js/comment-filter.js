@@ -1,10 +1,20 @@
-const { JsonStore } = require("./json-store");
 
 class NGComment {
-    constructor(file_path){
-        this._store = new JsonStore(file_path);
+    constructor(){
         this._ng_texts = [];
         this._ng_user_ids = [];
+    }
+
+    setNGComments(ng_texts, ng_user_ids){
+        this._ng_texts = ng_texts;
+        this._ng_user_ids = ng_user_ids;
+    }
+
+    getNGComments(){
+        return {
+            ng_texts: this._ng_texts,
+            ng_user_ids: this._ng_user_ids
+        };
     }
 
     getComments(comments){
@@ -54,26 +64,6 @@ class NGComment {
             ng_texts: this._ng_texts, 
             ng_user_ids: this._ng_user_ids
         };
-    }
-
-    load(){
-        try {
-            const { ng_texts, ng_user_ids } = this._store.load();
-            this._ng_texts = ng_texts;
-            this._ng_user_ids = ng_user_ids;
-        } catch (error) {
-            this._ng_texts = [];
-            this._ng_user_ids = [];
-            throw error;
-        }
-    }
-
-    save(){
-        this._store.save(
-            {
-                ng_texts: this._ng_texts, 
-                ng_user_ids: this._ng_user_ids
-            });
     }
 }
 
@@ -242,8 +232,8 @@ class CommentNumLimit {
 }
 
 class CommentFilter {
-    constructor(nglist_path, num_per_min=100){
-        this.ng_comment = new NGComment(nglist_path);
+    constructor(num_per_min=100){
+        this.ng_comment = new NGComment();
         this._comment_num_limit = new CommentNumLimit(num_per_min);
         this._comments = [];
         this._do_limit = true;
@@ -255,6 +245,14 @@ class CommentFilter {
 
     setLimit(do_limit){
         this._do_limit = do_limit;
+    }
+
+    setNGComments(ng_texts, ng_user_ids){
+        this.ng_comment.setNGComments(ng_texts, ng_user_ids);
+    }
+
+    getNGComments(){
+        return this.ng_comment.getNGComments();
     }
 
     setPlayTime(play_time_sec){

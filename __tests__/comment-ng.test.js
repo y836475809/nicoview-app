@@ -10,15 +10,10 @@ const mkComments = () => {
     ];
 };
 
-class TestNGComment extends NGComment{
-    load(){}
-    save(){}
-}
-
 test.beforeEach(t => {
-    t.context.cf = new TestNGComment();
+    t.context.cf = new NGComment();
 
-    t.context.delete_cf = new TestNGComment();
+    t.context.delete_cf = new NGComment();
     t.context.delete_cf.addNGTexts(["text1", "text2", "text3"]);
     t.context.delete_cf.addNGUserIDs(["id1", "id2", "id3"]);
 });

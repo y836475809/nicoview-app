@@ -569,6 +569,7 @@ app.on("ready", async ()=>{
         // "stack",
         "nico-search",
         "download",
+        "nglist",
     ];
     hname.forEach(name=>{
         ipcMain.handle(`${name}:getItems`, async (event, args) => {

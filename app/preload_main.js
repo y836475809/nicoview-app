@@ -6,7 +6,6 @@ process.once("loaded", () => {
     global.path = require("path");
     global.fs = require("fs");
     global.EventEmitter = require("events");
-    global.IPC_CHANNEL = require(`${root_dir}/app/js/ipc-channel`);
     global.logger = require(`${root_dir}/app/js/logger`);
 
     if (process.env.NODE_ENV == "DEBUG") {

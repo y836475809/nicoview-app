@@ -180,9 +180,7 @@
 
     <script>
         /* globals riot logger */
-        const { shell, remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
         const { ImportLibrary } = window.ImportLibrary;
@@ -214,7 +212,7 @@
 
         this.onclickOpenDir = async (e) => {
             const dir = await ipc.invoke("config:get", { key:"app_setting_dir", value:"" });
-            shell.openItem(dir);
+            await ipc.invoke("setting:open-dir", { dir });
         };
 
         this.onclickSelectffmpegPath = async e => {
@@ -410,21 +408,16 @@
         });
 
         this.onclickImportFiles = async ()=>{
-            const result = await dialog.showOpenDialog(remote.getCurrentWindow(), {
-                properties: ["openFile", "multiSelections"],
-                title: "ファイルを選択",
-                defaultPath: ".",
-                filters: [
-                    {name: "avi", extensions:  ["mp4", "flv", "swf"]}
-                ]
+            const file_paths = await ipc.invoke("app:show-select-file-dialog",{
+                name:"avi",
+                exts:["mp4", "flv", "swf"],
+                multi_select:true
             });
-            if(result.canceled===true){
+            if(!file_paths){
                 return;
             }
 
             let cancel = false;
-            const file_paths = result.filePaths;
-           
             this.obs_msg_dialog.trigger("show", {
                 message: "インポート中...",
                 cb: result=>{

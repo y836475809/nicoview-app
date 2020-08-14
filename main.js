@@ -391,9 +391,9 @@ app.on("ready", async ()=>{
         return selectFolderDialog(bw);
     });
     ipcMain.handle("app:show-select-file-dialog", async (event, args) => {
-        const { name, exts } = args;
+        const { name, exts, multi_select } = args;
         const bw = BrowserWindow.fromId(event.sender.id);
-        return selectFileDialog(bw, name, exts);
+        return selectFileDialog(bw, name, exts, multi_select);
     });
     
     ipcMain.on("app:play-video", async (event, args) => {
@@ -679,6 +679,10 @@ app.on("ready", async ()=>{
         main_win.webContents.send("setting:on-reload-css");
 
         applyCSS(player_win);
+    });
+    ipcMain.handle("setting:open-dir", async (event, args) => {
+        const { dir } = args;
+        await shell.openPath(dir);
     });
 
     createWindow();

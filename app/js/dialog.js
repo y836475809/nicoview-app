@@ -10,9 +10,9 @@ const showMessageBox = async (bw, type, title, message, okcancel) => {
     return ret.response == 0;
 };
 
-const selectFileDialog = async (bw, name, exts)=>{
+const selectFileDialog = async (bw, name, exts, multi_select)=>{
     const result = await dialog.showOpenDialog(bw, {
-        properties: ["openFile"],
+        properties: multi_select?["openFile", "multiSelections"]:["openFile"],
         title: "ファイルを選択",
         defaultPath: ".",
         filters: [
@@ -23,7 +23,7 @@ const selectFileDialog = async (bw, name, exts)=>{
     if(result.canceled===true){
         return null;
     }
-    return result.filePaths[0];
+    return multi_select?result.filePaths:result.filePaths[0];
 };
 
 const selectFolderDialog = async (bw)=>{

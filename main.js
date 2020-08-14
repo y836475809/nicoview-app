@@ -433,15 +433,14 @@ app.on("ready", async ()=>{
         });
     });
 
-    const hname = [
+    [
         "bookmark",
         "library-search",
         "mylist",
         "nico-search",
         "download",
         "nglist",
-    ];
-    hname.forEach(name=>{
+    ].forEach(name=>{
         ipcMain.handle(`${name}:getItems`, async (event, args) => {
             if(!store.has(name)){
                 store.setItems(name, await loadJson(name, []));

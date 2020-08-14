@@ -3,7 +3,6 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 
-const { IPC_CHANNEL } = require("./app/js/ipc-channel");
 const { Config } = require("./app/js/config");
 const { Library } = require("./app/js/library");
 const { History } = require("./app/js/history");
@@ -255,7 +254,7 @@ function createWindow() {
 
     main_win.webContents.on("did-finish-load", async () => { 
         applyCSS(main_win);
-        main_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
+        main_win.webContents.send("app:on-load-content");
 
         main_win.webContents.on("context-menu", (e, props) => {
             popupInputContextMenu(main_win, props);
@@ -711,7 +710,7 @@ const createPlayerWindow = () => {
         player_win.removeMenu();
         player_win.webContents.on("did-finish-load", async () => {
             applyCSS(player_win);
-            player_win.webContents.send(IPC_CHANNEL.MAIN_HTML_LOADED);
+            player_win.webContents.send("app:on-load-content");
 
             player_win.webContents.on("context-menu", (e, props) => {
                 popupInputContextMenu(player_win, props);
@@ -722,7 +721,7 @@ const createPlayerWindow = () => {
             player_win.maximize();
         }
 
-        ipcMain.once(IPC_CHANNEL.READY_PLAYER, (event, args) => {
+        ipcMain.once("app:on-ready-player", (event, args) => {
             if(is_debug){
                 player_win.webContents.openDevTools();
             }

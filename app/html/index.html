@@ -35,8 +35,6 @@
     <script type="riot/tag" src="../tags/open-video-form.tag"></script>
     <script>
         /* globals riot */
-        const { ipcRenderer } = window.electron;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const ipc = window.electron.ipcRenderer;
         var { logger } = window.logger; // eslint-disable-line
 
@@ -45,7 +43,7 @@
         ipc.invoke("config:set", 
             { key:"download.wait_time", value:10 }).then();
 
-        ipcRenderer.on(IPC_CHANNEL.MAIN_HTML_LOADED, (event)=>{
+        ipc.on("app:on-load-content", (event)=>{
             riot.mount("main-page", {obs});
         });
 

@@ -42,7 +42,6 @@
         const { remote, ipcRenderer } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;  
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
@@ -501,7 +500,7 @@
                 });
             }
 
-            ipcRenderer.send(IPC_CHANNEL.READY_PLAYER);
+            ipcRenderer.send("app:on-ready-player");
         });   
 
         let resize_begin = false;

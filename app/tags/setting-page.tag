@@ -180,13 +180,12 @@
 
     <script>
         /* globals riot logger */
-        const { shell, ipcRenderer, remote } = window.electron;
+        const { shell, remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
         const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RendererDailog;
-        const { IPC_CHANNEL } = window.IPC_CHANNEL;
         const { ImportLibrary } = window.ImportLibrary;
         const { ImportNNDDData } = window.ImportNNDDData;
         

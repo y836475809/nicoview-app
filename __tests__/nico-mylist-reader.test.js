@@ -7,6 +7,15 @@ test.before(t => {
     mylist_xml = fs.readFileSync(`${__dirname}/data/mylist00000000.xml`, "utf-8");
 });
 
+test("nico mylist get video id from link", t => {
+    const mrd = new NicoMylistReader();
+    t.is("sm12345",
+        mrd._getVideoIDFromLink("http://www.nicovideo.jp/mylist/sm12345"));
+
+    t.is("sm12345",
+        mrd._getVideoIDFromLink("http://www.nicovideo.jp/mylist/sm12345?ref=rss_mylist_rss2"));        
+});
+
 test("nico mylist parse xml", t => {
     const mrd = new NicoMylistReader();
     const mylist = mrd.parse("mylist/00000000", mylist_xml);

@@ -64,7 +64,7 @@ class NicoMylistReader {
         $("channel > item").each((i, el) => {
             const item = $(el);
             const link = item.find("link").text();
-            const video_id = link.match(/[^/]+$/)[0];
+            const video_id = this._getVideoIDFromLink(link);
             const description = this._parseCDATA(item.find("description").text());
             items.push( {
                 no: i+1,
@@ -93,6 +93,19 @@ class NicoMylistReader {
             throw new Error("empty");
         }
         return mylist;
+    }
+
+    /**
+     * 
+     * @param {String} link 
+     */
+    _getVideoIDFromLink(link){
+        const p = link.split("/").pop();
+        if(p.includes("?")){
+            return p.split("?")[0];
+        }else{
+            return p;
+        }
     }
 
     _parseCDATA(xml){

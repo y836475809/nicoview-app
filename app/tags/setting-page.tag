@@ -185,7 +185,6 @@
         const { dialog } = remote;
         const path = window.path;
         const fs = window.fs;
-        const { selectFileDialog, selectFolderDialog, showMessageBox } = window.RendererDailog;
         const { ImportLibrary } = window.ImportLibrary;
         const { ImportNNDDData } = window.ImportNNDDData;
         
@@ -196,7 +195,7 @@
         this.import_items = ImportNNDDData.getItems();
 
         this.onclickSelectDataDir = async e => {
-            const dir = await selectFolderDialog();
+            const dir = await ipc.invoke("app:show-select-folder-dialog");
             if(dir == null){
                 return;
             }
@@ -205,7 +204,7 @@
         };
 
         this.onclickSelectDownloadDir = async e => {
-            const dir = await selectFolderDialog();
+            const dir = await ipc.invoke("app:show-select-folder-dialog");
             if(dir == null){
                 return; 
             }
@@ -219,7 +218,10 @@
         };
 
         this.onclickSelectffmpegPath = async e => {
-            const file_path = await selectFileDialog("ffmpeg", ["*"]);
+            const file_path = await ipc.invoke("app:show-select-file-dialog",{
+                name:"ffmpeg",
+                exts:["*"]
+            });
             if(file_path == null){
                 return;
             }
@@ -229,7 +231,10 @@
 
         
         this.onclickSelectcCssPath = async e => {
-            const file_path = await selectFileDialog("CSS", ["css"]);
+            const file_path = await ipc.invoke("app:show-select-file-dialog",{
+                name:"CSS",
+                exts:["css"]
+            });
             if(file_path == null){
                 return;
             }
@@ -284,7 +289,7 @@
         };
 
         this.onclickNNDDSystemDir = async (e) => {
-            const dir = await selectFolderDialog();
+            const dir = await ipc.invoke("app:show-select-folder-dialog");
             if(dir == null){
                 return; 
             }
@@ -305,14 +310,20 @@
             try {
                 fs.statSync(data_dir);
             } catch (error) {
-                await showMessageBox("error", `アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`
+                });
                 return;
             }
 
             try {
                 fs.statSync(nndd_system_dir);
             } catch (error) {
-                await showMessageBox("error", `NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`
+                });
                 return;
             }
 
@@ -339,10 +350,16 @@
                 obs.trigger("play-history-page:reload-items");
                 obs.trigger("mylist-page:sidebar:reload-items");
 
-                await showMessageBox("info", "インポート完了");
+                await ipc.invoke("app:show-message-box", {
+                    type:"info",
+                    message:"インポート完了"
+                });
             } catch (error) {
                 logger.error(error);
-                await showMessageBox("error", `インポート失敗: ${error.message}`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`インポート失敗\n${error.message}`
+                });
             } finally {
                 this.obs_msg_dialog.trigger("close");
             }            
@@ -443,15 +460,16 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            const result_msg = `インポート完了\n失敗:${error_files.length}`;
-            await showMessageBox("info", result_msg);
+            await ipc.invoke("app:show-message-box", {
+                type:"info",
+                message:`インポート完了\n失敗:${error_files.length}`
+            });
             this.obs_msg_dialog.trigger("close");
 
             if(error_files.length>0){
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: `${error_files.length}個がインポートに失敗しました`,
-                    message: "詳細はログを参照",
+                    message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`,
                 });
             } 
         };

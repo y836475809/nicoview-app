@@ -180,7 +180,7 @@
 
     <script>
         const Sortable = window.Sortable;
-        const { showOKCancelBox } = window.RendererDailog;
+        const ipc = window.electron.ipcRenderer;
         let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;
@@ -221,7 +221,12 @@
             if(confirm.includes("delete") === false){
                 return true;
             }
-            return await showOKCancelBox("info", "削除しますか?");
+            const ret = await ipc.invoke("app:show-message-box", {
+                type:"info",
+                message:"削除しますか?",
+                okcancel:true
+            });
+            return ret;
         };
 
         obs.on("loadData", async (args) => {

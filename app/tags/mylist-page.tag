@@ -205,7 +205,6 @@
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
-        const { showOKCancelBox, showMessageBox } = window.RendererDailog;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -304,11 +303,15 @@
 
         const play = async (item, online) => {
             const video_id = item.id;
-            if(!online && needConvertVideo(await ipc.invoke("library:getItem", {video_id}))){
-                if(!await showOKCancelBox("info", 
-                    "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
+            if(!online && needConvertVideo(await ipc.invoke("library:getItem", {video_id}))){       
+                const ret = await ipc.invoke("app:show-message-box", {
+                    type:"info",
+                    message:"保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
+                    okcancel:true
+                });
+                if(!ret){
                     return;
-                }        
+                }
                 obs.trigger("library-page:convert-video", video_id);
             }else{
                 Command.play(item, online);
@@ -368,11 +371,15 @@
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
 
-                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){
-                    if(!await showOKCancelBox("info", 
-                        "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?")){
+                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){      
+                    const ret = await ipc.invoke("app:show-message-box", {
+                        type:"info",
+                        message:"保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
+                        okcancel:true
+                    });
+                    if(!ret){
                         return;
-                    }        
+                    }
                     obs.trigger("library-page:convert-video", video_id);
                 }else{
                     ipc.send("app:play-video", {
@@ -503,7 +510,10 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
             }
 
@@ -541,7 +551,10 @@
                     await setMylist(mylist); 
                 } catch (error) {
                     logger.error(error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
             }
         });
@@ -558,7 +571,10 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
             }   
         });

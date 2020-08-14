@@ -301,7 +301,6 @@
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
-        const { showMessageBox } = window.RendererDailog;
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
@@ -471,7 +470,10 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
             }
             

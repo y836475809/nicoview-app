@@ -201,7 +201,6 @@
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoUpdate } = window.NicoUpdate;
-        const { showMessageBox, showOKCancelBox } = window.RendererDailog;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { NicoVideoData } = window.NicoVideoData;
         const { JsonDataConverter } = window.NicoDataConverter;
@@ -417,15 +416,13 @@
             this.obs_modal_dialog.trigger("close");
             
             if(error_items.length > 0){
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: `${error_items.length}個が更新に失敗しました`,
-                    message: "詳細はログを参照",
+                    message: `${error_items.length}個が更新に失敗\n詳細はログを参照`,
                 });
             }else{
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "info",
-                    title: "",
                     message: `更新完了(${cur_update}/${items.length})`,
                 });
             }
@@ -490,15 +487,13 @@
             this.obs_modal_dialog.trigger("close");
 
             if(error_items.length > 0){
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: `${error_items.length}個がNNDD形式への変換に失敗しました`,
-                    message: "詳細はログを参照",
+                    message: `${error_items.length}個がNNDD形式への変換に失敗\n詳細はログを参照`,
                 });
             }else{
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "info",
-                    title: "",
                     message: `NNDD形式への変換完了(${cur_update}/${items.length})`,
                 });
             }
@@ -534,7 +529,10 @@
                 }
             }
             if(error_ids.length > 0){
-                await showMessageBox("error", `${error_ids.length}個の削除に失敗\n詳細はログを参照`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`${error_ids.length}個の削除に失敗\n詳細はログを参照`
+                });
             }
             this.obs_modal_dialog.trigger("close");
         };
@@ -561,7 +559,10 @@
 
                 cnv_mp4.on("cancel_error", async error=>{
                     logger.error(error);
-                    await showMessageBox("error", `中断失敗: ${error.message}`);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:`中断失敗\n${error.message}`
+                    });
                 });
 
                 updateState("変換中");
@@ -571,16 +572,25 @@
                 const props = {video_type:"mp4"};
                 await ipc.invoke("library:updateItemProps", {video_id, props});
 
-                await showMessageBox("info", "変換完了");
+                await ipc.invoke("app:show-message-box", {
+                    type:"info",
+                    message:"変換完了"
+                });
                 updateState("変換完了");  
 
             } catch (error) {
                 if(error.cancel === true){
-                    await showMessageBox("info", "変換中断");
+                    await ipc.invoke("app:show-message-box", {
+                        type:"info",
+                        message:"変換中断"
+                    });
                     updateState("変換中断");   
                 }else{
                     logger.error(error);
-                    await showMessageBox("error", `変換失敗: ${error.message}`);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message: `変換失敗\n${error.message}`
+                    });
                     updateState("変換失敗");   
                 }
             }finally{
@@ -606,8 +616,12 @@
             const video_type = item.video_type;
 
             if(!online && needConvertVideo(video_type)){
-                if(!await showOKCancelBox("info", 
-                    `動画が${video_type}のため再生できません\nmp4に変換しますか?`)){
+                const ret = await ipc.invoke("app:show-message-box", {
+                    type:"info",
+                    message:`動画が${video_type}のため再生できません\nmp4に変換しますか?`,
+                    okcancel:true
+                });
+                if(!ret){
                     return;
                 }
                 await convertVideo(this, video_id);
@@ -663,7 +677,12 @@
                 { label: "削除", async click() {
                     const items = grid_table.getSelectedDatas();
                     const video_ids = items.map(item => item.id);
-                    if(!await showOKCancelBox("info", "動画を削除しますか?")){
+                    const ret = await ipc.invoke("app:show-message-box", {
+                        type:"info",
+                        message:"動画を削除しますか?",
+                        okcancel:true
+                    });
+                    if(!ret){
                         return;
                     }
                     await deleteLibraryData(video_ids);
@@ -725,10 +744,9 @@
                 await ipc.invoke("library:load");
             } catch (error) {
                 logger.error(error);
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: "ライブラリの読み込み失敗",
-                    message: error.message,
+                    message: `ライブラリの読み込み失敗\n${error.message}`,
                 });
                 // loadLibraryItems([]);
             }

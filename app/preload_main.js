@@ -40,7 +40,6 @@ window.addEventListener("load", () => {
     window.$ = window.jQuery = require("jquery");
     global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
-    global.RendererDailog = require(`${root_dir}/app/js/renderer-dialog`);
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);
     global.NicoSearch = require(`${root_dir}/app/js/nico-search`);
     global.NicoVideoData = require(`${root_dir}/app/js/nico-data-file`);

@@ -69,7 +69,6 @@
         const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
         const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
-        const { showMessageBox, showOKCancelBox } = window.RendererDailog;
 
         const obs = this.opts.obs; 
         this.obs_schedule = riot.observable();
@@ -183,7 +182,12 @@
                 }},
                 { type: "separator" },
                 { label: "削除", async click() {
-                    if(!await showOKCancelBox("info", "削除しますか?")){
+                    const ret = await ipc.invoke("app:show-message-box", {
+                        type:"info",
+                        message:"削除しますか?",
+                        okcancel:true
+                    });
+                    if(!ret){
                         return;
                     }
                     const items = grid_table_dl.grid_table.getSelectedDatas();
@@ -287,7 +291,10 @@
                 }
             } catch (error) {
                 logger.error(`download id=${video_id}: `, error);
-                await showMessageBox("error", error.message);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:error.message
+                });
             } finally {
                 event_em.emit("download-end");
             }    
@@ -365,10 +372,9 @@
                 grid_table_dl.setData(items);
             } catch (error) {
                 logger.error("download item load error: ", error);
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: "ダウンロードリストの読み込み失敗",
-                    message: error.message,
+                    message: `ダウンロードリストの読み込み失敗\n${error.message}`,
                 });
             }
 

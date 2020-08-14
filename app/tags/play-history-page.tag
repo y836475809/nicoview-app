@@ -131,10 +131,9 @@
                 setData(items);
             } catch (error) {
                 logger.error(error);
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: "再生履歴の読み込み失敗",
-                    message: error.message,
+                    message: `再生履歴の読み込み失敗\n${error.message}`,
                 });
             }
         };

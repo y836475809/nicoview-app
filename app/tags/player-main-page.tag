@@ -46,7 +46,6 @@
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
-        const { showMessageBox } = window.RendererDailog;
         const { NicoVideoData } = window.NicoVideoData;
 
         const obs = this.opts.obs;
@@ -174,7 +173,10 @@
                 await play_by_video_data(video, viewinfo, comments, state);
             } catch (error) {
                 logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                await showMessageBox("error", error.message);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:error.message
+                });
             }
         }; 
 
@@ -234,7 +236,10 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
             }
 
@@ -331,7 +336,10 @@
                 } catch (error) {
                     if(!error.cancel){
                         logger.error(error);
-                        await showMessageBox("error", error.message);
+                        await ipc.invoke("app:show-message-box", {
+                            type:"error",
+                            message:error.message
+                        });
                     }
                 }
                 this.obs_modal_dialog.trigger("close");
@@ -351,7 +359,10 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await showMessageBox("error", error.message);
+                    await ipc.invoke("app:show-message-box", {
+                        type:"error",
+                        message:error.message
+                    });
                 }
                 this.obs_modal_dialog.trigger("close");
             }
@@ -368,7 +379,10 @@
                 });
             } catch (error) {
                 logger.error("player main save ng comment", error);
-                await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`NGコメントの保存に失敗\n${error.message}`
+                });
             }
 
             const comments = comment_filter.getCommnets();
@@ -387,7 +401,10 @@
                 });
             } catch (error) {
                 logger.error("player main save comment ng", error);
-                await showMessageBox("error", `NGコメントの保存に失敗\n${error.message}`);
+                await ipc.invoke("app:show-message-box", {
+                    type:"error",
+                    message:`NGコメントの保存に失敗\n${error.message}`
+                });
             }
 
             const comments = comment_filter.getCommnets();
@@ -493,10 +510,9 @@
                 comment_filter.setNGComments(ng_texts, ng_user_ids);
             } catch (error) {
                 logger.error("player main load ng comment", error);
-                ipc.send("app:show-message", {
+                await ipc.invoke("app:show-message-box", {
                     type: "error",
-                    title: "NGコメントリストの読み込み失敗",
-                    message: error.message,
+                    message: `NGコメントリストの読み込み失敗\n${error.message}`,
                 });
             }
 

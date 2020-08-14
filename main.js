@@ -12,6 +12,7 @@ const { logger } = require("./app/js/logger");
 const { StartupConfig } = require("./app/start-up-config");
 const { CSSLoader } = require("./app/js/css-loader");
 const { Store } = require("./app/js/store");
+const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./app/js/dialog");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -379,14 +380,20 @@ app.on("ready", async ()=>{
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
 
-    ipcMain.on("app:show-message", (event, args) => {
-        const { type, title, message } = args;
-        dialog.showMessageBoxSync({
-            type: type,
-            title: title,
-            buttons: ["OK"],
-            message: message
-        });
+    // dialog
+    ipcMain.handle("app:show-message-box", async (event, args) => {
+        const { type, title, message, okcancel} = args;
+        const bw = BrowserWindow.fromId(event.sender.id);
+        return showMessageBox(bw, type, title, message, okcancel);
+    });
+    ipcMain.handle("app:show-select-folder-dialog", async (event, args) => {
+        const bw = BrowserWindow.fromId(event.sender.id);
+        return selectFolderDialog(bw);
+    });
+    ipcMain.handle("app:show-select-file-dialog", async (event, args) => {
+        const { name, exts } = args;
+        const bw = BrowserWindow.fromId(event.sender.id);
+        return selectFileDialog(bw, name, exts);
     });
     
     ipcMain.on("app:play-video", async (event, args) => {

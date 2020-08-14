@@ -195,7 +195,7 @@
 
     <script>
         /* globals riot logger */
-        const {remote, ipcRenderer } = window.electron;
+        const {remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
@@ -209,7 +209,7 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
 
-        ipcRenderer.on("libraryItemAdded", async (event, args) => {
+        ipc.on("library:on-add-item", async (event, args) => {
             const {video_item} = args;
             const video_data = new NicoVideoData(video_item);
             const video_id = video_item.id;
@@ -218,20 +218,20 @@
             grid_table.updateItem(video_item, video_id);
         });
 
-        ipcRenderer.on("libraryItemDeleted", async (event, args) => {
+        ipc.on("library:on-delete-item", async (event, args) => {
             const { video_id } = args;
             grid_table.deleteItemById(video_id);
         });
 
-        ipcRenderer.on("libraryItemUpdated", (event, args) => {
+        ipc.on("library:on-update-item", (event, args) => {
             const {video_id, props} = args;
-            logger.debug("libraryItemUpdated video_id=", video_id, " props=", props);
+            logger.debug("library:on-update-item video_id=", video_id, " props=", props);
 
             props.tags = props.tags ? props.tags.join(" ") : "";
             grid_table.updateCells(video_id, props);
         });
 
-        ipcRenderer.on("libraryInitialized", (event, args) =>{
+        ipc.on("library:on-init", (event, args) =>{
             const {items} = args;
             const library_items = items.map(value=>{
                 const video_data = new NicoVideoData(value);

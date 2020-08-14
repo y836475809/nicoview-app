@@ -39,7 +39,7 @@
 
     <script>
         /* globals riot logger */
-        const { remote, ipcRenderer } = window.electron;
+        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { NicoPlay } = window.NicoPlay;
@@ -261,7 +261,7 @@
             }
         });
 
-        ipcRenderer.on("setting:on-change-log-level", (event, args) => {
+        ipc.on("setting:on-change-log-level", (event, args) => {
             const { level } = args;
             logger.setLevel(level);
         });
@@ -500,7 +500,7 @@
                 });
             }
 
-            ipcRenderer.send("app:on-ready-player");
+            ipc.send("app:on-ready-player");
         });   
 
         let resize_begin = false;

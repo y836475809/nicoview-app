@@ -295,7 +295,7 @@
 
     <script>
         /* globals riot logger */
-        const {remote, ipcRenderer} = window.electron;
+        const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
@@ -379,7 +379,7 @@
             await this.search();
         });
 
-        ipcRenderer.on("downloadItemUpdated", async (event) => {
+        ipc.on("download:on-update-item", async (event) => {
             const video_ids = await ipc.invoke("download:getIncompleteIDs");
             const items = grid_table.dataView.getItems();
 
@@ -392,13 +392,13 @@
             }
         });
 
-        ipcRenderer.on("libraryItemAdded", async (event, args) => {
+        ipc.on("library:on-add-item", async (event, args) => {
             const {video_item} = args;
             const video_id = video_item.id;
             grid_table.updateCells(video_id, { saved:true });
         });
 
-        ipcRenderer.on("libraryItemDeleted", async (event, args) => {
+        ipc.on("library:on-delete-item", async (event, args) => {
             const { video_id } = args;
             grid_table.updateCells(video_id, { saved:false });
         });

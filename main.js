@@ -226,7 +226,7 @@ function createWindow() {
             { label: "ファイル",
                 submenu: [
                     { label: "動画IDを指定して再生", click: () => {
-                        main_win.webContents.send("open-video-form");
+                        main_win.webContents.send("app:open-video-form");
                     }}
                 ]
             }, 
@@ -453,7 +453,7 @@ app.on("ready", async ()=>{
             store.setItems(name, items);
             await saveJson(name, items);
             if(name=="download"){
-                main_win.webContents.send("downloadItemUpdated");
+                main_win.webContents.send("download:on-update-item");
             }
         });  
     });
@@ -497,7 +497,7 @@ app.on("ready", async ()=>{
         const items = history.getData();
         await saveJson("history", items);
 
-        main_win.webContents.send("history:onItemUpdated", args);
+        main_win.webContents.send("history:on-update-item", args);
 
         const video_id = item.id;
         const video_item = library.getItem(video_id);
@@ -626,18 +626,18 @@ app.on("ready", async ()=>{
         };
     });
     library.on("libraryInitialized", ()=>{  
-        main_win.webContents.send("libraryInitialized", {
+        main_win.webContents.send("library:on-init", {
             items:library.getItems()
         });
     });
     library.on("libraryItemUpdated", (args)=>{  
-        main_win.webContents.send("libraryItemUpdated", args);
+        main_win.webContents.send("library:on-update-item", args);
     });
     library.on("libraryItemAdded", (args)=>{  
-        main_win.webContents.send("libraryItemAdded", args);
+        main_win.webContents.send("library:on-add-item", args);
     });
     library.on("libraryItemDeleted", (args)=>{  
-        main_win.webContents.send("libraryItemDeleted", args);
+        main_win.webContents.send("library:on-delete-item", args);
     });
 
     // config

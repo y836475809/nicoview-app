@@ -194,7 +194,7 @@
 
     <script>
         /* globals riot logger */
-        const { remote, ipcRenderer, shell } = window.electron;
+        const { remote, shell } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
 
@@ -213,7 +213,7 @@
             this.update();
         };
 
-        ipcRenderer.on("downloadItemUpdated", async (event) => {
+        ipc.on("download:on-update-item", async (event) => {
             await updateDownloadBadge();
         });
 
@@ -312,7 +312,7 @@
             select_page(page_name);
         });  
 
-        ipcRenderer.on("open-video-form", ()=>{
+        ipc.on("app:open-video-form", ()=>{
             this.obs_open_video_form.trigger("show");
         });  
 

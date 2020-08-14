@@ -46,7 +46,7 @@ class Library extends EventEmitter {
         }
 
         await this.library_db.update(video_id, props);
-        this.emit("libraryItemUpdated", {video_id, props});
+        this.emit("update-item", {video_id, props});
     }
 
     async save(force=true){
@@ -63,13 +63,13 @@ class Library extends EventEmitter {
         this.library_db.setPathData(path_data_list);
         this.library_db.setVideoData(video_data_list);
 
-        this.emit("libraryInitialized");
+        this.emit("init");
     }
     async load(){
         this.library_db = new LibraryDB(
             {filename : path.join(this._data_dir, "library.json")});
         await this.library_db.load();
-        this.emit("libraryInitialized");
+        this.emit("init");
     }
 
     async addDownloadedItem(download_item){
@@ -84,7 +84,7 @@ class Library extends EventEmitter {
         video_item.modification_date = -1;
         video_item.play_count = 0;
         await this.library_db.insert(video_item.dirpath, video_item);
-        this.emit("libraryItemAdded", {video_item});
+        this.emit("add-item", {video_item});
     }
     
     async addItem(item){
@@ -93,7 +93,7 @@ class Library extends EventEmitter {
         }
 
         await this.library_db.insert(item.dirpath, item);
-        this.emit("libraryItemAdded", { video_item : item });
+        this.emit("add-item", { video_item : item });
     }
     
     async delete(video_id){
@@ -102,7 +102,7 @@ class Library extends EventEmitter {
         }
         
         await this.library_db.delete(video_id);
-        this.emit("libraryItemDeleted", { video_id });
+        this.emit("delete-item", { video_id });
     }
 
 }

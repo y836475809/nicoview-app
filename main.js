@@ -625,18 +625,18 @@ app.on("ready", async ()=>{
             error : null
         };
     });
-    library.on("libraryInitialized", ()=>{  
+    library.on("init", ()=>{  
         main_win.webContents.send("library:on-init", {
             items:library.getItems()
         });
     });
-    library.on("libraryItemUpdated", (args)=>{  
+    library.on("update-item", (args)=>{  
         main_win.webContents.send("library:on-update-item", args);
     });
-    library.on("libraryItemAdded", (args)=>{  
+    library.on("add-item", (args)=>{  
         main_win.webContents.send("library:on-add-item", args);
     });
-    library.on("libraryItemDeleted", (args)=>{  
+    library.on("delete-item", (args)=>{  
         main_win.webContents.send("library:on-delete-item", args);
     });
 

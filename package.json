@@ -2,7 +2,7 @@
   "name": "nicoview-app",
   "version": "0.0.0",
   "description": "",
-  "main": "main.js",
+  "main": "app/main.js",
   "scripts": {
     "test-main": "electron . --debug --name test-main",
     "test-search": "electron . --debug --name test-search",
@@ -42,7 +42,6 @@
       "output": "./build"
     },
     "files": [
-      "./main.js",
       "./app/**/*",
       "./icon/**/*"
     ],

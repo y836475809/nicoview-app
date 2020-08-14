@@ -3,16 +3,16 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 
-const { Config } = require("./app/js/config");
-const { Library } = require("./app/js/library");
-const { History } = require("./app/js/history");
-const { importNNDDDB } = require("./app/js/import-nndd-db");
-const { getNicoDataFilePaths } = require("./app/js/nico-data-file");
-const { logger } = require("./app/js/logger");
-const { StartupConfig } = require("./app/start-up-config");
-const { CSSLoader } = require("./app/js/css-loader");
-const { Store } = require("./app/js/store");
-const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./app/js/dialog");
+const { Config } = require("./js/config");
+const { Library } = require("./js/library");
+const { History } = require("./js/history");
+const { importNNDDDB } = require("./js/import-nndd-db");
+const { getNicoDataFilePaths } = require("./js/nico-data-file");
+const { logger } = require("./js/logger");
+const { StartupConfig } = require("./start-up-config");
+const { CSSLoader } = require("./js/css-loader");
+const { Store } = require("./js/store");
+const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 

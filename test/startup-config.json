@@ -3,37 +3,37 @@
     "mock_server_wait_msec": 500,
     "test-main": {
         "use_mock_server": true,
-        "main": "app/html/index.html",
+        "main": "html/index.html",
         "config_fiiename": "config.json",
         "window_frame": false
     },
     "test-search": {
         "use_mock_server": true,
-        "main": "test/test-search.html",
+        "main": "../test/test-search.html",
         "config_fiiename": "config-debug.json",
         "window_frame": true
     },
     "test-mylist": {
         "use_mock_server": true,
-        "main": "test/test-mylist.html",
+        "main": "../test/test-mylist.html",
         "config_fiiename": "config-debug.json",
         "window_frame": true
     },
     "test-setting": {
         "use_mock_server": false,
-        "main": "test/test-setting.html",
+        "main": "../test/test-setting.html",
         "config_fiiename": "config-debug.json",
         "window_frame": true
     },
     "test-nicoscript": {
         "use_mock_server": false,
-        "main": "test/test-nicoscript.html",
+        "main": "../test/test-nicoscript.html",
         "config_fiiename": "config-debug.json",
         "window_frame": true
     },
     "test-tween": {
         "use_mock_server": false,
-        "main": "test/test-tween.html",
+        "main": "../test/test-tween.html",
         "config_fiiename": "config-debug.json",
         "window_frame": true
     }

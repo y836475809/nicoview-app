@@ -23,7 +23,7 @@ class StartupConfig {
             this._params = {
                 debug: false,
                 use_mock_server:false,
-                main: "app/html/index.html",
+                main: "html/index.html",
                 config_fiiename: "config.json",
                 window_frame: false
             };
@@ -39,15 +39,15 @@ class StartupConfig {
     }
 
     get player_html_path(){
-        return `${this._base_dir}/app/html/player.html`;
+        return `${this._base_dir}/html/player.html`;
     }
 
     get preload_main_path(){
-        return `${this._base_dir}/app/preload_main.js`;
+        return `${this._base_dir}/preload_main.js`;
     }
 
     get preload_player_path(){
-        return `${this._base_dir}/app/preload_player.js`;
+        return `${this._base_dir}/preload_player.js`;
     }
 
     get config_fiiename(){

@@ -32,8 +32,8 @@ test("parse nndd history", t => {
     const data = imp_nndd._getHistory(body);
 
     t.deepEqual(data, [
-        { thumb_img:thumbUrl1, id:"sm1", title:videoName1, play_time:0, play_date:1, url:url1 },
-        { thumb_img:thumbUrl2, id:"sm2", title:videoName2, play_time:0, play_date:2, url:url2 },
+        { thumb_img:thumbUrl1, id:"sm1", title:videoName1, time:0, play_date:1, url:url1 },
+        { thumb_img:thumbUrl2, id:"sm2", title:videoName2, time:0, play_date:2, url:url2 },
     ]);
 });
 

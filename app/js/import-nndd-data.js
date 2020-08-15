@@ -98,7 +98,7 @@ class ImportNNDDData {
                 thumb_img: decodeURIComponent(item.attr("thumburl")),
                 id: m[1],
                 title: title,
-                play_time: 0,
+                time: 0,
                 play_date: parseInt(item.attr("playdate")),
                 url: decodeURIComponent(item.attr("url"))
             });

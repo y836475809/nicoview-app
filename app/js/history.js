@@ -29,7 +29,7 @@ class History {
                 id: new_item.id,
                 title: new_item.title,
                 play_date: Date.now(), 
-                play_time: 0,
+                time: 0,
                 url: new_item.url                
             }); 
         }else{

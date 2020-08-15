@@ -24,7 +24,8 @@
         <listview class="content"
             obs={obs_listview}
             icon_class={icon_class}
-            name={name}>
+            name={name}
+            gettitle={getTitle}>
         </listview>
     </aside>
 
@@ -41,6 +42,15 @@
         this.name = "bookmark";
         this.icon_class = {
             video :  "fas fa-bookmark fa-lg"
+        };
+
+        this.getTitle = (item) => {
+            const { title, data } = item;
+            if(data.time>0){
+                return `[${time_format.toTimeString(data.time)}] ${title}`;
+            }else{
+                return title;
+            }
         };
 
         const resizeHeight = (items) => {
@@ -161,12 +171,8 @@
         
         obs.on("bookmark-page:add-items", items => {
             const bk_items = items.map(item => {
-                let title = item.title;
-                if (item.time > 0) {
-                    title = `${item.title} ${time_format.toTimeString(item.time)}`;
-                }
                 return {
-                    title: title,
+                    title: item.title,
                     type: "video",
                     data: {
                         video_id: item.id,

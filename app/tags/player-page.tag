@@ -221,9 +221,15 @@
             const createMenuItems = (items) => {
                 return items.map(item=>{
                     const { id, title, time } = item;
-                    const menu_title = `${title} ${time?toTimeString(time):""}`;
+                    const getTitle = () => {
+                        if(time){
+                            return `[${toTimeString(time)}] ${title}`;
+                        }else{
+                            return title;
+                        } 
+                    };
                     return { 
-                        label: menu_title, click() {
+                        label: getTitle(), click() {
                             ipc.send("app:play-video", {
                                 video_id: id,
                                 time: time?time:0,

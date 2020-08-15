@@ -68,6 +68,15 @@
 
     <div class="setting-page">
         <div class="container">
+            <div class="center-v title">設定ファイル(config.json)のフォルダ</div>
+            <div class="content" style="display: flex;">
+                <input disabled=true class="app-setting-dir-input" type="text" readonly}>
+                <button title="フォルダを開く" onclick={onclickOpenDir}>
+                    <i class="far fa-folder-open"></i>
+                </button>
+            </div>
+        </div>
+        <div class="container">
             <div class="center-v title">ブックマーク, 履歴, DB等の保存先</div> 
             <div class="content" style="display: flex;">
                 <input disabled=true class="data-dir-input" type="text" readonly>
@@ -89,7 +98,7 @@
             <div class="center-v title">動画インポート</div>
             <div class="content">
                 <div style="display:flex;">
-                    <div class="label">動画を選択して動画、コメント、サムネイル、動画情報をインポート</div>
+                    <div class="label">動画ファイルを選択(コメント、サムネイル、動画情報もインポートされる)</div>
                     <button title="ファイル選択" onclick={onclickImportFiles}>
                         <i class="far fa-file"></i>
                     </button>
@@ -132,16 +141,7 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">設定ファイル(config.json)のフォルダ</div>
-            <div class="content" style="display: flex;">
-                <input disabled=true class="app-setting-dir-input" type="text" readonly}>
-                <button title="フォルダを開く" onclick={onclickOpenDir}>
-                    <i class="far fa-folder-open"></i>
-                </button>
-            </div>
-        </div>
-        <div class="container">
-            <div class="center-v title">CSS</div>
+            <div class="center-v title">ユーザーCSS</div>
             <div class="content" style="display: flex;">
                 <input disabled=true class="css-path-input" type="text" readonly}>
                 <button title="ファイル選択" onclick={onclickSelectcCssPath}>

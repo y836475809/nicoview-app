@@ -12,8 +12,8 @@
     "test-tween": "electron . --debug --name test-tween",
     "main": "electron .",
     "test": "ava -v -s",
-    "pack-dir": "electron-builder --x64 --dir",
-    "pack": "electron-builder --x64"
+    "build": "electron-builder --x64 --dir",
+    "build-zip": "electron-builder --x64"
   },
   "author": "y836475809",
   "license": "MIT",

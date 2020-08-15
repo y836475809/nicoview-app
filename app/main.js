@@ -10,17 +10,25 @@ const { importNNDDDB } = require("./js/import-nndd-db");
 const { getNicoDataFilePaths } = require("./js/nico-data-file");
 const { logger } = require("./js/logger");
 const { StartupConfig } = require("./start-up-config");
-const { CSSLoader } = require("./js/css-loader");
 const { Store } = require("./js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
+
+const { 
+    JsonStore, UserCSS, 
+    getWindowState,
+    setLogLevel,
+    popupInputContextMenu } = require("./util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
 const config = new Config();
 const library = new Library();
 const history = new History();
-const css_loader = new CSSLoader();
 const store = new Store();
+const user_css = new UserCSS();
+const json_store = new JsonStore(async ()=>{
+    return await config.get("data_dir", "");
+});
 
 const startup_config = new StartupConfig(__dirname, process.argv);
 startup_config.load();
@@ -81,132 +89,6 @@ process.on('unhandledRejection', (reason, p) => {
     });
 });
 
-const loadJson = async (name, default_value) => {
-    const data_dir = await config.get("data_dir","");
-    const file_path = path.join(data_dir, `${name}.json`);
-    try {
-        await fsPromises.stat(file_path);
-    } catch (error) {
-        return default_value;
-    }
-
-    try {
-        const data = await fsPromises.readFile(file_path, "utf-8");
-        return JSON.parse(data);
-    } catch (error) {
-        logger.error(`loadJson ${name}`, error);
-
-        await dialog.showMessageBox({
-            type: "error",
-            buttons: ["OK"],
-            message: `${file_path}の読み込みに失敗\n${error.message}`
-        });
-        return default_value;
-    }
-};
-
-const saveJson = async (name, items) => {
-    const data_dir = await config.get("data_dir", "");
-    const file_path = path.join(data_dir, `${name}.json`);
-    try {
-        const json = JSON.stringify(items, null, "  ");
-        await fsPromises.writeFile(file_path, json, "utf-8");
-    } catch (error) {
-        logger.error(`saveJson ${name}`, error);
-
-        await dialog.showMessageBox({
-            type: "error",
-            buttons: ["OK"],
-            message: `${file_path}の保存に失敗\n${error.message}`
-        });
-    }
-};
-
-const getWindowState = (w) => {
-    const bounds = w.getBounds(); 
-    return {
-        x: bounds.x, 
-        y: bounds.y,  
-        width: bounds.width,  
-        height: bounds.height, 
-        maximized: w.isMaximized()
-    };
-};
-
-const setLogLevel = (level) => {
-    process.env.LOG_LEVEL = level;
-    logger.setLevel(level);
-};
-
-const loadCSS = async (file_path) => {
-    if(!file_path){
-        return;
-    }
-    try {
-        await css_loader.load(file_path);
-    } catch (error) {
-        logger.error(error);
-        await dialog.showMessageBox({
-            type: "error",
-            buttons: ["OK"],
-            title: `${path.basename(file_path)}の読み込みに失敗`,
-            message: error.message
-        });
-    }
-};
-
-const applyCSS = (win) => {
-    if(!win){
-        return;
-    }
-    
-    try {
-        const css = css_loader.CSS;
-        if(!css){
-            return;
-        }
-        win.webContents.insertCSS(css);
-    } catch (error) {
-        logger.error(error);
-        dialog.showMessageBoxSync({
-            type: "error",
-            buttons: ["OK"],
-            message: `CSSの適用に失敗: ${error.message}`
-        });
-    }
-};
-
-const popupInputContextMenu = (bwin, props) => {
-    const { inputFieldType, editFlags } = props;
-    if (inputFieldType === "plainText") {
-        const input_context_menu = Menu.buildFromTemplate([
-            {
-                id: "canCut",
-                label: "切り取り",
-                role: "cut",
-            }, {
-                id: "canCopy",
-                label: "コピー",
-                role: "copy",
-            }, {
-                id: "canPaste",
-                label: "貼り付け",
-                role: "paste",
-            }, {
-                type: "separator",
-            }, {
-                id: "canSelectAll",
-                label: "すべて選択",
-                role: "selectall",
-            },
-        ]);
-        input_context_menu.items.forEach(item => {
-            item.enabled = editFlags[item.id];
-        });
-        input_context_menu.popup(bwin);
-    }
-};
-
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -254,7 +136,7 @@ function createWindow() {
     main_win.setMenu(main_menu());
 
     main_win.webContents.on("did-finish-load", async () => { 
-        applyCSS(main_win);
+        user_css.apply(main_win);
         main_win.webContents.send("app:on-load-content");
 
         main_win.webContents.on("context-menu", (e, props) => {
@@ -375,7 +257,7 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    await loadCSS(config.get("css_path", ""));
+    await user_css.load(config.get("css_path", ""));
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
@@ -450,14 +332,14 @@ app.on("ready", async ()=>{
     ].forEach(name=>{
         ipcMain.handle(`${name}:getItems`, async (event, args) => {
             if(!store.has(name)){
-                store.setItems(name, await loadJson(name, []));
+                store.setItems(name, await json_store.load(name, []));
             }
             return store.getItems(name);
         });  
         ipcMain.handle(`${name}:updateItems`, async (event, args) => {
             const { items } = args;
             store.setItems(name, items);
-            await saveJson(name, items);
+            await json_store.save(name, items);
             if(name=="download"){
                 main_win.webContents.send("download:on-update-item");
             }
@@ -468,7 +350,7 @@ app.on("ready", async ()=>{
     ipcMain.handle("download:getIncompleteIDs", async (event, args) => {
         const name = "download";
         if(!store.has(name)){
-            store.setItems(name, await loadJson(name, []));
+            store.setItems(name, await json_store.load(name, []));
         }
         const items = store.getItems(name);
         if(!items){
@@ -485,7 +367,7 @@ app.on("ready", async ()=>{
 
     // history
     const history_max = 50;
-    const items = await loadJson("history", []);
+    const items = await json_store.load("history", []);
     history.setup(history_max);  
     history.setData(items);
     ipcMain.handle("history:getItems", (event, args) => {
@@ -494,14 +376,14 @@ app.on("ready", async ()=>{
     ipcMain.handle("history:updateItems", async (event, args) => {
         const { items } = args;
         history.setData(items);
-        await saveJson("history", items);
+        await json_store.save("history", items);
     });
     ipcMain.on("history:addItem", async (event, args) => {
         const { item } = args;
         history.add(item);
 
         const items = history.getData();
-        await saveJson("history", items);
+        await json_store.save("history", items);
 
         main_win.webContents.send("history:on-update-item", args);
 
@@ -673,12 +555,12 @@ app.on("ready", async ()=>{
     });
     ipcMain.handle("setting:reload-css", async (event, args) => {
         const { file_path } = args;
-        await loadCSS(file_path);
+        await user_css.load(file_path);
 
-        applyCSS(main_win);
+        user_css.apply(main_win);
         main_win.webContents.send("setting:on-reload-css");
 
-        applyCSS(player_win);
+        user_css.apply(player_win);
     });
     ipcMain.handle("setting:open-dir", async (event, args) => {
         const { dir } = args;
@@ -719,7 +601,7 @@ const createPlayerWindow = () => {
         player_win = new BrowserWindow(state);
         player_win.removeMenu();
         player_win.webContents.on("did-finish-load", async () => {
-            applyCSS(player_win);
+            user_css.apply(player_win);
             player_win.webContents.send("app:on-load-content");
 
             player_win.webContents.on("context-menu", (e, props) => {

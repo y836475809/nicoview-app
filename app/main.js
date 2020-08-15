@@ -89,6 +89,86 @@ process.on('unhandledRejection', (reason, p) => {
     });
 });
 
+const setupConfig = async () => {
+    try {
+        const config_path = path.join(app.getPath("userData"), config_fiiename);
+        config.setup(config_path);
+        await config.load();
+    } catch (error) {
+        const ret = dialog.showMessageBoxSync({
+            type: "error",
+            buttons: ["OK", "Cancel"],
+            message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
+        });
+        if(ret===0){ 
+            //OK
+            config.clear();
+        }else{ 
+            //Cancel
+            return false;
+        }
+    }
+    
+    try {
+        await config.configFolder("data_dir", "DB,ブックマーク,履歴等");
+        await config.configFolder("download.dir", "動画");
+    } catch (error) {
+        dialog.showMessageBoxSync({
+            type: "error",
+            buttons: ["OK"],
+            message: `設定失敗、終了します: ${error.message}`
+        });
+        return false;
+    }  
+
+    return true;
+};
+
+const quit = async () => {
+    if(config.get("check_window_close", true)){
+        const ret = dialog.showMessageBoxSync( {
+            type: "info", 
+            buttons: ["OK", "Cancel"],
+            message:"終了しますか?"
+        });
+        if(ret!=0){
+            // cancel, 終了しない
+            return false;
+        }
+    }
+
+    try {
+        config.set("main.window.state", getWindowState(main_win));
+        await config.save();
+    } catch (error) {
+        const ret = dialog.showMessageBoxSync({
+            type: "error",
+            buttons: ["OK", "Cancel"],
+            message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
+        });
+        if(ret!=0){
+            // cancel, 終了しない
+            return false;
+        }
+    }
+    
+    try {
+        await library.save(false);
+    } catch (error) {
+        const ret = dialog.showMessageBoxSync({
+            type: "error",
+            buttons: ["OK", "Cancel"],
+            message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
+        });
+        if(ret!=0){
+            // cancel, 終了しない
+            return false;
+        }
+    }
+
+    return true;
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -154,56 +234,20 @@ function createWindow() {
 
     main_win.on("close", async (e) => {        
         if(do_app_quit){
+            if(main_win){
+                main_win.webContents.closeDevTools();
+            }
             return;
         }
 
-        if(config.get("check_window_close", true)){
-            const ret = dialog.showMessageBoxSync({
-                type: "info", 
-                buttons: ["OK", "Cancel"],
-                message:"終了しますか?"
-            });
-            if(ret!=0){
-                // cancel, 終了しない
-                e.preventDefault();
-                return;
-            }
-        }
-
-        try {
-            config.set("main.window.state", getWindowState(main_win));
-            await config.save();
-        } catch (error) {
-            const ret = dialog.showMessageBoxSync({
-                type: "error",
-                buttons: ["OK", "Cancel"],
-                message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
-            });
-            if(ret!=0){
-                // cancel, 終了しない
-                e.preventDefault();
-                return;
-            }
-        }
-        
-        try {
-            await library.save(false);
-        } catch (error) {
-            const ret = dialog.showMessageBoxSync({
-                type: "error",
-                buttons: ["OK", "Cancel"],
-                message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
-            });
-            if(ret!=0){
-                // cancel, 終了しない
-                e.preventDefault();
-                return;
-            }
-        }
-
-        // devtools閉じて終了
-        if(main_win){
-            main_win.webContents.closeDevTools();
+        e.preventDefault();
+        if(await quit()){
+            // devtools閉じて終了
+            if(main_win){
+                main_win.webContents.closeDevTools();
+            }         
+            do_app_quit = true;
+            app.quit(); 
         }
     });
 
@@ -221,36 +265,9 @@ function createWindow() {
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
 app.on("ready", async ()=>{
-    try {
-        const config_path = path.join(app.getPath("userData"), config_fiiename);
-        config.setup(config_path);
-        await config.load();
-    } catch (error) {
-        const ret = await dialog.showMessageBox({
-            type: "error",
-            buttons: ["OK", "Cancel"],
-            message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
-        });
-        if(ret===0){ //OK
-            config.clear();
-        }else{ //Cancel
-            do_app_quit = true;
-            app.quit();
-            return;
-        }
-    }
-    try {
-        await config.configFolder("data_dir", "DB,ブックマーク,履歴等");
-        await config.configFolder("download.dir", "動画");
-    } catch (error) {
-        await dialog.showMessageBox({
-            type: "error",
-            buttons: ["OK"],
-            message: `設定失敗、終了します: ${error.message}`
-        });
-
+    if(!await setupConfig()){
         do_app_quit = true;
-        app.quit();
+        app.quit(); 
         return;
     }
 

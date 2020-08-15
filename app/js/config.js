@@ -1,5 +1,4 @@
 
-const { dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
@@ -54,17 +53,6 @@ class Config {
         await fsPromises.writeFile(this.config_path, json, "utf-8");
     }
 
-    async configFolder(key, label) {
-        const cfg_dir = this.get(key, undefined);
-        if (await this._checkDir(cfg_dir) !== true) {     
-            const dir = await this._selectFolder(`${label}を保存するフォルダの選択`);
-            if (dir === undefined) {
-                throw new Error(`${label}を保存するフォルダが選択されていない`);
-            }
-            this.set(key, dir);
-        }
-    }
-
     _initJsonData(){
         this.json_data = {};
         this.json_data["app_setting_dir"] = path.dirname(this.config_path);
@@ -103,29 +91,6 @@ class Config {
         }else{
             obj[prop] = value;
         }
-    }
-
-    async _checkDir(dir) {
-        if (dir === undefined) {
-            return false;
-        }
-        try {
-            await fsPromises.stat(dir);
-            return true;
-        } catch (error) {
-            return false;
-        }
-    }
-
-    async _selectFolder(title) {
-        const dirs = dialog.showOpenDialogSync({
-            title: title,
-            properties: ["openDirectory", "createDirectory"]
-        });
-        if (dirs === undefined) {
-            return undefined;
-        }
-        return dirs[0];
     }
 }
 

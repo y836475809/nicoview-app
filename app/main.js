@@ -17,7 +17,8 @@ const {
     JsonStore, UserCSS, 
     getWindowState,
     setLogLevel,
-    popupInputContextMenu } = require("./util");
+    popupInputContextMenu,
+    selectFolder } = require("./util");
 
 app.commandLine.appendSwitch("autoplay-policy", "no-user-gesture-required");
 
@@ -110,8 +111,18 @@ const setupConfig = async () => {
     }
     
     try {
-        await config.configFolder("data_dir", "DB,ブックマーク,履歴等");
-        await config.configFolder("download.dir", "動画");
+        [
+            { key:"data_dir", title:"DB,ブックマーク,履歴等" }, 
+            { key:"download.dir", title:"動画" }
+        ].forEach(param => {
+            const { key, title } = param;
+            const cfg_dir = config.get(key, undefined);
+            const select_dir = selectFolder(cfg_dir, `${title}を保存するフォルダの選択`);
+            if (!select_dir) {
+                throw new Error(`${title}を保存するフォルダが選択されていない`);
+            }
+            config.set(key, select_dir);
+        });
     } catch (error) {
         dialog.showMessageBoxSync({
             type: "error",

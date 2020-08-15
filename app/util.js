@@ -147,10 +147,38 @@ const popupInputContextMenu = (bw, props) => {
     }
 };
 
+const selectFolder = (dir, title) => {
+    const checkDir = (dir) => {
+        if (!dir) {
+            return false;
+        }
+        try {
+            fs.statSync(dir);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    };
+
+    if(checkDir(dir)){
+        return dir;
+    }
+
+    const dirs = dialog.showOpenDialogSync({
+        title: title,
+        properties: ["openDirectory", "createDirectory"]
+    });
+    if (dirs) {
+        return dirs[0];
+    }
+    return null;
+};
+
 module.exports = {
     JsonStore,
     UserCSS,
     getWindowState,
     setLogLevel,
-    popupInputContextMenu
+    popupInputContextMenu,
+    selectFolder
 };

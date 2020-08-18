@@ -357,6 +357,7 @@ app.on("ready", async ()=>{
         "nico-search",
         "download",
         "nglist",
+        "stack",
     ].forEach(name=>{
         ipcMain.handle(`${name}:getItems`, async (event, args) => {
             if(!store.has(name)){
@@ -425,15 +426,6 @@ app.on("ready", async ()=>{
             play_count : video_item.play_count + 1
         };
         library.update(video_id, props);
-    }); 
-
-    // stack
-    ipcMain.handle("stack:getItems", async (event, args) => {
-        return store.getItems("stack");
-    });  
-    ipcMain.handle("stack:updateItems", (event, args) => {
-        const { items } = args;
-        store.setItems("stack", items);
     }); 
 
     // library

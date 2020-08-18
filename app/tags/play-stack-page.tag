@@ -98,18 +98,7 @@
         this.items = [];
         let item_duration = 300;
 
-        this.getTime = (item) => {
-            const time = item.time?item.time:0;
-            return toTimeString(time);
-        };
-
-        this.on("mount", () => {
-            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
-            item_duration = parseInt(prop);
-        });
-
-        obs.on("play-stack-page:add-items", async (args) => {
-            const { items } = args;
+        const addItems = async (items) => {
             items.forEach(item => {
                 item.state = "stack-item-hide";
             });
@@ -126,7 +115,28 @@
                     elm.classList.remove("stack-item-show"); 
                 });
             }, 50);
+        };
 
+        this.getTime = (item) => {
+            const time = item.time?item.time:0;
+            return toTimeString(time);
+        };
+
+        this.on("mount", async () => {
+            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
+            item_duration = parseInt(prop);
+
+            const items = await ipc.invoke("stack:getItems");
+            await addItems(items);
+        });
+
+        obs.on("play-stack-page:add-items", async (args) => {
+            const { items } = args;
+
+            await addItems(items);
+            this.items.forEach(item => {
+                delete item.state;
+            });
             await ipc.invoke("stack:updateItems", { items:this.items });
         });
 

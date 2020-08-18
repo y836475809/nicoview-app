@@ -261,6 +261,7 @@ class CommentTimeLine {
         };
         this.timeLine = null;
         this.enable = true;
+        this._last_time_sec = 0;
 
         this._paused = true;
         
@@ -278,6 +279,10 @@ class CommentTimeLine {
 
     get ended(){
         return this._ended;
+    }
+
+    get lastTimeSec(){
+        return this._last_time_sec;
     }
 
     setFPS(fps){
@@ -302,6 +307,18 @@ class CommentTimeLine {
                 paused: true 
             }
         );
+
+        comments.sort((a, b) => {
+            if (a.vpos < b.vpos) return -1;
+            if (a.vpos > b.vpos) return 1;
+            return 0;
+        });
+
+        this._last_time_sec = 0;
+        if(comments.length>0){
+            this._last_time_sec  = 
+                comments[comments.length-1].vpos/100 + this.duration_sec;
+        }
         
         const [flow_comments,
             fixed_top_comments,
@@ -545,11 +562,11 @@ class CommentTimeLine {
         const fixed_top_comments = [];
         const fixed_bottom_comments = [];
 
-        comments.sort((a, b) => {
-            if (a.vpos < b.vpos) return -1;
-            if (a.vpos > b.vpos) return 1;
-            return 0;
-        });
+        // comments.sort((a, b) => {
+        //     if (a.vpos < b.vpos) return -1;
+        //     if (a.vpos > b.vpos) return 1;
+        //     return 0;
+        // });
 
         const cmt_opt_parser = new CommentOptionParser();
         comments.forEach(comment=>{

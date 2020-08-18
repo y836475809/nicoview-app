@@ -71,6 +71,7 @@
                 clearInterval(comment_sync_id);
             }
             if(comment_params.auto_sync_checked){
+                const last_time_sec = comment_tl.lastTimeSec;
                 const interval_ms = comment_params.auto_sync_interval*1000;
                 const threshold_sec = comment_params.auto_sync_threshold;
                 comment_sync_id = setInterval(()=>{
@@ -79,9 +80,9 @@
                             clearInterval(comment_sync_id);
                         } 
                     }
-                    const ct = comment_tl.getCurrentTime();
                     const vt = video_elm.currentTime;
-                    if(ct <= video_elm.duration){
+                    if(vt < last_time_sec && !comment_tl.ended){
+                        const ct = comment_tl.getCurrentTime();
                         if(Math.abs(ct - vt) > threshold_sec){
                             logger.debug("comment_sync ct=", ct, ", vt=", vt, "ct-vt=", ct - vt);
                             comment_tl.seek(vt);

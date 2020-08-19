@@ -424,11 +424,14 @@
                 return "";
             }
 
+            const tags = value.split(" ");
+
             let content = "";
-            value.split(" ").forEach(tag => {
+            tags.forEach(tag => {
                 content += `<div class='state-content label-tag'>${tag}</div>`;
             });
-            return `<div class='wrap-gridtable-cell'>${content}</div>`;
+            const title = tags.join("\n");
+            return `<div title="${title}" class='wrap-gridtable-cell'>${content}</div>`;
         };
 
         const columns = [

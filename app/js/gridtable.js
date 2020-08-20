@@ -182,6 +182,8 @@ class GridTable {
         }); 
 
         this.grid.registerPlugin(new Slick.AutoTooltips());
+
+        this._loadState();
     }
 
     setupResizer(container){
@@ -249,10 +251,9 @@ class GridTable {
         this.dataView.beginUpdate();
         this.dataView.setItems(data);
         this.dataView.setFilter(this._filter, this.target_column_ids);
+        this.dataView.reSort();
         this.dataView.endUpdate();
-        this.grid.invalidate();
-
-        this._loadState();
+        this.grid.invalidate();        
     }
 
     addItem(item){

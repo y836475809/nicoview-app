@@ -1,4 +1,5 @@
 require("slickgrid/lib/jquery.event.drag-2.3.0");
+require("slickgrid/lib/jquery-ui-1.11.3");
 require("slickgrid/slick.core");
 require("slickgrid/slick.grid");
 require("slickgrid/slick.dataview");
@@ -100,7 +101,7 @@ class GridTable {
 
         const default_options =  {
             enableCellNavigation: true,
-            enableColumnReorder: false,
+            enableColumnReorder: true,
             fullWidthRows: true, 
             id_click_as_dbclick:""
         };
@@ -180,6 +181,9 @@ class GridTable {
         this.grid.onColumnsResized.subscribe(() => {
             this._saveState();
         }); 
+        this.grid.onColumnsReordered.subscribe(() => {
+            this._saveState();
+        });
 
         this.grid.registerPlugin(new Slick.AutoTooltips());
 

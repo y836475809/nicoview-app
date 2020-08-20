@@ -353,10 +353,12 @@ class GridTable {
     }
 
     _saveState(){
-        const width_state = {};
         const columns = this.grid.getColumns();
-        columns.forEach(val=>{
-            width_state[val.id] = val.width;
+        const columns_state = columns.map(val=>{
+            return {
+                id: val.id,
+                width: val.width
+            };
         });
 
         const sort_state = {};
@@ -367,31 +369,49 @@ class GridTable {
         }
 
         ipc.invoke("config:set", { 
-            key:`gridtable.${this.name}.columns`, 
-            value:{
-                width: width_state,
-                sort: sort_state
-            } 
+            key:`gridtable.${this.name}`, 
+            value: {
+                columns: columns_state,
+                sort: sort_state,
+            }
         }).then();
     }
 
     _loadState(){
         ipc.invoke("config:get", { 
-            key:`gridtable.${this.name}.columns`, 
+            key:`gridtable.${this.name}`, 
             value:{
-                width: null,
+                columns: null,
                 sort: null
             } 
         }).then((value)=>{
-            if(value.width){
+            if(value.columns){
                 const columns = this.grid.getColumns();
+                
+                const column_map = new Map();
                 columns.forEach(val=>{
-                    const column_id = val.id;
-                    const width = value.width[column_id];
-                    val.width = width ? width : 80;
+                    column_map.set(val.id, val);
                 });
-                this.grid.setColumns(columns);
+
+                const order_columns = [];
+                value.columns.forEach(column => {
+                    if(column_map.has(column.id)){
+                        const colm = column_map.get(column.id);
+                        colm.width = column.width?column.width:80;
+                        order_columns.push(colm);
+                    }
+                });
+
+                if(columns.length == order_columns.length){
+                    this.grid.setColumns(order_columns);
+                }else{
+                    columns.forEach(val=>{
+                        val.width = 80;
+                    });
+                    this.grid.setColumns(columns);
+                }
             } 
+
             if(value.sort){
                 const { id, sort_asc } = value.sort;
                 if(id){

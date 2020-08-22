@@ -32,7 +32,7 @@
     "gsap": "^3.3.2",
     "jquery": "^3.5.1",
     "riot": "^3.13.2",
-    "slickgrid": "^2.4.24",
+    "slickgrid": "^2.4.27",
     "sortablejs": "^1.10.2",
     "sql.js": "^0.5.0"
   },

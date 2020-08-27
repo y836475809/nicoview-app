@@ -154,15 +154,15 @@
         <ul class="listview-list">
             <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
                 title={getTooltip(item)}>
-                <div class="dblclick center-hv" title="ダブルクリック動作"
-                    onclick={onclickItemAsdblclick.bind(this,item)} 
+                <div class="dblclick center-hv" title="クリック動作"
+                    onclick={onclickItem.bind(this,item)} 
                     ondblclick={ondblclickItem.bind(this,item)}
                     onmouseup={onmouseUp.bind(this,item)}
                     onmousedown={onmouseDown.bind(this,item)}>
                     <i class={getIconClass(item)}></i>
                 </div>           
                 <div class="title-wraper center-v"
-                    onclick={onclickItem.bind(this,item)} 
+                    onclick={onclickItemAsdblclick.bind(this,item)} 
                     ondblclick={ondblclickItem.bind(this,item)}
                     onmouseup={onmouseUp.bind(this,item)}
                     onmousedown={onmouseDown.bind(this,item)}>
@@ -379,7 +379,10 @@
             elms.forEach((elm) => {
                 elm.classList.remove("selected");
             });
-            target_elm.classList.add("selected"); 
+            const target = target_elm.closest(".listview-item");
+            if(target){
+                target.classList.add("selected"); 
+            }
         };
 
         const getSelectedItems = () => {
@@ -390,7 +393,7 @@
         };
 
         this.onclickItem = (item, e) => {
-            setSelected(e.target.parentElement, item);
+            setSelected(e.target, item);
             obs.trigger("item-clicked", item);
         };
 
@@ -399,12 +402,12 @@
         };
 
         this.onclickItemAsdblclick = (item, e) => {
-            setSelected(e.target.parentElement, item);
+            setSelected(e.target, item);
             obs.trigger("item-dlbclicked", item);
         };
 
         this.onmouseUp= (item, e) => {
-            setSelected(e.target.parentElement, item);
+            setSelected(e.target, item);
             if(e.button===2){
                 const items = getSelectedItems();
                 obs.trigger("show-contextmenu", e, { items });
@@ -412,7 +415,7 @@
         };
 
         this.onmouseDown= (item, e) => {
-            setSelected(e.target.parentElement, item);
+            setSelected(e.target, item);
         };
 
         this.onclickDelete = async (i, e) => {

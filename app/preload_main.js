@@ -37,7 +37,6 @@ window.addEventListener( "unhandledrejection", async e => {
 } );
 
 window.addEventListener("load", () => {
-    window.$ = window.jQuery = require("jquery");
     global.Sortable = require("sortablejs");
     global.GridTable = require(`${root_dir}/app/js/gridtable`);
     global.TimeFormat = require(`${root_dir}/app/js/time-format`);

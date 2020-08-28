@@ -1,3 +1,4 @@
+window.jQuery = require("slickgrid/lib/jquery-3.1.0");
 require("slickgrid/lib/jquery.event.drag-2.3.0");
 require("slickgrid/lib/jquery-ui-1.11.3");
 require("slickgrid/slick.core");
@@ -10,7 +11,7 @@ require("slickgrid/plugins/slick.resizer");
 const ipc = require("electron").ipcRenderer;
 const time_format = require("./time-format");
 
-/* globals $ Slick */
+/* globals Slick */
 
 const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
     if(!value){
@@ -120,7 +121,6 @@ class GridTable {
     }
 
     init(container){
-        // this.container = $(container);
         this.dataView = new Slick.Data.DataView();
         this.grid = new Slick.Grid(container, this.dataView, this.columns, this.options);
         this.grid.onSort.subscribe((e, args) => {
@@ -143,7 +143,7 @@ class GridTable {
         this.grid.onClick.subscribe((e) => {
             const cell = this.grid.getCellFromEvent(e);
 
-            if ($(e.target).hasClass("cmd-btn")) {
+            if (e.target.classList.contains("cmd-btn")) {
                 const data = this.dataView.getItem(cell.row);
                 this.on_button_click(e, e.target.dataset.cmdid, data);
                 e.stopPropagation();
@@ -203,9 +203,9 @@ class GridTable {
 
     resizeGrid(width, height){
         if(width && height){
-            const  container = $(this.grid.getContainerNode());
-            container.width(width);
-            container.height(height);      
+            const container = this.grid.getContainerNode();
+            container.style.width = `${width}px`;
+            container.style.height = `${height}px`;     
             this.grid.resizeCanvas();
             return; 
         }

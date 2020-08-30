@@ -16,9 +16,7 @@
 
     <script>
         /* globals riot */
-        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const {Menu} = remote;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -33,20 +31,10 @@
             const { items } = args;
             await ipc.invoke("library-search:updateItems", { items });
         });
-
-        const createMenu = (self) => {
-            return  Menu.buildFromTemplate([
-                { 
-                    label: "削除", click() {
-                        self.obs_listview.trigger("deleteList");
-                    }
-                }
-            ]);
-        };
         
-        this.obs_listview.on("show-contextmenu", (e) => {
-            const context_menu = createMenu(this);
-            context_menu.popup({window: remote.getCurrentWindow()}); 
+        this.obs_listview.on("show-contextmenu", (e, args) => {
+            const { items, cb } = args;
+            cb(null);
         });
 
         obs.on("library-page:sidebar:add-search-item", (query) => {

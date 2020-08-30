@@ -180,6 +180,8 @@
 
     <script>
         const Sortable = window.Sortable;
+        const {remote} = window.electron;
+        const {Menu, MenuItem} = remote;
         const ipc = window.electron.ipcRenderer;
         let item_duration = 300;
         let sortable = null;
@@ -410,7 +412,18 @@
             setSelected(e.target, item);
             if(e.button===2){
                 const items = getSelectedItems();
-                obs.trigger("show-contextmenu", e, { items });
+                const cb = (context_menu) => {
+                    if(!context_menu){
+                        context_menu = new Menu();
+                    }
+                    context_menu.append(new MenuItem({
+                        label: "削除", click() {
+                            obs.trigger("deleteList");
+                        }
+                    }));
+                    context_menu.popup({window: remote.getCurrentWindow()}); 
+                };
+                obs.trigger("show-contextmenu", e, { items, cb });
             }
         };
 

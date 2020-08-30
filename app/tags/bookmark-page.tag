@@ -94,7 +94,7 @@
             return false;
         };
 
-        const createMenu = (items, self) => {
+        const createMenu = (items) => {
             return Menu.buildFromTemplate([
                 { 
                     id: "play",
@@ -140,23 +140,17 @@
                         })();
                     }
                 },
-                { 
-                    id: "delete",
-                    label: "削除", click() {
-                        self.obs_listview.trigger("deleteList");
-                    }
-                }
             ]);
         };
-        
-        this.obs_listview.on("show-contextmenu", async (e, args) => {
-            const { items } = args;
-            const context_menu = createMenu(items, this);
+
+        this.obs_listview.on("show-contextmenu", (e, args) => {
+            const { items, cb } = args;
+            const context_menu = createMenu(items);
             context_menu.items.forEach(menu => {
                 const id = menu.id;
                 menu.enabled =  getMenuEnable(id, items);
             });
-            context_menu.popup({window: remote.getCurrentWindow()}); 
+            cb(context_menu);
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {  

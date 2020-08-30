@@ -25,9 +25,7 @@
 
     <script>
         /* globals riot */
-        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const {Menu} = remote;
         const { searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
@@ -73,20 +71,9 @@
             await ipc.invoke("nico-search:updateItems", { items });
         });
 
-        const createMenu = (self) => {
-            const menu_templete = [
-                { 
-                    label: "削除", click() {
-                        self.obs_listview.trigger("deleteList");
-                    }
-                }
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
-        this.obs_listview.on("show-contextmenu", (e) => {
-            const context_menu = createMenu(this);
-            context_menu.popup({window: remote.getCurrentWindow()}); 
+        this.obs_listview.on("show-contextmenu", (e, args) => {
+            const { items, cb } = args; 
+            cb(null);
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {

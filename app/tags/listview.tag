@@ -437,11 +437,6 @@
                         context_menu = new Menu();
                     }
                     context_menu.append(new MenuItem({
-                        label: "削除", click() {
-                            obs.trigger("deleteList");
-                        }
-                    }));
-                    context_menu.append(new MenuItem({
                         label: "マークの切り替え", click() {
                             items.forEach(item => {
                                 item.marked = !item.marked;

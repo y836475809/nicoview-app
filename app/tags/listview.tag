@@ -52,8 +52,13 @@
 
         .listview-item-default-icon {
             font-size: var(--icon-size);
-            color: royalblue;
             pointer-events: none;
+        }
+        .listview-item-default-icon-color {
+            color: royalblue;
+        }
+        .listview-item-marked-icon-color {
+            color: red;
         }
 
         .title-wraper {
@@ -368,7 +373,7 @@
             filter("");
         };
 
-        this.getIconClass = (item) => {
+        const getIconClass = (item) => {
             const type = item.type;
             if(icon_class === undefined || type === undefined){
                 return default_icon_class; 
@@ -377,7 +382,13 @@
             if(icon_name === undefined){
                 return default_icon_class; 
             }
-            return `center-hv ${icon_name} ${this.opts.name}-item`; 
+            return `center-hv ${icon_name}`; 
+        };
+
+        this.getIconClass = (item) => {
+            const icon_class = getIconClass(item);
+            const color_class = item.marked?"marked":"default";
+            return `${icon_class} listview-item-${color_class}-icon-color`;
         };
 
         const setSelected = (target_elm, item) => {
@@ -412,7 +423,12 @@
             obs.trigger("item-dlbclicked", item);
         };
 
-        this.onmouseUp= (item, e) => {
+        const updateItemIcon = () => {
+            this.update();
+            triggerChange();
+        };
+
+        this.onmouseUp = (item, e) => {
             setSelected(e.target, item);
             if(e.button===2){
                 const items = getSelectedItems();
@@ -423,6 +439,14 @@
                     context_menu.append(new MenuItem({
                         label: "削除", click() {
                             obs.trigger("deleteList");
+                        }
+                    }));
+                    context_menu.append(new MenuItem({
+                        label: "マークの切り替え", click() {
+                            items.forEach(item => {
+                                item.marked = !item.marked;
+                            });
+                            updateItemIcon();
                         }
                     }));
                     context_menu.popup({window: remote.getCurrentWindow()}); 

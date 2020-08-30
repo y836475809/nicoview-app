@@ -14,10 +14,6 @@
             width: 100%;
             background-color: var(--control-color);
         }
-
-        .bookmark-item {
-            color:royalblue;
-        }
     </style>    
 
     <aside class="sidebar">

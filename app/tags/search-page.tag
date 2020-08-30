@@ -6,9 +6,6 @@
             background-color: var(--control-color);
         }
         
-        .nico-search-item {
-            color:royalblue;
-        }
         .nico-search-item-adjust {
             margin-right: 4px;
         }

@@ -13,3 +13,10 @@ search-page > .split-page {
 bookmark-page {
     --page-width: 300px !important;
 }
+
+listview .listview-item-default-icon-color {
+    color: royalblue !important;
+}
+listview .listview-item-marked-icon-color {
+    color: red !important;
+}

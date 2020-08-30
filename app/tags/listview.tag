@@ -136,8 +136,12 @@
             background-color: #C8EBFB;
         }
         
+        .dblclick > i {
+            transition-duration: 0.2s;
+        }
         .dblclick:hover > i {
-            color: red;
+            transform: scale(1.5);
+	        transition-duration: 0.2s;
         }
     </style>
     

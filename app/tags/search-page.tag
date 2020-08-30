@@ -55,6 +55,9 @@
 
         const loadItems = async () => {
             const items = await ipc.invoke("nico-search:getItems");
+            items.forEach(item => {
+                item.type = item.cond.search_target;
+            });
             this.obs_listview.trigger("loadData", { items });
         };
 
@@ -64,6 +67,9 @@
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
+            items.forEach(item => {
+                delete item.type;
+            });
             await ipc.invoke("nico-search:updateItems", { items });
         });
 

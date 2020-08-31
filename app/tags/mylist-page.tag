@@ -259,12 +259,7 @@
 
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
             const video_id = dataContext.id;
-            const view_count = dataContext.view_count;
-            const comment_count = dataContext.comment_count;
-
-            let result = `<div>ID:${video_id}<br>
-                            再生:${view_count.toLocaleString()}<br>
-                            コメント:${comment_count.toLocaleString()}</div>`;
+            let result = `<div>ID:${video_id}</div>`;
             if(dataContext.saved){
                 result += "<div class='state-content state-saved'>ローカル</div>";
             }

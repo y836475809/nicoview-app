@@ -36,8 +36,6 @@ test("nico mylist parse xml", t => {
                 thumb_img: "http://tn.smilevideo.jp/smile?i=12345678.63399.M",
                 length: "100:10",
                 date: "2000年1月3日 03：03：03",
-                view_count: "10,000",
-                comment_count: "100"
             },
             {
                 no: 2,
@@ -48,8 +46,6 @@ test("nico mylist parse xml", t => {
                 thumb_img: "http://tn.smilevideo.jp/smile?i=20.M",
                 length: "50:50",
                 date: "2000年1月2日 02：02：02",
-                view_count: "200,000",
-                comment_count: "1,000"
             },
             {
                 no: 3,
@@ -60,8 +56,6 @@ test("nico mylist parse xml", t => {
                 thumb_img: "http://tn.smilevideo.jp/smile?i=10",
                 length: "0:10",
                 date: "2000年1月1日 01：01：01",
-                view_count: "20",
-                comment_count: "30"
             }
         ]
     });

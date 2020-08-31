@@ -75,8 +75,6 @@ class NicoMylistReader {
                 thumb_img: description.thumbnail_src,
                 length: description.length,
                 date: description.date,
-                view_count: description.num_view,
-                comment_count: description.num_comment
             });
         });
 
@@ -115,8 +113,6 @@ class NicoMylistReader {
             thumbnail_src: $(".nico-thumbnail > img").attr("src"),
             length: $(".nico-info-length").text(),
             date: $(".nico-info-date").text(),
-            num_view: $(".nico-numbers-view").text(),
-            num_comment: $(".nico-numbers-res").text(),
         };
     }
 

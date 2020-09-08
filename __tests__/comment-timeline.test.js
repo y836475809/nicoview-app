@@ -88,7 +88,7 @@ test("flow comments", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "15px",
-                top:(300/12*0) + "px",
+                top:(300/12*0 + (300/12-parseInt(elm.style.fontSize))/2) + "px",
                 left:"300px",
                 color: "#FFFFFF"
             });
@@ -106,7 +106,7 @@ test("flow comments", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "20px",
-                top: (300/12*1) +"px",
+                top: (300/12*1 + (300/12-parseInt(elm.style.fontSize))/2) +"px",
                 left:"300px",
                 color: "#FF0000"
             });
@@ -162,7 +162,7 @@ test("fixed comments no option", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "15px",
-                top: (0*(300/12))+"px",
+                top: (0*(300/12) + (300/12-parseInt(elm.style.fontSize))/2)+"px",
                 left:"100px",
                 color: "#FFFFFF"
             });
@@ -180,7 +180,7 @@ test("fixed comments no option", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "20px",
-                top: (1*(300/12))+"px",
+                top: (1*(300/12) + (300/12-parseInt(elm.style.fontSize))/2)+"px",
                 left:"100px",
                 color: "#FF0000"
             });
@@ -199,7 +199,7 @@ test("fixed comments no option", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "15px",
-                top: (12-0-1)*(300/12) + "px",
+                top: ((12-0-1)*(300/12) + (300/12-parseInt(elm.style.fontSize))/2) + "px",
                 left:"100px",
                 color: "#FFFFFF"
             });
@@ -217,7 +217,7 @@ test("fixed comments no option", t => {
                 whiteSpace:"nowrap",
                 position:"absolute",
                 fontSize: "20px",
-                top: (12-1-1)*(300/12) + "px",
+                top: ((12-1-1)*(300/12) + (300/12-parseInt(elm.style.fontSize))/2) + "px",
                 left:"100px",
                 color: "#FF0000"
             });

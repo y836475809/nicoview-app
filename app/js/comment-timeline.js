@@ -337,9 +337,10 @@ class CommentTimeLine {
         const duration_msec = this.duration_sec * 1000;
 
         const flow_cmt = new FlowComment(this.row_num, view_width, duration_msec);
-
         const fragment = document.createDocumentFragment();
-        const params = this._createFlowParams(comments, flow_cmt, fragment);
+        const row_h = this.area_size.height / this.row_num;
+
+        const params = this._createFlowParams(comments, flow_cmt, row_h, fragment);
         this.parent_elm.appendChild(fragment);
 
         this._createFlowTweenMax(params);
@@ -468,7 +469,7 @@ class CommentTimeLine {
         return Math.max(...lens);
     }
 
-    _createElm(comment, row_index, fragment){
+    _createElm(comment, fragment){
         const elm = document.createElement("div");
         elm.classList.add("comment");
 
@@ -482,19 +483,17 @@ class CommentTimeLine {
 
         const view_height = this.area_size.height;
         const view_width = this.area_size.width;
-        const row_h = this.area_size.height/this.row_num;
 
-        const font_size = comment.font_size;
-        if(font_size=="big"){
-            elm.style.fontSize =  Math.floor(view_height/15) + "px";
-        }else if(font_size=="small"){
-            elm.style.fontSize =  Math.floor(view_height/25) + "px";
-        }else{
-            elm.style.fontSize = Math.floor(view_height/20) + "px";
-        } 
-        const text_width = this._getTextWidth(comment.content, parseInt(elm.style.fontSize));
+        let font_size = Math.floor(view_height/20);
+        if(comment.font_size=="big"){
+            font_size = Math.floor(view_height/15);
+        }else if(comment.font_size=="small"){
+            font_size = Math.floor(view_height/25);
+        }
         
-        elm.style.top = (row_index * row_h) + "px";
+        const text_width = this._getTextWidth(comment.content, font_size);
+
+        elm.style.fontSize = font_size + "px";
         elm.style.left = view_width + "px";
         elm.style.color = comment.color;
 
@@ -507,16 +506,20 @@ class CommentTimeLine {
      * @param {FlowComment} flow_cmt 
      * @param {DocumentFragment} fragment 
      */
-    _createFlowParams(comments, flow_cmt, fragment){
+    _createFlowParams(comments, flow_cmt, row_h, fragment){
         flow_cmt.createRowIndexMap(comments);
 
         return comments.map((comment, index)=>{
             const row_index = flow_cmt.getRowIndex(comment);
             const { elm, text_width } = 
-                this._createElm(comment, row_index, fragment);
+                this._createElm(comment, fragment);
             const id = `flow-comment-id${index}`;
             elm.id = id;
             elm.classList.add("flow");
+
+            const margin = (row_h - parseInt(elm.style.fontSize)) / 2;
+            elm.style.top = (row_index * row_h + margin) + "px";
+
             const left = -(this.area_size.width + text_width);
             const delay = comment.vpos / 1000; //sec
             return { elm, left, delay };
@@ -535,7 +538,7 @@ class CommentTimeLine {
         return comments.map((comment, index)=>{
             const row_index = fixed_cmt.getRowIndex(comment);
             const { elm, text_width } = 
-                this._createElm(comment, row_index, fragment);
+                this._createElm(comment, fragment);
             const id = `fixed-${pos_type}-comment-id${index}`;
             elm.id = id;
             elm.classList.add("fixed");
@@ -543,10 +546,11 @@ class CommentTimeLine {
             elm.style.left = (this.area_size.width / 2 - text_width / 2) + "px";
             const duration = comment.duration / 1000; //sec
 
+            const margin = (row_h - parseInt(elm.style.fontSize)) / 2;
             if(pos_type=="ue"){
-                elm.style.top = (row_index * row_h) + "px";
+                elm.style.top = (row_index * row_h + margin) + "px";
             }else if(pos_type=="shita"){
-                elm.style.top = ((this.row_num - row_index - 1) * row_h) + "px";
+                elm.style.top = ((this.row_num - row_index - 1) * row_h + margin) + "px";
             }
 
             return { elm, delay, duration };

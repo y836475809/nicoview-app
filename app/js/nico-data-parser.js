@@ -186,9 +186,9 @@ const json_thumb_info = (api_data) => {
         },
         tags: tags,
         owner: {
-            id: owner.id, 
-            nickname: owner.nickname,
-            iconURL: owner.iconURL,
+            id: owner?owner.id:"", 
+            nickname: owner?owner.nickname:"", 
+            iconURL: owner?owner.iconURL:"", 
         }
     };
 };

@@ -109,8 +109,8 @@
             <div class="user-info", style="display: flex;">
                 <img class="user-thumbnail" src={user_thumbnail_url}>
                 <div>
-                    <div class="user-name">投稿者: {user_nickname}</div>
-                    <div class="userlist-link" onclick={onclickUserListLink}>user/{user_id}</div>
+                    <div class="user-name">投稿者: {getUserNickname()}</div>
+                    <div class="userlist-link" onclick={onclickUserListLink}>{getUserListLink()}</div>
                 </div>
                 <div class="icon-button center-hv" onclick={onclickCloseDescription}>
                     <i title="閉じる" class="icon fas fa-times"></i>
@@ -132,6 +132,13 @@
 
         this.user_thumbnail_url = "";
         this.user_description_class = "text";
+
+        this.getUserNickname = () => {
+            return this.user_nickname?this.user_nickname:"未取得";
+        };
+        this.getUserListLink = () => {
+            return this.user_id?`user/${this.user_id}`:"";
+        };
 
         const watchLinkClick = (e) => {
             e.preventDefault(); 
@@ -291,7 +298,7 @@
                 elm_description.style.height = new_height + "px";
             }
 
-            if(this.user_thumbnail_url != this.user_icon_url){
+            if(this.user_icon_url && this.user_thumbnail_url != this.user_icon_url){
                 this.user_thumbnail_url = this.user_icon_url;
             }
         };
@@ -381,6 +388,9 @@
         };
 
         this.onclickUserListLink = (e) => {
+            if(!this.user_id){
+                return;
+            }
             obs.trigger("player-main-page:load-mylist", `user/${this.user_id}`);
         };
 

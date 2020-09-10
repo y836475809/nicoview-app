@@ -241,7 +241,10 @@
 
         const setDescription = (description) => {
             const content_elms = this.root.querySelectorAll(".user-description");
-            content_elms.forEach(content_elm => {    
+            content_elms.forEach(content_elm => {  
+                content_elm.scrollTop  = 0;
+                content_elm.scrollLeft = 0;
+
                 content_elm.innerHTML = description;
 
                 if(content_elm.childElementCount==0){

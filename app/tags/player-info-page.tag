@@ -240,12 +240,12 @@
         };
 
         const columns = [
-            {id: "vpos", name: "時間", sortable: true, formatter: timeFormatter},
-            {id: "content", name: "コメント", sortable: true},
-            {id: "user_id", name: "ユーザーID", sortable: true},
-            {id: "date", name: "投稿日", sortable: true, formatter: dateFormatter},
-            {id: "no", name: "番号", sortable: true},
-            {id: "mail", name: "オプション", sortable: true}
+            {id: "vpos", name: "時間", formatter: timeFormatter},
+            {id: "content", name: "コメント"},
+            {id: "user_id", name: "ユーザーID"},
+            {id: "date", name: "投稿日", formatter: dateFormatter},
+            {id: "no", name: "番号"},
+            {id: "mail", name: "オプション"}
         ];
         const options = {
             rowHeight: row_height,

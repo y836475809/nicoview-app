@@ -21,7 +21,7 @@
     "ava": "^3.12.1",
     "electron": "^9.2.1",
     "electron-builder": "^22.8.0",
-    "eslint-plugin-html": "^6.0.3",
+    "eslint-plugin-html": "^6.1.0",
     "nock": "^13.0.4",
     "sinon": "^9.0.3"
   },

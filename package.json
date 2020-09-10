@@ -31,7 +31,7 @@
     "electron-log": "^4.2.4",
     "gsap": "^3.5.0",
     "riot": "^3.13.2",
-    "slickgrid": "^2.4.27",
+    "slickgrid": "^2.4.28",
     "sortablejs": "^1.10.2",
     "sql.js": "^0.5.0"
   },

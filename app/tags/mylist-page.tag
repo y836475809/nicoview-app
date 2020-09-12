@@ -474,6 +474,10 @@
         };
 
         const updateMylist = async () => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+            
             this.obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],

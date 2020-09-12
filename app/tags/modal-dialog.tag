@@ -1,4 +1,4 @@
-<modal-dialog>
+<modal-dialog data-open="false">
     <style scoped>
         .container {
             width: 250px;
@@ -56,6 +56,8 @@
         const obs_dialog = this.opts.obs;
 
         obs_dialog.on("show", async (args) => {
+            this.root.dataset.open = true;
+
             const { message, buttons, cb } = args;
             this.message = message;
             this.showok = buttons===undefined ? false : buttons.includes("ok");
@@ -76,6 +78,7 @@
         obs_dialog.on("close", () => {
             const dialog = this.root.querySelector("dialog");
             dialog.close();
+            this.root.dataset.open = false;
         });
 
         this.onclickButton = (result, e) =>{

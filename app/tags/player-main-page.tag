@@ -181,6 +181,10 @@
         }; 
 
         const playVideoOnline = async (video_id, time, is_saved) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+            
             cancelPlay();
 
             const state = { 
@@ -296,6 +300,10 @@
         });
   
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
             logger.debug("player main update video_id=", video_id);
             const nico_update = new NicoUpdate();
 

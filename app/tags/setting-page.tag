@@ -176,7 +176,7 @@
             </div>
         </div>
     </div>
-    <modal-dialog obs={obs_msg_dialog}></modal-dialog>
+    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
         /* globals riot logger */
@@ -187,7 +187,7 @@
         const { ImportNNDDData } = window.ImportNNDDData;
         
         const obs = this.opts.obs; 
-        this.obs_msg_dialog = riot.observable();
+        this.obs_modal_dialog = riot.observable();
 
         this.cache_size = "--MB";
         this.import_items = ImportNNDDData.getItems();
@@ -263,14 +263,18 @@
         };
 
         this.onclickclearCache = async (e) => {
-            this.obs_msg_dialog.trigger("show", {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
+            this.obs_modal_dialog.trigger("show", {
                 message: "キャッシュクリア中...",
             });
             await new Promise(resolve => setTimeout(resolve, 100));
 
             await ipc.invoke("setting:clear-app-cache");
 
-            this.obs_msg_dialog.trigger("close");
+            this.obs_modal_dialog.trigger("close");
 
             this.cache_size = await getCacheSizeLabel();
             this.update();
@@ -303,6 +307,10 @@
         };
 
         this.onclickExecNNDDImport = async (e) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
             const data_dir = await ipc.invoke("config:get", { key:"data_dir", value:"" });
             const nndd_system_dir = await ipc.invoke("config:get", { key:"nndd.system_path", value:"" });
             try {
@@ -333,14 +341,14 @@
                 }
             });
 
-            this.obs_msg_dialog.trigger("show", {
+            this.obs_modal_dialog.trigger("show", {
                 message: "インポート中...",
             });
             try {
                 const import_nndd = new ImportNNDDData(nndd_system_dir, data_dir);
                 for (let index = 0; index < import_items.length; index++) {
                     const import_item = import_items[index];
-                    this.obs_msg_dialog.trigger("update-message", `${import_item.title}をインポート`);
+                    this.obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
                     await import_nndd.call(import_item.name);
                 }
 
@@ -359,7 +367,7 @@
                     message:`インポート失敗\n${error.message}`
                 });
             } finally {
-                this.obs_msg_dialog.trigger("close");
+                this.obs_modal_dialog.trigger("close");
             }            
         };
 
@@ -408,6 +416,10 @@
         });
 
         this.onclickImportFiles = async ()=>{
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+            
             const file_paths = await ipc.invoke("app:show-select-file-dialog",{
                 name:"avi",
                 exts:["mp4", "flv", "swf"],
@@ -418,7 +430,7 @@
             }
 
             let cancel = false;
-            this.obs_msg_dialog.trigger("show", {
+            this.obs_modal_dialog.trigger("show", {
                 message: "インポート中...",
                 cb: result=>{
                     cancel = true;
@@ -448,7 +460,7 @@
                 }
 
                 const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
-                this.obs_msg_dialog.trigger("update-message", message);
+                this.obs_modal_dialog.trigger("update-message", message);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -457,7 +469,7 @@
                 type:"info",
                 message:`インポート完了\n失敗:${error_files.length}`
             });
-            this.obs_msg_dialog.trigger("close");
+            this.obs_modal_dialog.trigger("close");
 
             if(error_files.length>0){
                 await ipc.invoke("app:show-message-box", {

@@ -336,6 +336,10 @@
         };
 
         const updateNicoData = async (items, func) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
             let update_cancel = false;
             let nico_update = null;
             this.obs_modal_dialog.trigger("show", {
@@ -417,6 +421,10 @@
         };
 
         const convertNicoDataToNNDD = async (items) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
             let cnv_cancel = false;
             this.obs_modal_dialog.trigger("show", {
                 message: "...",
@@ -488,6 +496,10 @@
         };
 
         const deleteLibraryData = async (video_ids) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+
             let cancel = false;
             this.obs_modal_dialog.trigger("show", {
                 message: "...",
@@ -526,6 +538,10 @@
         };
 
         const convertVideo = async (self, video_id) => {
+            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+                return;
+            }
+            
             const updateState = (state) => {
                 grid_table.updateCell(video_id, "state", state);
             };

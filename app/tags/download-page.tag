@@ -367,6 +367,10 @@
                         Command.addBookmarkItems(obs, [data]);
                     }
                 });
+                grid_table_dl.onMoveRows(async ()=>{
+                    await onChangeDownloadItem();
+                });
+
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");
                 const items = await ipc.invoke("download:getItems");
                 grid_table_dl.setData(items);

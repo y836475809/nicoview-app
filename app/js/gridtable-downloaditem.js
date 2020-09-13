@@ -117,9 +117,13 @@ class GridTableDownloadItem {
             this.grid_table.dataView.endUpdate();
 
             this.grid_table.grid.setSelectedRows(selectedRows);
+
+            this.on_move_rows();
         });
 
         this.grid_table.grid.registerPlugin(moveRowsPlugin); 
+
+        this.on_move_rows = ()=>{};
     }
 
     onContextMenu(on_context_menu){
@@ -138,6 +142,10 @@ class GridTableDownloadItem {
         this.grid_table.onButtonClick((e, cmd_id, data)=>{
             on_click(e, cmd_id, data);
         });
+    }
+
+    onMoveRows(on_move_rows){
+        this.on_move_rows = on_move_rows;
     }
 
     setData(items){

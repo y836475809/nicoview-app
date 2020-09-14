@@ -242,6 +242,10 @@
                 video_elm.play();
             });
             obs.on("player-video:pause", () => {
+                const is_ready = video_elm.readyState > 2;
+                if(!is_ready){
+                    return;
+                }
                 logger.debug("player pause");
                 video_elm.pause();
                 comment_tl.pause();

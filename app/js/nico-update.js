@@ -421,7 +421,8 @@ class NicoUpdate extends EventEmitter {
 
     async _getComments(api_data, cur_comments){
         this.nico_comment = new NicoComment(api_data);
-        const res_from = this._getMaxCommentNo(cur_comments) + 1;
+        const max_no = this._getMaxCommentNo(cur_comments);
+        const res_from = max_no===null?0:max_no+1;
         const comments_diff = await this.nico_comment.getCommentDiff(res_from);
         return comments_diff;
     }
@@ -431,9 +432,13 @@ class NicoUpdate extends EventEmitter {
      * @param {Array} comments 
      */
     _getMaxCommentNo(comments){
-        return Math.max.apply(null, comments.map(comment=>{
+        const no_list = comments.map(comment=>{
             return comment.no;
-        }));
+        });
+        if(no_list.length===0){
+            return null;
+        }
+        return Math.max.apply(null, no_list);
     }
  
     _typeOf(obj) {

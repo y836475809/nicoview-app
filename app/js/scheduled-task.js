@@ -29,9 +29,10 @@ class ScheduledTask extends EventEmitter{
         if(this.timer){
             this.emit("execute");
 
-            this.execution();
-            const rest = this._getRestMsec();
-            this.timer = setTimeout(()=>{this._task();}, rest);
+            this.execution().then(()=>{
+                const rest = this._getRestMsec();
+                this.timer = setTimeout(()=>{this._task();}, rest);
+            });
         }
     }
 

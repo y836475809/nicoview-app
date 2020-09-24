@@ -337,9 +337,7 @@
 
                 if(enable==true){
                     scheduled_task.stop();
-                    scheduled_task = new ScheduledTask(download_schedule.date, () =>{
-                        startDownload();
-                    });
+                    scheduled_task = new ScheduledTask(download_schedule.date, startDownload);
                     scheduled_task.start();
                 }else{
                     scheduled_task.stop();
@@ -382,9 +380,7 @@
                 });
             }
 
-            scheduled_task = new ScheduledTask(download_schedule.date, ()=>{
-                startDownload();
-            });
+            scheduled_task = new ScheduledTask(download_schedule.date, startDownload);
             if(download_schedule.enable==true){
                 scheduled_task.start();
             }

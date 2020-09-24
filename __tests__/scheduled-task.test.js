@@ -14,6 +14,15 @@ const mkDate = (hour, minute) => {
     return { hour:hour, minute:minute };
 };
 
+const task = () => {
+    count++;
+    return {
+        then:(func)=>{
+            func();
+        }
+    };
+};
+
 test.beforeEach(t => {
     clock = sinon.useFakeTimers();
     clock.tick(toMsec(24) + new Date().getTimezoneOffset()*60*1000);
@@ -26,9 +35,7 @@ test.afterEach(t => {
 });
 
 test("scheduled task", t => {
-    const sk = new ScheduledTask(mkDate(3, 0), ()=>{
-        count++;
-    });
+    const sk = new ScheduledTask(mkDate(3, 0),task);
     sk.on("start", ()=>{log.push("start");});
     sk.on("execute", ()=>{log.push("execute");});
     sk.on("stop", ()=>{log.push("stop");});
@@ -42,9 +49,7 @@ test("scheduled task", t => {
 });
 
 test("scheduled task 0", t => {
-    const sk = new ScheduledTask(mkDate(3, 0), ()=>{
-        count++;
-    });
+    const sk = new ScheduledTask(mkDate(3, 0),task);
     sk.on("start", ()=>{log.push("start");});
     sk.on("execute", ()=>{log.push("execute");});
     sk.on("stop", ()=>{log.push("stop");});
@@ -58,9 +63,7 @@ test("scheduled task 0", t => {
 });
 
 test("scheduled task 3", t => {
-    const sk = new ScheduledTask(mkDate(3, 0), ()=>{
-        count++;
-    });
+    const sk = new ScheduledTask(mkDate(3, 0), task);
     sk.on("start", ()=>{log.push("start");});
     sk.on("execute", ()=>{log.push("execute");});
     sk.on("stop", ()=>{log.push("stop");});
@@ -76,9 +79,7 @@ test("scheduled task 3", t => {
 test("scheduled task next day", t => {
     clock.tick(toMsec(4));
 
-    const sk = new ScheduledTask(mkDate(3, 0), ()=>{
-        count++;
-    });
+    const sk = new ScheduledTask(mkDate(3, 0), task);
     sk.on("start", ()=>{log.push("start");});
     sk.on("execute", ()=>{log.push("execute");});
     sk.on("stop", ()=>{log.push("stop");});
@@ -98,9 +99,7 @@ test("scheduled task next day", t => {
 });
 
 test("scheduled task minute", t => {
-    const sk = new ScheduledTask(mkDate(3, 1), ()=>{
-        count++;
-    });
+    const sk = new ScheduledTask(mkDate(3, 1), task);
     sk.on("start", ()=>{log.push("start");});
     sk.on("execute", ()=>{log.push("execute");});
     sk.on("stop", ()=>{log.push("stop");});
@@ -118,4 +117,28 @@ test("scheduled task minute", t => {
 
     t.is(count, 1);
     t.deepEqual(log, ["start","execute","stop"]);
+});
+
+test("scheduled task repeat", async (t) => {
+    const sk = new ScheduledTask(mkDate(3, 1), task);
+    sk.on("start", ()=>{log.push("start");});
+    sk.on("execute", ()=>{log.push("execute");});
+    sk.on("stop", ()=>{log.push("stop");});
+
+    sk.start();
+
+    clock.tick(toMsec(4));
+    t.is(count, 1);
+
+    clock.tick(toMsec(24));
+    t.is(count, 2);
+
+    clock.tick(toMsec(24));
+    t.is(count, 3);
+
+    sk.stop();
+
+    t.deepEqual(log, [
+        "start","execute","execute", "execute", "stop"
+    ]);
 });

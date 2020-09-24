@@ -146,11 +146,23 @@
 
         const deleteDownloadItems = async (video_ids) => {
             if(nico_down!=null){
+                const del_ids = video_ids.filter(video_id=>{
+                    return video_id != nico_down.video_id;
+                });
+                grid_table_dl.deleteItems(del_ids); 
+
                 if(video_ids.includes(nico_down.video_id)){
                     cancelDownload();
+
+                    await ipc.invoke("app:show-message-box", {
+                        type:"info",
+                        message:`${nico_down.video_id}のダウンロードをキャンセル`,
+                        okcancel:false
+                    });
                 }
-            } 
-            grid_table_dl.deleteItems(video_ids); 
+            }else{
+                grid_table_dl.deleteItems(video_ids); 
+            }
 
             await onChangeDownloadItem();
         };
@@ -288,6 +300,7 @@
                     }
                
                     await onChangeDownloadItem();
+                    nico_down = null;
                 }
             } catch (error) {
                 logger.error(`download id=${video_id}: `, error);
@@ -297,6 +310,7 @@
                 });
             } finally {
                 event_em.emit("download-end");
+                nico_down = null;
             }    
         };
 

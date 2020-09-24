@@ -98,8 +98,7 @@ class NicoDownloader {
     }
 
     async _renameTmp(oldname, newname){
-        const promisify_rename = util.promisify(fs.rename);
-        await promisify_rename(oldname, newname);
+        await fs.promises.rename(oldname, newname);
     }
 
     async download(on_progress){

@@ -152,29 +152,15 @@ class GridTableDownloadItem {
         const dl_items = items.map(value=>{
             const dl_item = Object.assign({...value});
             Object.assign(dl_item, {
-                progress: "",
-                visible: true
+                progress: ""
             });
             return dl_item;
         });
         this.grid_table.setData(dl_items);
-
-        this.filterVisible();
     }
 
     getData(){
-        const cp_items = [];
-        const items = this.grid_table.dataView.getItems().filter(item => {
-            return item.visible === true;
-        });
-        Object.assign(cp_items , items);
-        return cp_items;
-    }
-
-    filterVisible(){
-        this.grid_table.dataView.setFilter((item)=>{
-            return item.visible===true;
-        });
+        return this.grid_table.dataView.getItems();
     }
 
     hasItem(id){
@@ -182,8 +168,7 @@ class GridTableDownloadItem {
         if(!item){
             return false;
         }
-
-        return item.visible;
+        return true;
     }
 
     addItems(items, state){
@@ -193,13 +178,11 @@ class GridTableDownloadItem {
                 return value.id == item.id;
             });
             if(fd_item===undefined){
-                item["visible"] = true;
                 item["state"] = state;
                 item["progress"] = "";
                 this.grid_table.dataView.addItem(item);
             }else{
                 this.grid_table.dataView.deleteItem(fd_item.id);
-                fd_item["visible"] = true;
                 fd_item["state"] = state;
                 fd_item["progress"] = "";
                 this.grid_table.dataView.addItem(fd_item);
@@ -211,12 +194,8 @@ class GridTableDownloadItem {
 
     deleteItems(video_ids){
         video_ids.forEach(video_id => {
-            const item = this.grid_table.dataView.getItemById(video_id);
-            if(item){
-                item.visible = false;
-            }
+            this.grid_table.dataView.deleteItem(video_id);
         });
-        this.filterVisible();
     }
 
     clearItems(target_state){
@@ -231,7 +210,6 @@ class GridTableDownloadItem {
                 this.grid_table.dataView.deleteItem(item.id);
             }
         });
-        this.filterVisible();
     }
 
     updateItem(video_id, prop){
@@ -241,9 +219,6 @@ class GridTableDownloadItem {
         }
         
         const item = this.grid_table.dataView.getItemById(video_id);
-        if(item.visible===false){
-            return;
-        }
 
         Object.assign(item, prop);
         
@@ -262,8 +237,7 @@ class GridTableDownloadItem {
 
         if(!video_id){
             const find_index = items.findIndex(item=>{
-                return item.visible 
-                    && (item.state == DownloadState.wait || item.state == DownloadState.error); 
+                return (item.state == DownloadState.wait || item.state == DownloadState.error); 
             });
             if(find_index<0){
                 return null;
@@ -273,10 +247,9 @@ class GridTableDownloadItem {
         }
 
         const index = this.grid_table.dataView.getIdxById(video_id);
-        if(!index){
+        if(index===undefined){
             const find_index = items.findIndex(item=>{
-                return item.visible 
-                    && (item.state == DownloadState.wait || item.state == DownloadState.error); 
+                return (item.state == DownloadState.wait || item.state == DownloadState.error); 
             });
             if(find_index<0){
                 return null;
@@ -288,7 +261,7 @@ class GridTableDownloadItem {
         let next_index = index + 1;
         for (let index = next_index; index < items.length; index++) {
             const item = this.grid_table.dataView.getItemByIdx(index);
-            if(item && item.visible){
+            if(item && (item.state == DownloadState.wait || item.state == DownloadState.error)){
                 return item.id;
             }
         }

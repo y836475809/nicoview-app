@@ -213,19 +213,19 @@
         const confirm = !this.opts.confirm?[]:this.opts.confirm;
 
         const triggerChange = () => {
-            this.items.map(item=>{
+            const items = this.items.map(item=>{
                 delete item.state;
-                return item;
+                return Object.create(item);
             });
-            obs.trigger("changed", {items:this.items});
+            obs.trigger("changed", {items});
         };
 
         const triggerDelete = (items) => {
-            items.map(item=>{
+            const deleted_items = items.map(item=>{
                 delete item.state;
-                return item;
+                return Object.create(item);
             });
-            obs.trigger("items-deleted", {items});
+            obs.trigger("items-deleted", {items:deleted_items});
         };
 
         const deleteConfirm = async () => {

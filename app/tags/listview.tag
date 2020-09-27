@@ -213,17 +213,17 @@
         const confirm = !this.opts.confirm?[]:this.opts.confirm;
 
         const triggerChange = () => {
-            const items = this.items.map(item=>{
+            const items = JSON.parse(JSON.stringify(this.items)).map(item=>{
                 delete item.state;
-                return Object.create(item);
+                return item;
             });
             obs.trigger("changed", {items});
         };
 
         const triggerDelete = (items) => {
-            const deleted_items = items.map(item=>{
+            const deleted_items = JSON.parse(JSON.stringify(items)).map(item=>{
                 delete item.state;
-                return Object.create(item);
+                return item;
             });
             obs.trigger("items-deleted", {items:deleted_items});
         };

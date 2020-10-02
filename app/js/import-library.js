@@ -17,6 +17,7 @@ class ImportLibrary {
         const thumbnail_size = await this._getThumbnailSize();
         const data_type = await this._getDataType();
         const thumb_info = this._getThumbInfo(data_type);
+        const tags = this._getTags(thumb_info.tags);
 
         const video = thumb_info.video;
         return {
@@ -34,9 +35,19 @@ class ImportLibrary {
             is_economy: false, // TODO とりあえず高画質にする
             play_time: toTimeSec(video.duration),
             pub_date: new Date(video.postedDateTime).getTime(),
-            tags: thumb_info.tags,
+            tags: tags,
             is_deleted: false,       
         };
+    }
+
+    _getTags(thumb_info_tags){
+        if(!thumb_info_tags){
+            return [];
+        }
+
+        return thumb_info_tags.map(tag=>{
+            return tag.name;
+        });
     }
 
     async _getThumbnailSize(){

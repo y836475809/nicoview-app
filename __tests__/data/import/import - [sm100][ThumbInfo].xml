@@ -1,7 +1,7 @@
 <nicovideo_thumb_response status="ok">
   <thumb>
     <video_id>sm100</video_id>
-    <title>import test</title>
+    <title>import test xml</title>
     <description></description>
     <thumbnail_url>http://tn-skr3.smilevideo.jp/smile?i=100</thumbnail_url>
     <first_retrieve>2000-01-01T00:00:100+09:00</first_retrieve>
@@ -18,8 +18,8 @@
     <embeddable>1</embeddable>
     <no_live_play>0</no_live_play>
     <tags domain="jp">
-      <tag category="1" lock="1">tag1</tag>
-      <tag>tag2</tag>
+      <tag category="1" lock="1">xml_tag1</tag>
+      <tag>xml_tag2</tag>
     </tags>
     <user_id>100</user_id>
   </thumb>

@@ -1,7 +1,7 @@
 {
   "video": {
     "video_id": "sm100",
-    "title": "import test",
+    "title": "import test json",
     "description": "",
     "thumbnailURL": "http://tn-skr3.smilevideo.jp/smile?i=100",
     "largeThumbnailURL": "http://tn-skr3.smilevideo.jp/smile?i=100",
@@ -17,12 +17,12 @@
   "tags": [
     {
       "id": "0",
-      "name": "tag1",
+      "name": "json_tag1",
       "isLocked": true
     },
     {
       "id": "1",
-      "name": "tag2",
+      "name": "json_tag2",
       "isLocked": false
     }
   ],

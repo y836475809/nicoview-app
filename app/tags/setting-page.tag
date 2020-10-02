@@ -448,11 +448,7 @@
                 try {
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
-                    const video_id = item.id;
-                    const exist = await ipc.invoke("library:has", {video_id});
-                    if(!exist){
-                        await ipc.invoke("library:addItem", { item });
-                    }
+                    await ipc.invoke("library:addItem", { item });
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     logger.error(error);

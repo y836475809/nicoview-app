@@ -319,10 +319,10 @@ class GridTable {
         this.toStringFunc = toStringFunc;
     }
 
-    filterData(word){
+    filterData(word, target_column_ids){
         this.dataView.setFilterArgs({
             filter: this.filter,
-            target_column_ids: this.target_column_ids,
+            target_column_ids: target_column_ids?target_column_ids:this.target_column_ids,
             searchString: word, 
             toStringFunc: this.toStringFunc,
         });

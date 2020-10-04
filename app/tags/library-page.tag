@@ -10,7 +10,8 @@
     <div class="library-sidebar">
         <listview 
             obs={obs_listview}
-            name={name}>
+            name={name}
+            gettooltip={gettooltip}>
         </listview>
     </div>
 
@@ -21,6 +22,7 @@
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "library-search";
+        this.gettooltip = this.opts.gettooltip; 
 
         this.on("mount", async () => {
             const items = await ipc.invoke("library-search:getItems");
@@ -37,15 +39,13 @@
             cb(null);
         });
 
-        obs.on("library-page:sidebar:add-search-item", (query) => {
-            const items = [
-                { title: query, query: query }
-            ];
-            this.obs_listview.trigger("addList", { items });
+        obs.on("library-page:sidebar:add-search-item", (args) => {
+            const { item } = args;
+            this.obs_listview.trigger("addList", { items:[item] });
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {
-            obs.trigger("library-page:search-item-dlbclicked", item.query);
+            obs.trigger("library-page:search-item-dlbclicked", item);
         });
     </script>
 </library-sidebar>
@@ -75,6 +75,23 @@
             user-select: none;
             padding-left: 5px;
         }
+
+        .search-target-container {
+            display: flex;
+            margin-left: auto;
+        }
+        .search-target-none {
+            display: none;
+        }
+        .search-target {
+            margin-right: 5px;
+            user-select: none;
+        }
+        .search-target > input[type=checkbox] +label {
+            cursor: pointer;
+            height: 30px;
+        }
+
         .library-controls-container .search-container {
             margin-left: auto;
         }
@@ -93,16 +110,17 @@
             outline: none;
         }
 
-        .search-container > div {
+        .button {
             width: var(--search-button-size);
             height: var(--search-button-size); 
-            background-color: white; 
+            background-color: white;
+            cursor: pointer; 
         }
-        .search-container > div > i {
+        .button > i {
             font-size: 20px;
             color: gray;
         }
-        .search-container > div > i:hover {
+        .button > i:hover {
             color: black;
         }
         .search-container > .search-button,
@@ -123,14 +141,13 @@
             font-size: 1.2em;
         }
 
-        .search-container > .add-button {
-            background-color: rgba(0, 0, 0, 0);
+        .search-container > .toggle-target-button > i {
+            font-size: 15px;
         }
 
-        .search-button,
-        .clear-button,
-        .add-button {
-            cursor: pointer;
+        .search-container > .add-button,
+        .search-container > .toggle-target-button {
+            background-color: rgba(0, 0, 0, 0);
         }
 
         .library-grid-container {
@@ -164,14 +181,23 @@
     <div class="library-controls-container">
         <div class="item-info center-v">項目数 {num_filtered_items.toLocaleString()}/{num_items.toLocaleString()}</div>
         <div class="search-container">
+            <div class="search-target-container search-target-none">
+                <div class="search-target center-v" each={item in search_targets} >
+                    <input type="checkbox" id={getSearchTargetElmID(item.id)} />
+                        <label for={getSearchTargetElmID(item.id)} class="center-v">{item.title}</label>
+                </div>
+            </div>
+            <div class="button toggle-target-button center-hv" title="検索対象選択の切り替え" onclick={onclickToggleSearchTargets}>
+                <i class="fas fa-filter"></i>
+            </div>
             <input class="search-input" placeholder="検索" onkeydown={onkeydownSearchInput} />
-            <div class="search-button center-hv" title="検索" onclick={onclickSearch}>
+            <div class="button search-button center-hv" title="検索" onclick={onclickSearch}>
                 <i class="fas fa-search"></i>
             </div>
-            <div class="clear-button center-hv" title="全て表示" onclick={onclickShowAll}>
+            <div class="button clear-button center-hv" title="全て表示" onclick={onclickShowAll}>
                 <i class="fas fa-times-circle"></i>
             </div>
-            <div class="add-button center-hv" title="検索条件を保存" onclick={onclickSaveSearch}>
+            <div class="button add-button center-hv" title="検索条件を保存" onclick={onclickSaveSearch}>
                 <i class="far fa-star"></i>
             </div>
         </div>
@@ -266,13 +292,69 @@
             rowHeight: 135,
         };   
         const grid_table = new GridTable("library-grid", columns, options);
+
+        this.search_targets = this.opts.search_targets;
+        this.getSearchTargetElmID = (id) => {
+            return `search-target-${id}`;
+        };
+        const getSearchTargetElm = (target_id) => {
+            const id = this.getSearchTargetElmID(target_id);
+            return this.root.querySelector(`#${id}`);
+        };
+        const getSearchTargetEnable = () => {
+            const elm = this.root.querySelector(".search-target-container");
+            return elm.classList.contains("search-target-none") === false;
+        };
+        const setSearchTargetEnable = (enable) => {
+            const elm = this.root.querySelector(".search-target-container");
+            if(enable){
+                elm.classList.remove("search-target-none");
+            }else if(getSearchTargetEnable()){
+                this.search_targets.forEach(target=>{
+                    const elm = getSearchTargetElm(target.id);
+                    elm.checked = false;
+                }); 
+                elm.classList.add("search-target-none");
+            }
+        };
+        this.onclickToggleSearchTargets = (e) => {
+            const enable = getSearchTargetEnable();
+            setSearchTargetEnable(!enable);
+        };
+        const getSearchTargetIDs = () => { 
+            if(!getSearchTargetEnable()){
+                return null;
+            }
+
+            const target_ids = [];
+            this.search_targets.forEach(target=>{
+                const elm = getSearchTargetElm(target.id);
+                if(elm.checked){
+                    target_ids.push(target.id);
+                }
+            });
+            return target_ids;
+        };
+        const setSearchTargets = (target_ids) => {
+            if(!target_ids){
+                setSearchTargetEnable(false);
+                return;
+            }
+
+            setSearchTargetEnable(true);
+
+            this.search_targets.forEach(target=>{
+                const elm = getSearchTargetElm(target.id);
+                elm.checked = target_ids.includes(target.id);
+            });
+        };
     
         const getSearchInputElm = () => {
             return this.root.querySelector(".search-container > .search-input");
         };
 
-        const filterItems = (query) => {
-            grid_table.filterData(query); 
+        const filterItems = (query, target_ids) => {
+            grid_table.filterData(query, target_ids);
             grid_table.scrollToTop();
             grid_table.clearSelected();
 
@@ -283,13 +365,15 @@
         this.onclickSearch = (e) => {
             const elm = getSearchInputElm();
             const query = elm.value; 
-            filterItems(query);
+            const target_ids = getSearchTargetIDs();
+            filterItems(query, target_ids);
         };
 
         this.onkeydownSearchInput = (e) => {
             if(e.keyCode===13){
                 const param = e.target.value;
-                filterItems(param);
+                const target_ids = getSearchTargetIDs();
+                filterItems(param, target_ids);
             }
         };
 
@@ -305,13 +389,29 @@
             if(!param){
                 return;
             }
-            obs.trigger("library-page:sidebar:add-search-item", param);
+            
+            const item = { 
+                title: param, 
+                query: param
+            };
+
+            const target_ids = getSearchTargetIDs();
+            if(target_ids){
+                item.target_ids = target_ids;
+            }
+
+            obs.trigger("library-page:sidebar:add-search-item", { item });
         };
         
         obs.on("library-page:search-item-dlbclicked", (item) => {
+            const query = item.query;
+            const target_ids = item.target_ids;
+
             const search_elm = getSearchInputElm();
-            search_elm.value = item;   
-            filterItems(item);      
+            search_elm.value = query;
+            setSearchTargets(target_ids);
+
+            filterItems(query, target_ids);      
         });
 
         obs.on("library-page:bookmark-item-dlbclicked", (item) => {
@@ -704,7 +804,7 @@
                 }   
                 return false; 
             },
-            ["title", "id", "is_economy", "tags", "video_type"],
+            this.search_targets.map(item=>item.id),
             (item, column_id)=>{
                 if(column_id=="is_economy"){
                     return item[column_id]?"エコノミー":"";
@@ -794,14 +894,47 @@
 <library-page>
     <div class="split-page">
         <div class="left">
-            <library-sidebar obs={obs}></library-sidebar>
+            <library-sidebar 
+                obs={obs} 
+                gettooltip={gettooltip}>
+            </library-sidebar>
         </div>
         <div class="gutter"></div>
         <div class="right">
-            <library-content obs={obs}></library-content>
+            <library-content 
+                obs={obs}
+                search_targets={search_targets}>
+            </library-content>
         </div>
     </div>
     <script>
         this.obs = this.opts.obs;
+
+        this.search_targets = Object.freeze([
+            { title: "名前", id: "title" }, 
+            { title: "タグ", id: "tags" }, 
+            { title: "ID",   id: "id" }, 
+            { title: "画質", id: "is_economy" }, 
+            { title: "動画形式", id: "video_type" }
+        ]);
+
+        const target_map = new Map();
+        this.search_targets.forEach(target=>{
+            target_map.set(target.id, target.title);
+        });
+        this.gettooltip = (item) => {
+            const target_ids = item.target_ids;
+            if(!target_ids){
+                return item.title;
+            }
+            const target_titles = target_ids.map(target_id=>{
+                if(target_map.has(target_id)){
+                    return target_map.get(target_id);
+                }else{
+                    return `${target_id}に対応する項目がない`;
+                }
+            });
+            return `${item.title}\n検索対象:${target_titles.join(", ")}`;
+        };
     </script>
 </library-page>

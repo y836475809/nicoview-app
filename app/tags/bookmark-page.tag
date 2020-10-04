@@ -19,7 +19,7 @@
     <aside class="sidebar">
         <listview class="content"
             obs={obs_listview}
-            icon_class={icon_class}
+            geticon={geticon}
             name={name}
             gettitle={getTitle}>
         </listview>
@@ -36,8 +36,9 @@
         this.obs_listview = riot.observable();
         this.sb_button_icon = "fas fa-chevron-left";
         this.name = "bookmark";
-        this.icon_class = {
-            video :  "fas fa-bookmark fa-lg"
+
+        this.geticon = (item) => {
+            return "fas fa-bookmark fa-lg";
         };
 
         this.getTitle = (item) => {

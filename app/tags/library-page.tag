@@ -11,6 +11,7 @@
         <listview 
             obs={obs_listview}
             name={name}
+            geticon={geticon}
             gettooltip={gettooltip}>
         </listview>
     </div>
@@ -22,7 +23,8 @@
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "library-search";
-        this.gettooltip = this.opts.gettooltip; 
+        this.gettooltip = this.opts.gettooltip;
+        this.geticon = this.opts.geticon;
 
         this.on("mount", async () => {
             const items = await ipc.invoke("library-search:getItems");
@@ -896,6 +898,7 @@
         <div class="left">
             <library-sidebar 
                 obs={obs} 
+                geticon={geticon}
                 gettooltip={gettooltip}>
             </library-sidebar>
         </div>
@@ -935,6 +938,13 @@
                 }
             });
             return `${item.title}\n検索対象:${target_titles.join(", ")}`;
+        };
+        this.geticon = (item) => {
+            const target_ids = item.target_ids;
+            if(target_ids){
+                return "fas fa-filter";
+            }
+            return null;
         };
     </script>
 </library-page>

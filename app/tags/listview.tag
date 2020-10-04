@@ -196,8 +196,8 @@
         let sortable = null;
         const obs = this.opts.obs;
 
-        const default_icon_class = "fas fa-square listview-item-default-icon";
-        const icon_class = this.opts.icon_class;
+        const default_icon = "fas fa-square listview-item-default-icon";
+        
         this.getTooltip = this.opts.gettooltip;
         if(!this.getTooltip){
             this.getTooltip = (item) => {
@@ -210,6 +210,13 @@
                 return item.title;
             };
         }
+        this.getIcon = this.opts.geticon;
+        if(!this.getIcon){
+            this.getIcon = (item) => {
+                return default_icon;
+            };
+        }  
+
         const confirm = !this.opts.confirm?[]:this.opts.confirm;
 
         const triggerChange = () => {
@@ -373,22 +380,13 @@
             filter("");
         };
 
-        const getIconClass = (item) => {
-            const type = item.type;
-            if(icon_class === undefined || type === undefined){
-                return default_icon_class; 
-            }
-            const icon_name = icon_class[type];
-            if(icon_name === undefined){
-                return default_icon_class; 
-            }
-            return `center-hv ${icon_name}`; 
-        };
-
         this.getIconClass = (item) => {
-            const icon_class = getIconClass(item);
-            const color_class = item.marked?"marked":"default";
-            return `${icon_class} listview-item-${color_class}-icon-color`;
+            let icon = this.getIcon(item);
+            if(!icon){
+                icon = default_icon;
+            }
+            const color = item.marked?"marked":"default";
+            return `center-hv ${icon} listview-item-${color}-icon-color`;
         };
 
         const setSelected = (target_elm, item) => {

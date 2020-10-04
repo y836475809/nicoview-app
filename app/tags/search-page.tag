@@ -14,7 +14,7 @@
     <div class="nico-search-sidebar">
         <listview 
             obs={obs_listview}
-            icon_class={icon_class}
+            geticon={geticon}
             name={name}
             gettooltip={getTooltip}>
         </listview>
@@ -28,9 +28,15 @@
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "nico-search";
-        this.icon_class = {
-            tag :  "fas fa-tag fa-lg",
-            keyword: "fas fa-ellipsis-h nico-search-item-adjust",
+        this.geticon = (item) => {
+            const search_target = item.cond.search_target;
+            if(search_target == "keyword"){
+                return "fas fa-ellipsis-h nico-search-item-adjust";
+            }
+            if(search_target == "tag"){
+                return "fas fa-tag fa-lg";
+            }
+            return null;
         };
 
         const sort_map = new Map();

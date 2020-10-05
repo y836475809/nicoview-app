@@ -576,8 +576,8 @@
 
         this.onkeydownInput = async (e) =>{
             if(e.keyCode===13){
-                const param = e.target.value;
-                nico_search_params.query(param);
+                const query = e.target.value;
+                nico_search_params.query(query);
                 await this.search();
             }
         };

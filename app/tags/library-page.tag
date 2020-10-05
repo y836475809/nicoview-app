@@ -373,9 +373,9 @@
 
         this.onkeydownSearchInput = (e) => {
             if(e.keyCode===13){
-                const param = e.target.value;
+                const query = e.target.value;
                 const target_ids = getSearchTargetIDs();
-                filterItems(param, target_ids);
+                filterItems(query, target_ids);
             }
         };
 
@@ -387,14 +387,14 @@
     
         this.onclickSaveSearch = () => {
             const search_elm = getSearchInputElm();
-            const param = search_elm.value;
-            if(!param){
+            const query = search_elm.value;
+            if(!query){
                 return;
             }
             
             const item = { 
-                title: param, 
-                query: param
+                title: query, 
+                query: query
             };
 
             const target_ids = getSearchTargetIDs();
@@ -473,7 +473,6 @@
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
                         const video_item = await ipc.invoke("library:getItem", {video_id:item.id});
-                        nico_update = new NicoUpdate(video_item);
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
                             await ipc.invoke("library:updateItemProps", {video_id, props});

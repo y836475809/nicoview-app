@@ -380,6 +380,8 @@
         };
 
         this.onclickShowAll = (e) => {
+            setSearchTargetEnable(false);
+            
             const search_elm = getSearchInputElm();
             search_elm.value = "";
             filterItems(""); 

@@ -4,37 +4,31 @@
     "test-main": {
         "use_mock_server": true,
         "main": "html/index.html",
-        "config_fiiename": "config.json",
-        "window_frame": false
+        "config_fiiename": "config.json"
     },
     "test-search": {
         "use_mock_server": true,
         "main": "../test/test-search.html",
-        "config_fiiename": "config-debug.json",
-        "window_frame": true
+        "config_fiiename": "config-debug.json"
     },
     "test-mylist": {
         "use_mock_server": true,
         "main": "../test/test-mylist.html",
-        "config_fiiename": "config-debug.json",
-        "window_frame": true
+        "config_fiiename": "config-debug.json"
     },
     "test-setting": {
         "use_mock_server": false,
         "main": "../test/test-setting.html",
-        "config_fiiename": "config-debug.json",
-        "window_frame": true
+        "config_fiiename": "config-debug.json"
     },
     "test-nicoscript": {
         "use_mock_server": false,
         "main": "../test/test-nicoscript.html",
-        "config_fiiename": "config-debug.json",
-        "window_frame": true
+        "config_fiiename": "config-debug.json"
     },
     "test-tween": {
         "use_mock_server": false,
         "main": "../test/test-tween.html",
-        "config_fiiename": "config-debug.json",
-        "window_frame": true
+        "config_fiiename": "config-debug.json"
     }
 }

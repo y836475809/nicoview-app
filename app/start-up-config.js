@@ -24,8 +24,7 @@ class StartupConfig {
                 debug: false,
                 use_mock_server:false,
                 main: "html/index.html",
-                config_fiiename: "config.json",
-                window_frame: false
+                config_fiiename: "config.json"
             };
         }
     }
@@ -52,10 +51,6 @@ class StartupConfig {
 
     get config_fiiename(){
         return this._params["config_fiiename"];
-    }
-
-    get window_frame(){
-        return this._params["window_frame"];
     }
 
     get use_mock_server(){

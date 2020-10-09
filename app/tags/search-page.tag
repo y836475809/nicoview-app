@@ -294,7 +294,7 @@
         const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
 
@@ -404,16 +404,8 @@
         const nico_search_params = new NicoSearchParams(search_limit, search_context);
         const nico_search = new NicoSearch();
 
-        const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
-            let content = `<div>${value}</div>`;
-            if(dataContext.saved){
-                content += "<div class='state-content state-saved'>ローカル</div>";
-            }
-            if(dataContext.reg_download){
-                content += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
-            }
-            return content;
-        };
+        const seach_infoFormatter = infoFormatter.bind(this, 
+            (value, dataContext)=>{ return `<div>${value}</div>`; });
 
         const tagsFormatter = (row, cell, value, columnDef, dataContext)=> {
             if(!value){
@@ -424,7 +416,7 @@
 
             let content = "";
             tags.forEach(tag => {
-                content += `<div class='state-content label-tag'>${tag}</div>`;
+                content += `<div class='tag-content label-tag'>${tag}</div>`;
             });
             const title = tags.join("\n");
             return `<div title="${title}" class='wrap-gridtable-cell'>${content}</div>`;
@@ -435,7 +427,7 @@
             {id: "title", name: "名前", formatter:wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報", formatter:htmlFormatter},
+            {id: "info", name: "情報", formatter:seach_infoFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},
             {id: "tags", name: "タグ", formatter:tagsFormatter},

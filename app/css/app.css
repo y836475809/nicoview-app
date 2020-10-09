@@ -83,12 +83,22 @@ html, body {
   overflow-wrap: break-word;
 }
 
-.state-content {
+.tag-content {
   display: inline-block;
   border-radius: 2px;
   padding: 3px 10px 3px 10px;
   margin-right: 5px;        
   margin-bottom: 5px;
+}
+
+.state-content {
+  display: inline-block;
+  border-radius: 2px;
+  padding: 3px 3px 3px 3px;
+  margin-right: 5px;        
+  margin-bottom: 5px;
+  font-size: 20px;
+  color: #444444;
 }
 .state-saved {
   background-color: #7fbfff;

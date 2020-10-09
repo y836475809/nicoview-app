@@ -66,6 +66,17 @@ const buttonFormatter = (opts, row, cell, value, columnDef, dataContext)=> {
     return `<div style="display:flex; flex-wrap: wrap;">${buttons}</div>`;
 };
 
+const infoFormatter = (mkContent, row, cell, value, columnDef, dataContext)=> {
+    let content = mkContent(value, dataContext);
+    if(dataContext.saved){
+        content += "<div title='ローカル保存済み' class='state-content state-saved'><i class='fas fa-hdd'></i></div>";
+    }
+    if(dataContext.reg_download){
+        content += "<div title='ダウンロード登録済み' class='state-content state-reg-download'><i class='fas fa-download'></i></div>";
+    }
+    return content;
+};
+
 const formatterMap = new Map([
     ["_img", imageFormatter],
     ["_date", dateFormatter],
@@ -432,4 +443,5 @@ module.exports = {
     GridTable,
     wrapFormatter,
     buttonFormatter,
+    infoFormatter,
 };

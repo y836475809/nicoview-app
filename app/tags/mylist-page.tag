@@ -189,7 +189,7 @@
         const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
@@ -257,24 +257,17 @@
             return `<div>${result}</div>`;
         };
 
-        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const video_id = dataContext.id;
-            let result = `<div>ID:${video_id}</div>`;
-            if(dataContext.saved){
-                result += "<div class='state-content state-saved'>ローカル</div>";
-            }
-            if(dataContext.reg_download){
-                result += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
-            }
-            return result;
-        };
+        const mylist_infoFormatter = infoFormatter.bind(this, 
+            (value, dataContext)=>{ 
+                return `<div>ID: ${dataContext.id}</div>`;
+            });
         const columns = [
             {id: "no", name: "#"},
             {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
             {id: "title", name: "名前", formatter:wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報", formatter:infoFormatter},
+            {id: "info", name: "情報", formatter:mylist_infoFormatter},
             {id: "description", name: "説明", formatter:htmlFormatter},
             {id: "date", name: "投稿日"},
             {id: "length", name: "時間"}

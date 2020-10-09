@@ -22,7 +22,7 @@
         const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { Menu } = remote;
-        const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
+        const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
 
         const obs = this.opts.obs; 
@@ -56,24 +56,17 @@
             setData(items);
         });
 
-        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const video_id = dataContext.id;
-            let result = `<div>ID: ${video_id}</div>`;
-            if(dataContext.saved){
-                result += "<div class='state-content state-saved'>ローカル</div>";
-            }
-            if(dataContext.reg_download){
-                result += "<div class='state-content state-reg-download'>ダウンロード追加</div>";
-            }
-            return result;
-        };
+        const history_infoFormatter = infoFormatter.bind(this, 
+            (value, dataContext)=>{ 
+                return `<div>ID: ${dataContext.id}</div>`;
+            });
 
         const columns = [
             {id: "thumb_img", name: "サムネイル", height:100, width: 130},
             {id: "title", name: "名前", sortable: true, formatter:wrapFormatter},
             {id: "command", name: "操作", sortable: false, 
                 formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報",sortable: false, formatter:infoFormatter},
+            {id: "info", name: "情報",sortable: false, formatter:history_infoFormatter},
             {id: "play_date", name: "再生日", sortable: true}
         ];
         const options = {

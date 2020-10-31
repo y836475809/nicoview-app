@@ -473,7 +473,9 @@ class CommentTimeLine {
         const elm = document.createElement("div");
         elm.classList.add("comment");
 
-        elm.innerText = comment.content;
+        // 半角空白が連続していたら一つにまとめられてしまうので
+        // 2個連続している半角空白を全角空白に置き換える
+        elm.innerText = comment.content.replace(/(\s)\1/g, "\u3000");
 
         elm.style.display = "none";
         elm.style.whiteSpace = "nowrap";

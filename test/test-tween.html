@@ -53,6 +53,7 @@
             <button class="test-btn" type=button onclick="createFixedTL();">fix</button>
             <button class="test-btn" type=button onclick="createMixedTL();">flow, fix</button>
             <button class="test-btn" type=button onclick="createFixedAATL();">AA</button>
+            <button class="test-btn" type=button onclick="createSpaces();">spaces</button>
         </div>
         <div>   
             <button class="test-btn" type=button onclick="resume();">resume</button>
@@ -150,6 +151,18 @@
             { no: 3, vpos: 100, mail:"184 ue red small", content: 
 `　 ┏┛┏┛　 ┃┣┛┗┻┫┃┏┓　 　 ┣┫　 ‌
 　 ┗━┛　 　 ┗┛　 　 　 ┗┛┗┛　 　 ┗┛　 `},
+        ];
+        createTL(commnets);
+    };
+
+    const createSpaces = ()=>{
+        const commnets = [
+            { no: 1, vpos: 100, mail:"184 ue red small", content: "AAAAA" },
+            { no: 2, vpos: 110, mail:"184 ue red small", content: "A A A A A" },
+            { no: 3, vpos: 120, mail:"184 ue red small", content: "A  A  A  A  A" },
+            { no: 4, vpos: 130, mail:"184 ue red small", content: "A   A   A   A   A" },
+            { no: 5, vpos: 140, mail:"184 ue red small", content: "A    A    A    A    A" },
+            { no: 6, vpos: 150, mail:"184 ue red small", content: "A     A     A     A     A" },
         ];
         createTL(commnets);
     };

@@ -18,7 +18,7 @@
   "author": "y836475809",
   "license": "MIT",
   "devDependencies": {
-    "ava": "^3.12.1",
+    "ava": "^3.14.0",
     "electron": "^9.3.0",
     "electron-builder": "^22.8.0",
     "eslint-plugin-html": "^6.1.1",

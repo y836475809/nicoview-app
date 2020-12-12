@@ -201,6 +201,19 @@
             });
             video_elm.addEventListener("progress", function(){
                 logger.debug("progressによるイベント発火");
+
+                if (video_elm.duration <= 0) {
+                    return;
+                }
+                for (let i = 0; i < video_elm.buffered.length; i++) {
+                    const index = video_elm.buffered.length - 1 - i;
+                    if (video_elm.buffered.start(index) < video_elm.currentTime) {
+                        const time_sec = video_elm.buffered.end(index);
+                        obs.trigger("player-seek:buffered-update", time_sec);
+                        break;
+                    }
+                }
+                
             }); 
             video_elm.addEventListener("waiting", function(){
                 logger.debug("waitingによるイベント発火");

@@ -28,8 +28,14 @@
             background-color: lightgray;
         }
         .seek-value {
+            margin-top: -10px;
             height: 100%;
             background-color: #797b80;
+        }
+        .buffered-value {
+            height: 100%;
+            width: 0;
+            background-color: royalblue;
         }
 
         .seek-timer {
@@ -68,6 +74,7 @@
 
     <div class="seek-container" onmousedown={mousedown} onmousemove={mouseOver}>
         <div class="seek-bar">  
+            <div class="buffered-value"></div>
             <div class="seek-value"></div>
         </div>
     </div>
@@ -131,7 +138,18 @@
             this.update();
         };
 
+        const updateBuffered = (time_sec)=>{
+            this.buffered = time_sec;
+            const per = time_sec / this.duration;
+            const seek_container = this.root.querySelector(".seek-container");
+            const buffered_value = this.root.querySelector(".buffered-value");  
+            buffered_value.style.width = per * seek_container.clientWidth + "px";
+
+            this.update();
+        };
+
         this.on("mount", () => {
+            this.buffered = 0;
             this.duration = 0;
             updateSeek(0);
             this.update();
@@ -139,6 +157,8 @@
 
         obs.on("player-seek:reload", (duration) => {
             this.duration = duration;
+
+            updateBuffered(0);
             updateSeek(0);
 
             this.update();
@@ -148,7 +168,12 @@
             updateSeek(current);
         });
 
+        obs.on("player-seek:buffered-update", (time_sec) => {
+            updateBuffered(time_sec);
+        });
+
         obs.on("player-seek:redraw", () => {
+            updateBuffered(this.buffered);
             updateSeek(this.current);
         });
     </script>

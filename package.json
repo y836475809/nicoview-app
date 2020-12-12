@@ -28,7 +28,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.1",
     "cheerio": "^1.0.0-rc.3",
-    "electron-log": "^4.2.4",
+    "electron-log": "^4.3.0",
     "gsap": "^3.5.1",
     "riot": "^3.13.2",
     "slickgrid": "^2.4.28",

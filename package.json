@@ -23,7 +23,7 @@
     "electron-builder": "^22.8.0",
     "eslint-plugin-html": "^6.1.1",
     "nock": "^13.0.5",
-    "sinon": "^9.0.3"
+    "sinon": "^9.2.2"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.14.0",

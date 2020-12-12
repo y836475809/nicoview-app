@@ -4,7 +4,7 @@
     "test-main": {
         "use_mock_server": true,
         "main": "html/index.html",
-        "config_fiiename": "config.json"
+        "config_fiiename": "config-main-debug.json"
     },
     "test-search": {
         "use_mock_server": true,

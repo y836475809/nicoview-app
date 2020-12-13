@@ -266,6 +266,7 @@ class CommentTimeLine {
         this._paused = true;
         
         this._ended = false;
+        this._has_comment = true;
         this._on_complete = ()=>{};
     }
 
@@ -281,6 +282,10 @@ class CommentTimeLine {
         return this._ended;
     }
 
+    get hasComment(){
+        return this._has_comment;
+    }
+
     get lastTimeSec(){
         return this._last_time_sec;
     }
@@ -293,6 +298,7 @@ class CommentTimeLine {
      * @param {Array} comments 
      */
     create(comments) {
+        this._has_comment = comments.length > 0;
         this._ended = false;
         this._createCanvas();
         this.clear();

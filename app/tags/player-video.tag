@@ -230,7 +230,7 @@
             video_elm.addEventListener("ended", () => {
                 logger.debug("endedによるイベント発火");
 
-                if(comment_tl.enable === false || comment_tl.ended === true){
+                if(comment_tl.enable === false || comment_tl.ended === true || comment_tl.hasComment === false){
                     // コメント非表示またはコメントが完了している場合は動画終了でpauseにする
                     obs.trigger("player-controls:set-state", "pause"); 
                 }
@@ -239,7 +239,7 @@
             obs.on("player-video:play", () => {
                 logger.debug("player play");
                 if(video_elm.currentTime == video_elm.duration){
-                    if(comment_tl.enable === true && comment_tl.ended === false){
+                    if(comment_tl.enable === true && comment_tl.ended === false && comment_tl.hasComment === true){
                         comment_tl.play();
                         return;
                     }else{

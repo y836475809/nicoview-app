@@ -184,7 +184,7 @@
             <div class="button play-stack-button center-hv" onclick="{onclickTogglePage.bind(this,'play-stack')}">
                 <div class="button-border"></div>
                 <div>
-                    <i class="fas fa-folder-plus"></i>
+                    <i class="fas fa-stream"></i>
                     <div class="button-label">後で見る</div>
                 </div>
             </div>

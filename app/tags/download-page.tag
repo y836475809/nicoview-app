@@ -358,7 +358,8 @@
                 }
             });
 
-            grid_table_dl = new GridTableDownloadItem(".download-grid");
+            const grid_container = this.root.querySelector(".download-grid");
+            grid_table_dl = new GridTableDownloadItem(grid_container);
             
             const context_menu = createMenu();
             try {

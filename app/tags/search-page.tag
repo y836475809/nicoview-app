@@ -673,7 +673,8 @@
                 }
             });
 
-            grid_table.init(".search-grid");
+            const grid_container = this.root.querySelector(".search-grid");
+            grid_table.init(grid_container);
             grid_table.setupResizer(".search-grid-container");
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;

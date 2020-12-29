@@ -115,7 +115,11 @@ class GridTable {
             enableCellNavigation: true,
             enableColumnReorder: true,
             fullWidthRows: true, 
-            id_click_as_dbclick:""
+            id_click_as_dbclick:"",
+
+            // マウスダウン後、この距離以上移動したらコンテキストメニュー開かない
+            // (マウスジェスチャ時、コンテキストメニューを開かないようにするため)
+            contextmenu_distance: 20,
         };
         if(options===undefined){
             options = {};
@@ -134,6 +138,30 @@ class GridTable {
     init(container){
         this.dataView = new Slick.Data.DataView();
         this.grid = new Slick.Grid(container, this.dataView, this.columns, this.options);
+        
+        this._show_contextmenu = true;
+        if(typeof container === "object"){
+            container.onmousedown = (e)=>{
+                this._start_pos = {
+                    x: e.pageX,
+                    y: e.pageY,
+                };
+                this._show_contextmenu = true;
+            };
+            container.onmouseup  = (e)=>{
+                if(!this._start_pos){
+                    return;
+                }
+                const distance = this.options.contextmenu_distance;
+                const x = Math.abs(this._start_pos.x - e.pageX);
+                const y = Math.abs(this._start_pos.y - e.pageY);
+                if(x > distance || y > distance){
+                    this._show_contextmenu = false;
+                }
+                this._start_pos = null;
+            };
+        }
+
         this.grid.onSort.subscribe((e, args) => {
             const comparer = (a, b) => {
                 return (a[args.sortCol.field] > b[args.sortCol.field]) ? 1 : -1;
@@ -179,6 +207,11 @@ class GridTable {
         });
         this.grid.onContextMenu.subscribe((e) => {
             e.preventDefault();
+
+            if(!this._show_contextmenu){
+                return;
+            }
+
             const selected_rows = this.grid.getSelectedRows();
             const cell = this.grid.getCellFromEvent(e);
             if(selected_rows.indexOf(cell.row)===-1){

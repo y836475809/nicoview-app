@@ -342,7 +342,8 @@
             nico_mylist_store = new NicoMylistStore(mylist_dir);
             nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
-            grid_table.init(".mylist-grid");
+            const grid_container = this.root.querySelector(".mylist-grid");
+            grid_table.init(grid_container);
             grid_table.setupResizer(".mylist-grid-container");
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;

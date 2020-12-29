@@ -132,7 +132,8 @@
         };
 
         this.on("mount", async () => {
-            grid_table.init(".history-grid");
+            const grid_container = this.root.querySelector(".history-grid");
+            grid_table.init(grid_container);
             grid_table.setupResizer(".history-grid-container");
             grid_table.onDblClick((e, data)=>{
                 const video_id = data.id;

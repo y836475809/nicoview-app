@@ -798,7 +798,8 @@
             return Menu.buildFromTemplate(menu_templete);
         };
         this.on("mount", async () => {    
-            grid_table.init(".library-grid");
+            const grid_container = this.root.querySelector(".library-grid");
+            grid_table.init(grid_container);
             grid_table.setupResizer(".library-grid-container");
     
             grid_table.setFilter((column_id, value, word) => { 

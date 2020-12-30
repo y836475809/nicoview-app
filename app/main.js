@@ -306,6 +306,12 @@ app.on("ready", async ()=>{
         return selectFileDialog(bw, name, exts, multi_select);
     });
     
+    ipcMain.on("app:show-player", async (event, args) => {
+        if(player_win){
+            player_win.show();
+        }
+    });
+
     ipcMain.on("app:play-video", async (event, args) => {
         await createPlayerWindow();
         player_win.show();

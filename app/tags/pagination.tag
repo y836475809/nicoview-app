@@ -88,6 +88,14 @@
             this.obs_page_selector.trigger("set-data", { page_num, total_page_num });
         });
 
+        pagination_obs.on("forward", () => {
+            this.onclickForward();
+        });
+
+        pagination_obs.on("back", () => {
+            this.onclickBack();
+        });
+
         this.onclickBack = () =>{
             if(this.page_num > 1){
                 this.page_num -= 1;

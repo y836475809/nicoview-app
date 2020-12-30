@@ -441,12 +441,16 @@
             return this.root.querySelector(".input-container > input");
         };
 
+        const canSearch = () => {
+            return this.root.querySelector("modal-dialog").dataset.open!="true";
+        };
+
         this.search = async () => {
             if(nico_search_params.isQueryEmpty()){
                 return;
             }
 
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(!canSearch()){
                 return;
             }
             
@@ -636,6 +640,22 @@
         
         obs.on("css-loaded", () => {
             grid_table.resizeGrid();
+        });
+
+        obs.on("search-page:forward-page", () => {
+            if(!canSearch()){
+                return;
+            }
+
+            this.pagination_obs.trigger("forward");
+        });
+
+        obs.on("search-page:back-page", () => {
+            if(!canSearch()){
+                return;
+            }
+
+            this.pagination_obs.trigger("back");
         });
 
         const createMenu = (items) => {

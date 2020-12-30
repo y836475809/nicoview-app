@@ -109,7 +109,7 @@
         }
     </style>
 
-    <div class="main-container">
+    <div class="main-container" onmousedown={mousedown} onmouseup={mouseup}>
         <div class="main-sidebar left">
             <div class="button center-v library-button" onclick="{onclickPageSelect.bind(this,'library')}">
                 <div class="button-border"></div>
@@ -197,9 +197,55 @@
         const { remote, shell } = window.electron;
         const ipc = window.electron.ipcRenderer;
         const {Menu} = remote;
+        const { MouseGesture } = window.MouseGesture;
 
         this.obs = this.opts.obs;
         this.obs_open_video_form = riot.observable();
+
+        const mouse_gesture = new MouseGesture();
+
+        this.mousedown = (e) => {
+            mouse_gesture.mouseDown(e);
+        };
+        this.mouseup = (e) => {
+            mouse_gesture.mouseUp(e);
+        };
+
+        this.obs.on("main-page:update-mousegesture-config", (args)=>{
+            const { config } = args;
+            mouse_gesture.config = config;
+        });
+
+        (async()=>{
+            const config = await ipc.invoke("config:get", 
+                { 
+                    key: mouse_gesture.name, 
+                    value: mouse_gesture.defaultConfig
+                });
+            mouse_gesture.config = config;
+        })(); 
+        
+        mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
+        mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
+        mouse_gesture.setActionShowPalyer(()=>{ipc.send("app:show-player");});
+
+        mouse_gesture.onGesture((gesture)=>{
+            if(mouse_gesture.action("all-page", gesture)){
+                return;
+            }
+            
+            const items = [...this.root.querySelectorAll(".page-container.left > *")];
+            const cu_index = items.findIndex(item=>{
+                return item.style.zIndex > 0;
+            });
+            if(cu_index<0){
+                return;
+            }
+            const page_name = items[cu_index].tagName.toLowerCase();
+            if(mouse_gesture.action(page_name, gesture)){
+                return;
+            }
+        });
 
         const updateDownloadBadge = async () => {
             const video_ids = await ipc.invoke("download:getIncompleteIDs");

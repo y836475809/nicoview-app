@@ -30,6 +30,10 @@ class Config {
         this._setObj(key, value, this.json_data);
     }
 
+    update(key, value) {
+        this._setObj(key, value, this.json_data, true);
+    }
+
     clear() {
         this._initJsonData();
     }
@@ -72,7 +76,7 @@ class Config {
         return obj;
     }
 
-    _setObj(key, value, json_data){
+    _setObj(key, value, json_data, do_update=false){
         let obj = json_data;
         const props = key.split(".");
         for (let index = 0; index < props.length-1; index++) {
@@ -86,10 +90,14 @@ class Config {
             obj = obj[prop];
         }
         const prop = props[props.length-1];
-        if(typeof(obj[prop])=="object" && typeof(value)=="object"){
-            Object.assign(obj[prop], value);
-        }else{
+        if(do_update){
             obj[prop] = value;
+        }else{
+            if(typeof(obj[prop])=="object" && typeof(value)=="object"){
+                Object.assign(obj[prop], value);
+            }else{
+                obj[prop] = value;
+            }
         }
     }
 }

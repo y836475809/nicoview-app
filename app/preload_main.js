@@ -54,5 +54,5 @@ window.addEventListener("load", () => {
     global.ImportNNDDData = require(`${root_dir}/app/js/import-nndd-data`);
     global.NicoDataConverter = require(`${root_dir}/app/js/nico-data-converter`);
     global.Command = require(`${root_dir}/app/js/command`);
-    global.MouseGesture = require(`${root_dir}/app/js/mouse_gesture`);
+    global.MouseGesture = require(`${root_dir}/app/js/mouse-gesture`);
 });

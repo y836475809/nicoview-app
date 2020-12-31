@@ -9,6 +9,9 @@
             margin-right: 5px;
             user-select: none;
         } 
+        .download-schedule-container .schedule-enable-check {
+            vertical-align: middle;
+        } 
 
         .download-schedule-container .label.disabled {
             color: gray;
@@ -33,9 +36,10 @@
     </style>
     
     <div class="download-schedule-container center-hv">
-        <input type="checkbox" class="schedule-enable-check" name="schedule-enable"
-            onchange={onChangeParams}>
-        <div class="label">毎日</div>
+        <label class="label center-v">
+            <input type="checkbox" class="schedule-enable-check" name="schedule-enable"
+                onchange={onChangeParams}>毎日
+        </label>
         <select class="hour-select" onchange={onChangeParams}>
             <option each={hour in hours} value={hour}>{hour}</option>
         </select>

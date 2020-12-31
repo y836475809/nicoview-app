@@ -180,8 +180,10 @@
         </div>
         <div class="container">
             <div class="content">
-                <input class="check-window-close" type="checkbox" 
-                onclick={onclickCheckWindowClose} /><label>ウィンドウを閉じる時に確認する</label>
+                <label>
+                    <input class="check-window-close" type="checkbox" 
+                        onclick={onclickCheckWindowClose} />ウィンドウを閉じる時に確認する
+                </label>
             </div>
         </div>
         <div class="container">
@@ -197,8 +199,10 @@
         <div class="container">
             <div class="center-v title">ログ出力レベル設定</div>
             <div class="content">
-                <input class="check-loglevel-debug" type="checkbox" 
-                onclick={onclickCheckLogLevelDebug} /><label>Debug</label>
+                <label>
+                    <input class="check-loglevel-debug" type="checkbox" 
+                        onclick={onclickCheckLogLevelDebug} />Debug
+                </label>
             </div>
         </div>
     </div>

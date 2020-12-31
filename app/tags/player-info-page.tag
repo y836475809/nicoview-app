@@ -55,11 +55,11 @@
         .controls-container input[type='checkbox']:hover {
             cursor: pointer;
         }
-        .comment-checkbox {
+        .controls-container input.comment-checkbox {
             height: 32px;
             vertical-align:middle;
         }
-        .comment-checkbox + label  {
+        .controls-container label.comment-checkbox {
             position: relative;
             top: 3px;
             margin-right: 10px;
@@ -133,9 +133,10 @@
             <player-user obs={opts.obs}></player-user>
         </div>
         <div class="controls-container">
-            <input class="center-v comment-checkbox comment-visible" type="checkbox" 
-                onclick={onclickCommentVisibleCheck} />
-                <label class="center-v" title="コメントの表示/非表示">表示</label>
+            <label class="center-v comment-checkbox" title="コメントの表示/非表示">
+                <input class="center-v comment-checkbox comment-visible" type="checkbox" 
+                    onclick={onclickCommentVisibleCheck} />表示
+            </label>
             <div class="comment-state center-v" title="表示制限、フィルタリングしたコメント数/全コメント数">
                 {comment_state}
             </div>

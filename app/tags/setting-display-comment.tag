@@ -22,16 +22,20 @@
                     onchange={onchangeFPS.bind(this,item)}>{item}fps
             </label>
             <hr>
-            <input class="comment-do-limit-checkbox" type="checkbox" 
-            onclick={onclickLimitCommentCheck} /><label>表示数を制限</label>
+            <label>
+                <input class="comment-do-limit-checkbox" type="checkbox" 
+                    onclick={onclickLimitCommentCheck} />表示数を制限
+            </label>
         </div>
     </div>
     <div class="setting-section">
         <div class="setting-params">
             <div class="title">コメント同期調整</div>
             <hr>
-            <input class="auto-sync-checkbox" type="checkbox" 
-            onclick={onclickAutoSyncCheck} /><label>同期調整を行う</label>
+            <label>
+                <input class="auto-sync-checkbox" type="checkbox" 
+                    onclick={onclickAutoSyncCheck} />同期調整を行う
+            </label>
             <hr>
             <div class="param-label center-v">以下の間隔で同期を調整する</div>
             <label each={item in sync_interval_items} >

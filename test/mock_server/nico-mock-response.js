@@ -264,6 +264,8 @@ class NicoMockResponse {
         const stat = fs.statSync(file_path);
         const fileSize = stat.size;
         const head = {
+            'Accept-Ranges': 'bytes',
+            'Content-Range': 'bytes ' + 0 + '-' + fileSize + '/' + fileSize,
             'Content-Length': fileSize,
             'Content-Type': 'video/mp4',
         };

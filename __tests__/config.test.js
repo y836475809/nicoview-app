@@ -105,19 +105,3 @@ test("setObj replace num to obj, obj to num", t => {
     t.deepEqual(json_data, {test:{value:1}});
 
 });
-
-test("update", t => {
-    const config = new TestConfig();
-    const json_data = {};
-
-    config._setObj("test", {value:1}, json_data);
-    t.deepEqual(json_data, {test:{value:1}});
-
-    // 普通にセットした場合、追加になる
-    config._setObj("test", {value2:2}, json_data);
-    t.deepEqual(json_data, {test:{value:1, value2:2}});
-
-    // updateの場合、上書きになる
-    config._setObj("test", {value2:2}, json_data, true);
-    t.deepEqual(json_data, {test:{value2:2}});
-});

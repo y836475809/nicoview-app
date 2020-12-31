@@ -563,10 +563,10 @@ app.on("ready", async ()=>{
         const { key, value } = args;
         config.set(key, value);
     });
-    ipcMain.handle("config:update", (event, args) => {
-        const { key, value } = args;
-        config.update(key, value);
-    });
+    // ipcMain.handle("config:update", (event, args) => {
+    //     const { key, value } = args;
+    //     config.update(key, value);
+    // });
 
     // setting
     ipcMain.handle("setting:change-log-level", (event, args) => {

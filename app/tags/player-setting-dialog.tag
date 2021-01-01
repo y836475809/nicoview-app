@@ -56,6 +56,10 @@
         .setting-section .param-label {
             font-size: 1.2em;
             height: 30px;
+            user-select: none;
+        }
+        .setting-section label {
+            user-select: none;
         }
 
         .setting-container input[type='checkbox']:hover,

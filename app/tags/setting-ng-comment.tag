@@ -4,13 +4,9 @@
             --control-height: 25px;
         }
 
-        .setting-params {
-            height: 300px;
-        }
-
         .comment-ng-grid-container {
             width: 100%;
-            height: calc(100% - var(--title-height) - var(--control-height) * 2);
+            height: calc(300px - var(--title-height) - var(--control-height));
         }
 
         .delete-button {
@@ -23,6 +19,7 @@
             user-select: none;
             border-style: none;
             border: 1px solid var(--control-border-color);
+            margin-top: 10px;
         }
 
         .delete-button:active {

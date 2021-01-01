@@ -8,8 +8,8 @@
 
     <div class="setting-section">
         <div class="setting-params">
-            <div class="title">コメント表示</div>
-            <hr>
+            <!-- <div class="title">コメント表示</div> -->
+            <!-- <hr> -->
             <div class="param-label center-v">表示時間</div>
             <label each={item in duration_items} >
                 <input type="radio" name="duration" value={item} 
@@ -30,11 +30,9 @@
     </div>
     <div class="setting-section">
         <div class="setting-params">
-            <div class="title">コメント同期調整</div>
-            <hr>
             <label>
                 <input class="auto-sync-checkbox" type="checkbox" 
-                    onclick={onclickAutoSyncCheck} />同期調整を行う
+                    onclick={onclickAutoSyncCheck} />コメントと動画の同期調整を行う
             </label>
             <hr>
             <div class="param-label center-v">以下の間隔で同期を調整する</div>

@@ -4,7 +4,7 @@
 
     <div class="setting-section">
         <div class="setting-params">
-            <div class="title">コンテキストメニュー</div>
+            <div class="title">中クリックで表示する「履歴」、「後で見る」の数</div>
             <hr>
             <div class="param-label center-v">履歴表示数</div>
             <label each={item in menu_num_items} >

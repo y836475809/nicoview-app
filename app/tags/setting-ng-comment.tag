@@ -6,7 +6,7 @@
 
         .comment-ng-grid-container {
             width: 100%;
-            height: calc(300px - var(--title-height) - var(--control-height));
+            height: calc(300px - var(--control-height));
         }
 
         .delete-button {
@@ -33,8 +33,6 @@
 
     <div class="setting-section"> 
         <div class="setting-params">
-            <div class="title">NGコメント</div>
-            <hr>
             <div class="comment-ng-grid-container">
                 <div class="comment-ng-grid"></div>
             </div>

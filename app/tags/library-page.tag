@@ -242,7 +242,9 @@
             const {video_id, props} = args;
             logger.debug("library:on-update-item video_id=", video_id, " props=", props);
 
-            props.tags = props.tags ? props.tags.join(" ") : "";
+            if(Array.isArray(props.tags)){
+                props.tags = props.tags.join(" ");
+            }
             grid_table.updateCells(video_id, props);
         });
 

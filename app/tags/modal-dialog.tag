@@ -1,6 +1,15 @@
 <modal-dialog data-open="false">
     <style scoped>
-        .container {
+        .message-modal-dialog {
+            border: solid 1px #aaa;
+            border-radius: 5px;
+        }
+
+        .message-modal-dialog::backdrop {
+            opacity: 0;
+        }
+
+        .message-modal-dialog .container {
             width: 250px;
             height: 150px;
             display: grid;
@@ -10,25 +19,17 @@
                 "item2";
         }
 
-        dialog {
-            border: solid 1px #aaa;
-            border-radius: 5px;
-        }
-        dialog::backdrop {
-            opacity: 0;
-        }
-
-        .message {
+        .message-modal-dialog .message {
             grid-area: item1;
             color: black;
             user-select: none;
         } 
 
-        .button-container {
+        .message-modal-dialog .button-container {
             grid-area: item2;
             margin: auto;
         }
-        .button { 
+        .message-modal-dialog .button { 
             display: inline-block;
             text-align: center;
             border: 1px solid #aaa;
@@ -40,7 +41,7 @@
         }   
     </style>
 
-    <dialog class="dialog-shadow" oncancel={oncancel}>
+    <dialog class="message-modal-dialog dialog-shadow" oncancel={oncancel}>
         <div class="container">
             <div class="center-hv">
                 <p class="message">{message}</p>

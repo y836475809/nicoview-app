@@ -182,9 +182,9 @@ test("parse json thumb info tags", t => {
     const tags = NicoDataParser.json_thumb_info_tags(api_data_tags);
     t.deepEqual(tags,
         [
-            {id:"10", name:"タグ1", isLocked:true, category:true},
-            {id:"20", name:"タグ2", isLocked:false},
-            {id:"30", name:"タグ3", isLocked:true}
+            {name:"タグ1", isLocked:true, isCategory:true},
+            {name:"タグ2", isLocked:false, isCategory:false},
+            {name:"タグ3", isLocked:true, isCategory:false},
         ]);
 });
 

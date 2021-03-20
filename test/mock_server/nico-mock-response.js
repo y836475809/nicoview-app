@@ -11,19 +11,17 @@ const createApiData = (video_id, is_smile) =>{
     const cp_data = JSON.parse(JSON.stringify(data_api_data));
     const video = cp_data.video;
     video.id = video_id;
-    video.thumbnailURL = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
-    video.largeThumbnailURL = `https://img.cdn.nimg.jp/s/nicovideo/thumbnails/${id}/${id}`;
-    video.postedDateTime = "2018/01/01 01:00:00";
+    video.thumbnail.url      = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
+    video.thumbnail.largeUrl = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}.L`;
+    video.registeredAt = "2018/01/01 01:00:00";
     if(is_smile===true){
         video.dmcInfo = null;
     }else{
-        video.dmcInfo.video_id = video_id;
-        video.dmcInfo.session_api.recipe_id = `nicovideo-${video_id}`;
+        cp_data.media.delivery.movie.session.recipeId = `nicovideo-${video_id}`;
     }
-    video.smileInfo.url = `https://smile-cls20.sl.nicovideo.jp/smile?m=${id}.67759`;
 
     // HBの確認しやすいように2秒毎にHB
-    video.dmcInfo.session_api.heartbeat_lifetime = 2200;
+    cp_data.media.delivery.movie.session.heartbeatLifetime = 2200;
 
     return cp_data;
 };

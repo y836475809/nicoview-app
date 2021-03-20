@@ -327,10 +327,9 @@ class NicoDownLoadMocks {
     }
 
     thumbnail({delay=1, code=200} = {}){
-        this.thumbnail_nock = nock("https://tn.smilevideo.jp");
+        this.thumbnail_nock = nock("https://nicovideo.cdn.nimg.jp");
         this.thumbnail_nock
-            .get("/smile")
-            .query({ i: "12345678.L" }) 
+            .get(/\/thumbnails\/12345678\/.*/)
             .delay(delay)
             .reply(code, "thumbnail");
     }

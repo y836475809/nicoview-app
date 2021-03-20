@@ -1,5 +1,7 @@
 const test = require("ava");
 const path = require("path");
+const { TestData } = require("./helper/nico-mock");
+const { NicoAPI } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
 const test_video_id = "sm100";
@@ -57,30 +59,14 @@ class TestNicoUpdate extends NicoUpdate {
     }
 
     async _getWatchData(){
+        const nico_api = new NicoAPI();
+        nico_api.parse(TestData.data_api_data);
+        nico_api._video.id = this.video_id;
+        nico_api._video.isDeleted = this._is_deleted_in_nico;
+        nico_api._video.thumbnail.largeUrl = this._large_thumb_url;
+        nico_api._video.thumbnail.url = "url-S";
         const watch_data = {
-            api_data:{
-                video:{
-                    video_id: this.video_id,
-                    title: "", 
-                    description: "", 
-                    isDeleted: this._is_deleted_in_nico,
-                    thumbnailURL:"url-S",
-                    largeThumbnailURL:this._large_thumb_url,
-                    postedDateTime: 0, 
-                    movieType:"mp4",
-                    viewCount: 0, 
-                    mylistCount: 0 
-                },
-                thread: {
-                    commentCount: 0
-                },
-                tags:[],
-                owner: {
-                    id: "", 
-                    nickname: "",
-                    iconURL: "",
-                }
-            }
+            nico_api
         };
 
         return watch_data;
@@ -414,7 +400,7 @@ test.cb("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not delete
         ]);
         t.deepEqual(nico_update.log, [
             "_isDataTypeJson",
-            "_getThumbImg:url-S.L",
+            "_getThumbImg:url-L",
             "_writeFile",
             "_setThumbnailSize:L",
             "updated"
@@ -440,7 +426,7 @@ test.cb("updateThumbnail, db=json, thumb_size=L, not deleted in nico, not delete
         ]);
         t.deepEqual(nico_update.log, [
             "_isDataTypeJson",
-            "_getThumbImg:url-S.L",
+            "_getThumbImg:url-L",
             "_writeFile",
             "_setThumbnailSize:L",
             "updated"
@@ -463,15 +449,9 @@ test.cb("updateThumbnail, db=json, thumb_size=L, large_thumb_url=null, not delet
     nico_update.updateThumbnail().then(()=>{
         t.falsy(nico_update.video_item.is_deleted);
         t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
-        ]);
+        t.deepEqual(nico_update.paths, []);
         t.deepEqual(nico_update.log, [
             "_isDataTypeJson",
-            "_getThumbImg:url-S.L",
-            "_writeFile",
-            "_setThumbnailSize:L",
-            "updated"
         ]);
         t.end();
     });
@@ -512,7 +492,7 @@ test.cb("update, db=xml, not deleted in nico, not deleted in db", (t) => {
             "_setTags",
             "_writeFile",
             "_writeFile",
-            "_getThumbImg:url-S.L",
+            "_getThumbImg:url-L",
             "_writeFile",
             "_setThumbnailSize:L",
             "_isDataTypeJson",
@@ -544,7 +524,7 @@ test.cb("update, db=json, not deleted in nico, not deleted in db", (t) => {
             "_setTags",
             "_writeFile",
             "_writeFile",
-            "_getThumbImg:url-S.L",
+            "_getThumbImg:url-L",
             "_writeFile",
             "_setThumbnailSize:L",
             "_isDataTypeJson",

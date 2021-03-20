@@ -147,48 +147,42 @@ const getVideoType = (smile_url) => {
     throw new Error("not flv or mp4");
 };
 
-const json_thumb_info_tags = (api_data_tags) => {
-    return api_data_tags.map((value) => {
+const json_thumb_info_tags = (nico_api_tags) => {
+    return nico_api_tags.map((value) => {
         const tag = {
-            id: value.id,
             name: value.name,
             isLocked: value.isLocked,
+            isCategory: value.isCategory
         };
-
-        if(value.isCategory === true){
-            tag.category = true;
-        }
-
         return tag;
     });  
 };
 
-const json_thumb_info = (api_data) => {
-    const video = api_data.video;
-    const thread = api_data.thread;
-    const owner = api_data.owner;
-    const tags = json_thumb_info_tags(api_data.tags);
+const json_thumb_info = (nico_api) => {
+    const video = nico_api.getVideo();
+    const owner = nico_api.getOwner();
+    const tags = json_thumb_info_tags(nico_api.getTags());
     return {
         video: {
             video_id: video.id,
             title: video.title, 
             description: video.description, 
-            thumbnailURL: video.thumbnailURL, 
-            largeThumbnailURL: video.largeThumbnailURL, 
-            postedDateTime: video.postedDateTime, 
+            thumbnailURL: video.thumbnail.url, 
+            largeThumbnailURL: video.thumbnail.largeUrl, 
+            postedDateTime: video.registeredAt, 
             duration: video.duration, 
-            viewCount: video.viewCount, 
-            mylistCount: video.mylistCount, 
-            video_type: video.movieType ? video.movieType : getVideoType(video.smileInfo.url)
+            viewCount: video.count.view, 
+            mylistCount: video.count.mylist, 
+            video_type: video.videoType
         },
         thread: {
-            commentCount: thread.commentCount
+            commentCount: video.count.comment
         },
         tags: tags,
         owner: {
             id: owner?owner.id:"", 
             nickname: owner?owner.nickname:"", 
-            iconURL: owner?owner.iconURL:"", 
+            iconURL: owner?owner.iconUrl:"", 
         }
     };
 };

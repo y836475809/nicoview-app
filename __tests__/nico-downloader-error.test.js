@@ -162,7 +162,8 @@ test("downloader timeout dmc_video", async (t) => {
     t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
-test("downloader timeout smile_video", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader timeout smile_video", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:mock_timeout});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
@@ -350,7 +351,8 @@ test("downloader network error dmc_video 500", async (t) => {
     t.regex(result.reason.message, /500/);
 });
 
-test("downloader network error smile_video 404", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader network error smile_video 404", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:404});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
@@ -366,7 +368,8 @@ test("downloader network error smile_video 404", async (t) => {
     t.regex(result.reason.message, /404/);
 });
 
-test("downloader network error smile_video 500", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader network error smile_video 500", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:500});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
@@ -461,7 +464,8 @@ test("downloader save dmc error", async (t) => {
     t.is(result.reason.message, "stream error");
 });
 
-test("downloader save smile error", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader save smile error", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);

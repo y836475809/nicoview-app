@@ -1,32 +1,18 @@
 const test = require("ava");
 const fsPromises = require("fs").promises;
+const { TestData } = require("./helper/nico-mock");
+const { NicoAPI } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
-const test_watch_data = {
-    api_data:{
-        cookie_jar: {},
-        video:{
-            video_id: "",
-            title: "", 
-            description: "", 
-            isDeleted: false,
-            thumbnailURL:"url-S",
-            largeThumbnailURL:"url-L",
-            postedDateTime: 0, 
-            movieType:"mp4",
-            viewCount: 0, 
-            mylistCount: 0 
-        },
-        thread: {
-            commentCount: 0
-        },
-        tags:[],
-        owner: {
-            id: "", 
-            nickname: "",
-            iconURL: "",
-        }
-    }
+const get_test_watch_data = () => {
+    const nico_api = new NicoAPI();
+    nico_api.parse(TestData.data_api_data);
+    nico_api._video.isDeleted = false;
+    nico_api._video.thumbnail.largeUrl = "url-L";
+    nico_api._video.thumbnail.url = "url-S";
+    return {
+        nico_api
+    };
 };
 
 const test_comments = [
@@ -147,7 +133,7 @@ class TestNicoUpdate extends NicoUpdate {
     }
 
     setupTestParams({
-        watch_data=test_watch_data,
+        watch_data = get_test_watch_data(),
         comments_diff=test_comments,
         img_data=new Uint8Array([0xff, 0xd8, 0xff, 0xd9])}={}){
         this._watch_data = watch_data;
@@ -185,7 +171,7 @@ class TestNicoUpdate extends NicoUpdate {
         this.log.push("_getWatchData");
         return this._watch_data;
     }
-    async _getComments(api_data, cur_comments){
+    async _getComments(nico_api, cur_comments){
         this.log.push("_getComments");
         return this._comments_diff;
     }
@@ -207,16 +193,6 @@ test.before(async t => {
         jpeg:await fsPromises.readFile(`${__dirname}/data/sample1.jpeg`),
         png:await fsPromises.readFile(`${__dirname}/data/sample2.png`)
     };
-});
-
-test("validate watch_data", t => {
-    const nico_update = new NicoUpdate({data_type:"json", common_filename:"test"});
-    
-    t.truthy(nico_update._validateWatchData(test_watch_data));
-
-    t.falsy(nico_update._validateWatchData({}));
-    t.falsy(nico_update._validateWatchData(null));
-    t.falsy(nico_update._validateWatchData("not find 404"));
 });
 
 test("validate comments", t => {

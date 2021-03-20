@@ -245,7 +245,8 @@ test("nico play dmc error hb_post", async (t) => {
     t.is(nico_play.nico_video._heart_beat_id, null);
 });
 
-test("nico play smile", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("nico play smile", async (t) => {
     t.plan(4);
 
     nico_mocks.watch();

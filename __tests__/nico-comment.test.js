@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoComment } = require("../app/js/niconico");
+const { NicoAPI, NicoComment } = require("../app/js/niconico");
 const { NicoMocks, TestData} = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");
 
@@ -21,6 +21,10 @@ test.after(t => {
 test.beforeEach(t => {
     prof_time.start(t);
     nico_mocks.clean();
+
+    const nico_api = new NicoAPI();
+    nico_api.parse(data_api_data);
+    t.context.nico_comment = new NicoComment(nico_api);
 });
 
 test.afterEach(t => {
@@ -28,7 +32,7 @@ test.afterEach(t => {
 });
 
 test("request param", t => {
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
 
     {
         const comment_json = nico_comment.makeJsonNoOwner(0, 0);
@@ -60,7 +64,7 @@ test("request param", t => {
 });
 
 test("request param inc rs,ps no", t => {
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
 
     {
         const comment_json = nico_comment._get_comment_json();
@@ -103,7 +107,7 @@ test("request param inc rs,ps no", t => {
 test("get comment", async (t) => {
     nico_mocks.comment();
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     const res_comments = await nico_comment.getComment();
 
     t.is(res_comments.length, 7);
@@ -121,7 +125,7 @@ test("get comment empty param", async (t) => {
 
     nico_mocks.comment();
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     try {
         await nico_comment._post([]);
     } catch (error) {
@@ -133,7 +137,7 @@ test("get comment empty param", async (t) => {
 test("get comment illegal param", async (t) => {
     nico_mocks.comment();
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
 
     let cmds = [];
     cmds.push(nico_comment._getPing("rs", 0));
@@ -150,7 +154,7 @@ test("get comment timeout", async (t) => {
 
     nico_mocks.comment(mock_timeout);
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     try {
         await nico_comment.getComment();
     } catch (error) {
@@ -165,7 +169,7 @@ test("get comment cancel", async(t) => {
     
     nico_mocks.comment(3000);
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     setTimeout(()=>{
         nico_comment.cancel();
     }, 1000);
@@ -182,7 +186,7 @@ test("get comment cancel 2", async(t) => {
     
     nico_mocks.comment(3000);
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     
     setTimeout(()=>{
         nico_comment.cancel();
@@ -201,7 +205,7 @@ test("get comment 403", async (t) => {
 
     nico_mocks.comment(1, 403);
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     try {
         await nico_comment.getComment();
     } catch (error) {
@@ -216,7 +220,7 @@ test("get comment 500", async (t) => {
 
     nico_mocks.comment(1, 500);
 
-    const nico_comment = new NicoComment(data_api_data);
+    const nico_comment = t.context.nico_comment;
     try {
         await nico_comment.getComment();
     } catch (error) {

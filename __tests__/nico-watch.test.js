@@ -31,7 +31,7 @@ test("watch get cookie", async (t) => {
     nico_mocks.watch();
 
     const nico_watch = new NicoWatch();
-    const { nico_cookie, api_data } = await nico_watch.watch(TestData.video_id);
+    const { nico_cookie, nico_api } = await nico_watch.watch(TestData.video_id);
     t.deepEqual(nico_cookie.getSesstionCookies(),[
         {
             url: "https://www.nicovideo.jp",
@@ -51,9 +51,12 @@ test("watch get cookie", async (t) => {
         }
     ]);
 
-    t.not(api_data.video, undefined);
-    t.not(api_data.commentComposite.threads, undefined);
-    t.not(api_data.video.dmcInfo.session_api, undefined);
+    t.not(nico_api.getVideo(), undefined);
+    t.not(nico_api.getVideoQuality(), undefined);
+    t.not(nico_api.getTags(), undefined);
+    t.not(nico_api.getCommentOwnerThread(), undefined);
+    t.not(nico_api.getCommentDefaultThread(), undefined);
+    t.not(nico_api.getSession(), undefined);
 });
 
 test("watch cancel", async(t) => {

@@ -119,7 +119,7 @@ class NicoDownloader {
             this._setupNicoFilePath();
 
             on_progress(DonwloadProgMsg.start_thumbinfo);
-            const thumbInfo_data = NicoDataParser.json_thumb_info(this.watch_data.api_data);
+            const thumbInfo_data = NicoDataParser.json_thumb_info(this._nico_api);
 
             on_progress(DonwloadProgMsg.start_comment);
             const comment_data = await this._getComment();
@@ -169,13 +169,16 @@ class NicoDownloader {
 
     async _getWatchData(video_id){
         this.nico_watch = new NicoWatch();
-        this.watch_data = await this.nico_watch.watch(video_id);
+        const watch_data = await this.nico_watch.watch(video_id);
+        this._nico_cookie = watch_data.nico_cookie;
+        this._nico_api = watch_data.nico_api;
     }
 
     async _getVideoInfo(){
-        this.nico_video = new NicoVideo(this.watch_data.api_data);
+        this.nico_video = new NicoVideo(this._nico_api);
 
         if(this.nico_video.isDmc()){
+            // TODO isDmc出ない場合はエラーにしたほうがよさそう
             await this.nico_video.postDmcSession();
             this.videoinfo = {
                 server: "dmc",
@@ -190,22 +193,20 @@ class NicoDownloader {
     }
 
     async _getComment(){
-        const api_data = this.watch_data.api_data;
-        this.nico_comment = new NicoComment(api_data);
+        this.nico_comment = new NicoComment(this._nico_api);
         return await this.nico_comment.getComment();
     }
 
-    _getThumbnailData(api_data){
-        const video = api_data.video;
+    _getThumbnailData(large_url){
         return { 
-            thumbnail_url: video.thumbnailURL + ".L", 
+            thumbnail_url: large_url, 
             thumbnail_size: "L" 
         };
     }
 
     async _getThumbImg(){
-        const api_data = this.watch_data.api_data;
-        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
+        const large_url = this._nico_api.getVideo().thumbnail.largeUrl;
+        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(large_url);
 
         this.img_request = new NicoClientRequest();
         const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
@@ -224,10 +225,9 @@ class NicoDownloader {
             throw error;
         });
 
-        const { nico_cookie } = this.watch_data;
         const video_url = this.nico_video.DmcContentUri;
 
-        this.video_download = new DownloadRequest(video_url, nico_cookie);
+        this.video_download = new DownloadRequest(video_url, this._nico_cookie);
         try {
             await this.video_download.download(stream, on_progress);
             this.nico_video.stopHeartBeat();
@@ -249,37 +249,33 @@ class NicoDownloader {
     }   
 
     getDownloadedItem(){
-        const { api_data } = this.watch_data;
-        const is_deleted = api_data.video.isDeleted;
-        const video_id = api_data.video.id;
-        const video_type = NicoDataParser.getVideoType(api_data.video.smileInfo.url);
-        const tags = api_data.tags.map((value) => {
+        const video = this._nico_api.getVideo();
+        const tags = this._nico_api.getTags().map((value) => {
             return value.name;
         });
-        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(api_data);
+        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(video.thumbnail.largeUrl);
         
         return {
             data_type:"json", 
             dirpath: this.dist_dir,
-            id: video_id,
-            title: api_data.video.title,
-            video_type: video_type,
+            id: video.id,
+            title: video.title,
+            video_type: video.videoType,
             is_economy: !this.videoinfo.maxQuality,
-            play_time: api_data.video.duration,
-            pub_date: new Date(api_data.video.postedDateTime).getTime(),
+            play_time: video.duration,
+            pub_date: new Date(video.registeredAt).getTime(),
             tags: tags,
-            is_deleted: is_deleted,
+            is_deleted: video.isDeleted,
             thumbnail_size: thumbnail_size,
         };
     }
 
     _setupNicoFilePath(){
-        const { api_data } = this.watch_data;
-        const video_type = NicoDataParser.getVideoType(api_data.video.smileInfo.url);
+        const video = this._nico_api.getVideo();
 
         this.nico_json.dirPath = this.dist_dir;
-        this.nico_json.commonFilename = api_data.video.title;
-        this.nico_json.videoType = video_type;
+        this.nico_json.commonFilename = video.title;
+        this.nico_json.videoType = video.videoType;
     }
 
     _getTmpVideoPath(){

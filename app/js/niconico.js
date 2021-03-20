@@ -3,6 +3,142 @@ const { NicoClientRequest } = require("./nico-client-request");
 const { NICO_URL, getWatchURL } = require("./nico-url");
 const { logger } = require("./logger");
 
+class NicoAPI {
+    isDmc(){
+        return this._api_data != null && this._api_data != undefined;
+    }
+
+    getVideo(){
+        return this._video;
+    }
+
+    isDeletedVideo(){
+        return this._video.isDeleted;
+    }
+
+    getVideoQuality(){
+        return this._video_quality;
+    }
+
+    getTags(){
+        return this._tags;
+    }
+
+    getOwner(){
+        return this._owner;
+    }
+
+    getCommentOwnerThread(){
+        return this._comment.threads[0];
+    }
+    getCommentDefaultThread(){
+        return this._comment.threads[1];
+    }
+
+    getSession(){
+        return this._session;
+    }
+
+    parse(api_data){
+        this._api_data = api_data;
+        const video = this._api_data.video;
+        const count = this._api_data.video.count;
+        const movie = this._api_data.media.delivery.movie;
+        this._video = {
+            id: video.id,
+            title: video.title,
+            duration: video.duration,
+            description: video.description,
+            isDeleted: video.isDeleted,
+            registeredAt: video.registeredAt,
+
+            // TODO とりあえずmp4にしておく
+            videoType: "mp4", 
+
+            count:{
+                view: count.view,
+                comment: count.comment,
+                mylist: count.mylist,
+                like: count.like,
+            },
+            thumbnail: {
+                url: video.thumbnail.url, 
+                largeUrl: video.thumbnail.largeUrl,
+            }
+        };
+
+        this._video_quality = {
+            audios: movie.audios,
+            videos: movie.videos,
+        };
+
+        const owner = this._api_data.owner;
+        this._owner = {
+            id: owner?owner.id:"", 
+            nickname: owner?owner.nickname:"", 
+            iconUrl: owner?owner.iconUrl:"", 
+        };
+
+        const threads = this._api_data.comment.threads;
+        this._comment = {
+            threads:threads
+        };
+
+        const tags = this._api_data.tag.items;
+        this._tags = tags.map(item => {
+            return {
+                name: item.name,
+                isLocked: item.isLocked,
+                isCategory: item.isCategory
+            };
+        });
+
+        const session = this._api_data.media.delivery.movie.session;
+        this._session = {
+            recipeId: session.recipeId,
+            contentId: session.contentId,
+            videos:session.videos,
+            audios:session.audios,
+            heartbeatLifetime:session.heartbeatLifetime,
+            token: session.token,
+            signature: session.signature,
+            contentKeyTimeout: session.contentKeyTimeout,
+            serviceUserId: session.serviceUserId,
+            playerId: session.playerId,
+            url: session.urls[0].url,
+            priority: session.priority,
+        };
+    }
+
+    validate(){
+        if(this._typeOf(this._api_data)!="object"){
+            return false;
+        }
+
+        if(this._typeOf(this._session)!="object"){
+            return false;
+        }
+
+        if(this._typeOf(this._video)!="object"){
+            return false;
+        } 
+
+        if(this._typeOf(this._comment)!="object"){
+            return false;
+        }   
+        
+        if(this._typeOf(this._owner)!="object"){
+            return false;
+        }   
+        return true;
+    }
+
+    _typeOf(obj) {
+        const toString = Object.prototype.toString;
+        return toString.call(obj).slice(8, -1).toLowerCase();
+    }
+}
+
 class NicoWatch {
     constructor() { 
         this._req = null;
@@ -24,15 +160,17 @@ class NicoWatch {
             throw new Error("not find data-api-data");
         }
         const api_data = JSON.parse(data_json);
+        const nico_api = new NicoAPI();
+        nico_api.parse(api_data);
+
         const nico_cookie = this._req.getNicoCookie();
-        return { nico_cookie, api_data }; 
+        return { nico_cookie, nico_api }; 
     }
 }
 
 class NicoVideo {
-    constructor(api_data, heart_beat_rate=0.9) {
-        this._api_data = api_data;  
-        this._dmcInfo = api_data.video.dmcInfo;
+    constructor(nico_api, heart_beat_rate=0.9) {
+        this._nico_api = nico_api;  
 
         this._heart_beat_rate = heart_beat_rate;
         this._heart_beat_id = null;
@@ -63,18 +201,19 @@ class NicoVideo {
     }
 
     isDmc() {
-        return this._dmcInfo != null;
+        return this._nico_api.isDmc();
     }
 
     get DmcSession() {
         if (!this.isDmc()) {
             return null;
         }
-        const session_api = this._dmcInfo.session_api;
+
+        const session_api = this._nico_api.getSession();
         return {
             session: {
-                recipe_id: session_api.recipe_id,
-                content_id: session_api.content_id,
+                recipe_id: session_api.recipeId,
+                content_id: session_api.contentId,
                 content_type: "movie",
                 content_src_id_sets: [{
                     content_src_ids: [{
@@ -87,7 +226,7 @@ class NicoVideo {
                 timing_constraint: "unlimited",
                 keep_method: {
                     heartbeat: {
-                        lifetime: session_api.heartbeat_lifetime
+                        lifetime: session_api.heartbeatLifetime
                     }
                 },
                 protocol: {
@@ -113,12 +252,12 @@ class NicoVideo {
                 },
                 content_auth: {
                     auth_type: "ht2",
-                    content_key_timeout: session_api.content_key_timeout,
+                    content_key_timeout: session_api.contentKeyTimeout,
                     service_id: "nicovideo",
-                    service_user_id: session_api.service_user_id
+                    service_user_id: session_api.serviceUserId
                 },
                 client_info: {
-                    player_id: session_api.player_id
+                    player_id: session_api.playerId
                 },
                 priority: session_api.priority
             }
@@ -130,7 +269,8 @@ class NicoVideo {
             throw new Error(`dmc info is ${this.DmcSession}`);
         }  
 
-        const url = `${this._dmcInfo.session_api.urls[0].url}?_format=json`;
+        const session_url = this._nico_api.getSession().url;
+        const url = `${session_url}?_format=json`;
         const json = this.DmcSession;
 
         this._req_session = new NicoClientRequest();
@@ -146,7 +286,8 @@ class NicoVideo {
         this.stopHeartBeat();
 
         const id = this.dmc_session.session.id;
-        const url = `${this._dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        const session_url = this._nico_api.getSession().url;
+        const url = `${session_url}/${id}?_format=json&_method=PUT`;
         
         this._req_hb_options = new NicoClientRequest();
         return this._req_hb_options.options(url);
@@ -156,10 +297,10 @@ class NicoVideo {
         this.stopHeartBeat();
 
         const id = this.dmc_session.session.id;
-        const url = `${this._dmcInfo.session_api.urls[0].url}/${id}?_format=json&_method=PUT`;
+        const session_url = this._nico_api.getSession().url;
+        const url = `${session_url}/${id}?_format=json&_method=PUT`;
         const session = this.dmc_session;
-        const interval_ms = this._dmcInfo.session_api.heartbeat_lifetime * this._heart_beat_rate;   
-        
+        const interval_ms = this._nico_api.getSession().heartbeatLifetime * this._heart_beat_rate;
         this._req_hb_post = new NicoClientRequest();
         this.heart_beat_id = setInterval(async () => {              
             try {
@@ -187,10 +328,10 @@ class NicoVideo {
     }
 
     isDMCMaxQuality(){
-        const quality = this._api_data.video.dmcInfo.quality;
+        const { audios, videos } = this._nico_api.getVideoQuality();
         const max_quality = { 
-            video: quality.videos[0].id,
-            audio: quality.audios[0].id
+            video: videos[0].id,
+            audio: audios[0].id
         };
     
         const src_id_to_mux = 
@@ -206,8 +347,8 @@ class NicoVideo {
 }
 
 class NicoComment {
-    constructor(api_data) {
-        this._api_data = api_data;
+    constructor(nico_api) {
+        this._nico_api = nico_api;
         this._r_no = 0;
         this._p_no = 0;
         this._req = null;
@@ -254,8 +395,8 @@ class NicoComment {
     }
 
     hasOwnerComment() {
-        const comment_composite = this._api_data.commentComposite;
-        return comment_composite.threads[0].isActive;
+        const thread = this._nico_api.getCommentOwnerThread();
+        return thread.isActive;
     }
 
     _getContentLen(duration) {
@@ -274,16 +415,18 @@ class NicoComment {
 
     makeJsonNoOwner(r_no, p_no) {
         //no owner
-        const comment_composite = this._api_data.commentComposite;
-        const thread = comment_composite.threads[1].id;
-        const fork = comment_composite.threads[1].fork;
-        const content_len = this._getContentLen(this._api_data.video.duration);
+        const thread = this._nico_api.getCommentDefaultThread();
+        const id = thread.id;
+        const fork = thread.fork;
+
+        const duration = this._nico_api.getVideo().duration;
+        const content_len = this._getContentLen(duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
         this._addCommand(cmds, p_no, {
             thread: {
-                thread: thread,
+                thread: id,
                 version: "20090904",
                 fork: fork,
                 language: 0,
@@ -295,7 +438,7 @@ class NicoComment {
         });
         this._addCommand(cmds, ++p_no, {
             thread_leaves: {
-                thread: thread,
+                thread: id,
                 language: 0,
                 user_id: "",
                 content: `0-${content_len}:100,1000`,
@@ -310,12 +453,15 @@ class NicoComment {
 
     makeJsonOwner(r_no, p_no) {
         //owner
-        const comment_composite = this._api_data.commentComposite;
-        const thread0 = comment_composite.threads[0].id;
-        const fork0 = comment_composite.threads[0].fork;
-        const thread1 = comment_composite.threads[1].id;
-        const fork1 = comment_composite.threads[1].fork;
-        const content_len = this._getContentLen(this._api_data.video.duration);
+        const owner_thread = this._nico_api.getCommentOwnerThread();
+        const default_thread = this._nico_api.getCommentDefaultThread();
+        const thread0 = owner_thread.id;
+        const fork0 = owner_thread.fork;
+        const thread1 = default_thread.id;
+        const fork1 = default_thread.fork;
+
+        const duration = this._nico_api.getVideo().duration;
+        const content_len = this._getContentLen(duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
@@ -359,8 +505,8 @@ class NicoComment {
     }
 
     makeJsonDiff(r_no, p_no, res_from) {
-        const comment_composite = this._api_data.commentComposite;
-        const thread1 = comment_composite.threads[1].id;
+        const default_thread = this._nico_api.getCommentDefaultThread();
+        const thread1 = default_thread.id;
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
         this._addCommand(cmds, p_no, {
@@ -398,6 +544,7 @@ class NicoThumbnail {
 }
 
 module.exports = {
+    NicoAPI,
     NicoWatch,
     NicoVideo,
     NicoComment,

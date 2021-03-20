@@ -35,23 +35,23 @@ class NicoPlay extends EventEmitter {
             try {
                 this.emit("changeState", "startWatch");
                 this.nico_watch = new NicoWatch();
-                const { nico_cookie, api_data } = await this.nico_watch.watch(video_id); 
-                const is_deleted = api_data.video.isDeleted;
+                const { nico_cookie, nico_api } = await this.nico_watch.watch(video_id); 
+                const is_deleted = nico_api.getVideo().isDeleted;
                 this.emit("changeState", "finishWatch");
 
                 this.emit("changeState", "startComment");
-                this.nico_comment = new NicoComment(api_data);
+                this.nico_comment = new NicoComment(nico_api);
                 const comments = await this.nico_comment.getComment();
                 const cnved_comments = NicoDataParser.makeComments(comments);
                 this.emit("changeState", "finishComment");
 
-                this.nico_video = new NicoVideo(api_data, this.heart_beat_rate);
+                this.nico_video = new NicoVideo(nico_api, this.heart_beat_rate);
 
                 if(this.force_smile || !this.nico_video.isDmc())
                 {
                     this.emit("changeState", "startPlaySmile");
                     const cookies = nico_cookie.getSesstionCookies();
-                    const thumb_info = NicoDataParser.json_thumb_info(api_data); 
+                    const thumb_info = NicoDataParser.json_thumb_info(nico_api); 
                     const video_url = this.nico_video.SmileUrl;
                     const is_economy = !this.nico_video.isSmileMaxQuality();
                     resolve({
@@ -79,7 +79,7 @@ class NicoPlay extends EventEmitter {
 
                 this.emit("changeState", "startPlayVideo");
                 const cookies = nico_cookie.getSesstionCookies();
-                const thumb_info = NicoDataParser.json_thumb_info(api_data); 
+                const thumb_info = NicoDataParser.json_thumb_info(nico_api); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 const is_economy = !this.nico_video.isDMCMaxQuality();
                 resolve({

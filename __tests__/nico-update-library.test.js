@@ -1,6 +1,7 @@
 const test = require("ava");
 const path = require("path");
 const { TestData} = require("./helper/nico-mock");
+const { NicoAPI } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
 
 test.beforeEach(async t => {
@@ -50,16 +51,19 @@ class TestNicoUpdate extends NicoUpdate {
         super(video_item);
         this.nico_video_deleted = nico_video_deleted;
         this.paths = [];
-        this.data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
-        this.data_api_data.video.isDeleted = nico_video_deleted;
+
+        const data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
+        this.nico_api = new NicoAPI();
+        this.nico_api.parse(data_api_data);
+        this.nico_api._video.isDeleted = nico_video_deleted;
     } 
     async _getWatchData(){
-        return { cookie_jar: null, api_data: this.data_api_data };
+        return { cookie_jar: null, nico_api: this.nico_api };
     }
     _getCurrentCommentData(){
         return [];
     }
-    async _getComments(api_data, cur_comments){
+    async _getComments(nico_api, cur_comments){
         return [{}];
     }
     async _getThumbImg(url){
@@ -76,12 +80,15 @@ class TestNicoUpdate extends NicoUpdate {
 class TestNicoUpdateTags extends NicoUpdate {
     constructor(video_item){
         super(video_item);
-        this.data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
+
+        const data_api_data = JSON.parse(JSON.stringify(TestData.data_api_data));
+        this.nico_api = new NicoAPI();
+        this.nico_api.parse(data_api_data);
     }
     async _getWatchData(){
-        return { cookie_jar: null, api_data: this.data_api_data };
+        return { cookie_jar: null, nico_api: this.nico_api };
     }
-    async _getComments(api_data, cur_comments){
+    async _getComments(nico_api, cur_comments){
         return [{}];
     }
     _getCurrentCommentData(){

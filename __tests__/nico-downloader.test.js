@@ -116,9 +116,9 @@ test("downloader dmc", async (t) => {
                 video_id: "sm12345678",
                 title: "test",
                 description: "test description",
-                thumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678",
-                largeThumbnailURL: "https://tn.smilevideo.jp/smile?i=12345678.L",
-                postedDateTime: "2018/01/01 01:00:00",
+                thumbnailURL: "https://nicovideo.cdn.nimg.jp/thumbnails/12345678/12345678.1",
+                largeThumbnailURL: "https://nicovideo.cdn.nimg.jp/thumbnails/12345678/12345678.1.L",
+                postedDateTime: "2018-01-01T01:00:00+09:00",
                 duration: 100,
                 viewCount: 200,
                 mylistCount: 300,
@@ -128,12 +128,12 @@ test("downloader dmc", async (t) => {
                 commentCount: 1000
             },
             tags:[
-                {id: "1", name: "tag1", isLocked: true, category:true},
-                {id: "2", name: "tag2", isLocked: true},
-                {id: "3", name: "tag3", isLocked: false}
+                {name: "tag1", isLocked: true, isCategory:true},
+                {name: "tag2", isLocked: true, isCategory:false},
+                {name: "tag3", isLocked: false, isCategory:false},
             ],
             owner: {
-                id: "123345677",
+                id: 123345677,
                 nickname: "aaaaさん",
                 iconURL: "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/100.123345677.jpg?1313765172"
             }
@@ -141,7 +141,8 @@ test("downloader dmc", async (t) => {
     }      
 });
 
-test("downloader smile", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader smile", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
@@ -251,7 +252,8 @@ test("downloader dmc low quality", async (t) => {
     });     
 });
 
-test("downloader smile low quality", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader smile low quality", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir, false);
@@ -294,7 +296,8 @@ test("downloader cancel dmc low quality", async (t) => {
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.skip, reason: "最高画質でないため" });
 });
 
-test("downloader cancel smile low quality", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader cancel smile low quality", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_quality:"low"});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);
@@ -415,7 +418,8 @@ test("downloader cancel dmc_video", async (t) => {
     t.deepEqual(result, { type: TestNicoDownloader.ResultType.cancel, reason: "cancel" });
 });
 
-test("downloader cancel smile_video", async (t) => {
+// NOTE smileなくなったようなのでskip
+test.skip("downloader cancel smile_video", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:2000});
 
     const nico_down = new TestNicoDownloader(video_id, dist_dir);

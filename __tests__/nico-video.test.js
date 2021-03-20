@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoVideo } = require("../app/js/niconico");
+const { NicoAPI, NicoVideo } = require("../app/js/niconico");
 const { NicoMocks, TestData } = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");
 
@@ -8,6 +8,11 @@ const data_api_data = TestData.data_api_data;
 const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
 const mock_timeout = 121*1000;
+
+const setHBLifetime = (nico_video, time_ms) => {
+    const session = nico_video._nico_api._session;
+    session.heartbeatLifetime = time_ms;
+};
 
 test.before(t => {
     prof_time.clear();
@@ -21,21 +26,26 @@ test.after(t => {
 test.beforeEach(t => {
     prof_time.start(t);
     nico_mocks.clean();
+    
+    const nico_api = new NicoAPI();
+    nico_api.parse(data_api_data);
+    t.context.nico_video = new NicoVideo(nico_api); 
 });
 
 test.afterEach(t => {
     prof_time.end(t);
 });
 
-test("nico smile", t => {
-    const nico_video = new NicoVideo(data_api_data);
+// NOTE smileなくなったようなのでskip
+test.skip("nico smile", t => {
+    const nico_video = t.context.nico_video;
 
     t.truthy(nico_video.isDmc());
     t.regex(nico_video.SmileUrl, /https:\/\/smile-cls\d\d.sl.nicovideo.jp\/smile\?m=\d+\.\d+/);
 });
 
 test("nico dmc quality check", (t) => {
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
 
     nico_video.dmc_session = TestData.dmc_session;
     t.truthy(nico_video.isDMCMaxQuality());
@@ -44,8 +54,9 @@ test("nico dmc quality check", (t) => {
     t.falsy(nico_video.isDMCMaxQuality());
 });
 
-test("nico smile quality check", (t) => {
-    const nico_video = new NicoVideo(data_api_data);
+// NOTE smileなくなったようなのでskip
+test.skip("nico smile quality check", (t) => {
+    const nico_video =t.context.nico_video;
     nico_video._dmcInfo = null;
 
     const url = "https://smile-cls20.sl.nicovideo.jp/smile?m=12345678.67759";
@@ -58,7 +69,7 @@ test("nico smile quality check", (t) => {
 });
 
 test("nico session", t => {
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     const dmc_session =  nico_video.DmcSession;
 
     t.not(dmc_session.session, undefined);
@@ -78,7 +89,7 @@ test("nico session", t => {
 test("nico dmc session", async (t) => {
     nico_mocks.dmc_session();
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     await nico_video.postDmcSession();
 
     t.is(nico_video.dmc_session.session.id, "12345678");
@@ -89,7 +100,7 @@ test("nico dmc session error", async (t) => {
 
     nico_mocks.dmc_session_error();
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     try {
         await nico_video.postDmcSession();
     } catch (error) {
@@ -103,7 +114,7 @@ test("nico dmc session timeout", async (t) => {
 
     nico_mocks.dmc_session(mock_timeout);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     try {
         await nico_video.postDmcSession();
     } catch (error) {
@@ -117,7 +128,7 @@ test("nico dmc session cancel", async (t) => {
 
     nico_mocks.dmc_session(3000);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     setTimeout(()=>{
         nico_video.cancel();
     }, 1000);
@@ -134,11 +145,11 @@ test("nico dmc heart beat", async (t) => {
 
     nico_mocks.dmc_hb();
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
 
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat();
 
     await new Promise(resolve => setTimeout(resolve, 3000));
@@ -153,11 +164,11 @@ test("nico stop dmc heart beat", async (t) => {
 
     nico_mocks.dmc_hb();
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
 
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat();
 
     await new Promise(resolve => setTimeout(resolve, 500));
@@ -174,11 +185,11 @@ test("stop by cancel dmc heart beat", async (t) => {
     
     nico_mocks.dmc_hb(1, 1*1000);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     await nico_video.optionsHeartBeat();
   
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 2);   
@@ -197,7 +208,7 @@ test("cancel dmc heart beat options", async (t) => {
 
     nico_mocks.dmc_hb(3000);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
 
     setTimeout(()=>{
@@ -219,7 +230,7 @@ test("timeout dmc heart beat options", async (t) => {
 
     nico_mocks.dmc_hb(mock_timeout);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
 
     try {
@@ -236,10 +247,10 @@ test.cb("timeout dmc heart beat post",  (t) => {
 
     nico_mocks.dmc_hb(1, mock_timeout);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat();
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 10*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat((error)=>{
         t.is(error.cancel, undefined);
         t.is(error.name, "Error");
@@ -254,7 +265,7 @@ test("stop by hb options error 403 dmc heart beat", async(t) => {
     
     nico_mocks.dmc_hb_options_error(403);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     try {
         await nico_video.optionsHeartBeat();
@@ -273,7 +284,7 @@ test("stop by hb options error 500 dmc heart beat", async(t) => {
     
     nico_mocks.dmc_hb_options_error(500);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     try {
         await nico_video.optionsHeartBeat();
@@ -292,11 +303,11 @@ test.cb("stop by hb post error 403 dmc heart beat", (t) => {
     
     nico_mocks.dmc_hb_post_error(403);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
   
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 0); 
@@ -314,11 +325,11 @@ test.cb("stop by hb post error 500 dmc heart beat", (t) => {
     
     nico_mocks.dmc_hb_post_error(500);
 
-    const nico_video = new NicoVideo(data_api_data);
+    const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
   
-    nico_video._dmcInfo.session_api.heartbeat_lifetime = 1*1000;
+    setHBLifetime(nico_video, 1*1000);
     nico_video.postHeartBeat((error=>{
         t.is(nico_mocks.hb_options_count, 1);
         t.is(nico_mocks.hb_post_count, 0); 

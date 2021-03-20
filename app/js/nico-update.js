@@ -61,15 +61,15 @@ class NicoUpdate extends EventEmitter {
     async update(){
         this._checkVideoDeleted();
 
-        const api_data = await this._getApiData();
+        const nico_api = await this._getNicoAPI();
 
         const { nico_xml, nico_json } = this._getNicoFileData();
 
-        this._updateThumbInfo(api_data, nico_json);
-        await this._updateComment(api_data, nico_json);
+        this._updateThumbInfo(nico_api, nico_json);
+        await this._updateComment(nico_api, nico_json);
 
         const thumbnail_size = "L";
-        await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+        await this._updateThumbnail(nico_api, thumbnail_size, nico_xml, nico_json);
 
         if(!this._isDataTypeJson()){
             this._setDataType("json");
@@ -81,10 +81,10 @@ class NicoUpdate extends EventEmitter {
     async updateThumbInfo(){
         this._checkVideoDeleted();
 
-        const api_data = await this._getApiData();
+        const nico_api = await this._getNicoAPI();
         const { nico_xml, nico_json } = this._getNicoFileData();
 
-        this._updateThumbInfo(api_data, nico_json);
+        this._updateThumbInfo(nico_api, nico_json);
 
         if(!this._isDataTypeJson()){
             await this._convertComment(nico_xml, nico_json);
@@ -96,27 +96,27 @@ class NicoUpdate extends EventEmitter {
         this._emitUpdated();
     }
 
-    _updateThumbInfo(api_data, nico_json){
-        this._setTags(api_data.tags);
+    _updateThumbInfo(nico_api, nico_json){
+        this._setTags(nico_api.getTags());
 
-        const thumbInfo = NicoDataParser.json_thumb_info(api_data);
+        const thumbInfo = NicoDataParser.json_thumb_info(nico_api);
         this._writeFile(nico_json.thumbInfoPath, thumbInfo, "json");
     }
 
     async updateComment(){
         this._checkVideoDeleted(true);
 
-        const api_data = await this._getApiData(true);
+        const nico_api = await this._getNicoAPI(true);
         const { nico_xml, nico_json } = this._getNicoFileData();
 
-        const is_update = await this._updateComment(api_data, nico_json);
+        const is_update = await this._updateComment(nico_api, nico_json);
         if(!is_update){
             return;
         }
         
         if(!this._isDataTypeJson()){  
             await this._convertThumbInfo(nico_xml, nico_json);
-            this._setTags(api_data.tags);
+            this._setTags(nico_api.getTags());
             this._setDataType("json");
         }else if(!await this._existPath(nico_json.thumbInfoPath)){ 
             await this._convertThumbInfo(nico_xml, nico_json);  
@@ -125,7 +125,7 @@ class NicoUpdate extends EventEmitter {
         this._emitUpdated();
     }
     
-    async _updateComment(api_data, nico_json){
+    async _updateComment(nico_api, nico_json){
         const cur_comment_data = this._getCurrentCommentData();
         const cur_comments = cur_comment_data.filter(value => {
             return Object.prototype.hasOwnProperty.call(value, "chat");
@@ -134,7 +134,7 @@ class NicoUpdate extends EventEmitter {
                 no: value.chat.no
             };
         });
-        const comments_diff = await this._getComments(api_data, cur_comments);
+        const comments_diff = await this._getComments(nico_api, cur_comments);
         if(comments_diff.length===0){
             return false;
         }
@@ -190,7 +190,7 @@ class NicoUpdate extends EventEmitter {
     async updateThumbnail(){
         this._checkVideoDeleted();
 
-        const api_data = await this._getApiData();
+        const nico_api = await this._getNicoAPI();
 
         let thumbnail_size = null;
         if(this._isDataTypeJson()){
@@ -200,27 +200,27 @@ class NicoUpdate extends EventEmitter {
         }
 
         const { nico_xml, nico_json } = this._getNicoFileData();
-        const is_update = await this._updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json);
+        const is_update = await this._updateThumbnail(nico_api, thumbnail_size, nico_xml, nico_json);
         if(!is_update){
             return;
         }
         this._emitUpdated(true);
     }  
 
-    async _updateThumbnail(api_data, thumbnail_size, nico_xml, nico_json){
+    async _updateThumbnail(nico_api, thumbnail_size, nico_xml, nico_json){
         let thumb_url = null;
         let img_path = null;
-        
+        const thumbnail = nico_api.getVideo().thumbnail;
         if(thumbnail_size=="L"){
-            thumb_url = api_data.video.thumbnailURL + ".L";
+            thumb_url = thumbnail.largeUrl;
             nico_json.thumbnailSize = thumbnail_size;
             img_path = nico_json.thumbImgPath;
         }else{
-            thumb_url = api_data.video.thumbnailURL;
+            thumb_url = thumbnail.url;
             img_path = nico_xml.thumbImgPath;   
         }
 
-        if(thumb_url===null){
+        if(!thumb_url){
             return false;
         }
 
@@ -237,20 +237,7 @@ class NicoUpdate extends EventEmitter {
         return true;
     }  
 
-    async _getThumbInfo(){
-        const watch_data = await this._getWatchData();
-        const api_data = watch_data.api_data;
-        const is_deleted = api_data.video.isDeleted;
-        const tags = api_data.tags;
-        if(is_deleted===true){
-            return { api_data, is_deleted: is_deleted, tags: tags, thumbInfo: null };
-        }
-
-        const thumbInfo = NicoDataParser.json_thumb_info(api_data);
-        return { api_data, is_deleted, tags, thumbInfo };
-    }
-
-    async _getApiData(ignore_deleted=false){
+    async _getNicoAPI(ignore_deleted=false){
         let watch_data = null;
         try {
             watch_data = await this._getWatchData();
@@ -261,24 +248,24 @@ class NicoUpdate extends EventEmitter {
             throw error;
         }        
 
-        if(!this._validateWatchData(watch_data)){
+        const nico_api = watch_data.nico_api;
+        if(!nico_api.validate()){
             throw new Error(`${this.video_item.id}のwatch dataが正しくないデータです`);
         }
 
-        const api_data = watch_data.api_data;
-        const is_deleted = api_data.video.isDeleted;
+        const is_deleted = nico_api.isDeletedVideo();
         
         this._setDeleted(is_deleted);
 
         if(ignore_deleted===true){
-            return api_data;
+            return nico_api;
         }
 
         if(is_deleted===true){
             throw new Error(`${this.video_item.id}は削除されています`);
         }
 
-        return api_data;
+        return nico_api;
     }
 
     _checkVideoDeleted(ignore_deleted=false){
@@ -419,8 +406,8 @@ class NicoUpdate extends EventEmitter {
         return watch_data;
     }
 
-    async _getComments(api_data, cur_comments){
-        this.nico_comment = new NicoComment(api_data);
+    async _getComments(nico_api, cur_comments){
+        this.nico_comment = new NicoComment(nico_api);
         const max_no = this._getMaxCommentNo(cur_comments);
         const res_from = max_no===null?0:max_no+1;
         const comments_diff = await this.nico_comment.getCommentDiff(res_from);
@@ -444,33 +431,6 @@ class NicoUpdate extends EventEmitter {
     _typeOf(obj) {
         const toString = Object.prototype.toString;
         return toString.call(obj).slice(8, -1).toLowerCase();
-    }
-
-    _validateWatchData(watch_data){
-        if(this._typeOf(watch_data)!="object"){
-            return false;
-        }
-
-        const api_data = watch_data.api_data;
-        if(this._typeOf(api_data)!="object"){
-            return false;
-        }
-
-        const video = api_data.video;
-        if(this._typeOf(video)!="object"){
-            return false;
-        } 
-
-        const thread = api_data.thread;
-        if(this._typeOf(thread)!="object"){
-            return false;
-        }   
-        
-        const owner = api_data.owner;
-        if(this._typeOf(owner)!="object"){
-            return false;
-        }   
-        return true;
     }
 
     _validateComment(comments){

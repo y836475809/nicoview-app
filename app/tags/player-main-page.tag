@@ -146,7 +146,6 @@
             ["startComment", "コメント取得開始"],
             ["finishComment", "コメント取得完了"],
             ["startPlayVideo", "再生開始"],
-            ["startPlaySmile", "smile再生開始"],
             ["startHeartBeat", "HeartBeat開始"],
         ]);
 

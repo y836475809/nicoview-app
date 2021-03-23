@@ -196,10 +196,6 @@ class NicoVideo {
         this.stopHeartBeat();
     }
 
-    get SmileUrl() {
-        return this._api_data.video.smileInfo.url;
-    }
-
     isDmc() {
         return this._nico_api.isDmc();
     }
@@ -320,11 +316,6 @@ class NicoVideo {
             clearInterval(this.heart_beat_id);
             this.heart_beat_id = null;
         }
-    }
-    
-    isSmileMaxQuality(){
-        const url = this._api_data.video.smileInfo.url;
-        return !/low/.test(url);
     }
 
     isDMCMaxQuality(){

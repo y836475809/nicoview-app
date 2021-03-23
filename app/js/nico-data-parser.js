@@ -134,19 +134,6 @@ const xml_thumb_info  = (xml) => {
     };
 };
 
-const getVideoType = (smile_url) => {
-    //"https://smile-cls30.sl.nicovideo.jp/smile?v=XXXXXXX.XXXXX" => flv
-    //"https://smile-cls30.sl.nicovideo.jp/smile?m=XXXXXXX.XXXXX" => mp4
-    if(/.*\/smile\?v=.*/.test(smile_url)){
-        return "flv";
-    }
-    if(/.*\/smile\?m=.*/.test(smile_url)){
-        return "mp4";
-    }
-
-    throw new Error("not flv or mp4");
-};
-
 const json_thumb_info_tags = (nico_api_tags) => {
     return nico_api_tags.map((value) => {
         const tag = {
@@ -233,5 +220,4 @@ module.exports = {
     json_thumb_info,
     json_comment,
     makeComments,
-    getVideoType,
 };

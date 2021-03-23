@@ -36,14 +36,6 @@ test.afterEach(t => {
     prof_time.end(t);
 });
 
-// NOTE smileなくなったようなのでskip
-test.skip("nico smile", t => {
-    const nico_video = t.context.nico_video;
-
-    t.truthy(nico_video.isDmc());
-    t.regex(nico_video.SmileUrl, /https:\/\/smile-cls\d\d.sl.nicovideo.jp\/smile\?m=\d+\.\d+/);
-});
-
 test("nico dmc quality check", (t) => {
     const nico_video = t.context.nico_video;
 
@@ -52,20 +44,6 @@ test("nico dmc quality check", (t) => {
     
     nico_video.dmc_session = TestData.dmc_session_low;
     t.falsy(nico_video.isDMCMaxQuality());
-});
-
-// NOTE smileなくなったようなのでskip
-test.skip("nico smile quality check", (t) => {
-    const nico_video =t.context.nico_video;
-    nico_video._dmcInfo = null;
-
-    const url = "https://smile-cls20.sl.nicovideo.jp/smile?m=12345678.67759";
-
-    nico_video._api_data.video.smileInfo.url = `${url}`;
-    t.truthy(nico_video.isSmileMaxQuality());
-    
-    nico_video._api_data.video.smileInfo.url = `${url}low`;
-    t.falsy(nico_video.isSmileMaxQuality());
 });
 
 test("nico session", t => {

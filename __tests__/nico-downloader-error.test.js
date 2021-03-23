@@ -162,23 +162,6 @@ test("downloader timeout dmc_video", async (t) => {
     t.regex(result.reason.message, /timeout\s*:\s*https/i);
 });
 
-// NOTE smileなくなったようなのでskip
-test.skip("downloader timeout smile_video", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_delay:mock_timeout});
-
-    const nico_down = new TestNicoDownloader(video_id, dist_dir);
-    const result = await nico_down.download((state)=>{
-        log.push(state);
-    });  
-    t.deepEqual(log, [
-        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
-        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
-        DonwloadProgMsg.start_smile
-    ]); 
-    t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.regex(result.reason.message, /timeout\s*:\s*https/i);
-});
-
 test("downloader network error watch 404", async (t) => {
     setupNicoDownloadNock(nico_download_mocks, {watch_code:404});
 
@@ -351,40 +334,6 @@ test("downloader network error dmc_video 500", async (t) => {
     t.regex(result.reason.message, /500/);
 });
 
-// NOTE smileなくなったようなのでskip
-test.skip("downloader network error smile_video 404", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:404});
-
-    const nico_down = new TestNicoDownloader(video_id, dist_dir);
-    const result = await nico_down.download((state)=>{
-        log.push(state);
-    });
-    t.deepEqual(log, [
-        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
-        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
-        DonwloadProgMsg.start_smile
-    ]);
-    t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.regex(result.reason.message, /404/);
-});
-
-// NOTE smileなくなったようなのでskip
-test.skip("downloader network error smile_video 500", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile", video_code:500});
-
-    const nico_down = new TestNicoDownloader(video_id, dist_dir);
-    const result = await nico_down.download((state)=>{
-        log.push(state);
-    });
-    t.deepEqual(log, [
-        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
-        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
-        DonwloadProgMsg.start_smile
-    ]);
-    t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.regex(result.reason.message, /500/);
-});
-
 test("downloader save thumbinfo error", async (t) => {
     setupNicoDownloadNock(nico_download_mocks);
 
@@ -463,24 +412,3 @@ test("downloader save dmc error", async (t) => {
     t.is(result.type, TestNicoDownloader.ResultType.error);
     t.is(result.reason.message, "stream error");
 });
-
-// NOTE smileなくなったようなのでskip
-test.skip("downloader save smile error", async (t) => {
-    setupNicoDownloadNock(nico_download_mocks, {video_kind:"smile"});
-
-    const nico_down = new TestNicoDownloader(video_id, dist_dir);
-    nico_down.streamError();
-
-    const result = await nico_down.download((state)=>{
-        log.push(state);
-    });  
-    t.deepEqual(log, [
-        DonwloadProgMsg.start_watch, DonwloadProgMsg.start_thumbinfo, 
-        DonwloadProgMsg.start_comment, DonwloadProgMsg.start_thumbimg, 
-        DonwloadProgMsg.start_smile, "0.0MB 100%"
-    ]);
-    t.is(result.type, TestNicoDownloader.ResultType.error);
-    t.is(result.reason.message, "stream error");
-});
-
-

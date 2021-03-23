@@ -6,7 +6,6 @@ class NicoPlay extends EventEmitter {
     constructor(heart_beat_rate=0.9){
         super();
         this.heart_beat_rate = heart_beat_rate;
-        this.force_smile = false;
     }
 
     cancel(){
@@ -25,10 +24,6 @@ class NicoPlay extends EventEmitter {
         this.nico_video.stopHeartBeat();
     }
 
-    setForceSmile(force_smile){
-        this.force_smile = force_smile;
-    }
-    
     play(video_id){
         this.cancel();
         return new Promise(async (resolve, reject) => {  
@@ -47,22 +42,8 @@ class NicoPlay extends EventEmitter {
 
                 this.nico_video = new NicoVideo(nico_api, this.heart_beat_rate);
 
-                if(this.force_smile || !this.nico_video.isDmc())
-                {
-                    this.emit("changeState", "startPlaySmile");
-                    const cookies = nico_cookie.getSesstionCookies();
-                    const thumb_info = NicoDataParser.json_thumb_info(nico_api); 
-                    const video_url = this.nico_video.SmileUrl;
-                    const is_economy = !this.nico_video.isSmileMaxQuality();
-                    resolve({
-                        is_economy: is_economy,
-                        is_deleted: is_deleted,
-                        cookies: cookies,
-                        comments: cnved_comments,
-                        thumb_info: thumb_info,
-                        video_url: video_url
-                    });
-                    return;                    
+                if(!this.nico_video.isDmc()){
+                    throw new Error("nico play, Dmc is nill");                  
                 }
                 
                 await this.nico_video.postDmcSession();

@@ -6,7 +6,7 @@ const comment_data = require("./data/comment.json");
 const data_api_data = require("./data/api-data.json");
 const dmc_session_data = require("./data/dmc-session.json");
 
-const createApiData = (video_id, is_smile) =>{
+const createApiData = (video_id) =>{
     const id = video_id.replace("sm", "");
     const cp_data = JSON.parse(JSON.stringify(data_api_data));
     const video = cp_data.video;
@@ -14,12 +14,8 @@ const createApiData = (video_id, is_smile) =>{
     video.thumbnail.url      = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
     video.thumbnail.largeUrl = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}.L`;
     video.registeredAt = "2018/01/01 01:00:00";
-    if(is_smile===true){
-        video.dmcInfo = null;
-    }else{
-        cp_data.media.delivery.movie.session.recipeId = `nicovideo-${video_id}`;
-    }
 
+    cp_data.media.delivery.movie.session.recipeId = `nicovideo-${video_id}`;
     // HBの確認しやすいように2秒毎にHB
     cp_data.media.delivery.movie.session.heartbeatLifetime = 2200;
 
@@ -181,7 +177,7 @@ class NicoMockResponse {
                 "nicosid=123456.789; path=/; domain=.nicovideo.jp"
             ]
         };
-        const apt_data = createApiData(video_id, false);
+        const apt_data = createApiData(video_id);
         const data_api_data = escapeHtml(JSON.stringify(apt_data));
         const body =  `<!DOCTYPE html>
         <html lang="ja">

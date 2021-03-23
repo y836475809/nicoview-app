@@ -244,30 +244,3 @@ test("nico play dmc error hb_post", async (t) => {
     t.is(nico_mocks.hb_post_count, 0);
     t.is(nico_play.nico_video._heart_beat_id, null);
 });
-
-// NOTE smileなくなったようなのでskip
-test.skip("nico play smile", async (t) => {
-    t.plan(4);
-
-    nico_mocks.watch();
-    nico_mocks.comment();
-    // nico_mocks.dmc_session();
-    // nico_mocks.dmc_hb();
-
-    const nico_play = createNicoPlay(hb_1s_rate);
-    nico_play.setForceSmile(true);
-
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);    
-    }).catch(error => {
-        t.is(error, undefined);
-    });
-
-    await new Promise(resolve => setTimeout(resolve, 2500));
-    t.is(state_log, 
-        "startWatch:finishWatch:"
-        + "startComment:finishComment:"
-        + "startPlaySmile:");
-    t.is(nico_mocks.hb_options_count, 0);
-    t.is(nico_mocks.hb_post_count, 0);
-});

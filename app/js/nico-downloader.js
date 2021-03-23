@@ -18,7 +18,6 @@ const DonwloadProgMsg =  Object.freeze({
     start_comment: "コメント取得",
     start_thumbimg: "サムネイル取得",
     start_dmc: "DMC取得",
-    start_smile: "smile取得",
     write_data: "データ書き込み",
     complete: "完了",
     rename_video_file: "動画ファイルリネーム",
@@ -132,13 +131,8 @@ class NicoDownloader {
             const tmp_video_path = this._getTmpVideoPath();
             const stream = this._createStream(tmp_video_path);
             stream.setDefaultEncoding("binary");
-            if(this.videoinfo.server=="dmc"){
-                on_progress(DonwloadProgMsg.start_dmc);
-                await this._getVideoDmc(stream, on_progress);
-            }else{
-                on_progress(DonwloadProgMsg.start_smile);
-                await this._getVideoSmile(stream, on_progress);
-            }
+            on_progress(DonwloadProgMsg.start_dmc);
+            await this._getVideoDmc(stream, on_progress);
 
             on_progress(DonwloadProgMsg.write_data);
             this._writeJson(this.nico_json.thumbInfoPath, thumbInfo_data);
@@ -177,19 +171,15 @@ class NicoDownloader {
     async _getVideoInfo(){
         this.nico_video = new NicoVideo(this._nico_api);
 
-        if(this.nico_video.isDmc()){
-            // TODO isDmc出ない場合はエラーにしたほうがよさそう
-            await this.nico_video.postDmcSession();
-            this.videoinfo = {
-                server: "dmc",
-                maxQuality: this.nico_video.isDMCMaxQuality()
-            };
-        }else{
-            this.videoinfo = {
-                server: "smile",
-                maxQuality: this.nico_video.isSmileMaxQuality()
-            };
-        }        
+        if(!this.nico_video.isDmc()){
+            throw new Error("_getVideoInfo, Dmc is null");
+        }
+
+        await this.nico_video.postDmcSession();
+        this.videoinfo = {
+            server: "dmc",
+            maxQuality: this.nico_video.isDMCMaxQuality()
+        };
     }
 
     async _getComment(){
@@ -239,14 +229,6 @@ class NicoDownloader {
             throw error;
         }
     }
-
-    async _getVideoSmile(stream, on_progress){
-        //cancel
-        const { nico_cookie, api_data } = this.watch_data;
-        const url = api_data.video.smileInfo.url;
-        this.video_download = new DownloadRequest(url, nico_cookie);
-        await this.video_download.download(stream, on_progress);
-    }   
 
     getDownloadedItem(){
         const video = this._nico_api.getVideo();

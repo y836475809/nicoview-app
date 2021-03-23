@@ -249,7 +249,7 @@ class NicoDownLoadMocks {
     clean(){
         nock.cleanAll();
     }
-    watch({kind="dmc", delay=1, code=200} = {}){
+    watch({delay=1, code=200} = {}){
         this.watch_nock = nock("https://www.nicovideo.jp");
         const headers = {
             "Set-Cookie": [
@@ -258,13 +258,6 @@ class NicoDownLoadMocks {
             ]
         };
         const cp_data_api_data = JSON.parse(JSON.stringify(data_api_data));
-        if(kind=="smile max"){
-            cp_data_api_data.video.dmcInfo = null;
-        }else if(kind=="smile low"){
-            cp_data_api_data.video.dmcInfo = null;
-            cp_data_api_data.video.smileInfo.url += "low";
-        }
-
         const body = MockNicoUitl.getWatchHtml(video_id, cp_data_api_data);
         this.watch_nock
             .get(`/watch/${video_id}`)
@@ -360,19 +353,6 @@ class NicoDownLoadMocks {
         this.dmc_video_nock = nock("https://pa0000.dmc.nico");
         this.dmc_video_nock
             .get("/m")
-            .delay(delay)
-            .reply(code, data, headers);
-    }
-
-    smile_video({delay=1, code=200, quality=""} = {}){
-        const data = "video smile";
-        const headers = {
-            "content-length": Buffer.byteLength(data)
-        };
-        this.smile_video_nock = nock("https://smile-cls20.sl.nicovideo.jp");
-        this.smile_video_nock
-            .get("/smile")
-            .query({ m: `12345678.67759${quality}`})
             .delay(delay)
             .reply(code, data, headers);
     }
@@ -492,7 +472,7 @@ class writeBufStream extends stream.Writable {
 }
 
 const setupNicoDownloadNock = (target_nock, {
-    video_kind="dmc", video_quality="max",
+    video_quality="max",
     watch_delay=1, watch_code=200, 
     dmc_session_delay=1, dmc_session_code=200, 
     comment_delay=1, comment_code=200, 
@@ -500,28 +480,12 @@ const setupNicoDownloadNock = (target_nock, {
     hb_delay=1, hb_code=200, 
     video_delay=1, video_code=200}={}) => {
 
-    if(video_kind=="dmc"){
-        target_nock.watch({ delay:watch_delay, code:watch_code });
-        target_nock.dmc_session({quality:video_quality, delay:dmc_session_delay, code:dmc_session_code });
-        target_nock.comment({ delay:comment_delay, code:comment_code });
-        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
-        target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
-        target_nock.dmc_video({ delay:video_delay, code:video_code });  
-    }else if(video_kind=="smile"){
-        let watch_kind = "";
-        let smile_quality= "";
-        if(video_quality=="max"){
-            watch_kind = "smile max";
-            smile_quality = "";
-        }else{
-            watch_kind = "smile low";
-            smile_quality = "low";
-        }      
-        target_nock.watch({kind:watch_kind, delay:watch_delay, code:watch_code });
-        target_nock.comment({ delay:comment_delay, code:comment_code });
-        target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
-        target_nock.smile_video({quality:smile_quality, delay:video_delay, code:video_code });  
-    }
+    target_nock.watch({ delay:watch_delay, code:watch_code });
+    target_nock.dmc_session({quality:video_quality, delay:dmc_session_delay, code:dmc_session_code });
+    target_nock.comment({ delay:comment_delay, code:comment_code });
+    target_nock.thumbnail({ delay:thumbnail_delay, code:thumbnail_code });
+    target_nock.dmc_hb({ options_delay:hb_delay, code:hb_code });
+    target_nock.dmc_video({ delay:video_delay, code:video_code });  
 };
 
 class NicoMylistMocks {

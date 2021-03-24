@@ -115,7 +115,6 @@ class GridTable {
             enableCellNavigation: true,
             enableColumnReorder: true,
             fullWidthRows: true, 
-            id_click_as_dbclick:"",
 
             // マウスダウン後、この距離以上移動したらコンテキストメニュー開かない
             // (マウスジェスチャ時、コンテキストメニューを開かないようにするため)
@@ -191,10 +190,6 @@ class GridTable {
             
             this.grid.setSelectedRows([cell.row]);
             
-            if(cell.cell == this.grid.getColumnIndex(this.options.id_click_as_dbclick)){
-                const data = this.dataView.getItem(cell.row);
-                this.on_dblclick(e, data);   
-            }
             e.stopPropagation();
         });
         this.grid.onDblClick.subscribe((e) => {

@@ -165,7 +165,36 @@ class NicoSearch {
         try {
             const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
             const result = JSON.parse(body);
-            result.meta.page = page;
+
+            const search_offset = 1600;
+            const search_limit = 32;
+
+            const search_result_num = result.meta.totalCount;
+            let total_page_num = 0;
+            if(search_result_num < search_offset+search_limit){
+                total_page_num = Math.ceil(search_result_num / search_limit);
+            }else{
+                total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
+            }
+            result.page_ifno = {
+                page_num: page, 
+                total_page_num: total_page_num, 
+                search_result_num: search_result_num
+            };
+
+            result.list = result.data.map(value => {
+                return {
+                    thumbnailUrl: value.thumbnailUrl,
+                    contentId: value.contentId,
+                    title: value.title,
+                    viewCounter: value.viewCounter,
+                    commentCounter: value.commentCounter,
+                    lengthSeconds: value.lengthSeconds,
+                    startTime: value.startTime,
+                    tags: value.tags,
+                };
+            });
+
             return result;
         } catch (error) {
             if(error.status){

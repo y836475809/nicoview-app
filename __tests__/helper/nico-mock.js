@@ -204,7 +204,7 @@ class NicoMocks {
         this.search_nock = nock("https://api.search.nicovideo.jp", 
             { encodedQueryParams: true });
         this.search_nock
-            .get("/api/v2/video/contents/search")
+            .get("/api/v2/snapshot/video/contents/search")
             .query({ 
                 q: encodeURIComponent(text), 
                 targets: encodeURIComponent("title,description,tags"), 

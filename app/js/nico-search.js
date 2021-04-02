@@ -158,7 +158,7 @@ class NicoSearch {
     async search(params){   
         const service = params._service;
         const query_json = params.get();
-        const url = `${NICO_URL.SEARCH}/api/v2/${service}/contents/search`;
+        const url = `${NICO_URL.SEARCH}/api/v2/snapshot/${service}/contents/search`;
         const page = params._page;
         
         this._req = new NicoClientRequest();

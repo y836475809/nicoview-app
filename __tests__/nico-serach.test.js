@@ -122,9 +122,7 @@ test("nico search", async t => {
     pramas.query(word);
     const nico_search = new NicoSearch();
     const result = await nico_search.search(pramas);
-    const meta = result.meta;
     const page_ifno = result.page_ifno;
-    t.is(meta.status, 200);
     t.is(page_ifno.page_num, 1);
     t.is(page_ifno.total_page_num, 1);
     t.is(page_ifno.search_result_num, 1);

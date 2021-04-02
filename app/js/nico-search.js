@@ -176,13 +176,14 @@ class NicoSearch {
             }else{
                 total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
             }
-            result.page_ifno = {
+
+            const search_result = {};
+            search_result.page_ifno = {
                 page_num: page, 
                 total_page_num: total_page_num, 
                 search_result_num: search_result_num
             };
-
-            result.list = result.data.map(value => {
+            search_result.list = result.data.map(value => {
                 return {
                     thumbnailUrl: value.thumbnailUrl,
                     contentId: value.contentId,
@@ -195,7 +196,7 @@ class NicoSearch {
                 };
             });
 
-            return result;
+            return search_result;
         } catch (error) {
             if(error.status){
                 let message = `status=${error.status}, エラー`;

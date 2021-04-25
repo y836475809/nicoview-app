@@ -122,6 +122,62 @@ const createSession = (video_id, is_low_quality) =>{
 };
 
 class NicoMockResponse {
+    searchExt(req, res){
+        const cookie = req.headers["cookie"];
+        if(!cookie.match(/user_session=user_session/)){
+            const obj = {
+                message:encodeURI("ログインしてください"),
+                status:"fail" 
+            };
+            this._writeJson(res, obj);
+            return;
+        }
+
+        // https://ext.nicovideo.jp/api/search/search/word?mode=watch&page=1&sort=f&order=d
+        const url_obj = new URL(req.url);
+        const q = querystring.parse(url_obj.search);
+        const text = decodeURI(url_obj.pathname.split("/").slice(-1)[0]);
+        const page = parseInt(q["page"]);
+        const sort = q["sort"];
+        const order = q["order"];
+        const limit = 32;
+        const offset = limit*(page - 1);
+        const list = [];
+        for (let i = 0; i < limit; i++) {
+            const tag_cnt = Math.floor(Math.random() * 5);
+            const tags = [];
+            for (let index = 0; index < tag_cnt; index++) {
+                tags.push(`タグ${index+1}`);
+            }
+            const no = offset + i;
+            list.push({
+                id: `sm${no}`,
+                title: `title ${text} ${no}`,
+                first_retrieve: new Date(new Date().getTime() - Math.floor(Math.random() * 5000)).toISOString(),
+                view_counter: Math.floor(Math.random() * 100),
+                mylist_counter: Math.floor(Math.random() * 100),
+                thumbnail_url: `https:\\/\\/nicovideo.cdn.nimg.jp\\/thumbnails\\/${no}\\/${no}.1234`,
+                num_res: tag_cnt,
+                last_res_body: tags.join(" "),
+                length: `${Math.floor(Math.random() * 100)}:${Math.floor(Math.random() * 100)+10}`,
+                title_short: `title short ${text} ${no}`,
+                description_short:  `description short ${text} ${no}`,
+                thumbnail_style: null,
+                is_middle_thumbnail: true
+            });
+        }
+        const obj = {
+            ss_id:"1234-5678-90",
+            list: list,
+            count: 1000,
+            has_ng_video_for_adsense_on_listing: true,
+            related_tags: ["tag1", "tag2"],
+            page: page,
+            status: "ok"
+        };
+        this._writeJson(res, obj);
+    }
+
     search(url, res){
         const q = querystring.parse(new URL(url).search);
         const text = q["?q"];

@@ -3,6 +3,8 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 
+process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
+
 const { Config } = require("./js/config");
 const { Library } = require("./js/library");
 const { History } = require("./js/history");
@@ -12,6 +14,7 @@ const { logger } = require("./js/logger");
 const { StartupConfig } = require("./start-up-config");
 const { Store } = require("./js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
+const { NicoLogin } = require("./js/nico-login");
 
 const { 
     JsonStore, UserCSS, 
@@ -37,6 +40,7 @@ startup_config.load();
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 let main_win = null;
+let main_win_menu = null;
 let player_win = null;
 let do_app_quit = false;
 
@@ -65,8 +69,6 @@ if(is_debug===true){
         console.log(`use local proxy, mock_server_port is ${port}`);
     }
 }
-
-process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
 
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);
@@ -180,6 +182,30 @@ const quit = async () => {
     return true;
 };
 
+const setLoginState = (state) => {
+    const menu_login = main_win_menu.getMenuItemById("nico-login");
+    menu_login.enabled = state=="logout";
+
+    const menu_logout = main_win_menu.getMenuItemById("nico-logout");
+    menu_logout.enabled = !menu_login.enabled;
+
+    const state_text = state=="logout"?"ログアウト":"ログイン";
+    main_win.title = `${app.name} ${app.getVersion()} [${state_text}]`;
+};
+
+const nico_login = new NicoLogin((state)=>{
+    setLoginState(state);
+}, (e)=>{
+    const { name, error } = e;
+    logger.error(`${name}: `, error);
+    dialog.showMessageBoxSync({
+        type: "error",
+        buttons: ["OK"],
+        message: `${name}失敗: ${error.message}`
+    });
+});
+nico_login.setupIPC();
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -204,6 +230,16 @@ function createWindow() {
                     }}
                 ]
             }, 
+            { label: "ニコニコ動画",
+                submenu: [
+                    { id: "nico-login", enabled: false, label: "ログイン", click() {
+                        nico_login.showDialog(main_win);
+                    }},
+                    { id: "nico-logout", enabled: false, label: "ログアウト", async click() {
+                        await nico_login.logout();
+                    }}
+                ]
+            }, 
             { label: "ログ",
                 submenu: [
                     { label: "ログファイルを開く", click() {
@@ -224,7 +260,10 @@ function createWindow() {
         ];
         return Menu.buildFromTemplate(menu_templete);
     };
-    main_win.setMenu(main_menu());
+    
+    main_win_menu = main_menu();
+    main_win.setMenu(main_win_menu);
+    setLoginState("logout");
 
     main_win.webContents.on("did-finish-load", async () => { 
         user_css.apply(main_win);

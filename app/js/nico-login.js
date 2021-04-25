@@ -58,7 +58,7 @@ class NicoLoginRequest {
         this.max_date.setSeconds(this.max_date.getSeconds() + max_age);
     }
 
-    login(username, password){
+    login(mail, password){
         const url = new URL("https://secure.nicovideo.jp/secure/login?site=niconico");
         const headers = {
             "user-agent": user_agent,
@@ -72,7 +72,7 @@ class NicoLoginRequest {
         }; 
 
         const post_data = querystring.stringify({
-            "mail_tel" : username,
+            "mail_tel" : mail,
             "password" : password
         });
         options.headers["Content-Type"] =  'application/x-www-form-urlencoded';

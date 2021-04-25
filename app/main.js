@@ -67,6 +67,9 @@ if(is_debug===true){
         process.env["proxy_server"] = app.commandLine.getSwitchValue("proxy-server");
 
         console.log(`use local proxy, mock_server_port is ${port}`);
+
+        const { nico_mock_login_logout } = require("../test/mock_server/nico-mock-server");
+        nico_mock_login_logout();
     }
 }
 

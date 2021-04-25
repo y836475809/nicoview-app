@@ -102,6 +102,53 @@ class NicoMockServer {
     }
 }
 
+const nico_mock_login_logout = ({delay=500, code=302} = {}) => {
+    const nock = require("nock");
+
+    const max_age_sec = 2591999;
+    const cookies = [
+        'nicosid=12345.12345; expires=Mon, 31-Mar-3021 00:00:00 GMT; Max-Age=315360000; path=/; domain=.nicovideo.jp',
+        'user_session=deleted; Max-Age=0; Expires=Fri, 02 Apr 3041 00:00:00 GMT; Path=/',
+        `user_session=user_session_12345; Max-Age=${max_age_sec}; Expires=Sun, 02 May 3021 00:00:00 GMT; Path=/; Domain=.nicovideo.jp`,
+        `user_session_secure=AAAAA; Max-Age=${max_age_sec}; Expires=Sun, 02 May 3021 00:00:00 GMT; Path=/; Domain=.nicovideo.jp; Secure; HTTPOnly`,       
+        'registrationActionTrackId=; Max-Age=0; Expires=Fri, 02 Apr 3021 00:00:00 GMT; Path=/; Domain=.nicovideo.jp; Secure; HTTPOnly',
+        'nicosid=12345.12345; Max-Age=315360000; Expires=Mon, 31 Mar 3031 00:00:00 GMT; Path=/; Domain=.nicovideo.jp'
+    ];
+
+    nock("https://secure.nicovideo.jp")
+        .persist()
+        .post("/secure/login?site=niconico")
+        .delay(delay)
+        .reply((uri, body)=>{
+            console.log(`nock login: ${uri}`);
+            if(body=="mail_tel=a&password=a"){
+                return [code, "", {
+                    "Set-Cookie": cookies
+                }];
+            }else{
+                return [code, "", {
+                    "Set-Cookie": [
+                        'nicosid=12345.12345; expires=Mon, 31-Mar-2021 00:00:00 GMT; Max-Age=315360000; path=/; domain=.nicovideo.jp',
+                        'nicosid=12345.12345; Max-Age=315360000; Expires=Mon, 31 Mar 2031 00:00:00 GMT; Path=/; Domain=.nicovideo.jp'
+                    ]
+                }];
+            }
+        })
+        .get("/secure/logout?site=niconico")
+        .delay(delay)
+        .reply((uri, body)=>{
+            console.log(`nock logout: ${uri}`);
+            return [code, "", {
+                "Set-Cookie": [
+                    'user_session=deleted; Max-Age=-12345; Expires=Wed, 1 Mar 1987 01:01:01 GMT; Path=/',
+                    'user_session=deleted; Max-Age=-12345; Expires=Wed, 1 Mar 1987 01:01:01 GMT; Path=/; Domain=.nicovideo.jp',
+                    'user_session_secure=deleted; Max-Age=-12345; Expires=Wed, 1 Mar 1987 01:01:01 GMT; Path=/; Domain=.nicovideo.jp; Secure; HTTPOnly',
+                ]
+            }];
+        });
+};
+
 module.exports = {
     NicoMockServer,
+    nico_mock_login_logout,
 };

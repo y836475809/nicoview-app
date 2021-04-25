@@ -145,9 +145,9 @@ class NicoMockResponse {
         const list = [];
         for (let i = 0; i < limit; i++) {
             const tag_cnt = Math.floor(Math.random() * 5);
-            const tags = [];
+            const comments = [];
             for (let index = 0; index < tag_cnt; index++) {
-                tags.push(`タグ${index+1}`);
+                comments.push(`コメント${index+1}`);
             }
             const no = offset + i;
             list.push({
@@ -158,7 +158,7 @@ class NicoMockResponse {
                 mylist_counter: Math.floor(Math.random() * 100),
                 thumbnail_url: `https:\\/\\/nicovideo.cdn.nimg.jp\\/thumbnails\\/${no}\\/${no}.1234`,
                 num_res: tag_cnt,
-                last_res_body: tags.join(" ") + " ",
+                last_res_body: comments.join(" ") + " ",
                 length: `${Math.floor(Math.random() * 100)}:${Math.floor(Math.random() * 100)+10}`,
                 title_short: `title short ${text} ${no}`,
                 description_short:  `description short ${text} ${no}`,

@@ -158,7 +158,7 @@ class NicoMockResponse {
                 mylist_counter: Math.floor(Math.random() * 100),
                 thumbnail_url: `https:\\/\\/nicovideo.cdn.nimg.jp\\/thumbnails\\/${no}\\/${no}.1234`,
                 num_res: tag_cnt,
-                last_res_body: tags.join(" "),
+                last_res_body: tags.join(" ") + " ",
                 length: `${Math.floor(Math.random() * 100)}:${Math.floor(Math.random() * 100)+10}`,
                 title_short: `title short ${text} ${no}`,
                 description_short:  `description short ${text} ${no}`,

@@ -292,7 +292,7 @@ class NicoSearch {
                     commentCounter: value.num_res,
                     lengthSeconds: toTimeSec(value.length),
                     startTime: value.first_retrieve,
-                    tags: value.last_res_body,
+                    tags: value.last_res_body.trim(),
                 };
             });
 

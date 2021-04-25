@@ -153,7 +153,6 @@
         .selected-container {
             display: flex;
             margin-left: 5px;
-            width: 250px;
             margin-top: 5px;
             margin-bottom: 5px;
         }
@@ -239,6 +238,10 @@
     <div style="display: flex;">
         <div class="selected-container center-v">
             <div>検索条件</div>
+            <label style="margin: 0 5px 0 5px;" class="center-v" title="offの場合、ニコニコ動画内部APIで検索する(ログインが必要)" >
+                <input class="check-search-api" type="checkbox" 
+                    checked={api_checked} onclick={onclickCheckSearchAPI} />スナップショット検索
+            </label>
             <div class="title center-v" onclick="{onclickToggleMenu}">
                 {sort_title}
             </div>
@@ -302,13 +305,15 @@
         this.obs_modal_dialog = riot.observable();
         this.pagination_obs = riot.observable();
 
+        this.api_checked = "checked";
         this.sort_items = searchItems.sortItems;
         this.search_target_items = searchItems.searchTargetItems;
 
         const loadSearchCond = async () => {
-            const { sort, search_target } = await ipc.invoke("config:get", 
+            const { api, sort, search_target } = await ipc.invoke("config:get", 
                 { key:"search.condition", 
                     value:{
+                        api:"snapshot",
                         sort:{ name:"startTime", order:"-" },
                         search_target:{ target:"tag" }
                     } 
@@ -322,14 +327,16 @@
                 return item.target == search_target.target;
             });
 
-            return { sort_item, search_target_item };
+            return { api, sort_item, search_target_item };
         };
 
         const saveSearchCond = async () => {
+            const api = nico_search_params.getAPI();
             const { sort_name, sort_order, search_target } = nico_search_params.getParams();
             await ipc.invoke("config:set",
                 { key: "search.condition", 
-                    value: { 
+                    value: {
+                        api: api,
                         sort:{ name:sort_name, order:sort_order },
                         search_target:{ target:search_target } 
                     }
@@ -339,6 +346,14 @@
         this.onclickToggleMenu = (e) => {
             const elm = this.root.querySelector(".cond-menu-container1");
             elm.classList.toggle("cond-menu-container-expand");
+        };
+
+        this.onclickCheckSearchAPI = (e) => {
+            const elm = this.root.querySelector(".check-search-api");
+            const api = elm.checked?"snapshot":"ext";
+            nico_search_params.api(api);
+            
+            saveSearchCond();
         };
 
         this.onchangeSort = async (item, e) => {
@@ -464,7 +479,17 @@
 
             grid_table.clearSelected();
             try {
-                const search_result = await nico_search.search(nico_search_params);
+                let search_result = null;
+                if(nico_search_params.getAPI()=="snapshot"){
+                    search_result = await nico_search.search(nico_search_params);
+                }                
+                if(nico_search_params.getAPI()=="ext"){
+                    const cookie = await ipc.invoke("app:get-nico-login-cookie");
+                    if(!cookie){
+                        throw new Error("内部APIで検索するにはニコニコ動画へのログインが必要");
+                    }
+                    search_result = await nico_search.searchExt(nico_search_params.getParamsExt(), cookie);
+                }
                 setData(search_result);
             } catch (error) {
                 if(!error.cancel){
@@ -727,9 +752,11 @@
                 context_menu.popup({window: remote.getCurrentWindow()});
             });
 
-            const { sort_item, search_target_item } = await loadSearchCond();
+            const { api, sort_item, search_target_item } = await loadSearchCond();
+            this.api_checked = api=="snapshot"?"checked":"";
             this.sort_title = sort_item.title;
             this.search_target_title = search_target_item.title;
+            nico_search_params.api(api);
             nico_search_params.page(0);
             nico_search_params.sortName(sort_item.name);
             nico_search_params.sortOder(sort_item.order);

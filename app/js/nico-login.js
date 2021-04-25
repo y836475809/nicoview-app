@@ -149,6 +149,89 @@ class NicoLoginRequest {
     }    
 }
 
+const { BrowserWindow, ipcMain } = require("electron");
+const path = require("path");
+
+class NicoLogin {
+    constructor(on_state, on_error){
+        this._req = new NicoLoginRequest();
+        this._login_win = null;
+        this._on_state = on_state;
+        this._on_error = on_error;
+
+        const base_dir = path.resolve(__dirname, "..");
+        this._html_path = path.join(base_dir, "html", "login.html");
+        this._preload_path = path.join(base_dir, "preload_login.js");
+    }
+
+    showDialog(parent_win){
+        this._login_win = new BrowserWindow({
+            width: 350, height: 200,
+            resizable: false,
+            minimizable: false,
+            parent: parent_win,
+            modal: true,
+            webPreferences:{
+                nodeIntegration: false,
+                contextIsolation: false,
+                preload: this._preload_path,
+                spellcheck: false
+            }
+        });
+        this._login_win.removeMenu();
+        this._login_win.loadURL(this._html_path);
+    }
+
+    async logout() {
+        try {
+            await this._req.logout();
+            this._on_state("logout"); 
+        } catch (error) {
+            this._on_error({
+                name:"logout",
+                error:error
+            });
+        }
+    }
+
+    setupIPC(){
+        ipcMain.on("app:nico-login", async (event, arg) => {
+            const { mail, password } = arg;
+            try {
+                await this._req.login(mail, password);
+                this._on_state("login"); 
+
+                if(this._login_win){
+                    this._login_win.hide();
+                    this._login_win.close();
+                }
+                this._login_win = null;
+            } catch (error) {
+                this._on_error({
+                    name:"login",
+                    error:error
+                });
+            }
+        });
+        
+        ipcMain.on("app:nico-login-cancel", (event, arg) => {
+            if(this._login_win){
+                this._login_win.hide();
+                this._login_win.close();
+            }
+            this._login_win = null;
+        });
+        
+        ipcMain.handle("app:get-nico-login-cookie", (event, args) => {
+            if(this._req.isAlreadyLogin() && this._req.isExpired()){
+                return this._req.getCookie();
+            }
+            return null;
+        });
+    }
+}
+
 module.exports = {
     NicoLoginRequest,
+    NicoLogin
 };

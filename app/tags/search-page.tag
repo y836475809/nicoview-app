@@ -445,7 +445,7 @@
             {id: "info", name: "情報", formatter:seach_infoFormatter},
             {id: "pub_date", name: "投稿日"},
             {id: "play_time", name: "時間"},
-            {id: "tags", name: "タグ", formatter:tagsFormatter},
+            {id: "tags", name: "タグ, コメント", formatter:tagsFormatter},
         ];
         const options = {
             rowHeight: 100,

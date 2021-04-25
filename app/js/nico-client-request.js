@@ -74,7 +74,7 @@ class NicoCookie {
 }
 
 class NicoClientRequest {
-    get(url, {nico_cookie=null, stream=null, on_progress=null, encoding="utf8"}={}){
+    get(url, {nico_cookie=null, cookie=null, stream=null, on_progress=null, encoding="utf8"}={}){
         this._resetParams();
  
         this._stream = stream;
@@ -85,6 +85,9 @@ class NicoClientRequest {
         const options = this._getOptions(url, "GET");
         if(nico_cookie){
             options.headers["Cookie"] = nico_cookie.getCookieHeaders();
+        }
+        if(cookie){
+            options.headers["Cookie"] = cookie;
         }
 
         return this._request(url, options);

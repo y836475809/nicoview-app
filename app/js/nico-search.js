@@ -1,5 +1,6 @@
 const { NicoClientRequest } = require("./nico-client-request");
 const { NICO_URL } = require("./nico-url");
+const { toTimeSec } = require("./time-format");
 const querystring = require("querystring");
 
 const sortNames = [
@@ -29,6 +30,7 @@ const searchItems = Object.freeze({
 
 class NicoSearchParams {
     constructor(limit=32, context="electron-app"){
+        this._api = "snapshot";
         this._service = "video";
         this._query = "";
         this._sort = "";
@@ -64,6 +66,34 @@ class NicoSearchParams {
             search_target: this._search_target,
             page: this._page
         };
+    }
+
+    getParamsExt(){
+        let sort_name = "f";
+        if(this._sort_name=="startTime"){
+            sort_name = "f";
+        }
+        if(this._sort_name=="viewCounter"){
+            sort_name = "v";
+        }
+        if(this._sort_name=="commentCounter"){
+            sort_name = "r";
+        }
+        return {
+            query: this._query,
+            sort_name: sort_name,
+            sort_order: this._sort_order=="+"?"a":"d",
+            search_target: this._search_target=="keyword"?"search":"tag",
+            page: this._page
+        };
+    }
+
+    api(name){
+        this._api = name;
+    }
+
+    getAPI(){
+        return this._api;
     }
 
     service(name){
@@ -197,6 +227,76 @@ class NicoSearch {
             });
 
             return search_result;
+        } catch (error) {
+            if(error.status){
+                let message = `status=${error.status}, エラー`;
+                if(error.status === 400){
+                    message = `status=${error.status}, 不正なパラメータです`; 
+                }else if(error.status === 404){
+                    message = `status=${error.status}, ページが見つかりません`; 
+                }else if(error.status === 500){
+                    message = `status=${error.status}, 検索サーバの異常です`; 
+                }else if(error.status === 503){
+                    message = `status=${error.status}, サービスがメンテナンス中です`; 
+                }
+                throw new Error(message);                     
+            }else{
+                throw error;     
+            }
+        }
+    }
+
+    async searchExt(params_ext, cookie){   
+        const { query, sort_name, sort_order, search_target, page } = params_ext;
+        const word = encodeURIComponent(query);
+        const qs = querystring.stringify({
+            mode:"watch",
+            page: page,
+            sort: sort_name,
+            order: sort_order
+        });
+        const url = `https://ext.nicovideo.jp/api/search/${search_target}/${word}?${qs}`;
+
+        this._req = new NicoClientRequest();
+        try {
+            const body = await this._req.get(url, {cookie:cookie});
+            const result = JSON.parse(body);
+
+            if(result.status != "ok") {
+                throw new Error(`status=${result.status}, message=${decodeURI(result.message)}`);
+            }
+
+            const page_num = result.page;
+            const search_offset = 1600;
+            const search_limit = 32;
+            const search_result_num = result.count;
+
+            let total_page_num = 0;
+            if(search_result_num < search_offset+search_limit){
+                total_page_num = Math.ceil(search_result_num / search_limit);
+            }else{
+                total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
+            }
+            result.page_ifno = {
+                page_num: page_num, 
+                total_page_num: total_page_num, 
+                search_result_num: search_result_num
+            };
+
+            result.list = result.list.map(value => {
+                return {
+                    thumbnailUrl: value.thumbnail_url,
+                    contentId: value.id,
+                    title: unescape(value.title),
+                    viewCounter: value.view_counter,
+                    commentCounter: value.num_res,
+                    lengthSeconds: toTimeSec(value.length),
+                    startTime: value.first_retrieve,
+                    tags: value.last_res_body,
+                };
+            });
+
+            return result;
         } catch (error) {
             if(error.status){
                 let message = `status=${error.status}, エラー`;

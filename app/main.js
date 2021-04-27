@@ -15,6 +15,7 @@ const { StartupConfig } = require("./start-up-config");
 const { Store } = require("./js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
 const { NicoLogin } = require("./js/nico-login");
+const ContextMenus = require("./js/contextmenu");
 
 const { 
     JsonStore, UserCSS, 
@@ -640,6 +641,9 @@ app.on("ready", async ()=>{
     });
 
     createWindow();
+
+    ContextMenus.setupPlayerCM1(player_win);
+    ContextMenus.setupPlayerCM2(player_win, store, history, config);
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

@@ -90,8 +90,7 @@ const setupPlayerCM1 = (window) => {
             menu_items.forEach(menu_item => {
                 if(menu_item.type != "separator"){
                     const id = menu_item.id;
-                    if(!menu_item.click){  
-                        console.log("menu_item.click id=", id);         
+                    if(!menu_item.click){         
                         menu_item.click = ()=>{
                             resolve(menu_item.id);
                         };

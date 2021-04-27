@@ -156,8 +156,42 @@ const setupPlayerCM2 = (window, store, history, config) => {
     });
 };
 
+const ngcomment = (window) => {
+    ipcMain.handle("app:popup-player-contextmenu-ngcomment", async (event, args) => {
+        return await new Promise((resolve, reject) => {
+            const createMenuItems = () => {
+                const menu_templete = [
+                    { 
+                        id: "add-comment-ng=list",
+                        label: "コメントをNGリストに登録", 
+                    },
+                    { 
+                        id: "add-uerid-ng=list",
+                        label: "ユーザーIDをNGリストに登録", 
+                    },
+                ];
+                menu_templete.forEach(menu_item => {
+                    if(menu_item.type != "separator"){
+                        if(!menu_item.click){         
+                            menu_item.click = ()=>{
+                                resolve(menu_item.id);
+                            };
+                        }
+                    }
+                });
+                return Menu.buildFromTemplate(menu_templete);
+            };
+            const context_menu = createMenuItems();
+            context_menu.popup({window: window});
+        });
+    });
+};
+
 
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
+    player : {
+        ngcomment
+    }
 };

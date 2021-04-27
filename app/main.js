@@ -644,6 +644,7 @@ app.on("ready", async ()=>{
 
     ContextMenus.setupPlayerCM1(player_win);
     ContextMenus.setupPlayerCM2(player_win, store, history, config);
+    ContextMenus.player.ngcomment(player_win);
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

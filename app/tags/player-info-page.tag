@@ -167,8 +167,7 @@
     
     <script>
         /* globals logger */
-        const { remote } = window.electron;
-        const { Menu } = remote;
+        const ipc = window.electron.ipcRenderer; 
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
         const { SyncCommentScroll } = window.SyncCommentScroll;
@@ -387,26 +386,6 @@
             obs.trigger("player-main-page:add-ng-comment", args);
         };
 
-        const createMenu = () => {
-            const menu_templete = [
-                { label: "コメントをNGリストに登録", click() {
-                    const items = grid_table.getSelectedDatas();
-                    const texts = items.map(item=>{
-                        return item.content;
-                    });
-                    triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
-                }},
-                { label: "ユーザーIDをNGリストに登録", click() {
-                    const items = grid_table.getSelectedDatas();
-                    const user_ids = items.map(item=>{
-                        return item.user_id;
-                    });
-                    triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
-                }},
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         this.on("mount", () => {  
             grid_table.init(".comment-grid");
             grid_table.setupResizer(".comment-grid-container");
@@ -416,9 +395,25 @@
                 obs.trigger("player-video:seek", sec);
             });
 
-            const context_menu = createMenu();
-            grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
+            grid_table.onContextMenu(async (e)=>{
+                const menu_id = await ipc.invoke("app:popup-player-contextmenu-ngcomment");
+                if(!menu_id){
+                    return;
+                }
+                if(menu_id=="add-comment-ng=list"){
+                    const items = grid_table.getSelectedDatas();
+                    const texts = items.map(item=>{
+                        return item.content;
+                    });
+                    triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
+                }
+                if(menu_id=="add-uerid-ng=list"){
+                    const items = grid_table.getSelectedDatas();
+                    const user_ids = items.map(item=>{
+                        return item.user_id;
+                    });
+                    triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
+                }
             });
 
             const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");

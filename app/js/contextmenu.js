@@ -357,6 +357,66 @@ const toggleMark = (window) => {
     });
 };
 
+const download = (window) => {
+    ipcMain.handle("app:popup-download-contextmenu", async (event, args) => {
+        const { items } = args;
+        return await new Promise(resolve => {
+            const menu_items = [
+                { 
+                    label: "再生", click() {
+                        const video_id = items[0].id;
+                        ipcMain.emit("app:play-video", null, {
+                            video_id : video_id,
+                            time : 0,
+                            online: false
+                        });
+                        resolve(null);
+                    }
+                },
+                { 
+                    label: "オンラインで再生", click() {
+                        const video_id = items[0].id;
+                        ipcMain.emit("app:play-video", null, {
+                            video_id : video_id,
+                            time : 0,
+                            online: true
+                        });
+                        resolve(null);
+                    }
+                },
+                { 
+                    id:"add-stack",
+                    label: "後で見る", 
+                },
+                { type: "separator" },
+                { 
+                    id:"add-bookmark",
+                    label: "ブックマーク", 
+                },
+                { type: "separator" },
+                { 
+                    id:"delete",
+                    label: "削除", 
+                }
+            ];
+            menu_items.forEach(menu_item => {
+                if(menu_item.type != "separator"){
+                    if(!menu_item.click){         
+                        menu_item.click = ()=>{
+                            resolve(menu_item.id);
+                        };
+                    }
+                }
+            });
+            const context_menu = Menu.buildFromTemplate(menu_items);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
+            context_menu.popup({window: window});
+        });
+    });
+};
+
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
@@ -370,5 +430,8 @@ module.exports = {
     listview : {
         toggleMark,
         bookmark,
+    },
+    main: {
+        download
     }
 };

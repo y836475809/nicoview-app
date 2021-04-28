@@ -62,9 +62,7 @@
     <script>
         /* globals riot logger */
         const EventEmitter = window.EventEmitter;
-        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
         const { Command } = window.Command;
@@ -171,45 +169,6 @@
             grid_table_dl.clearItems(state);
 
             await onChangeDownloadItem();
-        };
-
-        const createMenu = () => {
-            const menu_templete = [
-                { label: "再生", click() {
-                    const items = grid_table_dl.grid_table.getSelectedDatas();
-                    Command.play(items[0], false);
-                }},
-                { label: "オンラインで再生", click() {
-                    const items = grid_table_dl.grid_table.getSelectedDatas();
-                    Command.play(items[0], true);
-                }},
-                { label: "後で見る", click() {
-                    const items = grid_table_dl.grid_table.getSelectedDatas();
-                    Command.addStackItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ブックマーク", click() {
-                    const items = grid_table_dl.grid_table.getSelectedDatas();
-                    Command.addBookmarkItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "削除", async click() {
-                    const ret = await ipc.invoke("app:show-message-box", {
-                        type:"info",
-                        message:"削除しますか?",
-                        okcancel:true
-                    });
-                    if(!ret){
-                        return;
-                    }
-                    const items = grid_table_dl.grid_table.getSelectedDatas();
-                    const video_ids = items.map(value => {
-                        return value.id;
-                    });
-                    await deleteDownloadItems(video_ids);
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
         };
 
         const wait = async (wait_time, do_cancel, on_progress) => {
@@ -360,11 +319,38 @@
 
             const grid_container = this.root.querySelector(".download-grid");
             grid_table_dl = new GridTableDownloadItem(grid_container);
-            
-            const context_menu = createMenu();
+
             try {
-                grid_table_dl.onContextMenu(e=>{
-                    context_menu.popup({window: remote.getCurrentWindow()});
+                grid_table_dl.onContextMenu(async e=>{
+                    const items = grid_table_dl.grid_table.getSelectedDatas();
+                    if(items.length==0){
+                        return;
+                    }
+
+                    const menu_id = await ipc.invoke("app:popup-download-contextmenu", {items});
+                    if(!menu_id){
+                        return;
+                    }
+                    if(menu_id=="add-stack"){
+                        Command.addStackItems(obs, items);
+                    }
+                    if(menu_id=="add-bookmark"){
+                        Command.addBookmarkItems(obs, items);
+                    }
+                    if(menu_id=="delete"){
+                        const ret = await ipc.invoke("app:show-message-box", {
+                            type:"info",
+                            message:"削除しますか?",
+                            okcancel:true
+                        });
+                        if(!ret){
+                            return;
+                        }
+                        const video_ids = items.map(value => {
+                            return value.id;
+                        });
+                        await deleteDownloadItems(video_ids);
+                    }
                 });
                 grid_table_dl.onDblClick((e, data)=>{
                     Command.play(data, false);

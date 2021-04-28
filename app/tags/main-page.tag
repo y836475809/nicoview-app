@@ -384,6 +384,11 @@
             this.obs.trigger("bookmark-page:add-items", [bk_item]);
         });
 
+        ipc.on("app:add-bookmarks", (event, args)=>{
+            const bk_items = args;
+            this.obs.trigger("bookmark-page:add-items", bk_items);
+        });
+
         ipc.on("setting:on-reload-css", (event)=>{
             this.obs.trigger("css-loaded");
         });

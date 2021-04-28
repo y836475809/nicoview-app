@@ -211,9 +211,7 @@
 
     <script>
         /* globals riot logger */
-        const {remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoUpdate } = window.NicoUpdate;
@@ -642,7 +640,7 @@
             this.obs_modal_dialog.trigger("close");
         };
 
-        const convertVideo = async (self, video_id) => {
+        const convertVideo = async (video_id) => {
             if(this.root.querySelector("modal-dialog").dataset.open=="true"){
                 return;
             }
@@ -658,7 +656,7 @@
 
                 const cnv_mp4 = new ConvertMP4();
 
-                self.obs_modal_dialog.trigger("show", {
+                this.obs_modal_dialog.trigger("show", {
                     message: "mp4に変換中...",
                     buttons: ["cancel"],
                     cb: (result)=>{
@@ -703,21 +701,8 @@
                     updateState("変換失敗");   
                 }
             }finally{
-                self.obs_modal_dialog.trigger("close");      
+                this.obs_modal_dialog.trigger("close");      
             }
-        };
-
-        const createConvertMenu = (self) => {
-            const menu_templete = [
-                { label: "mp4に変換", click() {
-                    const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    (async()=>{
-                        await convertVideo(self, video_id);
-                    })();
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
         };
 
         const play = async (item, online) => {
@@ -739,66 +724,6 @@
             }
         };
 
-        const createMenu = () => {
-            const menu_templete = [
-                { label: "再生", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    await play(items[0], false);
-                }},
-                { label: "オンラインで再生", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    await play(items[0], true);
-                }},
-                { label: "後で見る", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addStackItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "コメント更新", click() {
-                    const items = grid_table.getSelectedDatas();
-                    updateNicoData(items, async (nico_update)=>{
-                        await nico_update.updateComment();
-                    });
-                }},
-                { label: "画像更新", click() {
-                    const items = grid_table.getSelectedDatas();
-                    updateNicoData(items, async (nico_update)=>{
-                        await nico_update.updateThumbnail();
-                    });
-                }},
-                { label: "動画以外を更新", click() {
-                    const items = grid_table.getSelectedDatas();
-                    updateNicoData(items, async (nico_update)=>{
-                        await nico_update.update();
-                    });
-                }},
-                { type: "separator" },
-                { label: "ブックマーク", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addBookmarkItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "NNDD形式(XML)に変換", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    await convertNicoDataToNNDD(items);
-                }},
-                { type: "separator" },
-                { label: "削除", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    const video_ids = items.map(item => item.id);
-                    const ret = await ipc.invoke("app:show-message-box", {
-                        type:"info",
-                        message:"動画を削除しますか?",
-                        okcancel:true
-                    });
-                    if(!ret){
-                        return;
-                    }
-                    await deleteLibraryData(video_ids);
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
         this.on("mount", async () => {    
             const grid_container = this.root.querySelector(".library-grid");
             grid_table.init(grid_container);
@@ -837,16 +762,56 @@
                     Command.addBookmarkItems(obs, [data]);
                 }
             });
-            
-            const converter_context_menu = createConvertMenu(this);
-            const context_menu = createMenu();
-            grid_table.onContextMenu((e)=>{
+
+            grid_table.onContextMenu(async (e)=>{
                 const items = grid_table.getSelectedDatas();
+                if(items.length==0){
+                    return;
+                }
                 const video_type = items[0].video_type;
+
                 if(video_type=="mp4"){
-                    context_menu.popup({window: remote.getCurrentWindow()});
+                    const menu_id = await ipc.invoke("app:popup-library-contextmenu", {items});
+                    if(!menu_id){
+                        return;
+                    }
+
+                    if(menu_id=="update-comment"){
+                        updateNicoData(items, async (nico_update)=>{
+                            await nico_update.updateComment();
+                        });
+                    }
+                    if(menu_id=="update-thumbnail"){
+                        updateNicoData(items, async (nico_update)=>{
+                            await nico_update.updateThumbnail();
+                        });
+                    }
+                    if(menu_id=="update-except-video"){
+                        updateNicoData(items, async (nico_update)=>{
+                            await nico_update.update();
+                        });
+                    }
+                    if(menu_id=="conver-to-xml"){
+                        await convertNicoDataToNNDD(items);
+                    }
+                    if(menu_id=="delete"){
+                        const video_ids = items.map(item => item.id);
+                        const ret = await ipc.invoke("app:show-message-box", {
+                            type:"info",
+                            message:"動画を削除しますか?",
+                            okcancel:true
+                        });
+                        if(!ret){
+                            return;
+                        }
+                        await deleteLibraryData(video_ids);
+                    }
                 }else{
-                    converter_context_menu.popup({window: remote.getCurrentWindow()});
+                    const menu_id = await ipc.invoke("app:popup-library-convert-video-contextmenu");
+                    if(menu_id=="convert-video"){
+                        const video_id = items[0].id;
+                        await convertVideo(video_id);
+                    }   
                 }
             });
             

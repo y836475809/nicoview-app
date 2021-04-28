@@ -454,7 +454,126 @@ const download = (window) => {
     });
 };
 
+const librayMain = (main_win) => {
+    ipcMain.handle("app:popup-library-contextmenu", async (event, args) => {
+        const { items } = args;
+        return await new Promise(resolve => {
+            const menu_items = [
+                { label: "再生", click() {
+                    const video_id = items[0].id;
+                    ipcMain.emit("app:play-video", null, {
+                        video_id : video_id,
+                        time : 0,
+                        online: false
+                    });
+                    resolve(null);
+                }},
+                { label: "オンラインで再生", click() {
+                    const video_id = items[0].id;
+                    ipcMain.emit("app:play-video", null, {
+                        video_id : video_id,
+                        time : 0,
+                        online: true
+                    });
+                    resolve(null);
+                }},
+                { label: "後で見る", click() {
+                    const stack_items = items.map(item => {
+                        return {
+                            id: item.id,
+                            title: item.title, 
+                            thumb_img:item.thumb_img
+                        };
+                    });
+                    main_win.webContents.send("app:add-stack-items", {items:stack_items});
+                    resolve(null);
+                }
+                },
+                { type: "separator" },
+                { 
+                    id:"update-comment",
+                    label: "コメント更新",
+                },
+                { 
+                    id:"update-thumbnail",
+                    label: "画像更新", 
+                },
+                { 
+                    id:"update-except-video",
+                    label: "動画以外を更新",
+                },
+                { type: "separator" },
+                { label: "ブックマーク", click() {
+                    const bk_items = items.map(item => {
+                        return {
+                            title: item.title,
+                            id: item.id,
+                            time: 0
+                        };
+                    });
+                    main_win.webContents.send("app:add-bookmarks", bk_items);
+                    resolve(null);
+                }
+                },
+                { type: "separator" },
+                { 
+                    id:"conver-to-xml",
+                    label: "NNDD形式(XML)に変換",
+                },
+                { type: "separator" },
+                { 
+                    id:"delete",
+                    label: "削除", 
+                }
+            ];
+            menu_items.forEach(menu_item => {
+                if(menu_item.type != "separator"){
+                    if(!menu_item.click){      
+                        menu_item.click = ()=>{
+                            resolve(menu_item.id);
+                        };
+                    }
+                }
+            });
+            const context_menu = Menu.buildFromTemplate(menu_items);
+            context_menu.addListener("menu-will-close", () => {
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
+            });  
+            context_menu.popup({window: main_win});
+        });
+    });
+};
 
+const librayConvertVideo = (main_win) => {
+    ipcMain.handle("app:popup-library-convert-video-contextmenu", async (event, args) => {
+        return await new Promise(resolve => {
+            const menu_items = [
+                { 
+                    id: "convert-video",
+                    label: "mp4に変換",
+                },
+            ];
+            menu_items.forEach(menu_item => {
+                if(menu_item.type != "separator"){
+                    if(!menu_item.click){      
+                        menu_item.click = ()=>{
+                            resolve(menu_item.id);
+                        };
+                    }
+                }
+            });
+            const context_menu = Menu.buildFromTemplate(menu_items);
+            context_menu.addListener("menu-will-close", () => {
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
+            });  
+            context_menu.popup({window: main_win});
+        });
+    });
+};
 
 module.exports = { 
     setupPlayerCM1,
@@ -471,6 +590,8 @@ module.exports = {
         bookmark,
     },
     main: {
-        download
+        download,
+        librayMain,
+        librayConvertVideo,
     }
 };

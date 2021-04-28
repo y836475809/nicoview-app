@@ -39,9 +39,7 @@
 
     <script>
         /* globals riot logger */
-        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;

@@ -194,9 +194,7 @@
 
     <script>
         /* globals riot logger */
-        const { remote, shell } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const {Menu} = remote;
         const { MouseGesture } = window.MouseGesture;
 
         this.obs = this.opts.obs;

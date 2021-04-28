@@ -189,8 +189,6 @@
 
     <script>
         const Sortable = window.Sortable;
-        const {remote} = window.electron;
-        const {Menu, MenuItem} = remote;
         const ipc = window.electron.ipcRenderer;
         let item_duration = 300;
         let sortable = null;
@@ -319,6 +317,14 @@
             elms[index].classList.add("selected");  
         });
 
+        obs.on("toggle-mark", (args) => {
+            const { items } = args;
+            items.forEach(item => {
+                item.marked = !item.marked;
+            });
+            updateItemIcon();
+        });
+
         const sortItems = () => {
             const order = sortable.toArray().map(value=>Number(value));
             const sorted_items = [];
@@ -430,19 +436,16 @@
             setSelected(e.target, item);
             if(e.button===2){
                 const items = getSelectedItems();
-                const cb = (context_menu) => {
-                    if(!context_menu){
-                        context_menu = new Menu();
-                    }
-                    context_menu.append(new MenuItem({
-                        label: "マークの切り替え", click() {
+                const cb = () => {
+                    (async ()=>{
+                        const menu_id = await ipc.invoke("app:popup-listview-toggle-mark");
+                        if(menu_id=="toggle-mark"){
                             items.forEach(item => {
                                 item.marked = !item.marked;
                             });
                             updateItemIcon();
                         }
-                    }));
-                    context_menu.popup({window: remote.getCurrentWindow()}); 
+                    })();   
                 };
                 obs.trigger("show-contextmenu", e, { items, cb });
             }

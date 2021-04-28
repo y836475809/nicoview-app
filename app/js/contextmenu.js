@@ -267,6 +267,96 @@ const text = (window) => {
     });
 };
 
+const getBookMarkMenuEnable = (type, items) => {
+    if(items.length === 0) {
+        return false;
+    }
+
+    if(type == "play"){
+        return true;
+    }
+    if(type == "go-to-library"){
+        return true;
+    }
+    if(type == "delete"){
+        return true;
+    }
+    if(type == "toggle-mark"){
+        return true;
+    }
+
+    return false;
+};
+
+const bookmark = (window) => {
+    ipcMain.handle("app:popup-listview-bookmark", async (event, args) => {
+        const { items } = args;
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { 
+                    id: "play",
+                    label: "再生", click() {
+                        const { video_id, time } = items[0].data;
+                        const online = false;
+                        ipcMain.emit("app:play-video", null, {
+                            video_id,
+                            time,
+                            online
+                        });
+                        resolve(null);
+                    }
+                },
+                { 
+                    id: "play",
+                    label: "オンラインで再生", click() {
+                        const { video_id, time } = items[0].data;
+                        const online = true;
+                        ipcMain.emit("app:play-video", null, {
+                            video_id,
+                            time,
+                            online
+                        });
+                        resolve(null);
+                    }
+                },
+                { 
+                    id: "go-to-library",
+                    label: "ライブラリの項目へ移動", click() {
+                        resolve("go-to-library");
+                    }
+                },
+                { 
+                    id: "toggle-mark",
+                    label: "マークの切り替え", click() {
+                        resolve("toggle-mark");
+                    }
+                },
+            ]);
+            context_menu.items.forEach(menu => {
+                const id = menu.id;
+                menu.enabled = getBookMarkMenuEnable(id, items);
+            });
+            context_menu.popup({window: window});
+        });
+    });
+};
+
+const toggleMark = (window) => {
+    ipcMain.handle("app:popup-listview-toggle-mark", async (event, args) => {
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { 
+                    id: "toggle-mark",
+                    label: "マークの切り替え", click() {
+                        resolve("toggle-mark");
+                    }
+                },
+            ]);
+            context_menu.popup({window: window});
+        });
+    });
+};
+
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
@@ -276,5 +366,9 @@ module.exports = {
         mylistlink,
         link,
         text,
+    },
+    listview : {
+        toggleMark,
+        bookmark,
     }
 };

@@ -649,6 +649,8 @@ app.on("ready", async ()=>{
     ContextMenus.player.mylistlink(main_win, player_win);
     ContextMenus.player.link(player_win);
     ContextMenus.player.text(player_win);
+    ContextMenus.listview.bookmark(main_win);
+    ContextMenus.listview.toggleMark(main_win);
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

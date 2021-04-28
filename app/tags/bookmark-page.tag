@@ -27,9 +27,7 @@
 
     <script>
         /* globals riot */
-        const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const {Menu} = remote;
         const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
@@ -73,81 +71,23 @@
             resizeHeight(items);
         });
 
-        const getMenuEnable = (type, items) => {
-            if(items.length === 0) {
-                return false;
-            }
-
-            if(type == "play"){
-                return true;
-            }
-            if(type == "go-to-library"){
-                return true;
-            }
-            if(type == "delete"){
-                return true;
-            }
-
-            return false;
-        };
-
-        const createMenu = (items) => {
-            return Menu.buildFromTemplate([
-                { 
-                    id: "play",
-                    label: "再生", click() {
-                        if(items.length==0){
-                            return;
-                        }
-                        const { video_id, time } = items[0].data;
-                        const online = false;
-                        ipc.send("app:play-video", {
-                            video_id,
-                            time,
-                            online
-                        });
-                    }
-                },
-                { 
-                    id: "play",
-                    label: "オンラインで再生", click() {
-                        const { video_id, time } = items[0].data;
-                        const online = true;
-                        ipc.send("app:play-video", {
-                            video_id,
-                            time,
-                            online
-                        });
-                    }
-                },
-                { 
-                    id: "go-to-library",
-                    label: "ライブラリの項目へ移動", click() {
-                        if(items.length==0){
-                            return;
-                        }
-
-                        const video_id = items[0].data.video_id;
-                        (async ()=>{
-                            const exist = await ipc.invoke("library:has", {video_id});
-                            if(exist===true){
-                                obs.trigger("main-page:select-page", "library");
-                                obs.trigger("library-page:scrollto", video_id);     
-                            } 
-                        })();
-                    }
-                },
-            ]);
-        };
-
-        this.obs_listview.on("show-contextmenu", (e, args) => {
+        this.obs_listview.on("show-contextmenu", async (e, args) => {
             const { items, cb } = args;
-            const context_menu = createMenu(items);
-            context_menu.items.forEach(menu => {
-                const id = menu.id;
-                menu.enabled =  getMenuEnable(id, items);
+
+            const menu_id = await ipc.invoke("app:popup-listview-bookmark", {
+                items
             });
-            cb(context_menu);
+            if(menu_id=="go-to-library"){
+                const video_id = items[0].data.video_id;
+                const exist = await ipc.invoke("library:has", {video_id});
+                if(exist){
+                    obs.trigger("main-page:select-page", "library");
+                    obs.trigger("library-page:scrollto", video_id);     
+                } 
+            }
+            if(menu_id=="toggle-mark"){
+                this.obs_listview.trigger("toggle-mark", { items });
+            }
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {  

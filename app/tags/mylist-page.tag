@@ -186,9 +186,7 @@
     <script>
         /* globals riot logger */
         const path = window.path;
-        const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
@@ -294,49 +292,6 @@
             }
         };
 
-        const createMenu = () => {
-            const menu_templete = [
-                { label: "再生", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    await play(items[0], false);
-                }},
-                { label: "オンラインで再生", async click() {
-                    const items = grid_table.getSelectedDatas();
-                    await play(items[0], true);
-                }},
-                { label: "後で見る", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addStackItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ダウンロードに追加", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addDownloadItems(obs, items);
-                }},
-                { label: "ダウンロードから削除", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.deleteDownloadItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ブックマーク", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addBookmarkItems(obs, items);
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
-        const createConvertVideoMenu = () => {
-            const menu_templete = [
-                { label: "mp4に変換", click() {
-                    const items = grid_table.getSelectedDatas();
-                    const video_id = items[0].id;
-                    obs.trigger("library-page:convert-video", video_id); 
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         this.on("mount", async () => {
             const mylist_dir = path.join(await ipc.invoke("config:get", { key:"data_dir", value:"" }), "mylist");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
@@ -381,16 +336,21 @@
                 }
             });
             
-            const context_menu = createMenu();
-            const context_menu_cnv_video = createConvertVideoMenu();
             grid_table.onContextMenu(async (e)=>{
                 const items = grid_table.getSelectedDatas();
+                if(items.length==0){
+                    return;
+                }
                 const video_id = items[0].id;
 
-                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){
-                    context_menu_cnv_video.popup({window: remote.getCurrentWindow()});
-                }else{
-                    context_menu.popup({window: remote.getCurrentWindow()});
+                const need_convert = needConvertVideo(await ipc.invoke("library:getItem", {video_id}));
+                const context_menu_type = need_convert?"convert-video":"main";
+                const menu_id = await ipc.invoke("app:popup-myist-contextmenu", {context_menu_type, items});
+                if(!menu_id){
+                    return;
+                }
+                if(menu_id=="convert-video"){
+                    obs.trigger("library-page:convert-video", video_id); 
                 }
             });   
         });

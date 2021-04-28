@@ -374,6 +374,14 @@
             const item = args;
             this.obs.trigger("download-page:add-download-items", [item]);
         });
+        ipc.on("app:add-download-items", (event, args)=>{
+            const items = args;
+            this.obs.trigger("download-page:add-download-items", items);
+        });
+        ipc.on("app:delete-download-items", (event, args)=>{
+            const items = args;
+            this.obs.trigger("download-page:delete-download-items", items);
+        });
 
         ipc.on("app:add-stack-items", (event, args)=>{
             this.obs.trigger("play-stack-page:add-items", args);

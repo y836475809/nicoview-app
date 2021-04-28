@@ -654,6 +654,7 @@ app.on("ready", async ()=>{
     ContextMenus.main.download(main_win);
     ContextMenus.main.librayMain(main_win);
     ContextMenus.main.librayConvertVideo(main_win);
+    ContextMenus.main.mylist(main_win);
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

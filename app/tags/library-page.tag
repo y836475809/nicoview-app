@@ -718,7 +718,7 @@
                 if(!ret){
                     return;
                 }
-                await convertVideo(this, video_id);
+                await convertVideo(video_id);
             }else{
                 Command.play(item, online);
             }
@@ -829,7 +829,7 @@
 
         obs.on("library-page:convert-video", async (args) => { 
             const video_id = args;
-            await convertVideo(this, video_id);          
+            await convertVideo(video_id);          
         });   
         
         obs.on("library-page:play", async (item) => { 

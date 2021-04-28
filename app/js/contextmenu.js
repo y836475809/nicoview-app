@@ -182,6 +182,9 @@ const ngcomment = (window) => {
                 return Menu.buildFromTemplate(menu_templete);
             };
             const context_menu = createMenuItems();
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -213,6 +216,9 @@ const watchlink = (window) => {
                     resolve(null);
                 }}
             ]);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -232,6 +238,9 @@ const mylistlink = (main_win, window) => {
                     resolve(null);
                 }}
             ]);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -247,6 +256,9 @@ const link = (window) => {
                     resolve(null);
                 }}
             ]);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -262,6 +274,9 @@ const text = (window) => {
                     resolve(null);
                 }}
             ]);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -336,6 +351,9 @@ const bookmark = (window) => {
                 const id = menu.id;
                 menu.enabled = getBookMarkMenuEnable(id, items);
             });
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });
@@ -352,6 +370,9 @@ const toggleMark = (window) => {
                     }
                 },
             ]);
+            context_menu.addListener("menu-will-close", () => {
+                resolve(null);
+            });  
             context_menu.popup({window: window});
         });
     });

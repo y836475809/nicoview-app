@@ -183,7 +183,9 @@ const ngcomment = (window) => {
             };
             const context_menu = createMenuItems();
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -217,7 +219,9 @@ const watchlink = (window) => {
                 }}
             ]);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -239,7 +243,9 @@ const mylistlink = (main_win, window) => {
                 }}
             ]);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -257,7 +263,9 @@ const link = (window) => {
                 }}
             ]);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -275,7 +283,9 @@ const text = (window) => {
                 }}
             ]);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -352,7 +362,9 @@ const bookmark = (window) => {
                 menu.enabled = getBookMarkMenuEnable(id, items);
             });
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -371,7 +383,9 @@ const toggleMark = (window) => {
                 },
             ]);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
@@ -431,12 +445,16 @@ const download = (window) => {
             });
             const context_menu = Menu.buildFromTemplate(menu_items);
             context_menu.addListener("menu-will-close", () => {
-                resolve(null);
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
             });  
             context_menu.popup({window: window});
         });
     });
 };
+
+
 
 module.exports = { 
     setupPlayerCM1,

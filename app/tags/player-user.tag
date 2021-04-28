@@ -122,9 +122,7 @@
     
     <script>
         /* globals */
-        const { remote, clipboard } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
 
@@ -156,35 +154,19 @@
             return false;
         };
 
-        const watchLinkMouseUp = (e) => {
+        const watchLinkMouseUp = async (e) => {
             e.preventDefault(); 
             e.stopPropagation();
 
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
             
-            if(e.button === 2){
-                const menu_template = Menu.buildFromTemplate([
-                    { label: "再生", click() {
-                        ipc.send("app:play-video", {
-                            video_id: video_id,
-                            time: 0,
-                            online: false
-                        }); 
-                    }},
-                    { label: "オンラインで再生", click() {
-                        ipc.send("app:play-video", {
-                            video_id: video_id,
-                            time: 0,
-                            online: true
-                        });
-                    }},
-                    { label: "URLをコピー", click() {
-                        clipboard.writeText(e.target.href);
-                    }}
-                ]);
-                menu_template.popup({window: remote.getCurrentWindow()}); 
-            }
+            if(e.button === 2){ 
+                await ipc.invoke("app:popup-player-contextmenu-watchlink", {
+                    video_id: video_id,
+                    url: e.target.href
+                });
+            }      
             return false;
         };
 
@@ -197,36 +179,28 @@
             return false;
         };
 
-        const mylistLinkMouseUp = (e) => {
+        const mylistLinkMouseUp = async (e) => {
             e.preventDefault(); 
             e.stopPropagation();
 
             const mylist_id = NicoURL.getMylistID(e.target.href);
             if(e.button === 2){
-                const menu_template = Menu.buildFromTemplate([
-                    { label: "マイリストで開く", click() {
-                        obs.trigger("player-main-page:load-mylist", mylist_id);
-                    }},
-                    { label: "URLをコピー", click() {
-                        clipboard.writeText(e.target.href);
-                    }}
-                ]);
-                menu_template.popup({window: remote.getCurrentWindow()}); 
+                await ipc.invoke("app:popup-player-contextmenu-mylistlink", {
+                    mylist_id: mylist_id,
+                    url: e.target.href
+                });
             }
             return false;
         };
 
-        const linkMouseUp = (e) => {
+        const linkMouseUp = async (e) => {
             e.preventDefault(); 
             e.stopPropagation();
 
             if(e.button === 2){
-                const menu_template = Menu.buildFromTemplate([
-                    { label: "URLをコピー", click() {
-                        clipboard.writeText(e.target.href);
-                    }}
-                ]);
-                menu_template.popup({window: remote.getCurrentWindow()}); 
+                await ipc.invoke("app:popup-player-contextmenu-link", {
+                    url: e.target.href
+                });
             }
             return false;
         };
@@ -317,51 +291,29 @@
             closePopupDescription();
         };
 
-        const popupDescriptionMenu = (type, text) => {
-            let menu_template = null;
+        const popupDescriptionMenu = async (type, text) => {
             if(type=="watch"){
                 const video_id = text;
-                menu_template = Menu.buildFromTemplate([
-                    { label: "再生", click() {
-                        ipc.send("app:play-video", {
-                            video_id: video_id,
-                            time: 0,
-                            online: false
-                        }); 
-                    }},
-                    { label: "オンラインで再生", click() {
-                        ipc.send("app:play-video", {
-                            video_id: video_id,
-                            time: 0,
-                            online: true
-                        });
-                    }},
-                    { label: "URLをコピー", click() {
-                        clipboard.writeText(NicoURL.getWatchURL(video_id));
-                    }}
-                ]);
+                await ipc.invoke("app:popup-player-contextmenu-watchlink", {
+                    video_id: video_id,
+                    url: NicoURL.getWatchURL(video_id)
+                });
             }
             if(type=="mylist" || type=="user"){
                 const mylist_id = text;
-                menu_template = Menu.buildFromTemplate([
-                    { label: "マイリストで開く", click() {
-                        obs.trigger("player-main-page:load-mylist", mylist_id);
-                    }},
-                    { label: "URLをコピー", click() {
-                        clipboard.writeText(NicoURL.getMylistURL(mylist_id));
-                    }}
-                ]);
+                await ipc.invoke("app:popup-player-contextmenu-mylistlink", {
+                    mylist_id: mylist_id,
+                    url: NicoURL.getMylistURL(mylist_id)
+                });
             }
             if(type=="text"){
-                menu_template = Menu.buildFromTemplate([
-                    { label: "コピー", click() {
-                        clipboard.writeText(text);
-                    }}
-                ]);    
-            }   
-            menu_template.popup({window: remote.getCurrentWindow()});
+                await ipc.invoke("app:popup-player-contextmenu-text", {
+                    text: text
+                });  
+            }
         };
-        this.oncontextmenu = (e) => {
+        
+        this.oncontextmenu = async (e) => {
             if(e.button !== 2){
                 return;
             }
@@ -373,21 +325,21 @@
 
             if(/^sm\d+/.test(text)){
                 const video_id = text.match(/sm\d+/)[0];
-                popupDescriptionMenu("watch", video_id);
+                await popupDescriptionMenu("watch", video_id);
                 return;
             }
             if(/^mylist\/\d+/.test(text)){
                 const mylist_id = text;
-                popupDescriptionMenu("mylist", mylist_id);
+                await popupDescriptionMenu("mylist", mylist_id);
                 return;
             }
             if(/^user\/\d+/.test(text)){
                 const mylist_id = text;
-                popupDescriptionMenu("user", mylist_id);
+                await popupDescriptionMenu("user", mylist_id);
                 return;
             }
 
-            popupDescriptionMenu("text", text);
+            await popupDescriptionMenu("text", text);
         };
 
         this.onclickUserListLink = (e) => {

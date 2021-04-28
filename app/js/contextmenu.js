@@ -187,11 +187,94 @@ const ngcomment = (window) => {
     });
 };
 
+const watchlink = (window) => {
+    ipcMain.handle("app:popup-player-contextmenu-watchlink", async (event, args) => {
+        const { video_id, url } = args;
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { label: "再生", click() {
+                    ipcMain.emit("app:play-video", null, {
+                        video_id: video_id,
+                        time: 0,
+                        online: false
+                    });
+                    resolve(null);
+                }},
+                { label: "オンラインで再生", click() {
+                    ipcMain.emit("app:play-video", null, {
+                        video_id: video_id,
+                        time: 0,
+                        online: true
+                    });
+                    resolve(null);
+                }},
+                { label: "URLをコピー", click() {
+                    clipboard.writeText(url);
+                    resolve(null);
+                }}
+            ]);
+            context_menu.popup({window: window});
+        });
+    });
+};
+
+const mylistlink = (main_win, window) => {
+    ipcMain.handle("app:popup-player-contextmenu-mylistlink", async (event, args) => {
+        const { mylist_id, url } = args;
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { label: "マイリストで開く", click() {
+                    main_win.webContents.send("app:load-mylist", mylist_id);
+                    resolve(null);
+                }},
+                { label: "URLをコピー", click() {
+                    clipboard.writeText(url);
+                    resolve(null);
+                }}
+            ]);
+            context_menu.popup({window: window});
+        });
+    });
+};
+
+const link = (window) => {
+    ipcMain.handle("app:popup-player-contextmenu-link", async (event, args) => {
+        const { url } = args;
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { label: "URLをコピー", click() {
+                    clipboard.writeText(url);
+                    resolve(null);
+                }}
+            ]);
+            context_menu.popup({window: window});
+        });
+    });
+};
+
+const text = (window) => {
+    ipcMain.handle("app:popup-player-contextmenu-text", async (event, args) => {
+        const { text } = args;
+        return await new Promise(resolve => {
+            const context_menu = Menu.buildFromTemplate([
+                { label: "コピー", click() {
+                    clipboard.writeText(text);
+                    resolve(null);
+                }}
+            ]);
+            context_menu.popup({window: window});
+        });
+    });
+};
 
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
     player : {
-        ngcomment
+        ngcomment,
+        watchlink,
+        mylistlink,
+        link,
+        text,
     }
 };

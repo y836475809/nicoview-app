@@ -19,9 +19,7 @@
 
     <script>
         /* globals logger */
-        const { remote } = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
 
@@ -86,38 +84,6 @@
             grid_table.setData(items);
         };
 
-        const createMenu = () => {
-            const menu_templete = [
-                { label: "再生", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.play(items[0], false);
-                }},
-                { label: "オンラインで再生", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.play(items[0], true);
-                }},
-                { label: "後で見る", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addStackItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ダウンロードに追加", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addDownloadItems(obs, items);
-                }},
-                { label: "ダウンロードから削除", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.deleteDownloadItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ブックマーク", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addBookmarkItems(obs, items);
-                }}
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         const loadItems = async () => {
             try {
                 const items = await ipc.invoke("history:getItems");
@@ -158,9 +124,12 @@
                 }
             });
 
-            const context_menu = createMenu();
-            grid_table.onContextMenu((e)=>{
-                context_menu.popup({window: remote.getCurrentWindow()});
+            grid_table.onContextMenu(async (e)=>{
+                const items = grid_table.getSelectedDatas();
+                if(items.length==0){
+                    return;
+                }
+                await ipc.invoke("app:popup-play-history-contextmenu", {items});           
             });           
             
             await loadItems();

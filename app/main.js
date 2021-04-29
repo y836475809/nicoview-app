@@ -647,7 +647,7 @@ app.on("ready", async ()=>{
     ContextMenus.setupPlayerCM2(player_win, store, history, config);
     ContextMenus.player.ngcomment(player_win);
     ContextMenus.player.watchlink(player_win);
-    ContextMenus.player.mylistlink(main_win, player_win);
+    ContextMenus.player.mylistlink(player_win);
     ContextMenus.player.link(player_win);
     ContextMenus.player.text(player_win);
     ContextMenus.player.settingNGComment(player_win);

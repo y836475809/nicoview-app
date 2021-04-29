@@ -217,13 +217,13 @@ const watchlink = (play_win) => {
     });
 };
 
-const mylistlink = (main_win, play_win) => {
+const mylistlink = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-mylistlink", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
             const menu_items = [
                 { label: "マイリストで開く", click() {
-                    main_win.webContents.send("app:load-mylist", mylist_id);
+                    Command.loadMylist(mylist_id);
                     resolve(null);
                 }},
                 { label: "URLをコピー", click() {

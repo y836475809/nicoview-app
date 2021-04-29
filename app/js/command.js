@@ -78,6 +78,12 @@ class Command {
             obs.trigger("download-page:delete-download-items", video_ids);
         }
     }
+
+    static loadMylist(mylist_id) {
+        if(isMainProcess()){
+            send("app:load-mylist", mylist_id);
+        }
+    }
 }
 
 module.exports = {

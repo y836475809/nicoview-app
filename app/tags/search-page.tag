@@ -294,7 +294,6 @@
 
     <script>
         /* globals riot logger */
-        const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -414,7 +413,7 @@
 
         const search_offset = 1600;
         const search_limit = 32;
-        const search_context = `${remote.app.name}/${remote.app.getVersion()}`;
+        const search_context = process.env["user_agent"];
         const nico_search_params = new NicoSearchParams(search_limit, search_context);
         const nico_search = new NicoSearch();
 

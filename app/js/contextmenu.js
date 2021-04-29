@@ -3,6 +3,27 @@ const { toTimeString } = require("./time-format");
 const { getWatchURL } = require("./nico-url"); 
 const { Command } = require("./command"); 
 
+const popup = (parent_win, menu_items, resolve, cb=()=>{}) => {
+    menu_items.forEach(menu_item => {
+        if(menu_item.type != "separator"){
+            if(!menu_item.click){         
+                menu_item.click = ()=>{
+                    resolve(menu_item.id);
+                };
+            }
+            cb(menu_item);
+        }
+    });
+    
+    const context_menu = Menu.buildFromTemplate(menu_items);
+    context_menu.addListener("menu-will-close", () => {
+        setTimeout(()=>{
+            resolve(null);
+        }, 200); 
+    });  
+    context_menu.popup({window: parent_win});
+};
+
 const getMenuEnable = (menu_id, data) => {
     const { title, thumbnailURL } = data;
 
@@ -23,7 +44,7 @@ const getMenuEnable = (menu_id, data) => {
     return true;
 };
 
-const setupPlayerCM1 = (window) => {
+const setupPlayerCM1 = (play_win) => {
     ipcMain.handle("app:show-player-contextmeu", async (event, args) => {
         const { play_data } = args;
         const { video_id, title, thumbnailURL, online } = play_data;
@@ -103,31 +124,16 @@ const setupPlayerCM1 = (window) => {
                     ]
                 } 
             ];
-    
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    const id = menu_item.id;
-                    if(!menu_item.click){         
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                    menu_item.enabled = getMenuEnable(id, play_data);
-                }
-            });
 
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            popup(play_win, menu_items, resolve, (menu_item)=>{
+                const id = menu_item.id;
+                menu_item.enabled = getMenuEnable(id, play_data);
+            });
         });
     });
 };
 
-const setupPlayerCM2 = (window, store, history, config) => {
+const setupPlayerCM2 = (play_win, store, history, config) => {
     ipcMain.handle("app:show-player-contextmeu2", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const createMenuItems = (items) => {
@@ -162,58 +168,36 @@ const setupPlayerCM2 = (window, store, history, config) => {
                 menu_items.push({ type: "separator" });
                 Array.prototype.push.apply(menu_items, createMenuItems(stack_items));
             }
-            const context_menu =  Menu.buildFromTemplate(menu_items.concat());
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+
+            popup(play_win, menu_items, resolve);
         });
     });
 };
 
-const ngcomment = (window) => {
+const ngcomment = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-ngcomment", async (event, args) => {
         return await new Promise((resolve, reject) => {
-            const createMenuItems = () => {
-                const menu_templete = [
-                    { 
-                        id: "add-comment-ng=list",
-                        label: "コメントをNGリストに登録", 
-                    },
-                    { 
-                        id: "add-uerid-ng=list",
-                        label: "ユーザーIDをNGリストに登録", 
-                    },
-                ];
-                menu_templete.forEach(menu_item => {
-                    if(menu_item.type != "separator"){
-                        if(!menu_item.click){         
-                            menu_item.click = ()=>{
-                                resolve(menu_item.id);
-                            };
-                        }
-                    }
-                });
-                return Menu.buildFromTemplate(menu_templete);
-            };
-            const context_menu = createMenuItems();
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            const menu_items = [
+                { 
+                    id: "add-comment-ng=list",
+                    label: "コメントをNGリストに登録", 
+                },
+                { 
+                    id: "add-uerid-ng=list",
+                    label: "ユーザーIDをNGリストに登録", 
+                },
+            ];
+
+            popup(play_win, menu_items, resolve);
         });
     });
 };
 
-const watchlink = (window) => {
+const watchlink = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-watchlink", async (event, args) => {
         const { video_id, url } = args;
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { label: "再生", click() {
                     Command.play({id:video_id}, false);
                     resolve(null);
@@ -226,22 +210,18 @@ const watchlink = (window) => {
                     clipboard.writeText(url);
                     resolve(null);
                 }}
-            ]);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            ];
+            
+            popup(play_win, menu_items, resolve);
         });
     });
 };
 
-const mylistlink = (main_win, window) => {
+const mylistlink = (main_win, play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-mylistlink", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { label: "マイリストで開く", click() {
                     main_win.webContents.send("app:load-mylist", mylist_id);
                     resolve(null);
@@ -250,53 +230,41 @@ const mylistlink = (main_win, window) => {
                     clipboard.writeText(url);
                     resolve(null);
                 }}
-            ]);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            ];
+
+            popup(play_win, menu_items, resolve);
         });
     });
 };
 
-const link = (window) => {
+const link = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-link", async (event, args) => {
         const { url } = args;
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { label: "URLをコピー", click() {
                     clipboard.writeText(url);
                     resolve(null);
                 }}
-            ]);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            ];
+
+            popup(play_win, menu_items, resolve);
         });
     });
 };
 
-const text = (window) => {
+const text = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-text", async (event, args) => {
         const { text } = args;
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { label: "コピー", click() {
                     clipboard.writeText(text);
                     resolve(null);
                 }}
-            ]);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            ];
+
+            popup(play_win, menu_items, resolve);
         });
     });
 };
@@ -322,11 +290,11 @@ const getBookMarkMenuEnable = (type, items) => {
     return false;
 };
 
-const bookmark = (window) => {
+const bookmark = (main_win) => {
     ipcMain.handle("app:popup-listview-bookmark", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { 
                     id: "play",
                     label: "再生", click() {
@@ -361,43 +329,32 @@ const bookmark = (window) => {
                         resolve("toggle-mark");
                     }
                 },
-            ]);
-            context_menu.items.forEach(menu => {
-                const id = menu.id;
-                menu.enabled = getBookMarkMenuEnable(id, items);
+            ];
+
+            popup(main_win, menu_items, resolve,(menu_item)=>{
+                const id = menu_item.id;
+                menu_item.enabled = getBookMarkMenuEnable(id, items);
             });
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
         });
     });
 };
 
-const toggleMark = (window) => {
+const toggleMark = (main_win) => {
     ipcMain.handle("app:popup-listview-toggle-mark", async (event, args) => {
         return await new Promise(resolve => {
-            const context_menu = Menu.buildFromTemplate([
+            const menu_items = [
                 { 
                     id: "toggle-mark",
-                    label: "マークの切り替え", click() {
-                        resolve("toggle-mark");
-                    }
+                    label: "マークの切り替え",
                 },
-            ]);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+            ];
+
+            popup(main_win, menu_items, resolve);
         });
     });
 };
 
-const download = (window) => {
+const download = (main_win) => {
     ipcMain.handle("app:popup-download-contextmenu", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -433,22 +390,8 @@ const download = (window) => {
                     label: "削除", 
                 }
             ];
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){         
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: window});
+
+            popup(main_win, menu_items, resolve);
         });
     });
 };
@@ -500,22 +443,8 @@ const librayMain = (main_win) => {
                     label: "削除", 
                 }
             ];
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: main_win});
+
+            popup(main_win, menu_items, resolve);
         });
     });
 };
@@ -529,22 +458,8 @@ const librayConvertVideo = (main_win) => {
                     label: "mp4に変換",
                 },
             ];
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: main_win});
+
+            popup(main_win, menu_items, resolve);
         });
     });
 };
@@ -594,22 +509,7 @@ const mylist = (main_win) => {
                 ];
             }
 
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: main_win});
+            popup(main_win, menu_items, resolve);
         });
     });
 };
@@ -648,22 +548,7 @@ const playhistory = (main_win) => {
                 }}
             ];
 
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: main_win});
+            popup(main_win, menu_items, resolve);
         });
     });
 };
@@ -678,22 +563,7 @@ const settingNGComment = (player_win) => {
                 }
             ];
 
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: player_win});
+            popup(player_win, menu_items, resolve);
         });
     });
 };
@@ -732,22 +602,7 @@ const search = (main_win) => {
                 }},
             ];
 
-            menu_items.forEach(menu_item => {
-                if(menu_item.type != "separator"){
-                    if(!menu_item.click){      
-                        menu_item.click = ()=>{
-                            resolve(menu_item.id);
-                        };
-                    }
-                }
-            });
-            const context_menu = Menu.buildFromTemplate(menu_items);
-            context_menu.addListener("menu-will-close", () => {
-                setTimeout(()=>{
-                    resolve(null);
-                }, 200); 
-            });  
-            context_menu.popup({window: main_win});
+            popup(main_win, menu_items, resolve);
         });
     });
 };

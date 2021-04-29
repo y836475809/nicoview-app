@@ -105,13 +105,6 @@
                 const menu_id = await ipc.invoke("app:show-player-contextmeu", { play_data });
                 if(menu_id){
                     const { video_id, title, thumbnailURL, online } = play_data;
-                    if(menu_id=="add-bookmark"){
-                        obs.trigger("player-main-page:add-bookmark", {
-                            title: title,
-                            id: video_id,
-                            time: 0
-                        });
-                    }
                     if(menu_id=="add-bookmark-time"){
                         obs.trigger("player-video:get-current-time-callback", (current_time)=>{
                             obs.trigger("player-main-page:add-bookmark", {
@@ -131,15 +124,6 @@
                                 time: time
                             }]
                         });
-                    }
-                    if(menu_id=="add-download"){
-                        const item = {
-                            thumb_img: thumbnailURL,
-                            id: video_id,
-                            title: title,
-                            state: 0
-                        };
-                        obs.trigger("player-main-page:add-download-item", item);
                     }
                     if(menu_id=="show-open-video-form"){
                         this.obs_open_video_form.trigger("show");

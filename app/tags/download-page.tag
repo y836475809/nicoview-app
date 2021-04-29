@@ -331,12 +331,6 @@
                     if(!menu_id){
                         return;
                     }
-                    if(menu_id=="add-stack"){
-                        Command.addStackItems(obs, items);
-                    }
-                    if(menu_id=="add-bookmark"){
-                        Command.addBookmarkItems(obs, items);
-                    }
                     if(menu_id=="delete"){
                         const ret = await ipc.invoke("app:show-message-box", {
                             type:"info",

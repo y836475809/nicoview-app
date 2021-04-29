@@ -1,6 +1,7 @@
 const { ipcMain, Menu, clipboard } = require("electron");
 const { toTimeString } = require("./time-format"); 
 const { getWatchURL } = require("./nico-url"); 
+const { Command } = require("./command"); 
 
 const getMenuEnable = (menu_id, data) => {
     const { title, thumbnailURL } = data;
@@ -30,7 +31,14 @@ const setupPlayerCM1 = (window) => {
             const menu_items = [
                 { 
                     id: "add-bookmark",
-                    label: "ブックマーク",
+                    label: "ブックマーク", click() {
+                        const items = [{
+                            title: title,
+                            id: video_id
+                        }];
+                        Command.addBookmarkItems(null, items);
+                        resolve(null);
+                    }
                 },
                 { 
                     id: "add-bookmark-time",
@@ -43,7 +51,16 @@ const setupPlayerCM1 = (window) => {
                 { type: "separator" },
                 { 
                     id: "add-download",
-                    label: "ダウンロードに追加", 
+                    label: "ダウンロードに追加", click() {
+                        const items = [{
+                            thumb_img: thumbnailURL,
+                            id: video_id,
+                            title: title,
+                            state: 0
+                        }];
+                        Command.addDownloadItems(null, items);
+                        resolve(null);
+                    }
                 },   
                 { type: "separator" },
                 { 
@@ -198,19 +215,11 @@ const watchlink = (window) => {
         return await new Promise(resolve => {
             const context_menu = Menu.buildFromTemplate([
                 { label: "再生", click() {
-                    ipcMain.emit("app:play-video", null, {
-                        video_id: video_id,
-                        time: 0,
-                        online: false
-                    });
+                    Command.play({id:video_id}, false);
                     resolve(null);
                 }},
                 { label: "オンラインで再生", click() {
-                    ipcMain.emit("app:play-video", null, {
-                        video_id: video_id,
-                        time: 0,
-                        online: true
-                    });
+                    Command.play({id:video_id}, true);
                     resolve(null);
                 }},
                 { label: "URLをコピー", click() {
@@ -322,12 +331,10 @@ const bookmark = (window) => {
                     id: "play",
                     label: "再生", click() {
                         const { video_id, time } = items[0].data;
-                        const online = false;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id,
-                            time,
-                            online
-                        });
+                        Command.play({
+                            id: video_id,
+                            time: time
+                        }, false);
                         resolve(null);
                     }
                 },
@@ -335,12 +342,10 @@ const bookmark = (window) => {
                     id: "play",
                     label: "オンラインで再生", click() {
                         const { video_id, time } = items[0].data;
-                        const online = true;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id,
-                            time,
-                            online
-                        });
+                        Command.play({
+                            id: video_id,
+                            time: time
+                        }, true);
                         resolve(null);
                     }
                 },
@@ -399,34 +404,28 @@ const download = (window) => {
             const menu_items = [
                 { 
                     label: "再生", click() {
-                        const video_id = items[0].id;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id : video_id,
-                            time : 0,
-                            online: false
-                        });
+                        Command.play(items[0], false);
                         resolve(null);
                     }
                 },
                 { 
                     label: "オンラインで再生", click() {
-                        const video_id = items[0].id;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id : video_id,
-                            time : 0,
-                            online: true
-                        });
+                        Command.play(items[0], true);
                         resolve(null);
                     }
                 },
                 { 
-                    id:"add-stack",
-                    label: "後で見る", 
+                    label: "後で見る",click() {
+                        Command.addStackItems(null, items);
+                        resolve(null);
+                    }
                 },
                 { type: "separator" },
                 { 
-                    id:"add-bookmark",
-                    label: "ブックマーク", 
+                    label: "ブックマーク", click() {
+                        Command.addStackItems(null, items);
+                        resolve(null);
+                    }
                 },
                 { type: "separator" },
                 { 
@@ -460,35 +459,17 @@ const librayMain = (main_win) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { label: "再生", click() {
-                    const video_id = items[0].id;
-                    ipcMain.emit("app:play-video", null, {
-                        video_id : video_id,
-                        time : 0,
-                        online: false
-                    });
+                    Command.play(items[0], false);
                     resolve(null);
                 }},
                 { label: "オンラインで再生", click() {
-                    const video_id = items[0].id;
-                    ipcMain.emit("app:play-video", null, {
-                        video_id : video_id,
-                        time : 0,
-                        online: true
-                    });
+                    Command.play(items[0], true);
                     resolve(null);
                 }},
                 { label: "後で見る", click() {
-                    const stack_items = items.map(item => {
-                        return {
-                            id: item.id,
-                            title: item.title, 
-                            thumb_img:item.thumb_img
-                        };
-                    });
-                    main_win.webContents.send("app:add-stack-items", {items:stack_items});
+                    Command.addStackItems(null, items);
                     resolve(null);
-                }
-                },
+                }},
                 { type: "separator" },
                 { 
                     id:"update-comment",
@@ -504,14 +485,7 @@ const librayMain = (main_win) => {
                 },
                 { type: "separator" },
                 { label: "ブックマーク", click() {
-                    const bk_items = items.map(item => {
-                        return {
-                            title: item.title,
-                            id: item.id,
-                            time: 0
-                        };
-                    });
-                    main_win.webContents.send("app:add-bookmarks", bk_items);
+                    Command.addBookmarkItems(null, items);
                     resolve(null);
                 }
                 },
@@ -584,56 +558,29 @@ const mylist = (main_win) => {
             if(context_menu_type == "main"){
                 menu_items = [
                     { label: "再生", async click() {
-                        const video_id = items[0].id;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id : video_id,
-                            time : 0,
-                            online: false
-                        });
+                        Command.play(items[0], false);
                         resolve(null);
                     }},
                     { label: "オンラインで再生", async click() {
-                        const video_id = items[0].id;
-                        ipcMain.emit("app:play-video", null, {
-                            video_id : video_id,
-                            time : 0,
-                            online: true
-                        });
+                        Command.play(items[0], true);
                         resolve(null);
                     }},
                     { label: "後で見る", click() {
-                        const stack_items = items.map(item => {
-                            return {
-                                id: item.id,
-                                title: item.title, 
-                                thumb_img:item.thumb_img
-                            };
-                        });
-                        main_win.webContents.send("app:add-stack-items", {items:stack_items});
+                        Command.addStackItems(null, items);
                         resolve(null);
                     }},
                     { type: "separator" },
                     { label: "ダウンロードに追加", click() {
-                        main_win.webContents.send("app:add-download-items", items);
+                        Command.addDownloadItems(null, items);
                         resolve(null);
                     }},
                     { label: "ダウンロードから削除", click() {
-                        const video_ids = items.map(value => {
-                            return value.id;
-                        });
-                        main_win.webContents.send("app:delete-download-items", video_ids);
+                        Command.deleteDownloadItems(null, items);
                         resolve(null);
                     }},
                     { type: "separator" },
                     { label: "ブックマーク", click() {
-                        const bk_items = items.map(item => {
-                            return {
-                                title: item.title,
-                                id: item.id,
-                                time: 0
-                            };
-                        });
-                        main_win.webContents.send("app:add-bookmarks", bk_items);
+                        Command.addBookmarkItems(null, items);
                         resolve(null);
                     }}
                 ];

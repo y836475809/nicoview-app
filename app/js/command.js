@@ -1,12 +1,30 @@
 const ipc = require("electron").ipcRenderer;
+const { BrowserWindow, ipcMain } = require("electron");
+
+const isMainProcess = () => {
+    return process.type == "browser";
+};
+
+const send = (channel, args) => {
+    const win = BrowserWindow.getAllWindows().find(bw=>{
+        return bw._tag == "main";
+    });
+    win.webContents.send(channel, args);
+};
 
 class Command {
     static play(item, online) {
-        ipc.send("app:play-video", {
+        const video_item = {
             video_id : item.id,
-            time : 0,
+            time : item.time?item.time:0,
             online: online
-        });
+        };
+
+        if(isMainProcess()){
+            ipcMain.emit("app:play-video", null, video_item);
+        }else{
+            ipc.send("app:play-video", video_item);
+        }  
     }
 
     static addStackItems(obs, items) {
@@ -17,7 +35,12 @@ class Command {
                 thumb_img:item.thumb_img
             };
         });
-        obs.trigger("play-stack-page:add-items", {items:stack_items});
+
+        if(isMainProcess()){
+            send("app:add-stack-items", {items:stack_items});
+        }else{
+            obs.trigger("play-stack-page:add-items", {items:stack_items});
+        }
     }
 
     static addBookmarkItems(obs, items) {
@@ -28,18 +51,32 @@ class Command {
                 time: 0
             };
         });
-        obs.trigger("bookmark-page:add-items", bk_items);
+
+        if(isMainProcess()){
+            send("app:add-bookmarks", bk_items);
+        }else{
+            obs.trigger("bookmark-page:add-items", bk_items);
+        } 
     }
 
     static addDownloadItems(obs, items) {
-        obs.trigger("download-page:add-download-items", items);
+        if(isMainProcess()){
+            send("app:add-download-items", items);
+        }else{
+            obs.trigger("download-page:add-download-items", items);
+        } 
     }
 
     static deleteDownloadItems(obs, items) {
         const video_ids = items.map(value => {
             return value.id;
         });
-        obs.trigger("download-page:delete-download-items", video_ids);
+
+        if(isMainProcess()){
+            send("app:delete-download-items", video_ids);
+        }else{
+            obs.trigger("download-page:delete-download-items", video_ids);
+        }
     }
 }
 

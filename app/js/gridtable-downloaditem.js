@@ -194,7 +194,10 @@ class GridTableDownloadItem {
 
     deleteItems(video_ids){
         video_ids.forEach(video_id => {
-            this.grid_table.dataView.deleteItem(video_id);
+            const row_index = this.grid_table.dataView.getRowById(video_id);
+            if(row_index!==undefined){
+                this.grid_table.dataView.deleteItem(video_id);
+            }
         });
     }
 

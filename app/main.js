@@ -15,7 +15,7 @@ const { StartupConfig } = require("./start-up-config");
 const { Store } = require("./js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
 const { NicoLogin } = require("./js/nico-login");
-const ContextMenus = require("./js/contextmenu");
+const { setupContextmenu } = require("./js/contextmenu");
 
 const { 
     JsonStore, UserCSS, 
@@ -642,23 +642,8 @@ app.on("ready", async ()=>{
     });
 
     createWindow();
-
-    ContextMenus.setupPlayerCM1(player_win);
-    ContextMenus.setupPlayerCM2(player_win, store, history, config);
-    ContextMenus.player.ngcomment(player_win);
-    ContextMenus.player.watchlink(player_win);
-    ContextMenus.player.mylistlink(player_win);
-    ContextMenus.player.link(player_win);
-    ContextMenus.player.text(player_win);
-    ContextMenus.player.settingNGComment(player_win);
-    ContextMenus.listview.bookmark(main_win);
-    ContextMenus.listview.toggleMark(main_win);
-    ContextMenus.main.download(main_win);
-    ContextMenus.main.librayMain(main_win);
-    ContextMenus.main.librayConvertVideo(main_win);
-    ContextMenus.main.mylist(main_win);
-    ContextMenus.main.playhistory(main_win);
-    ContextMenus.main.search(main_win);
+    
+    setupContextmenu(main_win, player_win, config, history, store);
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

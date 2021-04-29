@@ -44,7 +44,7 @@ const getMenuEnable = (menu_id, data) => {
     return true;
 };
 
-const setupPlayerCM1 = (play_win) => {
+const player = (play_win) => {
     ipcMain.handle("app:show-player-contextmeu", async (event, args) => {
         const { play_data } = args;
         const { video_id, title, thumbnailURL, online } = play_data;
@@ -133,7 +133,7 @@ const setupPlayerCM1 = (play_win) => {
     });
 };
 
-const setupPlayerCM2 = (play_win, store, history, config) => {
+const player_history_stack = (play_win, store, history, config) => {
     ipcMain.handle("app:show-player-contextmeu2", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const createMenuItems = (items) => {
@@ -174,7 +174,7 @@ const setupPlayerCM2 = (play_win, store, history, config) => {
     });
 };
 
-const ngcomment = (play_win) => {
+const player_ngcomment = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-ngcomment", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const menu_items = [
@@ -193,7 +193,7 @@ const ngcomment = (play_win) => {
     });
 };
 
-const watchlink = (play_win) => {
+const player_watch_link = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-watchlink", async (event, args) => {
         const { video_id, url } = args;
         return await new Promise(resolve => {
@@ -217,7 +217,7 @@ const watchlink = (play_win) => {
     });
 };
 
-const mylistlink = (play_win) => {
+const player_mylist_link = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-mylistlink", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
@@ -237,7 +237,7 @@ const mylistlink = (play_win) => {
     });
 };
 
-const link = (play_win) => {
+const player_link = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-link", async (event, args) => {
         const { url } = args;
         return await new Promise(resolve => {
@@ -253,7 +253,7 @@ const link = (play_win) => {
     });
 };
 
-const text = (play_win) => {
+const player_text = (play_win) => {
     ipcMain.handle("app:popup-player-contextmenu-text", async (event, args) => {
         const { text } = args;
         return await new Promise(resolve => {
@@ -265,6 +265,21 @@ const text = (play_win) => {
             ];
 
             popup(play_win, menu_items, resolve);
+        });
+    });
+};
+
+const player_setting_ngcomment = (player_win) => {
+    ipcMain.handle("app:popup-setting-ng-comment-contextmenu", async (event, args) => {
+        return await new Promise(resolve => {
+            const menu_items = [
+                { 
+                    id:"delete",
+                    label: "削除",
+                }
+            ];
+
+            popup(player_win, menu_items, resolve);
         });
     });
 };
@@ -290,7 +305,7 @@ const getBookMarkMenuEnable = (type, items) => {
     return false;
 };
 
-const bookmark = (main_win) => {
+const listview_bookmark = (main_win) => {
     ipcMain.handle("app:popup-listview-bookmark", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -339,7 +354,7 @@ const bookmark = (main_win) => {
     });
 };
 
-const toggleMark = (main_win) => {
+const listview_toggle_mark = (main_win) => {
     ipcMain.handle("app:popup-listview-toggle-mark", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
@@ -354,7 +369,7 @@ const toggleMark = (main_win) => {
     });
 };
 
-const download = (main_win) => {
+const main_download = (main_win) => {
     ipcMain.handle("app:popup-download-contextmenu", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -396,7 +411,7 @@ const download = (main_win) => {
     });
 };
 
-const librayMain = (main_win) => {
+const main_library = (main_win) => {
     ipcMain.handle("app:popup-library-contextmenu", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -449,7 +464,7 @@ const librayMain = (main_win) => {
     });
 };
 
-const librayConvertVideo = (main_win) => {
+const main_library_convert_video = (main_win) => {
     ipcMain.handle("app:popup-library-convert-video-contextmenu", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
@@ -464,7 +479,7 @@ const librayConvertVideo = (main_win) => {
     });
 };
 
-const mylist = (main_win) => {
+const main_mylist = (main_win) => {
     ipcMain.handle("app:popup-myist-contextmenu", async (event, args) => {
         const { context_menu_type, items } = args;
 
@@ -514,7 +529,7 @@ const mylist = (main_win) => {
     });
 };
 
-const playhistory = (main_win) => {
+const main_play_history = (main_win) => {
     ipcMain.handle("app:popup-play-history-contextmenu", async (event, args) => {
         const { items } = args;
 
@@ -553,22 +568,7 @@ const playhistory = (main_win) => {
     });
 };
 
-const settingNGComment = (player_win) => {
-    ipcMain.handle("app:popup-setting-ng-comment-contextmenu", async (event, args) => {
-        return await new Promise(resolve => {
-            const menu_items = [
-                { 
-                    id:"delete",
-                    label: "削除",
-                }
-            ];
-
-            popup(player_win, menu_items, resolve);
-        });
-    });
-};
-
-const search = (main_win) => {
+const main_search = (main_win) => {
     ipcMain.handle("app:popup-search-contextmenu", async (event, args) => {
         const { items } = args;
 
@@ -607,27 +607,27 @@ const search = (main_win) => {
     });
 };
 
+const setupContextmenu = (main_win, player_win, config, history, store) => {
+    player(player_win);
+    player_history_stack(player_win, store, history, config);
+    player_ngcomment(player_win);
+    player_watch_link(player_win);
+    player_mylist_link(player_win);
+    player_link(player_win);
+    player_text(player_win);
+    player_setting_ngcomment(player_win);
+
+    listview_bookmark(main_win);
+    listview_toggle_mark(main_win);
+
+    main_download(main_win);
+    main_library(main_win);
+    main_library_convert_video(main_win);
+    main_mylist(main_win);
+    main_play_history(main_win);
+    main_search(main_win);
+};
+
 module.exports = { 
-    setupPlayerCM1,
-    setupPlayerCM2,
-    player : {
-        ngcomment,
-        watchlink,
-        mylistlink,
-        link,
-        text,
-        settingNGComment,
-    },
-    listview : {
-        toggleMark,
-        bookmark,
-    },
-    main: {
-        download,
-        librayMain,
-        librayConvertVideo,
-        mylist,
-        playhistory,
-        search,
-    }
+    setupContextmenu,
 };

@@ -423,7 +423,7 @@ const download = (window) => {
                 { type: "separator" },
                 { 
                     label: "ブックマーク", click() {
-                        Command.addStackItems(null, items);
+                        Command.addBookmarkItems(null, items);
                         resolve(null);
                     }
                 },

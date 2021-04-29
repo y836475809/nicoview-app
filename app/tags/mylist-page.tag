@@ -345,7 +345,7 @@
 
                 const need_convert = needConvertVideo(await ipc.invoke("library:getItem", {video_id}));
                 const context_menu_type = need_convert?"convert-video":"main";
-                const menu_id = await ipc.invoke("app:popup-myist-contextmenu", {context_menu_type, items});
+                const menu_id = await ipc.invoke("app:popup-mylist-contextmenu", {context_menu_type, items});
                 if(!menu_id){
                     return;
                 }

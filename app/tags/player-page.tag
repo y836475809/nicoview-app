@@ -90,7 +90,7 @@
             if(e.button === 1){
                 contextmenu_show = true;
 
-                await ipc.invoke("app:show-player-contextmeu2");
+                await ipc.invoke("app:popup-player-contextmenu-history-stack");
 
                 contextmenu_show = false;
             }
@@ -99,7 +99,7 @@
                 contextmenu_show = true;
 
                 const play_data = await getPlayData(); 
-                const menu_id = await ipc.invoke("app:show-player-contextmeu", { play_data });
+                const menu_id = await ipc.invoke("app:popup-player-contextmenu", { play_data });
                 if(menu_id){
                     const { video_id, title, thumbnailURL, online } = play_data;
                     if(menu_id=="add-bookmark-time"){

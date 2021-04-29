@@ -88,7 +88,7 @@
                 grid_table.init(".comment-ng-grid");
                 grid_table.setupResizer(".comment-ng-grid-container");
                 grid_table.onContextMenu(async (e) => {
-                    const menu_id = await ipc.invoke("app:popup-setting-ng-comment-contextmenu");
+                    const menu_id = await ipc.invoke("app:popup-setting-ngcomment-contextmenu");
                     if(!menu_id){
                         return;
                     }

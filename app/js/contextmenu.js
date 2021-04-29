@@ -45,7 +45,7 @@ const getMenuEnable = (menu_id, data) => {
 };
 
 const player = (play_win) => {
-    ipcMain.handle("app:show-player-contextmeu", async (event, args) => {
+    ipcMain.handle("app:popup-player-contextmenu", async (event, args) => {
         const { play_data } = args;
         const { video_id, title, thumbnailURL, online } = play_data;
         return await new Promise((resolve, reject) => {
@@ -134,7 +134,7 @@ const player = (play_win) => {
 };
 
 const player_history_stack = (play_win, store, history, config) => {
-    ipcMain.handle("app:show-player-contextmeu2", async (event, args) => {
+    ipcMain.handle("app:popup-player-contextmenu-history-stack", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const createMenuItems = (items) => {
                 return items.map(item=>{
@@ -191,7 +191,7 @@ const player_ngcomment = (play_win) => {
 };
 
 const player_watch_link = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-watchlink", async (event, args) => {
+    ipcMain.handle("app:popup-player-contextmenu-watch-link", async (event, args) => {
         const { video_id, url } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -215,7 +215,7 @@ const player_watch_link = (play_win) => {
 };
 
 const player_mylist_link = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-mylistlink", async (event, args) => {
+    ipcMain.handle("app:popup-player-contextmenu-mylist-link", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -267,7 +267,7 @@ const player_text = (play_win) => {
 };
 
 const player_setting_ngcomment = (player_win) => {
-    ipcMain.handle("app:popup-setting-ng-comment-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-setting-ngcomment-contextmenu", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -462,7 +462,7 @@ const main_library = (main_win) => {
 };
 
 const main_library_convert_video = (main_win) => {
-    ipcMain.handle("app:popup-library-convert-video-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-library-contextmenu-convert-video", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -477,7 +477,7 @@ const main_library_convert_video = (main_win) => {
 };
 
 const main_mylist = (main_win) => {
-    ipcMain.handle("app:popup-myist-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-mylist-contextmenu", async (event, args) => {
         const { context_menu_type, items } = args;
 
         return await new Promise(resolve => {

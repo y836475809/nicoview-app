@@ -162,7 +162,7 @@
             const video_id = paths.pop();
             
             if(e.button === 2){ 
-                await ipc.invoke("app:popup-player-contextmenu-watchlink", {
+                await ipc.invoke("app:popup-player-contextmenu-watch-link", {
                     video_id: video_id,
                     url: e.target.href
                 });
@@ -185,7 +185,7 @@
 
             const mylist_id = NicoURL.getMylistID(e.target.href);
             if(e.button === 2){
-                await ipc.invoke("app:popup-player-contextmenu-mylistlink", {
+                await ipc.invoke("app:popup-player-contextmenu-mylist-link", {
                     mylist_id: mylist_id,
                     url: e.target.href
                 });
@@ -294,14 +294,14 @@
         const popupDescriptionMenu = async (type, text) => {
             if(type=="watch"){
                 const video_id = text;
-                await ipc.invoke("app:popup-player-contextmenu-watchlink", {
+                await ipc.invoke("app:popup-player-contextmenu-watch-link", {
                     video_id: video_id,
                     url: NicoURL.getWatchURL(video_id)
                 });
             }
             if(type=="mylist" || type=="user"){
                 const mylist_id = text;
-                await ipc.invoke("app:popup-player-contextmenu-mylistlink", {
+                await ipc.invoke("app:popup-player-contextmenu-mylist-link", {
                     mylist_id: mylist_id,
                     url: NicoURL.getMylistURL(mylist_id)
                 });

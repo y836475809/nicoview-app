@@ -807,7 +807,7 @@
                         await deleteLibraryData(video_ids);
                     }
                 }else{
-                    const menu_id = await ipc.invoke("app:popup-library-convert-video-contextmenu");
+                    const menu_id = await ipc.invoke("app:popup-library-contextmenu-convert-video");
                     if(menu_id=="convert-video"){
                         const video_id = items[0].id;
                         await convertVideo(video_id);

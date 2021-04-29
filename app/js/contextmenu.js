@@ -698,6 +698,60 @@ const settingNGComment = (player_win) => {
     });
 };
 
+const search = (main_win) => {
+    ipcMain.handle("app:popup-search-contextmenu", async (event, args) => {
+        const { items } = args;
+
+        return await new Promise(resolve => {
+            const menu_items = [
+                { label: "再生", click() {
+                    Command.play(items[0], false);
+                    resolve(null);
+                }},
+                { label: "オンラインで再生", click() {
+                    Command.play(items[0], true);
+                    resolve(null);
+                }},
+                { label: "後で見る", click() {
+                    Command.addStackItems(null, items);
+                    resolve(null);
+                }},
+                { type: "separator" },
+                { label: "ダウンロードに追加", click() {
+                    Command.addDownloadItems(null, items);
+                    resolve(null);
+                }},
+                { label: "ダウンロードから削除", click() {
+                    Command.deleteDownloadItems(null, items);
+                    resolve(null);
+                }},
+                { type: "separator" },
+                { label: "動画をブックマーク", click() {
+                    Command.addBookmarkItems(null, items);
+                    resolve(null);
+                }},
+            ];
+
+            menu_items.forEach(menu_item => {
+                if(menu_item.type != "separator"){
+                    if(!menu_item.click){      
+                        menu_item.click = ()=>{
+                            resolve(menu_item.id);
+                        };
+                    }
+                }
+            });
+            const context_menu = Menu.buildFromTemplate(menu_items);
+            context_menu.addListener("menu-will-close", () => {
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
+            });  
+            context_menu.popup({window: main_win});
+        });
+    });
+};
+
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
@@ -719,5 +773,6 @@ module.exports = {
         librayConvertVideo,
         mylist,
         playhistory,
+        search,
     }
 };

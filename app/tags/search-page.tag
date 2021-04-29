@@ -296,7 +296,6 @@
         /* globals riot logger */
         const {remote} = window.electron;
         const ipc = window.electron.ipcRenderer;
-        const { Menu } = remote;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
@@ -678,33 +677,6 @@
 
             this.pagination_obs.trigger("back");
         });
-
-        const createMenu = (items) => {
-            const menu_templete = [
-                { label: "再生", click() {
-                    Command.play(items[0], false);
-                }},
-                { label: "オンラインで再生", click() {
-                    Command.play(items[0], true);
-                }},
-                { label: "後で見る", click() {
-                    const items = grid_table.getSelectedDatas();
-                    Command.addStackItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "ダウンロードに追加", click() {
-                    Command.addDownloadItems(obs, items);
-                }},
-                { label: "ダウンロードから削除", click() {
-                    Command.deleteDownloadItems(obs, items);
-                }},
-                { type: "separator" },
-                { label: "動画をブックマーク", click() {
-                    Command.addBookmarkItems(obs, items);
-                }},
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
         
         this.on("mount", async () => {
             const elm = this.root.querySelector(".cond-menu-container1");
@@ -741,15 +713,14 @@
                     Command.addDownloadItems(obs, [data]);
                 }
             });
-            grid_table.onContextMenu((e)=>{
+            grid_table.onContextMenu(async (e)=>{
                 const items = grid_table.getSelectedDatas().filter(value => {
                     return value.id!="";
                 });
                 if(items.length===0){
                     return;
                 }
-                const context_menu = createMenu(items);
-                context_menu.popup({window: remote.getCurrentWindow()});
+                await ipc.invoke("app:popup-search-contextmenu", {items});
             });
 
             const { api, sort_item, search_target_item } = await loadSearchCond();

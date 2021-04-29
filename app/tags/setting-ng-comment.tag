@@ -43,8 +43,7 @@
 
     <script>
         /* globals */
-        const { remote } = window.electron;
-        const { Menu } = remote;
+        const ipc = window.electron.ipcRenderer;
         const { GridTable } = window.GridTable;
 
         const obs_dialog = this.opts.obs;
@@ -83,25 +82,19 @@
             grid_table.deleteItems(items);
         };
 
-        const createMenu = () => {
-            const menu_templete = [
-                {
-                    label: "削除", click() {
-                        deleteSelectedItems();
-                    }
-                }
-            ];
-            return Menu.buildFromTemplate(menu_templete);
-        };
-
         const setup = (ng_items) => {
             if (grid_table == null) {
                 grid_table = new GridTable("comment-ng-grid", columns, options);
                 grid_table.init(".comment-ng-grid");
                 grid_table.setupResizer(".comment-ng-grid-container");
-                const context_menu = createMenu();
-                grid_table.onContextMenu((e) => {
-                    context_menu.popup({ window: remote.getCurrentWindow() });
+                grid_table.onContextMenu(async (e) => {
+                    const menu_id = await ipc.invoke("app:popup-setting-ng-comment-contextmenu");
+                    if(!menu_id){
+                        return;
+                    }
+                    if(menu_id=="delete"){
+                        deleteSelectedItems();
+                    }
                 });
             }
             

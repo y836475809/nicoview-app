@@ -650,6 +650,7 @@ app.on("ready", async ()=>{
     ContextMenus.player.mylistlink(main_win, player_win);
     ContextMenus.player.link(player_win);
     ContextMenus.player.text(player_win);
+    ContextMenus.player.settingNGComment(player_win);
     ContextMenus.listview.bookmark(main_win);
     ContextMenus.listview.toggleMark(main_win);
     ContextMenus.main.download(main_win);

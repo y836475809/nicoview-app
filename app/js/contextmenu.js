@@ -668,6 +668,36 @@ const playhistory = (main_win) => {
     });
 };
 
+const settingNGComment = (player_win) => {
+    ipcMain.handle("app:popup-setting-ng-comment-contextmenu", async (event, args) => {
+        return await new Promise(resolve => {
+            const menu_items = [
+                { 
+                    id:"delete",
+                    label: "削除",
+                }
+            ];
+
+            menu_items.forEach(menu_item => {
+                if(menu_item.type != "separator"){
+                    if(!menu_item.click){      
+                        menu_item.click = ()=>{
+                            resolve(menu_item.id);
+                        };
+                    }
+                }
+            });
+            const context_menu = Menu.buildFromTemplate(menu_items);
+            context_menu.addListener("menu-will-close", () => {
+                setTimeout(()=>{
+                    resolve(null);
+                }, 200); 
+            });  
+            context_menu.popup({window: player_win});
+        });
+    });
+};
+
 module.exports = { 
     setupPlayerCM1,
     setupPlayerCM2,
@@ -677,6 +707,7 @@ module.exports = {
         mylistlink,
         link,
         text,
+        settingNGComment,
     },
     listview : {
         toggleMark,

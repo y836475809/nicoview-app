@@ -148,11 +148,8 @@ const player_history_stack = (play_win, store, history, config) => {
                     };
                     return { 
                         label: getTitle(), click() {
-                            resolve({
-                                video_id: id,
-                                time: time?time:0,
-                                online: false
-                            });
+                            Command.play(item, false);
+                            resolve(null);
                         }
                     };
                 });

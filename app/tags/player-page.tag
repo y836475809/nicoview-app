@@ -90,10 +90,7 @@
             if(e.button === 1){
                 contextmenu_show = true;
 
-                const video_item = await ipc.invoke("app:show-player-contextmeu2");
-                if(video_item){
-                    ipc.send("app:play-video", video_item);
-                }
+                await ipc.invoke("app:show-player-contextmeu2");
 
                 contextmenu_show = false;
             }

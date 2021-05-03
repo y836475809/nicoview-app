@@ -1,9 +1,6 @@
 const root_dir = "..";
 
 process.once("loaded", () => {
-    global.process = process;
-    global.electron = require("electron");
-    global.path = require("path");
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
     global.myapi = require(`${root_dir}/app/js/my-api`);

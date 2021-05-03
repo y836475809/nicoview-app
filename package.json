@@ -29,7 +29,7 @@
     "@fortawesome/fontawesome-free": "^5.15.3",
     "cheerio": "^1.0.0-rc.6",
     "electron-log": "^4.3.5",
-    "gsap": "^3.5.1",
+    "gsap": "^3.6.1",
     "riot": "^3.13.2",
     "slickgrid": "^2.4.34",
     "sortablejs": "^1.13.0",

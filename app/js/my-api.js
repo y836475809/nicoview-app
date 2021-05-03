@@ -48,6 +48,12 @@ const onOpenVideoForm = (func) => {
     });
 };
 
+const clearAppCache = async ()=>{
+    return await ipcRenderer.invoke("setting:clear-app-cache");
+};
+const getAppCache = async ()=>{
+    return await ipcRenderer.invoke("setting:get-app-cache");
+};
 
 const Config = {
     get: async (key, default_value) => {
@@ -152,25 +158,18 @@ const PlayHistory = {
     },
 };
 
-const Setting = {
+const Shell = {
     openDir:async (dir)=>{
         return await ipcRenderer.invoke("setting:open-dir", {dir});
     },
+};
 
+const Setting = {
     reloadCSS:async (file_path)=>{
         return await ipcRenderer.invoke("setting:reload-css", {file_path});
     }, 
- 
     setLogLevel:async (level)=>{
         return await ipcRenderer.invoke("setting:change-log-level", {level});
-    }, 
-
-    clearAppCache:async ()=>{
-        return await ipcRenderer.invoke("setting:clear-app-cache");
-    }, 
-
-    getAppCache:async ()=>{
-        return await ipcRenderer.invoke("setting:get-app-cache");
     }, 
 
     onReloadCSS: (func) => {  
@@ -306,6 +305,8 @@ const myapi = {
         playerReady,
         showyPlayer,
         onOpenVideoForm,
+        clearAppCache,
+        getAppCache,
 
         Config,
         Dialog,
@@ -313,6 +314,7 @@ const myapi = {
         NGList,
         MyList,
         PlayHistory,
+        Shell,
         Setting,
         Stack,
         Bookmark,

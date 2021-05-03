@@ -276,7 +276,7 @@
 
         this.onclickOpenDir = async (e) => {
             const dir = await myapi.ipc.Config.get("app_setting_dir", "");
-            await myapi.ipc.Setting.openDir(dir);
+            await myapi.ipc.Shell.openDir(dir);
         };
 
         this.onclickSelectffmpegPath = async e => {
@@ -315,7 +315,7 @@
         };
 
         const getCacheSizeLabel = async () => {
-            const size_byte = await myapi.ipc.Setting.getAppCache();
+            const size_byte = await myapi.ipc.getAppCache();
             const mb = 1024**2;
             return `${(size_byte/mb).toFixed(1)}MB`;
         };
@@ -335,7 +335,7 @@
             });
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            await myapi.ipc.Setting.clearAppCache();
+            await myapi.ipc.clearAppCache();
 
             this.obs_modal_dialog.trigger("close");
 

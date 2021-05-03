@@ -211,7 +211,6 @@
     <script>
         /* globals riot logger */
         const myapi = window.myapi;
-        const path = window.path;
         const fs = window.fs;
         const { ImportLibrary } = window.ImportLibrary;
         const { ImportNNDDData } = window.ImportNNDDData;
@@ -442,20 +441,10 @@
             elm.checked = value;
         };
 
-        const getDefaultCSSPath = async () => {
-            try {
-                const css_path = path.join(process.resourcesPath, "user.css");
-                await fs.promises.stat(css_path);
-                return css_path;
-            } catch(err) {
-                return "";
-            }
-        };
-
         this.on("mount", async () => {
             setInputValue(".app-setting-dir-input", await myapi.ipc.Config.get("app_setting_dir", "")); 
 
-            const css_path = await getDefaultCSSPath();
+            const css_path = await myapi.ipc.Setting.getDefaultCSSPath();
             setInputValue(".css-path-input", await myapi.ipc.Config.get("css_path", css_path)); 
 
             setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 

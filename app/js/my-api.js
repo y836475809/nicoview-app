@@ -1,4 +1,6 @@
 const { ipcRenderer} = require("electron");
+const path = require("path");
+const fs = require("fs");
 
 const login = (mail, password) => {
     ipcRenderer.send("app:nico-login", {
@@ -165,6 +167,15 @@ const Shell = {
 };
 
 const Setting = {
+    getDefaultCSSPath:async () => {
+        try {
+            const css_path = path.join(process.resourcesPath, "user.css");
+            await fs.promises.stat(css_path);
+            return css_path;
+        } catch(err) {
+            return "";
+        }
+    },
     reloadCSS:async (file_path)=>{
         return await ipcRenderer.invoke("setting:reload-css", {file_path});
     }, 

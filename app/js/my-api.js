@@ -2,6 +2,10 @@ const { ipcRenderer} = require("electron");
 const path = require("path");
 const fs = require("fs");
 
+const isDebugMode = () => {
+    return process.env.NODE_ENV == "DEBUG";
+};
+
 const login = (mail, password) => {
     ipcRenderer.send("app:nico-login", {
         mail,
@@ -332,7 +336,9 @@ const Library = {
 };
 
 const myapi = {
-    ipc: {
+    isDebugMode,
+    
+    ipc: {    
         login,
         logout,
         getNicoLoginCookie,

@@ -48,7 +48,7 @@
             riot.mount("main-page", {obs});
         });
 
-        if(process.env.NODE_ENV == "DEBUG"){
+        if(myapi.isDebugMode()){
             const { NicoMockServer } = window.NicoMockServer;
             
             const nico_mock_server = new NicoMockServer();

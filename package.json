@@ -22,7 +22,7 @@
     "electron": "^9.4.0",
     "electron-builder": "^22.9.1",
     "eslint-plugin-html": "^6.1.2",
-    "nock": "^13.0.5",
+    "nock": "^13.0.11",
     "sinon": "^10.0.0"
   },
   "dependencies": {

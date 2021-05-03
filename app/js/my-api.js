@@ -6,6 +6,11 @@ const isDebugMode = () => {
     return process.env.NODE_ENV == "DEBUG";
 };
 
+const getUserAgent = () => {
+    return process.env["user_agent"];
+};
+
+
 const login = (mail, password) => {
     ipcRenderer.send("app:nico-login", {
         mail,
@@ -337,6 +342,7 @@ const Library = {
 
 const myapi = {
     isDebugMode,
+    getUserAgent,
     
     ipc: {    
         login,

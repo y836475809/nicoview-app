@@ -406,7 +406,7 @@
 
         const search_offset = 1600;
         const search_limit = 32;
-        const search_context = process.env["user_agent"];
+        const search_context = myapi.getUserAgent();
         const nico_search_params = new NicoSearchParams(search_limit, search_context);
         const nico_search = new NicoSearch();
 

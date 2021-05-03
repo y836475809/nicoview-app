@@ -37,15 +37,14 @@
     
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         var { logger } = window.logger; // eslint-disable-line
 
         const obs = riot.observable();
 
-        ipc.invoke("config:set", 
-            { key:"download.wait_time", value:10 }).then();
+        myapi.ipc.Config.set("download.wait_time", 10).then();
 
-        ipc.on("app:on-load-content", (event)=>{
+        myapi.ipc.onLoadContent(()=>{
             riot.mount("main-page", {obs});
         });
 
@@ -59,8 +58,7 @@
                 nico_mock_server.close();
             });
 
-            ipc.invoke("config:set", 
-                { key:"download.wait_time", value:1 }).then();
+            myapi.ipc.Config.set("download.wait_time", 1).then();
         }
     </script>
 </html>

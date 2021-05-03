@@ -18,7 +18,7 @@
 
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -27,13 +27,13 @@
         this.geticon = this.opts.geticon;
 
         this.on("mount", async () => {
-            const items = await ipc.invoke("library-search:getItems");
+            const items = await myapi.ipc.Library.getSearchItems();
             this.obs_listview.trigger("loadData", { items });
         });
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
-            await ipc.invoke("library-search:updateItems", { items });
+            await myapi.ipc.Library.updateSearchItems(items);
         });
         
         this.obs_listview.on("show-contextmenu", (e, args) => {
@@ -211,7 +211,7 @@
 
     <script>
         /* globals riot logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoUpdate } = window.NicoUpdate;
@@ -222,7 +222,7 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
 
-        ipc.on("library:on-add-item", async (event, args) => {
+        myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_data = new NicoVideoData(video_item);
             const video_id = video_item.id;
@@ -231,12 +231,12 @@
             grid_table.updateItem(video_item, video_id);
         });
 
-        ipc.on("library:on-delete-item", async (event, args) => {
+        myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
             grid_table.deleteItemById(video_id);
         });
 
-        ipc.on("library:on-update-item", (event, args) => {
+        myapi.ipc.Library.onUpdateItem((args) => {
             const {video_id, props} = args;
             logger.debug("library:on-update-item video_id=", video_id, " props=", props);
 
@@ -246,7 +246,7 @@
             grid_table.updateCells(video_id, props);
         });
 
-        ipc.on("library:on-init", (event, args) =>{
+        myapi.ipc.Library.onInit((args) =>{
             const {items} = args;
             const library_items = items.map(value=>{
                 const video_data = new NicoVideoData(value);
@@ -417,15 +417,6 @@
 
             filterItems(query, target_ids);      
         });
-
-        obs.on("library-page:bookmark-item-dlbclicked", (item) => {
-            const video_id = item.video_id;
-            ipc.send("app:play-video", {
-                video_id : video_id,
-                time : 0,
-                online: false
-            });     
-        });
     
         const loadLibraryItems = (items)=>{
             grid_table.setData(items);
@@ -474,12 +465,12 @@
 
                     grid_table.updateCell(item.id, "state", "更新中");
                     try {
-                        const video_item = await ipc.invoke("library:getItem", {video_id:item.id});
+                        const video_item = await myapi.ipc.Library.getItem(item.id);
                         nico_update = new NicoUpdate(video_item);
                         nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                            await ipc.invoke("library:updateItemProps", {video_id, props});
+                            await myapi.ipc.Library.updateItemProps(video_id, props);
                             if(update_thumbnail){
-                                const updated_video_item = await ipc.invoke("library:getItem", {video_id});
+                                const updated_video_item = await myapi.ipc.Library.getItem(video_id);
                                 const video_data = new NicoVideoData(updated_video_item);
                                 const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                 grid_table.updateCells(video_id, {thumb_img});
@@ -511,14 +502,13 @@
             this.obs_modal_dialog.trigger("close");
             
             if(error_items.length > 0){
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `${error_items.length}個が更新に失敗\n詳細はログを参照`,
+                    message: `${error_items.length}個が更新に失敗\n詳細はログを参照`
                 });
             }else{
-                await ipc.invoke("app:show-message-box", {
-                    type: "info",
-                    message: `更新完了(${cur_update}/${items.length})`,
+                await myapi.ipc.Dialog.showMessageBox({
+                    message: `更新完了(${cur_update}/${items.length})`
                 });
             }
         };
@@ -553,7 +543,7 @@
 
                     grid_table.updateCell(item.id, "state", "変換中");
                     try {
-                        const video_item = await ipc.invoke("library:getItem", {video_id:item.id});
+                        const video_item = await myapi.ipc.Library.getItem(item.id);
                         if(video_item.data_type == "json"){
                             const cnv_nico = new JsonDataConverter(video_item);
                             await cnv_nico.convertThumbInfo();
@@ -586,14 +576,13 @@
             this.obs_modal_dialog.trigger("close");
 
             if(error_items.length > 0){
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `${error_items.length}個がNNDD形式への変換に失敗\n詳細はログを参照`,
+                    message: `${error_items.length}個がNNDD形式への変換に失敗\n詳細はログを参照`
                 });
             }else{
-                await ipc.invoke("app:show-message-box", {
-                    type: "info",
-                    message: `NNDD形式への変換完了(${cur_update}/${items.length})`,
+                await myapi.ipc.Dialog.showMessageBox({
+                    message: `NNDD形式への変換完了(${cur_update}/${items.length})`
                 });
             }
         };
@@ -619,7 +608,7 @@
                 }
                 const video_id = video_ids[index];
                 this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
-                const result = await ipc.invoke("library:deleteItem", { video_id });
+                const result = await myapi.ipc.Library.deleteItem(video_id);
                 // await wait(3000);
                 // await wait(3000);
                 // const result =  {
@@ -632,9 +621,9 @@
                 }
             }
             if(error_ids.length > 0){
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`${error_ids.length}個の削除に失敗\n詳細はログを参照`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `${error_ids.length}個の削除に失敗\n詳細はログを参照`
                 });
             }
             this.obs_modal_dialog.trigger("close");
@@ -650,10 +639,9 @@
             };
 
             try {
-                const video_item = await ipc.invoke("library:getItem", {video_id});
+                const video_item = await myapi.ipc.Library.getItem(video_id);
                 const video_data = new NicoVideoData(video_item);
-                const ffmpeg_path = await ipc.invoke("config:get", { key:"ffmpeg_path", value:"" });
-
+                const ffmpeg_path = await myapi.ipc.Config.get("ffmpeg_path", "");
                 const cnv_mp4 = new ConvertMP4();
 
                 this.obs_modal_dialog.trigger("show", {
@@ -666,9 +654,9 @@
 
                 cnv_mp4.on("cancel_error", async error=>{
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:`中断失敗\n${error.message}`
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: `中断失敗\n${error.message}`
                     });
                 });
 
@@ -677,25 +665,23 @@
                 await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
                
                 const props = {video_type:"mp4"};
-                await ipc.invoke("library:updateItemProps", {video_id, props});
+                await myapi.ipc.Library.updateItemProps(video_id, props);
 
-                await ipc.invoke("app:show-message-box", {
-                    type:"info",
-                    message:"変換完了"
+                await myapi.ipc.Dialog.showMessageBox({
+                    message: "変換完了"
                 });
                 updateState("変換完了");  
 
             } catch (error) {
                 if(error.cancel === true){
-                    await ipc.invoke("app:show-message-box", {
-                        type:"info",
-                        message:"変換中断"
+                    await myapi.ipc.Dialog.showMessageBox({
+                        message: "変換中断"
                     });
                     updateState("変換中断");   
                 }else{
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
                         message: `変換失敗\n${error.message}`
                     });
                     updateState("変換失敗");   
@@ -710,10 +696,9 @@
             const video_type = item.video_type;
 
             if(!online && needConvertVideo(video_type)){
-                const ret = await ipc.invoke("app:show-message-box", {
-                    type:"info",
-                    message:`動画が${video_type}のため再生できません\nmp4に変換しますか?`,
-                    okcancel:true
+                const ret = await myapi.ipc.Dialog.showMessageBox({
+                    message: `動画が${video_type}のため再生できません\nmp4に変換しますか?`,
+                    okcancel: true
                 });
                 if(!ret){
                     return;
@@ -771,7 +756,7 @@
                 const video_type = items[0].video_type;
 
                 if(video_type=="mp4"){
-                    const menu_id = await ipc.invoke("app:popup-library-contextmenu", {items});
+                    const menu_id = await myapi.ipc.popupContextMenu("library", {items});
                     if(!menu_id){
                         return;
                     }
@@ -796,10 +781,9 @@
                     }
                     if(menu_id=="delete"){
                         const video_ids = items.map(item => item.id);
-                        const ret = await ipc.invoke("app:show-message-box", {
-                            type:"info",
-                            message:"動画を削除しますか?",
-                            okcancel:true
+                        const ret = await myapi.ipc.Dialog.showMessageBox({
+                            message: "動画を削除しますか?",
+                            okcancel: true
                         });
                         if(!ret){
                             return;
@@ -807,7 +791,7 @@
                         await deleteLibraryData(video_ids);
                     }
                 }else{
-                    const menu_id = await ipc.invoke("app:popup-library-contextmenu-convert-video");
+                    const menu_id = await myapi.ipc.popupContextMenu("library-convert-video", {items});
                     if(menu_id=="convert-video"){
                         const video_id = items[0].id;
                         await convertVideo(video_id);
@@ -816,12 +800,12 @@
             });
             
             try {
-                await ipc.invoke("library:load");
+                await myapi.ipc.Library.load();
             } catch (error) {
                 logger.error(error);
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `ライブラリの読み込み失敗\n${error.message}`,
+                    message: `ライブラリの読み込み失敗\n${error.message}`
                 });
                 // loadLibraryItems([]);
             }
@@ -834,7 +818,7 @@
         
         obs.on("library-page:play", async (item) => { 
             const video_id = item.id;
-            const video_item = await ipc.invoke("library:getItem", {video_id});
+            const video_item = await myapi.ipc.Library.getItem(video_id);
             if(video_item===null){
                 return;
             }
@@ -844,7 +828,7 @@
                 play_count : video_item.play_count + 1
             };
             logger.debug("update library video_id=", video_id, ", props=", props);
-            await ipc.invoke("library:updateItemProps", {video_id, props});
+            await myapi.ipc.Library.updateItemProps(video_id, props);
         });
 
         obs.on("library-page:scrollto", async (video_id) => { 

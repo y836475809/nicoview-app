@@ -59,7 +59,7 @@
 
     <script>
         /* globals */
-        const ipc = window.electron.ipcRenderer;
+        const { Command } = window.Command;
         const { NICO_URL } = window.NicoURL;
 
         const obs = this.opts.obs; 
@@ -87,12 +87,11 @@
             if(!video_id) {
                 return;
             }
-            const params = {
-                video_id: video_id,
-                time: 0,
-                online: isURL(elm.value)
-            };
-            ipc.send("app:play-video", params); 
+            const online = isURL(elm.value);
+            Command.play({
+                id: video_id,
+                time: 0
+            }, online);
         };
 
         this.onkeydownPlay = (e) => {

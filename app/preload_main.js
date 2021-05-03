@@ -7,6 +7,7 @@ process.once("loaded", () => {
     global.fs = require("fs");
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
+    global.myapi = require(`${root_dir}/app/js/my-api`);
 
     if (process.env.NODE_ENV == "DEBUG") {
         global.NicoMockServer = require(`${root_dir}/test/mock_server/nico-mock-server`);

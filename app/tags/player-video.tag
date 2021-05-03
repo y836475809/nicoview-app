@@ -26,8 +26,8 @@
 
     <script>
         /* globals logger */
+        const myapi = window.myapi;
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
-        const ipc = window.electron.ipcRenderer;
 
         const obs = this.opts.obs; 
 
@@ -155,14 +155,11 @@
                     resolve(default_params);
                 });
             });
-            comment_params = await ipc.invoke("config:get", {
-                key: "comment", 
-                value: default_comment_params
-            });
+            comment_params = await myapi.ipc.Config.get("comment", default_comment_params);
             
             video_elm = this.root.querySelector(".video-screen > video");
 
-            video_elm.volume = await ipc.invoke("config:get", { key:"player.volume", value:0.5 });
+            video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
 
             video_elm.addEventListener("loadedmetadata", (event) => {
                 obs.trigger("player-seek:reload", video_elm.duration);

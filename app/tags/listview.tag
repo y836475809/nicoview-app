@@ -189,7 +189,7 @@
 
     <script>
         const Sortable = window.Sortable;
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         let item_duration = 300;
         let sortable = null;
         const obs = this.opts.obs;
@@ -237,10 +237,9 @@
             if(confirm.includes("delete") === false){
                 return true;
             }
-            const ret = await ipc.invoke("app:show-message-box", {
-                type:"info",
-                message:"削除しますか?",
-                okcancel:true
+            const ret = await myapi.ipc.Dialog.showMessageBox({
+                message: "削除しますか?", 
+                okcancel: true
             });
             return ret;
         };
@@ -438,7 +437,7 @@
                 const items = getSelectedItems();
                 const cb = () => {
                     (async ()=>{
-                        const menu_id = await ipc.invoke("app:popup-listview-toggle-mark");
+                        const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
                         if(menu_id=="toggle-mark"){
                             items.forEach(item => {
                                 item.marked = !item.marked;

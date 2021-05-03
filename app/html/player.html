@@ -37,12 +37,12 @@
 
 <script>
     /* globals riot */
-    const ipc = window.electron.ipcRenderer;
+    const myapi = window.myapi;
     var { logger } = window.logger; // eslint-disable-line
 
     const obs = riot.observable();
 
-    ipc.on("app:on-load-content", (event)=>{
+    myapi.ipc.onLoadContent(()=>{
         riot.mount("player-main-page", {obs});
     });
 </script>

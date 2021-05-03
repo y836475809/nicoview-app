@@ -1,7 +1,9 @@
+const root_dir = "..";
 
 process.once("loaded", () => {
     global.process = process;
-    global.electron = require("electron");
+    global.electron = require("electron"); 
+    global.myapi = require(`${root_dir}/app/js/my-api`);
 });
 
 window.addEventListener( "error", async e => {

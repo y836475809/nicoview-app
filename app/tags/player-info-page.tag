@@ -167,7 +167,7 @@
     
     <script>
         /* globals logger */
-        const ipc = window.electron.ipcRenderer; 
+        const myapi = window.myapi;
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
         const { SyncCommentScroll } = window.SyncCommentScroll;
@@ -257,16 +257,6 @@
             obs.trigger("player-video:change-comment-visible", comment_visible);
         };
 
-        this.onclicAddDownload = (e) => {
-            const item = {
-                thumb_img: this.video_thumbnail_url,
-                id: this.video_id,
-                name: this.title,
-                state: 0
-            };
-            obs.trigger("player-main-page:add-download-item", item);
-        };
-        
         this.onclickUpdateThumbInfo = (e) => {
             obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
         };
@@ -396,7 +386,7 @@
             });
 
             grid_table.onContextMenu(async (e)=>{
-                const menu_id = await ipc.invoke("app:popup-player-contextmenu-ngcomment");
+                const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
                 if(!menu_id){
                     return;
                 }

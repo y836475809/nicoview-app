@@ -8,8 +8,8 @@ require("slickgrid/plugins/slick.rowselectionmodel");
 require("slickgrid/plugins/slick.autotooltips");
 require("slickgrid/plugins/slick.resizer");
 
-const ipc = require("electron").ipcRenderer;
 const time_format = require("./time-format");
+const myapi = require("./my-api");
 
 /* globals Slick */
 
@@ -412,22 +412,16 @@ class GridTable {
             sort_state["sort_asc"] = sort[0].sortAsc;
         }
 
-        ipc.invoke("config:set", { 
-            key:`gridtable.${this.name}`, 
-            value: {
-                columns: columns_state,
-                sort: sort_state,
-            }
+        myapi.ipc.Config.set(`gridtable.${this.name}`, {
+            columns: columns_state,
+            sort: sort_state,
         }).then();
     }
 
     _loadState(){
-        ipc.invoke("config:get", { 
-            key:`gridtable.${this.name}`, 
-            value:{
-                columns: null,
-                sort: null
-            } 
+        myapi.ipc.Config.get(`gridtable.${this.name}`, {
+            columns: null,
+            sort: null
         }).then((value)=>{
             if(value.columns){
                 const columns = this.grid.getColumns();

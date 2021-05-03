@@ -386,7 +386,7 @@ app.on("ready", async ()=>{
     const app_msg_list = [
         { name:"search-tag", focus:true },
         { name:"load-mylist", focus:true },
-        { name:"add-bookmark", focus:false },
+        { name:"add-bookmarks", focus:false },
         { name:"add-download-item", focus:false },
         { name:"add-stack-items", focus:false },
     ];
@@ -689,7 +689,7 @@ const createPlayerWindow = () => {
             player_win.maximize();
         }
 
-        ipcMain.once("app:on-ready-player", (event, args) => {
+        ipcMain.once("app:player-ready", (event, args) => {
             if(is_debug){
                 player_win.webContents.openDevTools();
             }

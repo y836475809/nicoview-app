@@ -62,7 +62,7 @@
     <script>
         /* globals riot logger */
         const EventEmitter = window.EventEmitter;
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
         const { Command } = window.Command;
@@ -133,7 +133,7 @@
                     state: state
                 };
             });
-            await ipc.invoke("download:updateItems", { items });
+            await myapi.ipc.Download.updateItems(items);
         };
 
         const addDownloadItems = async (items) => {
@@ -152,10 +152,8 @@
                 if(video_ids.includes(nico_down.video_id)){
                     cancelDownload();
 
-                    await ipc.invoke("app:show-message-box", {
-                        type:"info",
-                        message:`${nico_down.video_id}のダウンロードをキャンセル`,
-                        okcancel:false
+                    await myapi.ipc.Dialog.showMessageBox({
+                        message: `${nico_down.video_id}のダウンロードをキャンセル`
                     });
                 }
             }else{
@@ -183,10 +181,10 @@
 
         const startDownload = async() => {
             // TODO check exist download_dir
-            const download_dir = await ipc.invoke("config:get", { key:"download.dir", value:"" });
+            const download_dir = await myapi.ipc.Config.get("download.dir", "");
             event_em.emit("download-start");
 
-            let wait_time = await ipc.invoke("config:get", { key:"download.wait_time", value:10 });
+            let wait_time = await myapi.ipc.Config.get("download.wait_time", 10);
             if(!wait_time || wait_time <= 0){
                 wait_time = 10;
             }
@@ -231,8 +229,8 @@
 
                     if(result.type==NicoDownloader.ResultType.complete){
                         const download_item = nico_down.getDownloadedItem();
-                        await ipc.invoke("library:addDownloadItem", {download_item});
-                        
+                        await myapi.ipc.Library.addDownloadItem(download_item);
+
                         grid_table_dl.updateItem(video_id, {
                             progress: "終了", 
                             state: DownloadState.complete
@@ -263,9 +261,9 @@
                 }
             } catch (error) {
                 logger.error(`download id=${video_id}: `, error);
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:error.message
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: error.message
                 });
             } finally {
                 event_em.emit("download-end");
@@ -286,23 +284,17 @@
         });
 
         this.on("mount", async () => {
-            download_schedule = await ipc.invoke("config:get", { 
-                key:"download.schedule", 
-                value:  {
-                    date: {hour:0, minute:0},
-                    enable: false
-                }
+            download_schedule = await myapi.ipc.Config.get("download.schedule", {
+                date: {hour:0, minute:0},
+                enable: false
             });
             this.obs_schedule.trigger("set-params", download_schedule);
             this.obs_schedule.on("change-params", (args) => {
                 const { date, enable } = args;
 
-                ipc.invoke("config:set", { 
-                    key:"download.schedule", 
-                    value: {
-                        date: date,
-                        enable: enable
-                    }
+                myapi.ipc.Config.set("download.schedule", {
+                    date: date,
+                    enable: enable
                 }).then();
 
                 download_schedule.date = date;
@@ -327,15 +319,14 @@
                         return;
                     }
 
-                    const menu_id = await ipc.invoke("app:popup-download-contextmenu", {items});
+                    const menu_id = await myapi.ipc.popupContextMenu("download", {items});
                     if(!menu_id){
                         return;
                     }
                     if(menu_id=="delete"){
-                        const ret = await ipc.invoke("app:show-message-box", {
-                            type:"info",
-                            message:"削除しますか?",
-                            okcancel:true
+                        const ret = await myapi.ipc.Dialog.showMessageBox({
+                            message: "削除しますか?", 
+                            okcancel: true
                         });
                         if(!ret){
                             return;
@@ -365,13 +356,13 @@
                 });
 
                 grid_table_dl.grid_table.setupResizer(".download-grid-container");
-                const items = await ipc.invoke("download:getItems");
+                const items = await myapi.ipc.Download.getItems();
                 grid_table_dl.setData(items);
             } catch (error) {
                 logger.error("download item load error: ", error);
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `ダウンロードリストの読み込み失敗\n${error.message}`,
+                    message: `ダウンロードリストの読み込み失敗\n${error.message}`
                 });
             }
 

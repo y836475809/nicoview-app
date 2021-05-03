@@ -27,7 +27,8 @@
 
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
+        const { Command } = window.Command;
         const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
@@ -59,7 +60,7 @@
 
         this.on("mount", async () => {
             // TODO error対応
-            const items = await ipc.invoke("bookmark:getItems");
+            const items = await myapi.ipc.Bookmark.getItems();
             this.obs_listview.trigger("loadData", { items });
 
             resizeHeight(items);
@@ -67,19 +68,17 @@
 
         this.obs_listview.on("changed", async (args) => {
             const { items } = args;
-            await ipc.invoke("bookmark:updateItems", { items });
+            await myapi.ipc.Bookmark.updateItems(items);
             resizeHeight(items);
         });
 
         this.obs_listview.on("show-contextmenu", async (e, args) => {
             const { items, cb } = args;
 
-            const menu_id = await ipc.invoke("app:popup-listview-bookmark", {
-                items
-            });
+            const menu_id = await myapi.ipc.popupContextMenu("listview-bookmark", {items});
             if(menu_id=="go-to-library"){
                 const video_id = items[0].data.video_id;
-                const exist = await ipc.invoke("library:has", {video_id});
+                const exist = await myapi.ipc.Library.hasItem(video_id);
                 if(exist){
                     obs.trigger("main-page:select-page", "library");
                     obs.trigger("library-page:scrollto", video_id);     
@@ -92,12 +91,10 @@
 
         this.obs_listview.on("item-dlbclicked", (item) => {  
             const { video_id, time } = item.data;
-            const online = false;
-            ipc.send("app:play-video", {
-                video_id,
-                time,
-                online
-            });
+            Command.play({
+                id : video_id,
+                time : time
+            }, false);
         });
         
         obs.on("bookmark-page:add-items", items => {

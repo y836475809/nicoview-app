@@ -122,7 +122,8 @@
     
     <script>
         /* globals */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
+        const { Command } = window.Command;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
 
@@ -145,12 +146,10 @@
             const paths = e.target.href.split("/");
             const video_id = paths.pop();
 
-            ipc.send("app:play-video", {
-                video_id: video_id,
-                time: 0,
-                online: false
-            }); 
-            
+            Command.play({
+                id : video_id,
+                time : 0
+            }, false);
             return false;
         };
 
@@ -162,7 +161,7 @@
             const video_id = paths.pop();
             
             if(e.button === 2){ 
-                await ipc.invoke("app:popup-player-contextmenu-watch-link", {
+                await myapi.ipc.popupContextMenu("player-watch-link", {
                     video_id: video_id,
                     url: e.target.href
                 });
@@ -185,7 +184,7 @@
 
             const mylist_id = NicoURL.getMylistID(e.target.href);
             if(e.button === 2){
-                await ipc.invoke("app:popup-player-contextmenu-mylist-link", {
+                await myapi.ipc.popupContextMenu("player-mylist-link", {
                     mylist_id: mylist_id,
                     url: e.target.href
                 });
@@ -198,7 +197,7 @@
             e.stopPropagation();
 
             if(e.button === 2){
-                await ipc.invoke("app:popup-player-contextmenu-link", {
+                await myapi.ipc.popupContextMenu("player-link", {
                     url: e.target.href
                 });
             }
@@ -294,22 +293,22 @@
         const popupDescriptionMenu = async (type, text) => {
             if(type=="watch"){
                 const video_id = text;
-                await ipc.invoke("app:popup-player-contextmenu-watch-link", {
+                await myapi.ipc.popupContextMenu("player-watch-link", {
                     video_id: video_id,
                     url: NicoURL.getWatchURL(video_id)
                 });
             }
             if(type=="mylist" || type=="user"){
                 const mylist_id = text;
-                await ipc.invoke("app:popup-player-contextmenu-mylist-link", {
+                await myapi.ipc.popupContextMenu("player-mylist-link", {
                     mylist_id: mylist_id,
                     url: NicoURL.getMylistURL(mylist_id)
                 });
             }
             if(type=="text"){
-                await ipc.invoke("app:popup-player-contextmenu-text", {
+                await myapi.ipc.popupContextMenu("player-text", {
                     text: text
-                });  
+                });
             }
         };
         

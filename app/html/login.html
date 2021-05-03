@@ -74,18 +74,15 @@
     </body>
     
     <script>
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         
         const onclickLogin = e =>{
             const mail = document.querySelector("#mail");
             const password = document.querySelector("#pass");
-            ipc.send("app:nico-login", {
-                mail: mail.value,
-                password: password.value,
-            });
+            myapi.ipc.login(mail.value, password.value);
         };
         const onclickClose = e =>{
-            ipc.send("app:nico-login-cancel");
+            myapi.ipc.logout();
         };
     </script>
 </html>

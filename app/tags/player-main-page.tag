@@ -39,7 +39,7 @@
 
     <script>
         /* globals riot logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
@@ -77,10 +77,7 @@
                 obs.trigger("player-info-page:split-resized");
 
                 const ve = this.root.querySelector(".info-frame");
-                await ipc.invoke("config:set", { 
-                    key:"player.infoview_width",
-                    value: parseInt(ve.offsetWidth)
-                });
+                await myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
             }
             gutter = false;
             gutter_move = false;
@@ -123,12 +120,10 @@
                 state: state
             });   
             
-            ipc.send("history:addItem", { 
-                item:{
-                    id: video.video_id, 
-                    image: video.thumbnailURL, 
-                    title: video.title,  
-                } 
+            myapi.ipc.PlayHistory.addItem({
+                id: video.video_id, 
+                image: video.thumbnailURL, 
+                title: video.title,  
             });
         }; 
 
@@ -170,9 +165,9 @@
                 await play_by_video_data(video, viewinfo, comments, state);
             } catch (error) {
                 logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:error.message
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: error.message
                 });
             }
         }; 
@@ -215,7 +210,7 @@
 
                 const {is_economy, is_deleted, cookies, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = await ipc.invoke("app:set-cookie", cookies);
+                const ret = await myapi.ipc.setCookie(cookies);
                 if(ret!="ok"){
                     throw new Error(`error: cookieの設定に失敗 ${video_id}`);
                 } 
@@ -237,9 +232,9 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
             }
@@ -247,7 +242,7 @@
             this.obs_modal_dialog.trigger("close");
         }; 
   
-        ipc.on("app:play-video", async (event, args) => {
+        myapi.ipc.onPlayVideo(async (args)=>{
             const { video_id, online, time, video_item } = args;
 
             play_data = { 
@@ -267,7 +262,7 @@
             }
         });
 
-        ipc.on("setting:on-change-log-level", (event, args) => {
+        myapi.ipc.Setting.onChangeLogLevel((args) => {
             const { level } = args;
             logger.setLevel(level);
         });
@@ -277,23 +272,21 @@
         });
 
         obs.on("player-main-page:search-tag", (args) => {
-            ipc.send("app:search-tag", args);
+            myapi.ipc.Search.searchTag(args);
         });
 
         obs.on("player-main-page:load-mylist", (args) => {
-            ipc.send("app:load-mylist", args);
+            myapi.ipc.MyList.load(args);
         });
 
         obs.on("player-main-page:add-bookmark", (args) => {
-            ipc.send("app:add-bookmark", args);
-        });
-
-        obs.on("player-main-page:add-download-item", (args) => {
-            ipc.send("app:add-download-item", args);
+            const bk_item = args;
+            myapi.ipc.Bookmark.addItems([bk_item]);
         });
 
         obs.on("player-main-page:add-stack-items", (args) => {
-            ipc.send("app:add-stack-items", args);
+            const {items} = args;
+            myapi.ipc.Stack.addItems(items);
         });
   
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
@@ -316,8 +309,8 @@
 
             nico_update.on("updated", async (video_id, props, update_thumbnail) => {
                 try {
-                    await ipc.invoke("library:updateItemProps", {video_id, props});
-                    const updated_video_item = await ipc.invoke("library:getItem", {video_id});
+                    await myapi.ipc.Library.updateItemProps(video_id, props);
+                    const updated_video_item = await myapi.ipc.Library.getItem(video_id);
                     const video_data = new NicoVideoData(updated_video_item);
                     const viewinfo = {
                         is_economy: video_data.getIsEconomy(),
@@ -341,9 +334,9 @@
                 } catch (error) {
                     if(!error.cancel){
                         logger.error(error);
-                        await ipc.invoke("app:show-message-box", {
-                            type:"error",
-                            message:error.message
+                        await myapi.ipc.Dialog.showMessageBox({
+                            type: "error",
+                            message: error.message
                         });
                     }
                 }
@@ -351,7 +344,7 @@
             });
 
             try {   
-                const video_item = await ipc.invoke("library:getItem", {video_id});
+                const video_item = await myapi.ipc.Library.getItem(video_id);
                 nico_update.setVideoItem(video_item);
 
                 if(update_target=="thumbinfo"){
@@ -364,9 +357,9 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
                 this.obs_modal_dialog.trigger("close");
@@ -379,14 +372,12 @@
             comment_filter.ng_comment.addNGTexts(ng_texts);
             comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
             try {
-                await ipc.invoke("nglist:updateItems", {
-                    items:comment_filter.getNGComments()
-                });
+                await myapi.ipc.NGList.updateItems(comment_filter.getNGComments());
             } catch (error) {
                 logger.error("player main save ng comment", error);
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`NGコメントの保存に失敗\n${error.message}`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `NGコメントの保存に失敗\n${error.message}`
                 });
             }
 
@@ -401,14 +392,12 @@
             comment_filter.ng_comment.deleteNGTexts(ng_texts);
             comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
             try {
-                await ipc.invoke("nglist:updateItems", {
-                    items:comment_filter.getNGComments()
-                });
+                await myapi.ipc.NGList.updateItems(comment_filter.getNGComments());
             } catch (error) {
                 logger.error("player main save comment ng", error);
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`NGコメントの保存に失敗\n${error.message}`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `NGコメントの保存に失敗\n${error.message}`
                 });
             }
 
@@ -446,10 +435,7 @@
             const ve = this.root.querySelector(".info-frame");
 
             const infoview_show = parseInt(ve.style.width) == 0;
-            await ipc.invoke("config:set", { 
-                key:"player.infoview_show",
-                value: infoview_show
-            });
+            await myapi.ipc.Config.set("player.infoview_show", infoview_show);
 
             // 動画情報の表示/非表示の切り替え時はウィンドウリサイズイベントを通知しない
             // (動画表示部分のサイズは変更されないのでリサイズイベント不要)
@@ -457,10 +443,7 @@
 
             if(infoview_show){
                 // 表示
-                const infoview_width = await ipc.invoke("config:get", { 
-                    key:"player.infoview_width",
-                    value: 200
-                });
+                const infoview_width = await myapi.ipc.Config.get("player.infoview_width", 200);
                 // 動画サイズがウィンドウサイズに合わせて変化しないように
                 // 動画の幅を固定してからウィンドウサイズ変更
                 pe.style.width = pe.offsetWidth + "px";  
@@ -490,14 +473,10 @@
         };
 
         this.on("mount", async () => {
-            const params = await ipc.invoke("config:get", 
-                { 
-                    key:"player", 
-                    value:{  
-                        infoview_width: 200, 
-                        infoview_show: true 
-                    } 
-                });
+            const params = await myapi.ipc.Config.get("player", {  
+                infoview_width: 200, 
+                infoview_show: true 
+            });
                 
             const vw = params.infoview_show ? params.infoview_width : 0;
             const pe = this.root.querySelector(".player-frame");
@@ -508,20 +487,20 @@
             this.player_default_size = { width: 854 ,height: 480 };
             
             try {
-                const do_limit = await ipc.invoke("config:get", { key:"comment.do_limit", value:true });
-                const { ng_texts, ng_user_ids } = await ipc.invoke("nglist:getItems");
+                const do_limit = await myapi.ipc.Config.get("comment.do_limit", true);
+                const { ng_texts, ng_user_ids } = await myapi.ipc.NGList.getItems();
                 comment_filter = new CommentFilter();
                 comment_filter.setLimit(do_limit);
                 comment_filter.setNGComments(ng_texts, ng_user_ids);
             } catch (error) {
                 logger.error("player main load ng comment", error);
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `NGコメントリストの読み込み失敗\n${error.message}`,
+                    message: `NGコメントリストの読み込み失敗\n${error.message}`
                 });
             }
 
-            ipc.send("app:on-ready-player");
+            myapi.ipc.playerReady();
         });   
 
         let resize_begin = false;

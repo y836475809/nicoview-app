@@ -6,6 +6,7 @@ process.once("loaded", () => {
     global.path = require("path");
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
+    global.myapi = require(`${root_dir}/app/js/my-api`);
 });
 
 window.addEventListener( "error", async e => {
@@ -41,4 +42,5 @@ window.addEventListener("load", () => {
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
     global.SyncCommentScroll = require(`${root_dir}/app/js/sync-comment-scroll`);
+    global.Command = require(`${root_dir}/app/js/command`);
 });

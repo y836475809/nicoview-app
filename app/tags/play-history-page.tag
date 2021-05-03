@@ -19,38 +19,38 @@
 
     <script>
         /* globals logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
 
         const obs = this.opts.obs; 
 
-        ipc.on("download:on-update-item", async (event) => {
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+        myapi.ipc.Download.onUpdateItem(async ()=>{
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await ipc.invoke("library:has", {video_id});
+                item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
         });
 
-        ipc.on("library:on-add-item", async (event, args) => {
+        myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.id;
             grid_table.updateCells(video_id, { saved:true });
         });
 
-        ipc.on("library:on-delete-item", async (event, args) => {
+        myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
             grid_table.updateCells(video_id, { saved:false });
         });
 
-        ipc.on("history:on-update-item", async (event, args)=>{
-            const items = await ipc.invoke("history:getItems");
+        myapi.ipc.PlayHistory.onUpdateItem(async ()=>{
+            const items = await myapi.ipc.PlayHistory.getItems();
             setData(items);
         });
 
@@ -73,11 +73,11 @@
         const grid_table = new GridTable("history-grid", columns, options);
 
         const setData = async (items) => {
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await ipc.invoke("library:has", {video_id});
+                item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);  
             }
             grid_table.clearSelected();
@@ -86,13 +86,13 @@
 
         const loadItems = async () => {
             try {
-                const items = await ipc.invoke("history:getItems");
+                const items = await myapi.ipc.PlayHistory.getItems();
                 setData(items);
             } catch (error) {
                 logger.error(error);
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `再生履歴の読み込み失敗\n${error.message}`,
+                    message: `再生履歴の読み込み失敗\n${error.message}`
                 });
             }
         };
@@ -102,12 +102,7 @@
             grid_table.init(grid_container);
             grid_table.setupResizer(".history-grid-container");
             grid_table.onDblClick((e, data)=>{
-                const video_id = data.id;
-                ipc.send("app:play-video", {
-                    video_id : video_id,
-                    time : 0,
-                    online: false
-                });
+                Command.play(data, false);
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
                 if(cmd_id == "play"){
@@ -129,7 +124,7 @@
                 if(items.length==0){
                     return;
                 }
-                await ipc.invoke("app:popup-play-history-contextmenu", {items});           
+                await myapi.ipc.popupContextMenu("play-history", {items});           
             });           
             
             await loadItems();

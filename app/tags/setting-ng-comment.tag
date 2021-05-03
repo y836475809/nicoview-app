@@ -43,7 +43,7 @@
 
     <script>
         /* globals */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { GridTable } = window.GridTable;
 
         const obs_dialog = this.opts.obs;
@@ -88,7 +88,7 @@
                 grid_table.init(".comment-ng-grid");
                 grid_table.setupResizer(".comment-ng-grid-container");
                 grid_table.onContextMenu(async (e) => {
-                    const menu_id = await ipc.invoke("app:popup-setting-ngcomment-contextmenu");
+                    const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
                     if(!menu_id){
                         return;
                     }

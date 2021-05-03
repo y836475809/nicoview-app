@@ -51,7 +51,7 @@
 
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer; 
+        const myapi = window.myapi;
         
         const obs = this.opts.obs; 
         this.obs_open_video_form = riot.observable();
@@ -90,8 +90,8 @@
             if(e.button === 1){
                 contextmenu_show = true;
 
-                await ipc.invoke("app:popup-player-contextmenu-history-stack");
-
+                await myapi.ipc.popupContextMenu("player-history-stack");
+                
                 contextmenu_show = false;
             }
 
@@ -99,7 +99,7 @@
                 contextmenu_show = true;
 
                 const play_data = await getPlayData(); 
-                const menu_id = await ipc.invoke("app:popup-player-contextmenu", { play_data });
+                const menu_id = await myapi.ipc.popupContextMenu("player", { play_data });
                 if(menu_id){
                     const { video_id, title, thumbnailURL, online } = play_data;
                     if(menu_id=="add-bookmark-time"){

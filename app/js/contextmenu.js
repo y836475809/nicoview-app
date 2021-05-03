@@ -45,7 +45,7 @@ const getMenuEnable = (menu_id, data) => {
 };
 
 const player = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player", async (event, args) => {
         const { play_data } = args;
         const { video_id, title, thumbnailURL, online } = play_data;
         return await new Promise((resolve, reject) => {
@@ -134,7 +134,7 @@ const player = (play_win) => {
 };
 
 const player_history_stack = (play_win, store, history, config) => {
-    ipcMain.handle("app:popup-player-contextmenu-history-stack", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-history-stack", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const createMenuItems = (items) => {
                 return items.map(item=>{
@@ -172,7 +172,7 @@ const player_history_stack = (play_win, store, history, config) => {
 };
 
 const player_ngcomment = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-ngcomment", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-ngcomment", async (event, args) => {
         return await new Promise((resolve, reject) => {
             const menu_items = [
                 { 
@@ -191,7 +191,7 @@ const player_ngcomment = (play_win) => {
 };
 
 const player_watch_link = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-watch-link", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-watch-link", async (event, args) => {
         const { video_id, url } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -215,7 +215,7 @@ const player_watch_link = (play_win) => {
 };
 
 const player_mylist_link = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-mylist-link", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-mylist-link", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -235,7 +235,7 @@ const player_mylist_link = (play_win) => {
 };
 
 const player_link = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-link", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-link", async (event, args) => {
         const { url } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -251,7 +251,7 @@ const player_link = (play_win) => {
 };
 
 const player_text = (play_win) => {
-    ipcMain.handle("app:popup-player-contextmenu-text", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-text", async (event, args) => {
         const { text } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -267,7 +267,7 @@ const player_text = (play_win) => {
 };
 
 const player_setting_ngcomment = (player_win) => {
-    ipcMain.handle("app:popup-setting-ngcomment-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-setting-ngcomment", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -303,7 +303,7 @@ const getBookMarkMenuEnable = (type, items) => {
 };
 
 const listview_bookmark = (main_win) => {
-    ipcMain.handle("app:popup-listview-bookmark", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-listview-bookmark", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -352,7 +352,7 @@ const listview_bookmark = (main_win) => {
 };
 
 const listview_toggle_mark = (main_win) => {
-    ipcMain.handle("app:popup-listview-toggle-mark", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-listview-toggle-mark", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -367,7 +367,7 @@ const listview_toggle_mark = (main_win) => {
 };
 
 const main_download = (main_win) => {
-    ipcMain.handle("app:popup-download-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-download", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -409,7 +409,7 @@ const main_download = (main_win) => {
 };
 
 const main_library = (main_win) => {
-    ipcMain.handle("app:popup-library-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-library", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
             const menu_items = [
@@ -462,7 +462,7 @@ const main_library = (main_win) => {
 };
 
 const main_library_convert_video = (main_win) => {
-    ipcMain.handle("app:popup-library-contextmenu-convert-video", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-library-convert-video", async (event, args) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -477,7 +477,7 @@ const main_library_convert_video = (main_win) => {
 };
 
 const main_mylist = (main_win) => {
-    ipcMain.handle("app:popup-mylist-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-mylist", async (event, args) => {
         const { context_menu_type, items } = args;
 
         return await new Promise(resolve => {
@@ -527,7 +527,7 @@ const main_mylist = (main_win) => {
 };
 
 const main_play_history = (main_win) => {
-    ipcMain.handle("app:popup-play-history-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-play-history", async (event, args) => {
         const { items } = args;
 
         return await new Promise(resolve => {
@@ -566,7 +566,7 @@ const main_play_history = (main_win) => {
 };
 
 const main_search = (main_win) => {
-    ipcMain.handle("app:popup-search-contextmenu", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-search", async (event, args) => {
         const { items } = args;
 
         return await new Promise(resolve => {

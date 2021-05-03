@@ -194,7 +194,7 @@
 
     <script>
         /* globals riot logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { MouseGesture } = window.MouseGesture;
 
         this.obs = this.opts.obs;
@@ -215,17 +215,16 @@
         });
 
         (async()=>{
-            const config = await ipc.invoke("config:get", 
-                { 
-                    key: mouse_gesture.name, 
-                    value: mouse_gesture.defaultConfig
-                });
+            const config = await myapi.ipc.Config.get(
+                mouse_gesture.name, mouse_gesture.defaultConfig);
             mouse_gesture.config = config;
         })(); 
         
         mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
         mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
-        mouse_gesture.setActionShowPalyer(()=>{ipc.send("app:show-player");});
+        mouse_gesture.setActionShowPalyer(()=>{
+            myapi.ipc.showyPlayer();
+        });
 
         mouse_gesture.onGesture((gesture)=>{
             if(mouse_gesture.action("all-page", gesture)){
@@ -246,7 +245,7 @@
         });
 
         const updateDownloadBadge = async () => {
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const elm = this.root.querySelector(".download-badge > .item-num");
             if(video_ids.length === 0){
                 elm.style.display = "none";
@@ -257,11 +256,11 @@
             this.update();
         };
 
-        ipc.on("download:on-update-item", async (event) => {
+        myapi.ipc.Download.onUpdateItem(async ()=>{
             await updateDownloadBadge();
         });
 
-        ipc.on("setting:on-change-log-level", (event, args) => {
+        myapi.ipc.Setting.onChangeLogLevel((args) => {
             const { level } = args;
             logger.setLevel(level);
         });
@@ -356,48 +355,39 @@
             select_page(page_name);
         });  
 
-        ipc.on("app:open-video-form", ()=>{
+        myapi.ipc.onOpenVideoForm(()=>{
             this.obs_open_video_form.trigger("show");
-        });  
+        });
 
-        ipc.on("app:search-tag", (event, args)=>{
+        myapi.ipc.Search.onSearchTag((args)=>{
             this.obs.trigger("main-page:select-page", "search");
             this.obs.trigger("search-page:search-tag", args);
         });
 
-        ipc.on("app:load-mylist", (event, args)=>{
+        myapi.ipc.MyList.onLoad((args)=>{
             this.obs.trigger("main-page:select-page", "mylist");
             this.obs.trigger("mylist-page:load-mylist", args);
         });
 
-        ipc.on("app:add-download-item", (event, args)=>{
-            const item = args;
-            this.obs.trigger("download-page:add-download-items", [item]);
-        });
-        ipc.on("app:add-download-items", (event, args)=>{
+        myapi.ipc.Download.onAddItems((args)=>{
             const items = args;
             this.obs.trigger("download-page:add-download-items", items);
         });
-        ipc.on("app:delete-download-items", (event, args)=>{
+        myapi.ipc.Download.onDeleteItems((args)=>{
             const items = args;
             this.obs.trigger("download-page:delete-download-items", items);
         });
 
-        ipc.on("app:add-stack-items", (event, args)=>{
+        myapi.ipc.Stack.onAddItems((args)=>{
             this.obs.trigger("play-stack-page:add-items", args);
         });
 
-        ipc.on("app:add-bookmark", (event, args)=>{
-            const bk_item = args;
-            this.obs.trigger("bookmark-page:add-items", [bk_item]);
-        });
-
-        ipc.on("app:add-bookmarks", (event, args)=>{
+        myapi.ipc.Bookmark.onAddItems((args)=>{
             const bk_items = args;
             this.obs.trigger("bookmark-page:add-items", bk_items);
         });
 
-        ipc.on("setting:on-reload-css", (event)=>{
+        myapi.ipc.Setting.onReloadCSS((args)=>{
             this.obs.trigger("css-loaded");
         });
     </script>

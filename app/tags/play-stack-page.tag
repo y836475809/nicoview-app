@@ -91,7 +91,8 @@
     </div>
 
     <script>
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
+        const { Command } = window.Command;
         const { toTimeString } = window.TimeFormat;
 
         const obs = this.opts.obs;
@@ -126,7 +127,7 @@
             const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
             item_duration = parseInt(prop);
 
-            const items = await ipc.invoke("stack:getItems");
+            const items = await myapi.ipc.Stack.getItems();
             await addItems(items);
         });
 
@@ -137,15 +138,11 @@
             this.items.forEach(item => {
                 delete item.state;
             });
-            await ipc.invoke("stack:updateItems", { items:this.items });
+            await myapi.ipc.Stack.updateItems(this.items);
         });
 
         this.onclickItem = (item, e) => {
-            ipc.send("app:play-video", {
-                video_id: item.id,
-                time: item.time?item.time:0,
-                online: false
-            });
+            Command.play(item, false);
         };
 
         this.onclickDelete = (i, e) => {
@@ -154,7 +151,7 @@
             setTimeout(() => { 
                 this.items.splice(i, 1);
                 this.update();
-                ipc.invoke("stack:updateItems", { items:this.items }).then();
+                myapi.ipc.Stack.updateItems(this.items).then();
             }, item_duration);   
         };
     </script>

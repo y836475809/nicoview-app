@@ -210,7 +210,7 @@
 
     <script>
         /* globals riot logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const path = window.path;
         const fs = window.fs;
         const { ImportLibrary } = window.ImportLibrary;
@@ -237,16 +237,12 @@
             const gesture = e.target.value;
             mouse_gesture.setGesture(gesture, item.action);
             const config = mouse_gesture.config;
-            await ipc.invoke("config:set", { key: mouse_gesture.name, value: config });
+            await myapi.ipc.Config.set(mouse_gesture.name, config);
             obs.trigger("main-page:update-mousegesture-config", { config });
         };
 
         const setupMouseGesture = async () => {
-            const config = await ipc.invoke("config:get", 
-                { 
-                    key: mouse_gesture.name, 
-                    value: mouse_gesture.defaultConfig
-                });
+            const config = await myapi.ipc.Config.get(mouse_gesture.name, mouse_gesture.defaultConfig);
 
             for (const [key, value] of Object.entries(config)) {
                 const gesture = value;
@@ -261,66 +257,65 @@
         };
 
         this.onclickSelectDataDir = async e => {
-            const dir = await ipc.invoke("app:show-select-folder-dialog");
+            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
             if(dir == null){
                 return;
             }
             setInputValue(".data-dir-input", dir);
-            await ipc.invoke("config:set", { key:"data_dir", value:dir });
+            await myapi.ipc.Config.set("data_dir", dir);
         };
 
         this.onclickSelectDownloadDir = async e => {
-            const dir = await ipc.invoke("app:show-select-folder-dialog");
+            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
             if(dir == null){
                 return; 
             }
             setInputValue(".download-dir-input", dir);
-            await ipc.invoke("config:set", { key:"download.dir", value:dir });
+            await myapi.ipc.Config.set("download.dir", dir);
         };
 
         this.onclickOpenDir = async (e) => {
-            const dir = await ipc.invoke("config:get", { key:"app_setting_dir", value:"" });
-            await ipc.invoke("setting:open-dir", { dir });
+            const dir = await myapi.ipc.Config.get("app_setting_dir", "");
+            await myapi.ipc.Setting.openDir(dir);
         };
 
         this.onclickSelectffmpegPath = async e => {
-            const file_path = await ipc.invoke("app:show-select-file-dialog",{
-                name:"ffmpeg",
-                exts:["*"]
+            const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
+                name: "ffmpeg",
             });
             if(file_path == null){
                 return;
             }
             setInputValue(".ffmpeg-path-input", file_path);
-            await ipc.invoke("config:set", { key:"ffmpeg_path", value:file_path });
+            await myapi.ipc.Config.set("ffmpeg_path", file_path);
         };
 
         
         this.onclickSelectcCssPath = async e => {
-            const file_path = await ipc.invoke("app:show-select-file-dialog",{
-                name:"CSS",
-                exts:["css"]
+            const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
+                name: "CSS",
+                exts: ["css"]
             });
             if(file_path == null){
                 return;
             }
             setInputValue(".css-path-input", file_path);
-            await ipc.invoke("config:set", { key:"css_path", value:file_path });
+            await myapi.ipc.Config.set("css_path", file_path);
         };
 
         this.onclickReloadCss = async e => {
             const elm = this.root.querySelector(".css-path-input");
             const file_path = elm.value;
-            await ipc.invoke("setting:reload-css", { file_path });
+            await myapi.ipc.Setting.reloadCSS(file_path);
         };
 
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
-            await ipc.invoke("config:set", { key:"check_window_close", value:ch_elm.checked });
+            await myapi.ipc.Config.set("check_window_close", ch_elm.checked);
         };
 
         const getCacheSizeLabel = async () => {
-            const size_byte = await ipc.invoke("setting:get-app-cache");
+            const size_byte = await myapi.ipc.Setting.getAppCache();
             const mb = 1024**2;
             return `${(size_byte/mb).toFixed(1)}MB`;
         };
@@ -340,7 +335,7 @@
             });
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            await ipc.invoke("setting:clear-app-cache");
+            await myapi.ipc.Setting.clearAppCache();
 
             this.obs_modal_dialog.trigger("close");
 
@@ -354,24 +349,23 @@
             if(ch_elm.checked === true){
                 value = "debug";
             }
-            await ipc.invoke("config:set", { key:"log.level", value:value });
-            await ipc.invoke("setting:change-log-level", { level:value });
+            await myapi.ipc.Config.set("log.level", value);
+            await myapi.ipc.Setting.setLogLevel(value);
         };
 
         this.onclickNNDDSystemDir = async (e) => {
-            const dir = await ipc.invoke("app:show-select-folder-dialog");
+            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
             if(dir == null){
                 return; 
             }
             setInputValue(".nndd-system-path-input", dir);
-            await ipc.invoke("config:set", { key:"nndd.system_path", value:dir });
-
+            await myapi.ipc.Config.set("nndd.system_path", dir);
         };
 
         this.onclickCheckNNDDImportItem = async (item, e) => {
             const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
             const checked = ch_elm.checked;
-            await ipc.invoke("config:set", { key:`nndd.${item.name}`, value:checked });
+            await myapi.ipc.Config.set(`nndd.${item.name}`, checked);
         };
 
         this.onclickExecNNDDImport = async (e) => {
@@ -379,14 +373,14 @@
                 return;
             }
 
-            const data_dir = await ipc.invoke("config:get", { key:"data_dir", value:"" });
-            const nndd_system_dir = await ipc.invoke("config:get", { key:"nndd.system_path", value:"" });
+            const data_dir = await myapi.ipc.Config.get("data_dir", "");
+            const nndd_system_dir = await myapi.ipc.Config.get("nndd.system_path", "");
             try {
                 fs.statSync(data_dir);
             } catch (error) {
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`
                 });
                 return;
             }
@@ -394,9 +388,9 @@
             try {
                 fs.statSync(nndd_system_dir);
             } catch (error) {
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`
                 });
                 return;
             }
@@ -424,15 +418,14 @@
                 obs.trigger("play-history-page:reload-items");
                 obs.trigger("mylist-page:sidebar:reload-items");
 
-                await ipc.invoke("app:show-message-box", {
-                    type:"info",
-                    message:"インポート完了"
+                await myapi.ipc.Dialog.showMessageBox({
+                    message: "インポート完了"
                 });
             } catch (error) {
                 logger.error(error);
-                await ipc.invoke("app:show-message-box", {
-                    type:"error",
-                    message:`インポート失敗\n${error.message}`
+                await myapi.ipc.Dialog.showMessageBox({
+                    type: "error",
+                    message: `インポート失敗\n${error.message}`
                 });
             } finally {
                 this.obs_modal_dialog.trigger("close");
@@ -460,25 +453,24 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await ipc.invoke("config:get", { key:"app_setting_dir", value:"" })); 
-            
+            setInputValue(".app-setting-dir-input", await myapi.ipc.Config.get("app_setting_dir", "")); 
+
             const css_path = await getDefaultCSSPath();
-            setInputValue(".css-path-input", await ipc.invoke("config:get", { key:"css_path", value:css_path }));   
-            
-            setInputValue(".data-dir-input", await ipc.invoke("config:get", { key:"data_dir", value:""}));  
-            setInputValue(".download-dir-input", await ipc.invoke("config:get", { key:"download.dir", value:""}));
-            setInputValue(".ffmpeg-path-input", await ipc.invoke("config:get", { key:"ffmpeg_path", value:""}));
-            setCheckValue(".check-window-close", await ipc.invoke("config:get", { key:"check_window_close", value:true}));
-        
-            const log_level = await ipc.invoke("config:get", { key:"log.level", value:"info"});
+            setInputValue(".css-path-input", await myapi.ipc.Config.get("css_path", css_path)); 
+
+            setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
+            setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
+            setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
+            setCheckValue(".check-window-close", await myapi.ipc.Config.get("check_window_close", true));
+
+            const log_level = await myapi.ipc.Config.get("log.level", "info");
             setCheckValue(".check-loglevel-debug", log_level=="debug");
             
-            setInputValue(".nndd-system-path-input", await ipc.invoke("config:get", { key:"nndd.system_path", value:""}));  
+            setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", "")); 
             
             for (let index = 0; index < this.import_items.length; index++) {
                 const import_item = this.import_items[index];
-                setCheckValue(`.${import_item.name}`, 
-                    await ipc.invoke("config:get", { key:`nndd.${import_item.name}`, value:false}));
+                setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
             }
 
             setupMouseGesture();
@@ -489,10 +481,10 @@
                 return;
             }
             
-            const file_paths = await ipc.invoke("app:show-select-file-dialog",{
-                name:"avi",
-                exts:["mp4", "flv", "swf"],
-                multi_select:true
+            const file_paths = await myapi.ipc.Dialog.showSelectFileDialog({
+                name: "avi",
+                exts: ["mp4", "flv", "swf"],
+                multi_select: true
             });
             if(!file_paths){
                 return;
@@ -517,7 +509,7 @@
                 try {
                     const import_lib = new ImportLibrary(file_path);
                     const item = await import_lib.createLibraryItem();
-                    await ipc.invoke("library:addItem", { item });
+                    await myapi.ipc.Library.addItem(item);
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {
                     logger.error(error);
@@ -530,16 +522,15 @@
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
             
-            await ipc.invoke("app:show-message-box", {
-                type:"info",
-                message:`インポート完了\n失敗:${error_files.length}`
+            await myapi.ipc.Dialog.showMessageBox({
+                message: `インポート完了\n失敗:${error_files.length}`
             });
             this.obs_modal_dialog.trigger("close");
 
             if(error_files.length>0){
-                await ipc.invoke("app:show-message-box", {
+                await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`,
+                    message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
                 });
             } 
         };

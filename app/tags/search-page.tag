@@ -22,7 +22,7 @@
 
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
@@ -55,7 +55,7 @@
         };
 
         const loadItems = async () => {
-            const items = await ipc.invoke("nico-search:getItems");
+            const items = await myapi.ipc.Search.getItems();
             items.forEach(item => {
                 item.type = item.cond.search_target;
             });
@@ -71,7 +71,7 @@
             items.forEach(item => {
                 delete item.type;
             });
-            await ipc.invoke("nico-search:updateItems", { items });
+            await myapi.ipc.Search.updateItems(items);
         });
 
         this.obs_listview.on("show-contextmenu", (e, args) => {
@@ -294,7 +294,7 @@
 
     <script>
         /* globals riot logger */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
@@ -308,15 +308,11 @@
         this.search_target_items = searchItems.searchTargetItems;
 
         const loadSearchCond = async () => {
-            const { api, sort, search_target } = await ipc.invoke("config:get", 
-                { key:"search.condition", 
-                    value:{
-                        api:"snapshot",
-                        sort:{ name:"startTime", order:"-" },
-                        search_target:{ target:"tag" }
-                    } 
-                });
-                
+            const { api, sort, search_target } = await myapi.ipc.Config.get("search.condition",  {
+                api:"snapshot",
+                sort:{ name:"startTime", order:"-" },
+                search_target:{ target:"tag" }
+            });
             const sort_item = this.sort_items.find(item => {
                 return item.name == sort.name 
                     && item.order == sort.order;
@@ -331,14 +327,11 @@
         const saveSearchCond = async () => {
             const api = nico_search_params.getAPI();
             const { sort_name, sort_order, search_target } = nico_search_params.getParams();
-            await ipc.invoke("config:set",
-                { key: "search.condition", 
-                    value: {
-                        api: api,
-                        sort:{ name:sort_name, order:sort_order },
-                        search_target:{ target:search_target } 
-                    }
-                });
+            await myapi.ipc.Config.set("search.condition", {
+                api: api,
+                sort:{ name:sort_name, order:sort_order },
+                search_target:{ target:search_target } 
+            });
         };
 
         this.onclickToggleMenu = (e) => {
@@ -387,26 +380,26 @@
             await this.search();
         });
 
-        ipc.on("download:on-update-item", async (event) => {
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+        myapi.ipc.Download.onUpdateItem(async ()=>{
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await ipc.invoke("library:has", {video_id});
+                item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
         });
 
-        ipc.on("library:on-add-item", async (event, args) => {
+        myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.id;
             grid_table.updateCells(video_id, { saved:true });
         });
 
-        ipc.on("library:on-delete-item", async (event, args) => {
+        myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
             grid_table.updateCells(video_id, { saved:false });
         });
@@ -482,7 +475,7 @@
                     search_result = await nico_search.search(nico_search_params);
                 }                
                 if(nico_search_params.getAPI()=="ext"){
-                    const cookie = await ipc.invoke("app:get-nico-login-cookie");
+                    const cookie = await myapi.ipc.getNicoLoginCookie();
                     if(!cookie){
                         throw new Error("内部APIで検索するにはニコニコ動画へのログインが必要");
                     }
@@ -492,9 +485,9 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
             }
@@ -548,11 +541,11 @@
                 page_num, total_page_num, search_result_num
             });
 
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const items = await Promise.all(
                 search_list.map(async value => {
                     const video_id = value.contentId;
-                    const saved = await ipc.invoke("library:has", {video_id});
+                    const saved = await myapi.ipc.Library.hasItem(video_id);
                     const reg_download = video_ids.includes(video_id);
                     return createItem(value, saved, reg_download);
                 })
@@ -689,13 +682,8 @@
             grid_table.init(grid_container);
             grid_table.setupResizer(".search-grid-container");
             grid_table.onDblClick((e, data)=>{
-                const video_id = data.id;
-                if(video_id){
-                    ipc.send("app:play-video", {
-                        video_id : video_id,
-                        time : 0,
-                        online: false
-                    });
+                if(data.id){
+                    Command.play(data, false);
                 }
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
@@ -719,7 +707,7 @@
                 if(items.length===0){
                     return;
                 }
-                await ipc.invoke("app:popup-search-contextmenu", {items});
+                await myapi.ipc.popupContextMenu("search", {items});
             });
 
             const { api, sort_item, search_target_item } = await loadSearchCond();

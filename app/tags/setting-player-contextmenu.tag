@@ -21,14 +21,14 @@
     </div>
 
     <script>
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
 
         this.menu_num_items = [5, 10, 20];
 
         const changeParams = async (name, value) => {
-            const params = await ipc.invoke("config:get", { key: "player.contextmenu", value: 5 });
+            const params = await myapi.ipc.Config.get("player.contextmenu", 5);
             params[name] = value;
-            await ipc.invoke("config:set", { key: `player.contextmenu.${name}`, value: value });
+            await myapi.ipc.Config.set(`player.contextmenu.${name}`, value);
         };
 
         const setRadioValue = (name, items, value) => {
@@ -38,14 +38,10 @@
         };
 
         const setupContextMenuSetting = async () => {
-            const params = await ipc.invoke("config:get", 
-                { 
-                    key:"player.contextmenu", 
-                    value:{
-                        history_num:5,
-                        stack_num:5
-                    } 
-                });
+            const params = await myapi.ipc.Config.get("player.contextmenu", {
+                history_num: 5,
+                stack_num: 5
+            });
             setRadioValue("history_num", this.menu_num_items, params.history_num);
             setRadioValue("stack_num", this.menu_num_items, params.stack_num);   
         };

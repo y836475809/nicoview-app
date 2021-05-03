@@ -19,7 +19,7 @@
 
     <script>
         /* globals riot */
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
 
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
@@ -38,7 +38,7 @@
         };
 
         const loadItems = async () => {
-            this.items = await ipc.invoke("mylist:getItems");
+            this.items = await myapi.ipc.MyList.getItems();
             this.obs_listview.trigger("loadData", { items:this.items });
         };
 
@@ -50,7 +50,7 @@
             const { items } = args;
             this.items = items;
 
-            await ipc.invoke("mylist:updateItems", { items });
+            await myapi.ipc.MyList.updateItems(items);
         });
 
         this.obs_listview.on("show-contextmenu", (e, args) => {
@@ -186,7 +186,7 @@
     <script>
         /* globals riot logger */
         const path = window.path;
-        const ipc = window.electron.ipcRenderer;
+        const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
@@ -195,26 +195,26 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
 
-        ipc.on("download:on-update-item", async (event) => {
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+        myapi.ipc.Download.onUpdateItem(async ()=>{
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const items = grid_table.dataView.getItems();
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.id;
-                item.saved = await ipc.invoke("library:has", {video_id});
+                item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 grid_table.dataView.updateItem(video_id, item);    
             }
         });
 
-        ipc.on("library:on-add-item", async (event, args) => {
+        myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.id;
             grid_table.updateCells(video_id, { saved:true });
         });
 
-        ipc.on("library:on-delete-item", async (event, args) => {
+        myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
             grid_table.updateCells(video_id, { saved:false });
         });
@@ -277,11 +277,11 @@
 
         const play = async (item, online) => {
             const video_id = item.id;
-            if(!online && needConvertVideo(await ipc.invoke("library:getItem", {video_id}))){       
-                const ret = await ipc.invoke("app:show-message-box", {
-                    type:"info",
-                    message:"保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
-                    okcancel:true
+            const video_item = await myapi.ipc.Library.getItem(video_id);
+            if(!online && needConvertVideo(video_item)){       
+                const ret = await myapi.ipc.Dialog.showMessageBox({
+                    message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
+                    okcancel: true
                 });
                 if(!ret){
                     return;
@@ -293,7 +293,7 @@
         };
 
         this.on("mount", async () => {
-            const mylist_dir = path.join(await ipc.invoke("config:get", { key:"data_dir", value:"" }), "mylist");
+            const mylist_dir = path.join(await myapi.ipc.Config.get("data_dir", ""), "mylist");
             nico_mylist_store = new NicoMylistStore(mylist_dir);
             nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
@@ -302,23 +302,18 @@
             grid_table.setupResizer(".mylist-grid-container");
             grid_table.onDblClick(async (e, data)=>{
                 const video_id = data.id;
-
-                if(needConvertVideo(await ipc.invoke("library:getItem", {video_id}))===true){      
-                    const ret = await ipc.invoke("app:show-message-box", {
-                        type:"info",
-                        message:"保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
-                        okcancel:true
+                const video_item = await myapi.ipc.Library.getItem(video_id);
+                if(needConvertVideo(video_item)===true){      
+                    const ret = await myapi.ipc.Dialog.showMessageBox({
+                        message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
+                        okcancel: true
                     });
                     if(!ret){
                         return;
                     }
                     obs.trigger("library-page:convert-video", video_id);
                 }else{
-                    ipc.send("app:play-video", {
-                        video_id: video_id,
-                        time: 0,
-                        online: false
-                    });
+                    Command.play(data, false);
                 }
             });
             grid_table.onButtonClick(async (e, cmd_id, data)=>{
@@ -342,10 +337,10 @@
                     return;
                 }
                 const video_id = items[0].id;
-
-                const need_convert = needConvertVideo(await ipc.invoke("library:getItem", {video_id}));
+                const video_item = await myapi.ipc.Library.getItem(video_id);
+                const need_convert = needConvertVideo(video_item);
                 const context_menu_type = need_convert?"convert-video":"main";
-                const menu_id = await ipc.invoke("app:popup-mylist-contextmenu", {context_menu_type, items});
+                const menu_id = await myapi.ipc.popupContextMenu("mylist", {context_menu_type, items});
                 if(!menu_id){
                     return;
                 }
@@ -379,11 +374,11 @@
             loaded_mylist_id = mylist.mylist_id;
             
             const mylist_items = mylist.items;
-            const video_ids = await ipc.invoke("download:getIncompleteIDs");
+            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             for (let i=0; i<mylist_items.length; i++) {
                 const item = mylist_items[i];
                 const video_id = item.id;
-                item.saved = await ipc.invoke("library:has", {video_id});
+                item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);  
                 item.mylist_id = mylist.mylist_id;
             }
@@ -451,9 +446,9 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
             }
@@ -492,9 +487,9 @@
                     await setMylist(mylist); 
                 } catch (error) {
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
             }
@@ -512,9 +507,9 @@
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await ipc.invoke("app:show-message-box", {
-                        type:"error",
-                        message:error.message
+                    await myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
                     });
                 }
             }   

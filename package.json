@@ -27,7 +27,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.3",
-    "cheerio": "^1.0.0-rc.3",
+    "cheerio": "^1.0.0-rc.6",
     "electron-log": "^4.3.5",
     "gsap": "^3.5.1",
     "riot": "^3.13.2",

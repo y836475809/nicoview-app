@@ -1,6 +1,6 @@
 {
   "name": "nicoview-app",
-  "version": "0.8.18",
+  "version": "0.9.18",
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "app/main.js",
   "scripts": {
@@ -21,7 +21,7 @@
     "ava": "^3.14.0",
     "electron": "^9.4.0",
     "electron-builder": "^22.9.1",
-    "eslint-plugin-html": "^6.1.1",
+    "eslint-plugin-html": "^6.1.2",
     "nock": "^13.0.5",
     "sinon": "^9.2.2"
   },

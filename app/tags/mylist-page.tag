@@ -185,7 +185,6 @@
 
     <script>
         /* globals riot logger */
-        const path = window.path;
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -293,7 +292,7 @@
         };
 
         this.on("mount", async () => {
-            const mylist_dir = path.join(await myapi.ipc.Config.get("data_dir", ""), "mylist");
+            const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
             nico_mylist_store = new NicoMylistStore(mylist_dir);
             nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 

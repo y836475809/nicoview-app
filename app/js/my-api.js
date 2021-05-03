@@ -128,6 +128,9 @@ const NGList = {
 };
 
 const MyList = {
+    getMyListDir: async () => {
+        return path.join(await Config.get("data_dir", ""), "mylist");
+    },
     getItems: async ()=> {
         return await ipcRenderer.invoke("mylist:getItems");
     },

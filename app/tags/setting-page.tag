@@ -103,7 +103,7 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">ブックマーク, 履歴, DB等の保存先</div> 
+            <div class="center-v title">データの保存先(ブックマーク, 履歴, DB等の保存先)</div> 
             <div class="content" style="display: flex;">
                 <input disabled=true class="data-dir-input" type="text" readonly>
                 <button title="フォルダ選択" onclick={onclickSelectDataDir}>
@@ -211,7 +211,6 @@
     <script>
         /* globals riot logger */
         const myapi = window.myapi;
-        const fs = window.fs;
         const { ImportLibrary } = window.ImportLibrary;
         const { ImportNNDDData } = window.ImportNNDDData;
         const { MouseGesture } = window.MouseGesture;
@@ -372,24 +371,15 @@
                 return;
             }
 
-            const data_dir = await myapi.ipc.Config.get("data_dir", "");
-            const nndd_system_dir = await myapi.ipc.Config.get("nndd.system_path", "");
+            let data_dir = "";
+            let nndd_system_dir = "";
             try {
-                fs.statSync(data_dir);
+                data_dir = await myapi.ipc.Setting.getAppDataPath();
+                nndd_system_dir = await myapi.ipc.Setting.getNNDDSystemPath();
             } catch (error) {
                 await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
-                    message: `アプリのデータ保存先 "${data_dir}" が見つからない\n${error.message}`
-                });
-                return;
-            }
-
-            try {
-                fs.statSync(nndd_system_dir);
-            } catch (error) {
-                await myapi.ipc.Dialog.showMessageBox({
-                    type: "error",
-                    message: `NNDDのシステムパス "${nndd_system_dir}" が見つからない\n${error.message}`
+                    message: error.message
                 });
                 return;
             }

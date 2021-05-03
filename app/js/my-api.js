@@ -179,6 +179,30 @@ const Setting = {
             return "";
         }
     },
+    getAppDataPath : async () => {
+        const data_dir = await Config.get("data_dir", "");
+        if(data_dir==""){
+            throw new Error("データの保存先が設定されていない");
+        }
+        try {
+            await fs.promises.access(data_dir);
+            return data_dir;
+        } catch (error) {
+            throw new Error(`データの保存先 "${data_dir}" が見つからない\n${error.message}`);
+        }  
+    },
+    getNNDDSystemPath : async () => {
+        const system_dir = await Config.get("nndd.system_path", "");
+        if(system_dir==""){
+            throw new Error("NNDDのシステムパスが設定されていない");
+        }
+        try {
+            await fs.promises.access(system_dir);
+            return system_dir;
+        } catch (error) {
+            throw new Error(`NNDDのシステムパス "${system_dir}" が見つからない\n${error.message}`);
+        }  
+    },
     reloadCSS:async (file_path)=>{
         return await ipcRenderer.invoke("setting:reload-css", {file_path});
     }, 

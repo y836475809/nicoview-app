@@ -268,16 +268,15 @@ class NicoSearch {
                 throw new Error(`status=${result.status}, message=${decodeURI(result.message)}`);
             }
 
-            const page_num = result.page;
-            const search_offset = 1600;
             const search_limit = 32;
+            const max_page_num = 50;
+            
+            const page_num = result.page;
             const search_result_num = result.count;
 
-            let total_page_num = 0;
-            if(search_result_num < search_offset+search_limit){
-                total_page_num = Math.ceil(search_result_num / search_limit);
-            }else{
-                total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
+            let total_page_num = Math.ceil(search_result_num / search_limit);
+            if(total_page_num > max_page_num){
+                total_page_num = max_page_num;
             }
             result.page_ifno = {
                 page_num: page_num, 

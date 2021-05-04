@@ -166,10 +166,15 @@ class NicoMockResponse {
                 is_middle_thumbnail: true
             });
         }
+        // 検索語が数値の場合、その数値をヒット数にする
+        let count = parseInt(text);
+        if(isNaN(count)){
+            count = 1000;
+        }
         const obj = {
             ss_id:"1234-5678-90",
             list: list,
-            count: 1000,
+            count: count,
             has_ng_video_for_adsense_on_listing: true,
             related_tags: ["tag1", "tag2"],
             page: page,

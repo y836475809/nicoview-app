@@ -220,7 +220,6 @@
         }
 
         pagination {
-            width: 300px;
             margin: 0 0 5px 0;
         }
 

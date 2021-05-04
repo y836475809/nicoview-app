@@ -10,7 +10,7 @@
         }
 
         .label.page {
-            width: 60px;
+            min-width: 80px;
             cursor: pointer;
             border: 1px solid gray;
             border-radius: 3px;

@@ -2,13 +2,13 @@
     <style scoped>
         :scope {
             --header-height:30px;
-            --item-size: 30px;
+            --item-size: 35px;
             --icon-size: 16px;
             --margin: 10px;
         }
 
         .container {
-            width: calc(var(--item-size) * 10 + var(--margin) * 2);
+            width: calc(var(--item-size) * 10 + var(--margin) * 2 + 25px);
             border-radius: 5px;
             padding: var(--margin);
             background-color: white;
@@ -39,6 +39,8 @@
         .item-container {
             display : flex;
             flex-wrap : wrap; 
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
         }
         .item {
             width: var(--item-size);
@@ -76,7 +78,7 @@
 
     <script>
         const obs = this.opts.obs;
-        const max_page_num = 51;
+        const max_page_num = 0;
         this.items = [];
 
         for (let num = 1; num <= max_page_num; num++) {
@@ -98,7 +100,7 @@
             const { page_num, total_page_num } = args;
 
             this.items = [];
-            for (let num = 1; num <= max_page_num; num++) {
+            for (let num = 1; num <= total_page_num; num++) {
                 let class_name = "";
                 if(page_num == num){
                     class_name = "item-current-page";

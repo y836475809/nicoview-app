@@ -78,15 +78,7 @@
 
     <script>
         const obs = this.opts.obs;
-        const max_page_num = 0;
         this.items = [];
-
-        for (let num = 1; num <= max_page_num; num++) {
-            this.items.push({
-                num:num,
-                class_name:"item-disable"
-            });
-        }
 
         this.onclickItem = (item, e) => {
             obs.trigger("selected-page-num", { page_num:item.num });

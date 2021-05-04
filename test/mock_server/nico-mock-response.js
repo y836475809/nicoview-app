@@ -202,10 +202,15 @@ class NicoMockResponse {
                 startTime: new Date(new Date().getTime() - Math.floor(Math.random() * 5000)).toISOString()
             });
         }
+        // 検索語が数値の場合、その数値をヒット数にする
+        let count = parseInt(text);
+        if(isNaN(count)){
+            count = 1000;
+        }
         const obj = {
             meta: { 
                 status: 200,
-                totalCount: 1000,
+                totalCount: count,
                 id:"1234567890"
             },
             data: data

@@ -28,6 +28,9 @@ const searchItems = Object.freeze({
     ]
 });
 
+const search_max_offset = 100000;
+const search_max_limit = 100;
+
 class NicoSearchParams {
     constructor(limit=32, context="electron-app"){
         this._api = "snapshot";
@@ -153,15 +156,15 @@ class NicoSearchParams {
         if(!sortOrders.includes(this._sort_order)){
             msgs.push(`ソート順が"${this._sort_order}", ソート順は+か-`);
         }
-        if(this._limit>100){
-            msgs.push(`コンテンツの最大数が"${this._limit}", 最大数は100`);
+        if(this._limit>search_max_limit){
+            msgs.push(`コンテンツの最大数が"${this._limit}", 最大数は${search_max_limit}`);
         }
         if(this._page<1){ 
             msgs.push(`ページ数が"${this._page}", ページは1以上`);
         }
         const offset = this._calcOffset();
-        if(offset>1600){ 
-            msgs.push(`コンテンツの取得オフセットが"${offset}", 最大数は1600`);
+        if(offset>search_max_offset){ 
+            msgs.push(`コンテンツの取得オフセットが"${offset}", 最大数は${search_max_offset}`);
         }
 
         if(msgs.length>0){
@@ -196,15 +199,14 @@ class NicoSearch {
             const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
             const result = JSON.parse(body);
 
-            const search_offset = 1600;
-            const search_limit = 32;
+            const search_limit = params._limit;
 
             const search_result_num = result.meta.totalCount;
             let total_page_num = 0;
-            if(search_result_num < search_offset+search_limit){
+            if(search_result_num < search_max_offset+search_limit){
                 total_page_num = Math.ceil(search_result_num / search_limit);
             }else{
-                total_page_num = Math.ceil((search_offset+search_limit) / search_limit);
+                total_page_num = Math.ceil((search_max_offset+search_limit) / search_limit);
             }
 
             const search_result = {};

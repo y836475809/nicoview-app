@@ -108,9 +108,9 @@ test("nico search params error", t => {
     }
     {
         const params = default_params();
-        params.page(52);
+        params.page((100000/32)+2);
         const error = t.throws(() => { params.get(); });
-        t.is(error.message, "コンテンツの取得オフセットが\"1632\", 最大数は1600");
+        t.is(error.message, "コンテンツの取得オフセットが\"100032\", 最大数は100000");
     }
 });
 

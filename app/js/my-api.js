@@ -24,9 +24,6 @@ const logout = () => {
 const getNicoLoginCookie = async () => {
     return await ipcRenderer.invoke("app:get-nico-login-cookie");
 };
-const setCookie = async (cookies) => {
-    return await ipcRenderer.invoke("app:set-cookie", cookies);
-};
 
 const popupContextMenu = async (name, data) => {
     const channel = `app:popup-contextmenu-${name}`;
@@ -348,7 +345,6 @@ const myapi = {
         login,
         logout,
         getNicoLoginCookie,
-        setCookie,
         popupContextMenu,
         onLoadContent,
         onPlayVideo,

@@ -208,12 +208,9 @@
                     throw error;
                 });
 
-                const {is_economy, is_deleted, cookies, comments, thumb_info, video_url} = 
+                const {is_economy, is_deleted, comments, thumb_info, video_url} = 
                     await nico_play.play(video_id);
-                const ret = await myapi.ipc.setCookie(cookies);
-                if(ret!="ok"){
-                    throw new Error(`error: cookieの設定に失敗 ${video_id}`);
-                } 
+                    
                 const video_data = {
                     src: video_url,
                     type: `video/${thumb_info.video.video_type}`,

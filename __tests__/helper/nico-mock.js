@@ -40,19 +40,13 @@ class NicoMocks {
 
     watch(delay=1, code=200, body){
         this.watch_nock = nock("https://www.nicovideo.jp");
-        const headers = {
-            "Set-Cookie": [
-                `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
-                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
-            ]
-        };
         if(!body){
             body = MockNicoUitl.getWatchHtml(video_id);
         }
         this.watch_nock
             .get(`/watch/${video_id}`)
             .delay(delay)
-            .reply(code, body, headers);
+            .reply(code, body);
     }
     
     comment(delay=1, code=200){
@@ -251,18 +245,12 @@ class NicoDownLoadMocks {
     }
     watch({delay=1, code=200} = {}){
         this.watch_nock = nock("https://www.nicovideo.jp");
-        const headers = {
-            "Set-Cookie": [
-                `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
-                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
-            ]
-        };
         const cp_data_api_data = JSON.parse(JSON.stringify(data_api_data));
         const body = MockNicoUitl.getWatchHtml(video_id, cp_data_api_data);
         this.watch_nock
             .get(`/watch/${video_id}`)
             .delay(delay)
-            .reply(code, body, headers);
+            .reply(code, body);
     } 
 
     dmc_session({quality="max", delay=1, code=200} = {}){

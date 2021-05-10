@@ -58,7 +58,7 @@ class TestNicoUpdate extends NicoUpdate {
         this.nico_api._video.isDeleted = nico_video_deleted;
     } 
     async _getWatchData(){
-        return { cookie_jar: null, nico_api: this.nico_api };
+        return { nico_api: this.nico_api };
     }
     _getCurrentCommentData(){
         return [];
@@ -86,7 +86,7 @@ class TestNicoUpdateTags extends NicoUpdate {
         this.nico_api.parse(data_api_data);
     }
     async _getWatchData(){
-        return { cookie_jar: null, nico_api: this.nico_api };
+        return { nico_api: this.nico_api };
     }
     async _getComments(nico_api, cur_comments){
         return [{}];

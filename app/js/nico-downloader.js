@@ -28,11 +28,9 @@ class DownloadRequest {
     /**
      * 
      * @param {String} url 
-     * @param {NicoCookie} nico_cookie 
      */
-    constructor(url, nico_cookie){
+    constructor(url){
         this._url = url;
-        this._nico_cookie = nico_cookie;
         this._req = null;
     }
 
@@ -47,7 +45,6 @@ class DownloadRequest {
         await this._req.get(this._url, 
             {
                 encoding:"binary",
-                nico_cookie:this._nico_cookie, 
                 stream:stream,
                 on_progress:(current, content_len)=>{
                     const cur_per = Math.floor((current/content_len)*100);
@@ -164,7 +161,6 @@ class NicoDownloader {
     async _getWatchData(video_id){
         this.nico_watch = new NicoWatch();
         const watch_data = await this.nico_watch.watch(video_id);
-        this._nico_cookie = watch_data.nico_cookie;
         this._nico_api = watch_data.nico_api;
     }
 
@@ -217,7 +213,7 @@ class NicoDownloader {
 
         const video_url = this.nico_video.DmcContentUri;
 
-        this.video_download = new DownloadRequest(video_url, this._nico_cookie);
+        this.video_download = new DownloadRequest(video_url);
         try {
             await this.video_download.download(stream, on_progress);
             this.nico_video.stopHeartBeat();

@@ -163,8 +163,7 @@ class NicoWatch {
         const nico_api = new NicoAPI();
         nico_api.parse(api_data);
 
-        const nico_cookie = this._req.getNicoCookie();
-        return { nico_cookie, nico_api }; 
+        return { nico_api }; 
     }
 }
 

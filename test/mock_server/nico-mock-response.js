@@ -237,12 +237,6 @@ class NicoMockResponse {
 
     watch(url, res){
         const video_id = url.split("/").pop();
-        const headers = {
-            "Set-Cookie": [
-                `nicohistory=${video_id}%3A123456789; path=/; domain=.nicovideo.jp`,
-                "nicosid=123456.789; path=/; domain=.nicovideo.jp"
-            ]
-        };
         const apt_data = createApiData(video_id);
         const data_api_data = escapeHtml(JSON.stringify(apt_data));
         const body =  `<!DOCTYPE html>
@@ -252,7 +246,7 @@ class NicoMockResponse {
             </body>
         </html>`;
     
-        res.writeHead(200, headers);
+        res.writeHead(200);
         res.write(body);
         res.end();
     }

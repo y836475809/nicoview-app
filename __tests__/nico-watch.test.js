@@ -27,29 +27,11 @@ test.afterEach(t => {
     prof_time.end(t);
 });
 
-test("watch get cookie", async (t) => {
+test("watch get nico_api", async (t) => {
     nico_mocks.watch();
 
     const nico_watch = new NicoWatch();
-    const { nico_cookie, nico_api } = await nico_watch.watch(TestData.video_id);
-    t.deepEqual(nico_cookie.getSesstionCookies(),[
-        {
-            url: "https://www.nicovideo.jp",
-            name: "nicohistory",
-            value: `${TestData.video_id}%3A123456789`,
-            domain: ".nicovideo.jp",
-            path: "/",
-            secure: false
-        },
-        {
-            url: "https://www.nicovideo.jp",
-            name: "nicosid",
-            value: "123456.789",
-            domain: ".nicovideo.jp",
-            path: "/",
-            secure: false
-        }
-    ]);
+    const { nico_api } = await nico_watch.watch(TestData.video_id);
 
     t.not(nico_api.getVideo(), undefined);
     t.not(nico_api.getVideoQuality(), undefined);

@@ -370,19 +370,6 @@ app.on("ready", async ()=>{
         });
     });
 
-    ipcMain.handle("app:set-cookie", async (event, args) => {
-        const cookies = args;
-        try {
-            for (let index = 0; index < cookies.length; index++) {
-                const cookie = cookies[index];
-                await session.defaultSession.cookies.set(cookie);
-            }
-            return "ok";
-        } catch (error) {
-            return "error";
-        }
-    });
-
     const app_msg_list = [
         { name:"search-tag", focus:true },
         { name:"load-mylist", focus:true },

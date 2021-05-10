@@ -13,68 +13,8 @@ const getValue = (headers, key) => {
     return null;
 };
 
-class NicoCookie {
-    /**
-     * 
-     * @param {Array} headers 
-     */
-    constructor(url, headers){
-        this._url = new URL(url);
-        this._keys = ["nicohistory", "nicosid"];
-        this._cookie_headers = getValue(headers, "set-cookie");
-    }
-
-    getCookieHeaders(){
-        if(!this._cookie_headers){
-            throw new Error(`nico cookie headers is ${this._cookie_headers}`);
-        }
-        if (!Array.isArray(this._cookie_headers)) {
-            throw new Error(`nico cookie headers is not array`);
-        }
-
-        return this._cookie_headers.filter(value => {
-            return this._keys.some(key => value.includes(key));
-        });
-    }
-
-    getSesstionCookies(){
-        const sc = [];
-        const objs = this._parse(this.getCookieHeaders());
-        objs.forEach(value => {
-            for (let index = 0; index < this._keys.length; index++) {
-                const key = this._keys[index];
-                if(Object.prototype.hasOwnProperty.call(value, key)===true){
-                    // cookie.expires
-                    sc.push({
-                        url: this._url.origin,
-                        name: key,
-                        value: value[key],
-                        domain: value.domain,
-                        path: value.path,
-                        secure: value.secure==undefined?false:true
-                    }); 
-                }
-            }
-        });
-        return sc;
-    }
-
-    _parse(cookies){
-        const objs = [];
-        cookies.forEach(value => {
-            const obj = {};
-            value.split(";").forEach(( cookie ) => {
-                const parts = cookie.split("=");
-                obj[parts[0].trim()] = parts[1].trim();
-            });
-            objs.push(obj);
-        });
-        return objs;
-    }
-}
-
 class NicoClientRequest {
-    get(url, {nico_cookie=null, cookie=null, stream=null, on_progress=null, encoding="utf8"}={}){
+    get(url, {cookie=null, stream=null, on_progress=null, encoding="utf8"}={}){
         this._resetParams();
  
         this._stream = stream;
@@ -83,9 +23,6 @@ class NicoClientRequest {
         this._encoding = encoding;
 
         const options = this._getOptions(url, "GET");
-        if(nico_cookie){
-            options.headers["Cookie"] = nico_cookie.getCookieHeaders();
-        }
         if(cookie){
             options.headers["Cookie"] = cookie;
         }
@@ -124,10 +61,6 @@ class NicoClientRequest {
         return this._request(url, options);
     }
 
-    getNicoCookie(){
-        return this._res_nico_cookie;
-    }
-
     cancel(){
         if(!this._req){
             return;
@@ -141,7 +74,6 @@ class NicoClientRequest {
     _resetParams(){
         this._encoding = "utf8";
         this._stream = null;
-        this._res_nico_cookie = null;
         this._on_progress = null;
         this._res_json = false;
     }
@@ -202,7 +134,6 @@ class NicoClientRequest {
                 }
 
                 res.setEncoding(this._encoding);
-                this._res_nico_cookie = new NicoCookie(url, res.headers);
                
                 if(this._stream){
                     res.pipe(this._stream);
@@ -274,6 +205,5 @@ class NicoClientRequest {
 }
 
 module.exports = {
-    NicoCookie,
     NicoClientRequest,
 };

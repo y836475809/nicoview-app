@@ -30,7 +30,7 @@ class NicoPlay extends EventEmitter {
             try {
                 this.emit("changeState", "startWatch");
                 this.nico_watch = new NicoWatch();
-                const { nico_cookie, nico_api } = await this.nico_watch.watch(video_id); 
+                const { nico_api } = await this.nico_watch.watch(video_id); 
                 const is_deleted = nico_api.getVideo().isDeleted;
                 this.emit("changeState", "finishWatch");
 
@@ -59,14 +59,12 @@ class NicoPlay extends EventEmitter {
                 });
 
                 this.emit("changeState", "startPlayVideo");
-                const cookies = nico_cookie.getSesstionCookies();
                 const thumb_info = NicoDataParser.json_thumb_info(nico_api); 
                 const dmc_video_url = this.nico_video.DmcContentUri;
                 const is_economy = !this.nico_video.isDMCMaxQuality();
                 resolve({
                     is_economy: is_economy,
                     is_deleted: is_deleted,
-                    cookies: cookies,
                     comments: cnved_comments,
                     thumb_info: thumb_info,
                     video_url: dmc_video_url

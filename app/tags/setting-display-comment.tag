@@ -7,9 +7,8 @@
     </style>
 
     <div class="setting-section">
+        <div class="center-v title">コメント表示</div>
         <div class="setting-params">
-            <!-- <div class="title">コメント表示</div> -->
-            <!-- <hr> -->
             <div class="param-label center-v">表示時間</div>
             <label each={item in duration_items} >
                 <input type="radio" name="duration" value={item} 

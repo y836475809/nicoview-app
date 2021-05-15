@@ -2,11 +2,18 @@
     <style scoped>
         :scope {
             --control-height: 25px;
+            --margin: 5px
+        }
+
+        .setting-params {
+            width: 100%;
+            height: 300px;
         }
 
         .comment-ng-grid-container {
             width: 100%;
-            height: calc(300px - var(--control-height));
+            height: calc(100% - var(--control-height) - var(--margin));
+            background-color: white;
         }
 
         .delete-button {
@@ -19,7 +26,7 @@
             user-select: none;
             border-style: none;
             border: 1px solid var(--control-border-color);
-            margin-top: 10px;
+            margin-top: 5px;
         }
 
         .delete-button:active {
@@ -32,7 +39,8 @@
     </style>
 
     <div class="setting-section"> 
-        <div class="setting-params">
+        <div class="center-v title">NGコメント</div>
+        <div class="setting-params">     
             <div class="comment-ng-grid-container">
                 <div class="comment-ng-grid"></div>
             </div>

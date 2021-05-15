@@ -14,13 +14,16 @@
             min-height: 300px;
             width: 50vw;
             height: var(--setting-dialog-height);
-            padding-bottom: 2em;
         }
 
         dialog::backdrop {
             opacity: 0;
         }
 
+        .close-button-container {
+            height: 25px;
+            width: 100%;
+        }
         .close-button {
             margin-right: 4px;
             margin-bottom: 10px;
@@ -33,17 +36,22 @@
             color: black;
         }
 
-        .setting-container {
+        .player-setting-container {
+            margin: 10px;
+            background-color: white;
+            border-radius: 3px;
+            border: 1px solid darkgray;
+        }
+        .player-setting-container .title {
+            height: 30px;
             width: 100%;
-            height: calc(100% - 5px);
-            overflow: auto;
+            border-radius: 3px 3px 0 0;
+            padding: 0 10px 0 10px;
+            vertical-align: middle;
+            background-color: lightblue;
+            user-select: none;
         }
 
-        .setting-section {
-            width: calc(100% - 5px);
-            padding-bottom: 1em;
-            
-        }
         .setting-section .title {
             height: var(--title-height);
             user-select: none;
@@ -58,73 +66,20 @@
             height: 30px;
             user-select: none;
         }
-        .setting-section label {
-            user-select: none;
-        }
-
-        .setting-container input[type='checkbox']:hover,
-        .setting-container input[type='radio']:hover {
-            cursor: pointer;
-        }
-        .setting-container input[type='checkbox'],
-        .setting-container input[type='radio'] {
-            position: relative;
-            top: 2px;
-            margin-left: 15px;
-        }  
-
-        .setting-container input[name="player-setting-tab"] {
-            display: none;
-            margin-left: 5px;      
-        }
-        .setting-container input[name="player-setting-tab"]:checked + .tab_class {
-            border-bottom: 2px solid royalblue;
-        }
-        .setting-container input[name="player-setting-tab"]:checked + .tab_class + .content_class {       
-            width: calc(100% - 10px * 2);
-            z-index: 1;
-        }
-        .setting-container .tab_class {
-            position: relative;
-            top: 3px;
-            height: var(--setting-tab-height);
-            margin-right: 10px;
-        }
-        .setting-container .tab_class:hover {
-            cursor: pointer;
-        }
-        .setting-container .content_class {
-            z-index: -1;
-            position: absolute;
-            margin-top: 5px;
-            top: var(--setting-content-top);
-            width: calc(100% - 20px * 2);
-            height: calc(var(--setting-dialog-height) - (var(--setting-content-top) + var(--setting-tab-height)));
-            overflow: auto;
-            background-color: white;
-        }
     </style>
 
     <dialog class="dialog-shadow">
+        <div class="close-button-container">
         <i class="close-button fas fa-times" title="閉じる" onclick={onclickClose}></i>
-        <div class="setting-container" style="display: flex;">
-            <input type="radio" name="player-setting-tab" id="player-setting1" checked>
-            <label class="tab_class title" for="player-setting1">NGコメント</label>
-            <div class="content_class">
-                <setting-ng-comment obs={opts.obs}></setting-ng-comment>
-            </div>
-            
-            <input type="radio" name="player-setting-tab" id="player-setting2">
-            <label class="tab_class title" for="player-setting2">コメント表示</label>
-            <div class="content_class">
-                <setting-display-comment obs={opts.obs}></setting-display-comment>
-            </div>
-
-            <input type="radio" name="player-setting-tab" id="player-setting3">
-            <label class="tab_class title" for="player-setting3">コンテキストメニュー</label>
-            <div class="content_class">
-                <setting-player-contextmenu></setting-player-contextmenu>
-            </div>
+        </div>
+        <div class="player-setting-container">
+            <setting-ng-comment obs={opts.obs}></setting-ng-comment>
+        </div>
+        <div class="player-setting-container">
+            <setting-display-comment obs={opts.obs}></setting-display-comment>
+        </div>
+        <div class="player-setting-container">
+            <setting-player-contextmenu></setting-player-contextmenu>
         </div>
     </dialog>
 

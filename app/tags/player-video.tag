@@ -36,6 +36,7 @@
         let comment_tl = null;
         let comment_params = null;
         let comment_sync_id = null;
+        let play_ended = false;
 
         const getCommentFontFamily = () => {
             let font_family = getComputedStyle(this.root).getPropertyValue("--nico-comment-font-family");
@@ -81,7 +82,7 @@
                         } 
                     }
                     const vt = video_elm.currentTime;
-                    if(vt < last_time_sec && !comment_tl.ended){
+                    if(!play_ended && vt < last_time_sec && !comment_tl.ended){
                         const ct = comment_tl.getCurrentTime();
                         if(Math.abs(ct - vt) > threshold_sec){
                             logger.debug("comment_sync ct=", ct, ", vt=", vt, "ct-vt=", ct - vt);
@@ -176,6 +177,7 @@
             });
             video_elm.addEventListener("play", () => {
                 logger.debug("playによるイベント発火");
+                play_ended = false;
                 playVideoAndComment();
             });
             video_elm.addEventListener("pause", () => {
@@ -221,12 +223,13 @@
             }); 
             video_elm.addEventListener("playing", async () => {
                 logger.debug("playingによるイベント発火");
+                play_ended = false;
                 playVideoAndComment();
             });
 
             video_elm.addEventListener("ended", () => {
                 logger.debug("endedによるイベント発火");
-
+                play_ended = true;
                 if(comment_tl.enable === false || comment_tl.ended === true || comment_tl.hasComment === false){
                     // コメント非表示またはコメントが完了している場合は動画終了でpauseにする
                     obs.trigger("player-controls:set-state", "pause"); 

@@ -316,6 +316,13 @@
             elms[index].classList.add("selected");  
         });
 
+        obs.on("clear-select", () => {
+            const elms = this.root.querySelectorAll(".listview-item");
+            elms.forEach((elm) => {
+                elm.classList.remove("selected");
+            });
+        });
+
         obs.on("toggle-mark", (args) => {
             const { items } = args;
             items.forEach(item => {

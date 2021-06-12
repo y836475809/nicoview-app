@@ -86,6 +86,7 @@
             });
 
             if(index < 0){
+                this.obs_listview.trigger("clear-select");
                 return;
             }
             this.obs_listview.trigger("select-item-by-index", { index });
@@ -388,10 +389,10 @@
 
             if(await hasMylistID(mylist.mylist_id)){
                 is_current_fav = true;
-                obs.trigger("mylist-page:sidebar:select-item", { mylist_id: mylist.mylist_id });
             }else{
                 is_current_fav = false;
             }
+            obs.trigger("mylist-page:sidebar:select-item", { mylist_id: mylist.mylist_id });
             this.update();
 
             setData(mylist);

@@ -446,7 +446,11 @@ class CommentTimeLine {
     }
 
     seek(seek_sec){
-        this._ended = false;
+        if(seek_sec < this.lastTimeSec){
+            this._ended = false;
+        }else{
+            this._ended = true;
+        }   
 
         if(this.enable!==true){
             return;

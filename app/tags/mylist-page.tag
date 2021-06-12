@@ -147,6 +147,13 @@
             cursor: pointer;
         }
 
+        .add-mylist-button > .fav-mark {
+            color: royalblue; 
+        }
+        .add-mylist-button > .fav-mark:hover {
+            color: blue;
+        }
+
         .mylist-description {
             width: calc(100% - var(--margin) * 2);
             height: var(--description-height);
@@ -174,7 +181,7 @@
             <i class="fas fa-redo-alt"></i>
         </div>
         <div class="add-mylist-button center-hv" title="マイリストを保存" onclick={onclickSaveMylist}>
-            <i class="far fa-star"></i>
+            <i class={getIconClass()}></i>
         </div>
     </div>
     <div class="mylist-description">{mylist_description}</div>
@@ -358,13 +365,34 @@
             elm.value = id;
         };
 
+        const hasMylistID = async (mylist_id) => {
+            const mylist_id_list = await getMylistIDList();
+            return mylist_id_list.includes(mylist_id);
+        };
+
+        let is_current_fav = false;
+        this.getIconClass = () => {
+            if(is_current_fav){
+                return "fas fa-star fav-mark";
+            }else{
+                return "far fa-star";
+            }
+        };
+
         const setMylist = async (mylist) => {
             this.mylist_description = mylist.description;
-            this.update();
 
             const mylist_id_list = await getMylistIDList();
             nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
             nico_mylist_image_cache.loadCache(mylist.mylist_id);
+
+            if(await hasMylistID(mylist.mylist_id)){
+                is_current_fav = true;
+                obs.trigger("mylist-page:sidebar:select-item", { mylist_id: mylist.mylist_id });
+            }else{
+                is_current_fav = false;
+            }
+            this.update();
 
             setData(mylist);
         };
@@ -473,6 +501,9 @@
             const mylist = nico_mylist.mylist;
             addMylist(mylist);
             cacheImage(mylist.mylist_id);
+
+            is_current_fav = true;
+            this.update();
         };
 
         obs.on("mylist-page:item-dlbclicked", async (item) => {

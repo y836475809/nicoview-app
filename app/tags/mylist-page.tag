@@ -421,12 +421,16 @@
             await setMylist(mylist);
         };
 
-        const addMylist = (mylist) => {
+        const addMylist = async (mylist) => {
             if(!mylist){
                 return;
             }
 
             const mylist_id = mylist.mylist_id;
+
+            if(await hasMylistID(mylist.mylist_id)){
+                return;
+            }
    
             const item = {
                 title: mylist.title,
@@ -494,13 +498,13 @@
             await updateMylist();
         };
 
-        this.onclickSaveMylist = (e) => {
+        this.onclickSaveMylist = async (e) => {
             if(!nico_mylist){
                 return;
             }
 
             const mylist = nico_mylist.mylist;
-            addMylist(mylist);
+            await addMylist(mylist);
             cacheImage(mylist.mylist_id);
 
             is_current_fav = true;

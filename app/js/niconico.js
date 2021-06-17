@@ -29,10 +29,14 @@ class NicoAPI {
     }
 
     getCommentOwnerThread(){
-        return this._comment.threads[0];
+        if(this._owner_threads.length==0){
+            return null;
+        }
+        return this._owner_threads[0];
     }
-    getCommentDefaultThread(){
-        return this._comment.threads[1];
+
+    getCommentUserThreads(){
+        return this._user_threads;
     }
 
     getSession(){
@@ -80,9 +84,8 @@ class NicoAPI {
         };
 
         const threads = this._api_data.comment.threads;
-        this._comment = {
-            threads:threads
-        };
+        this._owner_threads = threads.filter(thread => thread.isActive && thread.isOwnerThread);
+        this._user_threads = threads.filter(thread => thread.isActive && !thread.isOwnerThread);
 
         const tags = this._api_data.tag.items;
         this._tags = tags.map(item => {
@@ -123,9 +126,13 @@ class NicoAPI {
             return false;
         } 
 
-        if(this._typeOf(this._comment)!="object"){
+        if(this._typeOf(this._owner_threads)!="array"){
             return false;
-        }   
+        }
+
+        if(this._typeOf(this._user_threads)!="array"){
+            return false;
+        }
         
         if(this._typeOf(this._owner)!="object"){
             return false;
@@ -354,14 +361,14 @@ class NicoComment {
         return response[2].thread.resultcode===0;
     }
 
-    getComment() {
+    async getComment() {
         const josn = this._get_comment_json();
-        return this._post(josn);
+        return await this._post(josn);
     }
 
-    getCommentDiff(res_from) {
+    async getCommentDiff(res_from) {
         const josn = this._get_comment_diff_json(res_from);
-        return this._post(josn);
+        return await this._post(josn);
     }
 
     _get_comment_json(){
@@ -379,13 +386,16 @@ class NicoComment {
         return josn;       
     }
 
-    _post(post_data){
+    async _post(post_data){
         this._req = new NicoClientRequest();
-        return this._req.post(`${NICO_URL.MSG}/api.json/`, {json:post_data});
+        return await this._req.post(`${NICO_URL.MSG}/api.json/`, {json:post_data});
     }
 
     hasOwnerComment() {
         const thread = this._nico_api.getCommentOwnerThread();
+        if(!thread){
+            return false;
+        }
         return thread.isActive;
     }
 
@@ -403,39 +413,93 @@ class NicoComment {
         cmds.push(this._getPing("pf", p_no));
     }
 
+    _createThreadObj(id, fork, is_owner, is_force_184, threadkey){
+        let obj =  {
+            thread: String(id),
+            version: is_owner?"20061206":"20090904",
+            fork: fork,
+            language: 0,
+            user_id: "",
+            with_global: 1,
+            scores: 1,
+            nicoru: 3,
+            force_184: "1"
+        };
+        if(is_force_184){
+            obj.force_184 = "1";
+        }
+        if(threadkey){
+            obj.threadkey = threadkey;
+        }
+        return obj;
+    }
+
+    _createThreadLeavesObj(id, fork, content_len, is_force_184, threadkey){
+        let obj = {
+            thread: String(id),
+            fork: fork,
+            language: 0,
+            user_id: "",
+            content: `0-${content_len}:100,1000,nicoru:100`,
+            scores: 1,
+            nicoru: 3,
+            force_184: "1"
+        };
+        if(is_force_184){
+            obj.force_184 = "1";
+        }
+        if(threadkey){
+            obj.threadkey = threadkey;
+        }
+        return obj;
+    }
+
+    _createDiffThreadObj(id, res_from, threadkey){
+        let obj = {
+            thread: String(id),
+            version: "20061206",
+            language: 0,
+            user_id: "",
+            res_from: res_from,
+            with_global: 1,
+            scores: 0,
+            nicoru: 3
+        };
+        if(threadkey){
+            obj.threadkey = threadkey;
+        }
+        return obj;
+    }
+
     makeJsonNoOwner(r_no, p_no) {
         //no owner
-        const thread = this._nico_api.getCommentDefaultThread();
-        const id = thread.id;
-        const fork = thread.fork;
-
         const duration = this._nico_api.getVideo().duration;
         const content_len = this._getContentLen(duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
-        this._addCommand(cmds, p_no, {
-            thread: {
-                thread: id,
-                version: "20090904",
-                fork: fork,
-                language: 0,
-                user_id: "",
-                with_global: 1,
-                scores: 1,
-                nicoru: 0
+
+        let p_no_cnt = p_no;
+        const user_threads = this._nico_api.getCommentUserThreads();
+        user_threads.forEach(user_thread => {
+            const id = user_thread.id;
+            const fork = user_thread.fork;
+            const forced = user_thread.is184Forced;
+            const threadkey = user_thread.threadkey;
+        
+            this._addCommand(cmds, p_no_cnt, {
+                thread: this._createThreadObj(id, fork, false, forced, threadkey)
+            });
+            p_no_cnt++;
+
+            if(user_thread.isLeafRequired){
+                this._addCommand(cmds, p_no_cnt, {
+                    thread_leaves: this._createThreadLeavesObj(id, fork, content_len, forced, threadkey)
+                });
+                p_no_cnt++;
             }
         });
-        this._addCommand(cmds, ++p_no, {
-            thread_leaves: {
-                thread: id,
-                language: 0,
-                user_id: "",
-                content: `0-${content_len}:100,1000`,
-                scores: 1,
-                nicoru: 0
-            }
-        });
+        
         cmds.push(this._getPing("rf", r_no));
         
         return cmds;
@@ -444,74 +508,67 @@ class NicoComment {
     makeJsonOwner(r_no, p_no) {
         //owner
         const owner_thread = this._nico_api.getCommentOwnerThread();
-        const default_thread = this._nico_api.getCommentDefaultThread();
-        const thread0 = owner_thread.id;
-        const fork0 = owner_thread.fork;
-        const thread1 = default_thread.id;
-        const fork1 = default_thread.fork;
+        const owner_id = owner_thread.id;
+        const owner_fork = owner_thread.fork;
+        const owner_forced = owner_thread.is184Forced;
+        const owner_threadkey = owner_thread.threadkey;
 
         const duration = this._nico_api.getVideo().duration;
         const content_len = this._getContentLen(duration);
 
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
-        this._addCommand(cmds, p_no, {
-            thread: {
-                thread: thread0,
-                version: "20061206",
-                fork: fork0,
-                language: 0,
-                user_id: "",
-                res_from: -1000,
-                with_global: 1,
-                scores: 1,
-                nicoru: 0
-            }
+
+        let p_no_cnt = p_no;
+        this._addCommand(cmds, p_no_cnt, {
+            thread: this._createThreadObj(owner_id, owner_fork, true, owner_forced, owner_threadkey)
         });
-        this._addCommand(cmds, ++p_no, {
-            thread: {
-                thread: thread1,
-                version: "20090904",
-                fork: fork1,
-                language: 0,
-                user_id: "",
-                with_global: 1,
-                scores: 1,
-                nicoru: 0
-            }
-        });   
-        this._addCommand(cmds, ++p_no, {
-            thread_leaves: {
-                thread: thread0,
-                language: 0,
-                user_id: "",
-                content: `0-${content_len}:100,1000`,
-                scores: 1,
-                nicoru: 0
-            }
-        });         
+        p_no_cnt++;
+
+        if(owner_thread.isLeafRequired){
+            this._addCommand(cmds, p_no_cnt, {
+                thread_leaves: this._createThreadLeavesObj(owner_id, owner_fork, content_len, owner_forced, owner_threadkey)
+            });
+            p_no_cnt++;
+        }
+
+        const user_threads = this._nico_api.getCommentUserThreads();
+        user_threads.forEach(user_thread => {
+            const id = user_thread.id;
+            const fork = user_thread.fork;
+            const forced = user_thread.is184Forced;
+            const threadkey = user_thread.threadkey;
+
+            this._addCommand(cmds, p_no_cnt, {
+                thread: this._createThreadObj(id, fork, false, forced, threadkey)
+            });
+            p_no_cnt++;
+
+            if(user_thread.isLeafRequired){
+                this._addCommand(cmds, p_no_cnt, {
+                    thread_leaves: this._createThreadLeavesObj(id, fork, content_len, forced, threadkey)
+                });
+                p_no_cnt++;
+            }     
+        });  
+        
         cmds.push(this._getPing("rf", r_no));
         return cmds;
     }
 
     makeJsonDiff(r_no, p_no, res_from) {
-        const default_thread = this._nico_api.getCommentDefaultThread();
-        const thread1 = default_thread.id;
+        const user_threads = this._nico_api.getCommentUserThreads();
+        const user_thread = user_threads[0];
+        const id = user_thread.id;
+        const threadkey = user_thread.threadkey;
+
         let cmds = [];
         cmds.push(this._getPing("rs", r_no));
+
         this._addCommand(cmds, p_no, {
-            thread: {
-                thread: thread1,
-                version: "20061206",
-                fork: 0,
-                language: 0,
-                user_id: "",
-                res_from: res_from,
-                with_global: 1,
-                scores: 0,
-                nicoru: 0
-            }
-        });  
+            thread: this._createDiffThreadObj(id, res_from, threadkey)
+        });
+
         cmds.push(this._getPing("rf", r_no));
 
         return cmds;

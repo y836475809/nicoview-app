@@ -37,7 +37,7 @@ test("watch get nico_api", async (t) => {
     t.not(nico_api.getVideoQuality(), undefined);
     t.not(nico_api.getTags(), undefined);
     t.not(nico_api.getCommentOwnerThread(), undefined);
-    t.not(nico_api.getCommentDefaultThread(), undefined);
+    t.not(nico_api.getCommentUserThreads(), undefined);
     t.not(nico_api.getSession(), undefined);
 });
 

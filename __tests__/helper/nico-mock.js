@@ -61,12 +61,12 @@ class NicoMocks {
                     return [404, "404 - \"Not Found\r\n\""];
                 }
 
-                if(data.length===8){
+                if(data.length===14){
                     //no owner
                     return [code, no_owner_comment];
                 }
     
-                if(data.length===11){
+                if(data.length===17){
                     //owner
                     return [code, owner_comment];
                 }
@@ -290,12 +290,12 @@ class NicoDownLoadMocks {
                     return [404, "404 - \"Not Found\r\n\""];
                 }
     
-                if(data.length===8){
+                if(data.length===14){
                     //no owner
                     return [code, no_owner_comment];
                 }
     
-                if(data.length===11){
+                if(data.length===17){
                     //owner
                     return [code, owner_comment];
                 }

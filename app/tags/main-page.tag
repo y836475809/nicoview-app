@@ -58,7 +58,7 @@
         }
         .main-sidebar .button-border {
             height: 100%;
-            width: 3px;
+            width: 8px;
             background-color: #2C7CFF;
             opacity: 0;
         }

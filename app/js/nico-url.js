@@ -1,7 +1,6 @@
 
 const NICO_URL =  Object.freeze({
     VIDEO: "https://www.nicovideo.jp",
-    MSG: "https://nmsg.nicovideo.jp",
     SEARCH: "https://api.search.nicovideo.jp",
 });
 

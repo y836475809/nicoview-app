@@ -28,6 +28,10 @@ class NicoAPI {
         return this._owner;
     }
 
+    getCommentServerUrl(){
+        return this._commnet_server_url;
+    }
+
     getCommentOwnerThread(){
         if(this._owner_threads.length==0){
             return null;
@@ -84,6 +88,7 @@ class NicoAPI {
         };
 
         const threads = this._api_data.comment.threads;
+        this._commnet_server_url = this._getCommentServerUrl(threads);
         this._owner_threads = threads.filter(thread => thread.isActive && thread.isOwnerThread);
         this._user_threads = threads.filter(thread => thread.isActive && !thread.isOwnerThread);
 
@@ -143,6 +148,28 @@ class NicoAPI {
     _typeOf(obj) {
         const toString = Object.prototype.toString;
         return toString.call(obj).slice(8, -1).toLowerCase();
+    }
+
+    /**
+     * api_dataのthreadsからコメントサーバのurlを取得する
+     * @param {Array} threads 
+     * @returns 
+     */
+    _getCommentServerUrl(threads){
+        const url_set = new Set();
+        threads.forEach(item=>{
+            url_set.add(item.server);
+        });
+
+        // TODO コメントサーバーはownerやuserで全部同じであるとしている
+        if(url_set.size > 1){
+            let msg;
+            for (let url of url_set) {
+                msg += url + ", ";
+            }
+            throw new Error(`several comment servers: ${msg}`);
+        }
+        return threads[0].server;
     }
 }
 
@@ -388,7 +415,8 @@ class NicoComment {
 
     async _post(post_data){
         this._req = new NicoClientRequest();
-        return await this._req.post(`${NICO_URL.MSG}/api.json/`, {json:post_data});
+        const url = `${this._nico_api.getCommentServerUrl()}/api.json/`;
+        return await this._req.post(url, {json:post_data});
     }
 
     hasOwnerComment() {

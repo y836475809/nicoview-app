@@ -60,11 +60,6 @@
             user-select: none;
         }
 
-        .setting-page .cache-label {
-            min-width: 200px;
-            user-select: none;
-        }
-        
         .setting-page .mg-container {
             margin-right: 15px;
         }
@@ -175,16 +170,6 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">アプリのキャッシュ</div>
-            <div class="content">
-                <div style="display: flex;">
-                <div class="center-v cache-label">キャッシュサイズ {cache_size}</div>
-                    <button onclick={onclickGetCacheSize}>キャッシュサイズ取得</button>
-                    <button onclick={onclickclearCache}>キャッシュクリア</button>
-                </div>
-            </div>
-        </div>
-        <div class="container">
             <div class="center-v title">ログ出力レベル設定</div>
             <div class="content">
                 <label>
@@ -206,7 +191,6 @@
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
 
-        this.cache_size = "--MB";
         this.import_items = ImportNNDDData.getItems();
 
         const mouse_gesture = new MouseGesture();
@@ -279,35 +263,6 @@
         this.onclickCheckWindowClose = async (e) => {
             const ch_elm = this.root.querySelector(".check-window-close");
             await myapi.ipc.Config.set("check_window_close", ch_elm.checked);
-        };
-
-        const getCacheSizeLabel = async () => {
-            const size_byte = await myapi.ipc.getAppCache();
-            const mb = 1024**2;
-            return `${(size_byte/mb).toFixed(1)}MB`;
-        };
-
-        this.onclickGetCacheSize = async (e) => {
-            this.cache_size = await getCacheSizeLabel();
-            this.update();
-        };
-
-        this.onclickclearCache = async (e) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
-                return;
-            }
-
-            this.obs_modal_dialog.trigger("show", {
-                message: "キャッシュクリア中...",
-            });
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            await myapi.ipc.clearAppCache();
-
-            this.obs_modal_dialog.trigger("close");
-
-            this.cache_size = await getCacheSizeLabel();
-            this.update();
         };
 
         this.onclickCheckLogLevelDebug = async (e) => {

@@ -611,12 +611,6 @@ app.on("ready", async ()=>{
             player_win.webContents.send("setting:on-change-log-level", args);
         }
     });
-    ipcMain.handle("setting:get-app-cache", async (event, args) => {     
-        return await session.defaultSession.getCacheSize();
-    });
-    ipcMain.handle("setting:clear-app-cache", async (event, args) => {     
-        await session.defaultSession.clearCache();
-    });
     ipcMain.handle("setting:open-dir", async (event, args) => {
         const { dir } = args;
         await shell.openPath(dir);

@@ -56,13 +56,6 @@ const onOpenVideoForm = (func) => {
     });
 };
 
-const clearAppCache = async ()=>{
-    return await ipcRenderer.invoke("setting:clear-app-cache");
-};
-const getAppCache = async ()=>{
-    return await ipcRenderer.invoke("setting:get-app-cache");
-};
-
 const Config = {
     get: async (key, default_value) => {
         return await ipcRenderer.invoke("config:get", {
@@ -333,8 +326,6 @@ const myapi = {
         playerReady,
         showyPlayer,
         onOpenVideoForm,
-        clearAppCache,
-        getAppCache,
 
         Config,
         Dialog,

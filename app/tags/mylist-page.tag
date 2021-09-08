@@ -559,10 +559,6 @@
             }); 
         });
 
-        obs.on("css-loaded", () => {
-            grid_table.resizeGrid();
-        });
-
         window.addEventListener("beforeunload", async (event) => {
             const mylist_id_list = await getMylistIDList();
             nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);

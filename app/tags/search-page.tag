@@ -648,10 +648,6 @@
 
             await this.search();
         });
-        
-        obs.on("css-loaded", () => {
-            grid_table.resizeGrid();
-        });
 
         obs.on("search-page:forward-page", () => {
             if(!canSearch()){

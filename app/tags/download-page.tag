@@ -279,10 +279,6 @@
             await deleteDownloadItems(video_ids);
         });
 
-        obs.on("css-loaded", () => {
-            grid_table_dl.grid_table.resizeGrid();
-        });
-
         this.on("mount", async () => {
             download_schedule = await myapi.ipc.Config.get("download.schedule", {
                 date: {hour:0, minute:0},

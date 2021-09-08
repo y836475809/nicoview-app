@@ -3,7 +3,6 @@ const fsPromises = fs.promises;
 const path = require("path");
 const { dialog, Menu } = require("electron");
 const { logger } = require("./js/logger");
-const { CSSLoader } = require("./js/css-loader");
 
 class JsonStore { 
     constructor(get_dir_func){
@@ -54,7 +53,6 @@ class JsonStore {
 
 class UserCSS {
     constructor(){
-        this._css_loader = new CSSLoader();
     }
 
     async load(file_path){
@@ -62,7 +60,8 @@ class UserCSS {
             return;
         }
         try {
-            await this._css_loader.load(file_path);
+            await fs.promises.stat(file_path);
+            this._css = await fs.promises.readFile(file_path, "utf8");
         } catch (error) {
             logger.error(error);
             await dialog.showMessageBox({
@@ -80,11 +79,10 @@ class UserCSS {
         }
         
         try {
-            const css = this._css_loader.CSS;
-            if(!css){
+            if(!this._css){
                 return;
             }
-            win.webContents.insertCSS(css);
+            win.webContents.insertCSS(this._css);
         } catch (error) {
             logger.error(error);
             dialog.showMessageBoxSync({

@@ -838,11 +838,6 @@
                 grid_table.setSelectedRows(rows);
             }
         });
-
-
-        obs.on("css-loaded", () => {
-            grid_table.resizeGrid();
-        });
     </script>
 </library-content>
 

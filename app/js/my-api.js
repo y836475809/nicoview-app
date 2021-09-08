@@ -176,15 +176,6 @@ const Shell = {
 };
 
 const Setting = {
-    getDefaultCSSPath:async () => {
-        try {
-            const css_path = path.join(process.resourcesPath, "user.css");
-            await fs.promises.stat(css_path);
-            return css_path;
-        } catch(err) {
-            return "";
-        }
-    },
     getAppDataPath : async () => {
         const data_dir = await Config.get("data_dir", "");
         if(data_dir==""){
@@ -209,18 +200,9 @@ const Setting = {
             throw new Error(`NNDDのシステムパス "${system_dir}" が見つからない\n${error.message}`);
         }  
     },
-    reloadCSS:async (file_path)=>{
-        return await ipcRenderer.invoke("setting:reload-css", {file_path});
-    }, 
     setLogLevel:async (level)=>{
         return await ipcRenderer.invoke("setting:change-log-level", {level});
     }, 
-
-    onReloadCSS: (func) => {  
-        ipcRenderer.on("setting:on-reload-css", (event, args)=>{
-            func();
-        });
-    },
     onChangeLogLevel: (func) => {  
         ipcRenderer.on("setting:on-change-log-level", (event, args)=>{
             func(args);

@@ -386,9 +386,5 @@
             const bk_items = args;
             this.obs.trigger("bookmark-page:add-items", bk_items);
         });
-
-        myapi.ipc.Setting.onReloadCSS((args)=>{
-            this.obs.trigger("css-loaded");
-        });
     </script>
 </main-page>

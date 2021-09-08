@@ -167,18 +167,6 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">ユーザーCSS</div>
-            <div class="content" style="display: flex;">
-                <input disabled=true class="css-path-input" type="text" readonly}>
-                <button title="ファイル選択" onclick={onclickSelectcCssPath}>
-                    <i class="far fa-file"></i>
-                </button>
-                <button title="読み込み" onclick={onclickReloadCss}>
-                    <i class="fas fa-redo-alt"></i>
-                </button>
-            </div>
-        </div>
-        <div class="container">
             <div class="content">
                 <label>
                     <input class="check-window-close" type="checkbox" 
@@ -286,25 +274,6 @@
             }
             setInputValue(".ffmpeg-path-input", file_path);
             await myapi.ipc.Config.set("ffmpeg_path", file_path);
-        };
-
-        
-        this.onclickSelectcCssPath = async e => {
-            const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
-                name: "CSS",
-                exts: ["css"]
-            });
-            if(file_path == null){
-                return;
-            }
-            setInputValue(".css-path-input", file_path);
-            await myapi.ipc.Config.set("css_path", file_path);
-        };
-
-        this.onclickReloadCss = async e => {
-            const elm = this.root.querySelector(".css-path-input");
-            const file_path = elm.value;
-            await myapi.ipc.Setting.reloadCSS(file_path);
         };
 
         this.onclickCheckWindowClose = async (e) => {
@@ -433,9 +402,6 @@
 
         this.on("mount", async () => {
             setInputValue(".app-setting-dir-input", await myapi.ipc.Config.get("app_setting_dir", "")); 
-
-            const css_path = await myapi.ipc.Setting.getDefaultCSSPath();
-            setInputValue(".css-path-input", await myapi.ipc.Config.get("css_path", css_path)); 
 
             setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
             setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 

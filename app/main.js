@@ -329,7 +329,10 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    await user_css.load(config.get("css_path", ""));
+    const user_css_path = is_debug?
+        path.join(__dirname, "css/user.css")
+        :path.join(process.resourcesPath, "user.css");
+    await user_css.load(user_css_path);
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
@@ -613,15 +616,6 @@ app.on("ready", async ()=>{
     });
     ipcMain.handle("setting:clear-app-cache", async (event, args) => {     
         await session.defaultSession.clearCache();
-    });
-    ipcMain.handle("setting:reload-css", async (event, args) => {
-        const { file_path } = args;
-        await user_css.load(file_path);
-
-        user_css.apply(main_win);
-        main_win.webContents.send("setting:on-reload-css");
-
-        user_css.apply(player_win);
     });
     ipcMain.handle("setting:open-dir", async (event, args) => {
         const { dir } = args;

@@ -327,9 +327,9 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    const user_css_path = is_debug?
-        path.join(__dirname, "css/user.css")
-        :path.join(process.resourcesPath, "user.css");
+    const user_css_path = startup_config.app_css?
+        path.join(__dirname, "css/user.css") // 開発、デバッグ時はcss/user.cssを使用
+        :path.join(process.resourcesPath, "user.css"); // リリース時はリソースフォルダのuser.cssを使用
     await user_css.load(user_css_path);
 
     const user_agent = process.env["user_agent"];

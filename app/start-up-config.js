@@ -15,13 +15,16 @@ class StartupConfig {
                 throw new Error(`not find config name=${name}`);
             } 
             this._params["debug"] = this._cmdline_parser.get("--debug", false);
+            this._params["app_css"] = true;
             if(this._params["use_mock_server"]){
                 this._params["mock_server_port"] = startup_config["mock_server_port"];
                 this._params["mock_server_wait_msec"] = startup_config["mock_server_wait_msec"];
             }
         }else{
+            const app_css = this._cmdline_parser.get("--app_css", false);
             this._params = {
                 debug: false,
+                app_css: app_css,
                 use_mock_server:false,
                 main: "html/index.html",
                 config_fiiename: "config.json"
@@ -31,6 +34,10 @@ class StartupConfig {
 
     get debug(){
         return this._params["debug"];
+    }
+
+    get app_css(){
+        return this._params["app_css"];
     }
 
     get main_html_path(){

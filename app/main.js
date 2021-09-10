@@ -142,16 +142,14 @@ const setupConfig = async () => {
 };
 
 const quit = async () => {
-    if(config.get("check_window_close", true)){
-        const ret = dialog.showMessageBoxSync( {
-            type: "info", 
-            buttons: ["OK", "Cancel"],
-            message:"終了しますか?"
-        });
-        if(ret!=0){
-            // cancel, 終了しない
-            return false;
-        }
+    const close_ret = dialog.showMessageBoxSync( {
+        type: "info", 
+        buttons: ["OK", "Cancel"],
+        message:"終了しますか?"
+    });
+    if(close_ret!=0){
+        // cancel, 終了しない
+        return false;
     }
 
     try {

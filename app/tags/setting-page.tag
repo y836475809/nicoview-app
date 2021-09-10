@@ -162,14 +162,6 @@
             </div>
         </div>
         <div class="container">
-            <div class="content">
-                <label>
-                    <input class="check-window-close" type="checkbox" 
-                        onclick={onclickCheckWindowClose} />ウィンドウを閉じる時に確認する
-                </label>
-            </div>
-        </div>
-        <div class="container">
             <div class="center-v title">ログ出力レベル設定</div>
             <div class="content">
                 <label>
@@ -258,11 +250,6 @@
             }
             setInputValue(".ffmpeg-path-input", file_path);
             await myapi.ipc.Config.set("ffmpeg_path", file_path);
-        };
-
-        this.onclickCheckWindowClose = async (e) => {
-            const ch_elm = this.root.querySelector(".check-window-close");
-            await myapi.ipc.Config.set("check_window_close", ch_elm.checked);
         };
 
         this.onclickCheckLogLevelDebug = async (e) => {
@@ -361,7 +348,6 @@
             setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
             setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
             setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-            setCheckValue(".check-window-close", await myapi.ipc.Config.get("check_window_close", true));
 
             const log_level = await myapi.ipc.Config.get("log.level", "info");
             setCheckValue(".check-loglevel-debug", log_level=="debug");

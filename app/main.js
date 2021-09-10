@@ -233,16 +233,6 @@ function createWindow() {
                     }}
                 ]
             }, 
-            { label: "ニコニコ動画",
-                submenu: [
-                    { id: "nico-login", enabled: false, label: "ログイン", click() {
-                        nico_login.showDialog(main_win);
-                    }},
-                    { id: "nico-logout", enabled: false, label: "ログアウト", async click() {
-                        await nico_login.logout();
-                    }}
-                ]
-            }, 
             { label: "ログ",
                 submenu: [
                     { label: "ログファイルを開く", click() {
@@ -252,7 +242,17 @@ function createWindow() {
                         shell.showItemInFolder(logger.getPath());
                     }}
                 ]
-            },                
+            },
+            { label: "ツール",
+                submenu: [
+                    { id: "nico-login", enabled: false, label: "ニコニコ動画ログイン", click() {
+                        nico_login.showDialog(main_win);
+                    }},
+                    { id: "nico-logout", enabled: false, label: "ニコニコ動画ログアウト", async click() {
+                        await nico_login.logout();
+                    }}
+                ]
+            }, 
             { label: "ヘルプ",  
                 submenu: [
                     { role: "reload" },

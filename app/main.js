@@ -226,13 +226,6 @@ function createWindow() {
 
     const main_menu = () => {
         const menu_templete = [
-            { label: "ファイル",
-                submenu: [
-                    { label: "動画IDを指定して再生", click: () => {
-                        main_win.webContents.send("app:open-video-form");
-                    }}
-                ]
-            }, 
             { label: "ログ",
                 submenu: [
                     { label: "ログファイルを開く", click() {

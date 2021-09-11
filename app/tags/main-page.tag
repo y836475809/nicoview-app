@@ -190,7 +190,6 @@
             </div>
         </div>
     </div>
-    <open-video-form obs={obs_open_video_form}></open-video-form>
 
     <script>
         /* globals riot logger */
@@ -198,7 +197,6 @@
         const { MouseGesture } = window.MouseGesture;
 
         this.obs = this.opts.obs;
-        this.obs_open_video_form = riot.observable();
 
         const mouse_gesture = new MouseGesture();
 
@@ -354,10 +352,6 @@
         this.obs.on("main-page:select-page", (page_name)=>{
             select_page(page_name);
         });  
-
-        myapi.ipc.onOpenVideoForm(()=>{
-            this.obs_open_video_form.trigger("show");
-        });
 
         myapi.ipc.Search.onSearchTag((args)=>{
             this.obs.trigger("main-page:select-page", "search");

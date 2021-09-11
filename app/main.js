@@ -255,6 +255,10 @@ function createWindow() {
             }, 
             { label: "ヘルプ",  
                 submenu: [
+                    { label: "設定ファイルの場所を開く", async click() {
+                        await shell.showItemInFolder(config.config_path);
+                    }},
+                    { type: "separator" },
                     { role: "reload" },
                     { role: "forcereload" },
                     { role: "toggledevtools" },

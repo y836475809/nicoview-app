@@ -52,14 +52,12 @@ class Config {
     }
 
     async save() {
-        delete this.json_data["app_setting_dir"];
         const json = JSON.stringify(this.json_data, null, "  ");
         await fsPromises.writeFile(this.config_path, json, "utf-8");
     }
 
     _initJsonData(){
         this.json_data = {};
-        this.json_data["app_setting_dir"] = path.dirname(this.config_path);
         this.json_data.download = {};
     }
 

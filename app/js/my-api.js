@@ -162,12 +162,6 @@ const PlayHistory = {
     },
 };
 
-const Shell = {
-    openDir:async (dir)=>{
-        return await ipcRenderer.invoke("setting:open-dir", {dir});
-    },
-};
-
 const Setting = {
     getAppDataPath : async () => {
         const data_dir = await Config.get("data_dir", "");
@@ -333,7 +327,6 @@ const myapi = {
         NGList,
         MyList,
         PlayHistory,
-        Shell,
         Setting,
         Stack,
         Bookmark,

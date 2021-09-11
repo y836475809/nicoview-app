@@ -89,15 +89,6 @@
             </div>
         </div>
         <div class="container">
-            <div class="center-v title">設定ファイル(config.json)のフォルダ</div>
-            <div class="content" style="display: flex;">
-                <input disabled=true class="app-setting-dir-input" type="text" readonly}>
-                <button title="フォルダを開く" onclick={onclickOpenDir}>
-                    <i class="far fa-folder-open"></i>
-                </button>
-            </div>
-        </div>
-        <div class="container">
             <div class="center-v title">データの保存先(ブックマーク, 履歴, DB等の保存先)</div> 
             <div class="content" style="display: flex;">
                 <input disabled=true class="data-dir-input" type="text" readonly>
@@ -236,11 +227,6 @@
             await myapi.ipc.Config.set("download.dir", dir);
         };
 
-        this.onclickOpenDir = async (e) => {
-            const dir = await myapi.ipc.Config.get("app_setting_dir", "");
-            await myapi.ipc.Shell.openDir(dir);
-        };
-
         this.onclickSelectffmpegPath = async e => {
             const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
                 name: "ffmpeg",
@@ -343,8 +329,6 @@
         };
 
         this.on("mount", async () => {
-            setInputValue(".app-setting-dir-input", await myapi.ipc.Config.get("app_setting_dir", "")); 
-
             setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
             setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
             setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 

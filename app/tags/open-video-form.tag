@@ -62,8 +62,6 @@
         const { Command } = window.Command;
         const { NICO_URL } = window.NicoURL;
 
-        const obs = this.opts.obs; 
-
         const formVisible = (visible) => {
             const elm = this.root.querySelector(".open-form");
             elm.style.display = visible===true?"":"none";
@@ -108,16 +106,15 @@
             formVisible(false);
         };
 
-        obs.on("show", () => {
-            formVisible(true);
-
-            const elm = this.root.querySelector(".open-form input");
-            elm.value = "";
-            elm.focus();
-        });
-
         this.on("mount", () => {
             formVisible(false);
+
+            this.opts.obs.on("show", () => {
+                formVisible(true);
+                const elm = this.root.querySelector(".open-form input");
+                elm.value = "";
+                elm.focus();
+            });
         });
     </script>    
 </open-video-form>  

@@ -46,7 +46,6 @@
         <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
             <player-controls obs={opts.obs}></player-controls>
         </div>
-        <open-video-form obs={obs_open_video_form}></open-video-form>
     </div>
 
     <script>
@@ -54,7 +53,7 @@
         const myapi = window.myapi;
         
         const obs = this.opts.obs; 
-        this.obs_open_video_form = riot.observable();
+        let obs_open_video_form = null;
 
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {
@@ -123,7 +122,11 @@
                         });
                     }
                     if(menu_id=="show-open-video-form"){
-                        this.obs_open_video_form.trigger("show");
+                        if(!obs_open_video_form){
+                            obs_open_video_form = riot.observable();
+                            riot.mount("open-video-form", {obs: obs_open_video_form});
+                        }
+                        obs_open_video_form.trigger("show");
                     }
                     if(menu_id=="change-movie-size"){
                         obs.trigger("player-video:get-video-size-callback",(args)=>{

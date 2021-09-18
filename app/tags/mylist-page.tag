@@ -189,10 +189,9 @@
     <div class="mylist-grid-container">
         <div class="mylist-grid"></div>
     </div>
-    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals riot logger */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -201,6 +200,7 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        let modal_dialog = null;
 
         myapi.ipc.Download.onUpdateItem(async ()=>{
             const video_ids = await myapi.ipc.Download.getIncompleteIDs();
@@ -355,6 +355,10 @@
                     obs.trigger("library-page:convert-video", video_id); 
                 }
             });   
+
+            modal_dialog = new ModalDialog(this.root, "mylist-md", {
+                obs:this.obs_modal_dialog
+            });
         });
 
         const getMylistID = () => {
@@ -455,7 +459,7 @@
         };
 
         const updateMylist = async () => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
             

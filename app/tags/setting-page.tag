@@ -162,17 +162,17 @@
             </div>
         </div>
     </div>
-    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals riot logger */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { ImportLibrary } = window.ImportLibrary;
         const { ImportNNDDData } = window.ImportNNDDData;
         const { MouseGesture } = window.MouseGesture;
-        
+
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        let modal_dialog = null;
 
         this.import_items = ImportNNDDData.getItems();
 
@@ -264,7 +264,7 @@
         };
 
         this.onclickExecNNDDImport = async (e) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
 
@@ -344,10 +344,14 @@
             }
 
             setupMouseGesture();
+        
+            modal_dialog = new ModalDialog(this.root, "setting-md", {
+                obs:this.obs_modal_dialog
+            });
         });
 
         this.onclickImportFiles = async ()=>{
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
             

@@ -289,10 +289,8 @@
         <div class="search-grid"></div>
     </div>
 
-    <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
-
     <script>
-        /* globals riot logger */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -300,6 +298,8 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        let modal_dialog = null;
+
         this.pagination_obs = riot.observable();
 
         this.api_checked = "checked";
@@ -447,7 +447,7 @@
         };
 
         const canSearch = () => {
-            return this.root.querySelector("modal-dialog").dataset.open!="true";
+            return !modal_dialog.isOpend();
         };
 
         this.search = async () => {
@@ -716,6 +716,11 @@
             nico_search_params.target(search_target_item.target);
 
             this.update();
+
+            modal_dialog = new ModalDialog(this.root, "search-md", {
+                obs:this.obs_modal_dialog,
+                oncancel: this.onCancelSearch
+            });
         });
     </script>
 </search-content>

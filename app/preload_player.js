@@ -4,6 +4,7 @@ process.once("loaded", () => {
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
     global.myapi = require(`${root_dir}/app/js/my-api`);
+    global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
 });
 
 window.addEventListener( "error", async e => {

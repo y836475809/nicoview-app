@@ -34,11 +34,10 @@
         </player-info-page>
     </div>
 
-    <modal-dialog obs={obs_modal_dialog} oncancel={onCancelSearch}></modal-dialog>
     <player-setting-dialog obs={opts.obs}></player-setting-dialog>
 
     <script>
-        /* globals riot logger */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
@@ -48,6 +47,7 @@
 
         const obs = this.opts.obs;
         this.obs_modal_dialog = riot.observable();
+        let modal_dialog = null;
 
         let comment_filter = null;
         let nico_play = null;
@@ -173,7 +173,7 @@
         }; 
 
         const playVideoOnline = async (video_id, time, is_saved) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
             
@@ -287,7 +287,7 @@
         });
   
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
 
@@ -496,6 +496,10 @@
                     message: `NGコメントリストの読み込み失敗\n${error.message}`
                 });
             }
+
+            modal_dialog = new ModalDialog(this.root, "player-md", {
+                obs:this.obs_modal_dialog
+            });
 
             myapi.ipc.playerReady();
         });   

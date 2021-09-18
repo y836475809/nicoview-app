@@ -54,32 +54,38 @@
     </dialog>
 
     <script>
-        const obs_dialog = this.opts.obs;
+        let on_cancel = null;
+        this.message = "";
+        
+        this.on("mount", () => {
+            const obs_dialog = this.opts.obs;
+            on_cancel = this.opts.oncancel;
 
-        obs_dialog.on("show", async (args) => {
-            this.root.dataset.open = true;
+            obs_dialog.on("show", (args) => {
+                this.root.dataset.open = true;
 
-            const { message, buttons, cb } = args;
-            this.message = message;
-            this.showok = buttons===undefined ? false : buttons.includes("ok");
-            this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
-            this.cb = cb;
+                const { message, buttons, cb } = args;
+                this.message = message;
+                this.showok = buttons===undefined ? false : buttons.includes("ok");
+                this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
+                this.cb = cb;
 
-            this.update();
+                this.update();
 
-            const dialog = this.root.querySelector("dialog");
-            dialog.showModal();
-        });
+                const dialog = this.root.querySelector("dialog");
+                dialog.showModal();
+            });
 
-        obs_dialog.on("update-message", (message) => {
-            this.message = message;
-            this.update();
-        });
+            obs_dialog.on("update-message", (message) => {
+                this.message = message;
+                this.update();
+            });
 
-        obs_dialog.on("close", () => {
-            const dialog = this.root.querySelector("dialog");
-            dialog.close();
-            this.root.dataset.open = false;
+            obs_dialog.on("close", () => {
+                const dialog = this.root.querySelector("dialog");
+                dialog.close();
+                this.root.dataset.open = false;
+            });
         });
 
         this.onclickButton = (result, e) =>{
@@ -89,6 +95,9 @@
         };
 
         this.oncancel = (e) => {
+            if(on_cancel){
+                on_cancel();
+            }
             e.preventDefault();
         };
     </script>

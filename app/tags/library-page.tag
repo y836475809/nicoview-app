@@ -207,10 +207,9 @@
     <div class="library-grid-container">
         <div class="library-grid"></div>
     </div>
-    <modal-dialog obs={obs_modal_dialog}></modal-dialog>
 
     <script>
-        /* globals riot logger */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -221,6 +220,7 @@
 
         const obs = this.opts.obs; 
         this.obs_modal_dialog = riot.observable();
+        let modal_dialog = null;
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
@@ -431,7 +431,7 @@
         };
 
         const updateNicoData = async (items, func) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
 
@@ -514,7 +514,7 @@
         };
 
         const convertNicoDataToNNDD = async (items) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
 
@@ -588,7 +588,7 @@
         };
 
         const deleteLibraryData = async (video_ids) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
 
@@ -630,7 +630,7 @@
         };
 
         const convertVideo = async (video_id) => {
-            if(this.root.querySelector("modal-dialog").dataset.open=="true"){
+            if(modal_dialog.isOpend()){
                 return;
             }
             
@@ -809,6 +809,10 @@
                 });
                 // loadLibraryItems([]);
             }
+            
+            modal_dialog = new ModalDialog(this.root, "library-md", {
+                obs:this.obs_modal_dialog
+            });
         });
 
         obs.on("library-page:convert-video", async (args) => { 

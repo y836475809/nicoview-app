@@ -4,7 +4,8 @@ process.once("loaded", () => {
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
     global.myapi = require(`${root_dir}/app/js/my-api`);
-
+    global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
+    
     if (global.myapi.isDebugMode()) {
         global.NicoMockServer = require(`${root_dir}/test/mock_server/nico-mock-server`);
         global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);

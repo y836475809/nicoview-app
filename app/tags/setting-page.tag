@@ -171,7 +171,7 @@
         const { MouseGesture } = window.MouseGesture;
 
         const obs = this.opts.obs; 
-        this.obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
         this.import_items = ImportNNDDData.getItems();
@@ -289,14 +289,14 @@
                 }
             });
 
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "インポート中...",
             });
             try {
                 const import_nndd = new ImportNNDDData(nndd_system_dir, data_dir);
                 for (let index = 0; index < import_items.length; index++) {
                     const import_item = import_items[index];
-                    this.obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
+                    obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
                     await import_nndd.call(import_item.name);
                 }
 
@@ -314,7 +314,7 @@
                     message: `インポート失敗\n${error.message}`
                 });
             } finally {
-                this.obs_modal_dialog.trigger("close");
+                obs_modal_dialog.trigger("close");
             }            
         };
 
@@ -346,7 +346,7 @@
             setupMouseGesture();
         
             modal_dialog = new ModalDialog(this.root, "setting-md", {
-                obs:this.obs_modal_dialog
+                obs:obs_modal_dialog
             });
         });
 
@@ -365,7 +365,7 @@
             }
 
             let cancel = false;
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "インポート中...",
                 cb: result=>{
                     cancel = true;
@@ -391,7 +391,7 @@
                 }
 
                 const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
-                this.obs_modal_dialog.trigger("update-message", message);
+                obs_modal_dialog.trigger("update-message", message);
 
                 await new Promise(resolve => setTimeout(resolve, 500));
             }
@@ -399,7 +399,7 @@
             await myapi.ipc.Dialog.showMessageBox({
                 message: `インポート完了\n失敗:${error_files.length}`
             });
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
 
             if(error_files.length>0){
                 await myapi.ipc.Dialog.showMessageBox({

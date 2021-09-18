@@ -199,7 +199,7 @@
         const { needConvertVideo } = window.VideoConverter;
 
         const obs = this.opts.obs; 
-        this.obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
         myapi.ipc.Download.onUpdateItem(async ()=>{
@@ -357,7 +357,7 @@
             });   
 
             modal_dialog = new ModalDialog(this.root, "mylist-md", {
-                obs:this.obs_modal_dialog
+                obs:obs_modal_dialog
             });
         });
 
@@ -463,7 +463,7 @@
                 return;
             }
             
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -489,7 +489,7 @@
                 }
             }
 
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
         };
 
         this.onkeydownUpdateMylist = async(e) => { 

@@ -297,7 +297,7 @@
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
-        this.obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
         this.pagination_obs = riot.observable();
@@ -459,7 +459,7 @@
                 return;
             }
             
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "検索中...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -491,7 +491,7 @@
                 }
             }
             
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
 
             const elm = getSearchInputElm();
             elm.focus();
@@ -718,7 +718,7 @@
             this.update();
 
             modal_dialog = new ModalDialog(this.root, "search-md", {
-                obs:this.obs_modal_dialog,
+                obs:obs_modal_dialog,
                 oncancel: this.onCancelSearch
             });
         });

@@ -46,7 +46,7 @@
         const { NicoVideoData } = window.NicoVideoData;
 
         const obs = this.opts.obs;
-        this.obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
         let comment_filter = null;
@@ -188,7 +188,7 @@
             try {
                 nico_play = new NicoPlay();
 
-                this.obs_modal_dialog.trigger("show", {
+                obs_modal_dialog.trigger("show", {
                     message: "...",
                     buttons: ["cancel"],
                     cb: result=>{
@@ -199,7 +199,7 @@
                 nico_play.on("changeState", (state)=>{
                     logger.debug("player main changeState state=", state);
                     const msg = play_msg_map.get(state);
-                    this.obs_modal_dialog.trigger("update-message", msg);
+                    obs_modal_dialog.trigger("update-message", msg);
                 });
                 nico_play.on("cancelHeartBeat", ()=>{
                     logger.debug("player main HeartBeat cancel");
@@ -236,7 +236,7 @@
                 }
             }
 
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
         }; 
   
         myapi.ipc.onPlayVideo(async (args)=>{
@@ -294,7 +294,7 @@
             logger.debug("player main update video_id=", video_id);
             const nico_update = new NicoUpdate();
 
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "更新中...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -337,7 +337,7 @@
                         });
                     }
                 }
-                this.obs_modal_dialog.trigger("close");
+                obs_modal_dialog.trigger("close");
             });
 
             try {   
@@ -359,7 +359,7 @@
                         message: error.message
                     });
                 }
-                this.obs_modal_dialog.trigger("close");
+                obs_modal_dialog.trigger("close");
             }
         });
 
@@ -498,7 +498,7 @@
             }
 
             modal_dialog = new ModalDialog(this.root, "player-md", {
-                obs:this.obs_modal_dialog
+                obs:obs_modal_dialog
             });
 
             myapi.ipc.playerReady();

@@ -219,7 +219,7 @@
         const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 
-        this.obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
         myapi.ipc.Library.onAddItem((args) => {
@@ -437,7 +437,7 @@
 
             let update_cancel = false;
             let nico_update = null;
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -460,7 +460,7 @@
                     }
                     
                     cur_update++;
-                    this.obs_modal_dialog.trigger("update-message", 
+                    obs_modal_dialog.trigger("update-message", 
                         `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
                     grid_table.updateCell(item.id, "state", "更新中");
@@ -492,14 +492,14 @@
                     if(cur_update < items.length){
                         await wait(1000);
                     }
-                    this.obs_modal_dialog.trigger("update-message", 
+                    obs_modal_dialog.trigger("update-message", 
                         `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
                 }                
             } catch (error) {
-                this.obs_modal_dialog.trigger("update-message", "更新キャンセル");
+                obs_modal_dialog.trigger("update-message", "更新キャンセル");
             }
 
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
             
             if(error_items.length > 0){
                 await myapi.ipc.Dialog.showMessageBox({
@@ -519,7 +519,7 @@
             }
 
             let cnv_cancel = false;
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -538,7 +538,7 @@
                     }
                     
                     cur_update++;
-                    this.obs_modal_dialog.trigger("update-message", 
+                    obs_modal_dialog.trigger("update-message", 
                         `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
                     grid_table.updateCell(item.id, "state", "変換中");
@@ -566,14 +566,14 @@
                     if(cur_update < items.length){
                         await wait(100);
                     }
-                    this.obs_modal_dialog.trigger("update-message", 
+                    obs_modal_dialog.trigger("update-message", 
                         `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
                 }                
             } catch (error) {
-                this.obs_modal_dialog.trigger("update-message", "変換キャンセル");
+                obs_modal_dialog.trigger("update-message", "変換キャンセル");
             }
 
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
 
             if(error_items.length > 0){
                 await myapi.ipc.Dialog.showMessageBox({
@@ -593,7 +593,7 @@
             }
 
             let cancel = false;
-            this.obs_modal_dialog.trigger("show", {
+            obs_modal_dialog.trigger("show", {
                 message: "...",
                 buttons: ["cancel"],
                 cb: result=>{
@@ -607,7 +607,7 @@
                     break;
                 }
                 const video_id = video_ids[index];
-                this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
+                obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
                 const result = await myapi.ipc.Library.deleteItem(video_id);
                 // await wait(3000);
                 // await wait(3000);
@@ -626,7 +626,7 @@
                     message: `${error_ids.length}個の削除に失敗\n詳細はログを参照`
                 });
             }
-            this.obs_modal_dialog.trigger("close");
+            obs_modal_dialog.trigger("close");
         };
 
         const convertVideo = async (video_id) => {
@@ -644,7 +644,7 @@
                 const ffmpeg_path = await myapi.ipc.Config.get("ffmpeg_path", "");
                 const cnv_mp4 = new ConvertMP4();
 
-                this.obs_modal_dialog.trigger("show", {
+                obs_modal_dialog.trigger("show", {
                     message: "mp4に変換中...",
                     buttons: ["cancel"],
                     cb: (result)=>{
@@ -687,7 +687,7 @@
                     updateState("変換失敗");   
                 }
             }finally{
-                this.obs_modal_dialog.trigger("close");      
+                obs_modal_dialog.trigger("close");      
             }
         };
 
@@ -811,7 +811,7 @@
             }
             
             modal_dialog = new ModalDialog(this.root, "library-md", {
-                obs:this.obs_modal_dialog
+                obs:obs_modal_dialog
             });
         });
 

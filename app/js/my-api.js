@@ -187,9 +187,6 @@ const Setting = {
             throw new Error(`NNDDのシステムパス "${system_dir}" が見つからない\n${error.message}`);
         }  
     },
-    setLogLevel:async (level)=>{
-        return await ipcRenderer.invoke("setting:change-log-level", {level});
-    }, 
     onChangeLogLevel: (func) => {  
         ipcRenderer.on("setting:on-change-log-level", (event, args)=>{
             func(args);

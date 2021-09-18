@@ -152,15 +152,6 @@
                 </button>
             </div>
         </div>
-        <div class="container">
-            <div class="center-v title">ログ出力レベル設定</div>
-            <div class="content">
-                <label>
-                    <input class="check-loglevel-debug" type="checkbox" 
-                        onclick={onclickCheckLogLevelDebug} />Debug
-                </label>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -236,16 +227,6 @@
             }
             setInputValue(".ffmpeg-path-input", file_path);
             await myapi.ipc.Config.set("ffmpeg_path", file_path);
-        };
-
-        this.onclickCheckLogLevelDebug = async (e) => {
-            const ch_elm = this.root.querySelector(".check-loglevel-debug");
-            let value = "info";
-            if(ch_elm.checked === true){
-                value = "debug";
-            }
-            await myapi.ipc.Config.set("log.level", value);
-            await myapi.ipc.Setting.setLogLevel(value);
         };
 
         this.onclickNNDDSystemDir = async (e) => {
@@ -332,10 +313,6 @@
             setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
             setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
             setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-
-            const log_level = await myapi.ipc.Config.get("log.level", "info");
-            setCheckValue(".check-loglevel-debug", log_level=="debug");
-            
             setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", "")); 
             
             for (let index = 0; index < this.import_items.length; index++) {

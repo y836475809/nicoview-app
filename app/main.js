@@ -208,6 +208,16 @@ const nico_login = new NicoLogin((state)=>{
 });
 nico_login.setupIPC();
 
+const changeLogLevel = (args) => {
+    const { level } = args;
+    config.set("log.level", level);
+    setLogLevel(level);
+    main_win.webContents.send("setting:on-change-log-level", args);
+    if(player_win !== null){
+        player_win.webContents.send("setting:on-change-log-level", args);
+    }
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -233,6 +243,11 @@ function createWindow() {
                     }},
                     { label: "ログの場所を開く", click() {
                         shell.showItemInFolder(logger.getPath());
+                    }},
+                    { type: "separator" },
+                    { id: "log-level", label: "debugレベルで取得", type: "checkbox", checked: false, click(e) {
+                        const level = e.checked?"debug":"info";
+                        changeLogLevel({level});
                     }}
                 ]
             },
@@ -264,6 +279,10 @@ function createWindow() {
     main_win_menu = main_menu();
     main_win.setMenu(main_win_menu);
     setLoginState("logout");
+
+    const menu_log_level = main_win_menu.getMenuItemById("log-level");
+    const log_level = config.get("log.level", "info");
+    menu_log_level.checked = log_level=="debug";
 
     main_win.webContents.on("did-finish-load", async () => { 
         user_css.apply(main_win);
@@ -598,14 +617,6 @@ app.on("ready", async ()=>{
     // });
 
     // setting
-    ipcMain.handle("setting:change-log-level", (event, args) => {
-        const { level } = args;
-        setLogLevel(level);
-        main_win.webContents.send("setting:on-change-log-level", args);
-        if(player_win !== null){
-            player_win.webContents.send("setting:on-change-log-level", args);
-        }
-    });
     ipcMain.handle("setting:open-dir", async (event, args) => {
         const { dir } = args;
         await shell.openPath(dir);

@@ -616,12 +616,6 @@ app.on("ready", async ()=>{
     //     config.update(key, value);
     // });
 
-    // setting
-    ipcMain.handle("setting:open-dir", async (event, args) => {
-        const { dir } = args;
-        await shell.openPath(dir);
-    });
-
     createWindow();
     
     setupContextmenu(main_win, player_win, config, history, store);

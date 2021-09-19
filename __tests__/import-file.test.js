@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { ImportFile } = require("../app/js/import-library");
+const { ImportFile } = require("../app/js/import-file");
 
 const dir = path.join(__dirname, "data", "import");
 const video_filepath = path.join(dir, "import - [sm100].mp4");

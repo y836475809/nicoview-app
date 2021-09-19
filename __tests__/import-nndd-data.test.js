@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { ImportNNDDData } = require("../app/js/import-nndd-data");
+const { ImportNNDDSetting } = require("../app/js/import-nndd-data");
 
 test("parse nndd history", t => {
     const thumbUrl1 = "http://dummy.jp/video/smile?i=1";
@@ -28,7 +28,7 @@ test("parse nndd history", t => {
 
         + '</history>';
 
-    const imp_nndd = new ImportNNDDData();
+    const imp_nndd = new ImportNNDDSetting();
     const data = imp_nndd._getHistory(body);
 
     t.deepEqual(data, [
@@ -60,7 +60,7 @@ test("parse nndd mylist", t => {
         + '</myLists>';
 
 
-    const imp_nndd = new ImportNNDDData();
+    const imp_nndd = new ImportNNDDSetting();
     const data = imp_nndd._getMyList(body);
 
     t.deepEqual(data, [
@@ -70,7 +70,7 @@ test("parse nndd mylist", t => {
 });
 
 test("mylist src, dest files", t => {
-    const imp_nndd = new ImportNNDDData("nndd_dir", "data_dir");
+    const imp_nndd = new ImportNNDDSetting("nndd_dir", "data_dir");
     const dest_dir = path.join("data_dir", "mylist");
     const file_items = imp_nndd._getMyListCopyFiles(
         ["mylist/1", "user/2"], dest_dir);
@@ -111,7 +111,7 @@ test("parse nndd search items", t => {
 
         + '</searchItems>';
 
-    const imp_nndd = new ImportNNDDData();
+    const imp_nndd = new ImportNNDDSetting();
     const data = imp_nndd._getSearchItems(body);
     t.deepEqual(data, [
         {              
@@ -159,7 +159,7 @@ test("parse nndd nglist", t => {
 
         + '</ng>';
 
-    const imp_nndd = new ImportNNDDData();
+    const imp_nndd = new ImportNNDDSetting();
     const data = imp_nndd._getNGList(body);
     t.deepEqual(data, {
         ng_user_ids: ["1", "2"],

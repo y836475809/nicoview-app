@@ -158,14 +158,14 @@
         /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { ImportLibrary } = window.ImportLibrary;
-        const { ImportNNDDData } = window.ImportNNDDData;
+        const { ImportNNDDSetting } = window.ImportNNDDSetting;
         const { MouseGesture } = window.MouseGesture;
 
         const obs = this.opts.obs; 
         const obs_modal_dialog = riot.observable();
         let modal_dialog = null;
 
-        this.import_items = ImportNNDDData.getItems();
+        this.import_items = ImportNNDDSetting.getItems();
 
         const mouse_gesture = new MouseGesture();
         
@@ -274,7 +274,7 @@
                 message: "インポート中...",
             });
             try {
-                const import_nndd = new ImportNNDDData(nndd_system_dir, data_dir);
+                const import_nndd = new ImportNNDDSetting(nndd_system_dir, data_dir);
                 for (let index = 0; index < import_items.length; index++) {
                     const import_item = import_items[index];
                     obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);

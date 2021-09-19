@@ -23,8 +23,32 @@
         const obs = this.opts.obs; 
         this.obs_listview = riot.observable();
         this.name = "library-search";
-        this.gettooltip = this.opts.gettooltip;
-        this.geticon = this.opts.geticon;
+
+        const target_map = new Map();
+        this.opts.search_targets.forEach(target=>{
+            target_map.set(target.id, target.title);
+        });
+        this.gettooltip = (item) => {
+            const target_ids = item.target_ids;
+            if(!target_ids){
+                return item.title;
+            }
+            const target_titles = target_ids.map(target_id=>{
+                if(target_map.has(target_id)){
+                    return target_map.get(target_id);
+                }else{
+                    return `${target_id}に対応する項目がない`;
+                }
+            });
+            return `${item.title}\n検索対象:${target_titles.join(", ")}`;
+        };
+        this.geticon = (item) => {
+            const target_ids = item.target_ids;
+            if(target_ids){
+                return "fas fa-filter";
+            }
+            return null;
+        };
 
         this.on("mount", async () => {
             const items = await myapi.ipc.Library.getSearchItems();
@@ -850,8 +874,7 @@
         <div class="left">
             <library-sidebar 
                 obs={obs} 
-                geticon={geticon}
-                gettooltip={gettooltip}>
+                search_targets={search_targets}>
             </library-sidebar>
         </div>
         <div class="gutter"></div>
@@ -872,31 +895,5 @@
             { title: "画質", id: "is_economy" }, 
             { title: "動画形式", id: "video_type" }
         ]);
-
-        const target_map = new Map();
-        this.search_targets.forEach(target=>{
-            target_map.set(target.id, target.title);
-        });
-        this.gettooltip = (item) => {
-            const target_ids = item.target_ids;
-            if(!target_ids){
-                return item.title;
-            }
-            const target_titles = target_ids.map(target_id=>{
-                if(target_map.has(target_id)){
-                    return target_map.get(target_id);
-                }else{
-                    return `${target_id}に対応する項目がない`;
-                }
-            });
-            return `${item.title}\n検索対象:${target_titles.join(", ")}`;
-        };
-        this.geticon = (item) => {
-            const target_ids = item.target_ids;
-            if(target_ids){
-                return "fas fa-filter";
-            }
-            return null;
-        };
     </script>
 </library-page>

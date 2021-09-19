@@ -4,7 +4,7 @@ const { NicoVideoData,
     getIDFromFilename, getCommonNameFromFilename } = require("./nico-data-file");
 const { toTimeSec } = require("./time-format");
 
-class ImportLibrary {
+class ImportFile {
     constructor(video_filepath){
         this.video_filepath = video_filepath;
         this.dir = path.dirname(video_filepath);
@@ -111,5 +111,5 @@ class ImportLibrary {
 }
 
 module.exports = {
-    ImportLibrary,
+    ImportFile,
 };

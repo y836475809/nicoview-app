@@ -1,12 +1,12 @@
 const test = require("ava");
 const path = require("path");
-const { ImportLibrary } = require("../app/js/import-library");
+const { ImportFile } = require("../app/js/import-library");
 
 const dir = path.join(__dirname, "data", "import");
 const video_filepath = path.join(dir, "import - [sm100].mp4");
 const dummy_video_filepath = path.join(dir, "import - [sm1000].mp4");
 
-class TestImportLibrary extends ImportLibrary {
+class TestImportFile extends ImportFile {
     constructor(video_filepath){
         super(video_filepath);
         this.paths = [];
@@ -20,7 +20,7 @@ class TestImportLibrary extends ImportLibrary {
     }
 }
 
-class TestXMLImportLibrary extends ImportLibrary {
+class TestXMLImportFile extends ImportFile {
     constructor(video_filepath, data_type){
         super(video_filepath);
         this._data_type = data_type;
@@ -41,35 +41,35 @@ class TestXMLImportLibrary extends ImportLibrary {
 
 test("_getThumbInfo ", t => {
     {
-        const im_lib = new ImportLibrary(video_filepath);
-        const thumb_info = im_lib._getThumbInfo("json");
+        const im_file = new ImportFile(video_filepath);
+        const thumb_info = im_file._getThumbInfo("json");
         t.is(thumb_info.video.video_id, "sm100");
     }
     {
-        const im_lib = new ImportLibrary(video_filepath);
-        const thumb_info = im_lib._getThumbInfo("xml");
+        const im_file = new ImportFile(video_filepath);
+        const thumb_info = im_file._getThumbInfo("xml");
         t.is(thumb_info.video.video_id, "sm100");
     }
     {
-        const im_lib = new ImportLibrary(video_filepath);
-        const thumb_info = im_lib._getThumbInfo("json");
+        const im_file = new ImportFile(video_filepath);
+        const thumb_info = im_file._getThumbInfo("json");
         t.is(thumb_info.video.video_id, "sm100");
     }
 
     {
-        const im_lib = new ImportLibrary(dummy_video_filepath);
-        t.throws(() => { im_lib._getThumbInfo("json"); });
+        const im_file = new ImportFile(dummy_video_filepath);
+        t.throws(() => { im_file._getThumbInfo("json"); });
     }
 
     {
-        const im_lib = new ImportLibrary(dummy_video_filepath);
+        const im_lib = new ImportFile(dummy_video_filepath);
         t.throws(() => { im_lib._getThumbInfo("xml"); });
     }
 });
 
 test("createLibraryItem xml", async t => {
-    const im_lib = new TestXMLImportLibrary(video_filepath, "xml");
-    const lib_item = await im_lib.createLibraryItem();
+    const im_file = new TestXMLImportFile(video_filepath, "xml");
+    const lib_item = await im_file.createLibraryItem();
     t.is(lib_item.data_type, "xml");
     t.is(lib_item.thumbnail_size, "S");
     t.is(lib_item.id, "sm100");
@@ -87,8 +87,8 @@ test("createLibraryItem xml", async t => {
 });
 
 test("createLibraryItem json", async t => {
-    const im_lib = new TestXMLImportLibrary(video_filepath, "json");
-    const lib_item = await im_lib.createLibraryItem();
+    const im_file = new TestXMLImportFile(video_filepath, "json");
+    const lib_item = await im_file.createLibraryItem();
     t.is(lib_item.data_type, "json");
     t.is(lib_item.thumbnail_size, "S");
     t.is(lib_item.id, "sm100");
@@ -106,12 +106,12 @@ test("createLibraryItem json", async t => {
 });
 
 test("file path ", async t => {
-    const im_lib = new TestImportLibrary(video_filepath);
-    await im_lib._getThumbnailSize();
-    await im_lib._existThumbInfo("xml");
-    await im_lib._existThumbInfo("json");
+    const im_file = new TestImportFile(video_filepath);
+    await im_file._getThumbnailSize();
+    await im_file._existThumbInfo("xml");
+    await im_file._existThumbInfo("json");
 
-    const paths = im_lib.paths;
+    const paths = im_file.paths;
     t.deepEqual(paths, [
         path.join(dir, "import - [sm100][ThumbImg].L.jpeg"),
         path.join(dir, "import - [sm100][ThumbInfo].xml"),

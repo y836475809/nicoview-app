@@ -157,7 +157,7 @@
     <script>
         /* globals riot logger ModalDialog */
         const myapi = window.myapi;
-        const { ImportLibrary } = window.ImportLibrary;
+        const { ImportFile } = window.ImportFile;
         const { ImportNNDDSetting } = window.ImportNNDDSetting;
         const { MouseGesture } = window.MouseGesture;
 
@@ -358,8 +358,8 @@
                 }
                 const file_path = file_paths[index];
                 try {
-                    const import_lib = new ImportLibrary(file_path);
-                    const item = await import_lib.createLibraryItem();
+                    const import_file = new ImportFile(file_path);
+                    const item = await import_file.createLibraryItem();
                     await myapi.ipc.Library.addItem(item);
                     await new Promise(resolve => setTimeout(resolve, 100));
                 } catch (error) {

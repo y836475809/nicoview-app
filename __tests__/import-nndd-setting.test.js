@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { ImportNNDDSetting } = require("../app/js/import-nndd-data");
+const { ImportNNDDSetting } = require("../app/js/import-nndd-setting");
 
 test("parse nndd history", t => {
     const thumbUrl1 = "http://dummy.jp/video/smile?i=1";

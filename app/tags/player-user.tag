@@ -174,7 +174,7 @@
             e.stopPropagation();
             
             const mylist_id = NicoURL.getMylistID(e.target.href);
-            obs.trigger("player-main-page:load-mylist", mylist_id);
+            myapi.ipc.MyList.load(mylist_id);
             return false;
         };
 
@@ -345,7 +345,7 @@
             if(!this.user_id){
                 return;
             }
-            obs.trigger("player-main-page:load-mylist", `user/${this.user_id}`);
+            myapi.ipc.MyList.load(`user/${this.user_id}`);
         };
 
         this.on("mount", () => {  

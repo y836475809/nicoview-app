@@ -268,24 +268,6 @@
             cb(play_data);
         });
 
-        obs.on("player-main-page:search-tag", (args) => {
-            myapi.ipc.Search.searchTag(args);
-        });
-
-        obs.on("player-main-page:load-mylist", (args) => {
-            myapi.ipc.MyList.load(args);
-        });
-
-        obs.on("player-main-page:add-bookmark", (args) => {
-            const bk_item = args;
-            myapi.ipc.Bookmark.addItems([bk_item]);
-        });
-
-        obs.on("player-main-page:add-stack-items", (args) => {
-            const {items} = args;
-            myapi.ipc.Stack.addItems(items);
-        });
-  
         obs.on("player-main-page:update-data", async(video_id, update_target) => {
             if(modal_dialog.isOpend()){
                 return;
@@ -410,10 +392,6 @@
             const comments = comment_filter.getCommnets();
             obs.trigger("player-video:update-comments", comments);
             obs.trigger("player-info-page:update-comments", comments);
-        });
-
-        obs.on("player-main-page:update-comment-display-params", (args) => {
-            obs.trigger("player-video:update-comment-display-params", args);
         });
 
         obs.on("player-main-page:show-player-setting-dialog", () => {

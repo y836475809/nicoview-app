@@ -103,23 +103,24 @@
                     const { video_id, title, thumbnailURL, online } = play_data;
                     if(menu_id=="add-bookmark-time"){
                         obs.trigger("player-video:get-current-time-callback", (current_time)=>{
-                            obs.trigger("player-main-page:add-bookmark", {
+                            const bk_item = {
                                 title: title,
                                 id: video_id,
                                 time: current_time
-                            });
+                            };
+                            myapi.ipc.Bookmark.addItems([bk_item]);
                         });
                     }
                     if(menu_id=="add-stack-time"){
                         const time = await getCurrentPlayTime();
-                        obs.trigger("player-main-page:add-stack-items", {
-                            items:[{
+                        myapi.ipc.Stack.addItems([
+                            {
                                 id: video_id,
                                 title: title, 
                                 thumb_img:thumbnailURL,
                                 time: time
-                            }]
-                        });
+                            }
+                        ]);
                     }
                     if(menu_id=="show-open-video-form"){
                         if(!obs_open_video_form){

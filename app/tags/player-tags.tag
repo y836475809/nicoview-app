@@ -28,13 +28,14 @@
     </button>
 
     <script>
+        const myapi = window.myapi;
         const obs = this.opts.obs; 
         
         this.video_tags = [];
         
         this.onclickTag = (item, e) => {
             const tag = item.name;
-            obs.trigger("player-main-page:search-tag", {
+            myapi.ipc.Search.searchTag({
                 query: tag,
                 search_target:"tag"
             });

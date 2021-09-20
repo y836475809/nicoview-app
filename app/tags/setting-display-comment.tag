@@ -76,7 +76,7 @@
             params[name] = value;
             await myapi.ipc.Config.set(`comment.${name}`, value);
             if(is_trigger){
-                obs_dialog.trigger("player-main-page:update-comment-display-params", params);
+                obs_dialog.trigger("player-video:update-comment-display-params", params);
             }
         };
 

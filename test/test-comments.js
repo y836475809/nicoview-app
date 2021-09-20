@@ -84,3 +84,31 @@ const randomfixedComments = (cm_num, interval_ms) => {
 
     return cms;
 };
+
+const default_nc_script_comments = () => {
+    return [
+        { user_id: "owner", no: 1,  vpos: 0,    content: "@デフォルト", mail:"red big" },
+        { user_id: "owner", no: 2,  vpos: 0,    content: "text-owner-0" , mail:"" },
+        { user_id: "owner", no: 3,  vpos: 20,   content: "text-owner-20", mail:"" },
+        { user_id: "a",     no: 1,  vpos: 10,   content: "text-0",   mail:"" },
+        { user_id: "a",     no: 2,  vpos: 50,   content: "text-50-green",  mail:"green" },
+        { user_id: "a",     no: 3,  vpos: 100,  content: "text-100", mail:"" },
+        { user_id: "a",     no: 4,  vpos: 150,  content: "text-150", mail:"" },
+        { user_id: "a",     no: 5,  vpos: 200,  content: "text-200", mail:"" },
+        { user_id: "a",     no: 6,  vpos: 250,  content: "text-250", mail:"" }
+    ];
+};
+
+const duration_nc_script_comments = () => {
+    return [
+        { user_id: "owner", no: 1,  vpos: 0,    content: "text-owner-1", mail:"ue @10" },
+        { user_id: "owner", no: 2,  vpos: 100,  content: "text-owner-2" , mail:"ue" },
+        { user_id: "owner", no: 3,  vpos: 200,  content: "text-owner-3", mail:"ue" },
+        { user_id: "a",     no: 1,  vpos: 300,  content: "text-1", mail:"ue" },
+        { user_id: "a",     no: 2,  vpos: 400,  content: "text-2", mail:"ue" },
+        { user_id: "a",     no: 3,  vpos: 500,  content: "text-3", mail:"ue" },
+        { user_id: "a",     no: 4,  vpos: 600,  content: "text-4", mail:"ue" },
+        { user_id: "a",     no: 5,  vpos: 700,  content: "text-5", mail:"ue" },
+        { user_id: "a",     no: 6,  vpos: 800,  content: "text-6", mail:"ue" }
+    ];
+};

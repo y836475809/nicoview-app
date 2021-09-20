@@ -54,6 +54,8 @@
             <button class="test-btn" type=button onclick="createMixedTL();">flow, fix</button>
             <button class="test-btn" type=button onclick="createFixedAATL();">AA</button>
             <button class="test-btn" type=button onclick="createSpaces();">spaces</button>
+            <button class="test-btn" type=button onclick="createNicoScriptFlow();">nico script flow</button>
+            <button class="test-btn" type=button onclick="createNicoScriptFix();">nico script fix</button>
         </div>
         <div>   
             <button class="test-btn" type=button onclick="resume();">resume</button>
@@ -68,7 +70,7 @@
 </body>
 
 <script>
-    const { CommentTimeLine } = window.CommentTimeLine;
+    const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
     var { logger } = window.logger; // eslint-disable-line
 
     const duration_sec = 4;
@@ -165,6 +167,18 @@
             { no: 6, vpos: 150, mail:"184 ue red small", content: "A     A     A     A     A" },
         ];
         createTL(commnets);
+    };
+
+    const createNicoScriptFlow = ()=>{
+        const nico_script = new NicoScript();
+        const app_comments = nico_script.getApplied(default_nc_script_comments());
+        createTL(app_comments);
+    };
+
+    const createNicoScriptFix = ()=>{
+        const nico_script = new NicoScript();
+        const app_comments = nico_script.getApplied(duration_nc_script_comments());
+        createTL(app_comments);
     };
 
     const resume = ()=>{

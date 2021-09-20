@@ -8,7 +8,6 @@
     "test-search": "electron . --debug --name test-search",
     "test-setting": "electron . --debug --name test-setting",
     "test-mylist": "electron . --debug --name test-mylist",
-    "test-nicoscript": "electron . --debug --name test-nicoscript",
     "test-tween": "electron . --debug --name test-tween",
     "main": "electron . --app_css",
     "test": "ava -v -s",

@@ -35,7 +35,7 @@ const json_store = new JsonStore(async ()=>{
     return await config.get("data_dir", "");
 });
 
-const startup_config = new StartupConfig(__dirname, process.argv);
+const startup_config = new StartupConfig(__dirname);
 startup_config.load();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。

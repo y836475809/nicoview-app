@@ -4,12 +4,12 @@
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "app/main.js",
   "scripts": {
-    "test-main": "electron . --debug --name test-main",
-    "test-search": "electron . --debug --name test-search",
-    "test-setting": "electron . --debug --name test-setting",
-    "test-mylist": "electron . --debug --name test-mylist",
-    "test-comment": "electron . --debug --name test-comment",
-    "main": "electron . --app_css",
+    "test-main": "electron . --debug=true --name=test-main --pp=10 --ppp=ooo",
+    "test-search": "electron . --debug=true --name=test-search",
+    "test-setting": "electron . --debug=true --name=test-setting",
+    "test-mylist": "electron . --debug=true --name=test-mylist",
+    "test-comment": "electron . --debug=true --name=test-comment",
+    "main": "electron . --app_css=true",
     "test": "ava -v -s",
     "build": "electron-builder --x64 --dir",
     "build-zip": "electron-builder --x64"

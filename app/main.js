@@ -77,7 +77,7 @@ if(is_debug===true){
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);
 
-    dialog.showMessageBoxSync({
+    dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
         type: "error",
         buttons: ["OK"],
         message: `致命的エラー: ${error.message}\n終了します`
@@ -89,7 +89,7 @@ process.on("uncaughtException", (error) => {
 
 process.on('unhandledRejection', (reason, p) => {
     logger.error("unhandled rejection:", p, "reason:", reason);
-    dialog.showMessageBoxSync({
+    dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
         type: "error",
         buttons: ["OK"],
         message: `エラー: ${reason.message}`
@@ -102,7 +102,7 @@ const setupConfig = async () => {
         config.setup(config_path);
         await config.load();
     } catch (error) {
-        const ret = dialog.showMessageBoxSync({
+        const ret = dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
             type: "error",
             buttons: ["OK", "Cancel"],
             message: `設定読み込み失敗、初期設定で続けますか?: ${error.message}`
@@ -130,7 +130,7 @@ const setupConfig = async () => {
             config.set(key, select_dir);
         });
     } catch (error) {
-        dialog.showMessageBoxSync({
+        dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
             type: "error",
             buttons: ["OK"],
             message: `設定失敗、終了します: ${error.message}`
@@ -142,7 +142,7 @@ const setupConfig = async () => {
 };
 
 const quit = async () => {
-    const close_ret = dialog.showMessageBoxSync( {
+    const close_ret = dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
         type: "info", 
         buttons: ["OK", "Cancel"],
         message:"終了しますか?"
@@ -156,7 +156,7 @@ const quit = async () => {
         config.set("main.window.state", getWindowState(main_win));
         await config.save();
     } catch (error) {
-        const ret = dialog.showMessageBoxSync({
+        const ret = dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
             type: "error",
             buttons: ["OK", "Cancel"],
             message: `設定の保存に失敗: ${error.message}\nこのまま終了しますか?`
@@ -170,7 +170,7 @@ const quit = async () => {
     try {
         await library.save(false);
     } catch (error) {
-        const ret = dialog.showMessageBoxSync({
+        const ret = dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
             type: "error",
             buttons: ["OK", "Cancel"],
             message: `データベースの保存に失敗: ${error.message}\nこのまま終了しますか?`
@@ -200,7 +200,7 @@ const nico_login = new NicoLogin((state)=>{
 }, (e)=>{
     const { name, error } = e;
     logger.error(`${name}: `, error);
-    dialog.showMessageBoxSync({
+    dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
         type: "error",
         buttons: ["OK"],
         message: `${name}失敗: ${error.message}`

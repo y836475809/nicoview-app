@@ -22,16 +22,10 @@
 <script type="riot/tag" src="../app/tags/mylist-page.tag"></script>
 <script>
     /* globals riot */
-    const { NicoMockServer } = window.NicoMockServer;
     var { logger } = window.logger; // eslint-disable-line
     var { ModalDialog } = window.ModalDialog; // eslint-disable-line
     
     const obs = riot.observable();    // eslint-disable-line
-
-    const nico_mock_server = new NicoMockServer();
-    nico_mock_server.create();
-    nico_mock_server.listen();
-
     riot.mount("mylist-page", {obs});
 </script>
 

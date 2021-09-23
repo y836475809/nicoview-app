@@ -57,21 +57,8 @@ if(is_debug===true){
     process.env.NODE_ENV = "DEBUG";
 
     if(startup_config.use_mock_server){
-        const port = startup_config.mock_server_port;
-        process.env["mock_server_port"] = port;
-        process.env["mock_server_wait_msec"] = startup_config.mock_server_wait_msec;
-
-        app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
-        app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
-        app.commandLine.appendSwitch("ignore-certificate-errors", "true");
-        app.commandLine.appendSwitch("allow-insecure-localhost", "true");
-        process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
-        process.env["proxy_server"] = app.commandLine.getSwitchValue("proxy-server");
-
-        console.log(`use local proxy, mock_server_port is ${port}`);
-
-        const { nico_mock_login_logout } = require("../../test/mock_server/nico-mock-server");
-        nico_mock_login_logout();
+        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
+        setupMockServer(startup_config);
     }
 }
 

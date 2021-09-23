@@ -4,15 +4,13 @@ const path = require("path");
 
 const { NicoMockResponse } = require("./nico-mock-response");
 
-const wait_msec = process.env["mock_server_wait_msec"];
-
 const options = { 
     key: fs.readFileSync(path.join(__dirname, "orekey.pem")),
     cert: fs.readFileSync(path.join(__dirname, "orecert.pem"))
 };
 
 class NicoMockServer {
-    create(){ 
+    create(wait_msec){ 
         this.nico_mock_res = new NicoMockResponse();
         this.srever = https.createServer(options, async (req, res) => {
             console.log(
@@ -90,8 +88,7 @@ class NicoMockServer {
         });
     }
 
-    listen(){
-        const port = process.env["mock_server_port"];
+    listen(port){
         this.srever.listen(port);
         console.log(`start mock server port=${port}`);
     }
@@ -151,7 +148,30 @@ const nico_mock_login_logout = ({delay=500, code=302} = {}) => {
         });
 };
 
+const { app } = require("electron");
+const setupMockServer = () => {
+    const startup_config = require("../startup-config.json");
+    const port = startup_config.mock_server_port;
+    const wait_msec = startup_config.mock_server_wait_msec;
+
+    app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
+    app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
+    app.commandLine.appendSwitch("ignore-certificate-errors", "true");
+    app.commandLine.appendSwitch("allow-insecure-localhost", "true");
+    process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
+    process.env["proxy_server"] = app.commandLine.getSwitchValue("proxy-server");
+
+    console.log(`use local proxy, mock_server_port is ${port}`);
+    
+    const nico_mock_server = new NicoMockServer();
+    nico_mock_server.create(wait_msec);
+    nico_mock_server.listen(port);
+    
+    nico_mock_login_logout();
+};
+
 module.exports = {
     NicoMockServer,
     nico_mock_login_logout,
+    setupMockServer
 };

@@ -85,26 +85,12 @@ const getCommnet = (post_data, comments) => {
     ];
 };
 
+let base64_data = null;
 const createImg = (text) => {
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = 320;
-    canvas.height = 180;
-
-    ctx.fillStyle = "rgb( 255, 255, 255 )" ;
-    ctx.fillRect(0, 0, 320, 180);
-
-    ctx.lineWidth = 5;
-    ctx.strokeStyle = 'rgb(0,0,255)';
-    ctx.strokeRect(0, 0, 320, 180);
-
-    ctx.font = "48pt Arial bold";
-    ctx.fillStyle = "rgba( 0, 0, 0, 0.8 )" ;
-    ctx.fillText(text, 10, 100);
-
-    const base64 = canvas.toDataURL("image/jpeg");
-    const base64_data = base64.replace(/^data:image\/jpeg;base64,/, "");
+    if(!base64_data){
+        const content = fs.readFileSync(path.join(__dirname, "data", "sample.L.jpeg"));
+        base64_data = content.toString( 'base64' );
+    }
     return Buffer.from(base64_data, "base64");
 };
 

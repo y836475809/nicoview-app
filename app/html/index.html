@@ -47,18 +47,5 @@
         myapi.ipc.onLoadContent(()=>{
             riot.mount("main-page", {obs});
         });
-
-        if(myapi.isDebugMode()){
-            const { NicoMockServer } = window.NicoMockServer;
-            
-            const nico_mock_server = new NicoMockServer();
-            nico_mock_server.create();
-            nico_mock_server.listen();
-            window.addEventListener("beforeunload", (event) => {
-                nico_mock_server.close();
-            });
-
-            myapi.ipc.Config.set("download.wait_time", 1).then();
-        }
     </script>
 </html>

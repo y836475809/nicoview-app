@@ -149,11 +149,7 @@ const nico_mock_login_logout = ({delay=500, code=302} = {}) => {
 };
 
 const { app } = require("electron");
-const setupMockServer = () => {
-    const startup_config = require("../startup-config.json");
-    const port = startup_config.mock_server_port;
-    const wait_msec = startup_config.mock_server_wait_msec;
-
+const setupMockServer = (port, wait_msec) => {
     app.commandLine.appendSwitch("host-rules", `MAP * localhost:${port}`);
     app.commandLine.appendSwitch("proxy-server", `https://localhost:${port}`);
     app.commandLine.appendSwitch("ignore-certificate-errors", "true");

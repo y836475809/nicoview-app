@@ -1,6 +1,6 @@
 const { app } = require("electron");
 
-class StartupConfig {
+class TestParams {
     constructor(base_dir){
         this._base_dir = base_dir;
     }
@@ -10,11 +10,13 @@ class StartupConfig {
         if(!name){
             throw new Error("--test has no value");
         }
-        const startup_config = require("../../test/startup-config.json");
-        this._params = startup_config[name];
+        const params_json = require("./test-params.json");
+        this._params = params_json[name];
         if(!this._params){
             throw new Error(`not find config name=${name}`);
         }
+        this._params["mock_server_port"] = params_json.mock_server_port;
+        this._params["mock_server_wait_msec"] = params_json.mock_server_wait_msec;
     }
 
     get main_html_path(){
@@ -28,8 +30,16 @@ class StartupConfig {
     get use_mock_server(){
         return this._params["use_mock_server"];
     }
+
+    get mock_server_port(){
+        return this._params["mock_server_port"];
+    }
+
+    get mock_server_wait_msec(){
+        return this._params["mock_server_wait_msec"];
+    }
 }
 
 module.exports = {
-    StartupConfig,
+    TestParams,
 };

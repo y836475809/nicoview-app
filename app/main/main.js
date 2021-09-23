@@ -11,7 +11,6 @@ const { History } = require("../js/history");
 const { importNNDDDB } = require("../js/import-nndd-db");
 const { getNicoDataFilePaths } = require("../js/nico-data-file");
 const { logger } = require("../js/logger");
-const { StartupConfig } = require("./start-up-config");
 const { Store } = require("../js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("../js/dialog");
 const { NicoLogin } = require("../js/nico-login");
@@ -51,14 +50,15 @@ const preload_player_path = path.join(app_dir, "main", "preload_player.js");
 let config_fiiename = "config.json";
 
 if(app.commandLine.getSwitchValue("test")){
-    const startup_config = new StartupConfig(app_dir);
-    startup_config.load();
-    main_html_path = startup_config.main_html_path;
-    config_fiiename = startup_config.config_fiiename;
+    const { TestParams } = require("../../test/test-params");
+    const test_params = new TestParams(app_dir);
+    test_params.load();
+    main_html_path = test_params.main_html_path;
+    config_fiiename = test_params.config_fiiename;
 
-    if(startup_config.use_mock_server){
+    if(test_params.use_mock_server){
         const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
-        setupMockServer(startup_config);
+        setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
     }
 }
 

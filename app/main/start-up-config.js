@@ -6,61 +6,19 @@ class StartupConfig {
     }
 
     load(){
-        const name = this._getArg("name", "");
-        if(name){
-            const startup_config = require("../../test/startup-config.json");
-            this._params = startup_config[name];
-            if(!this._params){
-                throw new Error(`not find config name=${name}`);
-            } 
-            this._params["app_css"] = true;
-            if(this._params["use_mock_server"]){
-                this._params["mock_server_port"] = startup_config["mock_server_port"];
-                this._params["mock_server_wait_msec"] = startup_config["mock_server_wait_msec"];
-            }
-        }else{
-            const app_css = this._getArg("app_css", false);
-            this._params = {
-                app_css: app_css,
-                use_mock_server:false,
-                main: "html/index.html",
-                config_fiiename: "config.json"
-            };
+        const name = app.commandLine.getSwitchValue("test");
+        if(!name){
+            throw new Error("--test has no value");
         }
-    }
-    
-    _getArg(name, default_value){
-        const value = app.commandLine.getSwitchValue(name);
-        if(value!==undefined){
-            if(typeof default_value === "boolean"){
-                return value.toLowerCase() === "true";
-            } 
-            if(typeof default_value === "number"){
-                return parseInt(value);
-            }
-            return value;
+        const startup_config = require("../../test/startup-config.json");
+        this._params = startup_config[name];
+        if(!this._params){
+            throw new Error(`not find config name=${name}`);
         }
-        return default_value;
-    }
-
-    get app_css(){
-        return this._params["app_css"];
     }
 
     get main_html_path(){
         return `${this._base_dir}/${this._params["main"]}`;
-    }
-
-    get player_html_path(){
-        return `${this._base_dir}/html/player.html`;
-    }
-
-    get preload_main_path(){
-        return `${this._base_dir}/main/preload_main.js`;
-    }
-
-    get preload_player_path(){
-        return `${this._base_dir}/main/preload_player.js`;
     }
 
     get config_fiiename(){
@@ -69,14 +27,6 @@ class StartupConfig {
 
     get use_mock_server(){
         return this._params["use_mock_server"];
-    }
-
-    get mock_server_port(){
-        return this._params["mock_server_port"];
-    }
-
-    get mock_server_wait_msec(){
-        return this._params["mock_server_wait_msec"];
     }
 }
 

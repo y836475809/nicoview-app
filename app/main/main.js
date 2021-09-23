@@ -36,8 +36,6 @@ const json_store = new JsonStore(async ()=>{
 });
 
 const app_dir = path.join(__dirname, "/..");
-const startup_config = new StartupConfig(app_dir);
-startup_config.load();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -46,15 +44,22 @@ let main_win_menu = null;
 let player_win = null;
 let do_app_quit = false;
 
-const main_html_path = startup_config.main_html_path;
-const player_html_path = startup_config.player_html_path;
-const preload_main_path = startup_config.preload_main_path;
-const preload_player_path = startup_config.preload_player_path;
-const config_fiiename = startup_config.config_fiiename;
+let main_html_path = path.join(app_dir, "html", "index.html");
+const player_html_path = path.join(app_dir, "html", "player.html");
+const preload_main_path = path.join(app_dir, "main", "preload_main.js");
+const preload_player_path = path.join(app_dir, "main", "preload_player.js");
+let config_fiiename = "config.json";
 
-if(startup_config.use_mock_server){
-    const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
-    setupMockServer(startup_config);
+if(app.commandLine.getSwitchValue("test")){
+    const startup_config = new StartupConfig(app_dir);
+    startup_config.load();
+    main_html_path = startup_config.main_html_path;
+    config_fiiename = startup_config.config_fiiename;
+
+    if(startup_config.use_mock_server){
+        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
+        setupMockServer(startup_config);
+    }
 }
 
 process.on("uncaughtException", (error) => {
@@ -335,9 +340,9 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    const user_css_path = startup_config.app_css?
-        path.join(app_dir, "css", "user.css") // 開発、デバッグ時はcss/user.cssを使用
-        :path.join(process.resourcesPath, "user.css"); // リリース時はリソースフォルダのuser.cssを使用
+    const user_css_path = app.isPackaged?
+        path.join(process.resourcesPath, "user.css") // リリース時はリソースフォルダのuser.cssを使用
+        :path.join(app_dir, "css", "user.css"); // 開発、デバッグ時はcss/user.cssを使用
     await user_css.load(user_css_path);
 
     const user_agent = process.env["user_agent"];

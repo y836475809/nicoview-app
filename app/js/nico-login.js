@@ -161,7 +161,7 @@ class NicoLogin {
 
         const base_dir = path.resolve(__dirname, "..");
         this._html_path = path.join(base_dir, "html", "login.html");
-        this._preload_path = path.join(base_dir, "preload_login.js");
+        this._preload_path = path.join(base_dir, "main", "preload_login.js");
     }
 
     showDialog(parent_win){

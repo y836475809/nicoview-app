@@ -255,6 +255,9 @@ function createWindow() {
                     { role: "forcereload" },
                     { role: "toggledevtools" },
                     { type: "separator" },
+                    { id: "open-devtools", label: "起動時にdevtoolsを開く", type: "checkbox", checked: false, click(e) {
+                        config.set("open_devtools", e.checked);
+                    }},
                     { label: "設定ファイルの場所を開く", async click() {
                         await shell.showItemInFolder(config.config_path);
                     }}
@@ -268,9 +271,15 @@ function createWindow() {
     main_win.setMenu(main_win_menu);
     setLoginState("logout");
 
-    const menu_log_level = main_win_menu.getMenuItemById("log-level");
-    const log_level = config.get("log.level", "info");
-    menu_log_level.checked = log_level=="debug";
+    [
+        ["log-level", config.get("log.level", "info")=="debug"], 
+        ["open-devtools", config.get("open_devtools", false)]
+    ].forEach(item => {
+        const menu_id = item[0];
+        const checked = item[1];
+        const menu_item = main_win_menu.getMenuItemById(menu_id);
+        menu_item.checked = checked;
+    });
 
     main_win.webContents.on("did-finish-load", async () => { 
         user_css.apply(main_win);
@@ -284,7 +293,7 @@ function createWindow() {
     // アプリケーションのindex.htmlの読み込み
     main_win.loadURL(main_html_path);
 
-    if(is_debug){
+    if(config.get("open_devtools", false)){
         // DevToolsを開く
         main_win.webContents.openDevTools();
     }
@@ -653,7 +662,7 @@ const createPlayerWindow = () => {
         }
 
         ipcMain.once("app:player-ready", (event, args) => {
-            if(is_debug){
+            if(config.get("open_devtools", false)){
                 player_win.webContents.openDevTools();
             }
             player_win.on("close", (e) => {

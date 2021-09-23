@@ -2,10 +2,6 @@ const { ipcRenderer} = require("electron");
 const path = require("path");
 const fs = require("fs");
 
-const isDebugMode = () => {
-    return process.env.NODE_ENV == "DEBUG";
-};
-
 const getUserAgent = () => {
     return process.env["user_agent"];
 };
@@ -304,7 +300,6 @@ const Library = {
 };
 
 const myapi = {
-    isDebugMode,
     getUserAgent,
     
     ipc: {    

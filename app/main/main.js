@@ -52,14 +52,9 @@ const preload_main_path = startup_config.preload_main_path;
 const preload_player_path = startup_config.preload_player_path;
 const config_fiiename = startup_config.config_fiiename;
 
-const is_debug = startup_config.debug;
-if(is_debug===true){
-    process.env.NODE_ENV = "DEBUG";
-
-    if(startup_config.use_mock_server){
-        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
-        setupMockServer(startup_config);
-    }
+if(startup_config.use_mock_server){
+    const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
+    setupMockServer(startup_config);
 }
 
 process.on("uncaughtException", (error) => {

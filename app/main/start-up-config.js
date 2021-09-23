@@ -13,7 +13,6 @@ class StartupConfig {
             if(!this._params){
                 throw new Error(`not find config name=${name}`);
             } 
-            this._params["debug"] = this._getArg("debug", false);
             this._params["app_css"] = true;
             if(this._params["use_mock_server"]){
                 this._params["mock_server_port"] = startup_config["mock_server_port"];
@@ -22,7 +21,6 @@ class StartupConfig {
         }else{
             const app_css = this._getArg("app_css", false);
             this._params = {
-                debug: false,
                 app_css: app_css,
                 use_mock_server:false,
                 main: "html/index.html",
@@ -43,10 +41,6 @@ class StartupConfig {
             return value;
         }
         return default_value;
-    }
-
-    get debug(){
-        return this._params["debug"];
     }
 
     get app_css(){

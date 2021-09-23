@@ -2,7 +2,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 const { dialog, Menu } = require("electron");
-const { logger } = require("./js/logger");
+const { logger } = require("../js/logger");
 
 class JsonStore { 
     constructor(get_dir_func){

@@ -1,4 +1,4 @@
-const root_dir = "..";
+const root_dir = "../..";
 
 process.once("loaded", () => { 
     global.myapi = require(`${root_dir}/app/js/my-api`);

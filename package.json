@@ -2,9 +2,9 @@
   "name": "nicoview-app",
   "version": "0.13.23.3",
   "description": "electron製のニコニコ動画閲覧アプリ",
-  "main": "app/main.js",
+  "main": "app/main/main.js",
   "scripts": {
-    "test-main": "electron . --debug=true --name=test-main --pp=10 --ppp=ooo",
+    "test-main": "electron . --debug=true --name=test-main",
     "test-search": "electron . --debug=true --name=test-search",
     "test-setting": "electron . --debug=true --name=test-setting",
     "test-mylist": "electron . --debug=true --name=test-mylist",

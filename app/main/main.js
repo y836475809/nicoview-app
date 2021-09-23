@@ -5,17 +5,17 @@ const path = require("path");
 
 process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
 
-const { Config } = require("./js/config");
-const { Library } = require("./js/library");
-const { History } = require("./js/history");
-const { importNNDDDB } = require("./js/import-nndd-db");
-const { getNicoDataFilePaths } = require("./js/nico-data-file");
-const { logger } = require("./js/logger");
+const { Config } = require("../js/config");
+const { Library } = require("../js/library");
+const { History } = require("../js/history");
+const { importNNDDDB } = require("../js/import-nndd-db");
+const { getNicoDataFilePaths } = require("../js/nico-data-file");
+const { logger } = require("../js/logger");
 const { StartupConfig } = require("./start-up-config");
-const { Store } = require("./js/store");
-const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./js/dialog");
-const { NicoLogin } = require("./js/nico-login");
-const { setupContextmenu } = require("./js/contextmenu");
+const { Store } = require("../js/store");
+const { selectFileDialog, selectFolderDialog, showMessageBox } = require("../js/dialog");
+const { NicoLogin } = require("../js/nico-login");
+const { setupContextmenu } = require("../js/contextmenu");
 
 const { 
     JsonStore, UserCSS, 
@@ -35,7 +35,8 @@ const json_store = new JsonStore(async ()=>{
     return await config.get("data_dir", "");
 });
 
-const startup_config = new StartupConfig(__dirname);
+const app_dir = path.join(__dirname, "/..");
+const startup_config = new StartupConfig(app_dir);
 startup_config.load();
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
@@ -69,7 +70,7 @@ if(is_debug===true){
 
         console.log(`use local proxy, mock_server_port is ${port}`);
 
-        const { nico_mock_login_logout } = require("../test/mock_server/nico-mock-server");
+        const { nico_mock_login_logout } = require("../../test/mock_server/nico-mock-server");
         nico_mock_login_logout();
     }
 }
@@ -344,7 +345,7 @@ app.on("ready", async ()=>{
     setLogLevel(log_level);
 
     const user_css_path = startup_config.app_css?
-        path.join(__dirname, "css/user.css") // 開発、デバッグ時はcss/user.cssを使用
+        path.join(app_dir, "css", "user.css") // 開発、デバッグ時はcss/user.cssを使用
         :path.join(process.resourcesPath, "user.css"); // リリース時はリソースフォルダのuser.cssを使用
     await user_css.load(user_css_path);
 

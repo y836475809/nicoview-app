@@ -8,7 +8,7 @@ class StartupConfig {
     load(){
         const name = this._getArg("name", "");
         if(name){
-            const startup_config = require("../test/startup-config.json");
+            const startup_config = require("../../test/startup-config.json");
             this._params = startup_config[name];
             if(!this._params){
                 throw new Error(`not find config name=${name}`);
@@ -62,11 +62,11 @@ class StartupConfig {
     }
 
     get preload_main_path(){
-        return `${this._base_dir}/preload_main.js`;
+        return `${this._base_dir}/main/preload_main.js`;
     }
 
     get preload_player_path(){
-        return `${this._base_dir}/preload_player.js`;
+        return `${this._base_dir}/main/preload_player.js`;
     }
 
     get config_fiiename(){

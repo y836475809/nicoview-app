@@ -13,8 +13,17 @@ const login = (mail, password) => {
         password,
     });
 };
-const logout = () => {
-    ipcRenderer.send("app:nico-login-cancel");
+
+const onOpenLoginDialog = (func) => {
+    ipcRenderer.on("app:on-open-nico-login-dialog", (event, ...args)=>{
+        func(...args);
+    });
+};
+
+const onCloseLoginDialog = (func) => {
+    ipcRenderer.on("app:on-close-nico-login-dialog", (event, ...args)=>{
+        func(...args);
+    });
 };
 
 const getNicoLoginCookie = async () => {
@@ -304,7 +313,8 @@ const myapi = {
     
     ipc: {    
         login,
-        logout,
+        onOpenLoginDialog,
+        onCloseLoginDialog,
         getNicoLoginCookie,
         popupContextMenu,
         onLoadContent,

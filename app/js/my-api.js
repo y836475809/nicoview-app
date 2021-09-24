@@ -55,12 +55,6 @@ const showyPlayer = () => {
     ipcRenderer.send("app:show-player");
 };
 
-const onOpenVideoForm = (func) => {  
-    ipcRenderer.on("app:open-video-form", (event, args)=>{
-        func();
-    });
-};
-
 const Config = {
     get: async (key, default_value) => {
         return await ipcRenderer.invoke("config:get", {
@@ -321,7 +315,6 @@ const myapi = {
         onPlayVideo,
         playerReady,
         showyPlayer,
-        onOpenVideoForm,
 
         Config,
         Dialog,

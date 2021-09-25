@@ -67,7 +67,7 @@
         };
 
         const getVideoID = (value) => {
-            if(isURL(value) === true){
+            if(isURL(value)){
                 return value.split("/").pop();
             }else{
                 return value;
@@ -80,7 +80,7 @@
             if(!video_id) {
                 return;
             }
-            const online = isURL(elm.value);
+            const online = false; // ローカル再生を優先
             Command.play({
                 id: video_id,
                 time: 0

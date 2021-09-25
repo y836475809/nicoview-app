@@ -1,6 +1,6 @@
 {
   "name": "nicoview-app",
-  "version": "0.13.23.5",
+  "version": "0.13.23.6",
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "app/main/main.js",
   "scripts": {
@@ -18,20 +18,20 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^3.15.0",
-    "electron": "^12.0.6",
-    "electron-builder": "^22.10.5",
-    "eslint-plugin-html": "^6.1.2",
-    "nock": "^13.0.11",
+    "electron": "^12.1.2",
+    "electron-builder": "^22.11.7",
+    "eslint-plugin-html": "^6.2.0",
+    "nock": "^13.1.3",
     "sinon": "^10.0.0"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^5.15.3",
-    "cheerio": "^1.0.0-rc.6",
-    "electron-log": "^4.3.5",
-    "gsap": "^3.6.1",
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "cheerio": "^1.0.0-rc.10",
+    "electron-log": "^4.4.1",
+    "gsap": "^3.7.1",
     "riot": "^3.13.2",
-    "slickgrid": "^2.4.34",
-    "sortablejs": "^1.13.0",
+    "slickgrid": "^2.4.40",
+    "sortablejs": "^1.14.0",
     "sql.js": "^0.5.0"
   },
   "build": {

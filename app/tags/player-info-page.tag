@@ -79,7 +79,8 @@
             font-size: 18px;
             color: gray;
         }
-        .icon:hover {
+        .icon:hover,
+        .icon-button:hover .icon {
             color: black;
         }
         .icon[data-state="false"] {
@@ -141,20 +142,19 @@
                 {comment_state}
             </div>
             <div class="move-right">
-                <div title="設定ダイアログ表示" class="icon-button center-hv">                      
-                    <span class="icon fas fa-cog" onclick={onclickShowSettingDialog}></span> 
+                <div title="設定ダイアログ表示" class="icon-button center-hv"
+                    onclick={onclickShowSettingDialog}>                      
+                    <span class="icon fas fa-cog"></span> 
                 </div>
-                <div title="動画情報更新" class="icon-button center-hv">
-                    <span class="icon center-hv" 
-                        data-state={String(enableUpdateData())} 
-                        onclick={onclickUpdateThumbInfo}>
+                <div title="動画情報更新" class="icon-button center-hv"
+                    onclick={onclickUpdateThumbInfo}>
+                    <span class="icon center-hv" data-state={String(enableUpdateData())}>
                         <i class="fas fa-info"></i>
                     </span>
                 </div>     
-                <div title="コメント更新" class="icon-button center-hv">
-                    <span class="icon center-hv" 
-                        data-state={String(enableUpdateData())} 
-                        onclick={onclickUpdateComment}>
+                <div title="コメント更新" class="icon-button center-hv"
+                    onclick={onclickUpdateComment}>
+                    <span class="icon center-hv" data-state={String(enableUpdateData())}>
                         <i class="far fa-comment-dots"></i>
                     </span>
                 </div>

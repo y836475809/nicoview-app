@@ -39,6 +39,9 @@
             cursor: pointer; 
             user-select: none;
         }   
+        .message-modal-dialog .button:hover {
+            background-color: skyblue;
+        }
     </style>
 
     <dialog class="message-modal-dialog dialog-shadow" oncancel={oncancel}>

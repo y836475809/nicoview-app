@@ -52,7 +52,7 @@
             height: 32px;
             user-select: none;
         }
-        .controls-container input[type='checkbox']:hover {
+        .controls-container .comment-checkbox:hover {
             cursor: pointer;
         }
         .controls-container input.comment-checkbox {

@@ -67,6 +67,12 @@
             height: 30px;
             user-select: none;
         }
+
+        .settings-container input[type="radio"]:hover,
+        .settings-container input[type="checkbox"]:hover,
+        .settings-container .cursor-pointer:hover {
+            cursor: pointer;
+        }
     </style>
 
     <dialog class="player-setting dialog-shadow">

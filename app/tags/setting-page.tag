@@ -66,6 +66,10 @@
         .setting-page .mg-label {
             margin-right: 5px;
         }
+        
+        .setting-page .cursor-pointer:hover {
+            cursor: pointer;
+        }
     </style>
 
     <div class="setting-page">
@@ -132,7 +136,7 @@
                 <div style="display:flex; flex-direction:column; margin-top:10px;">
                     <div class="label" style="margin-bottom:-5px;">インポートする対象</div>
                     <div style="display: flex;">
-                        <label style="margin-right: 10px;" each={item in import_items} >
+                        <label class="cursor-pointer" style="margin-right: 10px;" each={item in import_items} >
                             <input type="checkbox" class={item.name} name={item.name} 
                                 onclick={onclickCheckNNDDImportItem.bind(this,item)}/>{item.title}
                         </label>

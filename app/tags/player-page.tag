@@ -18,6 +18,7 @@
             height: calc(100% - var(--tags-height) - var(--controls-height));
             background-color: black;
             outline: none;
+            position: relative;
         }  
         .controls-container {
             height: var(--controls-height);
@@ -42,6 +43,7 @@
             <div>
                 <player-video obs={opts.obs}></player-video>
             </div>
+            <open-video-form obs={obs_open_video_form}></open-video-form>
         </div>
         <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
             <player-controls obs={opts.obs}></player-controls>
@@ -53,7 +55,7 @@
         const myapi = window.myapi;
         
         const obs = this.opts.obs; 
-        let obs_open_video_form = null;
+        this.obs_open_video_form = riot.observable();
 
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {
@@ -123,11 +125,7 @@
                         ]);
                     }
                     if(menu_id=="show-open-video-form"){
-                        if(!obs_open_video_form){
-                            obs_open_video_form = riot.observable();
-                            riot.mount("open-video-form", {obs: obs_open_video_form});
-                        }
-                        obs_open_video_form.trigger("show");
+                        this.obs_open_video_form.trigger("show");
                     }
                     if(menu_id=="change-movie-size"){
                         obs.trigger("player-video:get-video-size-callback",(args)=>{

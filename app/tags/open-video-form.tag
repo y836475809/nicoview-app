@@ -2,58 +2,49 @@
     <style scoped>
         :scope {
             --form-width: 400px;
-            --form-height: 80px;
+            --form-height: 90px;
             --btn-width: 20px;
         }
         .open-form {
-            position: fixed;
+            position: absolute;
             width: var(--form-width);
             height: var(--form-height);
-            left: calc(50% - var(--form-width));
-            top: calc(50% - var(--form-height));
+            left: calc(50% - var(--form-width) / 2);
+            top: calc(100% - var(--form-height) - 20px);
             background-color:white;
-            border-radius: 2px;
+            border-radius: 5px;
             border: 1px solid gray;
             z-index: 999;
-            padding: 10px 10px 5px 10px;
-        }
-        .open-form .label {
-            user-select: none;
-            margin-bottom: 10px;
+            padding: 10px;
         }
         .open-form input {
             font-size: 1.2em;
-            width: calc(100% - var(--btn-width));
+            width: 100%;
+            height: 30px;
         }
-        .open-form input:focus {
-            outline: none;
-        }
-        .open-form .button {
-            width: var(--btn-width);
-            color: gray;
+        .open-form .button { 
+            display: inline-block;
+            text-align: center;
+            border: 1px solid #aaa;
+            border-radius: 2px;
+            width: 100px;
+            height: 30px;
+            line-height: 30px;
+            cursor: pointer; 
             user-select: none;
-            cursor: pointer;
-        }
-        .open-form .button:hover {
-            color: black;
-        }
-        .open-form .button.close {
-            position: absolute;
-            top: 5px;
-            right: 0px;
+            margin-top: 10px;
+            margin-left: 10px;
+        }   
+        .open-form .button:hover { 
+            background-color: skyblue;
         }
     </style>
 
-    <div class="open-form">
-        <div class="label center-v">動画ID:保存済みを優先で再生&nbsp;&nbsp;URL:オンラインで再生</div>
-        <div style="display: flex;">
-            <input type="text" onkeydown={onkeydownPlay}>
-            <div class="button center-hv" title="再生" onclick={onclickPlay}>
-                <i class="fas fa-play"></i>
-            </div>
-        </div>
-        <div class="button close center-hv" title="閉じる" onclick={onclickClose}>
-            <i class="fas fa-times"></i>
+    <div class="open-form" onmouseup={stopProp} onmousedown={stopProp} onkeyup={stopProp}>
+        <input type="text" onkeydown={onkeydownPlay}>
+        <div style="display: flex; width: 200px; margin-left: auto;">
+            <div class="button" onclick={onclickPlay}>再生</div>
+            <div class="button" onclick={onclickClose}>閉じる</div>
         </div>
     </div>
 
@@ -61,6 +52,10 @@
         /* globals */
         const { Command } = window.Command;
         const { NICO_URL } = window.NicoURL;
+
+        this.stopProp = (e) => {
+            e.stopPropagation();
+        };
 
         const formVisible = (visible) => {
             const elm = this.root.querySelector(".open-form");
@@ -108,13 +103,13 @@
 
         this.on("mount", () => {
             formVisible(false);
+        });
 
-            this.opts.obs.on("show", () => {
-                formVisible(true);
-                const elm = this.root.querySelector(".open-form input");
-                elm.value = "";
-                elm.focus();
-            });
+        this.opts.obs.on("show", () => {
+            formVisible(true);
+            const elm = this.root.querySelector(".open-form input");
+            elm.value = "";
+            elm.focus();
         });
     </script>    
 </open-video-form>  

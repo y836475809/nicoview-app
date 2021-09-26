@@ -1,6 +1,6 @@
 <main-page>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --main-sidebar-width: 75px;
             --margin: 5px;
             width: 100%;
@@ -193,193 +193,187 @@
     <nico-login-dialog></nico-login-dialog>
 
     <script>
-        /* globals riot logger */
-        const myapi = window.myapi;
-        const { MouseGesture } = window.MouseGesture;
+        /* globals logger */
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
+                const { MouseGesture } = window.MouseGesture;
 
-        this.obs = this.opts.obs;
+                this.obs = props.obs;
 
-        const mouse_gesture = new MouseGesture();
-
-        this.mousedown = (e) => {
-            mouse_gesture.mouseDown(e);
-        };
-        this.mouseup = (e) => {
-            mouse_gesture.mouseUp(e);
-        };
-
-        this.obs.on("main-page:update-mousegesture-config", (args)=>{
-            const { config } = args;
-            mouse_gesture.config = config;
-        });
-
-        (async()=>{
-            const config = await myapi.ipc.Config.get(
-                mouse_gesture.name, mouse_gesture.defaultConfig);
-            mouse_gesture.config = config;
-        })(); 
-        
-        mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
-        mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
-        mouse_gesture.setActionShowPalyer(()=>{
-            myapi.ipc.showyPlayer();
-        });
-
-        mouse_gesture.onGesture((gesture)=>{
-            if(mouse_gesture.action("all-page", gesture)){
-                return;
-            }
-            
-            const items = [...this.root.querySelectorAll(".page-container.left > *")];
-            const cu_index = items.findIndex(item=>{
-                return item.style.zIndex > 0;
-            });
-            if(cu_index<0){
-                return;
-            }
-            const page_name = items[cu_index].tagName.toLowerCase();
-            if(mouse_gesture.action(page_name, gesture)){
-                return;
-            }
-        });
-
-        const updateDownloadBadge = async () => {
-            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
-            const elm = this.root.querySelector(".download-badge > .item-num");
-            if(video_ids.length === 0){
-                elm.style.display = "none";
-            }else{
-                elm.style.display = "";
-            }
-            this.donwnload_item_num = video_ids.length;
-            this.update();
-        };
-
-        myapi.ipc.Download.onUpdateItem(async ()=>{
-            await updateDownloadBadge();
-        });
-
-        myapi.ipc.Setting.onChangeLogLevel((args) => {
-            const { level } = args;
-            logger.setLevel(level);
-        });
-
-        this.donwnload_item_num = 0;
-
-        const changeClass = (remove_query, add_query, class_name) => {
-            const elms = this.root.querySelectorAll(remove_query);
-            elms.forEach(elm => {
-                elm.classList.remove(class_name);
-            });
-            const elm = this.root.querySelector(add_query);
-            elm.classList.add(class_name);
-        };
-
-        const select_page = (page_name)=>{
-            Array.from(this.root.querySelectorAll(".page-container.left > *"), 
-                (elm) => {
-                    elm.style.zIndex = 0;
+                this.mouse_gesture = new MouseGesture();
+                this.obs.on("main-page:update-mousegesture-config", (args)=>{
+                    const { config } = args;
+                    this.mouse_gesture.config = config;
                 });
-            const page = this.root.querySelector(`${page_name}-page`);
-            page.style.zIndex = 1;
 
-            changeClass(
-                ".main-sidebar.left > .button", 
-                `.${page_name}-button`, 
-                "select-button");
-
-            changeClass(
-                ".main-sidebar.left i.fas", 
-                `.${page_name}-button i.fas`, 
-                "select-icon");
-
-            changeClass(
-                ".main-sidebar.left .button-border", 
-                `.${page_name}-button > .button-border`, 
-                "select-button-border");
-        };
-
-        this.onclickPageSelect = (page_name, e) => {
-            select_page(page_name);
-        };
-
-        const hideRightPage = ()=>{ 
-            Array.from(this.root.querySelectorAll(".page-container.right > *"), 
-                (elm) => {
-                    elm.style.zIndex = -1;
+                (async()=>{
+                    const config = await  this.myapi.ipc.Config.get(
+                        this.mouse_gesture.name,  this.mouse_gesture.defaultConfig);
+                    this.mouse_gesture.config = config;
+                })(); 
+                
+                this.mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
+                this.mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
+                this.mouse_gesture.setActionShowPalyer(()=>{
+                    this.myapi.ipc.showyPlayer();
                 });
-        };
 
-        const toggleRightSidebarClass = (elm, toggle_class, select_class) => {
-            if(elm.classList.contains(toggle_class)===true){
-                elm.classList.remove(toggle_class); 
-            }else{
-                const buttons = this.root.querySelectorAll(`.main-sidebar.right ${select_class}`);
-                buttons.forEach(btn => {
-                    btn.classList.remove(toggle_class); 
+                this.mouse_gesture.onGesture((gesture)=>{
+                    if( this.mouse_gesture.action("all-page", gesture)){
+                        return;
+                    }
+                    
+                    const items = [...this.root.querySelectorAll(".page-container.left > *")];
+                    const cu_index = items.findIndex(item=>{
+                        return item.style.zIndex > 0;
+                    });
+                    if(cu_index<0){
+                        return;
+                    }
+                    const page_name = items[cu_index].tagName.toLowerCase();
+                    if( this.mouse_gesture.action(page_name, gesture)){
+                        return;
+                    }
                 });
-                elm.classList.add(toggle_class); 
-            } 
-        };
 
-        this.onclickTogglePage = (page_name, e) => {
-            const page = this.root.querySelector(`.${page_name}-page`);
-            const page_zIndex = page.style.zIndex;
+                this.myapi.ipc.Download.onUpdateItem(async ()=>{
+                    await  this.updateDownloadBadge();
+                });
 
-            hideRightPage();
+                this.myapi.ipc.Setting.onChangeLogLevel((args) => {
+                    const { level } = args;
+                    logger.setLevel(level);
+                });
 
-            if(page_zIndex > 0){
-                page.style.zIndex = -1;
-            }else{
-                page.style.zIndex = 2;
+                this.donwnload_item_num = 0;
+
+                this.obs.on("main-page:select-page", (page_name)=>{
+                    this.select_page(page_name);
+                });  
+
+                this.myapi.ipc.Search.onSearchTag((args)=>{
+                    this.obs.trigger("main-page:select-page", "search");
+                    this.obs.trigger("search-page:search-tag", args);
+                });
+
+                this.myapi.ipc.MyList.onLoad((args)=>{
+                    this.obs.trigger("main-page:select-page", "mylist");
+                    this.obs.trigger("mylist-page:load-mylist", args);
+                });
+
+                this.myapi.ipc.Download.onAddItems((args)=>{
+                    const items = args;
+                    this.obs.trigger("download-page:add-download-items", items);
+                });
+                this.myapi.ipc.Download.onDeleteItems((args)=>{
+                    const items = args;
+                    this.obs.trigger("download-page:delete-download-items", items);
+                });
+
+                this.myapi.ipc.Stack.onAddItems((args)=>{
+                    this.obs.trigger("play-stack-page:add-items", args);
+                });
+
+                this.myapi.ipc.Bookmark.onAddItems((args)=>{
+                    const bk_items = args;
+                    this.obs.trigger("bookmark-page:add-items", bk_items);
+                });
+            },
+            async onMounted() {
+                this.select_page("library");
+                this.hideRightPage();
+
+                await this.updateDownloadBadge();
+            },
+            mousedown(e) {
+                this.mouse_gesture.mouseDown(e);
+            },
+            mouseup(e) {
+                this.mouse_gesture.mouseUp(e);
+            },
+            async updateDownloadBadge() {
+                const video_ids = await  this.myapi.ipc.Download.getIncompleteIDs();
+                const elm = this.root.querySelector(".download-badge > .item-num");
+                if(video_ids.length === 0){
+                    elm.style.display = "none";
+                }else{
+                    elm.style.display = "";
+                }
+                this.donwnload_item_num = video_ids.length;
+                this.update();
+            },
+            changeClass(remove_query, add_query, class_name) {
+                const elms = this.root.querySelectorAll(remove_query);
+                elms.forEach(elm => {
+                    elm.classList.remove(class_name);
+                });
+                const elm = this.root.querySelector(add_query);
+                elm.classList.add(class_name);
+            },
+            select_page(page_name){
+                Array.from(this.root.querySelectorAll(".page-container.left > *"), 
+                    (elm) => {
+                        elm.style.zIndex = 0;
+                    });
+                const page = this.root.querySelector(`${page_name}-page`);
+                page.style.zIndex = 1;
+
+                this.changeClass(
+                    ".main-sidebar.left > .button", 
+                    `.${page_name}-button`, 
+                    "select-button");
+
+                this.changeClass(
+                    ".main-sidebar.left i.fas", 
+                    `.${page_name}-button i.fas`, 
+                    "select-icon");
+
+                this.changeClass(
+                    ".main-sidebar.left .button-border", 
+                    `.${page_name}-button > .button-border`, 
+                    "select-button-border");
+            },
+            onclickPageSelect(page_name, e) {
+                this.select_page(page_name);
+            },
+            hideRightPage() { 
+                Array.from(this.root.querySelectorAll(".page-container.right > *"), 
+                    (elm) => {
+                        elm.style.zIndex = -1;
+                    });
+            },
+            toggleRightSidebarClass(elm, toggle_class, select_class) {
+                if(elm.classList.contains(toggle_class)===true){
+                    elm.classList.remove(toggle_class); 
+                }else{
+                    const buttons = this.root.querySelectorAll(`.main-sidebar.right ${select_class}`);
+                    buttons.forEach(btn => {
+                        btn.classList.remove(toggle_class); 
+                    });
+                    elm.classList.add(toggle_class); 
+                } 
+            },
+            onclickTogglePage(page_name, e) {
+                const page = this.root.querySelector(`.${page_name}-page`);
+                const page_zIndex = page.style.zIndex;
+
+                this.hideRightPage();
+
+                if(page_zIndex > 0){
+                    page.style.zIndex = -1;
+                }else{
+                    page.style.zIndex = 2;
+                }
+
+                this.toggleRightSidebarClass(e.target, "select-button", ".button");
+
+                const icon_elm = this.root.querySelector(`.${page_name}-button i.fas`);
+                this.toggleRightSidebarClass(icon_elm, "select-icon", "i.fas");
+
+                const border_elm = this.root.querySelector(`.${page_name}-button > .button-border`);
+                this.toggleRightSidebarClass(border_elm, "select-button-border", ".button-border");
             }
-
-            toggleRightSidebarClass(e.target, "select-button", ".button");
-
-            const icon_elm = this.root.querySelector(`.${page_name}-button i.fas`);
-            toggleRightSidebarClass(icon_elm, "select-icon", "i.fas");
-
-            const border_elm = this.root.querySelector(`.${page_name}-button > .button-border`);
-            toggleRightSidebarClass(border_elm, "select-button-border", ".button-border");
         };
-
-        this.on("mount", async () => {
-            select_page("library");
-            hideRightPage();
-
-            await updateDownloadBadge();
-        });
-
-        this.obs.on("main-page:select-page", (page_name)=>{
-            select_page(page_name);
-        });  
-
-        myapi.ipc.Search.onSearchTag((args)=>{
-            this.obs.trigger("main-page:select-page", "search");
-            this.obs.trigger("search-page:search-tag", args);
-        });
-
-        myapi.ipc.MyList.onLoad((args)=>{
-            this.obs.trigger("main-page:select-page", "mylist");
-            this.obs.trigger("mylist-page:load-mylist", args);
-        });
-
-        myapi.ipc.Download.onAddItems((args)=>{
-            const items = args;
-            this.obs.trigger("download-page:add-download-items", items);
-        });
-        myapi.ipc.Download.onDeleteItems((args)=>{
-            const items = args;
-            this.obs.trigger("download-page:delete-download-items", items);
-        });
-
-        myapi.ipc.Stack.onAddItems((args)=>{
-            this.obs.trigger("play-stack-page:add-items", args);
-        });
-
-        myapi.ipc.Bookmark.onAddItems((args)=>{
-            const bk_items = args;
-            this.obs.trigger("bookmark-page:add-items", bk_items);
-        });
     </script>
 </main-page>

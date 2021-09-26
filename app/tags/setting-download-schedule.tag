@@ -1,5 +1,5 @@
 <setting-download-schedule>
-    <style scoped>
+    <style>
         .download-schedule-container {
             display: flex;
         }
@@ -51,64 +51,65 @@
     </div>
 
     <script> 
-        const obs =  this.opts.obs;
+        export default {
+            onBeforeMount(props) {
+                this.obs =  props.obs;
 
-        this.hours = [];
-        this.minutes = [];
-        for (let index = 0; index < 24; index++) {
-            this.hours.push(index);
-        }
-        for (let index = 0; index < 60; index++) {
-            this.minutes.push(index);
-        }
+                this.hours = [];
+                this.minutes = [];
+                for (let index = 0; index < 24; index++) {
+                    this.hours.push(index);
+                }
+                for (let index = 0; index < 60; index++) {
+                    this.minutes.push(index);
+                }
 
-        const getParamElms = () => {
-            const h_elm = this.root.querySelector(".hour-select");
-            const m_elm = this.root.querySelector(".minute-select");
-            const ck_elm = this.root.querySelector(".schedule-enable-check");
-            return { h_elm, m_elm, ck_elm };
+                this.obs.on("set-params", (args)=>{
+                    const { date, enable } = args;
+                    const { h_elm, m_elm, ck_elm } = this.getParamElms();
+                                
+                    h_elm.options[date.hour].selected = true;
+                    m_elm.options[date.minute].selected = true;
+                    ck_elm.checked = enable;
+
+                    this.changeEnable(enable);
+                });
+            },
+            getParamElms() {
+                const h_elm = this.root.querySelector(".hour-select");
+                const m_elm = this.root.querySelector(".minute-select");
+                const ck_elm = this.root.querySelector(".schedule-enable-check");
+                return { h_elm, m_elm, ck_elm };
+            },
+            changeEnable(enable) {
+                const { h_elm, m_elm } = this.getParamElms();
+
+                h_elm.disabled = !enable;
+                m_elm.disabled = !enable;
+
+                const label_elms = this.root.querySelectorAll(".label");
+                label_elms.forEach(elm => {
+                    if(enable){
+                        elm.classList.remove("disabled");
+                    }else{
+                        elm.classList.add("disabled");
+                    }   
+                });
+            },
+            onChangeParams(e) {
+                const { h_elm, m_elm, ck_elm } = this.getParamElms();
+
+                const hour = parseInt(h_elm.value);
+                const minute = parseInt(m_elm.value);
+                const enable = ck_elm.checked;
+
+                this.changeEnable(enable);
+
+                this.obs.trigger("change-params", { 
+                    date: { hour: hour, minute: minute },
+                    enable: enable
+                });
+            }
         };
-
-        const changeEnable = (enable) => {
-            const { h_elm, m_elm } = getParamElms();
-
-            h_elm.disabled = !enable;
-            m_elm.disabled = !enable;
-
-            const label_elms = this.root.querySelectorAll(".label");
-            label_elms.forEach(elm => {
-                if(enable){
-                    elm.classList.remove("disabled");
-                }else{
-                    elm.classList.add("disabled");
-                }   
-            });
-        };
-
-        this.onChangeParams = (e) =>{
-            const { h_elm, m_elm, ck_elm } = getParamElms();
-
-            const hour = parseInt(h_elm.value);
-            const minute = parseInt(m_elm.value);
-            const enable = ck_elm.checked;
-
-            changeEnable(enable);
-
-            obs.trigger("change-params", { 
-                date: { hour: hour, minute: minute },
-                enable: enable
-            });
-        };
-
-        obs.on("set-params", (args)=>{
-            const { date, enable } = args;
-            const { h_elm, m_elm, ck_elm } = getParamElms();
-                        
-            h_elm.options[date.hour].selected = true;
-            m_elm.options[date.minute].selected = true;
-            ck_elm.checked = enable;
-
-            changeEnable(enable);
-        });
     </script>
 </setting-download-schedule>

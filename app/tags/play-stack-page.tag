@@ -1,6 +1,6 @@
 <play-stack-page>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --page-width: 300px;
             --item-height: 80px;
             --thumb-size: 80px;
@@ -22,7 +22,9 @@
             border-bottom: 1px solid lightgrey;
             cursor: pointer;
             overflow: hidden;
-            transition: height var(--item-duration);  
+            transition: height var(--item-duration),
+                padding var(--item-duration),
+                border-bottom var(--item-duration);
         }
         .stack-item-hide { 
             height: 0;  
@@ -73,7 +75,7 @@
     </style>
 
     <div class="stack-container">
-        <div class="stack-item center-v {item.state}" data-id={i} each={ item, i in items }>
+        <div class="stack-item center-v {item.state}" data-id={i} each={ (item, i) in items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
                 <div style="display:flex; flex-direction:column;">
@@ -91,68 +93,68 @@
     </div>
 
     <script>
-        const myapi = window.myapi;
-        const { Command } = window.Command;
-        const { toTimeString } = window.TimeFormat;
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
+                this.Command = window.Command.Command;
+                const { toTimeString } = window.TimeFormat;
 
-        const obs = this.opts.obs;
-        this.items = [];
-        let item_duration = 300;
+                this.obs = props.obs;
+                this.items = [];
+                this.item_duration = 300;
 
-        const addItems = async (items) => {
-            items.forEach(item => {
-                item.state = "stack-item-hide";
-            });
-            this.items = items.concat(this.items);
-            this.update();
+                this.getTime = (item) => {
+                    const time = item.time?item.time:0;
+                    return toTimeString(time);
+                };
 
-            setTimeout(() => { 
-                const elms = this.root.querySelectorAll(".stack-item-hide");
-                elms.forEach(elm => {
-                    elm.classList.add("stack-item-show"); 
+                this.obs.on("play-stack-page:add-items", async (args) => {
+                    const { items } = args;
+
+                    await this.addItems(items);
+                    this.items.forEach(item => {
+                        delete item.state;
+                    });
+                    await this.myapi.ipc.Stack.updateItems(this.items);
                 });
-                elms.forEach(elm => {
-                    elm.classList.remove("stack-item-hide"); 
-                    elm.classList.remove("stack-item-show"); 
+            },
+            async onMounted() {
+                const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
+                this.item_duration = parseInt(prop);
+
+                const items = await this.myapi.ipc.Stack.getItems();
+                await this.addItems(items);
+            }, 
+            addItems(items) {
+                items.forEach(item => {
+                    item.state = "stack-item-hide";
                 });
-            }, 50);
-        };
-
-        this.getTime = (item) => {
-            const time = item.time?item.time:0;
-            return toTimeString(time);
-        };
-
-        this.on("mount", async () => {
-            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
-            item_duration = parseInt(prop);
-
-            const items = await myapi.ipc.Stack.getItems();
-            await addItems(items);
-        });
-
-        obs.on("play-stack-page:add-items", async (args) => {
-            const { items } = args;
-
-            await addItems(items);
-            this.items.forEach(item => {
-                delete item.state;
-            });
-            await myapi.ipc.Stack.updateItems(this.items);
-        });
-
-        this.onclickItem = (item, e) => {
-            Command.play(item, false);
-        };
-
-        this.onclickDelete = (i, e) => {
-            const elms = this.root.querySelectorAll(".stack-item");
-            elms[i].classList.add("stack-item-hide"); 
-            setTimeout(() => { 
-                this.items.splice(i, 1);
+                this.items = items.concat(this.items);
                 this.update();
-                myapi.ipc.Stack.updateItems(this.items).then();
-            }, item_duration);   
+
+                setTimeout(() => { 
+                    const elms = this.root.querySelectorAll(".stack-item-hide");
+                    elms.forEach(elm => {
+                        elm.classList.add("stack-item-show"); 
+                    });
+                    elms.forEach(elm => {
+                        elm.classList.remove("stack-item-hide"); 
+                        elm.classList.remove("stack-item-show"); 
+                    });
+                }, 50);
+            },
+            onclickItem(item, e) {
+                this.Command.play(item, false);
+            },
+            onclickDelete(i, e) {
+                const elms = this.root.querySelectorAll(".stack-item");
+                elms[i].classList.add("stack-item-hide"); 
+                setTimeout(() => { 
+                    this.items.splice(i, 1);
+                    this.update();
+                    this.myapi.ipc.Stack.updateItems(this.items).then();
+                }, this.item_duration);   
+            }
         };
     </script>
 </play-stack-page>

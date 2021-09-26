@@ -1,5 +1,5 @@
 <modal-dialog data-open="false">
-    <style scoped>
+    <style>
         .message-modal-dialog {
             border: solid 1px #aaa;
             border-radius: 5px;
@@ -57,51 +57,50 @@
     </dialog>
 
     <script>
-        let on_cancel = null;
-        this.message = "";
-        
-        this.on("mount", () => {
-            const obs_dialog = this.opts.obs;
-            on_cancel = this.opts.oncancel;
+        export default {
+            onBeforeMount(props) {
+                this.message = "";
+                this.obs_dialog = props.obs;
+                this.on_cancel = props.oncancel;
+            },
+            onMounted() {
+                this.obs_dialog.on("show", (args) => {
+                    this.root.dataset.open = true;
 
-            obs_dialog.on("show", (args) => {
-                this.root.dataset.open = true;
+                    const { message, buttons, cb } = args;
+                    this.message = message;
+                    this.showok = buttons===undefined ? false : buttons.includes("ok");
+                    this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
+                    this.cb = cb;
 
-                const { message, buttons, cb } = args;
-                this.message = message;
-                this.showok = buttons===undefined ? false : buttons.includes("ok");
-                this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
-                this.cb = cb;
+                    this.update();
 
-                this.update();
+                    const dialog = this.root.querySelector("dialog");
+                    dialog.showModal();
+                });
 
-                const dialog = this.root.querySelector("dialog");
-                dialog.showModal();
-            });
+                this.obs_dialog.on("update-message", (message) => {
+                    this.message = message;
+                    this.update();
+                });
 
-            obs_dialog.on("update-message", (message) => {
-                this.message = message;
-                this.update();
-            });
-
-            obs_dialog.on("close", () => {
-                const dialog = this.root.querySelector("dialog");
-                dialog.close();
-                this.root.dataset.open = false;
-            });
-        });
-
-        this.onclickButton = (result, e) =>{
-            if(this.cb){
-                this.cb(result);
+                this.obs_dialog.on("close", () => {
+                    const dialog = this.root.querySelector("dialog");
+                    dialog.close();
+                    this.root.dataset.open = false;
+                });
+            },
+            onclickButton(result, e) {
+                if(this.cb){
+                    this.cb(result);
+                }
+            },
+            oncancel(e) {
+                if(this.on_cancel){
+                    this.on_cancel();
+                }
+                e.preventDefault();
             }
-        };
-
-        this.oncancel = (e) => {
-            if(on_cancel){
-                on_cancel();
-            }
-            e.preventDefault();
         };
     </script>
 </modal-dialog>

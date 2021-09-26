@@ -1,5 +1,5 @@
 <setting-page>
-    <style scoped>
+    <style>
         .setting-page {       
             width: 100%;
             height: 100%;
@@ -160,234 +160,226 @@
 
     <script>
         /* globals my_obs logger ModalDialog */
-        const myapi = window.myapi;
-        const { ImportFile } = window.ImportFile;
-        const { ImportNNDDSetting } = window.ImportNNDDSetting;
-        const { MouseGesture } = window.MouseGesture;
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
+                this.ImportFile = window.ImportFile.ImportFile;
+                this.ImportNNDDSetting = window.ImportNNDDSetting.ImportNNDDSetting;
+                this.MouseGesture = window.MouseGesture.MouseGesture;
 
-        const obs = this.opts.obs; 
-        const obs_modal_dialog = my_obs.createObs();
-        let modal_dialog = null;
+                this.obs = props.obs;
+                this.obs_modal_dialog = my_obs.createObs();
+                this.modal_dialog = null;
 
-        this.import_items = ImportNNDDSetting.getItems();
+                this.import_items = this.ImportNNDDSetting.getItems();
 
-        const mouse_gesture = new MouseGesture();
-        
-        this.mouse_gesture_items = [];
-        for(const item of mouse_gesture.items){
-            const obj = {};
-            Object.assign(obj, item);
-            obj.class = `mg-${item.action}`;
-            this.mouse_gesture_items.push(obj);
-        }
+                this.mouse_gesture = new this.MouseGesture();
+                this.mouse_gesture_items = [];
+                for(const item of this.mouse_gesture.items){
+                    const obj = {};
+                    Object.assign(obj, item);
+                    obj.class = `mg-${item.action}`;
+                    this.mouse_gesture_items.push(obj);
+                }
+            },
+            async onMounted() {
+                this.setInputValue(".data-dir-input", await this.myapi.ipc.Config.get("data_dir", "")); 
+                this.setInputValue(".download-dir-input", await this.myapi.ipc.Config.get("download.dir", "")); 
+                this.setInputValue(".ffmpeg-path-input", await this.myapi.ipc.Config.get("ffmpeg_path", "")); 
+                this.setInputValue(".nndd-system-path-input", await this.myapi.ipc.Config.get("nndd.system_path", "")); 
+                
+                for (let index = 0; index < this.import_items.length; index++) {
+                    const import_item = this.import_items[index];
+                    this.setCheckValue(`.${import_item.name}`, await this.myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
+                }
 
-        this.onchangeMgSelect = async (item, e) => {
-            const gesture = e.target.value;
-            mouse_gesture.setGesture(gesture, item.action);
-            const config = mouse_gesture.config;
-            await myapi.ipc.Config.set(mouse_gesture.name, config);
-            obs.trigger("main-page:update-mousegesture-config", { config });
-        };
+                this.setupMouseGesture();
+            
+                this.modal_dialog = new ModalDialog(this.root, "setting-md", {
+                    obs:this.obs_modal_dialog
+                });
+            },
+            async onchangeMgSelect(item, e){
+                const gesture = e.target.value;
+                this.mouse_gesture.setGesture(gesture, item.action);
+                const config = this.mouse_gesture.config;
+                await this.myapi.ipc.Config.set(this.mouse_gesture.name, config);
+                this.obs.trigger("main-page:update-mousegesture-config", { config });
+            },
+            async setupMouseGesture(){
+                const config = await this.myapi.ipc.Config.get(
+                    this.mouse_gesture.name, this.mouse_gesture.defaultConfig);
 
-        const setupMouseGesture = async () => {
-            const config = await myapi.ipc.Config.get(mouse_gesture.name, mouse_gesture.defaultConfig);
-
-            for (const [key, value] of Object.entries(config)) {
-                const gesture = value;
-                const class_name = `mg-${key}`;
-                const elem = this.root.querySelector(`.${class_name}`);
-                for(let i = 0; i < elem.options.length; i++) {
-                    if(elem.options[i].value == gesture){
-                        elem.options[i].selected = true ;
+                for (const [key, value] of Object.entries(config)) {
+                    const gesture = value;
+                    const class_name = `mg-${key}`;
+                    const elem = this.root.querySelector(`.${class_name}`);
+                    for(let i = 0; i < elem.options.length; i++) {
+                        if(elem.options[i].value == gesture){
+                            elem.options[i].selected = true ;
+                        }
                     }
                 }
-            }
-        };
-
-        this.onclickSelectDataDir = async e => {
-            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
-            if(dir == null){
-                return;
-            }
-            setInputValue(".data-dir-input", dir);
-            await myapi.ipc.Config.set("data_dir", dir);
-        };
-
-        this.onclickSelectDownloadDir = async e => {
-            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
-            if(dir == null){
-                return; 
-            }
-            setInputValue(".download-dir-input", dir);
-            await myapi.ipc.Config.set("download.dir", dir);
-        };
-
-        this.onclickSelectffmpegPath = async e => {
-            const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
-                name: "ffmpeg",
-            });
-            if(file_path == null){
-                return;
-            }
-            setInputValue(".ffmpeg-path-input", file_path);
-            await myapi.ipc.Config.set("ffmpeg_path", file_path);
-        };
-
-        this.onclickNNDDSystemDir = async (e) => {
-            const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
-            if(dir == null){
-                return; 
-            }
-            setInputValue(".nndd-system-path-input", dir);
-            await myapi.ipc.Config.set("nndd.system_path", dir);
-        };
-
-        this.onclickCheckNNDDImportItem = async (item, e) => {
-            const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
-            const checked = ch_elm.checked;
-            await myapi.ipc.Config.set(`nndd.${item.name}`, checked);
-        };
-
-        this.onclickExecNNDDImport = async (e) => {
-            if(modal_dialog.isOpend()){
-                return;
-            }
-
-            let data_dir = "";
-            let nndd_system_dir = "";
-            try {
-                data_dir = await myapi.ipc.Setting.getAppDataPath();
-                nndd_system_dir = await myapi.ipc.Setting.getNNDDSystemPath();
-            } catch (error) {
-                await myapi.ipc.Dialog.showMessageBox({
-                    type: "error",
-                    message: error.message
+            },
+            async onclickSelectDataDir(e) {
+                const dir = await this.myapi.ipc.Dialog.showSelectFolderDialog();
+                if(dir == null){
+                    return;
+                }
+                this.setInputValue(".data-dir-input", dir);
+                await this.myapi.ipc.Config.set("data_dir", dir);
+            },
+            async onclickSelectDownloadDir(e) {
+                const dir = await this.myapi.ipc.Dialog.showSelectFolderDialog();
+                if(dir == null){
+                    return; 
+                }
+                this.setInputValue(".download-dir-input", dir);
+                await this.myapi.ipc.Config.set("download.dir", dir);
+            },
+            async onclickSelectffmpegPath(e) {
+                const file_path = await this.myapi.ipc.Dialog.showSelectFileDialog({
+                    name: "ffmpeg",
                 });
-                return;
-            }
-
-            const import_items = [];
-            this.import_items.forEach(item => {
+                if(file_path == null){
+                    return;
+                }
+                this.setInputValue(".ffmpeg-path-input", file_path);
+                await this.myapi.ipc.Config.set("ffmpeg_path", file_path);
+            },
+            async onclickNNDDSystemDir(e) {
+                const dir = await this.myapi.ipc.Dialog.showSelectFolderDialog();
+                if(dir == null){
+                    return; 
+                }
+                this.setInputValue(".nndd-system-path-input", dir);
+                await this.myapi.ipc.Config.set("nndd.system_path", dir);
+            },
+            async onclickCheckNNDDImportItem(item, e) {
                 const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
-                if(ch_elm.checked){
-                    import_items.push(item);
-                }
-            });
-
-            obs_modal_dialog.trigger("show", {
-                message: "インポート中...",
-            });
-            try {
-                const import_nndd = new ImportNNDDSetting(nndd_system_dir, data_dir);
-                for (let index = 0; index < import_items.length; index++) {
-                    const import_item = import_items[index];
-                    obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
-                    await import_nndd.call(import_item.name);
+                const checked = ch_elm.checked;
+                await this.myapi.ipc.Config.set(`nndd.${item.name}`, checked);
+            },
+            async onclickExecNNDDImport(e) {
+                if(this.modal_dialog.isOpend()){
+                    return;
                 }
 
-                obs.trigger("search-page:sidebar:reload-items");
-                obs.trigger("play-history-page:reload-items");
-                obs.trigger("mylist-page:sidebar:reload-items");
-
-                await myapi.ipc.Dialog.showMessageBox({
-                    message: "インポート完了"
-                });
-            } catch (error) {
-                logger.error(error);
-                await myapi.ipc.Dialog.showMessageBox({
-                    type: "error",
-                    message: `インポート失敗\n${error.message}`
-                });
-            } finally {
-                obs_modal_dialog.trigger("close");
-            }            
-        };
-
-        const setInputValue = (selector, value) => {          
-            const elm = this.root.querySelector(selector);
-            elm.value = value;
-        };
-
-        const setCheckValue = (selector, value) => {          
-            const elm = this.root.querySelector(selector);
-            elm.checked = value;
-        };
-
-        this.on("mount", async () => {
-            setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
-            setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
-            setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-            setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", "")); 
-            
-            for (let index = 0; index < this.import_items.length; index++) {
-                const import_item = this.import_items[index];
-                setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
-            }
-
-            setupMouseGesture();
-        
-            modal_dialog = new ModalDialog(this.root, "setting-md", {
-                obs:obs_modal_dialog
-            });
-        });
-
-        this.onclickImportFiles = async ()=>{
-            if(modal_dialog.isOpend()){
-                return;
-            }
-            
-            const file_paths = await myapi.ipc.Dialog.showSelectFileDialog({
-                name: "avi",
-                exts: ["mp4", "flv", "swf"],
-                multi_select: true
-            });
-            if(!file_paths){
-                return;
-            }
-
-            let cancel = false;
-            obs_modal_dialog.trigger("show", {
-                message: "インポート中...",
-                cb: result=>{
-                    cancel = true;
-                }
-            });
-
-            await new Promise(resolve => setTimeout(resolve, 100));
-
-            const error_files = [];
-            for (let index = 0; index < file_paths.length; index++) {
-                if(cancel===true){
-                    break;
-                }
-                const file_path = file_paths[index];
+                let data_dir = "";
+                let nndd_system_dir = "";
                 try {
-                    const import_file = new ImportFile(file_path);
-                    const item = await import_file.createLibraryItem();
-                    await myapi.ipc.Library.addItem(item);
-                    await new Promise(resolve => setTimeout(resolve, 100));
+                    data_dir = await this.myapi.ipc.Setting.getAppDataPath();
+                    nndd_system_dir = await this.myapi.ipc.Setting.getNNDDSystemPath();
+                } catch (error) {
+                    await this.myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: error.message
+                    });
+                    return;
+                }
+
+                const import_items = [];
+                this.import_items.forEach(item => {
+                    const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
+                    if(ch_elm.checked){
+                        import_items.push(item);
+                    }
+                });
+
+                this.obs_modal_dialog.trigger("show", {
+                    message: "インポート中...",
+                });
+                try {
+                    const import_nndd = new this.ImportNNDDSetting(nndd_system_dir, data_dir);
+                    for (let index = 0; index < import_items.length; index++) {
+                        const import_item = import_items[index];
+                        this.obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
+                        await import_nndd.call(import_item.name);
+                    }
+
+                    this.obs.trigger("search-page:sidebar:reload-items");
+                    this.obs.trigger("play-history-page:reload-items");
+                    this.obs.trigger("mylist-page:sidebar:reload-items");
+
+                    await this.myapi.ipc.Dialog.showMessageBox({
+                        message: "インポート完了"
+                    });
                 } catch (error) {
                     logger.error(error);
-                    error_files.push(file_path);
+                    await this.myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: `インポート失敗\n${error.message}`
+                    });
+                } finally {
+                    this.obs_modal_dialog.trigger("close");
+                }            
+            },
+            setInputValue(selector, value){          
+                const elm = this.root.querySelector(selector);
+                elm.value = value;
+            },
+            setCheckValue(selector, value) {          
+                const elm = this.root.querySelector(selector);
+                elm.checked = value;
+            },
+            async onclickImportFiles() {
+                if(this.modal_dialog.isOpend()){
+                    return;
+                }
+                
+                const file_paths = await this.myapi.ipc.Dialog.showSelectFileDialog({
+                    name: "avi",
+                    exts: ["mp4", "flv", "swf"],
+                    multi_select: true
+                });
+                if(!file_paths){
+                    return;
                 }
 
-                const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
-                obs_modal_dialog.trigger("update-message", message);
-
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-            
-            await myapi.ipc.Dialog.showMessageBox({
-                message: `インポート完了\n失敗:${error_files.length}`
-            });
-            obs_modal_dialog.trigger("close");
-
-            if(error_files.length>0){
-                await myapi.ipc.Dialog.showMessageBox({
-                    type: "error",
-                    message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
+                let cancel = false;
+                this.obs_modal_dialog.trigger("show", {
+                    message: "インポート中...",
+                    cb: result=>{
+                        cancel = true;
+                    }
                 });
-            } 
+
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                const error_files = [];
+                for (let index = 0; index < file_paths.length; index++) {
+                    if(cancel===true){
+                        break;
+                    }
+                    const file_path = file_paths[index];
+                    try {
+                        const import_file = new this.ImportFile(file_path);
+                        const item = await import_file.createLibraryItem();
+                        await this.myapi.ipc.Library.addItem(item);
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                    } catch (error) {
+                        logger.error(error);
+                        error_files.push(file_path);
+                    }
+
+                    const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
+                    this.obs_modal_dialog.trigger("update-message", message);
+
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
+                await this.myapi.ipc.Dialog.showMessageBox({
+                    message: `インポート完了\n失敗:${error_files.length}`
+                });
+                this.obs_modal_dialog.trigger("close");
+
+                if(error_files.length>0){
+                    await this.myapi.ipc.Dialog.showMessageBox({
+                        type: "error",
+                        message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
+                    });
+                } 
+            }
         };
     </script>
 </setting-page>

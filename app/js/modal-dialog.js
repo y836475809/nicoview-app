@@ -1,12 +1,12 @@
 /* globals riot */
 
 class ModalDialog {
-    constructor(parent, id, opts){
+    constructor(parent, id, props){
         const elem = document.createElement("div");
         elem.id = id;
         parent.appendChild(elem);
         this.modal_dialog = riot.mount(
-            `#${id}`, "modal-dialog", opts);
+            `#${id}`, props, "modal-dialog");
     }
     
     isOpend() {

@@ -159,14 +159,14 @@
     </div>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals my_obs logger ModalDialog */
         const myapi = window.myapi;
         const { ImportFile } = window.ImportFile;
         const { ImportNNDDSetting } = window.ImportNNDDSetting;
         const { MouseGesture } = window.MouseGesture;
 
         const obs = this.opts.obs; 
-        const obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = my_obs.createObs();
         let modal_dialog = null;
 
         this.import_items = ImportNNDDSetting.getItems();

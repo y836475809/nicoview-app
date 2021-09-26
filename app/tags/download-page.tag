@@ -60,7 +60,7 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals my_obs logger */
         const EventEmitter = window.EventEmitter;
         const myapi = window.myapi;
         const { NicoDownloader } = window.NicoDownloader;
@@ -69,7 +69,7 @@
         const { ScheduledTask } = window.ScheduledTask;
 
         const obs = this.opts.obs; 
-        this.obs_schedule = riot.observable();
+        this.obs_schedule = my_obs.createObs();
 
         let download_schedule = null;
 

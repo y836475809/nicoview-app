@@ -17,11 +17,11 @@
     </div>
 
     <script>
-        /* globals riot */
+        /* globals my_obs */
         const myapi = window.myapi;
 
         const obs = this.opts.obs; 
-        this.obs_listview = riot.observable();
+        this.obs_listview = my_obs.createObs();
         this.name = "library-search";
 
         const target_map = new Map();
@@ -233,7 +233,7 @@
     </div>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals my_obs logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -243,7 +243,7 @@
         const { JsonDataConverter } = window.NicoDataConverter;
 
         const obs = this.opts.obs; 
-        const obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = my_obs.createObs();
         let modal_dialog = null;
 
         myapi.ipc.Library.onAddItem((args) => {

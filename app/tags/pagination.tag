@@ -62,9 +62,9 @@
     <div class="label center-hv">ヒット件数: {search_result_num.toLocaleString()}</div>
 
     <script>
-        /* globals riot */
+        /* globals my_obs */
         const pagination_obs = this.opts.obs;
-        this.obs_page_selector = riot.observable();
+        this.obs_page_selector = my_obs.createObs();
 
         this.page_num = 1;
         this.total_page_num = 0;

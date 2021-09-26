@@ -21,12 +21,12 @@
     </div>
 
     <script>
-        /* globals riot */
+        /* globals my_obs */
         const myapi = window.myapi;
         const { searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
-        this.obs_listview = riot.observable();
+        this.obs_listview = my_obs.createObs();
         this.name = "nico-search";
         this.geticon = (item) => {
             const search_target = item.cond.search_target;
@@ -290,17 +290,17 @@
     </div>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals my_obs logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
 
         const obs = this.opts.obs; 
-        const obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = my_obs.createObs();
         let modal_dialog = null;
 
-        this.pagination_obs = riot.observable();
+        this.pagination_obs = my_obs.createObs();
 
         this.api_checked = "checked";
         this.sort_items = searchItems.sortItems;

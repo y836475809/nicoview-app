@@ -40,11 +40,11 @@
         const myapi = window.myapi;
         var { logger } = window.logger; // eslint-disable-line
         var { ModalDialog } = window.ModalDialog; // eslint-disable-line
-
-        const obs = riot.observable();
+        var my_obs = window.MyObservable; // eslint-disable-line
 
         myapi.ipc.Config.set("download.wait_time", 10).then();
 
+        const obs = my_obs.createObs();
         myapi.ipc.onLoadContent(()=>{
             riot.mount("main-page", {obs});
         });

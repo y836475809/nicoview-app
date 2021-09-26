@@ -20,9 +20,9 @@
     /* globals riot */
     var { logger } = window.logger; // eslint-disable-line
     var { ModalDialog } = window.ModalDialog; // eslint-disable-line
-    
-    const obs = riot.observable(); // eslint-disable-line
+    var my_obs = window.MyObservable; // eslint-disable-line
 
+    const obs = my_obs.createObs();
     riot.mount("setting-page", {obs});
 </script>
 

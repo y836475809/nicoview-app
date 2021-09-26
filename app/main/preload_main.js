@@ -6,6 +6,7 @@ process.once("loaded", () => {
     global.myapi = require(`${root_dir}/app/js/my-api`);
     global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
+    global.MyObservable = require(`${root_dir}/app/js/my-observable`);
 });
 
 window.addEventListener( "error", async e => {

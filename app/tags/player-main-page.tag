@@ -37,7 +37,7 @@
     <player-setting-dialog obs={opts.obs}></player-setting-dialog>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals my_obs logger ModalDialog */
         const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
@@ -46,7 +46,7 @@
         const { NicoVideoData } = window.NicoVideoData;
 
         const obs = this.opts.obs;
-        const obs_modal_dialog = riot.observable();
+        const obs_modal_dialog = my_obs.createObs();
         let modal_dialog = null;
 
         let comment_filter = null;

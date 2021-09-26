@@ -51,11 +51,11 @@
     </div>
 
     <script>
-        /* globals riot */
+        /* globals my_obs */
         const myapi = window.myapi;
         
         const obs = this.opts.obs; 
-        this.obs_open_video_form = riot.observable();
+        this.obs_open_video_form = my_obs.createObs();
 
         const getPlayData = async () => {
             return await new Promise((resolve, reject) => {

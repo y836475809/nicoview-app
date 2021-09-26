@@ -26,13 +26,13 @@
     </aside>
 
     <script>
-        /* globals riot */
+        /* globals my_obs */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const time_format = window.TimeFormat;
 
         const obs = this.opts.obs; 
-        this.obs_listview = riot.observable();
+        this.obs_listview = my_obs.createObs();
         this.sb_button_icon = "fas fa-chevron-left";
         this.name = "bookmark";
 

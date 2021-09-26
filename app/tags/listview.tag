@@ -1,6 +1,6 @@
 <listview>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --input-height: 30px;
             --serach-button-width: 30px;
             --item-height: 30px;
@@ -161,7 +161,7 @@
     </div>
     <div class="listview-menu-container">
         <ul class="listview-list">
-            <li class="listview-item {item.state}" data-id={i} each={ item, i in items }
+            <li class="listview-item {item.state}" data-id={i} each={ (item, i) in items }
                 title={getTooltip(item)}>
                 <div class="dblclick center-hv" title="クリック動作"
                     onclick={onclickItem.bind(this,item)} 
@@ -188,306 +188,289 @@
     </div>
 
     <script>
-        const Sortable = window.Sortable;
-        const myapi = window.myapi;
-        let item_duration = 300;
-        let sortable = null;
-        const obs = this.opts.obs;
+        export default {
+            onBeforeMount(props) {
+                this.Sortable = window.Sortable;
+                this.myapi = window.myapi;
+                this.item_duration = 300;
+                this.sortable = null;
+                this.obs = props.obs;
 
-        const default_icon = "fas fa-square listview-item-default-icon";
-        
-        this.getTooltip = this.opts.gettooltip;
-        if(!this.getTooltip){
-            this.getTooltip = (item) => {
-                return item.title;
-            };
-        }
-        this.getTitle = this.opts.gettitle;
-        if(!this.getTitle){
-            this.getTitle = (item) => {
-                return item.title;
-            };
-        }
-        this.getIcon = this.opts.geticon;
-        if(!this.getIcon){
-            this.getIcon = (item) => {
-                return default_icon;
-            };
-        }  
-
-        const confirm = !this.opts.confirm?[]:this.opts.confirm;
-
-        const triggerChange = () => {
-            const items = JSON.parse(JSON.stringify(this.items)).map(item=>{
-                delete item.state;
-                return item;
-            });
-            obs.trigger("changed", {items});
-        };
-
-        const triggerDelete = (items) => {
-            const deleted_items = JSON.parse(JSON.stringify(items)).map(item=>{
-                delete item.state;
-                return item;
-            });
-            obs.trigger("items-deleted", {items:deleted_items});
-        };
-
-        const deleteConfirm = async () => {
-            if(confirm.includes("delete") === false){
-                return true;
-            }
-            const ret = await myapi.ipc.Dialog.showMessageBox({
-                message: "削除しますか?", 
-                okcancel: true
-            });
-            return ret;
-        };
-
-        obs.on("loadData", async (args) => {
-            const { items } = args;
-            this.items = items;
-            this.update();
-        });
-
-        obs.on("addList", async (args) => {
-            const { items } = args;
-
-            items.forEach(item => {
-                item.state = "listview-item-hide";
-            });
-            this.items = this.items.concat(items);
-            this.update();
-
-            setTimeout(() => { 
-                const elms = this.root.querySelectorAll(".listview-item-hide");
-                elms.forEach(elm => {
-                    elm.classList.add("listview-item-show"); 
-                });
-                elms.forEach(elm => {
-                    elm.classList.remove("listview-item-hide"); 
-                    elm.classList.remove("listview-item-show"); 
-                });
-
-                const query = getInputValue();
-                filter(query);
-                triggerChange();
-            }, 50);
-        });
-
-        obs.on("deleteList", async () => {
-            if(await deleteConfirm() === false){
-                return;
-            }
-            const elms = this.root.querySelectorAll(".listview-item");
-
-            elms.forEach(elm => {
-                if(elm.classList.contains("selected")===true){
-                    elm.classList.add("listview-item-hide"); 
+                this.default_icon = "fas fa-square listview-item-default-icon";
+                
+                this.getTooltip = props.gettooltip;
+                if(!this.getTooltip){
+                    this.getTooltip = (item) => {
+                        return item.title;
+                    };
                 }
-            });
+                this.getTitle = props.gettitle;
+                if(!this.getTitle){
+                    this.getTitle = (item) => {
+                        return item.title;
+                    };
+                }
+                this.getIcon = props.geticon;
+                if(!this.getIcon){
+                    this.getIcon = (item) => {
+                        return this.default_icon;
+                    };
+                }  
 
-            setTimeout(() => { 
-                const deleted_items = this.items.filter((item, index) => {
-                    return elms[index].classList.contains("selected")===true;
+                this.confirm = !props.confirm?[]:props.confirm;
+
+                this.obs.on("loadData", async (args) => {
+                    const { items } = args;
+                    this.items = items;
+                    this.update();
                 });
 
-                this.items = this.items.filter((item, index) => {
-                    return elms[index].classList.contains("selected")===false;
+                this.obs.on("addList", async (args) => {
+                    const { items } = args;
+
+                    items.forEach(item => {
+                        item.state = "listview-item-hide";
+                    });
+                    this.items = this.items.concat(items);
+                    this.update();
+
+                    setTimeout(() => { 
+                        const elms = this.root.querySelectorAll(".listview-item-hide");
+                        elms.forEach(elm => {
+                            elm.classList.add("listview-item-show"); 
+                        });
+                        elms.forEach(elm => {
+                            elm.classList.remove("listview-item-hide"); 
+                            elm.classList.remove("listview-item-show"); 
+                        });
+
+                        const query = this.getInputValue();
+                        this.filter(query);
+                        this.triggerChange();
+                    }, 50);
                 });
+
+                this.obs.on("deleteList", async () => {
+                    if(await this.deleteConfirm() === false){
+                        return;
+                    }
+                    const elms = this.root.querySelectorAll(".listview-item");
+
+                    elms.forEach(elm => {
+                        if(elm.classList.contains("selected")===true){
+                            elm.classList.add("listview-item-hide"); 
+                        }
+                    });
+
+                    setTimeout(() => { 
+                        const deleted_items = this.items.filter((item, index) => {
+                            return elms[index].classList.contains("selected")===true;
+                        });
+
+                        this.items = this.items.filter((item, index) => {
+                            return elms[index].classList.contains("selected")===false;
+                        });
+                        this.update();
+                        this.triggerChange();
+                        this.triggerDelete(deleted_items);
+                    }, this.item_duration);
+                });
+
+                this.obs.on("select-item-by-index", (args) => {
+                    const { index } = args;
+                    if(index < 0){
+                        return;
+                    }
+                    const elms = this.root.querySelectorAll(".listview-item");
+                    if(index >= elms.length){
+                        return;
+                    }
+                    elms.forEach((elm) => {
+                        elm.classList.remove("selected");
+                    });
+                    elms[index].classList.add("selected");  
+                });
+
+                this.obs.on("clear-select", () => {
+                    const elms = this.root.querySelectorAll(".listview-item");
+                    elms.forEach((elm) => {
+                        elm.classList.remove("selected");
+                    });
+                });
+
+                this.obs.on("toggle-mark", (args) => {
+                    const { items } = args;
+                    items.forEach(item => {
+                        item.marked = !item.marked;
+                    });
+                    this.updateItemIcon();
+                });
+            },
+            onMounted() {
+                const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
+                this.item_duration = parseInt(prop);
+
+                const elm = this.root.querySelector(".listview-list");
+                this.sortable = this.Sortable.create(elm, {
+                    ghostClass: "listview-item-ghost-class",
+                    draggable: ".listview-item",
+                    onSort: (evt) => {
+                        this.sortItems();
+                    }
+                });
+            },
+            triggerChange() {
+                const items = JSON.parse(JSON.stringify(this.items)).map(item=>{
+                    delete item.state;
+                    return item;
+                });
+                this.obs.trigger("changed", {items});
+            },
+            triggerDelete(items) {
+                const deleted_items = JSON.parse(JSON.stringify(items)).map(item=>{
+                    delete item.state;
+                    return item;
+                });
+                this.obs.trigger("items-deleted", {items:deleted_items});
+            },
+            async deleteConfirm() {
+                if(this.confirm.includes("delete") === false){
+                    return true;
+                }
+                const ret = await this.myapi.ipc.Dialog.showMessageBox({
+                    message: "削除しますか?", 
+                    okcancel: true
+                });
+                return ret;
+            },
+            sortItems() {
+                const order = this.sortable.toArray().map(value=>Number(value));
+                const sorted_items = [];
+                order.forEach(value => {
+                    sorted_items.push(this.items[value]);
+                });
+                this.items = sorted_items;
+
                 this.update();
-                triggerChange();
-                triggerDelete(deleted_items);
-            }, item_duration);
-        });
 
-        obs.on("select-item-by-index", (args) => {
-            const { index } = args;
-            if(index < 0){
-                return;
-            }
-            const elms = this.root.querySelectorAll(".listview-item");
-            if(index >= elms.length){
-                return;
-            }
-            elms.forEach((elm) => {
-                elm.classList.remove("selected");
-            });
-            elms[index].classList.add("selected");  
-        });
-
-        obs.on("clear-select", () => {
-            const elms = this.root.querySelectorAll(".listview-item");
-            elms.forEach((elm) => {
-                elm.classList.remove("selected");
-            });
-        });
-
-        obs.on("toggle-mark", (args) => {
-            const { items } = args;
-            items.forEach(item => {
-                item.marked = !item.marked;
-            });
-            updateItemIcon();
-        });
-
-        const sortItems = () => {
-            const order = sortable.toArray().map(value=>Number(value));
-            const sorted_items = [];
-            order.forEach(value => {
-                sorted_items.push(this.items[value]);
-            });
-            this.items = sorted_items;
-
-            this.update();
-
-            triggerChange();
-        };
-
-        const getInputValue = () => {
-            const elm = this.root.querySelector(".listview-input");
-            return elm.value.toLowerCase();
-        };
-
-        const setInputValue = (value) => {
-            const elm = this.root.querySelector(".listview-input");
-            elm.value = value;
-        };
-
-        const filter = (query) => {
-            const elms = this.root.querySelectorAll(".listview-item");
-            elms.forEach((elm, index) => {
-                if (query == "") {
-                    elm.style.display ="";
-                }else{
-                    if(this.items[index].title.toLowerCase().includes(query)){
-                        
+                this.triggerChange();
+            },
+            getInputValue() {
+                const elm = this.root.querySelector(".listview-input");
+                return elm.value.toLowerCase();
+            },
+            setInputValue(value) {
+                const elm = this.root.querySelector(".listview-input");
+                elm.value = value;
+            },
+            filter(query) {
+                const elms = this.root.querySelectorAll(".listview-item");
+                elms.forEach((elm, index) => {
+                    if (query == "") {
                         elm.style.display ="";
                     }else{
-                        elm.style.display ="none";
-                    }
-                }
-            });
-
-            this.update();
-
-            const dofilter = query!="";
-            sortable.option("disabled", dofilter);
-        };
-
-        this.onkeydownSearchInput = (e) => {
-            if(e.code == "Enter"){
-                const query = getInputValue();
-                filter(query);
-            }
-        };
-
-        this.onclickSearch = (e) => {
-            const query = getInputValue();
-            filter(query);
-        };
-
-        this.onclickShowAll = (e) => {
-            setInputValue("");
-            filter("");
-        };
-
-        this.getIconClass = (item) => {
-            let icon = this.getIcon(item);
-            if(!icon){
-                icon = default_icon;
-            }
-            const color = item.marked?"marked":"default";
-            return `center-hv ${icon} listview-item-${color}-icon-color`;
-        };
-
-        const setSelected = (target_elm, item) => {
-            const elms = this.root.querySelectorAll(".listview-item");
-            elms.forEach((elm) => {
-                elm.classList.remove("selected");
-            });
-            const target = target_elm.closest(".listview-item");
-            if(target){
-                target.classList.add("selected"); 
-            }
-        };
-
-        const getSelectedItems = () => {
-            const elms = this.root.querySelectorAll(".listview-item");
-            return this.items.filter((item, index) => {
-                return elms[index].classList.contains("selected")===true;
-            });
-        };
-
-        this.onclickItem = (item, e) => {
-            setSelected(e.target, item);
-            obs.trigger("item-clicked", item);
-        };
-
-        this.ondblclickItem = (item, e) => {
-            obs.trigger("item-dlbclicked", item);
-        };
-
-        this.onclickItemAsdblclick = (item, e) => {
-            setSelected(e.target, item);
-            obs.trigger("item-dlbclicked", item);
-        };
-
-        const updateItemIcon = () => {
-            this.update();
-            triggerChange();
-        };
-
-        this.onmouseUp = (item, e) => {
-            setSelected(e.target, item);
-            if(e.button===2){
-                const items = getSelectedItems();
-                const cb = () => {
-                    (async ()=>{
-                        const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
-                        if(menu_id=="toggle-mark"){
-                            items.forEach(item => {
-                                item.marked = !item.marked;
-                            });
-                            updateItemIcon();
+                        if(this.items[index].title.toLowerCase().includes(query)){
+                            
+                            elm.style.display ="";
+                        }else{
+                            elm.style.display ="none";
                         }
-                    })();   
-                };
-                obs.trigger("show-contextmenu", e, { items, cb });
-            }
-        };
+                    }
+                });
 
-        this.onmouseDown= (item, e) => {
-            setSelected(e.target, item);
-        };
-
-        this.onclickDelete = async (i, e) => {
-            if(await deleteConfirm() === false){
-                return;
-            }
-
-            e.target.parentElement.classList.add("listview-item-hide"); 
- 
-            setTimeout(() => { 
-                const deleted_items = this.items.splice(i, 1);
                 this.update();
-                triggerChange();
-                triggerDelete(deleted_items);
-            }, item_duration);
-        };
 
-        this.on("mount", () => {
-            const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
-            item_duration = parseInt(prop);
-
-            const elm = this.root.querySelector(".listview-list");
-            sortable = Sortable.create(elm, {
-                ghostClass: "listview-item-ghost-class",
-                draggable: ".listview-item",
-                onSort: (evt) => {
-                    sortItems();
+                const dofilter = query!="";
+                this.sortable.option("disabled", dofilter);
+            },
+            onkeydownSearchInput(e) {
+                if(e.code == "Enter"){
+                    const query = this.getInputValue();
+                    this.filter(query);
                 }
-            });            
-        });
+            },
+            onclickSearch(e) {
+                const query = this.getInputValue();
+                this.filter(query);
+            },
+            onclickShowAll(e) {
+                this.setInputValue("");
+                this.filter("");
+            },
+            getIconClass(item) {
+                let icon = this.getIcon(item);
+                if(!icon){
+                    icon = this.default_icon;
+                }
+                const color = item.marked?"marked":"default";
+                return `center-hv ${icon} listview-item-${color}-icon-color`;
+            },
+            setSelected(target_elm, item) {
+                const elms = this.root.querySelectorAll(".listview-item");
+                elms.forEach((elm) => {
+                    elm.classList.remove("selected");
+                });
+                const target = target_elm.closest(".listview-item");
+                if(target){
+                    target.classList.add("selected"); 
+                }
+            },
+            getSelectedItems() {
+                const elms = this.root.querySelectorAll(".listview-item");
+                return this.items.filter((item, index) => {
+                    return elms[index].classList.contains("selected")===true;
+                });
+            },
+            onclickItem(item, e) {
+                this.setSelected(e.target, item);
+                this.obs.trigger("item-clicked", item);
+            },
+            ondblclickItem(item, e) {
+                this.obs.trigger("item-dlbclicked", item);
+            },
+            onclickItemAsdblclick(item, e) {
+                this.setSelected(e.target, item);
+                this.obs.trigger("item-dlbclicked", item);
+            },
+            updateItemIcon() {
+                this.update();
+                this.triggerChange();
+            },
+            onmouseUp(item, e) {
+                this.setSelected(e.target, item);
+                if(e.button===2){
+                    const items = this.getSelectedItems();
+                    const cb = () => {
+                        (async ()=>{
+                            const menu_id = await this.myapi.ipc.popupContextMenu("listview-toggle-mark");
+                            if(menu_id=="toggle-mark"){
+                                items.forEach(item => {
+                                    item.marked = !item.marked;
+                                });
+                                this.updateItemIcon();
+                            }
+                        })();   
+                    };
+                    this.obs.trigger("show-contextmenu", e, { items, cb });
+                }
+            },
+            onmouseDown(item, e) {
+                this.setSelected(e.target, item);
+            },
+            async onclickDelete(i, e) {
+                if(await this.deleteConfirm() === false){
+                    return;
+                }
+
+                e.target.parentElement.classList.add("listview-item-hide"); 
+    
+                setTimeout(() => { 
+                    const deleted_items = this.items.splice(i, 1);
+                    this.update();
+                    this.triggerChange();
+                    this.triggerDelete(deleted_items);
+                }, this.item_duration);
+            }
+        };
     </script>
 </listview>

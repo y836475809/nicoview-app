@@ -1,6 +1,6 @@
 <pagination>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             display: flex;
         }
 
@@ -63,80 +63,80 @@
 
     <script>
         /* globals my_obs */
-        const pagination_obs = this.opts.obs;
-        this.obs_page_selector = my_obs.createObs();
+        export default {
+            onBeforeMount(props) {
+                this.pagination_obs = props.obs;
+                this.obs_page_selector = my_obs.createObs();
 
-        this.page_num = 1;
-        this.total_page_num = 0;
-        this.search_result_num = 0;
+                this.page_num = 1;
+                this.total_page_num = 0;
+                this.search_result_num = 0;
 
-        pagination_obs.on("set-page-num", (args) => {
-            const { page_num } = args;
+                this.pagination_obs.on("set-page-num", (args) => {
+                    const { page_num } = args;
 
-            this.page_num = page_num;
-            this.update();
-        });
+                    this.page_num = page_num;
+                    this.update();
+                });
 
-        pagination_obs.on("set-data", (args) => {
-            const { page_num, total_page_num, search_result_num } = args;
+                this.pagination_obs.on("set-data", (args) => {
+                    const { page_num, total_page_num, search_result_num } = args;
 
-            this.page_num = page_num;
-            this.total_page_num = total_page_num;
-            this.search_result_num = search_result_num;
-            this.update();
+                    this.page_num = page_num;
+                    this.total_page_num = total_page_num;
+                    this.search_result_num = search_result_num;
+                    this.update();
 
-            this.obs_page_selector.trigger("set-data", { page_num, total_page_num });
-        });
+                    this.obs_page_selector.trigger("set-data", { page_num, total_page_num });
+                });
 
-        pagination_obs.on("forward", () => {
-            this.onclickForward();
-        });
+                this.pagination_obs.on("forward", () => {
+                    this.onclickForward();
+                });
 
-        pagination_obs.on("back", () => {
-            this.onclickBack();
-        });
+                this.pagination_obs.on("back", () => {
+                    this.onclickBack();
+                });
 
-        this.onclickBack = () =>{
-            if(this.page_num > 1){
-                this.page_num -= 1;
-                this.update();
+                this.obs_page_selector.on("selected-page-num", (args) => {
+                    const { page_num } = args;
+                    this.page_num = page_num;
+                    this.update();
 
-                pagination_obs.trigger("move-page", { page_num: this.page_num });
+                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                    this.changePageSelector("remove");
+                });
+
+                this.obs_page_selector.on("close", () => {
+                    const elm = this.root.querySelector(".page-selector");
+                    elm.classList.remove("page-selector-show"); 
+
+                    this.changePageSelector("remove");
+                });
+            },
+            onclickBack() {
+                if(this.page_num > 1){
+                    this.page_num -= 1;
+                    this.update();
+
+                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                }
+            },
+            onclickForward() {
+                if(this.page_num < this.total_page_num){
+                    this.page_num += 1;
+                    this.update();
+
+                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                }
+            },
+            changePageSelector(name) {
+                const elm = this.root.querySelector(".page-selector");
+                elm.classList[name]("page-selector-show"); 
+            },
+            onclickTogglePageSelector() {
+                this.changePageSelector("toggle");
             }
         };
-
-        this.onclickForward = () =>{
-            if(this.page_num < this.total_page_num){
-                this.page_num += 1;
-                this.update();
-
-                pagination_obs.trigger("move-page", { page_num: this.page_num });
-            }
-        };
-
-        const changePageSelector = (name) => {
-            const elm = this.root.querySelector(".page-selector");
-            elm.classList[name]("page-selector-show"); 
-        };
-
-        this.onclickTogglePageSelector = () => {
-            changePageSelector("toggle");
-        };
-
-        this.obs_page_selector.on("selected-page-num", (args) => {
-            const { page_num } = args;
-            this.page_num = page_num;
-            this.update();
-
-            pagination_obs.trigger("move-page", { page_num: this.page_num });
-            changePageSelector("remove");
-        });
-
-        this.obs_page_selector.on("close", () => {
-            const elm = this.root.querySelector(".page-selector");
-            elm.classList.remove("page-selector-show"); 
-
-            changePageSelector("remove");
-        });
     </script>
 </pagination>

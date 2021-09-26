@@ -1,6 +1,6 @@
 <search-page-selector>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --header-height:30px;
             --item-size: 35px;
             --icon-size: 16px;
@@ -77,35 +77,37 @@
     </div>
 
     <script>
-        const obs = this.opts.obs;
-        this.items = [];
+        export default {
+            onBeforeMount(props) {
+                this.obs = props.obs;
+                this.items = [];
 
-        this.onclickItem = (item, e) => {
-            obs.trigger("selected-page-num", { page_num:item.num });
-        };
+                this.obs.on("set-data", (args) => {
+                    const { page_num, total_page_num } = args;
 
-        this.onclickClose = e => {
-            obs.trigger("close");
-        };
+                    this.items = [];
+                    for (let num = 1; num <= total_page_num; num++) {
+                        let class_name = "";
+                        if(page_num == num){
+                            class_name = "item-current-page";
+                        }else if(num > total_page_num){
+                            class_name = "item-disable";
+                        }
+                        this.items.push({
+                            num:num,
+                            class_name:class_name
+                        });
+                    }
 
-        obs.on("set-data", (args) => {
-            const { page_num, total_page_num } = args;
-
-            this.items = [];
-            for (let num = 1; num <= total_page_num; num++) {
-                let class_name = "";
-                if(page_num == num){
-                    class_name = "item-current-page";
-                }else if(num > total_page_num){
-                    class_name = "item-disable";
-                }
-                this.items.push({
-                    num:num,
-                    class_name:class_name
+                    this.update();
                 });
+            },
+            onclickItem(item, e) {
+                this.obs.trigger("selected-page-num", { page_num:item.num });
+            },
+            onclickClose(e) {
+                this.obs.trigger("close");
             }
-
-            this.update();
-        });
+        };     
     </script>
 </search-page-selector>

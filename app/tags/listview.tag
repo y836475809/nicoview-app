@@ -26,9 +26,6 @@
             border-bottom: 1px solid lightgrey;
             overflow: hidden;
             user-select: none;
-            transition: height var(--item-duration), 
-                padding var(--item-duration),
-                border-bottom var(--item-duration);
         }
 
         .listview-item:hover {
@@ -48,6 +45,14 @@
             height: var(--item-height);
             padding: 5px 0 5px 5px;
             border-bottom: 1px solid lightgrey;
+        }
+        .listview-item-hide-anime { 
+            height: 0;
+            transition: all var(--item-duration);
+        } 
+        .listview-item-show-anime {
+            height: var(--item-height);
+            transition: all var(--item-duration);
         }
 
         .listview-item-default-icon {
@@ -235,13 +240,8 @@
                     this.update();
 
                     setTimeout(() => { 
-                        const elms = this.root.querySelectorAll(".listview-item-hide");
-                        elms.forEach(elm => {
-                            elm.classList.add("listview-item-show"); 
-                        });
-                        elms.forEach(elm => {
-                            elm.classList.remove("listview-item-hide"); 
-                            elm.classList.remove("listview-item-show"); 
+                        this.items.forEach(item => {
+                            item.state = "listview-item-show-anime";
                         });
 
                         const query = this.getInputValue();
@@ -461,11 +461,14 @@
                 if(await this.deleteConfirm() === false){
                     return;
                 }
-
-                e.target.parentElement.classList.add("listview-item-hide"); 
+                this.items[i].state = "listview-item-hide-anime";
+                this.update(); 
     
                 setTimeout(() => { 
                     const deleted_items = this.items.splice(i, 1);
+                    this.items.forEach(item=>{
+                        item.state = "";
+                    });
                     this.update();
                     this.triggerChange();
                     this.triggerDelete(deleted_items);

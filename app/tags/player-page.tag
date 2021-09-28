@@ -1,6 +1,6 @@
 <player-page>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --tags-height: 60px;
             --controls-height: 50px;
             background-color: var(--control-color);
@@ -35,113 +35,111 @@
 
     <div class="player-container">
         <div class="center-hv tags-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
-            <player-tags obs={opts.obs}></player-tags>
+            <player-tags obs={obs}></player-tags>
         </div>
         <div class="video-container" tabIndex="-1" 
             onkeyup={onkeyupTogglePlay}
             onmouseup={oncontextmenu}>
             <div>
-                <player-video obs={opts.obs}></player-video>
+                <player-video obs={obs}></player-video>
             </div>
             <open-video-form obs={obs_open_video_form}></open-video-form>
         </div>
         <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
-            <player-controls obs={opts.obs}></player-controls>
+            <player-controls obs={obs}></player-controls>
         </div>
     </div>
 
     <script>
         /* globals my_obs */
-        const myapi = window.myapi;
-        
-        const obs = this.opts.obs; 
-        this.obs_open_video_form = my_obs.createObs();
-
-        const getPlayData = async () => {
-            return await new Promise((resolve, reject) => {
-                obs.trigger("player-main-page:get-play-data-callback", (args)=>{
-                    resolve(args);
-                });
-            });
-        };
-
-        const getCurrentPlayTime = async () => {
-            return await new Promise((resolve, reject) => {
-                obs.trigger("player-video:get-current-time-callback", (args)=>{
-                    resolve(args);
-                });
-            });
-        };
-
-        const resizeVideo = (org_size) => {
-            const elm = this.root.querySelector(".video-container");
-            const dw = org_size.width - elm.offsetWidth;
-            const dh = org_size.height - elm.offsetHeight;
-            window.resizeBy(dw, dh);
-        };
-
-        let contextmenu_show = false;
-
-        this.oncontextmenu = async (e) => {
-            // コンテキストメニュー表示後の画面クリックでは再生/停止しない
-            if(e.button===0 && !contextmenu_show){   
-                obs.trigger("player-controls:play");
-            }
-
-            if(e.button === 1){
-                contextmenu_show = true;
-
-                await myapi.ipc.popupContextMenu("player-history-stack");
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
                 
-                contextmenu_show = false;
-            }
-
-            if(e.button===2){
-                contextmenu_show = true;
-
-                const play_data = await getPlayData(); 
-                const menu_id = await myapi.ipc.popupContextMenu("player", { play_data });
-                if(menu_id){
-                    const { video_id, title, thumbnailURL, online } = play_data;
-                    if(menu_id=="add-bookmark-time"){
-                        obs.trigger("player-video:get-current-time-callback", (current_time)=>{
-                            const bk_item = {
-                                title: title,
-                                id: video_id,
-                                time: current_time
-                            };
-                            myapi.ipc.Bookmark.addItems([bk_item]);
-                        });
-                    }
-                    if(menu_id=="add-stack-time"){
-                        const time = await getCurrentPlayTime();
-                        myapi.ipc.Stack.addItems([
-                            {
-                                id: video_id,
-                                title: title, 
-                                thumb_img:thumbnailURL,
-                                time: time
-                            }
-                        ]);
-                    }
-                    if(menu_id=="show-open-video-form"){
-                        this.obs_open_video_form.trigger("show");
-                    }
-                    if(menu_id=="change-movie-size"){
-                        obs.trigger("player-video:get-video-size-callback",(args)=>{
-                            const org_size = args;
-                            resizeVideo(org_size);
-                        });
-                    }
+                this.obs = props.obs; 
+                this.obs_open_video_form = my_obs.createObs();
+                this.contextmenu_show = false;
+            },
+            async getPlayData() {
+                return await new Promise((resolve, reject) => {
+                    this.obs.trigger("player-main-page:get-play-data-callback", (args)=>{
+                        resolve(args);
+                    });
+                });
+            },
+            async getCurrentPlayTime() {
+                return await new Promise((resolve, reject) => {
+                    this.obs.trigger("player-video:get-current-time-callback", (args)=>{
+                        resolve(args);
+                    });
+                });
+            },
+            resizeVideo(org_size) {
+                const elm = this.root.querySelector(".video-container");
+                const dw = org_size.width - elm.offsetWidth;
+                const dh = org_size.height - elm.offsetHeight;
+                window.resizeBy(dw, dh);
+            },
+            async oncontextmenu(e) {
+                // コンテキストメニュー表示後の画面クリックでは再生/停止しない
+                if(e.button===0 && !this.contextmenu_show){   
+                    this.obs.trigger("player-controls:play");
                 }
 
-                contextmenu_show = false;
-            }
-        };
+                if(e.button === 1){
+                    this.contextmenu_show = true;
 
-        this.onkeyupTogglePlay = (e) => {
-            if (e.keyCode === 32) {
-                obs.trigger("player-controls:play");
+                    await this.myapi.ipc.popupContextMenu("player-history-stack");
+                    
+                    this.contextmenu_show = false;
+                }
+
+                if(e.button===2){
+                    this.contextmenu_show = true;
+
+                    const play_data = await this.getPlayData(); 
+                    const menu_id = await this.myapi.ipc.popupContextMenu("player", { play_data });
+                    if(menu_id){
+                        const { video_id, title, thumbnailURL, online } = play_data;
+                        if(menu_id=="add-bookmark-time"){
+                            this.obs.trigger("player-video:get-current-time-callback", (current_time)=>{
+                                const bk_item = {
+                                    title: title,
+                                    id: video_id,
+                                    time: current_time
+                                };
+                                this.myapi.ipc.Bookmark.addItems([bk_item]);
+                            });
+                        }
+                        if(menu_id=="add-stack-time"){
+                            const time = await this.getCurrentPlayTime();
+                            this.myapi.ipc.Stack.addItems([
+                                {
+                                    id: video_id,
+                                    title: title, 
+                                    thumb_img:thumbnailURL,
+                                    time: time
+                                }
+                            ]);
+                        }
+                        if(menu_id=="show-open-video-form"){
+                            this.obs_open_video_form.trigger("show");
+                        }
+                        if(menu_id=="change-movie-size"){
+                            this.obs.trigger("player-video:get-video-size-callback",(args)=>{
+                                const org_size = args;
+                                this.resizeVideo(org_size);
+                            });
+                        }
+                    }
+
+                    this.contextmenu_show = false;
+                }
+            },
+            onkeyupTogglePlay(e) {
+                if (e.keyCode === 32) {
+                    this.obs.trigger("player-controls:play");
+                }
             }
         };
     </script>    

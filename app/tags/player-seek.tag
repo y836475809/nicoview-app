@@ -1,6 +1,6 @@
 <player-seek>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --seek-height: 50px;
             display:grid;
             grid-template-columns: 1fr 50px 10px 40px;
@@ -85,96 +85,94 @@
     
     <script>
         /* globals */
-        const time_format = window.TimeFormat;
+        export default {
+            onBeforeMount(props) {
+                this.time_format = window.TimeFormat;
+                this.obs = props.obs; 
+            },
+            onMounted() {
+                this.buffered = 0;
+                this.duration = 0;
+                this.updateSeek(0);
+                this.update();
 
-        const obs = this.opts.obs; 
+                this.obs.on("player-seek:reload", (duration) => {
+                    this.duration = duration;
 
-        this.mousedown = (e) => {
-            if(this.duration===0){
-                return;
+                    this.updateBuffered(0);
+                    this.updateSeek(0);
+
+                    this.update();
+                });
+
+                this.obs.on("player-seek:seek-update", (current) => {
+                    this.updateSeek(current);
+                });
+
+                this.obs.on("player-seek:buffered-update", (time_sec) => {
+                    this.updateBuffered(time_sec);
+                });
+
+                this.obs.on("player-seek:redraw", () => {
+                    this.updateBuffered(this.buffered);
+                    this.updateSeek(this.current);
+                });
+            },
+            mousedown(e) {
+                if(this.duration===0){
+                    return;
+                }
+
+                const seek_container = this.root.querySelector(".seek-container");
+                const left = e.layerX;
+                const per = left / seek_container.clientWidth;
+                const current = per * this.duration;
+
+                this.updateSeek(current);
+
+                this.obs.trigger("player-video:seek", current);
+            },
+            mouseOver(e) {
+                const left = e.layerX;
+
+                const seek_container = this.root.querySelector(".seek-container");
+                const rect = seek_container.getBoundingClientRect();
+                
+                const per = left / seek_container.clientWidth;
+                const current = per * this.duration;
+
+                const tp = this.root.querySelector(".seek-tooltip");
+                const tp_text = this.root.querySelector(".seek-tooltip > .text");
+                tp_text.innerText = this.time_format.toTimeString(current);
+    
+                const tp_left = rect.left + left - tp.clientWidth / 2;
+                tp.style.top = (rect.top - 30) + "px";
+                tp.style.left = tp_left + "px";
+
+                e.stopPropagation();
+            },
+            updateSeek(current) {
+                this.current = current;
+                const per = this.current / this.duration;
+
+                const seek_container = this.root.querySelector(".seek-container");
+                const seek_value = this.root.querySelector(".seek-value");  
+                seek_value.style.width = per * seek_container.clientWidth + "px";
+
+                this.fmt_current = this.time_format.toTimeString(this.current);
+                this.fmt_duration = this.time_format.toTimeString(this.duration);
+
+                this.update();
+            },
+            updateBuffered(time_sec) {
+                this.buffered = time_sec;
+                const per = time_sec / this.duration;
+                const seek_container = this.root.querySelector(".seek-container");
+                const buffered_value = this.root.querySelector(".buffered-value");  
+                buffered_value.style.width = per * seek_container.clientWidth + "px";
+
+                this.update();
             }
-
-            const seek_container = this.root.querySelector(".seek-container");
-            const left = e.layerX;
-            const per = left / seek_container.clientWidth;
-            const current = per * this.duration;
-
-            updateSeek(current);
-
-            obs.trigger("player-video:seek", current);
         };
-
-        this.mouseOver = (e) => {
-            const left = e.layerX;
-
-            const seek_container = this.root.querySelector(".seek-container");
-            const rect = seek_container.getBoundingClientRect();
-            
-            const per = left / seek_container.clientWidth;
-            const current = per * this.duration;
-
-            const tp = this.root.querySelector(".seek-tooltip");
-            const tp_text = this.root.querySelector(".seek-tooltip > .text");
-            tp_text.innerText = time_format.toTimeString(current);
-  
-            const tp_left = rect.left + left - tp.clientWidth / 2;
-            tp.style.top = (rect.top - 30) + "px";
-            tp.style.left = tp_left + "px";
-
-            e.stopPropagation();
-        };
-
-        const updateSeek = (current)=>{
-            this.current = current;
-            const per = this.current / this.duration;
-
-            const seek_container = this.root.querySelector(".seek-container");
-            const seek_value = this.root.querySelector(".seek-value");  
-            seek_value.style.width = per * seek_container.clientWidth + "px";
-
-            this.fmt_current = time_format.toTimeString(this.current);
-            this.fmt_duration = time_format.toTimeString(this.duration);
-
-            this.update();
-        };
-
-        const updateBuffered = (time_sec)=>{
-            this.buffered = time_sec;
-            const per = time_sec / this.duration;
-            const seek_container = this.root.querySelector(".seek-container");
-            const buffered_value = this.root.querySelector(".buffered-value");  
-            buffered_value.style.width = per * seek_container.clientWidth + "px";
-
-            this.update();
-        };
-
-        this.on("mount", () => {
-            this.buffered = 0;
-            this.duration = 0;
-            updateSeek(0);
-            this.update();
-        });
-
-        obs.on("player-seek:reload", (duration) => {
-            this.duration = duration;
-
-            updateBuffered(0);
-            updateSeek(0);
-
-            this.update();
-        });
-
-        obs.on("player-seek:seek-update", (current) => {
-            updateSeek(current);
-        });
-
-        obs.on("player-seek:buffered-update", (time_sec) => {
-            updateBuffered(time_sec);
-        });
-
-        obs.on("player-seek:redraw", () => {
-            updateBuffered(this.buffered);
-            updateSeek(this.current);
-        });
     </script>
 </player-seek>

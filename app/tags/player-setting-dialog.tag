@@ -1,6 +1,6 @@
 <player-setting-dialog>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --title-height: 25px;
             --setting-tab-height: 25px;
             --setting-content-top: 65px;
@@ -81,10 +81,10 @@
         </div>
         <div class="settings-container">
             <div class="setting-container">
-                <setting-ng-comment obs={opts.obs}></setting-ng-comment>
+                <setting-ng-comment obs={obs}></setting-ng-comment>
             </div>
             <div class="setting-container">
-                <setting-display-comment obs={opts.obs}></setting-display-comment>
+                <setting-display-comment obs={obs}></setting-display-comment>
             </div>
             <div class="setting-container">
                 <setting-player-contextmenu></setting-player-contextmenu>
@@ -93,20 +93,23 @@
     </dialog>
 
     <script>
-        const obs_dialog = this.opts.obs;
+        export default {
+            onBeforeMount(props) {
+                this.obs = props.obs;
+                // this.obs_dialog = props.obs;
+                this.obs.on("player-setting-dialog:show", (args) => {
+                    const { ng_items } = args;
 
-        this.onclickClose = (e) => {
-            const dialog = this.root.querySelector("dialog");
-            dialog.close();
+                    const dialog = this.root.querySelector("dialog");
+                    dialog.showModal();
+
+                    this.obs.trigger("setting-ng-comment:ng-items", ng_items);
+                });
+            },
+            onclickClose(e) {
+                const dialog = this.root.querySelector("dialog");
+                dialog.close();
+            }
         };
-
-        obs_dialog.on("player-setting-dialog:show", (args) => {
-            const { ng_items } = args;
-
-            const dialog = this.root.querySelector("dialog");
-            dialog.showModal();
-
-            obs_dialog.trigger("setting-ng-comment:ng-items", ng_items);
-        });
     </script>
 </player-setting-dialog>

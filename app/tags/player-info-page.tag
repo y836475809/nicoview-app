@@ -1,6 +1,6 @@
 <player-info-page>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --video-container-height: 130px;
             --user-container-height: 130px;
             --comment-controls-container-height: 35px;
@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="user-container">
-            <player-user obs={opts.obs}></player-user>
+            <player-user obs={obs}></player-user>
         </div>
         <div class="controls-container">
             <label class="center-v comment-checkbox" title="コメントの表示/非表示">
@@ -167,251 +167,245 @@
     
     <script>
         /* globals logger */
-        const myapi = window.myapi;
-        const { GridTable } = window.GridTable;
-        const time_format = window.TimeFormat;
-        const { SyncCommentScroll } = window.SyncCommentScroll;
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
+                const { GridTable } = window.GridTable;
+                const time_format = window.TimeFormat;
+                const { SyncCommentScroll } = window.SyncCommentScroll;
 
-        const obs = this.opts.obs; 
+                this.obs = props.obs; 
 
-        const row_height = 25;
+                const row_height = 25;
 
-        this.is_economy = false;
-        this.is_deleted = false;
-        this.is_online = false;
-        this.is_saved = false;
-
-        this.video_thumbnail_url = "";
-        this.title =  "-";
-        this.first_retrieve =  "";
-        this.view_counter = 0;
-        this.comment_counter = 0;
-        this.mylist_counter = 0;
-        this.comment_state = "";
-
-        this.video_thumbnail_tooltip = "";
-
-        let sync_comment_scroll = new SyncCommentScroll();
-        let sync_comment_checked = true;
-
-        this.enableDonwload = () => {
-            return this.is_deleted === false && this.is_saved === false;
-        };
-        this.enableUpdateData = () => {
-            return this.is_deleted === false && this.is_saved === true;
-        };
-
-        this.videoStateOnline = () => {
-            if(this.is_online === true){
-                return "オンライン再生";
-            }else{
-                return "ローカル再生";
-            }
-        };
-        this.videoStateLocal = () => {
-            if(this.is_saved === true){
-                return "保存済み";
-            }else{
-                return "";
-            }
-        };
-        this.videoStateEconomy = () => {
-            // if(this.is_economy === true){
-            //     return "エコノミー";
-            // }else{
-            //     return "";
-            // }
-            return this.is_economy ? "エコノミー" : "高画質";
-        };
-        this.videoStateDeleted = () => {
-            if(this.is_deleted === true){
-                return "削除されています";
-            }else{
-                return "";
-            }
-        };
-
-        const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
-            return time_format.toTimeString(value * 10 / 1000);
-        };
-        const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
-            //sec->ms
-            return time_format.toDateString(value * 1000);
-        };
-
-        const columns = [
-            {id: "vpos", name: "時間", formatter: timeFormatter},
-            {id: "content", name: "コメント"},
-            {id: "user_id", name: "ユーザーID"},
-            {id: "date", name: "投稿日", formatter: dateFormatter},
-            {id: "no", name: "番号"},
-            {id: "mail", name: "オプション"}
-        ];
-        const options = {
-            rowHeight: row_height,
-        };   
-        const grid_table = new GridTable("comment-grid", columns, options);
-
-        this.onclickCommentVisibleCheck = (e) => {
-            const comment_visible = e.target.checked;
-            obs.trigger("player-video:change-comment-visible", comment_visible);
-        };
-
-        this.onclickUpdateThumbInfo = (e) => {
-            obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
-        };
-
-        this.onclickUpdateComment = (e) => {
-            logger.debug("player video info update video_id=", this.video_id);
-            obs.trigger("player-main-page:update-data", this.video_id, "comment");
-        };
-
-        this.onclickShowSettingDialog = (e) => {
-            obs.trigger("player-main-page:show-player-setting-dialog");
-        };
-
-        const setComments = (comments) => {
-            sync_comment_scroll.setComments(comments);
-
-            const grid_table_comments = comments.map((value, index) => {
-                return Object.assign(value, { id: index });
-            });
-            grid_table.clearSelected();
-            grid_table.setData(grid_table_comments);    
-            grid_table.scrollToTop();
-        };
-
-        obs.on("player-info-page:update-comments", (args)=> {
-            const comments = args;
-            setComments(comments);
-        });
-
-        obs.on("player-info-page:set-viewinfo-data", (args)=> {
-            grid_table.resizeGrid();
-
-            const { viewinfo, comments, all_comment_num, state } = args;
-
-            this.is_economy = viewinfo.is_economy;
-            this.is_deleted = viewinfo.is_deleted;
-
-            if(state){
-                this.is_online = state.is_online;
-                this.is_saved = state.is_saved;
-            }
-            
-            if(this.is_economy===undefined){
                 this.is_economy = false;
-            }
-            if(this.is_deleted===undefined){
                 this.is_deleted = false;
-            }
-            if(this.is_online===undefined){
                 this.is_online = false;
-            }
-            if(this.is_saved===undefined){
                 this.is_saved = false;
+
+                this.video_thumbnail_url = "";
+                this.title =  "-";
+                this.first_retrieve =  "";
+                this.view_counter = 0;
+                this.comment_counter = 0;
+                this.mylist_counter = 0;
+                this.comment_state = "";
+
+                this.video_thumbnail_tooltip = "";
+
+                this.sync_comment_scroll = new SyncCommentScroll();
+                this.sync_comment_checked = true;
+
+                const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
+                    return time_format.toTimeString(value * 10 / 1000);
+                };
+                const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
+                    //sec->ms
+                    return time_format.toDateString(value * 1000);
+                };
+                const columns = [
+                    {id: "vpos", name: "時間", formatter: timeFormatter},
+                    {id: "content", name: "コメント"},
+                    {id: "user_id", name: "ユーザーID"},
+                    {id: "date", name: "投稿日", formatter: dateFormatter},
+                    {id: "no", name: "番号"},
+                    {id: "mail", name: "オプション"}
+                ];
+                const options = {
+                    rowHeight: row_height,
+                };   
+                this.grid_table = new GridTable("comment-grid", columns, options);
+                
+                this.obs.on("player-info-page:update-comments", (args)=> {
+                    const comments = args;
+                    this.setComments(comments);
+                });
+
+                this.obs.on("player-info-page:set-viewinfo-data", (args)=> {
+                    this.grid_table.resizeGrid();
+
+                    const { viewinfo, comments, all_comment_num, state } = args;
+
+                    this.is_economy = viewinfo.is_economy;
+                    this.is_deleted = viewinfo.is_deleted;
+
+                    if(state){
+                        this.is_online = state.is_online;
+                        this.is_saved = state.is_saved;
+                    }
+                    
+                    if(this.is_economy===undefined){
+                        this.is_economy = false;
+                    }
+                    if(this.is_deleted===undefined){
+                        this.is_deleted = false;
+                    }
+                    if(this.is_online===undefined){
+                        this.is_online = false;
+                    }
+                    if(this.is_saved===undefined){
+                        this.is_saved = false;
+                    }
+
+                    const thumb_info = viewinfo.thumb_info;
+                    const video = thumb_info.video;
+                    const thread = thumb_info.thread;
+                    const owner = thumb_info.owner;
+                    const description = video.description;
+
+                    this.video_id = video.video_id;
+                    this.title = video.title;
+                    this.video_thumbnail_url = video.thumbnailURL;
+                    this.first_retrieve = time_format.toDateString(video.postedDateTime);
+                    this.view_counter = video.viewCount;
+                    this.comment_counter = thread.commentCount;
+                    this.mylist_counter = video.mylistCount;
+
+                    this.video_thumbnail_tooltip = 
+                        `投稿日: ${this.first_retrieve}\n`
+                        + `再生: ${this.view_counter.toLocaleString()}\n`
+                        + `コメント: ${this.comment_counter.toLocaleString()}\n`
+                        + `マイリスト: ${this.mylist_counter.toLocaleString()}\n`
+                        + `状態: ${this.videoStateOnline()} ${this.videoStateLocal()}\n`
+                        + `画質: ${this.videoStateEconomy()}`; 
+                    const state_deleted = this.videoStateDeleted();
+                    if(state_deleted){
+                        this.video_thumbnail_tooltip += `\n${state_deleted}`;
+                    }
+
+                    this.comment_state = 
+                        `${comments.length.toLocaleString()}/${all_comment_num.toLocaleString()}`;
+                    
+                    const user_id = owner.id;
+                    const user_nickname = owner.nickname;
+                    const user_icon_url = owner.iconURL;
+                    
+                    this.obs.trigger("player-user:set-data", {
+                        user_id,
+                        user_nickname,
+                        user_icon_url, 
+                        description
+                    });
+
+                    this.setComments(comments);
+                    
+                    this.update();
+                });
+
+                this.obs.on("player-info-page:seek-update", (current_sec)=> {
+                    if(!this.sync_comment_checked){
+                        return;
+                    }
+
+                    const comment_index =  this.sync_comment_scroll.getCommentIndex(current_sec);
+                    this.grid_table.scrollRow(comment_index);
+                });
+
+                this.obs.on("player-info-page:reset-comment-scroll", ()=> {
+                    if(this.sync_comment_scroll){
+                        this.sync_comment_scroll.reset();
+                    }
+                });
+                
+                this.obs.on("player-info-page:split-resized", ()=> {
+                    this.grid_table.resizeGrid();
+                });
+            },
+            onMounted() {
+                this.grid_table.init(".comment-grid");
+                this.grid_table.setupResizer(".comment-grid-container");
+
+                this.grid_table.onDblClick(async (e, data)=>{
+                    const sec = data.vpos * 10 / 1000;
+                    this.obs.trigger("player-video:seek", sec);
+                });
+
+                this.grid_table.onContextMenu(async (e)=>{
+                    const menu_id = await this.myapi.ipc.popupContextMenu("player-ngcomment");
+                    if(!menu_id){
+                        return;
+                    }
+                    if(menu_id=="add-comment-ng=list"){
+                        const items = this.grid_table.getSelectedDatas();
+                        const texts = items.map(item=>{
+                            return item.content;
+                        });
+                        this.triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
+                    }
+                    if(menu_id=="add-uerid-ng=list"){
+                        const items = this.grid_table.getSelectedDatas();
+                        const user_ids = items.map(item=>{
+                            return item.user_id;
+                        });
+                        this.triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
+                    }
+                });
+
+                const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");
+                ch_elm.checked = true; 
+            },
+            enableDonwload() {
+                return this.is_deleted === false && this.is_saved === false;
+            },
+            enableUpdateData() {
+                return this.is_deleted === false && this.is_saved === true;
+            },
+            videoStateOnline() {
+                if(this.is_online === true){
+                    return "オンライン再生";
+                }else{
+                    return "ローカル再生";
+                }
+            },
+            videoStateLocal() {
+                if(this.is_saved === true){
+                    return "保存済み";
+                }else{
+                    return "";
+                }
+            },
+            videoStateEconomy() {
+                // if(this.is_economy === true){
+                //     return "エコノミー";
+                // }else{
+                //     return "";
+                // }
+                return this.is_economy ? "エコノミー" : "高画質";
+            },
+            videoStateDeleted() {
+                if(this.is_deleted === true){
+                    return "削除されています";
+                }else{
+                    return "";
+                }
+            },
+            onclickCommentVisibleCheck(e) {
+                const comment_visible = e.target.checked;
+                this.obs.trigger("player-video:change-comment-visible", comment_visible);
+            },
+            onclickUpdateThumbInfo(e) {
+                this.obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
+            },
+            onclickUpdateComment(e) {
+                logger.debug("player video info update video_id=", this.video_id);
+                this.obs.trigger("player-main-page:update-data", this.video_id, "comment");
+            },
+            onclickShowSettingDialog(e) {
+                this.obs.trigger("player-main-page:show-player-setting-dialog");
+            },
+            setComments(comments) {
+                this.sync_comment_scroll.setComments(comments);
+
+                const grid_table_comments = comments.map((value, index) => {
+                    return Object.assign(value, { id: index });
+                });
+                this.grid_table.clearSelected();
+                this.grid_table.setData(grid_table_comments);    
+                this.grid_table.scrollToTop();
+            },
+            triggerAddNGComment(args) {
+                this.obs.trigger("player-main-page:add-ng-comment", args);
             }
-
-            const thumb_info = viewinfo.thumb_info;
-            const video = thumb_info.video;
-            const thread = thumb_info.thread;
-            const owner = thumb_info.owner;
-            const description = video.description;
-
-            this.video_id = video.video_id;
-            this.title = video.title;
-            this.video_thumbnail_url = video.thumbnailURL;
-            this.first_retrieve = time_format.toDateString(video.postedDateTime);
-            this.view_counter = video.viewCount;
-            this.comment_counter = thread.commentCount;
-            this.mylist_counter = video.mylistCount;
-
-            this.video_thumbnail_tooltip = 
-                `投稿日: ${this.first_retrieve}\n`
-                + `再生: ${this.view_counter.toLocaleString()}\n`
-                + `コメント: ${this.comment_counter.toLocaleString()}\n`
-                + `マイリスト: ${this.mylist_counter.toLocaleString()}\n`
-                + `状態: ${this.videoStateOnline()} ${this.videoStateLocal()}\n`
-                + `画質: ${this.videoStateEconomy()}`; 
-            const state_deleted = this.videoStateDeleted();
-            if(state_deleted){
-                this.video_thumbnail_tooltip += `\n${state_deleted}`;
-            }
-
-            this.comment_state = 
-                `${comments.length.toLocaleString()}/${all_comment_num.toLocaleString()}`;
-            
-            const user_id = owner.id;
-            const user_nickname = owner.nickname;
-            const user_icon_url = owner.iconURL;
-            
-            obs.trigger("player-user:set-data", {
-                user_id,
-                user_nickname,
-                user_icon_url, 
-                description
-            });
-
-            setComments(comments);
-            
-            this.update();
-        });
-
-        obs.on("player-info-page:seek-update", (current_sec)=> {
-            if(!sync_comment_checked){
-                return;
-            }
-
-            const comment_index =  sync_comment_scroll.getCommentIndex(current_sec);
-            grid_table.scrollRow(comment_index);
-        });
-
-        obs.on("player-info-page:reset-comment-scroll", ()=> {
-            if(sync_comment_scroll){
-                sync_comment_scroll.reset();
-            }
-        });
-
-        const triggerAddNGComment = (args) => {
-            obs.trigger("player-main-page:add-ng-comment", args);
         };
-
-        this.on("mount", () => {  
-            grid_table.init(".comment-grid");
-            grid_table.setupResizer(".comment-grid-container");
-
-            grid_table.onDblClick(async (e, data)=>{
-                const sec = data.vpos * 10 / 1000;
-                obs.trigger("player-video:seek", sec);
-            });
-
-            grid_table.onContextMenu(async (e)=>{
-                const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
-                if(!menu_id){
-                    return;
-                }
-                if(menu_id=="add-comment-ng=list"){
-                    const items = grid_table.getSelectedDatas();
-                    const texts = items.map(item=>{
-                        return item.content;
-                    });
-                    triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
-                }
-                if(menu_id=="add-uerid-ng=list"){
-                    const items = grid_table.getSelectedDatas();
-                    const user_ids = items.map(item=>{
-                        return item.user_id;
-                    });
-                    triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
-                }
-            });
-
-            const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");
-            ch_elm.checked = true;          
-        });
-
-        obs.on("player-info-page:split-resized", ()=> {
-            grid_table.resizeGrid();
-        });
     </script>
 </player-info-page>

@@ -1,6 +1,6 @@
 <player-user>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --user-name-height: 30px;
             --user-thumbnail-size: 60px;
             overflow-x: hidden;
@@ -122,247 +122,233 @@
     
     <script>
         /* globals */
-        const myapi = window.myapi;
-        const { Command } = window.Command;
-        const NicoURL = window.NicoURL;
-        const { toTimeSec } = window.TimeFormat;
+        export default {
+            onBeforeMount(props) {
+                this.myapi = window.myapi;
+                this.Command = window.Command.Command;
+                this.NicoURL = window.NicoURL.NicoURL;
+                this.toTimeSec = window.TimeFormat.toTimeSec;
 
-        const obs = this.opts.obs; 
+                this.obs = props.obs; 
 
-        this.user_thumbnail_url = "";
-        this.user_description_class = "text";
+                this.user_thumbnail_url = "";
+                this.user_description_class = "text";
 
-        this.getUserNickname = () => {
-            return this.user_nickname?this.user_nickname:"未取得";
-        };
-        this.getUserListLink = () => {
-            return this.user_id?`user/${this.user_id}`:"";
-        };
+                this.obs.on("player-user:set-data", args => {
+                    const { user_id, user_nickname, user_icon_url, description } = args;
 
-        const watchLinkClick = (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
+                    this.closePopupDescription();
 
-            const paths = e.target.href.split("/");
-            const video_id = paths.pop();
+                    this.user_id = user_id;
+                    this.user_nickname = user_nickname;
+                    this.user_icon_url = user_icon_url;
+                    this.setDescription(description);
 
-            Command.play({
-                id : video_id,
-                time : 0
-            }, false);
-            return false;
-        };
-
-        const watchLinkMouseUp = async (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-
-            const paths = e.target.href.split("/");
-            const video_id = paths.pop();
-            
-            if(e.button === 2){ 
-                await myapi.ipc.popupContextMenu("player-watch-link", {
-                    video_id: video_id,
-                    url: e.target.href
+                    this.update();
                 });
-            }      
-            return false;
-        };
+            },
+            getUserNickname() {
+                return this.user_nickname?this.user_nickname:"未取得";
+            },
+            getUserListLink() {
+                return this.user_id?`user/${this.user_id}`:"";
+            },
+            watchLinkClick(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
 
-        const mylistLinkClick = (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-            
-            const mylist_id = NicoURL.getMylistID(e.target.href);
-            myapi.ipc.MyList.load(mylist_id);
-            return false;
-        };
+                const paths = e.target.href.split("/");
+                const video_id = paths.pop();
 
-        const mylistLinkMouseUp = async (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
+                this.Command.play({
+                    id : video_id,
+                    time : 0
+                }, false);
+                return false;
+            },
+            async watchLinkMouseUp(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
 
-            const mylist_id = NicoURL.getMylistID(e.target.href);
-            if(e.button === 2){
-                await myapi.ipc.popupContextMenu("player-mylist-link", {
-                    mylist_id: mylist_id,
-                    url: e.target.href
-                });
-            }
-            return false;
-        };
+                const paths = e.target.href.split("/");
+                const video_id = paths.pop();
+                
+                if(e.button === 2){ 
+                    await this.myapi.ipc.popupContextMenu("player-watch-link", {
+                        video_id: video_id,
+                        url: e.target.href
+                    });
+                }      
+                return false;
+            },
+            mylistLinkClick(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
+                
+                const mylist_id = this.NicoURL.getMylistID(e.target.href);
+                this.myapi.ipc.MyList.load(mylist_id);
+                return false;
+            },
+            async mylistLinkMouseUp(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
 
-        const linkMouseUp = async (e) => {
-            e.preventDefault(); 
-            e.stopPropagation();
-
-            if(e.button === 2){
-                await myapi.ipc.popupContextMenu("player-link", {
-                    url: e.target.href
-                });
-            }
-            return false;
-        };
-
-        const poundLink = (e) => {
-            const elm = e.target;
-            if(elm.classList.contains("seekTime")){
-                const seek_time_sec = toTimeSec(e.target.dataset.seektime);
-                obs.trigger("player-video:seek", seek_time_sec);
-            }
-        };
-
-        const setDescription = (description) => {
-            const content_elms = this.root.querySelectorAll(".user-description");
-            content_elms.forEach(content_elm => {  
-                content_elm.scrollTop  = 0;
-                content_elm.scrollLeft = 0;
-
-                content_elm.innerHTML = description;
-
-                if(content_elm.childElementCount==0){
-                    this.user_description_class = "text";
-                }else{
-                    this.user_description_class = "html";
-                    const a_tags = content_elm.querySelectorAll("a");
-                    a_tags.forEach(value=>{
-                        const href = value.getAttribute("href");
-                        const url_kind = NicoURL.getURLKind(href);
-                        if(url_kind=="watch"){
-                            value.onclick = watchLinkClick;
-                            value.onmouseup = watchLinkMouseUp;
-                        }else if(url_kind=="mylist" || url_kind=="user"){
-                            value.onclick = mylistLinkClick;
-                            value.onmouseup = mylistLinkMouseUp;
-                        }else if(url_kind=="pound"){
-                            value.onclick = (e) =>{
-                                e.preventDefault(); 
-                                e.stopPropagation();
-                                poundLink(e);
-                            };
-                        }else{
-                            value.onclick = (e) =>{
-                                e.preventDefault();
-                                return false;
-                            };
-                            value.onmouseup = linkMouseUp;
-                        }
+                const mylist_id = this.NicoURL.getMylistID(e.target.href);
+                if(e.button === 2){
+                    await this.myapi.ipc.popupContextMenu("player-mylist-link", {
+                        mylist_id: mylist_id,
+                        url: e.target.href
                     });
                 }
-            });
-        };
+                return false;
+            },
+            async linkMouseUp(e) {
+                e.preventDefault(); 
+                e.stopPropagation();
 
-        this.onclickPopupDescription = (e) => {
-            const elm = this.root.querySelector(".user-container-popup");
-            elm.style.display = "";
+                if(e.button === 2){
+                    await this.myapi.ipc.popupContextMenu("player-link", {
+                        url: e.target.href
+                    });
+                }
+                return false;
+            },
+            poundLink(e) {
+                const elm = e.target;
+                if(elm.classList.contains("seekTime")){
+                    const seek_time_sec = this.toTimeSec(e.target.dataset.seektime);
+                    this.obs.trigger("player-video:seek", seek_time_sec);
+                }
+            },
+            setDescription(description) {
+                const content_elms = this.root.querySelectorAll(".user-description");
+                content_elms.forEach(content_elm => {  
+                    content_elm.scrollTop  = 0;
+                    content_elm.scrollLeft = 0;
 
-            const rect = this.root.querySelector(".user-container").getBoundingClientRect();
-            elm.style.top = (rect.top + 5)+ "px";
+                    content_elm.innerHTML = description;
 
-            const user_info_elm = this.root.querySelector(".user-container-popup > .user-info");
-            const user_info_height = user_info_elm.clientHeight;
-
-            // ポップアップの高さをwindow内に収める
-            const popup_height = elm.clientHeight;
-            const max_height = window.innerHeight - rect.top - 30;
-            if(popup_height > max_height){
-                elm.style.height = max_height + "px";
-
-                const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
-                const new_height = max_height - elm_user_name.clientHeight - user_info_height + 6;
-                const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
-                elm_description.style.height = new_height + "px";
-            }
-
-            if(this.user_icon_url && this.user_thumbnail_url != this.user_icon_url){
-                this.user_thumbnail_url = this.user_icon_url;
-            }
-        };
-
-        const closePopupDescription = () => {
-            const elm = this.root.querySelector(".user-container-popup");
-            if(elm){
-                elm.style.display = "none";
-            }
-        };
-
-        this.onclickCloseDescription = (e) => {
-            closePopupDescription();
-        };
-
-        const popupDescriptionMenu = async (type, text) => {
-            if(type=="watch"){
-                const video_id = text;
-                await myapi.ipc.popupContextMenu("player-watch-link", {
-                    video_id: video_id,
-                    url: NicoURL.getWatchURL(video_id)
+                    if(content_elm.childElementCount==0){
+                        this.user_description_class = "text";
+                    }else{
+                        this.user_description_class = "html";
+                        const a_tags = content_elm.querySelectorAll("a");
+                        a_tags.forEach(value=>{
+                            const href = value.getAttribute("href");
+                            const url_kind = this.NicoURL.getURLKind(href);
+                            if(url_kind=="watch"){
+                                value.onclick = this.watchLinkClick;
+                                value.onmouseup = this.watchLinkMouseUp;
+                            }else if(url_kind=="mylist" || url_kind=="user"){
+                                value.onclick = this.mylistLinkClick;
+                                value.onmouseup = this.mylistLinkMouseUp;
+                            }else if(url_kind=="pound"){
+                                value.onclick = (e) =>{
+                                    e.preventDefault(); 
+                                    e.stopPropagation();
+                                    this.poundLink(e);
+                                };
+                            }else{
+                                value.onclick = (e) =>{
+                                    e.preventDefault();
+                                    return false;
+                                };
+                                value.onmouseup = this.linkMouseUp;
+                            }
+                        });
+                    }
                 });
-            }
-            if(type=="mylist" || type=="user"){
-                const mylist_id = text;
-                await myapi.ipc.popupContextMenu("player-mylist-link", {
-                    mylist_id: mylist_id,
-                    url: NicoURL.getMylistURL(mylist_id)
-                });
-            }
-            if(type=="text"){
-                await myapi.ipc.popupContextMenu("player-text", {
-                    text: text
-                });
+            },
+            onclickPopupDescription(e) {
+                const elm = this.root.querySelector(".user-container-popup");
+                elm.style.display = "";
+
+                const rect = this.root.querySelector(".user-container").getBoundingClientRect();
+                elm.style.top = (rect.top + 5)+ "px";
+
+                const user_info_elm = this.root.querySelector(".user-container-popup > .user-info");
+                const user_info_height = user_info_elm.clientHeight;
+
+                // ポップアップの高さをwindow内に収める
+                const popup_height = elm.clientHeight;
+                const max_height = window.innerHeight - rect.top - 30;
+                if(popup_height > max_height){
+                    elm.style.height = max_height + "px";
+
+                    const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
+                    const new_height = max_height - elm_user_name.clientHeight - user_info_height + 6;
+                    const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
+                    elm_description.style.height = new_height + "px";
+                }
+
+                if(this.user_icon_url && this.user_thumbnail_url != this.user_icon_url){
+                    this.user_thumbnail_url = this.user_icon_url;
+                }
+            },
+            closePopupDescription() {
+                const elm = this.root.querySelector(".user-container-popup");
+                if(elm){
+                    elm.style.display = "none";
+                }
+            },
+            onclickCloseDescription(e) {
+                this.closePopupDescription();
+            },
+            async popupDescriptionMenu(type, text) {
+                if(type=="watch"){
+                    const video_id = text;
+                    await this.myapi.ipc.popupContextMenu("player-watch-link", {
+                        video_id: video_id,
+                        url: this.NicoURL.getWatchURL(video_id)
+                    });
+                }
+                if(type=="mylist" || type=="user"){
+                    const mylist_id = text;
+                    await this.myapi.ipc.popupContextMenu("player-mylist-link", {
+                        mylist_id: mylist_id,
+                        url: this.NicoURL.getMylistURL(mylist_id)
+                    });
+                }
+                if(type=="text"){
+                    await this.myapi.ipc.popupContextMenu("player-text", {
+                        text: text
+                    });
+                }
+            },
+            async oncontextmenu(e) {
+                if(e.button !== 2){
+                    return;
+                }
+                
+                const text = document.getSelection().toString();
+                if(text==""){
+                    return;
+                }
+
+                if(/^sm\d+/.test(text)){
+                    const video_id = text.match(/sm\d+/)[0];
+                    await this.popupDescriptionMenu("watch", video_id);
+                    return;
+                }
+                if(/^mylist\/\d+/.test(text)){
+                    const mylist_id = text;
+                    await this.popupDescriptionMenu("mylist", mylist_id);
+                    return;
+                }
+                if(/^user\/\d+/.test(text)){
+                    const mylist_id = text;
+                    await this.popupDescriptionMenu("user", mylist_id);
+                    return;
+                }
+
+                await this.popupDescriptionMenu("text", text);
+            },
+            onclickUserListLink(e) {
+                if(!this.user_id){
+                    return;
+                }
+                this.myapi.ipc.MyList.load(`user/${this.user_id}`);
             }
         };
-        
-        this.oncontextmenu = async (e) => {
-            if(e.button !== 2){
-                return;
-            }
-            
-            const text = document.getSelection().toString();
-            if(text==""){
-                return;
-            }
-
-            if(/^sm\d+/.test(text)){
-                const video_id = text.match(/sm\d+/)[0];
-                await popupDescriptionMenu("watch", video_id);
-                return;
-            }
-            if(/^mylist\/\d+/.test(text)){
-                const mylist_id = text;
-                await popupDescriptionMenu("mylist", mylist_id);
-                return;
-            }
-            if(/^user\/\d+/.test(text)){
-                const mylist_id = text;
-                await popupDescriptionMenu("user", mylist_id);
-                return;
-            }
-
-            await popupDescriptionMenu("text", text);
-        };
-
-        this.onclickUserListLink = (e) => {
-            if(!this.user_id){
-                return;
-            }
-            myapi.ipc.MyList.load(`user/${this.user_id}`);
-        };
-
-        this.on("mount", () => {  
-    
-        });
-
-        obs.on("player-user:set-data", args => {
-            const { user_id, user_nickname, user_icon_url, description } = args;
-
-            closePopupDescription();
-
-            this.user_id = user_id;
-            this.user_nickname = user_nickname;
-            this.user_icon_url = user_icon_url;
-            setDescription(description);
-
-            this.update();
-        });
     </script>
 </player-user>

@@ -1,6 +1,6 @@
 <open-video-form>
-    <style scoped>
-        :scope {
+    <style>
+        :host {
             --form-width: 400px;
             --form-height: 90px;
             --btn-width: 20px;
@@ -50,66 +50,61 @@
 
     <script>
         /* globals */
-        const { Command } = window.Command;
-        const { NICO_URL } = window.NicoURL;
+        export default {
+            onBeforeMount(props) {
+                this.Command = window.Command.Command;
+                this.NICO_URL = window.NicoURL.NICO_URL;
 
-        this.stopProp = (e) => {
-            e.stopPropagation();
-        };
-
-        const formVisible = (visible) => {
-            const elm = this.root.querySelector(".open-form");
-            elm.style.display = visible===true?"":"none";
-        };
-
-        const isURL = (value) => {
-            return value.startsWith(`${NICO_URL.VIDEO}/watch/`);
-        };
-
-        const getVideoID = (value) => {
-            if(isURL(value)){
-                return value.split("/").pop();
-            }else{
-                return value;
+                props.obs.on("show", () => {
+                    this.formVisible(true);
+                    const elm = this.root.querySelector(".open-form input");
+                    elm.value = "";
+                    elm.focus();
+                });
+            },
+            onMounted() {
+                this.formVisible(false);
+            },
+            stopProp(e) {
+                e.stopPropagation();
+            },
+            formVisible(visible) {
+                const elm = this.root.querySelector(".open-form");
+                elm.style.display = visible===true?"":"none";
+            },
+            isURL(value) {
+                return value.startsWith(`${this.NICO_URL.VIDEO}/watch/`);
+            },
+            getVideoID(value) {
+                if(this.isURL(value)){
+                    return value.split("/").pop();
+                }else{
+                    return value;
+                }
+            },
+            playByVideoID() {
+                const elm = this.root.querySelector(".open-form input");
+                const video_id = this.getVideoID(elm.value);
+                if(!video_id) {
+                    return;
+                }
+                const online = false; // ローカル再生を優先
+                this.Command.play({
+                    id: video_id,
+                    time: 0
+                }, online);
+            },
+            onkeydownPlay(e) {
+                if(e.code == "Enter"){
+                    this.playByVideoID();
+                }
+            },
+            onclickPlay(e) {
+                this.playByVideoID();
+            },
+            onclickClose(e) {
+                this.formVisible(false);
             }
         };
-
-        const playByVideoID = () => {
-            const elm = this.root.querySelector(".open-form input");
-            const video_id = getVideoID(elm.value);
-            if(!video_id) {
-                return;
-            }
-            const online = false; // ローカル再生を優先
-            Command.play({
-                id: video_id,
-                time: 0
-            }, online);
-        };
-
-        this.onkeydownPlay = (e) => {
-            if(e.code == "Enter"){
-                playByVideoID();
-            }
-        };
-
-        this.onclickPlay = (e) => {
-            playByVideoID();
-        };
-
-        this.onclickClose = (e) => {
-            formVisible(false);
-        };
-
-        this.on("mount", () => {
-            formVisible(false);
-        });
-
-        this.opts.obs.on("show", () => {
-            formVisible(true);
-            const elm = this.root.querySelector(".open-form input");
-            elm.value = "";
-            elm.focus();
-        });
     </script>    
 </open-video-form>  

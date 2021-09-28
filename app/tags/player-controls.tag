@@ -1,6 +1,6 @@
 <player-controls>
-    <style scoped>
-        :scope{
+    <style>
+        :host{
             display:grid;
             grid-template-columns: 50px 1fr 100px 50px;
             grid-template-areas: "area1 area2 area3 area4";
@@ -67,102 +67,98 @@
         <div class="move-start" title="最初に移動" onclick={moveStart}>
             <i class="fas fa-circle"></i>
         </div>
-        <player-seek obs={opts.obs}></player-seek>
+        <player-seek obs={obs}></player-seek>
     </div>
     <div class="center-v volume">
-        <player-volume obs={opts.obs}></player-volume>
+        <player-volume obs={obs}></player-volume>
     </div>
     <div class="center-v toggle-info" title="動画情報の表示/非表示">
         <span class="fas fa-info" onclick={toggleInfoview}></span>
     </div>
     <script>
-        const obs = this.opts.obs; 
+        export default {
+            onBeforeMount(props) {
+                this.obs = props.obs; 
 
-        const button_class_map = new Map([
-            ["play", "fas fa-play"],
-            ["pause", "fas fa-pause"],
-            ["stop", "fas fa-stop"]
-        ]);
+                this.button_class_map = new Map([
+                    ["play", "fas fa-play"],
+                    ["pause", "fas fa-pause"],
+                    ["stop", "fas fa-stop"]
+                ]);
 
-        const state_button_map = new Map([
-            ["play", "pause"],
-            ["pause", "play"],
-            ["stop", "play"]
-        ]);
+                this.state_button_map = new Map([
+                    ["play", "pause"],
+                    ["pause", "play"],
+                    ["stop", "play"]
+                ]);
 
-        this.current_state = "stop";
-        this.button_class = button_class_map.get(state_button_map.get("stop"));
-        this.play_disabled = true;
+                this.current_state = "stop";
+                this.button_class = this.button_class_map.get(this.state_button_map.get("stop"));
+                this.play_disabled = true;
 
-        const updateState = (state) => {
-            this.current_state = state;
-            this.button_class = button_class_map.get(state_button_map.get(state));
-            this.update();
-        };
+                this.obs.on("player-controls:play", ()=> {
+                    this.play();
+                });
 
-        const getPlayEnable = () => {
-            return !this.play_disabled;
-        };
+                this.obs.on("player-controls:loaded-data", ()=> {
+                    this.setPlayEnable(true);
+                });
+                
+                this.obs.on("player-controls:set-state", (state)=> {
+                    this.updateState(state);
+                });
+            },
+            onMounted() {
+                this.updateState("play");
+                this.setPlayEnable(false);
 
-        const setPlayEnable = (value) => {
-            this.play_disabled = !value;
-            this.update();
-        };
+                this.obs.on("window-resized", () => { 
+                    this.obs.trigger("player-seek:redraw");
+                });
+            },
+            updateState(state) {
+                this.current_state = state;
+                this.button_class = this.button_class_map.get(this.state_button_map.get(state));
+                this.update();
+            },
+            getPlayEnable() {
+                return !this.play_disabled;
+            },
+            setPlayEnable(value) {
+                this.play_disabled = !value;
+                this.update();
+            },
+            isPlay() {
+                return this.current_state == "play";
+            },
+            isPause() {
+                return this.current_state == "pause";
+            },
+            isStop() {
+                return this.current_state == "stop";
+            },
+            play() {
+                if(!this.getPlayEnable()){
+                    return;
+                }
 
-        const isPlay = () => {
-            return this.current_state == "play";
-        };
-        const isPause = () => {
-            return this.current_state == "pause";
-        };
-        const isStop = () => {
-            return this.current_state == "stop";
-        };
-
-        this.play = () => {
-            if(!getPlayEnable()){
-                return;
+                if(this.isStop()){
+                    this.updateState("play");
+                }else if(this.isPlay()){
+                    this.obs.trigger("player-video:pause");
+                    this.updateState("pause");
+                }else{
+                    this.obs.trigger("player-video:play");
+                    this.updateState("play");
+                }
+            },
+            toggleInfoview() {
+                this.obs.trigger("player-main-page:toggle-infoview");
+            },
+            moveStart() {
+                this.obs.trigger("player-info-page:reset-comment-scroll");
+                this.obs.trigger("player-video:seek", 0);
             }
-
-            if(isStop()){
-                updateState("play");
-            }else if(isPlay()){
-                obs.trigger("player-video:pause");
-                updateState("pause");
-            }else{
-                obs.trigger("player-video:play");
-                updateState("play");
-            }
         };
-
-        this.toggleInfoview = () => {
-            obs.trigger("player-main-page:toggle-infoview");
-        };
-
-        this.moveStart = () => {
-            obs.trigger("player-info-page:reset-comment-scroll");
-            obs.trigger("player-video:seek", 0);
-        };
-
-        obs.on("player-controls:play", ()=> {
-            this.play();
-        });
-
-        obs.on("player-controls:loaded-data", ()=> {
-            setPlayEnable(true);
-        });
-        
-        obs.on("player-controls:set-state", (state)=> {
-            updateState(state);
-        });
-
-        this.on("mount", ()=> {
-            updateState("play");
-            setPlayEnable(false);
-
-            obs.on("window-resized", () => { 
-                obs.trigger("player-seek:redraw");
-            });
-        });
     </script>
 </player-controls>

@@ -285,19 +285,13 @@
                     obs:this.obs_modal_dialog
                 });
             },
-            getMylistIDList() {
-                return new Promise( (resolve, reject) => {
-                    const cb = (args) =>{
-                        const { items } = args;
-                        const mylist_id_list = items.map(item => {
-                            return item.mylist_id;
-                        });
-                        resolve(mylist_id_list);
-                    };
-                    this.obs.trigger("mylist-page:sidebar:get-items", { cb });
-                }); 
+            async getMylistIDList() {
+                const { items } = await this.obs.triggerReturn("mylist-page:sidebar:get-items");
+                const mylist_id_list = items.map(item => {
+                    return item.mylist_id;
+                });
+                return mylist_id_list;            
             },
-
             async existMylist(id) {
                 const ids = await this.getMylistIDList();
                 return ids.includes(id);

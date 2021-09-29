@@ -54,15 +54,16 @@
 
                     this.video_elm.load();
                 });
-                this.obs.on("player-video:get-current-time-callback", (cb) => { 
-                    cb(this.video_elm.currentTime);
+
+                this.obs.onReturn("player-video:get-current-time-callback", () => { 
+                    return this.video_elm.currentTime;
                 });
 
-                this.obs.on("player-video:get-video-size-callback", (cb) => {
-                    cb({
+                this.obs.onReturn("player-video:get-video-size-callback", () => { 
+                    return {
                         width: this.video_elm.videoWidth,
                         height: this.video_elm.videoHeight
-                    });
+                    };
                 });
             },
             async initVideo() {
@@ -70,11 +71,7 @@
                     return;
                 }
 
-                const default_comment_params = await new Promise((resolve, reject) => {
-                    this.obs.trigger("setting-display-comment:get-default_params", (default_params)=>{
-                        resolve(default_params);
-                    });
-                });
+                const default_comment_params = await this.obs.triggerReturn("setting-display-comment:get-default_params");
                 this.comment_params = await this.myapi.ipc.Config.get("comment", default_comment_params);
                 
                 this.video_elm = this.root.querySelector(".video-screen > video");

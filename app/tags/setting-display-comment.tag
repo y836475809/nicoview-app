@@ -71,8 +71,8 @@
                 this.sync_interval_items = [10, 30, 60, 120];
                 this.sync_threshold_items = [0.05, 0.1];
 
-                this.obs_dialog.on("setting-display-comment:get-default_params", (cb)=>{
-                    cb(this.default_params);
+                this.obs_dialog.onReturn("setting-display-comment:get-default_params", ()=>{
+                    return this.default_params;
                 });
             },
             async onMounted() {

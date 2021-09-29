@@ -67,9 +67,8 @@
                     this.obs_listview.trigger("addList", { items });
                 });
 
-                this.obs.on("mylist-page:sidebar:get-items", (args) => {
-                    const { cb } = args;
-                    cb({items:this.items});
+                this.obs.onReturn("mylist-page:sidebar:get-items", () => {
+                    return {items:this.items};
                 });
 
                 this.obs.on("mylist-page:sidebar:select-item", (args) => {

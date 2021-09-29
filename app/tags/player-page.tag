@@ -61,18 +61,10 @@
                 this.contextmenu_show = false;
             },
             async getPlayData() {
-                return await new Promise((resolve, reject) => {
-                    this.obs.trigger("player-main-page:get-play-data-callback", (args)=>{
-                        resolve(args);
-                    });
-                });
+                return await this.obs.triggerReturn("player-main-page:get-play-data-callback");
             },
             async getCurrentPlayTime() {
-                return await new Promise((resolve, reject) => {
-                    this.obs.trigger("player-video:get-current-time-callback", (args)=>{
-                        resolve(args);
-                    });
-                });
+                return await this.obs.triggerReturn("player-video:get-current-time-callback");
             },
             resizeVideo(org_size) {
                 const elm = this.root.querySelector(".video-container");
@@ -102,14 +94,13 @@
                     if(menu_id){
                         const { video_id, title, thumbnailURL, online } = play_data;
                         if(menu_id=="add-bookmark-time"){
-                            this.obs.trigger("player-video:get-current-time-callback", (current_time)=>{
-                                const bk_item = {
-                                    title: title,
-                                    id: video_id,
-                                    time: current_time
-                                };
-                                this.myapi.ipc.Bookmark.addItems([bk_item]);
-                            });
+                            const current_time = await this.getCurrentPlayTime();
+                            const bk_item = {
+                                title: title,
+                                id: video_id,
+                                time: current_time
+                            };
+                            this.myapi.ipc.Bookmark.addItems([bk_item]);
                         }
                         if(menu_id=="add-stack-time"){
                             const time = await this.getCurrentPlayTime();
@@ -126,10 +117,8 @@
                             this.obs_open_video_form.trigger("show");
                         }
                         if(menu_id=="change-movie-size"){
-                            this.obs.trigger("player-video:get-video-size-callback",(args)=>{
-                                const org_size = args;
-                                this.resizeVideo(org_size);
-                            });
+                            const org_size = await this.obs.triggerReturn("player-video:get-video-size-callback");
+                            this.resizeVideo(org_size);
                         }
                     }
 

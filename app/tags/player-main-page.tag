@@ -90,8 +90,8 @@
                     logger.setLevel(level);
                 });
 
-                this.obs.on("player-main-page:get-play-data-callback", (cb) => {
-                    cb(this.play_data);
+                this.obs.onReturn("player-main-page:get-play-data-callback", () => {
+                    return this.play_data;
                 });
 
                 this.obs.on("player-main-page:update-data", async(video_id, update_target) => {

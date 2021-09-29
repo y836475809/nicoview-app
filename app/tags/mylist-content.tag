@@ -424,7 +424,7 @@
 
                     const mylist_id_list = await this.getMylistIDList();
                     if(mylist_id_list.includes(mylist_id)){
-                        this.nico_mylist_store.save(mylist_id, nico_mylist.xml);
+                        this.nico_mylist_store.save(mylist_id, this.nico_mylist.xml);
                     }
                 } catch (error) {
                     if(!error.cancel){

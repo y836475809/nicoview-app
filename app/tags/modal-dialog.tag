@@ -47,19 +47,27 @@
     <dialog class="message-modal-dialog dialog-shadow" oncancel={oncancel}>
         <div class="container">
             <div class="center-hv">
-                <p class="message">{message}</p>
+                <p class="message">{state.message}</p>
             </div>
             <div class="button-container">
-                <div show={showok} class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
-                <div show={showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
+                <div show={state.showok} class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
+                <div show={state.showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
             </div>
         </div>
     </dialog>
 
     <script>
         export default {
+            state: {
+                message:"",
+                showok:false,
+                showcancel:false
+            },
+            obs_dialog: null,
+            on_cancel: null,
+            cb:null,
             onBeforeMount(props) {
-                this.message = "";
+                this.state.message = "";
                 this.obs_dialog = props.obs;
                 this.on_cancel = props.oncancel;
             },
@@ -68,9 +76,9 @@
                     this.root.dataset.open = true;
 
                     const { message, buttons, cb } = args;
-                    this.message = message;
-                    this.showok = buttons===undefined ? false : buttons.includes("ok");
-                    this.showcancel = buttons===undefined ? false : buttons.includes("cancel");
+                    this.state.message = message;
+                    this.state.showok = buttons===undefined ? false : buttons.includes("ok");
+                    this.state.showcancel = buttons===undefined ? false : buttons.includes("cancel");
                     this.cb = cb;
 
                     this.update();
@@ -80,7 +88,7 @@
                 });
 
                 this.obs_dialog.on("update-message", (message) => {
-                    this.message = message;
+                    this.state.message = message;
                     this.update();
                 });
 
@@ -90,7 +98,7 @@
                     this.root.dataset.open = false;
                 });
             },
-            onclickButton(result, e) {
+            onclickButton(result, e) { // eslint-disable-line no-unused-vars
                 if(this.cb){
                     this.cb(result);
                 }

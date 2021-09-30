@@ -166,7 +166,7 @@
     </div>
     <div class="listview-menu-container">
         <ul class="listview-list">
-            <li class="listview-item {item.state}" data-id={i} each={ (item, i) in items }
+            <li class="listview-item {item.state}" data-id={i} each={ (item, i) in state.items }
                 title={getTooltip(item)}>
                 <div class="dblclick center-hv" title="クリック動作"
                     onclick={onclickItem.bind(this,item)} 
@@ -193,15 +193,30 @@
     </div>
 
     <script>
-        export default {
-            onBeforeMount(props) {
-                this.Sortable = window.Sortable;
-                this.myapi = window.myapi;
-                this.item_duration = 300;
-                this.sortable = null;
-                this.obs = props.obs;
+        const Sortable = window.Sortable;
+        const myapi = window.myapi;
 
-                this.default_icon = "fas fa-square listview-item-default-icon";
+        const default_icon = "fas fa-square listview-item-default-icon";
+
+        const getInputValue = (tag) => {
+            const elm = tag.root.querySelector(".listview-input");
+            return elm.value.toLowerCase();
+        };
+        const setInputValue = (tag, value) => {
+            const elm = tag.root.querySelector(".listview-input");
+            elm.value = value;
+        };
+
+        export default {
+            state: {
+                items:[]
+            },
+            item_duration: 300,
+            sortable:null,
+            obs:null,
+            confirm:null,
+            onBeforeMount(props) {
+                this.obs = props.obs;
                 
                 this.getTooltip = props.gettooltip;
                 if(!this.getTooltip){
@@ -217,8 +232,8 @@
                 }
                 this.getIcon = props.geticon;
                 if(!this.getIcon){
-                    this.getIcon = (item) => {
-                        return this.default_icon;
+                    this.getIcon = (item) => { // eslint-disable-line no-unused-vars
+                        return default_icon;
                     };
                 }  
 
@@ -226,7 +241,7 @@
 
                 this.obs.on("loadData", async (args) => {
                     const { items } = args;
-                    this.items = items;
+                    this.state.items = items;
                     this.update();
                 });
 
@@ -236,15 +251,15 @@
                     items.forEach(item => {
                         item.state = "listview-item-hide";
                     });
-                    this.items = this.items.concat(items);
+                    this.state.items = this.state.items.concat(items);
                     this.update();
 
                     setTimeout(() => { 
-                        this.items.forEach(item => {
+                        this.state.items.forEach(item => {
                             item.state = "listview-item-show-anime";
                         });
 
-                        const query = this.getInputValue();
+                        const query = getInputValue(this);
                         this.filter(query);
                         this.triggerChange();
                     }, 50);
@@ -263,11 +278,11 @@
                     });
 
                     setTimeout(() => { 
-                        const deleted_items = this.items.filter((item, index) => {
+                        const deleted_items = this.state.items.filter((item, index) => {
                             return elms[index].classList.contains("selected")===true;
                         });
 
-                        this.items = this.items.filter((item, index) => {
+                        this.state.items = this.state.items.filter((item, index) => {
                             return elms[index].classList.contains("selected")===false;
                         });
                         this.update();
@@ -311,16 +326,16 @@
                 this.item_duration = parseInt(prop);
 
                 const elm = this.root.querySelector(".listview-list");
-                this.sortable = this.Sortable.create(elm, {
+                this.sortable = Sortable.create(elm, {
                     ghostClass: "listview-item-ghost-class",
                     draggable: ".listview-item",
-                    onSort: (evt) => {
+                    onSort: (evt) => {  // eslint-disable-line no-unused-vars
                         this.sortItems();
                     }
                 });
             },
             triggerChange() {
-                const items = JSON.parse(JSON.stringify(this.items)).map(item=>{
+                const items = JSON.parse(JSON.stringify(this.state.items)).map(item=>{
                     delete item.state;
                     return item;
                 });
@@ -337,7 +352,7 @@
                 if(this.confirm.includes("delete") === false){
                     return true;
                 }
-                const ret = await this.myapi.ipc.Dialog.showMessageBox({
+                const ret = await myapi.ipc.Dialog.showMessageBox({
                     message: "削除しますか?", 
                     okcancel: true
                 });
@@ -347,21 +362,13 @@
                 const order = this.sortable.toArray().map(value=>Number(value));
                 const sorted_items = [];
                 order.forEach(value => {
-                    sorted_items.push(this.items[value]);
+                    sorted_items.push(this.state.items[value]);
                 });
-                this.items = sorted_items;
+                this.state.items = sorted_items;
 
                 this.update();
 
                 this.triggerChange();
-            },
-            getInputValue() {
-                const elm = this.root.querySelector(".listview-input");
-                return elm.value.toLowerCase();
-            },
-            setInputValue(value) {
-                const elm = this.root.querySelector(".listview-input");
-                elm.value = value;
             },
             filter(query) {
                 const elms = this.root.querySelectorAll(".listview-item");
@@ -369,8 +376,7 @@
                     if (query == "") {
                         elm.style.display ="";
                     }else{
-                        if(this.items[index].title.toLowerCase().includes(query)){
-                            
+                        if(this.state.items[index].title.toLowerCase().includes(query)){
                             elm.style.display ="";
                         }else{
                             elm.style.display ="none";
@@ -385,27 +391,27 @@
             },
             onkeydownSearchInput(e) {
                 if(e.code == "Enter"){
-                    const query = this.getInputValue();
+                    const query = getInputValue(this);
                     this.filter(query);
                 }
             },
-            onclickSearch(e) {
-                const query = this.getInputValue();
+            onclickSearch(e) { // eslint-disable-line no-unused-vars
+                const query = getInputValue(this);
                 this.filter(query);
             },
-            onclickShowAll(e) {
-                this.setInputValue("");
+            onclickShowAll(e) { // eslint-disable-line no-unused-vars
+                setInputValue(this, "");
                 this.filter("");
             },
             getIconClass(item) {
                 let icon = this.getIcon(item);
                 if(!icon){
-                    icon = this.default_icon;
+                    icon = default_icon;
                 }
                 const color = item.marked?"marked":"default";
                 return `center-hv ${icon} listview-item-${color}-icon-color`;
             },
-            setSelected(target_elm, item) {
+            setSelected(target_elm, item) { // eslint-disable-line no-unused-vars
                 const elms = this.root.querySelectorAll(".listview-item");
                 elms.forEach((elm) => {
                     elm.classList.remove("selected");
@@ -417,7 +423,7 @@
             },
             getSelectedItems() {
                 const elms = this.root.querySelectorAll(".listview-item");
-                return this.items.filter((item, index) => {
+                return this.state.items.filter((item, index) => {
                     return elms[index].classList.contains("selected")===true;
                 });
             },
@@ -425,7 +431,7 @@
                 this.setSelected(e.target, item);
                 this.obs.trigger("item-clicked", item);
             },
-            ondblclickItem(item, e) {
+            ondblclickItem(item, e) { // eslint-disable-line no-unused-vars
                 this.obs.trigger("item-dlbclicked", item);
             },
             onclickItemAsdblclick(item, e) {
@@ -442,7 +448,7 @@
                     const items = this.getSelectedItems();
                     const cb = () => {
                         (async ()=>{
-                            const menu_id = await this.myapi.ipc.popupContextMenu("listview-toggle-mark");
+                            const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
                             if(menu_id=="toggle-mark"){
                                 items.forEach(item => {
                                     item.marked = !item.marked;
@@ -457,16 +463,16 @@
             onmouseDown(item, e) {
                 this.setSelected(e.target, item);
             },
-            async onclickDelete(i, e) {
+            async onclickDelete(i, e) { // eslint-disable-line no-unused-vars
                 if(await this.deleteConfirm() === false){
                     return;
                 }
-                this.items[i].state = "listview-item-hide-anime";
+                this.state.items[i].state = "listview-item-hide-anime";
                 this.update(); 
     
                 setTimeout(() => { 
-                    const deleted_items = this.items.splice(i, 1);
-                    this.items.forEach(item=>{
+                    const deleted_items = this.state.items.splice(i, 1);
+                    this.state.items.forEach(item=>{
                         item.state = "";
                     });
                     this.update();

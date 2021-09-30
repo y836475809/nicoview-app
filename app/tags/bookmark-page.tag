@@ -27,18 +27,29 @@
 
     <script>
         /* globals my_obs */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                const { Command } = window.Command;
-                const time_format = window.TimeFormat;
+        const myapi = window.myapi;
+        const { Command } = window.Command;
+        const time_format = window.TimeFormat;
 
+        const resizeHeight = (tag, items) => {
+            const sidebar = tag.root.querySelector(".sidebar");
+            const content = tag.root.querySelector(".content");
+            const item_height = 30;
+            const new_height = items.length*item_height;
+            sidebar.style.height = (new_height + 35) + "px";
+            content.style.height = new_height + "px";
+        };
+
+        export default {
+            obs:null,
+            obs_listview:null,
+            sb_button_icon:"fas fa-chevron-left",
+            name: "bookmark",
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_listview = my_obs.createObs();
-                this.sb_button_icon = "fas fa-chevron-left";
-                this.name = "bookmark";
 
-                this.geticon = (item) => {
+                this.geticon = (item) => {  // eslint-disable-line no-unused-vars
                     return "fas fa-bookmark fa-lg";
                 };
 
@@ -53,17 +64,17 @@
 
                 this.obs_listview.on("changed", async (args) => {
                     const { items } = args;
-                    await this.myapi.ipc.Bookmark.updateItems(items);
-                    this.resizeHeight(items);
+                    await myapi.ipc.Bookmark.updateItems(items);
+                    resizeHeight(this, items);
                 });
 
                 this.obs_listview.on("show-contextmenu", async (e, args) => {
-                    const { items, cb } = args;
+                    const { items, cb } = args; // eslint-disable-line no-unused-vars
 
-                    const menu_id = await this.myapi.ipc.popupContextMenu("listview-bookmark", {items});
+                    const menu_id = await myapi.ipc.popupContextMenu("listview-bookmark", {items});
                     if(menu_id=="go-to-library"){
                         const video_id = items[0].data.video_id;
-                        const exist = await this.myapi.ipc.Library.hasItem(video_id);
+                        const exist = await myapi.ipc.Library.hasItem(video_id);
                         if(exist){
                             this.obs.trigger("main-page:select-page", "library");
                             this.obs.trigger("library-page:scrollto", video_id);     
@@ -98,18 +109,10 @@
             },
             async onMounted() {
                 // TODO error対応
-                const items = await this.myapi.ipc.Bookmark.getItems();
+                const items = await myapi.ipc.Bookmark.getItems();
                 this.obs_listview.trigger("loadData", { items });
 
-                this.resizeHeight(items);
-            },
-            resizeHeight(items) {
-                const sidebar = this.root.querySelector(".sidebar");
-                const content = this.root.querySelector(".content");
-                const item_height = 30;
-                const new_height = items.length*item_height;
-                sidebar.style.height = (new_height + 35) + "px";
-                content.style.height = new_height + "px";
+                resizeHeight(this, items);
             }
         }; 
     </script>

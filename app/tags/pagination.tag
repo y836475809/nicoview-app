@@ -53,38 +53,41 @@
     <div class="navi center-hv" onclick={onclickBack}><i class="fas fa-chevron-left"></i></div>
     <div class="page-container center-hv" >
         <div class="label page center-hv" title="ページ選択" onclick={onclickTogglePageSelector}>
-            {page_num} / {total_page_num}
+            {state.page_num} / {state.total_page_num}
         </div>
         <search-page-selector class="page-selector" obs={obs_page_selector}> 
         </search-page-selector>
     </div>
     <div class="navi center-hv" onclick={onclickForward}><i class="fas fa-chevron-right"></i></div>
-    <div class="label center-hv">ヒット件数: {search_result_num.toLocaleString()}</div>
+    <div class="label center-hv">ヒット件数: {state.search_result_num.toLocaleString()}</div>
 
     <script>
         /* globals my_obs */
         export default {
+            state:{
+                page_num:1,
+                total_page_num:0,
+                search_result_num:0
+            },
+            pagination_obs:null,
+            obs_page_selector:null,
             onBeforeMount(props) {
                 this.pagination_obs = props.obs;
                 this.obs_page_selector = my_obs.createObs();
 
-                this.page_num = 1;
-                this.total_page_num = 0;
-                this.search_result_num = 0;
-
                 this.pagination_obs.on("set-page-num", (args) => {
                     const { page_num } = args;
 
-                    this.page_num = page_num;
+                    this.state.page_num = page_num;
                     this.update();
                 });
 
                 this.pagination_obs.on("set-data", (args) => {
                     const { page_num, total_page_num, search_result_num } = args;
 
-                    this.page_num = page_num;
-                    this.total_page_num = total_page_num;
-                    this.search_result_num = search_result_num;
+                    this.state.page_num = page_num;
+                    this.state.total_page_num = total_page_num;
+                    this.state.search_result_num = search_result_num;
                     this.update();
 
                     this.obs_page_selector.trigger("set-data", { page_num, total_page_num });
@@ -100,10 +103,10 @@
 
                 this.obs_page_selector.on("selected-page-num", (args) => {
                     const { page_num } = args;
-                    this.page_num = page_num;
+                    this.state.page_num = page_num;
                     this.update();
 
-                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                    this.pagination_obs.trigger("move-page", { page_num: this.state.page_num });
                     this.changePageSelector("remove");
                 });
 
@@ -115,19 +118,19 @@
                 });
             },
             onclickBack() {
-                if(this.page_num > 1){
-                    this.page_num -= 1;
+                if(this.state.page_num > 1){
+                    this.state.page_num -= 1;
                     this.update();
 
-                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                    this.pagination_obs.trigger("move-page", { page_num: this.state.page_num });
                 }
             },
             onclickForward() {
-                if(this.page_num < this.total_page_num){
-                    this.page_num += 1;
+                if(this.state.page_num < this.state.total_page_num){
+                    this.state.page_num += 1;
                     this.update();
 
-                    this.pagination_obs.trigger("move-page", { page_num: this.page_num });
+                    this.pagination_obs.trigger("move-page", { page_num: this.state.page_num });
                 }
             },
             changePageSelector(name) {

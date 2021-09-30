@@ -22,14 +22,17 @@
 
     <script>
         /* globals my_obs */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                const searchItems = window.NicoSearch.searchItems;
+        const myapi = window.myapi;
+        const { searchItems } = window.NicoSearch;
 
+        export default {
+            obs:null,
+            obs_listview:null,
+            name:"nico-search",
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_listview = my_obs.createObs();
-                this.name = "nico-search";
+                
                 this.geticon = (item) => {
                     const search_target = item.cond.search_target;
                     if(search_target == "keyword"){
@@ -62,11 +65,11 @@
                     items.forEach(item => {
                         delete item.type;
                     });
-                    await this.myapi.ipc.Search.updateItems(items);
+                    await myapi.ipc.Search.updateItems(items);
                 });
 
                 this.obs_listview.on("show-contextmenu", (e, args) => {
-                    const { items, cb } = args; 
+                    const { items, cb } = args; // eslint-disable-line no-unused-vars
                     cb(null);
                 });
 
@@ -89,7 +92,7 @@
                 await this.loadItems();
             },
             async loadItems() {
-                const items = await this.myapi.ipc.Search.getItems();
+                const items = await myapi.ipc.Search.getItems();
                 items.forEach(item => {
                     item.type = item.cond.search_target;
                 });

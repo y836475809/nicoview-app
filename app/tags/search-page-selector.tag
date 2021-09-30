@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="item-container">
-            <div class="item center-hv {item.class_name}" each={ item in items } 
+            <div class="item center-hv {item.class_name}" each={ item in state.items } 
                 onclick={onclickItem.bind(this,item)}>
                 {item.num}
             </div>
@@ -78,14 +78,17 @@
 
     <script>
         export default {
+            state:{
+                items:[]
+            },
+            obs:null,
             onBeforeMount(props) {
                 this.obs = props.obs;
-                this.items = [];
 
                 this.obs.on("set-data", (args) => {
                     const { page_num, total_page_num } = args;
 
-                    this.items = [];
+                    this.state.items = [];
                     for (let num = 1; num <= total_page_num; num++) {
                         let class_name = "";
                         if(page_num == num){
@@ -93,7 +96,7 @@
                         }else if(num > total_page_num){
                             class_name = "item-disable";
                         }
-                        this.items.push({
+                        this.state.items.push({
                             num:num,
                             class_name:class_name
                         });
@@ -102,10 +105,10 @@
                     this.update();
                 });
             },
-            onclickItem(item, e) {
+            onclickItem(item, e) { // eslint-disable-line no-unused-vars
                 this.obs.trigger("selected-page-num", { page_num:item.num });
             },
-            onclickClose(e) {
+            onclickClose(e) { // eslint-disable-line no-unused-vars
                 this.obs.trigger("close");
             }
         };     

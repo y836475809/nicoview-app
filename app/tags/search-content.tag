@@ -141,13 +141,13 @@
             <div>検索条件</div>
             <label style="margin: 0 5px 0 5px;" class="center-v" title="offの場合、ニコニコ動画内部APIで検索する(ログインが必要)" >
                 <input class="check-search-api" type="checkbox" 
-                    checked={api_checked} onclick={onclickCheckSearchAPI} />スナップショット検索
+                    checked={state.api_checked} onclick={onclickCheckSearchAPI} />スナップショット検索
             </label>
             <div class="title center-v" onclick="{onclickToggleMenu}">
-                {sort_title}
+                {state.sort_title}
             </div>
             <div class="title center-v" onclick="{onclickToggleMenu}">
-                {search_target_title}
+                {state.search_target_title}
             </div>
         </div>
         <div class="input-container center-v">
@@ -193,37 +193,70 @@
 
     <script>
         /* globals my_obs logger ModalDialog */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.GridTable = window.GridTable.GridTable;
-                this.wrapFormatter = window.GridTable.wrapFormatter;
-                this.buttonFormatter = window.GridTable.buttonFormatter;
-                this.infoFormatter = window.GridTable.infoFormatter;
-                this.Command = window.Command.Command;
-                this.NicoSearchParams = window.NicoSearch.NicoSearchParams;
-                this.NicoSearch = window.NicoSearch.NicoSearch;
-                this.searchItems = window.NicoSearch.searchItems;
+        const myapi = window.myapi;
+        const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
+        const { Command } = window.Command;
+        const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
 
+        const createItem = (value, saved, reg_download) => {
+            return {
+                thumb_img: value.thumbnailUrl,
+                id: value.contentId,
+                title: value.title,
+                info: `ID:${value.contentId}<br>
+                        再生:${value.viewCounter.toLocaleString()}<br>
+                        コメント:${value.commentCounter.toLocaleString()}`,
+                play_time: value.lengthSeconds,
+                pub_date: value.startTime,
+                tags: value.tags,
+                saved: saved,
+                reg_download: reg_download,
+            };
+        };
+        const createEmptyItem = () => {
+            return {
+                thumb_img: "",
+                id: "",
+                title: "",
+                info: "",
+                play_time: -1,
+                pub_date: -1,
+                tags: "",
+                saved: false,
+                reg_download: false,
+            };
+        };
+
+        export default {
+            state:{
+                api_checked:"checked",
+                sort_title:"",
+                search_target_title:"",
+            },
+            sort_items:searchItems.sortItems,
+            search_target_items:searchItems.searchTargetItems,
+            obs:null,
+            obs_modal_dialog:null,
+            pagination_obs:null,
+            nico_search_params:null,
+            nico_search:null,
+            grid_table:null,
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_modal_dialog = my_obs.createObs();
                 this.modal_dialog = null;
 
                 this.pagination_obs = my_obs.createObs();
 
-                this.api_checked = "checked";
-                this.sort_items = this.searchItems.sortItems;
-                this.search_target_items = this.searchItems.searchTargetItems;
-
                 const search_limit = 32;
-                const search_context = this.myapi.getUserAgent();
-                this.nico_search_params = new this.NicoSearchParams(search_limit, search_context);
-                this.nico_search = new this.NicoSearch();
+                const search_context = myapi.getUserAgent();
+                this.nico_search_params = new NicoSearchParams(search_limit, search_context);
+                this.nico_search = new NicoSearch();
 
-                const seach_infoFormatter = this.infoFormatter.bind(this, 
-                    (value, dataContext)=>{ return `<div>${value}</div>`; });
+                const seach_infoFormatter = infoFormatter.bind(this, 
+                    (value, dataContext)=>{ return `<div>${value}</div>`; }); // eslint-disable-line no-unused-vars
 
-                const tagsFormatter = (row, cell, value, columnDef, dataContext)=> {
+                const tagsFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
                     if(!value){
                         return "";
                     }
@@ -240,9 +273,9 @@
 
                 const columns = [
                     {id: "thumb_img", name: "サムネイル", width: 130},
-                    {id: "title", name: "名前", formatter:this.wrapFormatter},
+                    {id: "title", name: "名前", formatter:wrapFormatter},
                     {id: "command", name: "操作", sortable: false, 
-                        formatter: this.buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
+                        formatter: buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
                     {id: "info", name: "情報", formatter:seach_infoFormatter},
                     {id: "pub_date", name: "投稿日"},
                     {id: "play_time", name: "時間"},
@@ -251,7 +284,7 @@
                 const options = {
                     rowHeight: 100,
                 };   
-                this.grid_table = new this.GridTable("search-grid", columns, options);
+                this.grid_table = new GridTable("search-grid", columns, options);
 
                 this.pagination_obs.on("move-page", async args => {
                     const { page_num } = args;
@@ -259,26 +292,26 @@
                     await this.search();
                 });
 
-                this.myapi.ipc.Download.onUpdateItem(async ()=>{
-                    const video_ids = await this.myapi.ipc.Download.getIncompleteIDs();
+                myapi.ipc.Download.onUpdateItem(async ()=>{
+                    const video_ids = await myapi.ipc.Download.getIncompleteIDs();
                     const items = this.grid_table.dataView.getItems();
 
                     for (let i=0; i<items.length; i++) {
                         const item = items[i];
                         const video_id = item.id;
-                        item.saved = await this.myapi.ipc.Library.hasItem(video_id);
+                        item.saved = await myapi.ipc.Library.hasItem(video_id);
                         item.reg_download = video_ids.includes(video_id);
                         this.grid_table.dataView.updateItem(video_id, item);    
                     }
                 });
 
-                this.myapi.ipc.Library.onAddItem((args) => {
+                myapi.ipc.Library.onAddItem((args) => {
                     const {video_item} = args;
                     const video_id = video_item.id;
                     this.grid_table.updateCells(video_id, { saved:true });
                 });
 
-                this.myapi.ipc.Library.onDeleteItem((args) => {
+                myapi.ipc.Library.onDeleteItem((args) => {
                     const { video_id } = args;
                     this.grid_table.updateCells(video_id, { saved:false });
                 });
@@ -330,7 +363,6 @@
                     if(!this.canSearch()){
                         return;
                     }
-
                     this.pagination_obs.trigger("forward");
                 });
 
@@ -338,7 +370,6 @@
                     if(!this.canSearch()){
                         return;
                     }
-
                     this.pagination_obs.trigger("back");
                 });
             },
@@ -355,37 +386,37 @@
                 this.grid_table.setupResizer(".search-grid-container");
                 this.grid_table.onDblClick((e, data)=>{
                     if(data.id){
-                        this.Command.play(data, false);
+                        Command.play(data, false);
                     }
                 });
                 this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
                     if(cmd_id == "play"){
-                        this.Command.play(data, false);
+                        Command.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        this.Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(this.obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        this.Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(this.obs, [data]);
                     }
                     if(cmd_id == "download"){
-                        this.Command.addDownloadItems(this.obs, [data]);
+                        Command.addDownloadItems(this.obs, [data]);
                     }
                 });
-                this.grid_table.onContextMenu(async (e)=>{
+                this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
                     const items = this.grid_table.getSelectedDatas().filter(value => {
                         return value.id!="";
                     });
                     if(items.length===0){
                         return;
                     }
-                    await this.myapi.ipc.popupContextMenu("search", {items});
+                    await myapi.ipc.popupContextMenu("search", {items});
                 });
 
                 const { api, sort_item, search_target_item } = await this.loadSearchCond();
-                this.api_checked = api=="snapshot"?"checked":"";
-                this.sort_title = sort_item.title;
-                this.search_target_title = search_target_item.title;
+                this.state.api_checked = api=="snapshot"?"checked":"";
+                this.state.sort_title = sort_item.title;
+                this.state.search_target_title = search_target_item.title;
                 this.nico_search_params.api(api);
                 this.nico_search_params.page(0);
                 this.nico_search_params.sortName(sort_item.name);
@@ -400,7 +431,7 @@
                 });
             },
             async loadSearchCond() {
-                const { api, sort, search_target } = await this.myapi.ipc.Config.get("search.condition",  {
+                const { api, sort, search_target } = await myapi.ipc.Config.get("search.condition",  {
                     api:"snapshot",
                     sort:{ name:"startTime", order:"-" },
                     search_target:{ target:"tag" }
@@ -418,27 +449,27 @@
             async saveSearchCond() {
                 const api = this.nico_search_params.getAPI();
                 const { sort_name, sort_order, search_target } = this.nico_search_params.getParams();
-                await this.myapi.ipc.Config.set("search.condition", {
+                await myapi.ipc.Config.set("search.condition", {
                     api: api,
                     sort:{ name:sort_name, order:sort_order },
                     search_target:{ target:search_target } 
                 });
             },
-            onclickToggleMenu(e) {
+            onclickToggleMenu(e) { // eslint-disable-line no-unused-vars
                 const elm = this.root.querySelector(".cond-menu-container1");
                 elm.classList.toggle("cond-menu-container-expand");
             },
-            onclickCheckSearchAPI(e) {
+            onclickCheckSearchAPI(e) { // eslint-disable-line no-unused-vars
                 const elm = this.root.querySelector(".check-search-api");
                 const api = elm.checked?"snapshot":"ext";
                 this.nico_search_params.api(api);
                 
                 this.saveSearchCond();
             },
-            async onchangeSort(item, e) {
+            async onchangeSort(item, e) { // eslint-disable-line no-unused-vars
                 const { title, name, order } = item;
 
-                this.sort_title = title;
+                this.state.sort_title = title;
                 this.update();
 
                 this.nico_search_params.sortName(name);
@@ -448,10 +479,10 @@
 
                 await this.search();
             },
-            async onchangeTarget(item, e) {
+            async onchangeTarget(item, e) { // eslint-disable-line no-unused-vars
                 const { title, target } = item;
 
-                this.search_target_title = title;
+                this.state.search_target_title = title;
                 this.update();
 
                 this.nico_search_params.target(target);
@@ -478,7 +509,7 @@
                 this.obs_modal_dialog.trigger("show", {
                     message: "検索中...",
                     buttons: ["cancel"],
-                    cb: result=>{
+                    cb: ()=>{
                         this.onCancelSearch();
                     }
                 });
@@ -490,7 +521,7 @@
                         search_result = await this.nico_search.search(this.nico_search_params);
                     }                
                     if(this.nico_search_params.getAPI()=="ext"){
-                        const cookie = await this.myapi.ipc.getNicoLoginCookie();
+                        const cookie = await myapi.ipc.getNicoLoginCookie();
                         if(!cookie){
                             throw new Error("内部APIで検索するにはニコニコ動画へのログインが必要");
                         }
@@ -500,7 +531,7 @@
                 } catch (error) {
                     if(!error.cancel){
                         logger.error(error);
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             type: "error",
                             message: error.message
                         });
@@ -515,34 +546,6 @@
             onCancelSearch() {
                 this.nico_search.cancel();
             },
-            createItem(value, saved, reg_download) {
-                return {
-                    thumb_img: value.thumbnailUrl,
-                    id: value.contentId,
-                    title: value.title,
-                    info: `ID:${value.contentId}<br>
-                            再生:${value.viewCounter.toLocaleString()}<br>
-                            コメント:${value.commentCounter.toLocaleString()}`,
-                    play_time: value.lengthSeconds,
-                    pub_date: value.startTime,
-                    tags: value.tags,
-                    saved: saved,
-                    reg_download: reg_download,
-                };
-            },
-            createEmptyItem() {
-                return {
-                    thumb_img: "",
-                    id: "",
-                    title: "",
-                    info: "",
-                    play_time: -1,
-                    pub_date: -1,
-                    tags: "",
-                    saved: false,
-                    reg_download: false,
-                };
-            },
             async setData(search_result) {     
                 const page_info = search_result.page_ifno;
                 const search_list = search_result.list;
@@ -552,16 +555,16 @@
                     page_num, total_page_num, search_result_num
                 });
 
-                const video_ids = await this.myapi.ipc.Download.getIncompleteIDs();
+                const video_ids = await myapi.ipc.Download.getIncompleteIDs();
                 const items = await Promise.all(
                     search_list.map(async value => {
                         const video_id = value.contentId;
-                        const saved = await this.myapi.ipc.Library.hasItem(video_id);
+                        const saved = await myapi.ipc.Library.hasItem(video_id);
                         const reg_download = video_ids.includes(video_id);
-                        return this.createItem(value, saved, reg_download);
+                        return createItem(value, saved, reg_download);
                     })
                 );
-                items.push(this.createEmptyItem());
+                items.push(createEmptyItem());
                 this.grid_table.setData(items);
                 this.grid_table.scrollToTop();  
             },
@@ -571,7 +574,7 @@
                         return item.name == sort_name && item.order == sort_order;
                     });
                     if(result){
-                        this.sort_title = result.title;
+                        this.state.sort_title = result.title;
                     }
                 }     
                 if(search_target){
@@ -579,12 +582,12 @@
                         return item.target == search_target;
                     });
                     if(result){
-                        this.search_target_title = result.title;
+                        this.state.search_target_title = result.title;
                     }
                 }
                 this.update();
             },
-            async onclickSearch(e){
+            async onclickSearch(e){ // eslint-disable-line no-unused-vars
                 const elm = this.getSearchInputElm();
                 const query = elm.value;
                 this.nico_search_params.query(query);
@@ -597,7 +600,7 @@
                     await this.search();
                 }
             },
-            onclickAddSearch(e) {
+            onclickAddSearch(e) { // eslint-disable-line no-unused-vars
                 const elm = this.getSearchInputElm();
                 if(!elm.value){
                     return;

@@ -122,13 +122,13 @@
     
     <script>
         /* globals */
+        const myapi = window.myapi;
+        const { Command } = window.Command;
+        const NicoURL = window.NicoURL;
+        const { toTimeSec } = window.TimeFormat;
+
         export default {
             onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.Command = window.Command.Command;
-                this.NicoURL = window.NicoURL.NicoURL;
-                this.toTimeSec = window.TimeFormat.toTimeSec;
-
                 this.obs = props.obs; 
 
                 this.user_thumbnail_url = "";
@@ -160,7 +160,7 @@
                 const paths = e.target.href.split("/");
                 const video_id = paths.pop();
 
-                this.Command.play({
+                Command.play({
                     id : video_id,
                     time : 0
                 }, false);
@@ -174,7 +174,7 @@
                 const video_id = paths.pop();
                 
                 if(e.button === 2){ 
-                    await this.myapi.ipc.popupContextMenu("player-watch-link", {
+                    await myapi.ipc.popupContextMenu("player-watch-link", {
                         video_id: video_id,
                         url: e.target.href
                     });
@@ -185,17 +185,17 @@
                 e.preventDefault(); 
                 e.stopPropagation();
                 
-                const mylist_id = this.NicoURL.getMylistID(e.target.href);
-                this.myapi.ipc.MyList.load(mylist_id);
+                const mylist_id = NicoURL.getMylistID(e.target.href);
+                myapi.ipc.MyList.load(mylist_id);
                 return false;
             },
             async mylistLinkMouseUp(e) {
                 e.preventDefault(); 
                 e.stopPropagation();
 
-                const mylist_id = this.NicoURL.getMylistID(e.target.href);
+                const mylist_id = NicoURL.getMylistID(e.target.href);
                 if(e.button === 2){
-                    await this.myapi.ipc.popupContextMenu("player-mylist-link", {
+                    await myapi.ipc.popupContextMenu("player-mylist-link", {
                         mylist_id: mylist_id,
                         url: e.target.href
                     });
@@ -207,7 +207,7 @@
                 e.stopPropagation();
 
                 if(e.button === 2){
-                    await this.myapi.ipc.popupContextMenu("player-link", {
+                    await myapi.ipc.popupContextMenu("player-link", {
                         url: e.target.href
                     });
                 }
@@ -216,7 +216,7 @@
             poundLink(e) {
                 const elm = e.target;
                 if(elm.classList.contains("seekTime")){
-                    const seek_time_sec = this.toTimeSec(e.target.dataset.seektime);
+                    const seek_time_sec = toTimeSec(e.target.dataset.seektime);
                     this.obs.trigger("player-video:seek", seek_time_sec);
                 }
             },
@@ -235,7 +235,7 @@
                         const a_tags = content_elm.querySelectorAll("a");
                         a_tags.forEach(value=>{
                             const href = value.getAttribute("href");
-                            const url_kind = this.NicoURL.getURLKind(href);
+                            const url_kind = NicoURL.getURLKind(href);
                             if(url_kind=="watch"){
                                 value.onclick = this.watchLinkClick;
                                 value.onmouseup = this.watchLinkMouseUp;
@@ -297,20 +297,20 @@
             async popupDescriptionMenu(type, text) {
                 if(type=="watch"){
                     const video_id = text;
-                    await this.myapi.ipc.popupContextMenu("player-watch-link", {
+                    await myapi.ipc.popupContextMenu("player-watch-link", {
                         video_id: video_id,
-                        url: this.NicoURL.getWatchURL(video_id)
+                        url: NicoURL.getWatchURL(video_id)
                     });
                 }
                 if(type=="mylist" || type=="user"){
                     const mylist_id = text;
-                    await this.myapi.ipc.popupContextMenu("player-mylist-link", {
+                    await myapi.ipc.popupContextMenu("player-mylist-link", {
                         mylist_id: mylist_id,
-                        url: this.NicoURL.getMylistURL(mylist_id)
+                        url: NicoURL.getMylistURL(mylist_id)
                     });
                 }
                 if(type=="text"){
-                    await this.myapi.ipc.popupContextMenu("player-text", {
+                    await myapi.ipc.popupContextMenu("player-text", {
                         text: text
                     });
                 }
@@ -347,7 +347,7 @@
                 if(!this.user_id){
                     return;
                 }
-                this.myapi.ipc.MyList.load(`user/${this.user_id}`);
+                myapi.ipc.MyList.load(`user/${this.user_id}`);
             }
         };
     </script>

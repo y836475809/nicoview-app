@@ -48,7 +48,7 @@
     </style>
 
     <div class="download-control-container">
-        <button class="download-button start" disabled={dl_disabled} onclick={onclickStartDownload}>開始</button>
+        <button class="download-button start" disabled={state.dl_disabled} onclick={onclickStartDownload}>開始</button>
         <button class="download-button stop" onclick={onclickStopDownload}>停止</button>
         <button class="download-button clear" title="ダウンロード済みをクリア" onclick={onclickClearDownloadedItems}>クリア</button>
         <div class="schedule-container center-v">
@@ -61,36 +61,38 @@
 
     <script>
         /* globals my_obs logger */
-        export default {
-            onBeforeMount(props) {
-                const EventEmitter = window.EventEmitter;
-                this.myapi = window.myapi;
-                this.NicoDownloader = window.NicoDownloader.NicoDownloader;
-                this.GridTableDownloadItem = window.GridTableDownloadItem.GridTableDownloadItem;
-                this.DownloadState = window.GridTableDownloadItem.GridTableDownloadItem;
-                this.Command = window.Command.Command;
-                this.ScheduledTask = window.ScheduledTask.ScheduledTask;
+        const EventEmitter = window.EventEmitter;
+        const myapi = window.myapi;
+        const { NicoDownloader } = window.NicoDownloader;
+        const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
+        const { Command } = window.Command;
+        const { ScheduledTask } = window.ScheduledTask;
 
+        export default {
+            state:{
+                dl_disabled:""
+            },
+            obs:null,
+            obs_schedule:null,
+            download_schedule:null,
+            event_em:null,
+            scheduled_task:null,
+            grid_table_dl:null,
+            nico_down:null,
+            cancel_download:false,
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_schedule = my_obs.createObs();
 
-                this.download_schedule = null;
-
-                this.dl_disabled = "";
                 this.event_em = new EventEmitter(); 
                 this.event_em.on("download-start", ()=>{
-                    this.dl_disabled = "disabled";
+                    this.state.dl_disabled = "disabled";
                     this.update();
                 });
                 this.event_em.on("download-end", ()=>{
-                    this.dl_disabled = "";
+                    this.state.dl_disabled = "";
                     this.update();
                 });
-
-                this.scheduled_task = null;
-                this.grid_table_dl = null;
-                this.nico_down = null;
-                this.cancel_download = false;
 
                 this.obs.on("download-page:add-download-items", async (items) => {
                     await this.addDownloadItems(items);
@@ -101,7 +103,7 @@
                 });
             },
             async onMounted() {
-                this.download_schedule = await this.myapi.ipc.Config.get("download.schedule", {
+                this.download_schedule = await myapi.ipc.Config.get("download.schedule", {
                     date: {hour:0, minute:0},
                     enable: false
                 });
@@ -109,7 +111,7 @@
                 this.obs_schedule.on("change-params", (args) => {
                     const { date, enable } = args;
 
-                    this.myapi.ipc.Config.set("download.schedule", {
+                    myapi.ipc.Config.set("download.schedule", {
                         date: date,
                         enable: enable
                     }).then();
@@ -119,7 +121,7 @@
 
                     if(enable==true){
                         this.scheduled_task.stop();
-                        this.scheduled_task = new this.ScheduledTask(this.download_schedule.date, this.startDownload);
+                        this.scheduled_task = new ScheduledTask(this.download_schedule.date, this.startDownload);
                         this.scheduled_task.start();
                     }else{
                         this.scheduled_task.stop();
@@ -127,21 +129,21 @@
                 });
 
                 const grid_container = this.root.querySelector(".download-grid");
-                this.grid_table_dl = new this.GridTableDownloadItem(grid_container);
+                this.grid_table_dl = new GridTableDownloadItem(grid_container);
 
                 try {
-                    this.grid_table_dl.onContextMenu(async e=>{
+                    this.grid_table_dl.onContextMenu(async e=>{ // eslint-disable-line no-unused-vars
                         const items = this.grid_table_dl.grid_table.getSelectedDatas();
                         if(items.length==0){
                             return;
                         }
 
-                        const menu_id = await this.myapi.ipc.popupContextMenu("download", {items});
+                        const menu_id = await myapi.ipc.popupContextMenu("download", {items});
                         if(!menu_id){
                             return;
                         }
                         if(menu_id=="delete"){
-                            const ret = await this.myapi.ipc.Dialog.showMessageBox({
+                            const ret = await myapi.ipc.Dialog.showMessageBox({
                                 message: "削除しますか?", 
                                 okcancel: true
                             });
@@ -155,17 +157,17 @@
                         }
                     });
                     this.grid_table_dl.onDblClick((e, data)=>{
-                        this.Command.play(data, false);
+                        Command.play(data, false);
                     });
                     this.grid_table_dl.onButtonClick((e, cmd_id, data)=>{
                         if(cmd_id == "play"){
-                            this.Command.play(data, false);
+                            Command.play(data, false);
                         }
                         if(cmd_id == "stack"){
-                            this.Command.addStackItems(this.obs, [data]);
+                            Command.addStackItems(this.obs, [data]);
                         }
                         if(cmd_id == "bookmark"){
-                            this.Command.addBookmarkItems(this.obs, [data]);
+                            Command.addBookmarkItems(this.obs, [data]);
                         }
                     });
                     this.grid_table_dl.onMoveRows(async ()=>{
@@ -173,17 +175,17 @@
                     });
 
                     this.grid_table_dl.grid_table.setupResizer(".download-grid-container");
-                    const items = await this.myapi.ipc.Download.getItems();
+                    const items = await myapi.ipc.Download.getItems();
                     this.grid_table_dl.setData(items);
                 } catch (error) {
                     logger.error("download item load error: ", error);
-                    await this.myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBox({
                         type: "error",
                         message: `ダウンロードリストの読み込み失敗\n${error.message}`
                     });
                 }
 
-                this.scheduled_task = new this.ScheduledTask(this.download_schedule.date, this.startDownload);
+                this.scheduled_task = new ScheduledTask(this.download_schedule.date, this.startDownload);
                 if(this.download_schedule.enable==true){
                     this.scheduled_task.start();
                 }
@@ -200,7 +202,7 @@
                     }
                 }
             },
-            async onclickStartDownload(e) {
+            async onclickStartDownload(e) { // eslint-disable-line no-unused-vars
                 this.scheduled_task.stop();
 
                 await this.startDownload();
@@ -209,18 +211,18 @@
                     this.scheduled_task.start();
                 }
             },
-            onclickStopDownload(e) {
+            onclickStopDownload(e) { // eslint-disable-line no-unused-vars
                 this.cancelDownload();
                 this.cancel_download = true;
             },
             async onclickClearDownloadedItems() {
-                await this.clearDownloadItems(this.DownloadState.complete);
+                await this.clearDownloadItems(DownloadState.complete);
             },
             async onChangeDownloadItem() {
                 const items = this.grid_table_dl.getData().map(value => {
-                    let state = this.DownloadState.complete;
-                    if(value.state !== this.DownloadState.complete){
-                        state = this.DownloadState.wait;
+                    let state = DownloadState.complete;
+                    if(value.state !== DownloadState.complete){
+                        state = DownloadState.wait;
                     }
                     return {
                         thumb_img: value.thumb_img,
@@ -229,10 +231,10 @@
                         state: state
                     };
                 });
-                await this.myapi.ipc.Download.updateItems(items);
+                await myapi.ipc.Download.updateItems(items);
             },
             async addDownloadItems(items) {
-                this.grid_table_dl.addItems(items, this.DownloadState.wait);
+                this.grid_table_dl.addItems(items, DownloadState.wait);
 
                 await this.onChangeDownloadItem(); 
             },
@@ -246,7 +248,7 @@
                     if(video_ids.includes(this.nico_down.video_id)){
                         this.cancelDownload();
 
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             message: `${this.nico_down.video_id}のダウンロードをキャンセル`
                         });
                     }
@@ -272,10 +274,10 @@
             },
             async startDownload() {
                 // TODO check exist download_dir
-                const download_dir = await this.myapi.ipc.Config.get("download.dir", "");
+                const download_dir = await myapi.ipc.Config.get("download.dir", "");
                 this.event_em.emit("download-start");
 
-                let wait_time = await this.myapi.ipc.Config.get("download.wait_time", 10);
+                let wait_time = await myapi.ipc.Config.get("download.wait_time", 10);
                 if(!wait_time || wait_time <= 0){
                     wait_time = 10;
                 }
@@ -294,7 +296,7 @@
                         }, (progress)=>{ 
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: progress, 
-                                state: this.DownloadState.wait
+                                state: DownloadState.wait
                             });
                         });
 
@@ -305,44 +307,44 @@
                         if(this.cancel_download){
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: "キャンセル", 
-                                state: this.DownloadState.wait
+                                state: DownloadState.wait
                             });
                             break;
                         }
 
-                        this.nico_down = new this.NicoDownloader(video_id, download_dir);
+                        this.nico_down = new NicoDownloader(video_id, download_dir);
                         const result = await this.nico_down.download((progress)=>{
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: `${progress}`, 
-                                state: this.DownloadState.downloading
+                                state: DownloadState.downloading
                             });
                         });
 
-                        if(result.type==this.NicoDownloader.ResultType.complete){
+                        if(result.type==NicoDownloader.ResultType.complete){
                             const download_item = this.nico_down.getDownloadedItem();
-                            await this.myapi.ipc.Library.addDownloadItem(download_item);
+                            await myapi.ipc.Library.addDownloadItem(download_item);
 
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: "終了", 
-                                state: this.DownloadState.complete
+                                state: DownloadState.complete
                             });
                             logger.debug(`download complete id=${video_id}`);
-                        }else if(result.type==this.NicoDownloader.ResultType.cancel){
+                        }else if(result.type==NicoDownloader.ResultType.cancel){
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: "キャンセル", 
-                                state: this.DownloadState.wait
+                                state: DownloadState.wait
                             });
                             logger.debug(`download cancel id=${video_id}`);
-                        }else if(result.type==this.NicoDownloader.ResultType.skip){ 
+                        }else if(result.type==NicoDownloader.ResultType.skip){ 
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: `スキップ: ${result.reason}`, 
-                                state: this.DownloadState.wait
+                                state: DownloadState.wait
                             });
                             logger.debug(`download skip id=${video_id}: `, result.reason);
-                        }else if(result.type==this.NicoDownloader.ResultType.error){ 
+                        }else if(result.type==NicoDownloader.ResultType.error){ 
                             this.grid_table_dl.updateItem(video_id, {
                                 progress: `エラー: ${result.reason.message}`, 
-                                state: this.DownloadState.error
+                                state: DownloadState.error
                             });
                             logger.debug(`download id=${video_id}: `, result.reason);
                         }
@@ -352,7 +354,7 @@
                     }
                 } catch (error) {
                     logger.error(`download id=${video_id}: `, error);
-                    await this.myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBox({
                         type: "error",
                         message: error.message
                     });

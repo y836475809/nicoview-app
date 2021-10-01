@@ -85,57 +85,68 @@
             <i class={getIconClass()}></i>
         </div>
     </div>
-    <div class="mylist-description">{mylist_description}</div>
+    <div class="mylist-description">{state.mylist_description}</div>
     <div class="mylist-grid-container">
         <div class="mylist-grid"></div>
     </div>
 
     <script>
         /* globals my_obs logger ModalDialog */
-        export default {
-            onBeforeMount(props) {  
-                this.myapi = window.myapi;
-                const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
-                this.Command = window.Command.Command;
-                this.NicoMylist = window.NicoMylist.NicoMylist;
-                this.NicoMylistStore = window.NicoMylist.NicoMylistStore;
-                this.NicoMylistImageCache = window.NicoMylist.NicoMylistImageCache;
-                this.needConvertVideo = window.VideoConverter.needConvertVideo;
+        const myapi = window.myapi;
+        const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
+        const { Command } = window.Command;
+        const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
+        const { needConvertVideo } = window.VideoConverter;
 
+        const getMylistID = (tag) => {
+            const elm = tag.root.querySelector(".mylist-input");
+            return elm.value;
+        };
+        const setMylistID = (tag, id) => {
+            const elm = tag.root.querySelector(".mylist-input");
+            elm.value = id;
+        };
+        
+        export default {
+            state:{
+                mylist_description:""
+            },
+            obs:null,
+            obs_modal_dialog:null,
+            modal_dialog:null,
+            nico_mylist_image_cache:null,
+            nico_mylist_store:null,
+            nico_mylist:null,
+            loaded_mylist_id:null,
+            grid_table:null,
+            is_current_fav:false,
+            onBeforeMount(props) {  
                 this.obs = props.obs; 
                 this.obs_modal_dialog = my_obs.createObs();
-                this.modal_dialog = null;
 
-                this.myapi.ipc.Download.onUpdateItem(async ()=>{
-                    const video_ids = await this.myapi.ipc.Download.getIncompleteIDs();
+                myapi.ipc.Download.onUpdateItem(async ()=>{
+                    const video_ids = await myapi.ipc.Download.getIncompleteIDs();
                     const items = this.grid_table.dataView.getItems();
 
                     for (let i=0; i<items.length; i++) {
                         const item = items[i];
                         const video_id = item.id;
-                        item.saved = await this.myapi.ipc.Library.hasItem(video_id);
+                        item.saved = await myapi.ipc.Library.hasItem(video_id);
                         item.reg_download = video_ids.includes(video_id);
                         this.grid_table.dataView.updateItem(video_id, item);    
                     }
                 });
 
-                this.myapi.ipc.Library.onAddItem((args) => {
+                myapi.ipc.Library.onAddItem((args) => {
                     const {video_item} = args;
                     const video_id = video_item.id;
                     this.grid_table.updateCells(video_id, { saved:true });
                 });
 
-                this.myapi.ipc.Library.onDeleteItem((args) => {
+                myapi.ipc.Library.onDeleteItem((args) => {
                     const { video_id } = args;
                     this.grid_table.updateCells(video_id, { saved:false });
                 });
-        
-                this.mylist_description = "";
-
-                this.nico_mylist_image_cache = null;
-                this.nico_mylist_store = null;
-                this.nico_mylist = null;
-                this.loaded_mylist_id = null;
 
                 this.obs.on("mylist-page:item-dlbclicked", async (item) => {
                     const mylist_id = item.mylist_id;
@@ -144,11 +155,11 @@
                     }else{
                         try {
                             const mylist = this.nico_mylist_store.load(mylist_id);
-                            this.setMylistID(mylist_id);
+                            setMylistID(this, mylist_id);
                             await this.setMylist(mylist); 
                         } catch (error) {
                             logger.error(error);
-                            await this.myapi.ipc.Dialog.showMessageBox({
+                            await myapi.ipc.Dialog.showMessageBox({
                                 type: "error",
                                 message: error.message
                             });
@@ -157,7 +168,7 @@
                 });
 
                 this.obs.on("mylist-page:load-mylist", async(mylist_id)=> {
-                    this.setMylistID(mylist_id);
+                    setMylistID(this, mylist_id);
                     try {
                         if(await this.existMylist(mylist_id)){
                             await this.setMylist(this.nico_mylist_store.load(mylist_id)); 
@@ -168,7 +179,7 @@
                     } catch (error) {
                         if(!error.cancel){
                             logger.error(error);
-                            await this.myapi.ipc.Dialog.showMessageBox({
+                            await myapi.ipc.Dialog.showMessageBox({
                                 type: "error",
                                 message: error.message
                             });
@@ -185,7 +196,7 @@
                     }); 
                 });
 
-                window.addEventListener("beforeunload", async (event) => {
+                window.addEventListener("beforeunload", async (event) => { // eslint-disable-line no-unused-vars
                     const mylist_id_list = await this.getMylistIDList();
                     this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
                     this.nico_mylist_image_cache.save();
@@ -197,7 +208,7 @@
                     return this.nico_mylist_image_cache.getImageHtml(mylist_id, url);
                 };
 
-                const htmlFormatter = (row, cell, value, columnDef, dataContext)=> {
+                const htmlFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
                     const result = value.replace(/\r?\n/g, "<br>");
                     return `<div>${result}</div>`;
                 };
@@ -221,22 +232,20 @@
                     rowHeight: 100,
                 };    
                 this.grid_table = new GridTable("mylist-grid", columns, options);
-
-                this.is_current_fav = false;
             },
             async onMounted() {
-                const mylist_dir = await this.myapi.ipc.MyList.getMyListDir();  
-                this.nico_mylist_store = new this.NicoMylistStore(mylist_dir);
-                this.nico_mylist_image_cache = new this.NicoMylistImageCache(mylist_dir);
+                const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
+                this.nico_mylist_store = new NicoMylistStore(mylist_dir);
+                this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
                 const grid_container = this.root.querySelector(".mylist-grid");
                 this.grid_table.init(grid_container);
                 this.grid_table.setupResizer(".mylist-grid-container");
                 this.grid_table.onDblClick(async (e, data)=>{
                     const video_id = data.id;
-                    const video_item = await this.myapi.ipc.Library.getItem(video_id);
-                    if(this.needConvertVideo(video_item)===true){      
-                        const ret = await this.myapi.ipc.Dialog.showMessageBox({
+                    const video_item = await myapi.ipc.Library.getItem(video_id);
+                    if(needConvertVideo(video_item)===true){      
+                        const ret = await myapi.ipc.Dialog.showMessageBox({
                             message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
                             okcancel: true
                         });
@@ -245,7 +254,7 @@
                         }
                         this.obs.trigger("library-page:convert-video", video_id);
                     }else{
-                        this.Command.play(data, false);
+                        Command.play(data, false);
                     }
                 });
                 this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
@@ -253,26 +262,26 @@
                         await this.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        this.Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(this.obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        this.Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(this.obs, [data]);
                     }
                     if(cmd_id == "download"){
-                        this.Command.addDownloadItems(this.obs, [data]);
+                        Command.addDownloadItems(this.obs, [data]);
                     }
                 });
                 
-                this.grid_table.onContextMenu(async (e)=>{
+                this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
                     const items = this.grid_table.getSelectedDatas();
                     if(items.length==0){
                         return;
                     }
                     const video_id = items[0].id;
-                    const video_item = await this.myapi.ipc.Library.getItem(video_id);
-                    const need_convert = this.needConvertVideo(video_item);
+                    const video_item = await myapi.ipc.Library.getItem(video_id);
+                    const need_convert = needConvertVideo(video_item);
                     const context_menu_type = need_convert?"convert-video":"main";
-                    const menu_id = await this.myapi.ipc.popupContextMenu("mylist", {context_menu_type, items});
+                    const menu_id = await myapi.ipc.popupContextMenu("mylist", {context_menu_type, items});
                     if(!menu_id){
                         return;
                     }
@@ -298,9 +307,9 @@
             },
             async play(item, online) {
                 const video_id = item.id;
-                const video_item = await this.myapi.ipc.Library.getItem(video_id);
-                if(!online && this.needConvertVideo(video_item)){       
-                    const ret = await this.myapi.ipc.Dialog.showMessageBox({
+                const video_item = await myapi.ipc.Library.getItem(video_id);
+                if(!online && needConvertVideo(video_item)){       
+                    const ret = await myapi.ipc.Dialog.showMessageBox({
                         message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
                         okcancel: true
                     });
@@ -309,16 +318,8 @@
                     }
                     this.obs.trigger("library-page:convert-video", video_id);
                 }else{
-                    this.Command.play(item, online);
+                    Command.play(item, online);
                 }
-            },
-            getMylistID() {
-                const elm = this.root.querySelector(".mylist-input");
-                return elm.value;
-            },
-            setMylistID(id) {
-                const elm = this.root.querySelector(".mylist-input");
-                elm.value = id;
             },
             async hasMylistID(mylist_id) {
                 const mylist_id_list = await this.getMylistIDList();
@@ -332,7 +333,7 @@
                 }
             },
             async setMylist(mylist) {
-                this.mylist_description = mylist.description;
+                this.state.mylist_description = mylist.description;
 
                 const mylist_id_list = await this.getMylistIDList();
                 this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
@@ -352,11 +353,11 @@
                 this.loaded_mylist_id = mylist.mylist_id;
                 
                 const mylist_items = mylist.items;
-                const video_ids = await this.myapi.ipc.Download.getIncompleteIDs();
+                const video_ids = await myapi.ipc.Download.getIncompleteIDs();
                 for (let i=0; i<mylist_items.length; i++) {
                     const item = mylist_items[i];
                     const video_id = item.id;
-                    item.saved = await this.myapi.ipc.Library.hasItem(video_id);
+                    item.saved = await myapi.ipc.Library.hasItem(video_id);
                     item.reg_download = video_ids.includes(video_id);  
                     item.mylist_id = mylist.mylist_id;
                 }
@@ -365,7 +366,7 @@
                 this.grid_table.scrollToTop();   
             },
             async getMylist(mylist_id) {
-                this.nico_mylist = new this.NicoMylist();
+                this.nico_mylist = new NicoMylist();
                 const mylist = await this.nico_mylist.getMylist(mylist_id);
                 await this.setMylist(mylist);
             },
@@ -407,13 +408,13 @@
                 this.obs_modal_dialog.trigger("show", {
                     message: "更新中...",
                     buttons: ["cancel"],
-                    cb: result=>{
+                    cb: ()=>{
                         this.onCancelUpdate();
                     }
                 });
                 
                 try {
-                    const mylist_id = this.getMylistID();
+                    const mylist_id = getMylistID(this);
                     await this.getMylist(mylist_id);
 
                     const mylist_id_list = await this.getMylistIDList();
@@ -423,7 +424,7 @@
                 } catch (error) {
                     if(!error.cancel){
                         logger.error(error);
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             type: "error",
                             message: error.message
                         });
@@ -437,10 +438,10 @@
                     await this.updateMylist();
                 }
             },
-            async onclickUpdateMylist(e) {  
+            async onclickUpdateMylist(e) { // eslint-disable-line no-unused-vars
                 await this.updateMylist();
             },
-            async onclickSaveMylist(e) {
+            async onclickSaveMylist(e) { // eslint-disable-line no-unused-vars
                 if(!this.nico_mylist){
                     return;
                 }

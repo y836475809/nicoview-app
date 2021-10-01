@@ -19,15 +19,17 @@
 
     <script>
         /* globals my_obs */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
+        const myapi = window.myapi;
 
+        export default {
+            obs:null,
+            obs_listview:null,
+            name:"mylist",
+            items:[],
+            confirm:["delete"],
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_listview = my_obs.createObs();
-                this.name = "mylist";
-                this.items = [];
-                this.confirm = ["delete"];
 
                 this.getTooltip = (item) => {
                     const { title, creator } = item;
@@ -43,11 +45,11 @@
                     const { items } = args;
                     this.items = items;
 
-                    await this.myapi.ipc.MyList.updateItems(items);
+                    await myapi.ipc.MyList.updateItems(items);
                 });
 
                 this.obs_listview.on("show-contextmenu", (e, args) => {
-                    const { items, cb } = args;
+                    const { items, cb } = args; // eslint-disable-line no-unused-vars
                     cb(null);
                 });
 
@@ -92,7 +94,7 @@
                 await this.loadItems();
             },
             async loadItems() {
-                this.items = await this.myapi.ipc.MyList.getItems();
+                this.items = await myapi.ipc.MyList.getItems();
                 this.obs_listview.trigger("loadData", { items:this.items });
             }
         };

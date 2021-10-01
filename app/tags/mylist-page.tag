@@ -12,6 +12,7 @@
     </div>    
     <script>
         export default {
+            obs:null,
             onBeforeMount(props) {
                 this.obs = props.obs;
             }

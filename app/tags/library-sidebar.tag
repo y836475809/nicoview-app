@@ -18,13 +18,15 @@
 
     <script>
         /* globals my_obs */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
+        const myapi = window.myapi;
 
+        export default {
+            obs:null,
+            obs_listview:null,
+            name:"library-search",
+            onBeforeMount(props) {
                 this.obs = props.obs; 
                 this.obs_listview = my_obs.createObs();
-                this.name = "library-search";
 
                 const target_map = new Map();
                 this.props.search_targets.forEach(target=>{
@@ -55,11 +57,11 @@
 
                 this.obs_listview.on("changed", async (args) => {
                     const { items } = args;
-                    await this.myapi.ipc.Library.updateSearchItems(items);
+                    await myapi.ipc.Library.updateSearchItems(items);
                 });
                 
                 this.obs_listview.on("show-contextmenu", (e, args) => {
-                    const { items, cb } = args;
+                    const { items, cb } = args; // eslint-disable-line no-unused-vars
                     cb(null);
                 });
 
@@ -73,7 +75,7 @@
                 });
             },
             async onMounted() {
-                const items = await this.myapi.ipc.Library.getSearchItems();
+                const items = await myapi.ipc.Library.getSearchItems();
                 this.obs_listview.trigger("loadData", { items });
             }
         };

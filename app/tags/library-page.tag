@@ -16,6 +16,8 @@
     </div>
     <script>
         export default {
+            obs:null,
+            search_targets:null,
             onBeforeMount(props) {
                 this.obs = props.obs;
                 this.search_targets = Object.freeze([

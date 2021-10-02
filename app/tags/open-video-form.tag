@@ -84,7 +84,7 @@
             onBeforeMount(props) {
                 props.obs.on("show", () => {
                     formVisible(this, true);
-                    const elm = this.root.querySelector(".open-form input");
+                    const elm = this.$(".open-form input");
                     elm.value = "";
                     elm.focus();
                 });

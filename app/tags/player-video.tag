@@ -73,7 +73,7 @@
                 const default_comment_params = await this.obs.triggerReturn("setting-display-comment:get-default_params");
                 this.comment_params = await myapi.ipc.Config.get("comment", default_comment_params);
                 
-                this.video_elm = this.root.querySelector(".video-screen > video");
+                this.video_elm = this.$(".video-screen > video");
                 this.video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
 
                 this.video_elm.addEventListener("loadedmetadata", (event) => { // eslint-disable-line no-unused-vars
@@ -270,7 +270,7 @@
                 const row_num = 12;
                 const comment_font_family = this.getCommentFontFamily();
                 const  { duration_sec, fps } = this.comment_params;
-                const parent = this.root.querySelector(".video-screen");
+                const parent = this.$(".video-screen");
 
                 const nico_script = new NicoScript();
 

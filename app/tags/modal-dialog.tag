@@ -83,7 +83,7 @@
 
                     this.update();
 
-                    const dialog = this.root.querySelector("dialog");
+                    const dialog = this.$("dialog");
                     dialog.showModal();
                 });
 
@@ -93,7 +93,7 @@
                 });
 
                 this.obs_dialog.on("close", () => {
-                    const dialog = this.root.querySelector("dialog");
+                    const dialog = this.$("dialog");
                     dialog.close();
                     this.root.dataset.open = false;
                 });

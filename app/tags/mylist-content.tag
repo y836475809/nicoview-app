@@ -99,11 +99,11 @@
         const { needConvertVideo } = window.VideoConverter;
 
         const getMylistID = (tag) => {
-            const elm = tag.root.querySelector(".mylist-input");
+            const elm = tag.$(".mylist-input");
             return elm.value;
         };
         const setMylistID = (tag, id) => {
-            const elm = tag.root.querySelector(".mylist-input");
+            const elm = tag.$(".mylist-input");
             elm.value = id;
         };
         
@@ -238,7 +238,7 @@
                 this.nico_mylist_store = new NicoMylistStore(mylist_dir);
                 this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
-                const grid_container = this.root.querySelector(".mylist-grid");
+                const grid_container = this.$(".mylist-grid");
                 this.grid_table.init(grid_container);
                 this.grid_table.setupResizer(".mylist-grid-container");
                 this.grid_table.onDblClick(async (e, data)=>{
@@ -390,7 +390,7 @@
                 this.nico_mylist_store.save(mylist_id, this.nico_mylist.xml);
             },
             cacheImage(mylist_id) {
-                const elms = this.root.querySelectorAll(".mylist-img");
+                const elms = this.$$(".mylist-img");
                 elms.forEach(elm => {
                     this.nico_mylist_image_cache.setImage(mylist_id, elm);
                 });

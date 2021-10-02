@@ -82,7 +82,7 @@
                 });
             },
             async onMounted() {
-                const grid_container = this.root.querySelector(".history-grid");
+                const grid_container = this.$(".history-grid");
                 this.grid_table.init(grid_container);
                 this.grid_table.setupResizer(".history-grid-container");
                 this.grid_table.onDblClick((e, data)=>{

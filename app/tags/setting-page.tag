@@ -166,11 +166,11 @@
         const { MouseGesture } = window.MouseGesture;
 
         const setInputValue = (tag, selector, value) => {          
-            const elm = tag.root.querySelector(selector);
+            const elm = tag.$(selector);
             elm.value = value;
         };
         const setCheckValue = (tag, selector, value) => {          
-            const elm = tag.root.querySelector(selector);
+            const elm = tag.$(selector);
             elm.checked = value;
         };
         const setupMouseGesture = async (tag, mouse_gesture) => {
@@ -180,7 +180,7 @@
             for (const [key, value] of Object.entries(config)) {
                 const gesture = value;
                 const class_name = `mg-${key}`;
-                const elem = tag.root.querySelector(`.${class_name}`);
+                const elem = tag.$(`.${class_name}`);
                 for(let i = 0; i < elem.options.length; i++) {
                     if(elem.options[i].value == gesture){
                         elem.options[i].selected = true ;
@@ -272,7 +272,7 @@
                 await myapi.ipc.Config.set("nndd.system_path", dir);
             },
             async onclickCheckNNDDImportItem(item, e) {  // eslint-disable-line no-unused-vars
-                const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
+                const ch_elm = this.$(`input[name='${item.name}']`);
                 const checked = ch_elm.checked;
                 await myapi.ipc.Config.set(`nndd.${item.name}`, checked);
             },
@@ -296,7 +296,7 @@
 
                 const import_items = [];
                 this.state.import_items.forEach(item => {
-                    const ch_elm = this.root.querySelector(`input[name='${item.name}']`);
+                    const ch_elm = this.$(`input[name='${item.name}']`);
                     if(ch_elm.checked){
                         import_items.push(item);
                     }

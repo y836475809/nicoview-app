@@ -294,7 +294,7 @@
                 });
             },
             async onMounted() {
-                const grid_container = this.root.querySelector(".library-grid");
+                const grid_container = this.$(".library-grid");
                 this.grid_table.init(grid_container);
                 this.grid_table.setupResizer(".library-grid-container");
         
@@ -403,14 +403,14 @@
             },
             getSearchTargetElm(target_id) {
                 const id = this.getSearchTargetElmID(target_id);
-                return this.root.querySelector(`#${id}`);
+                return this.$(`#${id}`);
             },
             getSearchTargetEnable() {
-                const elm = this.root.querySelector(".search-target-container");
+                const elm = this.$(".search-target-container");
                 return elm.classList.contains("search-target-none") === false;
             },
             setSearchTargetEnable(enable) {
-                const elm = this.root.querySelector(".search-target-container");
+                const elm = this.$(".search-target-container");
                 if(enable){
                     elm.classList.remove("search-target-none");
                 }else if(this.getSearchTargetEnable()){
@@ -453,7 +453,7 @@
                 });
             },
             getSearchInputElm() {
-                return this.root.querySelector(".search-container > .search-input");
+                return this.$(".search-container > .search-input");
             },
             filterItems(query, target_ids) {
                 this.grid_table.filterData(query, target_ids);

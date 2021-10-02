@@ -111,7 +111,7 @@
                 });
 
                 this.obs_page_selector.on("close", () => {
-                    const elm = this.root.querySelector(".page-selector");
+                    const elm = this.$(".page-selector");
                     elm.classList.remove("page-selector-show"); 
 
                     this.changePageSelector("remove");
@@ -134,7 +134,7 @@
                 }
             },
             changePageSelector(name) {
-                const elm = this.root.querySelector(".page-selector");
+                const elm = this.$(".page-selector");
                 elm.classList[name]("page-selector-show"); 
             },
             onclickTogglePageSelector() {

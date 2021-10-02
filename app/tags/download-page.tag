@@ -128,7 +128,7 @@
                     }
                 });
 
-                const grid_container = this.root.querySelector(".download-grid");
+                const grid_container = this.$(".download-grid");
                 this.grid_table_dl = new GridTableDownloadItem(grid_container);
 
                 try {

@@ -199,11 +199,11 @@
         const default_icon = "fas fa-square listview-item-default-icon";
 
         const getInputValue = (tag) => {
-            const elm = tag.root.querySelector(".listview-input");
+            const elm = tag.$(".listview-input");
             return elm.value.toLowerCase();
         };
         const setInputValue = (tag, value) => {
-            const elm = tag.root.querySelector(".listview-input");
+            const elm = tag.$(".listview-input");
             elm.value = value;
         };
 
@@ -269,7 +269,7 @@
                     if(await this.deleteConfirm() === false){
                         return;
                     }
-                    const elms = this.root.querySelectorAll(".listview-item");
+                    const elms = this.$$(".listview-item");
 
                     elms.forEach(elm => {
                         if(elm.classList.contains("selected")===true){
@@ -296,7 +296,7 @@
                     if(index < 0){
                         return;
                     }
-                    const elms = this.root.querySelectorAll(".listview-item");
+                    const elms = this.$$(".listview-item");
                     if(index >= elms.length){
                         return;
                     }
@@ -307,7 +307,7 @@
                 });
 
                 this.obs.on("clear-select", () => {
-                    const elms = this.root.querySelectorAll(".listview-item");
+                    const elms = this.$$(".listview-item");
                     elms.forEach((elm) => {
                         elm.classList.remove("selected");
                     });
@@ -325,7 +325,7 @@
                 const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
                 this.item_duration = parseInt(prop);
 
-                const elm = this.root.querySelector(".listview-list");
+                const elm = this.$(".listview-list");
                 this.sortable = Sortable.create(elm, {
                     ghostClass: "listview-item-ghost-class",
                     draggable: ".listview-item",
@@ -371,7 +371,7 @@
                 this.triggerChange();
             },
             filter(query) {
-                const elms = this.root.querySelectorAll(".listview-item");
+                const elms = this.$$(".listview-item");
                 elms.forEach((elm, index) => {
                     if (query == "") {
                         elm.style.display ="";
@@ -412,7 +412,7 @@
                 return `center-hv ${icon} listview-item-${color}-icon-color`;
             },
             setSelected(target_elm, item) { // eslint-disable-line no-unused-vars
-                const elms = this.root.querySelectorAll(".listview-item");
+                const elms = this.$$(".listview-item");
                 elms.forEach((elm) => {
                     elm.classList.remove("selected");
                 });
@@ -422,7 +422,7 @@
                 }
             },
             getSelectedItems() {
-                const elms = this.root.querySelectorAll(".listview-item");
+                const elms = this.$$(".listview-item");
                 return this.state.items.filter((item, index) => {
                     return elms[index].classList.contains("selected")===true;
                 });

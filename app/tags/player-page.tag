@@ -67,7 +67,7 @@
                 return await this.obs.triggerReturn("player-video:get-current-time-callback");
             },
             resizeVideo(org_size) {
-                const elm = this.root.querySelector(".video-container");
+                const elm = this.$(".video-container");
                 const dw = org_size.width - elm.offsetWidth;
                 const dh = org_size.height - elm.offsetHeight;
                 window.resizeBy(dw, dh);

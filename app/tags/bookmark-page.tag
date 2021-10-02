@@ -32,8 +32,8 @@
         const time_format = window.TimeFormat;
 
         const resizeHeight = (tag, items) => {
-            const sidebar = tag.root.querySelector(".sidebar");
-            const content = tag.root.querySelector(".content");
+            const sidebar = tag.$(".sidebar");
+            const content = tag.$(".content");
             const item_height = 30;
             const new_height = items.length*item_height;
             sidebar.style.height = (new_height + 35) + "px";

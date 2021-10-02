@@ -52,11 +52,12 @@
 
     <script> 
         export default {
+            obs:null,
+            hours:[],
+            minutes:[],
             onBeforeMount(props) {
                 this.obs =  props.obs;
-
-                this.hours = [];
-                this.minutes = [];
+                
                 for (let index = 0; index < 24; index++) {
                     this.hours.push(index);
                 }
@@ -76,9 +77,9 @@
                 });
             },
             getParamElms() {
-                const h_elm = this.root.querySelector(".hour-select");
-                const m_elm = this.root.querySelector(".minute-select");
-                const ck_elm = this.root.querySelector(".schedule-enable-check");
+                const h_elm = this.$(".hour-select");
+                const m_elm = this.$(".minute-select");
+                const ck_elm = this.$(".schedule-enable-check");
                 return { h_elm, m_elm, ck_elm };
             },
             changeEnable(enable) {
@@ -87,7 +88,7 @@
                 h_elm.disabled = !enable;
                 m_elm.disabled = !enable;
 
-                const label_elms = this.root.querySelectorAll(".label");
+                const label_elms = this.$$(".label");
                 label_elms.forEach(elm => {
                     if(enable){
                         elm.classList.remove("disabled");
@@ -96,7 +97,7 @@
                     }   
                 });
             },
-            onChangeParams(e) {
+            onChangeParams(e) { // eslint-disable-line no-unused-vars
                 const { h_elm, m_elm, ck_elm } = this.getParamElms();
 
                 const hour = parseInt(h_elm.value);

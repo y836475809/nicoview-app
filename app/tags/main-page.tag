@@ -137,7 +137,7 @@
                 <div>
                     <span class="download-badge center-hv">
                         <i class="fas fa-download"></i>
-                        <span class="item-num">{donwnload_item_num}</span>
+                        <span class="item-num">{state.donwnload_item_num}</span>
                     </span> 
                     <div class="button-label">ダウンロード</div>
                 </div>
@@ -194,11 +194,16 @@
 
     <script>
         /* globals logger */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                const { MouseGesture } = window.MouseGesture;
+        const myapi = window.myapi;
+        const { MouseGesture } = window.MouseGesture;
 
+        export default {
+            state:{
+                donwnload_item_num:0
+            },
+            obs:null,
+            mouse_gesture:null,
+            onBeforeMount(props) {
                 this.obs = props.obs;
 
                 this.mouse_gesture = new MouseGesture();
@@ -208,7 +213,7 @@
                 });
 
                 (async()=>{
-                    const config = await  this.myapi.ipc.Config.get(
+                    const config = await  myapi.ipc.Config.get(
                         this.mouse_gesture.name,  this.mouse_gesture.defaultConfig);
                     this.mouse_gesture.config = config;
                 })(); 
@@ -216,7 +221,7 @@
                 this.mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
                 this.mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
                 this.mouse_gesture.setActionShowPalyer(()=>{
-                    this.myapi.ipc.showyPlayer();
+                    myapi.ipc.showyPlayer();
                 });
 
                 this.mouse_gesture.onGesture((gesture)=>{
@@ -224,7 +229,7 @@
                         return;
                     }
                     
-                    const items = [...this.root.querySelectorAll(".page-container.left > *")];
+                    const items = [...this.$$(".page-container.left > *")];
                     const cu_index = items.findIndex(item=>{
                         return item.style.zIndex > 0;
                     });
@@ -237,45 +242,43 @@
                     }
                 });
 
-                this.myapi.ipc.Download.onUpdateItem(async ()=>{
+                myapi.ipc.Download.onUpdateItem(async ()=>{
                     await  this.updateDownloadBadge();
                 });
 
-                this.myapi.ipc.Setting.onChangeLogLevel((args) => {
+                myapi.ipc.Setting.onChangeLogLevel((args) => {
                     const { level } = args;
                     logger.setLevel(level);
                 });
-
-                this.donwnload_item_num = 0;
 
                 this.obs.on("main-page:select-page", (page_name)=>{
                     this.select_page(page_name);
                 });  
 
-                this.myapi.ipc.Search.onSearchTag((args)=>{
+                myapi.ipc.Search.onSearchTag((args)=>{
                     this.obs.trigger("main-page:select-page", "search");
                     this.obs.trigger("search-page:search-tag", args);
                 });
 
-                this.myapi.ipc.MyList.onLoad((args)=>{
+                myapi.ipc.MyList.onLoad((args)=>{
                     this.obs.trigger("main-page:select-page", "mylist");
                     this.obs.trigger("mylist-page:load-mylist", args);
                 });
 
-                this.myapi.ipc.Download.onAddItems((args)=>{
+                myapi.ipc.Download.onAddItems((args)=>{
                     const items = args;
                     this.obs.trigger("download-page:add-download-items", items);
                 });
-                this.myapi.ipc.Download.onDeleteItems((args)=>{
+                myapi.ipc.Download.onDeleteItems((args)=>{
                     const items = args;
                     this.obs.trigger("download-page:delete-download-items", items);
                 });
 
-                this.myapi.ipc.Stack.onAddItems((args)=>{
+                myapi.ipc.Stack.onAddItems((args)=>{
                     this.obs.trigger("play-stack-page:add-items", args);
                 });
 
-                this.myapi.ipc.Bookmark.onAddItems((args)=>{
+                myapi.ipc.Bookmark.onAddItems((args)=>{
                     const bk_items = args;
                     this.obs.trigger("bookmark-page:add-items", bk_items);
                 });
@@ -293,30 +296,30 @@
                 this.mouse_gesture.mouseUp(e);
             },
             async updateDownloadBadge() {
-                const video_ids = await  this.myapi.ipc.Download.getIncompleteIDs();
-                const elm = this.root.querySelector(".download-badge > .item-num");
+                const video_ids = await  myapi.ipc.Download.getIncompleteIDs();
+                const elm = this.$(".download-badge > .item-num");
                 if(video_ids.length === 0){
                     elm.style.display = "none";
                 }else{
                     elm.style.display = "";
                 }
-                this.donwnload_item_num = video_ids.length;
+                this.state.donwnload_item_num = video_ids.length;
                 this.update();
             },
             changeClass(remove_query, add_query, class_name) {
-                const elms = this.root.querySelectorAll(remove_query);
+                const elms = this.$$(remove_query);
                 elms.forEach(elm => {
                     elm.classList.remove(class_name);
                 });
-                const elm = this.root.querySelector(add_query);
+                const elm = this.$(add_query);
                 elm.classList.add(class_name);
             },
             select_page(page_name){
-                Array.from(this.root.querySelectorAll(".page-container.left > *"), 
+                Array.from(this.$$(".page-container.left > *"), 
                     (elm) => {
                         elm.style.zIndex = 0;
                     });
-                const page = this.root.querySelector(`${page_name}-page`);
+                const page = this.$(`${page_name}-page`);
                 page.style.zIndex = 1;
 
                 this.changeClass(
@@ -334,11 +337,11 @@
                     `.${page_name}-button > .button-border`, 
                     "select-button-border");
             },
-            onclickPageSelect(page_name, e) {
+            onclickPageSelect(page_name, e) { // eslint-disable-line no-unused-vars
                 this.select_page(page_name);
             },
             hideRightPage() { 
-                Array.from(this.root.querySelectorAll(".page-container.right > *"), 
+                Array.from(this.$$(".page-container.right > *"), 
                     (elm) => {
                         elm.style.zIndex = -1;
                     });
@@ -347,7 +350,7 @@
                 if(elm.classList.contains(toggle_class)===true){
                     elm.classList.remove(toggle_class); 
                 }else{
-                    const buttons = this.root.querySelectorAll(`.main-sidebar.right ${select_class}`);
+                    const buttons = this.$$(`.main-sidebar.right ${select_class}`);
                     buttons.forEach(btn => {
                         btn.classList.remove(toggle_class); 
                     });
@@ -355,7 +358,7 @@
                 } 
             },
             onclickTogglePage(page_name, e) {
-                const page = this.root.querySelector(`.${page_name}-page`);
+                const page = this.$(`.${page_name}-page`);
                 const page_zIndex = page.style.zIndex;
 
                 this.hideRightPage();
@@ -368,10 +371,10 @@
 
                 this.toggleRightSidebarClass(e.target, "select-button", ".button");
 
-                const icon_elm = this.root.querySelector(`.${page_name}-button i.fas`);
+                const icon_elm = this.$(`.${page_name}-button i.fas`);
                 this.toggleRightSidebarClass(icon_elm, "select-icon", "i.fas");
 
-                const border_elm = this.root.querySelector(`.${page_name}-button > .button-border`);
+                const border_elm = this.$(`.${page_name}-button > .button-border`);
                 this.toggleRightSidebarClass(border_elm, "select-button-border", ".button-border");
             }
         };

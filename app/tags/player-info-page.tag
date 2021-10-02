@@ -102,8 +102,8 @@
     <div class="info-container">
         <div class="video-container">
             <div style="display: flex;">
-                <div class="video-thumbnail" title={video_thumbnail_tooltip}>
-                    <img src={video_thumbnail_url} class="video-thumbnail">
+                <div class="video-thumbnail" title={state.video_thumbnail_tooltip}>
+                    <img src={state.video_thumbnail_url} class="video-thumbnail">
                 </div>
                 <div class="video-info">
                     <div class="content">
@@ -139,7 +139,7 @@
                     onclick={onclickCommentVisibleCheck} />表示
             </label>
             <div class="comment-state center-v" title="表示制限、フィルタリングしたコメント数/全コメント数">
-                {comment_state}
+                {state.comment_state}
             </div>
             <div class="move-right">
                 <div title="設定ダイアログ表示" class="icon-button center-hv"
@@ -167,39 +167,39 @@
     
     <script>
         /* globals logger */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                const { GridTable } = window.GridTable;
-                const time_format = window.TimeFormat;
-                const { SyncCommentScroll } = window.SyncCommentScroll;
+        const  myapi = window.myapi;
+        const { GridTable } = window.GridTable;
+        const time_format = window.TimeFormat;
+        const { SyncCommentScroll } = window.SyncCommentScroll;
 
+        export default {
+            state:{
+                video_thumbnail_tooltip:"",
+                video_thumbnail_url:"",
+                comment_state:""
+            },
+            obs:null,
+            is_economy:false,
+            is_deleted:false,
+            is_online:false,
+            is_saved:false,
+            title:"",
+            first_retrieve:"",
+            view_counter:0,
+            comment_counter:0,
+            mylist_counter:0,
+            sync_comment_scroll:null,
+            sync_comment_checked:true,
+            grid_table:null,
+            onBeforeMount(props) {
                 this.obs = props.obs; 
 
-                const row_height = 25;
-
-                this.is_economy = false;
-                this.is_deleted = false;
-                this.is_online = false;
-                this.is_saved = false;
-
-                this.video_thumbnail_url = "";
-                this.title =  "-";
-                this.first_retrieve =  "";
-                this.view_counter = 0;
-                this.comment_counter = 0;
-                this.mylist_counter = 0;
-                this.comment_state = "";
-
-                this.video_thumbnail_tooltip = "";
-
                 this.sync_comment_scroll = new SyncCommentScroll();
-                this.sync_comment_checked = true;
 
-                const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
+                const timeFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
                     return time_format.toTimeString(value * 10 / 1000);
                 };
-                const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
+                const dateFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
                     //sec->ms
                     return time_format.toDateString(value * 1000);
                 };
@@ -212,7 +212,7 @@
                     {id: "mail", name: "オプション"}
                 ];
                 const options = {
-                    rowHeight: row_height,
+                    rowHeight: 25,
                 };   
                 this.grid_table = new GridTable("comment-grid", columns, options);
                 
@@ -255,13 +255,13 @@
 
                     this.video_id = video.video_id;
                     this.title = video.title;
-                    this.video_thumbnail_url = video.thumbnailURL;
+                    this.state.video_thumbnail_url = video.thumbnailURL;
                     this.first_retrieve = time_format.toDateString(video.postedDateTime);
                     this.view_counter = video.viewCount;
                     this.comment_counter = thread.commentCount;
                     this.mylist_counter = video.mylistCount;
 
-                    this.video_thumbnail_tooltip = 
+                    this.state.video_thumbnail_tooltip = 
                         `投稿日: ${this.first_retrieve}\n`
                         + `再生: ${this.view_counter.toLocaleString()}\n`
                         + `コメント: ${this.comment_counter.toLocaleString()}\n`
@@ -270,10 +270,10 @@
                         + `画質: ${this.videoStateEconomy()}`; 
                     const state_deleted = this.videoStateDeleted();
                     if(state_deleted){
-                        this.video_thumbnail_tooltip += `\n${state_deleted}`;
+                        this.state.video_thumbnail_tooltip += `\n${state_deleted}`;
                     }
 
-                    this.comment_state = 
+                    this.state.comment_state = 
                         `${comments.length.toLocaleString()}/${all_comment_num.toLocaleString()}`;
                     
                     const user_id = owner.id;
@@ -320,8 +320,8 @@
                     this.obs.trigger("player-video:seek", sec);
                 });
 
-                this.grid_table.onContextMenu(async (e)=>{
-                    const menu_id = await this.myapi.ipc.popupContextMenu("player-ngcomment");
+                this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
+                    const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
                     if(!menu_id){
                         return;
                     }
@@ -341,7 +341,7 @@
                     }
                 });
 
-                const ch_elm = this.root.querySelector(".comment-checkbox.comment-visible");
+                const ch_elm = this.$(".comment-checkbox.comment-visible");
                 ch_elm.checked = true; 
             },
             enableDonwload() {
@@ -365,11 +365,6 @@
                 }
             },
             videoStateEconomy() {
-                // if(this.is_economy === true){
-                //     return "エコノミー";
-                // }else{
-                //     return "";
-                // }
                 return this.is_economy ? "エコノミー" : "高画質";
             },
             videoStateDeleted() {
@@ -383,14 +378,14 @@
                 const comment_visible = e.target.checked;
                 this.obs.trigger("player-video:change-comment-visible", comment_visible);
             },
-            onclickUpdateThumbInfo(e) {
+            onclickUpdateThumbInfo(e) { // eslint-disable-line no-unused-vars
                 this.obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
             },
-            onclickUpdateComment(e) {
+            onclickUpdateComment(e) { // eslint-disable-line no-unused-vars
                 logger.debug("player video info update video_id=", this.video_id);
                 this.obs.trigger("player-main-page:update-data", this.video_id, "comment");
             },
-            onclickShowSettingDialog(e) {
+            onclickShowSettingDialog(e) { // eslint-disable-line no-unused-vars
                 this.obs.trigger("player-main-page:show-player-setting-dialog");
             },
             setComments(comments) {

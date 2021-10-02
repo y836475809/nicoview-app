@@ -38,34 +38,39 @@
 
     <script>
         /* globals my_obs logger ModalDialog */
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.NicoPlay = window.NicoPlay.NicoPlay;
-                const { NicoUpdate } = window.NicoUpdate;
-                this.CommentFilter = window.CommentFilter.CommentFilter;
-                this.toTimeSec = window.TimeFormat.toTimeSec;
-                this.NicoVideoData = window.NicoVideoData.NicoVideoData;
+        const myapi = window.myapi;
+        const { NicoPlay } = window.NicoPlay;
+        const { NicoUpdate } = window.NicoUpdate;
+        const { CommentFilter } = window.CommentFilter;
+        const { toTimeSec } = window.TimeFormat;
+        const { NicoVideoData } = window.NicoVideoData;
 
+        const play_msg_map = new Map([
+            ["startWatch", "watch取得開始"],
+            ["finishWatch", "watch取得完了"],
+            ["startComment", "コメント取得開始"],
+            ["finishComment", "コメント取得完了"],
+            ["startPlayVideo", "再生開始"],
+            ["startHeartBeat", "HeartBeat開始"],
+        ]);
+
+        export default {
+            obs:null,
+            obs_modal_dialog:null,
+            modal_dialog:null,
+            comment_filter:null,
+            nico_play:null,
+            play_data:null,
+            gutter:false,
+            gutter_move:false,
+            stop_resize_event:false,
+            resize_begin:false,
+            timer:null,
+            onBeforeMount(props) {
                 this.obs = props.obs;
                 this.obs_modal_dialog = my_obs.createObs();
-                this.modal_dialog = null;
 
-                this.comment_filter = null;
-                this.nico_play = null;
-                this.play_data = null;
-
-                this.gutter = false;
-                this.gutter_move = false;
-                this.play_msg_map = new Map([
-                    ["startWatch", "watch取得開始"],
-                    ["finishWatch", "watch取得完了"],
-                    ["startComment", "コメント取得開始"],
-                    ["finishComment", "コメント取得完了"],
-                    ["startPlayVideo", "再生開始"],
-                    ["startHeartBeat", "HeartBeat開始"],
-                ]);
-                this.myapi.ipc.onPlayVideo(async (args)=>{
+                myapi.ipc.onPlayVideo(async (args)=>{
                     const { video_id, online, time, video_item } = args;
 
                     this.play_data = { 
@@ -85,7 +90,7 @@
                     }
                 });
 
-                this.myapi.ipc.Setting.onChangeLogLevel((args) => {
+                myapi.ipc.Setting.onChangeLogLevel((args) => {
                     const { level } = args;
                     logger.setLevel(level);
                 });
@@ -105,18 +110,18 @@
                     this.obs_modal_dialog.trigger("show", {
                         message: "更新中...",
                         buttons: ["cancel"],
-                        cb: result=>{
+                        cb: ()=>{
                             if(nico_update){
                                 nico_update.cancel();
                             }
                         }
                     });
 
-                    nico_update.on("updated", async (video_id, props, update_thumbnail) => {
+                    nico_update.on("updated", async (video_id, props, update_thumbnail) => { // eslint-disable-line no-unused-vars
                         try {
-                            await this.myapi.ipc.Library.updateItemProps(video_id, props);
-                            const updated_video_item = await this.myapi.ipc.Library.getItem(video_id);
-                            const video_data = new this.NicoVideoData(updated_video_item);
+                            await myapi.ipc.Library.updateItemProps(video_id, props);
+                            const updated_video_item = await myapi.ipc.Library.getItem(video_id);
+                            const video_data = new NicoVideoData(updated_video_item);
                             const viewinfo = {
                                 is_economy: video_data.getIsEconomy(),
                                 is_deleted: video_data.getIsDeleted(),
@@ -139,7 +144,7 @@
                         } catch (error) {
                             if(!error.cancel){
                                 logger.error(error);
-                                await this.myapi.ipc.Dialog.showMessageBox({
+                                await myapi.ipc.Dialog.showMessageBox({
                                     type: "error",
                                     message: error.message
                                 });
@@ -149,7 +154,7 @@
                     });
 
                     try {   
-                        const video_item = await this.myapi.ipc.Library.getItem(video_id);
+                        const video_item = await myapi.ipc.Library.getItem(video_id);
                         nico_update.setVideoItem(video_item);
 
                         if(update_target=="thumbinfo"){
@@ -162,7 +167,7 @@
                     } catch (error) {
                         if(!error.cancel){
                             logger.error(error);
-                            await this.myapi.ipc.Dialog.showMessageBox({
+                            await myapi.ipc.Dialog.showMessageBox({
                                 type: "error",
                                 message: error.message
                             });
@@ -177,10 +182,10 @@
                     this.comment_filter.ng_comment.addNGTexts(ng_texts);
                     this.comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
                     try {
-                        await this.myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
+                        await myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
                     } catch (error) {
                         logger.error("player main save ng comment", error);
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             type: "error",
                             message: `NGコメントの保存に失敗\n${error.message}`
                         });
@@ -197,10 +202,10 @@
                     this.comment_filter.ng_comment.deleteNGTexts(ng_texts);
                     this.comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
                     try {
-                        await this.myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
+                        await myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
                     } catch (error) {
                         logger.error("player main save comment ng", error);
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             type: "error",
                             message: `NGコメントの保存に失敗\n${error.message}`
                         });
@@ -230,10 +235,7 @@
                     await this.toggleInfoview();
                 });
 
-                this.stop_resize_event = false;
-                this.resize_begin = false;
                 const timeout = 200;
-                this.timer;
                 window.addEventListener("resize", () => {
                     if(this.stop_resize_event){
                         return;
@@ -252,28 +254,28 @@
                 });
             },
             async onMounted() {
-                const params = await this.myapi.ipc.Config.get("player", {  
+                const params = await myapi.ipc.Config.get("player", {  
                     infoview_width: 200, 
                     infoview_show: true 
                 });
                     
                 const vw = params.infoview_show ? params.infoview_width : 0;
-                const pe = this.root.querySelector(".player-frame");
-                const ve = this.root.querySelector(".info-frame");
+                const pe = this.$(".player-frame");
+                const ve = this.$(".info-frame");
                 pe.style.width = `calc(100% - ${vw}px)`;
                 ve.style.width = vw + "px"; 
 
                 this.player_default_size = { width: 854 ,height: 480 };
                 
                 try {
-                    const do_limit = await this.myapi.ipc.Config.get("comment.do_limit", true);
-                    const { ng_texts, ng_user_ids } = await this.myapi.ipc.NGList.getItems();
-                    this.comment_filter = new this.CommentFilter();
+                    const do_limit = await myapi.ipc.Config.get("comment.do_limit", true);
+                    const { ng_texts, ng_user_ids } = await myapi.ipc.NGList.getItems();
+                    this.comment_filter = new CommentFilter();
                     this.comment_filter.setLimit(do_limit);
                     this.comment_filter.setNGComments(ng_texts, ng_user_ids);
                 } catch (error) {
                     logger.error("player main load ng comment", error);
-                    await this.myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBox({
                         type: "error",
                         message: `NGコメントリストの読み込み失敗\n${error.message}`
                     });
@@ -283,13 +285,13 @@
                     obs:this.obs_modal_dialog
                 });
 
-                this.myapi.ipc.playerReady();
+                myapi.ipc.playerReady();
             },
             mousemove(e) {
                 if(this.gutter){   
                     this.gutter_move = true;  
-                    let pe = this.root.querySelector(".player-frame");
-                    let ve = this.root.querySelector(".info-frame");
+                    let pe = this.$(".player-frame");
+                    let ve = this.$(".info-frame");
                     const mw = this.root.offsetWidth - e.clientX;
                     ve.style.width = mw + "px";
                     pe.style.width = `calc(100% - ${mw}px)`;
@@ -300,26 +302,25 @@
                     this.gutter = true;     
                 }
             },
-            async mouseup(e) {
+            async mouseup(e) { // eslint-disable-line no-unused-vars
                 if(this.gutter_move){
                     this.obs.trigger("player-video:reset-comment-timelime");
                     this.obs.trigger("player-info-page:split-resized");
 
-                    const ve = this.root.querySelector(".info-frame");
-                    await this.myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
+                    const ve = this.$(".info-frame");
+                    await myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
                 }
                 this.gutter = false;
                 this.gutter_move = false;
             },
             async play_by_video_data(video_data, viewinfo, comments, state) { 
-                
                 if(!/mp4/.test(video_data.type)){
                     throw new Error(`${video_data.type}形式は再生できません`);
                 }
 
                 const thumb_info = viewinfo.thumb_info;
                 const video = thumb_info.video;
-                const play_time_sec = this.toTimeSec(video.duration);
+                const play_time_sec = toTimeSec(video.duration);
 
                 this.play_data = {
                     video_id: video.video_id, 
@@ -348,7 +349,7 @@
                     state: state
                 });   
                 
-                this.myapi.ipc.PlayHistory.addItem({
+                myapi.ipc.PlayHistory.addItem({
                     id: video.video_id, 
                     image: video.thumbnailURL, 
                     title: video.title,  
@@ -368,7 +369,7 @@
                     time: time
                 };
                 try {
-                    const video_data = new this.NicoVideoData(video_item);
+                    const video_data = new NicoVideoData(video_item);
                     const video = {
                         src: video_data.getVideoPath(),
                         type: `video/${video_data.getVideoType()}`,
@@ -382,7 +383,7 @@
                     await this.play_by_video_data(video, viewinfo, comments, state);
                 } catch (error) {
                     logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                    await this.myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBox({
                         type: "error",
                         message: error.message
                     });
@@ -402,19 +403,19 @@
                 };
 
                 try {
-                    this.nico_play = new this.NicoPlay();
+                    this.nico_play = new NicoPlay();
 
                     this.obs_modal_dialog.trigger("show", {
                         message: "...",
                         buttons: ["cancel"],
-                        cb: result=>{
+                        cb: ()=>{
                             this.cancelPlay();
                         }
                     });
 
                     this.nico_play.on("changeState", (state)=>{
                         logger.debug("player main changeState state=", state);
-                        const msg = this.play_msg_map.get(state);
+                        const msg = play_msg_map.get(state);
                         this.obs_modal_dialog.trigger("update-message", msg);
                     });
                     this.nico_play.on("cancelHeartBeat", ()=>{
@@ -445,7 +446,7 @@
                 } catch (error) {
                     if(!error.cancel){
                         logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
-                        await this.myapi.ipc.Dialog.showMessageBox({
+                        await myapi.ipc.Dialog.showMessageBox({
                             type: "error",
                             message: error.message
                         });
@@ -455,11 +456,11 @@
                 this.obs_modal_dialog.trigger("close");
             },
             async toggleInfoview() {
-                const pe = this.root.querySelector(".player-frame");
-                const ve = this.root.querySelector(".info-frame");
+                const pe = this.$(".player-frame");
+                const ve = this.$(".info-frame");
 
                 const infoview_show = parseInt(ve.style.width) == 0;
-                await this.myapi.ipc.Config.set("player.infoview_show", infoview_show);
+                await myapi.ipc.Config.set("player.infoview_show", infoview_show);
 
                 // 動画情報の表示/非表示の切り替え時はウィンドウリサイズイベントを通知しない
                 // (動画表示部分のサイズは変更されないのでリサイズイベント不要)
@@ -467,7 +468,7 @@
 
                 if(infoview_show){
                     // 表示
-                    const infoview_width = await this.myapi.ipc.Config.get("player.infoview_width", 200);
+                    const infoview_width = await myapi.ipc.Config.get("player.infoview_width", 200);
                     // 動画サイズがウィンドウサイズに合わせて変化しないように
                     // 動画の幅を固定してからウィンドウサイズ変更
                     pe.style.width = pe.offsetWidth + "px";  

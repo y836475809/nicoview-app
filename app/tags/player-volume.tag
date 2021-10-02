@@ -31,20 +31,22 @@
 
     <script>
         /* globals */
+        const myapi = window.myapi;
+
         export default {
+            obs:null,
             onBeforeMount(props) {
-                this.myapi = window.myapi;
                 this.obs = props.obs; 
             },
             async onMounted() {
-                let picker = this.root.querySelector("div.picker");
-                let slider = this.root.querySelector("div.slider");   
-                const volume = await this.myapi.ipc.Config.get("player.volume", 0.5);
+                let picker = this.$("div.picker");
+                let slider = this.$("div.slider");   
+                const volume = await myapi.ipc.Config.get("player.volume", 0.5);
                 picker.style.left = volume * slider.clientWidth - 5 + "px";
 
             },
             picker_mousedown(e) {
-                let picker = this.root.querySelector("div.picker");
+                let picker = this.$("div.picker");
                 const left = parseInt(picker.style.left) + e.layerX;
                 this.updateVolume(left);
 
@@ -55,14 +57,14 @@
                 this.updateVolume(left);
             },
             updateVolume(pos) {
-                let picker = this.root.querySelector("div.picker");
+                let picker = this.$("div.picker");
                 picker.style.left = (pos - 5) + "px";
 
-                let slider = this.root.querySelector("div.slider");
+                let slider = this.$("div.slider");
                 const volume = pos / slider.clientWidth;
 
                 // TODO check
-                this.myapi.ipc.Config.set("player.volume", volume).then();
+                myapi.ipc.Config.set("player.volume", volume).then();
 
                 this.obs.trigger("player-video:volume-changed", volume); 
             }

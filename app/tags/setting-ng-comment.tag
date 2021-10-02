@@ -51,15 +51,14 @@
 
     <script>
         /* globals */
+        const myapi = window.myapi;
+        const { GridTable } = window.GridTable;
+
         export default {
+            obs_dialog:null,
+            grid_table:null,
             onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.GridTable = window.GridTable.GridTable;
-
                 this.obs_dialog = props.obs;
-
-                this.grid_table = null;
-                
                 this.obs_dialog.on("setting-ng-comment:ng-items", (args) => {
                     this.setup(args);
                 });
@@ -96,11 +95,11 @@
                     const options = {
                         rowHeight: 25,
                     };
-                    this.grid_table = new this.GridTable("comment-ng-grid", columns, options);
+                    this.grid_table = new GridTable("comment-ng-grid", columns, options);
                     this.grid_table.init(".comment-ng-grid");
                     this.grid_table.setupResizer(".comment-ng-grid-container");
-                    this.grid_table.onContextMenu(async (e) => {
-                        const menu_id = await this.myapi.ipc.popupContextMenu("player-setting-ngcomment");
+                    this.grid_table.onContextMenu(async (e) => { // eslint-disable-line no-unused-vars
+                        const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
                         if(!menu_id){
                             return;
                         }
@@ -132,10 +131,10 @@
                 const items = items1.concat(items2);
                 this.grid_table.setData(items);
 
-                const container = this.root.querySelector(".comment-ng-grid-container");
+                const container = this.$(".comment-ng-grid-container");
                 this.grid_table.resizeGrid(container.clientWidth, container.clientHeight); 
             },
-            onclickDelete(e) {
+            onclickDelete(e) { // eslint-disable-line no-unused-vars
                 this.deleteSelectedItems();
             }
         };

@@ -98,16 +98,16 @@
     <div class="user-container">   
         <div class="user-container-normal">
             <div style="display: flex;" class="center-v">
-                <div class="user-name">投稿者: {user_nickname}</div>
+                <div class="user-name">投稿者: {state.user_nickname}</div>
                 <div class="icon-button center-hv" onclick={onclickPopupDescription}>
                     <i title="ポップアップ表示" class="icon far fa-comment-alt"></i>
                 </div>
             </div>
-            <div class="user-description {user_description_class}" onmouseup={oncontextmenu}></div>
+            <div class="user-description {state.user_description_class}" onmouseup={oncontextmenu}></div>
         </div>
         <div style="display:none;" class="user-container-popup">
             <div class="user-info", style="display: flex;">
-                <img class="user-thumbnail" src={user_thumbnail_url}>
+                <img class="user-thumbnail" src={state.user_thumbnail_url}>
                 <div>
                     <div class="user-name">投稿者: {getUserNickname()}</div>
                     <div class="userlist-link" onclick={onclickUserListLink}>{getUserListLink()}</div>
@@ -116,7 +116,7 @@
                     <i title="閉じる" class="icon fas fa-times"></i>
                 </div>
             </div>
-            <div class="user-description {user_description_class}" onmouseup={oncontextmenu}></div>
+            <div class="user-description {state.user_description_class}" onmouseup={oncontextmenu}></div>
         </div>
     </div>
     
@@ -128,11 +128,13 @@
         const { toTimeSec } = window.TimeFormat;
 
         export default {
+            state:{
+                user_nickname:"",
+                user_description_class:"text",
+                user_thumbnail_url:"",
+            },
             onBeforeMount(props) {
-                this.obs = props.obs; 
-
-                this.user_thumbnail_url = "";
-                this.user_description_class = "text";
+                this.obs = props.obs;
 
                 this.obs.on("player-user:set-data", args => {
                     const { user_id, user_nickname, user_icon_url, description } = args;
@@ -140,7 +142,7 @@
                     this.closePopupDescription();
 
                     this.user_id = user_id;
-                    this.user_nickname = user_nickname;
+                    this.state.user_nickname = user_nickname;
                     this.user_icon_url = user_icon_url;
                     this.setDescription(description);
 
@@ -148,7 +150,7 @@
                 });
             },
             getUserNickname() {
-                return this.user_nickname?this.user_nickname:"未取得";
+                return this.state.user_nickname?this.state.user_nickname:"未取得";
             },
             getUserListLink() {
                 return this.user_id?`user/${this.user_id}`:"";
@@ -221,7 +223,7 @@
                 }
             },
             setDescription(description) {
-                const content_elms = this.root.querySelectorAll(".user-description");
+                const content_elms = this.$$(".user-description");
                 content_elms.forEach(content_elm => {  
                     content_elm.scrollTop  = 0;
                     content_elm.scrollLeft = 0;
@@ -229,9 +231,9 @@
                     content_elm.innerHTML = description;
 
                     if(content_elm.childElementCount==0){
-                        this.user_description_class = "text";
+                        this.state.user_description_class = "text";
                     }else{
-                        this.user_description_class = "html";
+                        this.state.user_description_class = "html";
                         const a_tags = content_elm.querySelectorAll("a");
                         a_tags.forEach(value=>{
                             const href = value.getAttribute("href");
@@ -259,14 +261,14 @@
                     }
                 });
             },
-            onclickPopupDescription(e) {
-                const elm = this.root.querySelector(".user-container-popup");
+            onclickPopupDescription(e) { // eslint-disable-line no-unused-vars
+                const elm = this.$(".user-container-popup");
                 elm.style.display = "";
 
-                const rect = this.root.querySelector(".user-container").getBoundingClientRect();
+                const rect = this.$(".user-container").getBoundingClientRect();
                 elm.style.top = (rect.top + 5)+ "px";
 
-                const user_info_elm = this.root.querySelector(".user-container-popup > .user-info");
+                const user_info_elm = this.$(".user-container-popup > .user-info");
                 const user_info_height = user_info_elm.clientHeight;
 
                 // ポップアップの高さをwindow内に収める
@@ -275,23 +277,23 @@
                 if(popup_height > max_height){
                     elm.style.height = max_height + "px";
 
-                    const elm_user_name = this.root.querySelector(".user-container-popup .user-name");
+                    const elm_user_name = this.$(".user-container-popup .user-name");
                     const new_height = max_height - elm_user_name.clientHeight - user_info_height + 6;
-                    const elm_description = this.root.querySelector(".user-container-popup > .user-description");  
+                    const elm_description = this.$(".user-container-popup > .user-description");  
                     elm_description.style.height = new_height + "px";
                 }
 
-                if(this.user_icon_url && this.user_thumbnail_url != this.user_icon_url){
-                    this.user_thumbnail_url = this.user_icon_url;
+                if(this.user_icon_url && this.state.user_thumbnail_url != this.user_icon_url){
+                    this.state.user_thumbnail_url = this.user_icon_url;
                 }
             },
             closePopupDescription() {
-                const elm = this.root.querySelector(".user-container-popup");
+                const elm = this.$(".user-container-popup");
                 if(elm){
                     elm.style.display = "none";
                 }
             },
-            onclickCloseDescription(e) {
+            onclickCloseDescription(e) { // eslint-disable-line no-unused-vars
                 this.closePopupDescription();
             },
             async popupDescriptionMenu(type, text) {
@@ -343,7 +345,7 @@
 
                 await this.popupDescriptionMenu("text", text);
             },
-            onclickUserListLink(e) {
+            onclickUserListLink(e) { // eslint-disable-line no-unused-vars
                 if(!this.user_id){
                     return;
                 }

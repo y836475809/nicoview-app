@@ -79,20 +79,26 @@
         </div>
     </div>
     <div class="seek-tooltip"><div class="center-hv text"></div></div>
-    <div class="seek-timer current">{fmt_current}</div>
+    <div class="seek-timer current">{state.fmt_current}</div>
     <div class="seek-timer slash">/</div>
-    <div class="seek-timer duration">{fmt_duration}</div>
+    <div class="seek-timer duration">{state.fmt_duration}</div>
     
     <script>
         /* globals */
+        const { toTimeString } = window.TimeFormat;
+
         export default {
+            state:{
+                fmt_current:"",
+                fmt_duration:""
+            },
+            obs:null,
+            buffered:0,
+            duration:0,
             onBeforeMount(props) {
-                this.time_format = window.TimeFormat;
                 this.obs = props.obs; 
             },
             onMounted() {
-                this.buffered = 0;
-                this.duration = 0;
                 this.updateSeek(0);
                 this.update();
 
@@ -123,7 +129,7 @@
                     return;
                 }
 
-                const seek_container = this.root.querySelector(".seek-container");
+                const seek_container = this.$(".seek-container");
                 const left = e.layerX;
                 const per = left / seek_container.clientWidth;
                 const current = per * this.duration;
@@ -135,15 +141,15 @@
             mouseOver(e) {
                 const left = e.layerX;
 
-                const seek_container = this.root.querySelector(".seek-container");
+                const seek_container = this.$(".seek-container");
                 const rect = seek_container.getBoundingClientRect();
                 
                 const per = left / seek_container.clientWidth;
                 const current = per * this.duration;
 
-                const tp = this.root.querySelector(".seek-tooltip");
-                const tp_text = this.root.querySelector(".seek-tooltip > .text");
-                tp_text.innerText = this.time_format.toTimeString(current);
+                const tp = this.$(".seek-tooltip");
+                const tp_text = this.$(".seek-tooltip > .text");
+                tp_text.innerText = toTimeString(current);
     
                 const tp_left = rect.left + left - tp.clientWidth / 2;
                 tp.style.top = (rect.top - 30) + "px";
@@ -155,20 +161,20 @@
                 this.current = current;
                 const per = this.current / this.duration;
 
-                const seek_container = this.root.querySelector(".seek-container");
-                const seek_value = this.root.querySelector(".seek-value");  
+                const seek_container = this.$(".seek-container");
+                const seek_value = this.$(".seek-value");  
                 seek_value.style.width = per * seek_container.clientWidth + "px";
 
-                this.fmt_current = this.time_format.toTimeString(this.current);
-                this.fmt_duration = this.time_format.toTimeString(this.duration);
+                this.state.fmt_current = toTimeString(this.current);
+                this.state.fmt_duration = toTimeString(this.duration);
 
                 this.update();
             },
             updateBuffered(time_sec) {
                 this.buffered = time_sec;
                 const per = time_sec / this.duration;
-                const seek_container = this.root.querySelector(".seek-container");
-                const buffered_value = this.root.querySelector(".buffered-value");  
+                const seek_container = this.$(".seek-container");
+                const buffered_value = this.$(".buffered-value");  
                 buffered_value.style.width = per * seek_container.clientWidth + "px";
 
                 this.update();

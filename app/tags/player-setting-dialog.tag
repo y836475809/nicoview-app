@@ -94,20 +94,20 @@
 
     <script>
         export default {
+            obs:null,
             onBeforeMount(props) {
                 this.obs = props.obs;
-                // this.obs_dialog = props.obs;
                 this.obs.on("player-setting-dialog:show", (args) => {
                     const { ng_items } = args;
 
-                    const dialog = this.root.querySelector("dialog");
+                    const dialog = this.$("dialog");
                     dialog.showModal();
 
                     this.obs.trigger("setting-ng-comment:ng-items", ng_items);
                 });
             },
-            onclickClose(e) {
-                const dialog = this.root.querySelector("dialog");
+            onclickClose(e) { // eslint-disable-line no-unused-vars
+                const dialog = this.$("dialog");
                 dialog.close();
             }
         };

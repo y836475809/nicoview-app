@@ -26,20 +26,19 @@
 
     <script>
         /* globals logger */
+        const myapi = window.myapi;
+        const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+
         export default {
+            obs:null,
+            video_elm:null,
+            play_data:null,
+            comment_tl:null,
+            comment_params:null,
+            comment_sync_id:null,
+            play_ended:false,
             onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.CommentTimeLine = window.CommentTimeLine.CommentTimeLine;
-                this.NicoScript = window.CommentTimeLine.NicoScript;
-
                 this.obs = props.obs; 
-
-                this.video_elm = null;
-                this.play_data = null;
-                this.comment_tl = null;
-                this.comment_params = null;
-                this.comment_sync_id = null;
-                this.play_ended = false;
 
                 this.obs.on("player-video:set-play-data", async(data) => {
                     await this.initVideo();
@@ -72,12 +71,12 @@
                 }
 
                 const default_comment_params = await this.obs.triggerReturn("setting-display-comment:get-default_params");
-                this.comment_params = await this.myapi.ipc.Config.get("comment", default_comment_params);
+                this.comment_params = await myapi.ipc.Config.get("comment", default_comment_params);
                 
                 this.video_elm = this.root.querySelector(".video-screen > video");
-                this.video_elm.volume = await this.myapi.ipc.Config.get("player.volume", 0.5);
+                this.video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
 
-                this.video_elm.addEventListener("loadedmetadata", (event) => {
+                this.video_elm.addEventListener("loadedmetadata", (event) => { // eslint-disable-line no-unused-vars
                     this.obs.trigger("player-seek:reload", this.video_elm.duration);
                 });
 
@@ -273,12 +272,12 @@
                 const  { duration_sec, fps } = this.comment_params;
                 const parent = this.root.querySelector(".video-screen");
 
-                const nico_script = new this.NicoScript();
+                const nico_script = new NicoScript();
 
                 if(this.comment_tl){
                     this.comment_tl.clear();
                 }
-                this.comment_tl = new this.CommentTimeLine(parent, duration_sec, row_num, comment_font_family);
+                this.comment_tl = new CommentTimeLine(parent, duration_sec, row_num, comment_font_family);
                 this.comment_tl.onComplete(()=>{
                     if(this.video_elm.currentTime == this.video_elm.duration){
                         // 動画終了後にコメントが流れる場合はコメント完了後にpauseにする

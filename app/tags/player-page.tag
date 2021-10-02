@@ -92,7 +92,7 @@
                     const play_data = await this.getPlayData(); 
                     const menu_id = await this.myapi.ipc.popupContextMenu("player", { play_data });
                     if(menu_id){
-                        const { video_id, title, thumbnailURL, online } = play_data;
+                        const { video_id, title, thumbnailURL, online } = play_data; // eslint-disable-line no-unused-vars
                         if(menu_id=="add-bookmark-time"){
                             const current_time = await this.getCurrentPlayTime();
                             const bk_item = {

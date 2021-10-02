@@ -59,8 +59,8 @@
     </style>
 
     <div class="center-v play-btn">
-        <button disabled={play_disabled} onclick={play}>
-            <span class={button_class}></span>
+        <button disabled={state.play_disabled} onclick={play}>
+            <span class={state.button_class}></span>
         </button>
     </div>
     <div class="center-v seek">
@@ -76,25 +76,28 @@
         <span class="fas fa-info" onclick={toggleInfoview}></span>
     </div>
     <script>
+        const  button_class_map = new Map([
+            ["play", "fas fa-play"],
+            ["pause", "fas fa-pause"],
+            ["stop", "fas fa-stop"]
+        ]);
+
+        const state_button_map = new Map([
+            ["play", "pause"],
+            ["pause", "play"],
+            ["stop", "play"]
+        ]);
+
         export default {
+            state:{
+                play_disabled:true,
+                button_class:""
+            },
+            current_state:"stop",
             onBeforeMount(props) {
                 this.obs = props.obs; 
-
-                this.button_class_map = new Map([
-                    ["play", "fas fa-play"],
-                    ["pause", "fas fa-pause"],
-                    ["stop", "fas fa-stop"]
-                ]);
-
-                this.state_button_map = new Map([
-                    ["play", "pause"],
-                    ["pause", "play"],
-                    ["stop", "play"]
-                ]);
-
-                this.current_state = "stop";
-                this.button_class = this.button_class_map.get(this.state_button_map.get("stop"));
-                this.play_disabled = true;
+                
+                this.state.button_class = button_class_map.get(state_button_map.get("stop"));
 
                 this.obs.on("player-controls:play", ()=> {
                     this.play();
@@ -118,7 +121,7 @@
             },
             updateState(state) {
                 this.current_state = state;
-                this.button_class = this.button_class_map.get(this.state_button_map.get(state));
+                this.state.button_class = button_class_map.get(state_button_map.get(state));
                 this.update();
             },
             getPlayEnable() {

@@ -285,6 +285,7 @@
 
                 if(this.user_icon_url && this.state.user_thumbnail_url != this.user_icon_url){
                     this.state.user_thumbnail_url = this.user_icon_url;
+                    this.update();
                 }
             },
             closePopupDescription() {

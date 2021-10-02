@@ -77,7 +77,7 @@
     </style>
 
     <div class="stack-container">
-        <div class={getItemClass(item)} data-id={i} each={ (item, i) in items }>
+        <div class={getItemClass(item)} data-id={i} each={ (item, i) in state.items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
                 <div style="display:flex; flex-direction:column;">
@@ -95,15 +95,18 @@
     </div>
 
     <script>
-        export default {
-            onBeforeMount(props) {
-                this.myapi = window.myapi;
-                this.Command = window.Command.Command;
-                const { toTimeString } = window.TimeFormat;
+        const myapi = window.myapi;
+        const { Command } = window.Command;
+        const { toTimeString } = window.TimeFormat;
 
+        export default {
+            state:{
+                items:[]
+            },
+            obs:null,
+            item_duration:300,
+            onBeforeMount(props) {
                 this.obs = props.obs;
-                this.items = [];
-                this.item_duration = 300;
 
                 this.getTime = (item) => {
                     const time = item.time?item.time:0;
@@ -115,11 +118,11 @@
 
                     this.addItems(items);
 
-                    const cp_items = JSON.parse(JSON.stringify(this.items));
+                    const cp_items = JSON.parse(JSON.stringify(this.state.items));
                     cp_items.forEach(item => {
                         delete item.state;
                     });
-                    await this.myapi.ipc.Stack.updateItems(cp_items);
+                    await myapi.ipc.Stack.updateItems(cp_items);
                 });
 
                 this.getItemClass = (item) => {
@@ -130,41 +133,41 @@
                 const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
                 this.item_duration = parseInt(prop);
 
-                const items = await this.myapi.ipc.Stack.getItems();
+                const items = await myapi.ipc.Stack.getItems();
                 this.addItems(items);
             }, 
             addItems(items) {
                 items.forEach(item => {
                     item.state = "stack-item-hide";
                 });
-                this.items = items.concat(this.items);
+                this.state.items = items.concat(this.state.items);
                 this.update();
 
                 setTimeout(() => { 
-                    this.items.forEach(item => {
+                    this.state.items.forEach(item => {
                         item.state = "stack-item-show-anime";
                     });
                     this.update();
                 }, 50);
             },
-            onclickItem(item, e) {
-                this.Command.play(item, false);
+            onclickItem(item, e) { // eslint-disable-line no-unused-vars
+                Command.play(item, false);
             },
-            onclickDelete(i, e) {
-                this.items[i].state = "stack-item-hide-anime";
+            onclickDelete(i, e) { // eslint-disable-line no-unused-vars
+                this.state.items[i].state = "stack-item-hide-anime";
                 this.update();
 
                 setTimeout(() => { 
-                    this.items.splice(i, 1);
-                    this.items.forEach(item=>{
+                    this.state.items.splice(i, 1);
+                    this.state.items.forEach(item=>{
                         item.state = "";
                     });
                     this.update();
-                    const cp_items = JSON.parse(JSON.stringify(this.items));
+                    const cp_items = JSON.parse(JSON.stringify(this.state.items));
                     cp_items.forEach(item => {
                         delete item.state;
                     });
-                    this.myapi.ipc.Stack.updateItems(cp_items).then();
+                    myapi.ipc.Stack.updateItems(cp_items).then();
                 }, this.item_duration);   
             }
         };

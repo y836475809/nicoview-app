@@ -74,49 +74,46 @@
     </dialog>
 
     <script>
-        export default {
-            onBeforeMount() {
-                this.myapi = window.myapi;
-                this.is_show = false;
+        const myapi = window.myapi;
 
-                this.myapi.ipc.onOpenLoginDialog(()=>{
+        const getDialog = (tag) => {
+            return tag.$("dialog");
+        };
+        const clean = (tag) => {
+            ["#nico-mail", "#nico-pass"].forEach(id =>{
+                const elm = tag.$(id);
+                elm.value = "";
+            });
+        };
+
+        export default {
+            is_show:false,
+            onBeforeMount() {
+                myapi.ipc.onOpenLoginDialog(()=>{
                     if(this.is_show){
                         return;
                     }
                     this.is_show = true;
-                    const dialog = this.getDialog();
+                    const dialog = getDialog(this);
                     dialog.showModal();
                 });
 
-                this.myapi.ipc.onCloseLoginDialog(()=>{
+                myapi.ipc.onCloseLoginDialog(()=>{
                     this.is_show = false;
-                    this.clean();
-                    const dialog = this.getDialog();
+                    clean(this);
+                    const dialog = getDialog(this);
                     dialog.close();
                 });
             },
-
-            getDialog() {
-                return this.root.querySelector("dialog");
-            },
-
-            clean() {
-                ["#nico-mail", "#nico-pass"].forEach(id =>{
-                    const elm = this.root.querySelector(id);
-                    elm.value = "";
-                });
-            },
-
             onclickLogin() {
-                const mail = this.root.querySelector("#nico-mail");
-                const password = this.root.querySelector("#nico-pass");
-                this.myapi.ipc.login(mail.value, password.value);
+                const mail = this.$("#nico-mail");
+                const password = this.$("#nico-pass");
+                myapi.ipc.login(mail.value, password.value);
             },
-
             onclickClose() {
                 this.is_show = false;
-                this.clean();
-                const dialog = this.getDialog();
+                clean(this);
+                const dialog = getDialog(this);
                 dialog.close();
             }
         };

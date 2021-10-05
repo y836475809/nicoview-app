@@ -279,12 +279,14 @@
                     const user_id = owner.id;
                     const user_nickname = owner.nickname;
                     const user_icon_url = owner.iconURL;
+                    const is_saved = this.is_saved;
                     
                     this.obs.trigger("player-user:set-data", {
                         user_id,
                         user_nickname,
                         user_icon_url, 
-                        description
+                        description,
+                        is_saved
                     });
 
                     this.setComments(comments);

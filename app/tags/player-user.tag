@@ -121,11 +121,12 @@
     </div>
     
     <script>
-        /* globals */
+        /* globals logger */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
+        const { ImgCacheStore } = window.ImgCacheStore;
 
         export default {
             state:{
@@ -133,11 +134,14 @@
                 user_description_class:"text",
                 user_thumbnail_url:"",
             },
-            onBeforeMount(props) {
+            user_icon_cache:null,
+            current_user_icon_url:"",
+            is_saved:false,
+            async onBeforeMount(props) {
                 this.obs = props.obs;
 
                 this.obs.on("player-user:set-data", args => {
-                    const { user_id, user_nickname, user_icon_url, description } = args;
+                    const { user_id, user_nickname, user_icon_url, description, is_saved } = args;
 
                     this.closePopupDescription();
 
@@ -146,8 +150,30 @@
                     this.user_icon_url = user_icon_url;
                     this.setDescription(description);
 
+                    this.is_saved = is_saved;
+
                     this.update();
                 });
+
+                const data_dir = await myapi.ipc.Config.get("data_dir", "");
+                this.user_icon_cache = new ImgCacheStore(data_dir, "user_icon.json");
+
+                window.addEventListener("beforeunload", (event) => { // eslint-disable-line no-unused-vars
+                    this.user_icon_cache.save();
+                });   
+            },
+            onMounted() {
+                this.$(".user-thumbnail").onload = (e) => {
+                    if(!this.is_saved){
+                        return;
+                    }
+                    const img = e.target;
+                    try {
+                        this.user_icon_cache.set(img);
+                    } catch (error) {
+                        logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
+                    }
+                };
             },
             getUserNickname() {
                 return this.state.user_nickname?this.state.user_nickname:"未取得";
@@ -261,7 +287,29 @@
                     }
                 });
             },
-            onclickPopupDescription(e) { // eslint-disable-line no-unused-vars
+            updateUserIcon(url){
+                if(this.current_user_icon_url == url){
+                    return;
+                }
+
+                this.current_user_icon_url = url;
+                
+                if(this.is_saved){
+                    try {
+                        this.user_icon_cache.load();
+                    } catch (error) {
+                        if(error.code != "ENOENT"){
+                            logger.debug(`user_icon_cache.load, error=${error}`);
+                            throw error;
+                        }
+                    }
+                    this.state.user_thumbnail_url = this.user_icon_cache.get(url);
+                }else{
+                    this.state.user_thumbnail_url = url;
+                }
+                this.update();
+            },
+            async onclickPopupDescription(e) { // eslint-disable-line no-unused-vars
                 const elm = this.$(".user-container-popup");
                 elm.style.display = "";
 
@@ -283,10 +331,7 @@
                     elm_description.style.height = new_height + "px";
                 }
 
-                if(this.user_icon_url && this.state.user_thumbnail_url != this.user_icon_url){
-                    this.state.user_thumbnail_url = this.user_icon_url;
-                    this.update();
-                }
+                this.updateUserIcon(this.user_icon_url);
             },
             closePopupDescription() {
                 const elm = this.$(".user-container-popup");

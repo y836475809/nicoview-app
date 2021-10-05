@@ -42,4 +42,5 @@ window.addEventListener("load", () => {
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
     global.SyncCommentScroll = require(`${root_dir}/app/js/sync-comment-scroll`);
     global.Command = require(`${root_dir}/app/js/command`);
+    global.ImgCacheStore = require(`${root_dir}/app/js/img-cache-store`);
 });

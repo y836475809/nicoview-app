@@ -79,8 +79,12 @@ class NicoMockServer {
                 if(!req.url.startsWith("https://")){
                     if(req.url.includes("/hlsvod/ht2_nicovideo/nicovideo")){
                         console.log("mock server: playVideo");
-                        this.nico_mock_res.playVideo(res);
+                        this.nico_mock_res.playVideo(res);           
+                    } else if(req.url.startsWith("/nicoaccount/usericon")){
+                        console.log("mock server: user icon url=", req.url);
+                        this.nico_mock_res.userIcon(req.url, res);
                     }else{
+                        console.log("mock server: http thumbnail url=", req.url);
                         this.nico_mock_res.thumbnail(req.url, res);
                     }
                 }            

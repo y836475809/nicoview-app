@@ -85,12 +85,14 @@ const getCommnet = (post_data, comments) => {
     ];
 };
 
-let base64_data = null;
-const createImg = (text) => {
-    if(!base64_data){
-        const content = fs.readFileSync(path.join(__dirname, "data", "sample.L.jpeg"));
-        base64_data = content.toString( 'base64' );
+const base64_map = new Map();
+const createImg = (fname) => {
+    if(!base64_map.has(fname)){
+        const content = fs.readFileSync(path.join(__dirname, "data", fname));
+        const base64_data = content.toString( 'base64' );
+        base64_map.set(fname, base64_data);
     }
+    const base64_data = base64_map.get(fname);
     return Buffer.from(base64_data, "base64");
 };
 
@@ -267,8 +269,12 @@ class NicoMockResponse {
     thumbnail(url, res){
         //thumbnailURL https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
         //largeThumbnailURL https://img.cdn.nimg.jp/s/nicovideo/thumbnails/${id}/${id}`;
-        const id = url.split("/").pop();
-        const img = createImg(id);
+        const img = createImg("sample.L.jpeg");
+        res.writeHead(200, {"Content-Type": "image/jpeg" });
+        res.end(img, "binary");
+    }
+    userIcon(url, res){
+        const img = createImg("user_icon.jpg");
         res.writeHead(200, {"Content-Type": "image/jpeg" });
         res.end(img, "binary");
     }

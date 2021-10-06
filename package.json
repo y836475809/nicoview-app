@@ -1,6 +1,6 @@
 {
   "name": "nicoview-app",
-  "version": "0.14.23.9",
+  "version": "0.14.23.10",
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "app/main/main.js",
   "scripts": {
@@ -9,6 +9,7 @@
     "test-setting": "electron . --test=test-setting",
     "test-mylist": "electron . --test=test-mylist",
     "test-comment": "electron . --test=test-comment",
+    "test-tag": "electron . --test=test-tag",
     "main": "electron .",
     "test": "ava -v -s",
     "build": "electron-builder --x64 --dir",

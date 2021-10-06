@@ -42,6 +42,17 @@
         .message-modal-dialog .button:hover {
             background-color: skyblue;
         }
+        .message-modal-dialog .non {
+            display: none;
+        }
+
+        .message-modal-dialog .button.left {
+            margin-right: 5px;
+        }
+        .message-modal-dialog .button.right {
+            margin-left: 5px;
+        }
+           
     </style>
 
     <dialog class="message-modal-dialog dialog-shadow" oncancel={oncancel}>
@@ -50,8 +61,8 @@
                 <p class="message">{state.message}</p>
             </div>
             <div class="button-container">
-                <div show={state.showok} class="button" onclick="{onclickButton.bind(this,'ok')}">OK</div>
-                <div show={state.showcancel} class="button" onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
+                <div class={state.btn_ok} onclick="{onclickButton.bind(this,'ok')}">OK</div>
+                <div class={state.btn_cancel} onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
             </div>
         </div>
     </dialog>
@@ -61,7 +72,9 @@
             state: {
                 message:"",
                 showok:false,
-                showcancel:false
+                showcancel:false,
+                btn_ok:"button",
+                btn_cancel:"button"
             },
             obs_dialog: null,
             on_cancel: null,
@@ -77,8 +90,22 @@
 
                     const { message, buttons, cb } = args;
                     this.state.message = message;
-                    this.state.showok = buttons===undefined ? false : buttons.includes("ok");
-                    this.state.showcancel = buttons===undefined ? false : buttons.includes("cancel");
+
+                    if(buttons===undefined){
+                        this.state.btn_ok = "button non";
+                        this.state.btn_cancel = "button non";
+                    }else{
+                        const show_ok = buttons.includes("ok");
+                        const show_cancel = buttons.includes("cancel");
+                        if(show_ok && show_cancel){
+                            this.state.btn_ok ="button left";
+                            this.state.btn_cancel ="button right";
+                        }else{
+                            this.state.btn_ok = show_ok?"button":"button non";
+                            this.state.btn_cancel = show_cancel?"button":"button non";
+                        }
+                    }
+                   
                     this.cb = cb;
 
                     this.update();

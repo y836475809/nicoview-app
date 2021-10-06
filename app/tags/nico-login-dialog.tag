@@ -50,6 +50,12 @@
         .nico-login-dialog .button:hover { 
             background-color: lightskyblue;
         }
+        .nico-login-dialog .button.left {
+            margin-right: 5px;
+        }
+        .nico-login-dialog .button.right {
+            margin-left: 5px;
+        }
     </style>
 
     <dialog class="nico-login-dialog dialog-shadow">
@@ -67,8 +73,8 @@
                 </div>
             </div>
             <div class="button-container">
-                <div class="button" onclick={onclickLogin}>ログイン</div>
-                <div class="button" onclick={onclickClose}>キャンセル</div>
+                <div class="button left" onclick={onclickLogin}>ログイン</div>
+                <div class="button right" onclick={onclickClose}>キャンセル</div>
             </div>
         </div>
     </dialog>

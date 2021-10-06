@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>test mylist</title>
+    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
+    <link rel="stylesheet" type="text/css" href="../app/css/split-page.css">
+    <style type="text/css">
+
+    </style>
+</head>
+
+<body>
+    <modal-dialog></modal-dialog>
+    <button id="test-modal1" type=button>ok,cancel dailog</button>
+    <button id="test-modal2" type=button>ok dailog</button>
+    <button id="test-modal3" type=button>cancel dailog</button>
+    <button id="test-modal4" type=button>msg</button>
+</body>
+
+<script type="riot" src="../app/tags/modal-dialog.tag"></script>
+<script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script>
+    /* globals riot */
+    var { logger } = window.logger; // eslint-disable-line
+    var { ModalDialog } = window.ModalDialog; // eslint-disable-line
+    var my_obs = window.MyObservable; // eslint-disable-line
+    const obs = my_obs.createObs();
+
+    (async function main() {
+        await riot.compile();
+        riot.mount("modal-dialog", { obs });
+    }());
+
+    const createModalFunc = (msg, buttons) => {
+        return () => {
+            obs.trigger("show", {
+                message: msg,
+                buttons: buttons,
+                cb: ()=>{
+                    obs.trigger("close");
+                }
+            });
+        };
+    };
+
+    window.onload = () => {
+        const btn1 = document.getElementById("test-modal1");
+        btn1.onclick = createModalFunc("ok cancel", ["ok", "cancel"]);
+
+        const btn2 = document.getElementById("test-modal2");
+        btn2.onclick = createModalFunc("ok", ["ok"]);
+
+        const btn3 = document.getElementById("test-modal3");
+        btn3.onclick = createModalFunc("cancel", ["cancel"]);
+
+        const btn4 = document.getElementById("test-modal4");
+        btn4.onclick = createModalFunc("msg");
+    };
+</script>
+
+</html>

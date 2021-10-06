@@ -156,6 +156,15 @@
                 </button>
             </div>
         </div>
+        <div class="container">
+            <div class="center-v title">キャッシュ</div>
+            <div class="content" style="display: flex;">
+                <label class="cursor-pointer" title="保存済み動画のみキャッシュ, 変更はプレイヤーを開いた時に反映">
+                    <input type="checkbox" class="user_icon_cache" onclick={onclickChecUerIconCache}/>
+                    ユーザーアイコンをキャッシュする
+                </label>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -216,7 +225,8 @@
                 setInputValue(this, ".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
                 setInputValue(this, ".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
                 setInputValue(this, ".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-                setInputValue(this, ".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", "")); 
+                setInputValue(this, ".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", ""));
+                setCheckValue(this, ".user_icon_cache", await myapi.ipc.Config.get("user_icon_cache", false));  
                 
                 for (let index = 0; index < this.state.import_items.length; index++) {
                     const import_item = this.state.import_items[index];
@@ -387,6 +397,10 @@
                         message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
                     });
                 } 
+            },
+            async onclickChecUerIconCache(e) {
+                const checked = e.target.checked;
+                await myapi.ipc.Config.set("user_icon_cache", checked);
             }
         };
     </script>

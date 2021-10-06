@@ -2,9 +2,17 @@ const { CacheStore } = require("./cache-store");
 
 class ImgCacheStore {
     constructor(dir, file_name){
-        this._enable = false;
+        this._enable = true;
         this._loaded = false;
         this._cs = new CacheStore(dir, file_name);
+    }
+
+    get enable(){
+        return this._enable;
+    }
+
+    set enable(value){
+        this._enable = value;
     }
 
     async set(img){

@@ -137,7 +137,7 @@
             user_icon_cache:null,
             current_user_icon_url:"",
             is_saved:false,
-            async onBeforeMount(props) {
+            onBeforeMount(props) {
                 this.obs = props.obs;
 
                 this.obs.on("player-user:set-data", args => {
@@ -154,26 +154,9 @@
 
                     this.update();
                 });
-
-                const data_dir = await myapi.ipc.Config.get("data_dir", "");
-                this.user_icon_cache = new ImgCacheStore(data_dir, "user_icon.json");
-
-                window.addEventListener("beforeunload", (event) => { // eslint-disable-line no-unused-vars
-                    this.user_icon_cache.save();
-                });   
             },
-            onMounted() {
-                this.$(".user-thumbnail").onload = (e) => {
-                    if(!this.is_saved){
-                        return;
-                    }
-                    const img = e.target;
-                    try {
-                        this.user_icon_cache.set(img);
-                    } catch (error) {
-                        logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
-                    }
-                };
+            async onMounted() {
+                await this.setupUserIconCache();
             },
             getUserNickname() {
                 return this.state.user_nickname?this.state.user_nickname:"未取得";
@@ -287,6 +270,28 @@
                     }
                 });
             },
+            async setupUserIconCache(){
+                const data_dir = await myapi.ipc.Config.get("data_dir", "");
+                const enable = await myapi.ipc.Config.get("user_icon_cache", false);
+                this.user_icon_cache = new ImgCacheStore(data_dir, "user_icon.json");
+                this.user_icon_cache.enable = enable;
+                if(enable){
+                    this.$(".user-thumbnail").onload = (e) => {
+                        if(!this.is_saved){
+                            return;
+                        }
+                        const img = e.target;
+                        try {
+                            this.user_icon_cache.set(img);
+                        } catch (error) {
+                            logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
+                        }
+                    };
+                    window.addEventListener("beforeunload", (event) => { // eslint-disable-line no-unused-vars
+                        this.user_icon_cache.save();
+                    });
+                }
+            },
             updateUserIcon(url){
                 if(this.current_user_icon_url == url){
                     return;
@@ -294,7 +299,7 @@
 
                 this.current_user_icon_url = url;
                 
-                if(this.is_saved){
+                if(this.is_saved && this.user_icon_cache.enable){
                     try {
                         this.user_icon_cache.load();
                     } catch (error) {

@@ -51,6 +51,10 @@ const player = (play_win) => {
         return await new Promise((resolve, reject) => {
             const menu_items = [
                 { 
+                    id: "add-stack-time",
+                    label: "後で見る", 
+                },
+                { 
                     id: "add-bookmark",
                     label: "ブックマーク", click() {
                         const items = [{
@@ -64,10 +68,6 @@ const player = (play_win) => {
                 { 
                     id: "add-bookmark-time",
                     label: "ブックマーク(時間)", 
-                },
-                { 
-                    id: "add-stack-time",
-                    label: "後で見る", 
                 },
                 { type: "separator" },
                 { 
@@ -92,12 +92,10 @@ const player = (play_win) => {
                         resolve(null);
                     }
                 },
-                { type: "separator" },
                 { 
                     id: "show-open-video-form",
                     label: "動画ID/URLを指定して再生",
                 },               
-                { type: "separator" },
                 { 
                     id: "reload",
                     label: "再読み込み", click() {
@@ -109,7 +107,6 @@ const player = (play_win) => {
                         resolve(null);
                     }
                 },
-                { type: "separator" },
                 {
                     id: "change-movie-size",
                     label: "動画のサイズに変更", 

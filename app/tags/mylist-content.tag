@@ -97,6 +97,7 @@
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
+        const { progressDailog } = window.ModalDialogUtil;
 
         const getMylistID = (tag) => {
             const elm = tag.$(".mylist-input");
@@ -187,13 +188,22 @@
                     }   
                 });
 
-                this.obs.on("mylist-page:items-deleted", (args)=> {
+                this.obs.on("mylist-page:items-deleted", async (args)=> {
                     const { items } = args;
                     items.forEach(item => {
                         const mylist_id = item.mylist_id;
                         this.nico_mylist_store.delete(mylist_id);
                         this.nico_mylist_image_cache.delete(mylist_id);
                     }); 
+
+                    const mylist_id = getMylistID(this);
+                    if(await this.hasMylistID(mylist_id)){
+                        this.is_current_fav = true;
+                    }else{
+                        // 現在表示されているmylistが削除された場合、お気に入り消す
+                        this.is_current_fav = false;
+                    }
+                    this.update();
                 });
 
                 window.addEventListener("beforeunload", async (event) => { // eslint-disable-line no-unused-vars
@@ -332,12 +342,14 @@
                     return "far fa-star";
                 }
             },
-            async setMylist(mylist) {
+            async setMylist(mylist, update_image_cache_id=true) {
                 this.state.mylist_description = mylist.description;
 
-                const mylist_id_list = await this.getMylistIDList();
-                this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
-                this.nico_mylist_image_cache.loadCache(mylist.mylist_id);
+                if(update_image_cache_id){
+                    const mylist_id_list = await this.getMylistIDList();
+                    this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
+                    this.nico_mylist_image_cache.loadCache(mylist.mylist_id);
+                }
 
                 if(await this.hasMylistID(mylist.mylist_id)){
                     this.is_current_fav = true;
@@ -380,6 +392,11 @@
                 if(await this.hasMylistID(mylist.mylist_id)){
                     return;
                 }
+
+                // 保存済みmylist id一覧に新規保存のmylist idを追加してキャッシュに伝える
+                const mylist_id_list = await this.getMylistIDList();
+                mylist_id_list.push(mylist_id);
+                this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
     
                 const item = {
                     title: mylist.title,
@@ -442,16 +459,28 @@
                 await this.updateMylist();
             },
             async onclickSaveMylist(e) { // eslint-disable-line no-unused-vars
-                if(!this.nico_mylist){
+                const mylist_id = getMylistID(this);
+                if(await this.existMylist(mylist_id)){
+                    this.is_current_fav = true;
+                    this.update();
                     return;
                 }
 
-                const mylist = this.nico_mylist.mylist;
-                await this.addMylist(mylist);
-                this.cacheImage(mylist.mylist_id);
+                await progressDailog(this.modal_dialog, this.obs_modal_dialog,
+                    {
+                        message:"更新中...",
+                        cb:() => { this.onCancelUpdate(); }
+                    },
+                    async ()=>{
+                        this.nico_mylist = new NicoMylist();
+                        const mylist = await this.nico_mylist.getMylist(mylist_id);
+                        await this.addMylist(mylist); // サイドバーのアイテムに追加
+                        await this.setMylist(mylist, false); // データ設定してgird更新
+                        this.cacheImage(mylist.mylist_id);
 
-                this.is_current_fav = true;
-                this.update();
+                        this.is_current_fav = true;
+                        this.update();
+                    });
             }
         };
     </script>

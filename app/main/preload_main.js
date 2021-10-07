@@ -50,4 +50,5 @@ window.addEventListener("load", () => {
     global.NicoDataConverter = require(`${root_dir}/app/js/nico-data-converter`);
     global.Command = require(`${root_dir}/app/js/command`);
     global.MouseGesture = require(`${root_dir}/app/js/mouse-gesture`);
+    global.ModalDialogUtil = require(`${root_dir}/app/js/modal-dialog-util`);
 });

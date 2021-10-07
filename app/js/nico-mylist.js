@@ -185,11 +185,15 @@ class NicoMylistImageCache {
                 // TODO <img src="${url}" ?
                 image.src = this._map.get(mylist_id).get(url);
             }else{
-                image.onload = (e) => {
-                    const data = this._getBase64(e.target);
-                    this._set(mylist_id, url, data);
-                };
-                image.src = url;
+                if(this._isImgData(url)){
+                    image.src = url;
+                }else{
+                    image.onload = (e) => {
+                        const data = this._getBase64(e.target);
+                        this._set(mylist_id, url, data);
+                    };
+                    image.src = url;
+                }
             }
             image.classList.add("gridtable-thumbnail", "mylist-img");
             return image.outerHTML;
@@ -202,6 +206,9 @@ class NicoMylistImageCache {
         this.loadCache(mylist_id);
 
         const url = img.src;
+        if(this._isImgData(url)){
+            return;
+        }
         if(this._has(mylist_id, url) === true){
             return;
         }
@@ -236,6 +243,10 @@ class NicoMylistImageCache {
         } catch(error) {
             logger.debug(`NicoMylistImageCache: delete mylistid=${mylist_id}, ${error}`);
         }
+    }
+
+    _isImgData(url){
+        return url.startsWith("data:image/");
     }
 
     _has(mylist_id, url){

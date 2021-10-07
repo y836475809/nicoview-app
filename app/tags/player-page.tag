@@ -52,13 +52,15 @@
 
     <script>
         /* globals my_obs */
+        const myapi = window.myapi;
+
         export default {
+            obs:null,
+            obs_open_video_form:null,
+            contextmenu_show:false,
             onBeforeMount(props) {
-                this.myapi = window.myapi;
-                
                 this.obs = props.obs; 
                 this.obs_open_video_form = my_obs.createObs();
-                this.contextmenu_show = false;
             },
             async getPlayData() {
                 return await this.obs.triggerReturn("player-main-page:get-play-data-callback");
@@ -81,7 +83,7 @@
                 if(e.button === 1){
                     this.contextmenu_show = true;
 
-                    await this.myapi.ipc.popupContextMenu("player-history-stack");
+                    await myapi.ipc.popupContextMenu("player-history-stack");
                     
                     this.contextmenu_show = false;
                 }
@@ -90,7 +92,7 @@
                     this.contextmenu_show = true;
 
                     const play_data = await this.getPlayData(); 
-                    const menu_id = await this.myapi.ipc.popupContextMenu("player", { play_data });
+                    const menu_id = await myapi.ipc.popupContextMenu("player", { play_data });
                     if(menu_id){
                         const { video_id, title, thumbnailURL, online } = play_data; // eslint-disable-line no-unused-vars
                         if(menu_id=="add-bookmark-time"){
@@ -100,11 +102,11 @@
                                 id: video_id,
                                 time: current_time
                             };
-                            this.myapi.ipc.Bookmark.addItems([bk_item]);
+                            myapi.ipc.Bookmark.addItems([bk_item]);
                         }
                         if(menu_id=="add-stack-time"){
                             const time = await this.getCurrentPlayTime();
-                            this.myapi.ipc.Stack.addItems([
+                            myapi.ipc.Stack.addItems([
                                 {
                                     id: video_id,
                                     title: title, 

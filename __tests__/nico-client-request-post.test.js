@@ -18,13 +18,13 @@ const nock_post = ({delay=1, code=200, res_json={key:"ok"}}={}) => {
         .post(test_path)
         .delay(delay)
         .times(Infinity)
-        .reply((uri, reqbody)=>{
+        .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
             post_count++;
             return [code, res_json];
         });
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
     process.env["http_proxy"]="";
     process.env["https_proxy"]="";

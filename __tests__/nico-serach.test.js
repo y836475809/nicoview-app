@@ -19,11 +19,11 @@ const default_params = () => {
     return params;
 };
 
-test.afterEach(t => {
+test.afterEach(t => { // eslint-disable-line no-unused-vars
     nico_mocks.clean(); 
 });
 
-test.beforeEach(t => {
+test.beforeEach(t => { // eslint-disable-line no-unused-vars
     nico_mocks.clean(); 
 });
 

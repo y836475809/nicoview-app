@@ -21,19 +21,19 @@ const getPropNum = (objs, prop_name) => {
 
 const nico_download_mocks = new NicoDownLoadMocks();
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
 });
 
-test.after(t => {
+test.after(t => { // eslint-disable-line no-unused-vars
     nico_download_mocks.clean();
 });
 
-test.beforeEach(t => {
+test.beforeEach(t => { // eslint-disable-line no-unused-vars
     log.length = 0;
     nico_download_mocks.clean();
 });
 
-test.afterEach(t => {
+test.afterEach(t => { // eslint-disable-line no-unused-vars
     nico_download_mocks.clean();
 });
 

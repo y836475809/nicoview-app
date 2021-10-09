@@ -60,7 +60,7 @@ class ConvertMP4 extends EventEmitter {
                 reject(error);
             });
 
-            this.pocess.on("close", async (code) => {
+            this.pocess.on("close", async (code) => { // eslint-disable-line no-unused-vars
                 if(this._cancel===false){
                     resolve();
                     return;
@@ -99,7 +99,7 @@ class ConvertMP4 extends EventEmitter {
             this._cancel = false;
             this.emit("cancel_error", error);
         });
-        cancel_proc.on("close", async (code) => {
+        cancel_proc.on("close", async (code) => { // eslint-disable-line no-unused-vars
             this._canceled = true;
         });
     }

@@ -13,7 +13,7 @@ const new_data = {
     item: "new"
 };
 
-const cnvJson = (file_path) => {
+const cnvJson = (file_path) => { // eslint-disable-line no-unused-vars
     return JSON.parse(fs.readFileSync(test_file_path, "utf-8"));
 };
 
@@ -28,7 +28,9 @@ test.beforeEach(t => {
     try {
         fs.statSync(tmp_file_path);
         fs.unlinkSync(tmp_file_path);
-    } catch (error) {}
+    } catch (error) {
+        // pass
+    }
 
     t.context.video_item = {
         id : "sm10",
@@ -69,7 +71,7 @@ test("writeFile _unlink error", t => {
             fs.writeFileSync(file_path, JSON.stringify(data));
             throw new Error();
         } 
-        _unlink(file_path){
+        _unlink(file_path){ // eslint-disable-line no-unused-vars
             throw new Error();
         } 
     }
@@ -85,7 +87,7 @@ test("writeFile _unlink error", t => {
 
 test("writeFile _rename error", t => {
     class TestNicoUpdate extends NicoUpdate {
-        _rename(old_path, new_path){
+        _rename(old_path, new_path){ // eslint-disable-line no-unused-vars
             throw new Error();
         } 
     }

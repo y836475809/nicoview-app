@@ -23,7 +23,7 @@ const nock_get = (delay=1, code=200) => {
         .reply(code, body, headers);
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 
     process.env["http_proxy"]="";

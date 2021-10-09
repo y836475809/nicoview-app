@@ -15,7 +15,7 @@ class TestImportFile extends ImportFile {
         this.paths.push(file_path);
         return true;
     }
-    async _getCreationTime(file_path){
+    async _getCreationTime(file_path){ // eslint-disable-line no-unused-vars
         return new Date();
     }
 }
@@ -25,10 +25,10 @@ class TestXMLImportFile extends ImportFile {
         super(video_filepath);
         this._data_type = data_type;
     }
-    async _existFile(file_path){
+    async _existFile(file_path){ // eslint-disable-line no-unused-vars
         return true;
     }
-    async _getCreationTime(file_path){
+    async _getCreationTime(file_path){ // eslint-disable-line no-unused-vars
         return new Date();
     }
     async _getThumbnailSize(){

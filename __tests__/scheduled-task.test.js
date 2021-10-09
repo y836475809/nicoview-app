@@ -23,14 +23,14 @@ const task = () => {
     };
 };
 
-test.beforeEach(t => {
+test.beforeEach(t => { // eslint-disable-line no-unused-vars
     clock = sinon.useFakeTimers();
     clock.tick(toMsec(24) + new Date().getTimezoneOffset()*60*1000);
     log = [];
     count = 0;
 });
 
-test.afterEach(t => {
+test.afterEach(t => { // eslint-disable-line no-unused-vars
     clock.restore();
 });
 

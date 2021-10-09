@@ -108,7 +108,7 @@ class NicoClientRequest {
         return status_code >= 200 && status_code < 300;
     }
 
-    _request(url, options, set_data_func=(req)=>{}){
+    _request(url, options, set_data_func=(req)=>{}){ // eslint-disable-line no-unused-vars
         return new Promise((resolve, reject) => {
             let str_data = "";
             let binary_data = [];

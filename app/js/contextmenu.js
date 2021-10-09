@@ -48,7 +48,7 @@ const player = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player", async (event, args) => {
         const { play_data } = args;
         const { video_id, title, thumbnailURL, online } = play_data;
-        return await new Promise((resolve, reject) => {
+        return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const menu_items = [
                 { 
                     id: "add-stack-time",
@@ -131,11 +131,11 @@ const player = (play_win) => {
 };
 
 const player_history_stack = (play_win, store, history, config) => {
-    ipcMain.handle("app:popup-contextmenu-player-history-stack", async (event, args) => {
-        return await new Promise((resolve, reject) => {
+    ipcMain.handle("app:popup-contextmenu-player-history-stack", async (event, args) => { // eslint-disable-line no-unused-vars
+        return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const createMenuItems = (items) => {
                 return items.map(item=>{
-                    const { id, title, time } = item;
+                    const { id, title, time } = item; // eslint-disable-line no-unused-vars
                     const getTitle = () => {
                         if(time){
                             return `[${toTimeString(time)}] ${title}`;
@@ -169,8 +169,8 @@ const player_history_stack = (play_win, store, history, config) => {
 };
 
 const player_ngcomment = (play_win) => {
-    ipcMain.handle("app:popup-contextmenu-player-ngcomment", async (event, args) => {
-        return await new Promise((resolve, reject) => {
+    ipcMain.handle("app:popup-contextmenu-player-ngcomment", async (event, args) => { // eslint-disable-line no-unused-vars
+        return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const menu_items = [
                 { 
                     id: "add-comment-ng=list",
@@ -264,7 +264,7 @@ const player_text = (play_win) => {
 };
 
 const player_setting_ngcomment = (player_win) => {
-    ipcMain.handle("app:popup-contextmenu-player-setting-ngcomment", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-player-setting-ngcomment", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -349,7 +349,7 @@ const listview_bookmark = (main_win) => {
 };
 
 const listview_toggle_mark = (main_win) => {
-    ipcMain.handle("app:popup-contextmenu-listview-toggle-mark", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-listview-toggle-mark", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
                 { 
@@ -459,7 +459,7 @@ const main_library = (main_win) => {
 };
 
 const main_library_convert_video = (main_win) => {
-    ipcMain.handle("app:popup-contextmenu-library-convert-video", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-library-convert-video", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
                 { 

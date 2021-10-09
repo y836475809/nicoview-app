@@ -17,7 +17,7 @@ const nock_options = (delay=1, code=200) => {
         .reply(code, "ok");
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
     process.env["http_proxy"]="";
     process.env["https_proxy"]="";

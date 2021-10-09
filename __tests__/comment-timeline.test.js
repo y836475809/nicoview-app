@@ -23,7 +23,7 @@ class McokElement {
         this.clientWidth = 300;
         this.clientHeight = 300;
     }
-    appendChild(elm){}
+    appendChild(elm){} // eslint-disable-line no-unused-vars
 }
 
 class MockDocument {
@@ -40,7 +40,7 @@ global.document = new MockDocument();
 class TestCommentTimeLine extends CommentTimeLine {
     _createCanvas(){}
     clear(){}
-    _getTextWidth(text, font_size){
+    _getTextWidth(text, font_size){ // eslint-disable-line no-unused-vars
         return 100;
     }
     _createFlowTweenMax(params){

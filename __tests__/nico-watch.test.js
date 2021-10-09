@@ -7,7 +7,7 @@ const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
 const mock_timeout = 121*1000;
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 });
 

@@ -22,6 +22,7 @@ class ProfTime {
     }
 
     log(t){
+        /* eslint-disable no-unused-vars */
         const black   = "\u001b[30m";
         const red     = "\u001b[31m";
         const green   = "\u001b[32m";
@@ -31,6 +32,7 @@ class ProfTime {
         const cyan    = "\u001b[36m";
         const white   = "\u001b[37m";
         const reset   = "\u001b[0m";
+        /* eslint-enable no-unused-vars */
     
         this.test_times.forEach(value => {
             t.log(`${value.name} ${green}(${value.time} ms)${reset}`);

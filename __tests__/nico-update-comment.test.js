@@ -98,7 +98,7 @@ class TestNicoUpdate extends NicoUpdate {
         return this.current_comment_data;
     }
 
-    async _getComments(api_data, cur_comments){
+    async _getComments(api_data, cur_comments){ // eslint-disable-line no-unused-vars
         return this.diff_comment_data;
     }
     

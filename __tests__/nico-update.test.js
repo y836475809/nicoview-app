@@ -24,7 +24,7 @@ class TestNicoUpdate extends NicoUpdate {
         this.data.push(data);
     }
 
-    _validateThumbnail(bytes){
+    _validateThumbnail(bytes){ // eslint-disable-line no-unused-vars
         return true;
     }
 }

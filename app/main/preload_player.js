@@ -9,7 +9,7 @@ process.once("loaded", () => {
 });
 
 window.addEventListener( "error", async e => {
-    const { message, filename, lineno, colno } = e;
+    const { message, filename, lineno, colno } = e; // eslint-disable-line no-unused-vars
     const msg = `${message}\n${filename}:${lineno}`;
     global.logger.error(msg);
     

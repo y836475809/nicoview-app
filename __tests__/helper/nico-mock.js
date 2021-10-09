@@ -14,7 +14,8 @@ const dmc_session_low = require(`${base_dir}/data/sm12345678-dmc-session-low-qua
 const disableNetConnect = () => {
     const yellow  = "\u001b[33m";
     const reset = "\u001b[0m";
-    console.warn(yellow + "disable http_proxy, https_proxy, no_proxy in this test" + reset);
+    console.warn(yellow +  // eslint-disable-line no-console
+        "disable http_proxy, https_proxy, no_proxy in this test" + reset);
 
     process.env["http_proxy"]="";
     process.env["https_proxy"]="";
@@ -140,7 +141,7 @@ class NicoMocks {
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(options_delay)
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 this.hb_options_count++;
                 return [200, "ok"];
             })
@@ -148,7 +149,7 @@ class NicoMocks {
             .query({ _format: "json", _method: "PUT" })
             .delay(post_delay)
             .times(50)
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 this.hb_post_count++;
                 return [200, {    
                     meta: {
@@ -180,7 +181,7 @@ class NicoMocks {
         this.dmc_hb_nock
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 this.hb_options_count++;
                 return [200, "ok"];
             })
@@ -271,7 +272,7 @@ class NicoDownLoadMocks {
             .post("/api/sessions")
             .query({ _format: "json" })   
             .delay(delay)
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 return [code, {
                     meta: { status: 201,message: "created" },
                     data: cp_dmc_session
@@ -321,14 +322,14 @@ class NicoDownLoadMocks {
             .options(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(options_delay)
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 return [code, "ok"];
             })
             .post(/\/api\/sessions\/.+/)
             .query({ _format: "json", _method: "PUT" })
             .delay(post_delay)
             .times(50)
-            .reply((uri, reqbody)=>{
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
                 return [code, "ok"];
             });
     } 

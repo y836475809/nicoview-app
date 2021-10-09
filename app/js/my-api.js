@@ -100,7 +100,7 @@ const Download = {
     },
 
     onUpdateItem: (func) => {
-        ipcRenderer.on("download:on-update-item", (event, args)=>{
+        ipcRenderer.on("download:on-update-item", (event, args)=>{ // eslint-disable-line no-unused-vars
             func();
         });
     },
@@ -155,7 +155,7 @@ const PlayHistory = {
     },
 
     onUpdateItem: (func) => {  
-        ipcRenderer.on("history:on-update-item", (event, args)=>{
+        ipcRenderer.on("history:on-update-item", (event, args)=>{ // eslint-disable-line no-unused-vars
             func();
         });
     },

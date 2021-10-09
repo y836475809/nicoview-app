@@ -1,6 +1,6 @@
 const cheerio = require("cheerio");
 const { NicoClientRequest } = require("./nico-client-request");
-const { NICO_URL, getWatchURL } = require("./nico-url");
+const { getWatchURL } = require("./nico-url");
 const { logger } = require("./logger");
 
 class NicoAPI {

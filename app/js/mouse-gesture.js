@@ -52,7 +52,7 @@ class MouseGesture {
 
     get defaultConfig() {
         const config = {};
-        for (const [key, value] of Object.entries(this._action_names)) {
+        for (const [key, value] of Object.entries(this._action_names)) { // eslint-disable-line no-unused-vars
             config[value] = "-";
         }
         return config;

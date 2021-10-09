@@ -1,5 +1,4 @@
 
-const path = require("path");
 const fs = require("fs");
 const fsPromises = fs.promises;
 const { deepCopy } = require("./deepcopy");

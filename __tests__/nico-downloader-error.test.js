@@ -9,19 +9,19 @@ const log = [];
 const nico_download_mocks = new NicoDownLoadMocks();
 const mock_timeout = 121*1000;
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
 });
 
-test.after(t => {
+test.after(t => { // eslint-disable-line no-unused-vars
     nico_download_mocks.clean();
 });
 
-test.beforeEach(t => {
+test.beforeEach(t => { // eslint-disable-line no-unused-vars
     log.length = 0;
     nico_download_mocks.clean();
 });
 
-test.afterEach(t => {
+test.afterEach(t => { // eslint-disable-line no-unused-vars
     nico_download_mocks.clean();
 });
 
@@ -35,7 +35,7 @@ class TestNicoDownloader extends NicoDownloader {
         this.thumbimg_error = false;
     }
 
-    async _renameTmp(oldname, newname){
+    async _renameTmp(oldname, newname){ // eslint-disable-line no-unused-vars
     }
 
     streamError(){
@@ -54,11 +54,11 @@ class TestNicoDownloader extends NicoDownloader {
         this.thumbimg_error = true;
     }
 
-    _createStream(dist_path){
+    _createStream(dist_path){ // eslint-disable-line no-unused-vars
         return new writeBufStream(this.stream_error);
     }
 
-    _writeJson(file_path, data){
+    _writeJson(file_path, data){ // eslint-disable-line no-unused-vars
         if(this.comment_error && /Comment/.test(file_path)){
             throw new Error("write comment error");
         }
@@ -67,7 +67,7 @@ class TestNicoDownloader extends NicoDownloader {
         }
     }
 
-    _writeBinary(file_path, data){
+    _writeBinary(file_path, data){ // eslint-disable-line no-unused-vars
         if(this.thumbimg_error){
             throw new Error("write thumbimg error");
         }

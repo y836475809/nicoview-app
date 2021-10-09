@@ -38,7 +38,7 @@ const nock_logout = ({delay=1, code=302} = {}) => {
     nock("https://secure.nicovideo.jp")
         .get("/secure/logout?site=niconico")
         .delay(delay)
-        .reply((uri, body)=>{
+        .reply((uri, body)=>{ // eslint-disable-line no-unused-vars
             return [code, "", {
                 "Set-Cookie": [
                     'user_session=deleted; Max-Age=-12345; Expires=Wed, 1 Mar 1987 01:01:01 GMT; Path=/',
@@ -49,7 +49,7 @@ const nock_logout = ({delay=1, code=302} = {}) => {
         });
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     process.env["http_proxy"]="";
     process.env["https_proxy"]="";
     process.env["no_proxy"]="";
@@ -57,14 +57,14 @@ test.before(t => {
     nock.disableNetConnect();
 });
 
-test.after(t => {
+test.after(t => { // eslint-disable-line no-unused-vars
 });
 
-test.beforeEach(t => {
+test.beforeEach(t => { // eslint-disable-line no-unused-vars
     nock.cleanAll();
 });
 
-test.afterEach(t => {
+test.afterEach(t => { // eslint-disable-line no-unused-vars
     nock.cleanAll();
 });
 

@@ -10,11 +10,11 @@ class TestPathJsonDataConverter extends JsonDataConverter{
         this.paths = [];
     }
 
-    _convertThumbinfo(json){
+    _convertThumbinfo(json){ // eslint-disable-line no-unused-vars
         return "";
     }
 
-    _convertComment(comment_json){
+    _convertComment(comment_json){ // eslint-disable-line no-unused-vars
         return "";
     }
 
@@ -23,7 +23,7 @@ class TestPathJsonDataConverter extends JsonDataConverter{
         return "[]";
     }
 
-    async _write(file_path, data){
+    async _write(file_path, data){ // eslint-disable-line no-unused-vars
         this.paths.push(file_path);
     }
 

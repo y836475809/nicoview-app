@@ -141,41 +141,41 @@ class TestNicoUpdate extends NicoUpdate {
         this._comments_diff = comments_diff;
     }
 
-    _convertComment(nico_xml, nico_json){
+    _convertComment(nico_xml, nico_json){ // eslint-disable-line no-unused-vars
         this.log.push("_convertComment");
     }
-    _convertThumbInfo(nico_xml, nico_json){
+    _convertThumbInfo(nico_xml, nico_json){ // eslint-disable-line no-unused-vars
         this.log.push("_convertThumbInfo");
     }
     _isDataTypeJson(){
         this.log.push("_isDataTypeJson");
         return false;
     }
-    _setDataType(data_type){
+    _setDataType(data_type){ // eslint-disable-line no-unused-vars
         this.log.push("_setDataType");
     }
-    _setTags(tags){
+    _setTags(tags){ // eslint-disable-line no-unused-vars
         this.log.push("_setTags");
     }
-    _setDeleted(is_deleted){}
-    _setThumbnailSize(thumbnail_size){
+    _setDeleted(is_deleted){} // eslint-disable-line no-unused-vars
+    _setThumbnailSize(thumbnail_size){ // eslint-disable-line no-unused-vars
         this.log.push("_setThumbnailSize");
     }
-    _writeFile(file_path, data, encoding){
+    _writeFile(file_path, data, encoding){ // eslint-disable-line no-unused-vars
         this.log.push("_writeFile");
     }
-    async _existPath(path){
+    async _existPath(path){ // eslint-disable-line no-unused-vars
         return false;
     }
     async _getWatchData(){
         this.log.push("_getWatchData");
         return this._watch_data;
     }
-    async _getComments(nico_api, cur_comments){
+    async _getComments(nico_api, cur_comments){ // eslint-disable-line no-unused-vars
         this.log.push("_getComments");
         return this._comments_diff;
     }
-    async _getThumbImg(url){
+    async _getThumbImg(url){ // eslint-disable-line no-unused-vars
         this.log.push("_getThumbImg");
         return this._img_data;
     }

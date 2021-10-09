@@ -13,32 +13,32 @@ const myapi = require("./my-api");
 
 /* globals Slick */
 
-const imageFormatter = (row, cell, value, columnDef, dataContext)=> {
+const imageFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
     if(!value){
         return "";
     }
     return `<img class="gridtable-thumbnail" src="${value}"/>`;
 };
 
-const dateFormatter = (row, cell, value, columnDef, dataContext)=> {
+const dateFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
     if(Number.isFinite(value) && value < 0){
         return "";
     }
     return time_format.toDateString(value);
 };
 
-const timeFormatter = (row, cell, value, columnDef, dataContext)=> {
+const timeFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
     if(Number.isFinite(value) && value < 0){
         return "";
     }
     return time_format.toTimeString(value);
 };
 
-const numberFormatter = (row, cell, value, columnDef, dataContext)=> {
+const numberFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
     return value.toLocaleString();
 };
 
-const wrapFormatter = (row, cell, value, columnDef, dataContext) => {
+const wrapFormatter = (row, cell, value, columnDef, dataContext) => { // eslint-disable-line no-unused-vars
     return `<div class="wrap-gridtable-cell">${value}</div>`;
 };
 
@@ -127,10 +127,10 @@ class GridTable {
             this.options = Object.assign(default_options, options);
         }
         
-        this.on_dblclick = (e, data)=>{};
-        this.on_button_click = (e, data)=>{};
-        this.on_context_menu = (e)=>{};
-        this.filter = (column_id, value, word) => { return true; };
+        this.on_dblclick = (e, data)=>{};     // eslint-disable-line no-unused-vars
+        this.on_button_click = (e, data)=>{}; // eslint-disable-line no-unused-vars
+        this.on_context_menu = (e)=>{};       // eslint-disable-line no-unused-vars
+        this.filter = (column_id, value, word) => { return true; }; // eslint-disable-line no-unused-vars
         this.target_column_ids = [];
     }
 
@@ -169,7 +169,7 @@ class GridTable {
             this.grid.invalidate();
             this.grid.render();
         });
-        this.dataView.onRowCountChanged.subscribe((e, args) => {
+        this.dataView.onRowCountChanged.subscribe((e, args) => { // eslint-disable-line no-unused-vars
             this.grid.updateRowCount();
         });
     
@@ -214,7 +214,7 @@ class GridTable {
             }
             this.on_context_menu(e);
         });  
-        this.grid.onSort.subscribe((e, args) => {
+        this.grid.onSort.subscribe((e, args) => { // eslint-disable-line no-unused-vars
             this._saveState();
         }); 
         this.grid.onColumnsResized.subscribe(() => {

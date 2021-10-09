@@ -10,7 +10,7 @@ const nico_mocks = new NicoMocks();
 let state_log = "";
 const hb_1s_rate = 1/120;
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 });
 
@@ -42,7 +42,7 @@ const createNicoPlay = (hb_rate) => {
     nico_play.on("cancelHeartBeat", ()=>{
         state_log += "cancelHeartBeat" + ":";
     });
-    nico_play.on("errorHeartBeat", (error)=>{
+    nico_play.on("errorHeartBeat", (error)=>{ // eslint-disable-line no-unused-vars
         state_log += "errorHeartBeat" + ":";
     });
     return nico_play;

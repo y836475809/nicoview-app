@@ -1,5 +1,4 @@
 const fs = require("fs");
-const util = require("util");
 const path = require("path");
 const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
 const { NicoClientRequest } = require("./nico-client-request");
@@ -40,7 +39,7 @@ class DownloadRequest {
         }
     }
 
-    async download(stream, on_progress=(state)=>{}){
+    async download(stream, on_progress=(state)=>{}){ // eslint-disable-line no-unused-vars
         this._req = new NicoClientRequest();
         await this._req.get(this._url, 
             {
@@ -231,7 +230,8 @@ class NicoDownloader {
         const tags = this._nico_api.getTags().map((value) => {
             return value.name;
         });
-        const { thumbnail_url, thumbnail_size } = this._getThumbnailData(video.thumbnail.largeUrl);
+        const { thumbnail_url, thumbnail_size } =  // eslint-disable-line no-unused-vars
+            this._getThumbnailData(video.thumbnail.largeUrl);
         
         return {
             data_type:"json", 

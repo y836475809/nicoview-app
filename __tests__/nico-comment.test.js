@@ -9,7 +9,7 @@ const prof_time = new ProfTime();
 const nico_mocks = new NicoMocks();
 const mock_timeout = 121*1000;
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 });
 
@@ -94,7 +94,7 @@ test("request param owner", t => {
 test("request param error", t => {
     const nico_comment = t.context.nico_comment;
     // ownerがないのにmakeJsonOwnerを呼ぶとエラー
-    t.throws(() => {　nico_comment.makeJsonOwner(0, 0); });
+    t.throws(() => { nico_comment.makeJsonOwner(0, 0); });
 });
 
 test("request param inc rs,ps no", t => {

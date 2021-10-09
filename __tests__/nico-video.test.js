@@ -14,7 +14,7 @@ const setHBLifetime = (nico_video, time_ms) => {
     session.heartbeatLifetime = time_ms;
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 });
 

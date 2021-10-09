@@ -190,7 +190,7 @@ class NicoLogin {
             }
         });
         
-        ipcMain.handle("app:get-nico-login-cookie", (event, args) => {
+        ipcMain.handle("app:get-nico-login-cookie", (event, args) => { // eslint-disable-line no-unused-vars
             if(this._req.isAlreadyLogin() && this._req.isExpired()){
                 return this._req.getCookie();
             }

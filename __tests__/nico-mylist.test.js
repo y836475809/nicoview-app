@@ -11,7 +11,7 @@ const getMylisID = (id) => {
     return `mylist/${id}`;
 };
 
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     prof_time.clear();
 });
 

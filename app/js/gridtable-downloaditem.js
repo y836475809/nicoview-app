@@ -3,6 +3,8 @@ require("slickgrid/lib/jquery.event.drop-2.3.0");
 require("slickgrid/plugins/slick.rowmovemanager");
 const { GridTable, wrapFormatter, buttonFormatter } = require("./gridtable");
 
+/* globals Slick */
+
 const DownloadState = Object.freeze({
     wait: 0,
     downloading: 1,
@@ -55,7 +57,7 @@ class GridTableDownloadItem {
         this.grid_table = new GridTable("download-item-grid", columns, options);
         this.grid_table.init(container);
             
-        this.grid_table.dataView.onRowCountChanged.subscribe((e, args) => {
+        this.grid_table.dataView.onRowCountChanged.subscribe((e, args) => { // eslint-disable-line no-unused-vars
             this.grid_table.grid.updateRowCount();
             this.grid_table.grid.render();
         });

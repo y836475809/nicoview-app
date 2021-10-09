@@ -42,7 +42,7 @@ class testMapDB extends MapDB {
         return false;
     }
 
-    async _appendFile(file_path, data){
+    async _appendFile(file_path, data){ // eslint-disable-line no-unused-vars
         const fname = path.basename(file_path);
         this.test_log.push(`append ${fname}`);
     }
@@ -50,7 +50,7 @@ class testMapDB extends MapDB {
         const fname = path.basename(file_path);
         this.test_log.push(`unlink ${fname}`);
     }
-    _writeFile(file_path, data){
+    _writeFile(file_path, data){ // eslint-disable-line no-unused-vars
         const fname = path.basename(file_path);
         this.test_log.push(`writeFile ${fname}`);   
     }
@@ -67,7 +67,7 @@ class testLibraryDB extends LibraryDB {
         this.exist_log = exist_log;
     }
 
-    _createDB(params){
+    _createDB(params){ // eslint-disable-line no-unused-vars
         return new testMapDB(this.exist_log);
     }
 } 

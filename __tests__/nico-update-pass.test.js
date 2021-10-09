@@ -21,11 +21,11 @@ class TestNicoUpdate extends NicoUpdate {
         this.log = [];
     }
 
-    _convertComment(nico_xml, nico_json){
+    _convertComment(nico_xml, nico_json){ // eslint-disable-line no-unused-vars
         this.log.push("_convertComment");
     }
 
-    _convertThumbInfo(nico_xml, nico_json){
+    _convertThumbInfo(nico_xml, nico_json){ // eslint-disable-line no-unused-vars
         this.log.push("_convertThumbInfo");
     }
 
@@ -39,7 +39,7 @@ class TestNicoUpdate extends NicoUpdate {
         super._setDataType(data_type);
     }
 
-    _setTags(tags){
+    _setTags(tags){ // eslint-disable-line no-unused-vars
         this.log.push("_setTags");
     }
 
@@ -48,13 +48,13 @@ class TestNicoUpdate extends NicoUpdate {
         super._setThumbnailSize(thumbnail_size);
     }
 
-    _writeFile(file_path, data, encoding){
+    _writeFile(file_path, data, encoding){ // eslint-disable-line no-unused-vars
         this.log.push("_writeFile");
         this.paths.push(file_path);
         this.data.push(data);
     }
     
-    async _existPath(path){
+    async _existPath(path){ // eslint-disable-line no-unused-vars
         return this._file_exist;
     }
 

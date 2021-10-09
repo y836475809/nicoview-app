@@ -342,7 +342,7 @@ app.on("ready", async ()=>{
         const bw = BrowserWindow.fromId(event.sender.id);
         return showMessageBox(bw, type, title, message, okcancel);
     });
-    ipcMain.handle("app:show-select-folder-dialog", async (event, args) => {
+    ipcMain.handle("app:show-select-folder-dialog", async (event, args) => { // eslint-disable-line no-unused-vars
         const bw = BrowserWindow.fromId(event.sender.id);
         return selectFolderDialog(bw);
     });
@@ -352,7 +352,7 @@ app.on("ready", async ()=>{
         return selectFileDialog(bw, name, exts, multi_select);
     });
     
-    ipcMain.on("app:show-player", async (event, args) => {
+    ipcMain.on("app:show-player", async (event, args) => { // eslint-disable-line no-unused-vars
         if(player_win){
             player_win.show();
         }
@@ -398,7 +398,7 @@ app.on("ready", async ()=>{
         "nglist",
         "stack",
     ].forEach(name=>{
-        ipcMain.handle(`${name}:getItems`, async (event, args) => {
+        ipcMain.handle(`${name}:getItems`, async (event, args) => { // eslint-disable-line no-unused-vars
             if(!store.has(name)){
                 store.setItems(name, await json_store.load(name, []));
             }
@@ -415,7 +415,7 @@ app.on("ready", async ()=>{
     });
 
     // download
-    ipcMain.handle("download:getIncompleteIDs", async (event, args) => {
+    ipcMain.handle("download:getIncompleteIDs", async (event, args) => { // eslint-disable-line no-unused-vars
         const name = "download";
         if(!store.has(name)){
             store.setItems(name, await json_store.load(name, []));
@@ -438,7 +438,7 @@ app.on("ready", async ()=>{
     const items = await json_store.load("history", []);
     history.setup(history_max);  
     history.setData(items);
-    ipcMain.handle("history:getItems", (event, args) => {
+    ipcMain.handle("history:getItems", (event, args) => { // eslint-disable-line no-unused-vars
         return history.getData("history");
     });
     ipcMain.handle("history:updateItems", async (event, args) => {
@@ -478,7 +478,7 @@ app.on("ready", async ()=>{
         const { download_item } = args;
         await library.addDownloadedItem(download_item);
     });
-    ipcMain.handle("library:load", async (event, args) => {
+    ipcMain.handle("library:load", async (event, args) => { // eslint-disable-line no-unused-vars
         await library.load();
     });
     ipcMain.handle("library:has", (event, args) => {
@@ -524,7 +524,9 @@ app.on("ready", async ()=>{
             try {
                 await fsPromises.stat(file_path);
                 exist_paths.push(file_path);
-            } catch (error) {}
+            } catch (error) {
+                // pass
+            }
         }
 
         for (let index = 0; index < exist_paths.length; index++) {
@@ -632,7 +634,7 @@ app.on("activate", () => {
 });
 
 const createPlayerWindow = () => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
         if(player_win !== null){
             resolve();
             return;
@@ -659,11 +661,11 @@ const createPlayerWindow = () => {
             player_win.maximize();
         }
 
-        ipcMain.once("app:player-ready", (event, args) => {
+        ipcMain.once("app:player-ready", (event, args) => { // eslint-disable-line no-unused-vars
             if(config.get("open_devtools", false)){
                 player_win.webContents.openDevTools();
             }
-            player_win.on("close", (e) => {
+            player_win.on("close", (e) => { // eslint-disable-line no-unused-vars
                 config.set("player.window.state", getWindowState(player_win));
                 player_win = null;
             });
@@ -673,7 +675,7 @@ const createPlayerWindow = () => {
 
         player_win.loadURL(player_html_path);
 
-        player_win.on("close", e => {
+        player_win.on("close", e => { // eslint-disable-line no-unused-vars
             if(player_win){
                 player_win.webContents.closeDevTools();
             }

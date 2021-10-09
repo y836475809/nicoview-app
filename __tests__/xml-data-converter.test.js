@@ -11,8 +11,8 @@ test.beforeEach(async t => {
 });
 
 class TestXMLDataConverter extends XMLDataConverter {
-    async _read(file_path){ return ""; }
-    async _write(file_path, data){} 
+    async _read(file_path){ return ""; } // eslint-disable-line no-unused-vars
+    async _write(file_path, data){}  // eslint-disable-line no-unused-vars
 }
 
 test("_convertTags", (t) => {

@@ -4,6 +4,8 @@ const path = require("path");
 
 const { NicoMockResponse } = require("./nico-mock-response");
 
+/* eslint-disable no-console */
+
 const options = { 
     key: fs.readFileSync(path.join(__dirname, "orekey.pem")),
     cert: fs.readFileSync(path.join(__dirname, "orecert.pem"))
@@ -140,7 +142,7 @@ const nico_mock_login_logout = ({delay=500, code=302} = {}) => {
         })
         .get("/secure/logout?site=niconico")
         .delay(delay)
-        .reply((uri, body)=>{
+        .reply((uri, body)=>{ // eslint-disable-line no-unused-vars
             console.log(`nock logout: ${uri}`);
             return [code, "", {
                 "Set-Cookie": [

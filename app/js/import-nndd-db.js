@@ -83,11 +83,11 @@ class DBConverter {
             const is_economy = value[5] !== 0;
             const modification_date = value[6];
             const creation_date = value[7];
-            const thumb_url = value[8];
+            const thumb_url = value[8]; // eslint-disable-line no-unused-vars
             const play_count = value[9];
             const time = value[10];
             const last_play_date = value[11];
-            const yet_reading = value[12];
+            const yet_reading = value[12]; // eslint-disable-line no-unused-vars
             const pub_date = value[13];
 
             const decoded_path = decodeURIComponent(uri);

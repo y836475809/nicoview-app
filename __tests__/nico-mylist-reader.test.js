@@ -3,7 +3,7 @@ const fs = require("fs");
 const { NicoMylistReader } = require("../app/js/nico-mylist");
 
 let mylist_xml = null;
-test.before(t => {
+test.before(t => { // eslint-disable-line no-unused-vars
     mylist_xml = fs.readFileSync(`${__dirname}/data/mylist00000000.xml`, "utf-8");
 });
 

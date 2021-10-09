@@ -63,16 +63,16 @@ class TestNicoUpdate extends NicoUpdate {
     _getCurrentCommentData(){
         return [];
     }
-    async _getComments(nico_api, cur_comments){
+    async _getComments(nico_api, cur_comments){ // eslint-disable-line no-unused-vars
         return [{}];
     }
-    async _getThumbImg(url){
+    async _getThumbImg(url){ // eslint-disable-line no-unused-vars
         return "jpeg";
     }
-    _writeFile(file_path, data){
+    _writeFile(file_path, data){ // eslint-disable-line no-unused-vars
         this.paths.push(file_path);
     }
-    _validateThumbnail(bytes){
+    _validateThumbnail(bytes){ // eslint-disable-line no-unused-vars
         return true;
     }
 }
@@ -88,18 +88,18 @@ class TestNicoUpdateTags extends NicoUpdate {
     async _getWatchData(){
         return { nico_api: this.nico_api };
     }
-    async _getComments(nico_api, cur_comments){
+    async _getComments(nico_api, cur_comments){ // eslint-disable-line no-unused-vars
         return [{}];
     }
     _getCurrentCommentData(){
         return [];
     }
-    async _getThumbImg(url){
+    async _getThumbImg(url){ // eslint-disable-line no-unused-vars
         return "jpeg";
     }
-    _writeFile(file_path, data){
+    _writeFile(file_path, data){ // eslint-disable-line no-unused-vars
     }
-    _validateThumbnail(bytes){
+    _validateThumbnail(bytes){ // eslint-disable-line no-unused-vars
         return true;
     }
 }

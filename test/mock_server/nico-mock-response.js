@@ -126,8 +126,8 @@ class NicoMockResponse {
         const q = querystring.parse(url_obj.search);
         const text = decodeURI(url_obj.pathname.split("/").slice(-1)[0]);
         const page = parseInt(q["page"]);
-        const sort = q["sort"];
-        const order = q["order"];
+        const sort = q["sort"]; // eslint-disable-line no-unused-vars
+        const order = q["order"]; // eslint-disable-line no-unused-vars
         const limit = 32;
         const offset = limit*(page - 1);
         const list = [];

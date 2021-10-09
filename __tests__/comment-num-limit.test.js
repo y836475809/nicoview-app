@@ -32,7 +32,7 @@ class TestCommentNumLimit extends CommentNumLimit{
         this.max_num = max_num;
     }
     
-    _getMaxNum(play_time_sec){
+    _getMaxNum(play_time_sec){ // eslint-disable-line no-unused-vars
         return this.max_num;
     }
 }

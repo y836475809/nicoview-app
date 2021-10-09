@@ -68,11 +68,6 @@
                     await myapi.ipc.Search.updateItems(items);
                 });
 
-                this.obs_listview.on("show-contextmenu", (e, args) => {
-                    const { items, cb } = args; // eslint-disable-line no-unused-vars
-                    cb(null);
-                });
-
                 this.obs_listview.on("item-dlbclicked", (item) => {
                     this.obs.trigger("search-page:item-dlbclicked", item.cond);
                 });

@@ -215,6 +215,7 @@
             sortable:null,
             obs:null,
             confirm:null,
+            contextmenu_show:false,
             onBeforeMount(props) {
                 this.obs = props.obs;
                 
@@ -435,6 +436,9 @@
                 this.obs.trigger("item-dlbclicked", item);
             },
             onclickItemAsdblclick(item, e) {
+                if(this.contextmenu_show){
+                    return;
+                }
                 this.setSelected(e.target, item);
                 this.obs.trigger("item-dlbclicked", item);
             },
@@ -442,22 +446,23 @@
                 this.update();
                 this.triggerChange();
             },
-            onmouseUp(item, e) {
+            async onmouseUp(item, e) {
                 this.setSelected(e.target, item);
                 if(e.button===2){
                     const items = this.getSelectedItems();
-                    const cb = () => {
-                        (async ()=>{
-                            const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
-                            if(menu_id=="toggle-mark"){
-                                items.forEach(item => {
-                                    item.marked = !item.marked;
-                                });
-                                this.updateItemIcon();
-                            }
-                        })();   
-                    };
-                    this.obs.trigger("show-contextmenu", e, { items, cb });
+                    this.contextmenu_show = true;
+                    if(this.obs.hasReturnEvent("show-contextmenu")){
+                        await this.obs.triggerReturn("show-contextmenu", e, { items });
+                    }else{
+                        const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
+                        if(menu_id=="toggle-mark"){
+                            items.forEach(item => {
+                                item.marked = !item.marked;
+                            });
+                            this.updateItemIcon();
+                        }
+                    }
+                    this.contextmenu_show = false;
                 }
             },
             onmouseDown(item, e) {

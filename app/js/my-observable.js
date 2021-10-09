@@ -33,6 +33,9 @@ class MyObservable {
             }
         }
     }
+    hasReturnEvent(event){
+        return this.return_callbacks.has(event);
+    }
 }
 
 const createObs = () => {

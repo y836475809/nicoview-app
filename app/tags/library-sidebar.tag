@@ -59,11 +59,6 @@
                     const { items } = args;
                     await myapi.ipc.Library.updateSearchItems(items);
                 });
-                
-                this.obs_listview.on("show-contextmenu", (e, args) => {
-                    const { items, cb } = args; // eslint-disable-line no-unused-vars
-                    cb(null);
-                });
 
                 this.obs.on("library-page:sidebar:add-search-item", (args) => {
                     const { item } = args;

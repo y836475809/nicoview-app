@@ -68,8 +68,8 @@
                     resizeHeight(this, items);
                 });
 
-                this.obs_listview.on("show-contextmenu", async (e, args) => {
-                    const { items, cb } = args; // eslint-disable-line no-unused-vars
+                this.obs_listview.onReturn("show-contextmenu", async (e, args) => {
+                    const { items } = args;
 
                     const menu_id = await myapi.ipc.popupContextMenu("listview-bookmark", {items});
                     if(menu_id=="go-to-library"){

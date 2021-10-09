@@ -299,6 +299,10 @@ class GridTable {
         this.grid.invalidate();        
     }
 
+    getDataLength(){
+        return this.dataView.getLength();
+    }
+
     addItem(item){
         this.dataView.addItem(item);
         this.dataView.reSort();

@@ -191,11 +191,17 @@
                     video_item.thumb_img = video_data.getThumbImgPath();
                     video_item.tags = video_item.tags ? video_item.tags.join(" ") : "";
                     this.grid_table.updateItem(video_item, video_id);
+
+                    this.state.num_items =  this.grid_table.getDataLength();
+                    this.update();
                 });
 
                 myapi.ipc.Library.onDeleteItem((args) => {
                     const { video_id } = args;
                     this.grid_table.deleteItemById(video_id);
+
+                    this.state.num_items =  this.grid_table.getDataLength();
+                    this.update();
                 });
 
                 myapi.ipc.Library.onUpdateItem((args) => {

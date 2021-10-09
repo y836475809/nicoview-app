@@ -1,20 +1,17 @@
 const fs = require("fs");
 const path = require("path");
-const EventEmitter = require("events");
 const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
 const { XMLDataConverter } = require("./nico-data-converter");
 const NicoDataParser = require("./nico-data-parser");
 const { deepCopy } = require("./deepcopy");
 
-class NicoUpdate extends EventEmitter {
+class NicoUpdate {
     /**
      * 
      * @param {Object} video_item 
      */
     constructor(video_item){
-        super();
-
         if(video_item){
             this.setVideoItem(video_item);
         }
@@ -30,9 +27,13 @@ class NicoUpdate extends EventEmitter {
         this.video_data = new NicoVideoData(this.video_item); 
     }
 
-    _emitUpdated(update_thumbnail=false){
+    _getResult(update_thumbnail=false){
         const props = this._getChangedProps(this.org_video_item, this.video_item);
-        this.emit("updated", this.video_item.id, props, update_thumbnail); 
+        return {
+            video_id:this.video_item.id,
+            props:props,
+            update_thumbnail:update_thumbnail,
+        };
     }
 
     _getChangedProps(org_item, updated_item){
@@ -75,7 +76,7 @@ class NicoUpdate extends EventEmitter {
             this._setDataType("json");
         }
 
-        this._emitUpdated(true);
+        return this._getResult(true);
     }
 
     async updateThumbInfo(){
@@ -93,7 +94,7 @@ class NicoUpdate extends EventEmitter {
             await this._convertComment(nico_xml, nico_json);    
         }
 
-        this._emitUpdated();
+        return this._getResult();
     }
 
     _updateThumbInfo(nico_api, nico_json){
@@ -122,7 +123,7 @@ class NicoUpdate extends EventEmitter {
             await this._convertThumbInfo(nico_xml, nico_json);  
         }
 
-        this._emitUpdated();
+        return this._getResult();
     }
     
     async _updateComment(nico_api, nico_json){
@@ -204,7 +205,8 @@ class NicoUpdate extends EventEmitter {
         if(!is_update){
             return;
         }
-        this._emitUpdated(true);
+
+        return this._getResult(true);
     }  
 
     async _updateThumbnail(nico_api, thumbnail_size, nico_xml, nico_json){

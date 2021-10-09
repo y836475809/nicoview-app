@@ -1,6 +1,6 @@
 {
   "name": "nicoview-app",
-  "version": "0.14.24.11",
+  "version": "0.14.25.11",
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "app/main/main.js",
   "scripts": {

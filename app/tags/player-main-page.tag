@@ -117,10 +117,21 @@
                         }
                     });
 
-                    nico_update.on("updated", async (video_id, props, update_thumbnail) => { // eslint-disable-line no-unused-vars
-                        try {
-                            await myapi.ipc.Library.updateItemProps(video_id, props);
-                            const updated_video_item = await myapi.ipc.Library.getItem(video_id);
+                    try {   
+                        const video_item = await myapi.ipc.Library.getItem(video_id);
+                        nico_update.setVideoItem(video_item);
+
+                        let result = null;
+                        if(update_target=="thumbinfo"){
+                            result = await nico_update.updateThumbInfo();
+                        }else if(update_target=="comment"){
+                            result = await nico_update.updateComment();
+                        }else{
+                            throw new Error(`${update_target} is unknown`);
+                        }
+                        if(result){
+                            await myapi.ipc.Library.updateItemProps(result.video_id, result.props);
+                            const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
                             const video_data = new NicoVideoData(updated_video_item);
                             const viewinfo = {
                                 is_economy: video_data.getIsEconomy(),
@@ -139,31 +150,8 @@
                                 comments: filtered_comments,
                                 all_comment_num: comments.length,
                             });
-
                             this.obs.trigger("player-video:update-comments", filtered_comments);
-                        } catch (error) {
-                            if(!error.cancel){
-                                logger.error(error);
-                                await myapi.ipc.Dialog.showMessageBox({
-                                    type: "error",
-                                    message: error.message
-                                });
-                            }
-                        }
-                        this.obs_modal_dialog.trigger("close");
-                    });
-
-                    try {   
-                        const video_item = await myapi.ipc.Library.getItem(video_id);
-                        nico_update.setVideoItem(video_item);
-
-                        if(update_target=="thumbinfo"){
-                            await nico_update.updateThumbInfo();
-                        }else if(update_target=="comment"){
-                            await nico_update.updateComment();
-                        }else{
-                            throw new Error(`${update_target} is unknown`);
-                        }
+                        }   
                     } catch (error) {
                         if(!error.cancel){
                             logger.error(error);
@@ -171,9 +159,9 @@
                                 type: "error",
                                 message: error.message
                             });
-                        }
-                        this.obs_modal_dialog.trigger("close");
+                        }       
                     }
+                    this.obs_modal_dialog.trigger("close");
                 });
 
                 this.obs.on("player-main-page:add-ng-comment", async (args) => {

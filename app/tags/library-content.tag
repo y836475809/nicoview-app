@@ -347,17 +347,17 @@
 
                         if(menu_id=="update-comment"){
                             this.updateNicoData(items, async (nico_update)=>{
-                                await nico_update.updateComment();
+                                return await nico_update.updateComment();
                             });
                         }
                         if(menu_id=="update-thumbnail"){
                             this.updateNicoData(items, async (nico_update)=>{
-                                await nico_update.updateThumbnail();
+                                return await nico_update.updateThumbnail();
                             });
                         }
                         if(menu_id=="update-except-video"){
                             this.updateNicoData(items, async (nico_update)=>{
-                                await nico_update.update();
+                                return await nico_update.update();
                             });
                         }
                         if(menu_id=="conver-to-xml"){
@@ -546,18 +546,17 @@
                         try {
                             const video_item = await myapi.ipc.Library.getItem(item.id);
                             nico_update = new NicoUpdate(video_item);
-                            nico_update.on("updated", async (video_id, props, update_thumbnail) => {
-                                await myapi.ipc.Library.updateItemProps(video_id, props);
-                                if(update_thumbnail){
-                                    const updated_video_item = await myapi.ipc.Library.getItem(video_id);
+                            const result = await func(nico_update);
+                            if(result){
+                                await myapi.ipc.Library.updateItemProps(result.video_id, result.props);
+                                if(result.update_thumbnail){
+                                    const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
                                     const video_data = new NicoVideoData(updated_video_item);
                                     const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
-                                    this.grid_table.updateCells(video_id, {thumb_img});
+                                    this.grid_table.updateCells(result.video_id, {thumb_img});
                                 }
-                            });
-                            await func(nico_update);
-
-                            this.grid_table.updateCell(item.id, "state", "更新完了");
+                            }
+                            this.grid_table.updateCell(item.id, "state", "更新完了");       
                         } catch (error) {
                             if(error.cancel===true){   
                                 this.grid_table.updateCell(item.id, "state", "更新キャンセル");

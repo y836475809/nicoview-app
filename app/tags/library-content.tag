@@ -254,7 +254,7 @@
                 };   
                 this.grid_table = new GridTable("library-grid", columns, options);
 
-                this. obs.on("library-page:search-item-dlbclicked", (item) => {
+                this.obs.on("library-page:search-item-dlbclicked", (item) => {
                     const query = item.query;
                     const target_ids = item.target_ids;
 

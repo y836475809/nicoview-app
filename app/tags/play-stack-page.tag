@@ -4,7 +4,7 @@
             --page-width: 300px;
             --item-height: 80px;
             --thumb-size: 80px;
-            --icon-size: 20px;
+            --icon-size: 40px;
             --item-duration: 300ms;
         }
 

@@ -73,23 +73,25 @@
         }
 
         .cond-menu-container1 {
+            position: absolute;
             display: flex;
-            height: 0px;
-            overflow: hidden;
-            transition: height 0.5s;
+            height: 160px;
+            z-index: 2;
         }
         .cond-menu-container2 {
             display: flex;
             background-color: white;
-            overflow: hidden;
             margin: 0 5px 5px 5px;
             padding: 5px;
             border: 1px solid gray;
             border-radius: 3px;
-            transition: height 0.5s;
+            z-index: 2;
         }
         .cond-menu-container-expand {
             height: 160px;
+        }
+        .cond-menu-container-non {
+            display: none;
         }
 
         .cond-menu-list {
@@ -112,6 +114,8 @@
 
         .cond-menu-container2 > .close-btn {
             font-weight: bold;
+            font-size: 20px;
+            margin-right: 5px;
             color: gray;
             user-select: none;
             cursor: pointer;
@@ -143,7 +147,7 @@
                 <input class="check-search-api" type="checkbox" 
                     checked={state.api_checked} onclick={onclickCheckSearchAPI} />スナップショット検索
             </label>
-            <div class="title center-v" onclick="{onclickToggleMenu}">
+            <div class="cond-sort title center-v" onclick="{onclickToggleMenu}">
                 {state.sort_title}
             </div>
             <div class="title center-v" onclick="{onclickToggleMenu}">
@@ -160,7 +164,7 @@
             </div>
         </div> 
     </div>
-    <div class="cond-menu-container1">
+    <div class="cond-menu-container1 cond-menu-container-non">
         <div class="cond-menu-container2">
             <div class="cond-menu-list">
                 <div class="title">並び替え</div>
@@ -457,7 +461,15 @@
             },
             onclickToggleMenu(e) { // eslint-disable-line no-unused-vars
                 const elm = this.$(".cond-menu-container1");
-                elm.classList.toggle("cond-menu-container-expand");
+                elm.classList.toggle("cond-menu-container-non");
+                
+                if(!elm.classList.contains("cond-menu-container-non")){
+                    const sort_elm = this.$(".selected-container .cond-sort");
+                    const x = sort_elm.offsetLeft - 5;
+                    const y = sort_elm.offsetTop + sort_elm.clientHeight + 5;
+                    elm.style.left = x + "px";
+                    elm.style.top = y + "px";
+                }
             },
             onclickCheckSearchAPI(e) { // eslint-disable-line no-unused-vars
                 const elm = this.$(".check-search-api");

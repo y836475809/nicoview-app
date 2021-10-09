@@ -11,6 +11,7 @@
     "test-comment": "electron . --test=test-comment",
     "test-tag": "electron . --test=test-tag",
     "main": "electron .",
+    "eslint": "eslint ./app/**/*.js ./app/html/*.html ./__tests__/**/*.js ./test/**/*.js ./test/**/*.html || exit 0",
     "test": "ava -v -s",
     "build": "electron-builder --x64 --dir",
     "build-zip": "electron-builder --x64"

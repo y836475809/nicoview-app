@@ -550,7 +550,7 @@
                                 await myapi.ipc.Library.updateItemProps(video_id, props);
                                 if(update_thumbnail){
                                     const updated_video_item = await myapi.ipc.Library.getItem(video_id);
-                                    const video_data = new this.NicoVideoData(updated_video_item);
+                                    const video_data = new NicoVideoData(updated_video_item);
                                     const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
                                     this.grid_table.updateCells(video_id, {thumb_img});
                                 }

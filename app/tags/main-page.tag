@@ -3,6 +3,7 @@
         :host {
             --main-sidebar-width: 75px;
             --margin: 5px;
+            --page-container-right-space: 20px;
             width: 100%;
             height: 100%;
             margin: 0;
@@ -26,7 +27,7 @@
         .page-container.right > * {
             position: absolute;
             top: var(--right-sidebar-page-top);
-            right: calc(var(--main-sidebar-width) + var(--margin));
+            right: calc(var(--main-sidebar-width) + var(--margin) + var(--page-container-right-space));
             overflow-x: hidden; 
             overflow-y: hidden; 
             padding: var(--margin);

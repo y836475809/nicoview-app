@@ -17,7 +17,7 @@ const { NicoLogin } = require("../js/nico-login");
 const { setupContextmenu } = require("../js/contextmenu");
 
 const { 
-    JsonStore, UserCSS, 
+    JsonStore, UserCSS, UserIconCache,
     getWindowState,
     setLogLevel,
     popupInputContextMenu,
@@ -33,6 +33,7 @@ const user_css = new UserCSS();
 const json_store = new JsonStore(async ()=>{
     return await config.get("data_dir", "");
 });
+const user_icon_cache = new UserIconCache();
 let nico_login = null;
 
 const app_dir = path.join(__dirname, "/..");
@@ -599,6 +600,10 @@ app.on("ready", async ()=>{
         config.set(key, value);
     });
 
+    user_icon_cache.setup(
+        path.join(config.get("data_dir", ""), "user_icon"),
+        config.get("user_icon_cache", false));
+    
     createWindow();
     
     setupContextmenu(main_win, player_win, config, history, store);

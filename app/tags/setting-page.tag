@@ -159,7 +159,7 @@
         <div class="container">
             <div class="center-v title">キャッシュ</div>
             <div class="content" style="display: flex;">
-                <label class="cursor-pointer" title="保存済み動画のみキャッシュ, 変更はプレイヤーを開いた時に反映">
+                <label class="cursor-pointer" title="保存済み動画のみキャッシュ, 変更は再起動後に反映">
                     <input type="checkbox" class="user_icon_cache" onclick={onclickChecUerIconCache}/>
                     ユーザーアイコンをキャッシュする
                 </label>

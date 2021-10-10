@@ -302,6 +302,21 @@ const Library = {
     },
 };
 
+const UserIconCache = {
+    get: async (img_url) => {
+        return await ipcRenderer.invoke("user-icon:get", { img_url });
+    },
+    set: (img_url, base64) => {  
+        ipcRenderer.send("user-icon:set", { img_url, base64 });
+    },
+    has: async (img_url) => {
+        return await ipcRenderer.invoke("user-icon:has", { img_url });
+    },
+    enable: async () => {
+        return await ipcRenderer.invoke("user-icon:enable");
+    },
+};
+
 const myapi = {
     getUserAgent,
     
@@ -327,6 +342,7 @@ const myapi = {
         Bookmark,
         Search,
         Library,
+        UserIconCache,
     }
 };
 

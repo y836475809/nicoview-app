@@ -126,7 +126,18 @@
         const { Command } = window.Command;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
-        const { ImgCacheStore } = window.ImgCacheStore;
+
+        const getBase64 = (img) => {
+            const canvas = document.createElement("canvas");
+            const width = img.naturalWidth;
+            const height = img.naturalHeight;
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+            const data = canvas.toDataURL("image/jpeg");
+            return data;
+        };
 
         export default {
             state:{
@@ -134,7 +145,7 @@
                 user_description_class:"text",
                 user_thumbnail_url:"",
             },
-            user_icon_cache:null,
+            user_icon_cache_enable:false,
             current_user_icon_url:"",
             is_saved:false,
             onBeforeMount(props) {
@@ -271,44 +282,34 @@
                 });
             },
             async setupUserIconCache(){
-                const data_dir = await myapi.ipc.Config.get("data_dir", "");
-                const enable = await myapi.ipc.Config.get("user_icon_cache", false);
-                this.user_icon_cache = new ImgCacheStore(data_dir, "user_icon.json");
-                this.user_icon_cache.enable = enable;
-                if(enable){
-                    this.$(".user-thumbnail").onload = (e) => {
-                        if(!this.is_saved){
-                            return;
-                        }
-                        const img = e.target;
-                        try {
-                            this.user_icon_cache.set(img);
-                        } catch (error) {
-                            logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
-                        }
-                    };
-                    window.addEventListener("beforeunload", (event) => { // eslint-disable-line no-unused-vars
-                        this.user_icon_cache.save();
-                    });
+                this.user_icon_cache_enable = await myapi.ipc.UserIconCache.enable();
+                if(!this.user_icon_cache_enable){
+                    return;
                 }
+
+                this.$(".user-thumbnail").onload = async (e) => {
+                    if(!this.is_saved){
+                        return;
+                    }
+                    const img = e.target;
+                    try {
+                        if(!await myapi.ipc.UserIconCache.has(img.src)){
+                            myapi.ipc.UserIconCache.set(img.src, getBase64(img)); 
+                        }
+                    } catch (error) {
+                        logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
+                    }
+                };
             },
-            updateUserIcon(url){
+            async updateUserIcon(url){
                 if(this.current_user_icon_url == url){
                     return;
                 }
 
                 this.current_user_icon_url = url;
                 
-                if(this.is_saved && this.user_icon_cache.enable){
-                    try {
-                        this.user_icon_cache.load();
-                    } catch (error) {
-                        if(error.code != "ENOENT"){
-                            logger.debug(`user_icon_cache.load, error=${error}`);
-                            throw error;
-                        }
-                    }
-                    this.state.user_thumbnail_url = this.user_icon_cache.get(url);
+                if(this.is_saved && this.user_icon_cache_enable){         
+                    this.state.user_thumbnail_url = await myapi.ipc.UserIconCache.get(url);
                 }else{
                     this.state.user_thumbnail_url = url;
                 }
@@ -336,7 +337,7 @@
                     elm_description.style.height = new_height + "px";
                 }
 
-                this.updateUserIcon(this.user_icon_url);
+                await this.updateUserIcon(this.user_icon_url);
             },
             closePopupDescription() {
                 const elm = this.$(".user-container-popup");

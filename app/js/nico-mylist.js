@@ -155,7 +155,12 @@ class NicoMylistStore {
 
     save(mylist_id, xml){
         const file_path = this._getFilePath(mylist_id);
-        fs.mkdirSync(path.dirname(file_path), { recursive: true });
+        const dir = path.dirname(file_path);
+        try {
+            fs.statSync(dir);
+        } catch (error) {
+            fs.mkdirSync(dir);
+        }
         fs.writeFileSync(file_path, xml, "utf-8");
     }
 

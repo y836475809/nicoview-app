@@ -212,8 +212,7 @@ class UserIconCache {
         ipcMain.on("user-icon:set", (event, args) => {
             const { img_url, base64 } = args;
             const buf = Buffer.from(base64.replace(/^data:image\/\w+;base64,/, ""), "base64");
-            const file_path = 
-            this._cnvToFilePath(img_url);
+            const file_path = this._cnvToFilePath(img_url);
             fs.writeFileSync(file_path, buf);
 
             this._cache.set(img_url, path.basename(file_path));

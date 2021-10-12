@@ -1,6 +1,5 @@
 const fs = require("fs");
 const path = require("path");
-const querystring = require("querystring");
 
 const comment_data = require("./data/comment.json");
 const data_api_data = require("./data/api-data.json");
@@ -123,11 +122,11 @@ class NicoMockResponse {
 
         // https://ext.nicovideo.jp/api/search/search/word?mode=watch&page=1&sort=f&order=d
         const url_obj = new URL(req.url);
-        const q = querystring.parse(url_obj.search);
+        const sp = url_obj.searchParams;
         const text = decodeURI(url_obj.pathname.split("/").slice(-1)[0]);
-        const page = parseInt(q["page"]);
-        const sort = q["sort"]; // eslint-disable-line no-unused-vars
-        const order = q["order"]; // eslint-disable-line no-unused-vars
+        const page = parseInt(sp.get("page"));
+        const sort = sp.get("sort"); // eslint-disable-line no-unused-vars
+        const order = sp.get("order"); // eslint-disable-line no-unused-vars
         const limit = 32;
         const offset = limit*(page - 1);
         const list = [];
@@ -172,10 +171,10 @@ class NicoMockResponse {
     }
 
     search(url, res){
-        const q = querystring.parse(new URL(url).search);
-        const text = q["?q"];
-        const limit = parseInt(q["_limit"]);
-        const offset = parseInt(q["_offset"]);
+        const sp = new URL(url).searchParams;
+        const text = sp.get("q");
+        const limit = parseInt(sp.get("_limit"));
+        const offset = parseInt(sp.get("_offset"));
         const data = [];
         for (let i = 0; i < limit; i++) {
             const tag_cnt = Math.floor(Math.random() * 5);

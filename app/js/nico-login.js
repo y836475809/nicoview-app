@@ -1,5 +1,4 @@
 const https = require("https");
-const querystring = require('querystring');
 const user_agent = process.env["user_agent"];
 const timeout_msec = 10*1000;
 
@@ -70,11 +69,10 @@ class NicoLoginRequest {
             method: "POST",
             headers:headers,
         }; 
-
-        const post_data = querystring.stringify({
+        const post_data = new URLSearchParams({
             "mail_tel" : mail,
             "password" : password
-        });
+        }).toString();
         options.headers["Content-Type"] =  'application/x-www-form-urlencoded';
         options.headers["Content-Length"] = post_data.length;   
 

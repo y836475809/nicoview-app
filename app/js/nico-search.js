@@ -1,7 +1,6 @@
 const { NicoClientRequest } = require("./nico-client-request");
 const { NICO_URL } = require("./nico-url");
 const { toTimeSec } = require("./time-format");
-const querystring = require("querystring");
 
 const sortNames = [
     "viewCounter",
@@ -190,13 +189,16 @@ class NicoSearch {
 
     async search(params){   
         const service = params._service;
-        const query_json = params.get();
-        const url = `${NICO_URL.SEARCH}/api/v2/snapshot/${service}/contents/search`;
         const page = params._page;
+        const query_json = params.get();
+        const url = new URL(`${NICO_URL.SEARCH}/api/v2/snapshot/${service}/contents/search`);
+        for(const key in query_json){
+            url.searchParams.append(key, query_json[key]);
+        }
         
         this._req = new NicoClientRequest();
         try {
-            const body = await this._req.get(`${url}?${querystring.stringify(query_json)}`);
+            const body = await this._req.get(url.href);
             const result = JSON.parse(body);
 
             const search_limit = params._limit;
@@ -251,17 +253,20 @@ class NicoSearch {
     async searchExt(params_ext, cookie){   
         const { query, sort_name, sort_order, search_target, page } = params_ext;
         const word = encodeURIComponent(query);
-        const qs = querystring.stringify({
+        const url = new URL(`https://ext.nicovideo.jp/api/search/${search_target}/${word}`);
+        const params = {
             mode:"watch",
             page: page,
             sort: sort_name,
             order: sort_order
-        });
-        const url = `https://ext.nicovideo.jp/api/search/${search_target}/${word}?${qs}`;
-
+        };
+        for(const key in params){
+            url.searchParams.append(key, params[key]);
+        }
+  
         this._req = new NicoClientRequest();
         try {
-            const body = await this._req.get(url, {cookie:cookie});
+            const body = await this._req.get(url.href, {cookie:cookie});
             const result = JSON.parse(body);
 
             if(result.status != "ok") {

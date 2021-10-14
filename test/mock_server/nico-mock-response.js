@@ -1,9 +1,12 @@
 const fs = require("fs");
 const path = require("path");
+const zlib = require("zlib");
 
 const comment_data = require("./data/comment.json");
 const data_api_data = require("./data/api-data.json");
 const dmc_session_data = require("./data/dmc-session.json");
+
+/* eslint-disable no-console */
 
 const createApiData = (video_id) =>{
     const id = video_id.replace("sm", "");
@@ -116,7 +119,7 @@ class NicoMockResponse {
                 message:encodeURI("ログインしてください"),
                 status:"fail" 
             };
-            this._writeJson(res, obj);
+            this._writeJson(req, res, obj);
             return;
         }
 
@@ -167,11 +170,17 @@ class NicoMockResponse {
             page: page,
             status: "ok"
         };
-        this._writeJson(res, obj);
+        this._writeJson(req, res, obj);
     }
 
-    search(url, res){
-        const sp = new URL(url).searchParams;
+    searchHtml(req, res, search_target){
+        const f_pth = path.join(__dirname, "data", "html", `${search_target}.html`);
+        const body = fs.readFileSync(f_pth, "utf-8");
+        this._writeString(req, res, body, "text");
+    }
+
+    search(req, res){
+        const sp = new URL(req.url).searchParams;
         const text = sp.get("q");
         const limit = parseInt(sp.get("_limit"));
         const offset = parseInt(sp.get("_offset"));
@@ -207,23 +216,23 @@ class NicoMockResponse {
             },
             data: data
         };
-        this._writeJson(res, obj);
+        this._writeJson(req, res, obj);
     }
 
-    mylist(url, res){
-        const id = new URL(url).pathname.replace("/mylist/", "");
+    mylist(req, res){
+        const id = new URL(req.url).pathname.replace("/mylist/", "");
         const file_path = path.join(__dirname, "data", `mylist${id}.xml`);
         try {
             fs.statSync(file_path);
             const xml = fs.readFileSync(file_path, "utf-8");
-            this._writeXML(res, xml);
+            this._writeString(req, res, xml, "xml");
         } catch (error) {
-            this._writeBody(res, 404, `local server mylist id=${id} : 404 Not Found\n`);
+            this._writeString(req, res, `local server mylist id=${id} : 404 Not Found\n`, "text", 404);
         }
     }
 
-    watch(url, res){
-        const video_id = url.split("/").pop();
+    watch(req, res){
+        const video_id = req.url.split("/").pop();
         const apt_data = createApiData(video_id);
         const data_api_data = escapeHtml(JSON.stringify(apt_data));
         const body =  `<!DOCTYPE html>
@@ -232,66 +241,73 @@ class NicoMockResponse {
             <div id="js-initial-watch-data" data-api-data="${data_api_data}"
             </body>
         </html>`;
-    
-        res.writeHead(200);
-        res.write(body);
-        res.end();
+        this._writeString(req, res, body, "text");
     }
 
-    comment(body, res){
+    comment(req, res, body){
         const data = JSON.parse(body);
         if(data.length===0){
-            this._writeBody(res, 404, `local server : 404 Not Found\n`);
+            this._writeString(`local server : 404 Not Found\n`, "text", 404);
         }else if(data.length===5){
-            this._writeJson(res, getCommnet(data, comment_data));
+            this._writeJson(req, res, getCommnet(data, comment_data));
         }else{
-            this._writeJson(res, comment_data);
+            this._writeJson(req, res, comment_data);
         }
     }
 
-    dmcSession(body, res){
+    dmcSession(req, res, body){
         const data = JSON.parse(body);
         const recipe_id = data.session.recipe_id;
         const video_id = `sm${recipe_id.match(/\d+/)[0]}`;
         const lowq = false; 
         const dmc_session = createSession(video_id, lowq);
-        this._writeJson(res, {
+        this._writeJson(req, res, {
             meta: { status: 201, message: "created" },
             data: dmc_session
         });
     }
     
-    dmcHB(res){
-        this._writeJson(res, { status: 200, message: "ok" });
+    dmcHB(req, res){
+        this._writeJson(req, res, { status: 200, message: "ok" });
     }
     
-    thumbnail(url, res){
+    thumbnail(req, res){
         //thumbnailURL https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
         //largeThumbnailURL https://img.cdn.nimg.jp/s/nicovideo/thumbnails/${id}/${id}`;
         const img = createImg("sample.L.jpeg");
-        res.writeHead(200, {"Content-Type": "image/jpeg" });
-        res.end(img, "binary");
+        this._writeImage(req, res, img);
     }
-    userIcon(url, res){
+    userIcon(req, res){
         const img = createImg("user_icon.jpg");
-        res.writeHead(200, {"Content-Type": "image/jpeg" });
-        res.end(img, "binary");
+        this._writeImage(req, res, img);
     }
 
-    downloadVideo(res){
-        const { head, video_fs } = this._video("download");
+    downloadVideo(req, res){
+        const isgzip = this._isgzip(req, res);
+        const { head, video_fs } = this._video("download", isgzip);
         this.download_video_fs = video_fs;
 
-        res.writeHead(200, head);
-        this.download_video_fs.pipe(res);
+        if(isgzip){ 
+            res.writeHead(200, head);
+            this.download_video_fs.pipe(zlib.createGzip(req, res)).pipe(res);
+        }else{
+            res.writeHead(200, head);
+            this.download_video_fs.pipe(res);
+        }
     }
 
-    playVideo(res){
-        const { head, video_fs } = this._video("play");
+    playVideo(req, res){
+        const isgzip = this._isgzip(req, res);
+        const { head, video_fs } = this._video("play", isgzip);
         this.play_video_fs = video_fs;
 
-        res.writeHead(200, head);
-        this.play_video_fs.pipe(res);
+        if(isgzip){ 
+            res.writeHead(200, head);
+            this.play_video_fs.pipe(zlib.createGzip()).pipe(res);
+        }else{
+            res.writeHead(200, head);
+            this.play_video_fs.pipe(res);
+        }
     }
 
     close(){
@@ -303,40 +319,92 @@ class NicoMockResponse {
         }
     }
 
-    _video(name){
+    _video(name, isgzip){
         const file_path = path.join(__dirname, "data", `${name}.mp4`);
 
-        const stat = fs.statSync(file_path);
-        const fileSize = stat.size;
+
+        let file_size = 0;
+        if(isgzip){
+            const content = fs.readFileSync(file_path);
+            const binary = zlib.gzipSync(content);
+            file_size = binary.length;
+
+        }else{
+            const stat = fs.statSync(file_path);
+            file_size = stat.size;
+        }
+
         const head = {
             'Accept-Ranges': 'bytes',
-            'Content-Range': 'bytes ' + 0 + '-' + fileSize + '/' + fileSize,
-            'Content-Length': fileSize,
+            'Content-Range': 'bytes ' + 0 + '-' + file_size + '/' + file_size,
+            'Content-Length': file_size,
             'Content-Type': 'video/mp4',
         };
+        if(isgzip){
+            head["Content-Encoding"] = "gzip";
+        }
         
         const download_speed = 20;
         const b_szie = 1638000/download_speed;
-        const sbuf = Math.floor(stat.size/b_szie);
+        const sbuf = Math.floor(file_size/b_szie);
         const video_fs = fs.createReadStream(file_path,  { highWaterMark: sbuf });
 
         return { head, video_fs };
     }
 
-    _writeJson(res, obj){
-        res.writeHead(200,{"Content-Type":"application/json"});
-        res.end(JSON.stringify(obj));  
+    _isgzip(req, res){ // eslint-disable-line no-unused-vars
+        let accept_encoding = req.headers["accept-encoding"];
+        if(!accept_encoding) {
+            accept_encoding = '';
+        }
+        return accept_encoding.match(/\bgzip\b/);
     }
 
-    _writeXML(res, xml){
-        res.writeHead(200,{"Content-Type":"application/xml"});
-        res.end(xml);
+    _writeImage(req, res, body, code=200){
+        if(this._isgzip(req, res)){
+            res.writeHead(code, {
+                "Content-Type": "image/jpeg" , "Content-Encoding": "gzip"
+            });
+            const result = zlib.gzipSync(body);
+            res.write(result, "binary");
+            res.end();
+        }else
+        {   
+            res.writeHead(code, {"Content-Type": "image/jpeg" });
+            res.end(body, "binary");
+        }
     }
 
-    _writeBody(res, code, body){
-        res.writeHead(code, {"Content-Type": "text/plain"});
-        res.write(body);
-        res.end();
+    _writeJson(req, res, obj, code=200){
+        this._writeString(req, res, JSON.stringify(obj), "json", code);
+    }
+
+    _writeString(req, res, data, type, code=200){
+        let content_type = "";
+        if(type=="text"){
+            content_type = "text/plain";
+        }
+        if(type=="xml"){
+            content_type = "application/xml";
+        }
+        if(type=="json"){
+            content_type = "application/json";
+        }
+
+        if(this._isgzip(req, res)){
+            res.writeHead(code, {
+                "Content-Type": content_type, "Content-Encoding": "gzip"
+            });
+            const buf = new Buffer.from(data, "utf-8");
+            const result = zlib.gzipSync(buf);
+            res.write(result);
+            res.end();
+            console.log("_writeString response is gzip");
+        }else{
+            res.writeHead(code,{"Content-Type":content_type});
+            res.end(data);
+            console.log("_writeString response is text");
+        }
     }
 }
 

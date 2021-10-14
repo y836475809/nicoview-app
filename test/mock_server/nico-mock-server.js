@@ -29,15 +29,15 @@ class NicoMockServer {
 
                     if(req.url.startsWith("https://nmsg.nicovideo.jp/api.json/")){
                         console.log("mock server: comment");
-                        this.nico_mock_res.comment(body, res);
+                        this.nico_mock_res.comment(req, res, body);
                     }
                     if(req.url.startsWith("https://api.dmc.nico/api/sessions")){
                         if(req.url.includes("_method=PUT")){
                             console.log("mock server: put dmcHB");
-                            this.nico_mock_res.dmcHB(res);
+                            this.nico_mock_res.dmcHB(req, res);
                         }else{
                             console.log("mock server: dmcSession");
-                            this.nico_mock_res.dmcSession(body, res);
+                            this.nico_mock_res.dmcSession(req, res, body);
                         }
                     }
                 });
@@ -47,7 +47,7 @@ class NicoMockServer {
 
                 if(req.url.startsWith("https://api.dmc.nico")){
                     console.log("mock server: options dmcHB");
-                    this.nico_mock_res.dmcHB(res);
+                    this.nico_mock_res.dmcHB(req, res);
                 }
             }
             if(req.method.toLowerCase() == "get") {
@@ -58,36 +58,36 @@ class NicoMockServer {
                 }
                 if(req.url.startsWith("https://api.search.nicovideo.jp")){
                     console.log("mock server: search");
-                    this.nico_mock_res.search(req.url, res);
+                    this.nico_mock_res.search(req, res);
                 }
                 if(req.url.startsWith("https://www.nicovideo.jp/mylist")){
                     console.log("mock server: mylist");
-                    this.nico_mock_res.mylist(req.url, res);
+                    this.nico_mock_res.mylist(req, res);
                 }
                 if(req.url.startsWith("https://www.nicovideo.jp/watch")){
                     console.log("mock server: watch");
-                    this.nico_mock_res.watch(req.url, res);
+                    this.nico_mock_res.watch(req, res);
                 }
                 if(req.url.startsWith("https://nicovideo.cdn.nimg.jp")){
                     console.log("mock server: thumbnail");
-                    this.nico_mock_res.thumbnail(req.url, res);
+                    this.nico_mock_res.thumbnail(req, res);
                 }
                 if(req.url.startsWith("https://pa0000.dmc.nico/hlsvod/ht2_nicovideo")){
                     console.log("mock server: downloadVideo");
-                    this.nico_mock_res.downloadVideo(res);
+                    this.nico_mock_res.downloadVideo(req, res);
                 }
 
                 // img tag, video tag
                 if(!req.url.startsWith("https://")){
                     if(req.url.includes("/hlsvod/ht2_nicovideo/nicovideo")){
                         console.log("mock server: playVideo");
-                        this.nico_mock_res.playVideo(res);           
+                        this.nico_mock_res.playVideo(req, res);           
                     } else if(req.url.startsWith("/nicoaccount/usericon")){
                         console.log("mock server: user icon url=", req.url);
-                        this.nico_mock_res.userIcon(req.url, res);
+                        this.nico_mock_res.userIcon(req, res);
                     }else{
                         console.log("mock server: http thumbnail url=", req.url);
-                        this.nico_mock_res.thumbnail(req.url, res);
+                        this.nico_mock_res.thumbnail(req, res);
                     }
                 }            
             }

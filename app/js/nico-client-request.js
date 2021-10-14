@@ -1,4 +1,5 @@
 const https = require("https");
+const zlib = require("zlib");
 
 const user_agent = process.env["user_agent"];
 const proxy_server = process.env["proxy_server"];
@@ -80,7 +81,8 @@ class NicoClientRequest {
 
     _getOptions(url, method){
         const headers = {
-            "user-agent": user_agent
+            "user-agent": user_agent,
+            "accept-encoding": "gzip",
         };
 
         if(proxy_server){
@@ -133,12 +135,24 @@ class NicoClientRequest {
                     content_len = 0;
                 }
 
-                res.setEncoding(this._encoding);
+                let content_encoding = res.headers["content-encoding"];
+                if(!content_encoding){
+                    content_encoding = "";
+                    res.setEncoding(this._encoding);
+                }
                
                 if(this._stream){
-                    res.pipe(this._stream);
+                    let res_on = null;
+                    if(content_encoding.includes("gzip")){
+                        res_on = zlib.createGunzip();
+                        res.pipe(res_on).pipe(this._stream);
+                    }else{
+                        res_on = res;
+                        res_on.pipe(this._stream);
+                    }
+
                     if(this._on_progress){
-                        res.on("data", (chunk) => {
+                        res_on.on("data", (chunk) => {
                             if(content_len === 0){
                                 return;
                             }
@@ -151,21 +165,29 @@ class NicoClientRequest {
                             }
                         });
                     }
-                    res.on("end", () => {
+                    res_on.on("end", () => {
                         resolve();
                     });
                     this._stream.on("error", (error) => { 
                         reject(error);
                     });
                 }else{
-                    res.on("data", (chunk) => {
+                    let res_on = null;
+                    if(content_encoding.includes("gzip")){
+                        res_on = zlib.createGunzip();
+                        res.pipe(res_on);
+                    }else{
+                        res_on = res;
+                    }
+
+                    res_on.on("data", (chunk) => {
                         if(is_binary===true){
                             binary_data.push(Buffer.from(chunk, "binary"));
                         }else{
                             str_data += chunk;
                         }
                     });
-                    res.on("end", () => {
+                    res_on.on("end", () => {
                         if(is_binary===true){
                             resolve(Buffer.concat(binary_data));
                         }else{

@@ -112,13 +112,6 @@ class NicoClientRequest {
 
     _request(url, options, set_data_func=(req)=>{}){ // eslint-disable-line no-unused-vars
         return new Promise((resolve, reject) => {
-            let str_data = "";
-            let binary_data = [];
-            const is_binary = this._encoding == "binary";
-
-            let current = 0 ;
-            let content_len = 0;
-
             this._req = https.request(options, (res) => {
                 // console.log('STATUS: ' + res.statusCode);
                 // console.log('HEADERS: ' + JSON.stringify(res.headers));
@@ -130,11 +123,6 @@ class NicoClientRequest {
                     return;
                 }
 
-                content_len = parseInt(getValue(res.headers, "content-length"));
-                if(isNaN(content_len)){
-                    content_len = 0;
-                }
-
                 let content_encoding = res.headers["content-encoding"];
                 if(!content_encoding){
                     content_encoding = "";
@@ -142,68 +130,22 @@ class NicoClientRequest {
                 }
                
                 if(this._stream){
-                    let res_on = null;
-                    if(content_encoding.includes("gzip")){
-                        res_on = zlib.createGunzip();
-                        res.pipe(res_on).pipe(this._stream);
+                    if(this._isgzip(res)){
+                        const gzip = zlib.createGunzip();
+                        res.pipe(gzip).pipe(this._stream);
+                        this._resStreamData(gzip, resolve, reject);
                     }else{
-                        res_on = res;
-                        res_on.pipe(this._stream);
-                    }
-
-                    if(this._on_progress){
-                        res_on.on("data", (chunk) => {
-                            if(content_len === 0){
-                                return;
-                            }
-                            
-                            const pre_per = Math.floor((current/content_len)*100);
-                            current += chunk.length;
-                            const cur_per = Math.floor((current/content_len)*100);
-                            if(cur_per > pre_per){
-                                this._on_progress(current, content_len);
-                            }
-                        });
-                    }
-                    res_on.on("end", () => {
-                        resolve();
-                    });
-                    this._stream.on("error", (error) => { 
-                        reject(error);
-                    });
+                        res.pipe(this._stream);
+                        this._resStreamData(res, resolve, reject);
+                    } 
                 }else{
-                    let res_on = null;
-                    if(content_encoding.includes("gzip")){
-                        res_on = zlib.createGunzip();
-                        res.pipe(res_on);
+                    if(this._isgzip(res)){
+                        const gzip = zlib.createGunzip();
+                        res.pipe(gzip);
+                        this._resData(gzip, url, resolve, reject);
                     }else{
-                        res_on = res;
+                        this._resData(res, url, resolve, reject);
                     }
-
-                    res_on.on("data", (chunk) => {
-                        if(is_binary===true){
-                            binary_data.push(Buffer.from(chunk, "binary"));
-                        }else{
-                            str_data += chunk;
-                        }
-                    });
-                    res_on.on("end", () => {
-                        if(is_binary===true){
-                            resolve(Buffer.concat(binary_data));
-                        }else{
-                            if(this._res_json===true){
-                                try {
-                                    const json_data = JSON.parse(str_data);
-                                    resolve(json_data);
-                                } catch (error) {
-                                    error.message = `response json parse error:${error.message},url=${url},`;
-                                    reject(error);
-                                }   
-                            }else{
-                                resolve(str_data);
-                            }
-                        }    
-                    });
                 }
             });
 
@@ -223,6 +165,74 @@ class NicoClientRequest {
             
             this._req.end();
         });
+    }
+
+    _isgzip(res){
+        const content_encoding = res.headers["content-encoding"];
+        if(!content_encoding){
+            return false;
+        }
+        return content_encoding.includes("gzip");
+    }
+
+    _resStreamData(res, resolve, reject){
+        let current = 0 ;
+        let content_len = parseInt(getValue(res.headers, "content-length"));
+        if(isNaN(content_len)){
+            content_len = 0;
+        }
+
+        if(this._on_progress){
+            res.on("data", (chunk) => {
+                if(content_len === 0){
+                    return;
+                }
+                
+                const pre_per = Math.floor((current/content_len)*100);
+                current += chunk.length;
+                const cur_per = Math.floor((current/content_len)*100);
+                if(cur_per > pre_per){
+                    this._on_progress(current, content_len);
+                }
+            });
+        }
+        res.on("end", () => {
+            resolve();
+        });
+        this._stream.on("error", (error) => { 
+            reject(error);
+        });
+    }
+
+    _resData(res, url, resolve, reject){
+        const is_binary = this._encoding == "binary";
+        let str_data = "";
+        let binary_data = [];
+
+        res.on("data", (chunk) => {
+            if(is_binary){
+                binary_data.push(Buffer.from(chunk, "binary"));
+            }else{
+                str_data += chunk;
+            }
+        });
+        res.on("end", () => {
+            if(is_binary){
+                resolve(Buffer.concat(binary_data));
+            }else{
+                if(this._res_json){
+                    try {
+                        const json_data = JSON.parse(str_data);
+                        resolve(json_data);
+                    } catch (error) {
+                        error.message = `response json parse error:${error.message},url=${url},`;
+                        reject(error);
+                    }   
+                }else{
+                    resolve(str_data);
+                }
+            }    
+        });  
     }
 }
 

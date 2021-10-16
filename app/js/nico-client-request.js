@@ -5,6 +5,37 @@ const user_agent = process.env["user_agent"];
 const proxy_server = process.env["proxy_server"];
 const timeout_msec = 120*1000;
 
+class NicoCookie {
+    /**
+     * 
+     * @param {Array<String>} cookies 
+     * @param {String} name 
+     */
+    static getValue(cookies, name){
+        let value = null;
+        cookies.some(c=>{
+            const ret = new RegExp(name + "=[^;]+").exec(c);
+            if(ret){
+                value = ret[0].replace(name + "=", "");
+                return true;
+            }
+        });
+        return value;
+    }
+
+    /**
+     * 
+     * @param {Object} json_obj 
+     */
+    static getHeader(json_obj) {
+        let header = "";
+        Object.keys(json_obj).forEach(key => {
+            header += `${key}=${json_obj[key]}; `;
+        });
+        return header.slice(0, -2);
+    }
+}
+
 const getValue = (headers, key) => {
     for (const prop in headers) {
         if(prop.toLowerCase() == key.toLowerCase()){
@@ -115,6 +146,7 @@ class NicoClientRequest {
             this._req = https.request(options, (res) => {
                 // console.log('STATUS: ' + res.statusCode);
                 // console.log('HEADERS: ' + JSON.stringify(res.headers));
+                this.set_cookie = res.headers["set-cookie"];
 
                 if(!this._validateStatus(res.statusCode)){
                     const status_error = new Error(`${res.statusCode}: ${url}`);
@@ -238,4 +270,5 @@ class NicoClientRequest {
 
 module.exports = {
     NicoClientRequest,
+    NicoCookie,
 };

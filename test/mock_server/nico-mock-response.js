@@ -111,6 +111,7 @@ const createSession = (video_id, is_low_quality) =>{
     return cp_data;
 };
 
+let search_html_count = 0;
 class NicoMockResponse {
     searchExt(req, res){
         const cookie = req.headers["cookie"];
@@ -174,9 +175,18 @@ class NicoMockResponse {
     }
 
     searchHtml(req, res, search_target){
+        search_html_count++;
+
         const f_pth = path.join(__dirname, "data", "html", `${search_target}.html`);
         const body = fs.readFileSync(f_pth, "utf-8");
-        this._writeString(req, res, body, "text");
+
+        const cookies = [];
+        cookies.push(`nico_gc=${search_html_count}__srch_s%3Df%26srch_o%3Dd; expires=Sun, 14-Nov-2021 00:00:00 GMT; Max-Age=2592000; path=/; domain=.nicovideo.jp`);
+        if(!req.headers["cookie"]){
+            cookies.push("nicosid=12345.67890; expires=Mon, 13-Oct-2031 10:10:10 GMT; Max-Age=315360000; path=/; domain=.nicovideo.jp");
+        }
+
+        this._writeString(req, res, body, "text", 200, cookies);
     }
 
     search(req, res){
@@ -379,7 +389,7 @@ class NicoMockResponse {
         this._writeString(req, res, JSON.stringify(obj), "json", code);
     }
 
-    _writeString(req, res, data, type, code=200){
+    _writeString(req, res, data, type, code=200, cookies=null){
         let content_type = "";
         if(type=="text"){
             content_type = "text/plain";
@@ -392,16 +402,27 @@ class NicoMockResponse {
         }
 
         if(this._isgzip(req, res)){
-            res.writeHead(code, {
-                "Content-Type": content_type, "Content-Encoding": "gzip"
-            });
+            const head = {
+                "Content-Type": content_type, 
+                "Content-Encoding": "gzip"
+            };
+            if(cookies){
+                head["Set-Cookie"] = cookies;
+            }
+            res.writeHead(code, head);
             const buf = new Buffer.from(data, "utf-8");
             const result = zlib.gzipSync(buf);
             res.write(result);
             res.end();
             console.log("_writeString response is gzip");
         }else{
-            res.writeHead(code,{"Content-Type":content_type});
+            const head = {
+                "Content-Type": content_type
+            };
+            if(cookies){
+                head["Set-Cookie"] = cookies;
+            }
+            res.writeHead(code, head);
             res.end(data);
             console.log("_writeString response is text");
         }

@@ -196,3 +196,42 @@ test("nico search json error", async t => {
     const error = await t.throwsAsync(nico_search.search(pramas));
     t.regex(error.message, /json/i);
 });
+
+async function searchHtml(t, page) {
+    const pramas = default_params().getParamsExt();
+    pramas.page = page;
+    nico_mocks.searchHtml(
+        "search", 
+        pramas.query, pramas.page, 
+        pramas.sort_name, pramas.sort_order, 
+        200, 1);
+
+    const nico_search = new NicoSearch();
+
+    {
+        t.is(nico_search._cookie_html, null);
+        const result = await nico_search.searchHtml(pramas);
+        const page_ifno = result.page_ifno;
+        t.is(page_ifno.page_num, page);
+        t.true(page_ifno.total_page_num > 0);
+        t.true(page_ifno.search_result_num > 0);
+        t.is(result.list.length, 32);
+        const cookie = nico_search._cookie_html;
+        t.is(cookie["nico_gc"], "1srch_s%3Df%26srch_o%3Dd");
+        t.is(cookie["nicosid"], "12345.67890");
+    }
+    {
+        const result = await nico_search.searchHtml(pramas);
+        const page_ifno = result.page_ifno;
+        t.is(page_ifno.page_num, page);
+        t.true(page_ifno.total_page_num > 0);
+        t.true(page_ifno.search_result_num > 0);
+        t.is(result.list.length, 32);
+        const cookie = nico_search._cookie_html;
+        t.is(cookie["nico_gc"], "2srch_s%3Df%26srch_o%3Dd");
+        t.is(cookie["nicosid"], undefined);
+    }
+}
+
+test("nico search html page2", searchHtml, 1);
+test("nico search html page1", searchHtml, 2);

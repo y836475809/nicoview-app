@@ -143,7 +143,7 @@
     <div style="display: flex;">
         <div class="selected-container center-v">
             <div>検索条件</div>
-            <label style="margin: 0 5px 0 5px;" class="center-v" title="offの場合、ニコニコ動画内部APIで検索する(ログインが必要)" >
+            <label style="margin: 0 5px 0 5px;" class="center-v" title="offでニコニコ動画検索ページ使用" >
                 <input class="check-search-api" type="checkbox" 
                     checked={state.api_checked} onclick={onclickCheckSearchAPI} />スナップショット検索
             </label>
@@ -473,7 +473,7 @@
             },
             onclickCheckSearchAPI(e) { // eslint-disable-line no-unused-vars
                 const elm = this.$(".check-search-api");
-                const api = elm.checked?"snapshot":"ext";
+                const api = elm.checked?"snapshot":"html";
                 this.nico_search_params.api(api);
                 
                 this.saveSearchCond();
@@ -532,12 +532,8 @@
                     if(this.nico_search_params.getAPI()=="snapshot"){
                         search_result = await this.nico_search.search(this.nico_search_params);
                     }                
-                    if(this.nico_search_params.getAPI()=="ext"){
-                        const cookie = await myapi.ipc.getNicoLoginCookie();
-                        if(!cookie){
-                            throw new Error("内部APIで検索するにはニコニコ動画へのログインが必要");
-                        }
-                        search_result = await this.nico_search.searchExt(this.nico_search_params.getParamsExt(), cookie);
+                    if(this.nico_search_params.getAPI()=="html"){
+                        search_result = await this.nico_search.searchHtml(this.nico_search_params.getParamsExt());
                     }
                     this.setData(search_result);
                 } catch (error) {

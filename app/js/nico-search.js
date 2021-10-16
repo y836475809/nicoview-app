@@ -1,7 +1,6 @@
 const { NicoClientRequest, NicoCookie } = require("./nico-client-request");
 const { nicoSearchHtmlParse } = require("./nico-search-html-parse");
 const { NICO_URL } = require("./nico-url");
-const { toTimeSec } = require("./time-format");
 
 const sortNames = [
     "viewCounter",

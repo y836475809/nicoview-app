@@ -191,7 +191,6 @@
             </div>
         </div>
     </div>
-    <nico-login-dialog></nico-login-dialog>
 
     <script>
         /* globals logger */

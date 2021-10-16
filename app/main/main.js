@@ -13,7 +13,6 @@ const { getNicoDataFilePaths } = require("../js/nico-data-file");
 const { logger } = require("../js/logger");
 const { Store } = require("../js/store");
 const { selectFileDialog, selectFolderDialog, showMessageBox } = require("../js/dialog");
-const { NicoLogin } = require("../js/nico-login");
 const { setupContextmenu } = require("../js/contextmenu");
 
 const { 
@@ -34,7 +33,6 @@ const json_store = new JsonStore(async ()=>{
     return await config.get("data_dir", "");
 });
 const user_icon_cache = new UserIconCache();
-let nico_login = null;
 
 const app_dir = path.join(__dirname, "/..");
 
@@ -174,17 +172,6 @@ const quit = async () => {
     return true;
 };
 
-const setLoginState = (state) => {
-    const menu_login = main_win_menu.getMenuItemById("nico-login");
-    menu_login.enabled = state=="logout";
-
-    const menu_logout = main_win_menu.getMenuItemById("nico-logout");
-    menu_logout.enabled = !menu_login.enabled;
-
-    const state_text = state=="logout"?"ログアウト":"ログイン";
-    main_win.title = `${app.name} ${app.getVersion()} [${state_text}]`;
-};
-
 const changeLogLevel = (args) => {
     const { level } = args;
     config.set("log.level", level);
@@ -228,16 +215,6 @@ function createWindow() {
                     }}
                 ]
             },
-            { label: "ツール",
-                submenu: [
-                    { id: "nico-login", enabled: false, label: "ニコニコ動画ログイン", click() {
-                        nico_login.showDialog();
-                    }},
-                    { id: "nico-logout", enabled: false, label: "ニコニコ動画ログアウト", async click() {
-                        await nico_login.logout();
-                    }}
-                ]
-            }, 
             { label: "ヘルプ",  
                 submenu: [
                     { role: "reload" },
@@ -258,7 +235,6 @@ function createWindow() {
     
     main_win_menu = main_menu();
     main_win.setMenu(main_win_menu);
-    setLoginState("logout");
 
     [
         ["log-level", config.get("log.level", "info")=="debug"], 
@@ -607,20 +583,6 @@ app.on("ready", async ()=>{
     createWindow();
     
     setupContextmenu(main_win, player_win, config, history, store);
-
-    nico_login = new NicoLogin(main_win, 
-        (state)=>{
-            setLoginState(state);
-        }, (e)=>{
-            const { name, error } = e;
-            logger.error(`${name}: `, error);
-            dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
-                type: "error",
-                buttons: ["OK"],
-                message: `${name}失敗: ${error.message}`
-            });
-        });
-    nico_login.setupIPC();
 });
 
 // すべてのウィンドウが閉じられた時にアプリケーションを終了する。

@@ -6,30 +6,6 @@ const getUserAgent = () => {
     return process.env["user_agent"];
 };
 
-
-const login = (mail, password) => {
-    ipcRenderer.send("app:nico-login", {
-        mail,
-        password,
-    });
-};
-
-const onOpenLoginDialog = (func) => {
-    ipcRenderer.on("app:on-open-nico-login-dialog", (event, ...args)=>{
-        func(...args);
-    });
-};
-
-const onCloseLoginDialog = (func) => {
-    ipcRenderer.on("app:on-close-nico-login-dialog", (event, ...args)=>{
-        func(...args);
-    });
-};
-
-const getNicoLoginCookie = async () => {
-    return await ipcRenderer.invoke("app:get-nico-login-cookie");
-};
-
 const popupContextMenu = async (name, data) => {
     const channel = `app:popup-contextmenu-${name}`;
     return await ipcRenderer.invoke(channel, data);            
@@ -320,11 +296,7 @@ const UserIconCache = {
 const myapi = {
     getUserAgent,
     
-    ipc: {    
-        login,
-        onOpenLoginDialog,
-        onCloseLoginDialog,
-        getNicoLoginCookie,
+    ipc: {
         popupContextMenu,
         onLoadContent,
         onPlayVideo,

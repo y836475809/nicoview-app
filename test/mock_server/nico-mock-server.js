@@ -52,10 +52,6 @@ class NicoMockServer {
             }
             if(req.method.toLowerCase() == "get") {
                 await new Promise(resolve => setTimeout(resolve, wait_msec));
-                if(req.url.startsWith("https://ext.nicovideo.jp")){
-                    console.log("mock server: search ext");
-                    this.nico_mock_res.searchExt(req, res);
-                }
                 if(req.url.startsWith("https://api.search.nicovideo.jp")){
                     console.log("mock server: search");
                     this.nico_mock_res.search(req, res);

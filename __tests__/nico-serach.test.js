@@ -198,7 +198,7 @@ test("nico search json error", async t => {
 });
 
 async function searchHtml(t, page) {
-    const pramas = default_params().getParamsExt();
+    const pramas = default_params().getParamsHtml();
     pramas.page = page;
     nico_mocks.searchHtml(
         "search", 

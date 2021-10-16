@@ -113,67 +113,6 @@ const createSession = (video_id, is_low_quality) =>{
 
 let search_html_count = 0;
 class NicoMockResponse {
-    searchExt(req, res){
-        const cookie = req.headers["cookie"];
-        if(!cookie.match(/user_session=user_session/)){
-            const obj = {
-                message:encodeURI("ログインしてください"),
-                status:"fail" 
-            };
-            this._writeJson(req, res, obj);
-            return;
-        }
-
-        // https://ext.nicovideo.jp/api/search/search/word?mode=watch&page=1&sort=f&order=d
-        const url_obj = new URL(req.url);
-        const sp = url_obj.searchParams;
-        const text = decodeURI(url_obj.pathname.split("/").slice(-1)[0]);
-        const page = parseInt(sp.get("page"));
-        const sort = sp.get("sort"); // eslint-disable-line no-unused-vars
-        const order = sp.get("order"); // eslint-disable-line no-unused-vars
-        const limit = 32;
-        const offset = limit*(page - 1);
-        const list = [];
-        for (let i = 0; i < limit; i++) {
-            const tag_cnt = Math.floor(Math.random() * 5);
-            const comments = [];
-            for (let index = 0; index < tag_cnt; index++) {
-                comments.push(`コメント${index+1}`);
-            }
-            const no = offset + i;
-            list.push({
-                id: `sm${no}`,
-                title: `title ${text} ${no}`,
-                first_retrieve: new Date(new Date().getTime() - Math.floor(Math.random() * 5000)).toISOString(),
-                view_counter: Math.floor(Math.random() * 100),
-                mylist_counter: Math.floor(Math.random() * 100),
-                thumbnail_url: `https:\\/\\/nicovideo.cdn.nimg.jp\\/thumbnails\\/${no}\\/${no}.1234`,
-                num_res: tag_cnt,
-                last_res_body: comments.join(" ") + " ",
-                length: `${Math.floor(Math.random() * 100)}:${Math.floor(Math.random() * 100)+10}`,
-                title_short: `title short ${text} ${no}`,
-                description_short:  `description short ${text} ${no}`,
-                thumbnail_style: null,
-                is_middle_thumbnail: true
-            });
-        }
-        // 検索語が数値の場合、その数値をヒット数にする
-        let count = parseInt(text);
-        if(isNaN(count)){
-            count = 1000;
-        }
-        const obj = {
-            ss_id:"1234-5678-90",
-            list: list,
-            count: count,
-            has_ng_video_for_adsense_on_listing: true,
-            related_tags: ["tag1", "tag2"],
-            page: page,
-            status: "ok"
-        };
-        this._writeJson(req, res, obj);
-    }
-
     searchHtml(req, res, search_target){
         search_html_count++;
 

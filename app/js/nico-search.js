@@ -71,7 +71,7 @@ class NicoSearchParams {
         };
     }
 
-    getParamsExt(){
+    getParamsHtml(){
         let sort_name = "f";
         if(this._sort_name=="startTime"){
             sort_name = "f";
@@ -233,78 +233,6 @@ class NicoSearch {
             });
 
             return search_result;
-        } catch (error) {
-            if(error.status){
-                let message = `status=${error.status}, エラー`;
-                if(error.status === 400){
-                    message = `status=${error.status}, 不正なパラメータです`; 
-                }else if(error.status === 404){
-                    message = `status=${error.status}, ページが見つかりません`; 
-                }else if(error.status === 500){
-                    message = `status=${error.status}, 検索サーバの異常です`; 
-                }else if(error.status === 503){
-                    message = `status=${error.status}, サービスがメンテナンス中です`; 
-                }
-                throw new Error(message);                     
-            }else{
-                throw error;     
-            }
-        }
-    }
-
-    async searchExt(params_ext, cookie){   
-        const { query, sort_name, sort_order, search_target, page } = params_ext;
-        const word = encodeURIComponent(query);
-        const url = new URL(`https://ext.nicovideo.jp/api/search/${search_target}/${word}`);
-        const params = {
-            mode:"watch",
-            page: page,
-            sort: sort_name,
-            order: sort_order
-        };
-        for(const key in params){
-            url.searchParams.append(key, params[key]);
-        }
-  
-        this._req = new NicoClientRequest();
-        try {
-            const body = await this._req.get(url.href, {cookie:cookie});
-            const result = JSON.parse(body);
-
-            if(result.status != "ok") {
-                throw new Error(`status=${result.status}, message=${decodeURI(result.message)}`);
-            }
-
-            const search_limit = 32;
-            const max_page_num = 50;
-            
-            const page_num = result.page;
-            const search_result_num = result.count;
-
-            let total_page_num = Math.ceil(search_result_num / search_limit);
-            if(total_page_num > max_page_num){
-                total_page_num = max_page_num;
-            }
-            result.page_ifno = {
-                page_num: page_num, 
-                total_page_num: total_page_num, 
-                search_result_num: search_result_num
-            };
-
-            result.list = result.list.map(value => {
-                return {
-                    thumbnailUrl: value.thumbnail_url,
-                    contentId: value.id,
-                    title: unescape(value.title),
-                    viewCounter: value.view_counter,
-                    commentCounter: value.num_res,
-                    lengthSeconds: toTimeSec(value.length),
-                    startTime: value.first_retrieve,
-                    tags: value.last_res_body.trim(),
-                };
-            });
-
-            return result;
         } catch (error) {
             if(error.status){
                 let message = `status=${error.status}, エラー`;

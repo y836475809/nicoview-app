@@ -533,7 +533,7 @@
                         search_result = await this.nico_search.search(this.nico_search_params);
                     }                
                     if(this.nico_search_params.getAPI()=="html"){
-                        search_result = await this.nico_search.searchHtml(this.nico_search_params.getParamsExt());
+                        search_result = await this.nico_search.searchHtml(this.nico_search_params.getParamsHtml());
                     }
                     this.setData(search_result);
                 } catch (error) {

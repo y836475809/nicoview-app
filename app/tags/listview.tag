@@ -2,7 +2,7 @@
     <style>
         :host {
             --input-height: 30px;
-            --serach-button-width: 30px;
+            --search-button-width: 30px;
             --item-height: 30px;
             --item-duration: 300ms;
             --icon-size: 15px;
@@ -108,7 +108,7 @@
             border-right-width: 0px !important;
             border-radius: 2px;
             height: var(--input-height);
-            width: calc(100% - var(--serach-button-width));
+            width: calc(100% - var(--search-button-width));
             margin-bottom: 5px;
             padding: 2px;   
         }
@@ -135,11 +135,11 @@
         .search-button {            
             border-left-width: 0px !important;
             border-right-width: 0px !important;
-            width: calc(var(--serach-button-width) - 5px);
+            width: calc(var(--search-button-width) - 5px);
         }
         .clear-button {            
             border-left-width: 0px !important;
-            width: var(--serach-button-width);
+            width: var(--search-button-width);
         }
 
         .listview-item-ghost-class {

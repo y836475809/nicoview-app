@@ -1,6 +1,7 @@
 const { NicoClientRequest, NicoCookie } = require("./nico-client-request");
 const { nicoSearchHtmlParse } = require("./nico-search-html-parse");
 const { NICO_URL } = require("./nico-url");
+const { logger } = require("./logger");
 
 const sortNames = [
     "viewCounter",
@@ -257,9 +258,14 @@ class NicoSearch {
 
     _getCookieHTML(){
         const set_cookie = this._req.set_cookie;
+        if(!set_cookie){
+            return;
+        }
         const nicosid = NicoCookie.getValue(set_cookie, "nicosid");
         const nico_gc = NicoCookie.getValue(set_cookie, "nico_gc");
-        this._cookie_html = {};
+        if(this._cookie_html === null){
+            this._cookie_html = {};
+        }
         if(nicosid){
             this._cookie_html["nicosid"] = nicosid;
         }
@@ -291,12 +297,14 @@ class NicoSearch {
         try {
             const cookie = this._cookie_html?
                 NicoCookie.getHeader(this._cookie_html):null;
+            logger.debug("searchHtml pre request cookie_html=", this._cookie_html);
             const body = await this._req.get(src_url.href, {
                 cookie:cookie
             });
             const result = nicoSearchHtmlParse(body, search_target);
 
             this._getCookieHTML();
+            logger.debug("searchHtml post request cookie_html=", this._cookie_html);
 
             const search_limit = 32;
             const max_page_num = 50;

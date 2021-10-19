@@ -202,7 +202,7 @@ async function searchHtml(t, page) {
     pramas.page = page;
     nico_mocks.searchHtml(
         "search", 
-        pramas.query, pramas.page, 
+        pramas.query, pramas.query, pramas.page, 
         pramas.sort_name, pramas.sort_order, 
         200, 1);
 
@@ -229,9 +229,35 @@ async function searchHtml(t, page) {
         t.is(result.list.length, 32);
         const cookie = nico_search._cookie_html;
         t.is(cookie["nico_gc"], "2srch_s%3Df%26srch_o%3Dd");
-        t.is(cookie["nicosid"], undefined);
+        t.is(cookie["nicosid"], "12345.67890");
     }
 }
-
 test("nico search html page2", searchHtml, 1);
 test("nico search html page1", searchHtml, 2);
+
+test("nico search html change word, cookie not chnage", async t => {
+    const pramas = default_params().getParamsHtml();
+    nico_mocks.searchHtml(
+        "search", 
+        "word1", "word2", pramas.page, 
+        pramas.sort_name, pramas.sort_order, 
+        200, 1);
+
+    const nico_search = new NicoSearch();
+
+    {
+        pramas.query = "word1";
+        t.is(nico_search._cookie_html, null);
+        await nico_search.searchHtml(pramas);
+        const cookie = nico_search._cookie_html;
+        t.is(cookie["nico_gc"], "1srch_s%3Df%26srch_o%3Dd");
+        t.is(cookie["nicosid"], "12345.67890");
+    }
+    {
+        pramas.query = "word2";
+        await nico_search.searchHtml(pramas);
+        const cookie = nico_search._cookie_html;
+        t.is(cookie["nico_gc"], "1srch_s%3Df%26srch_o%3Dd");
+        t.is(cookie["nicosid"], "12345.67890");
+    }
+});

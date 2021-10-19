@@ -112,19 +112,26 @@ const createSession = (video_id, is_low_quality) =>{
 };
 
 let search_html_count = 0;
+let search_html_last_word = null;
 class NicoMockResponse {
     searchHtml(req, res, search_target){
         search_html_count++;
 
+        const word = new URL(req.url).pathname.split("/").pop();
+
         const f_pth = path.join(__dirname, "data", "html", `${search_target}.html`);
         const body = fs.readFileSync(f_pth, "utf-8");
 
-        const cookies = [];
+        let cookies = [];
         cookies.push(`nico_gc=${search_html_count}__srch_s%3Df%26srch_o%3Dd; expires=Sun, 14-Nov-2021 00:00:00 GMT; Max-Age=2592000; path=/; domain=.nicovideo.jp`);
         if(!req.headers["cookie"]){
             cookies.push("nicosid=12345.67890; expires=Mon, 13-Oct-2031 10:10:10 GMT; Max-Age=315360000; path=/; domain=.nicovideo.jp");
         }
 
+        if(search_html_last_word!==null && search_html_last_word != word){
+            cookies = null;
+        }
+        search_html_last_word = word;
         this._writeString(req, res, body, "text", 200, cookies);
     }
 

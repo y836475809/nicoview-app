@@ -235,7 +235,7 @@ class NicoMocks {
         this._search(text, code, delay, "incorrect_json");
     }
 
-    searchHtml(target, word, page, sort, order, code, delay){
+    searchHtml(target, word1, word2, page, sort, order, code, delay){
         const f_pth = path.join(__dirname, "..", "..", "test", "mock_server", "data", "html", `${target}.html`);
         const html = fs.readFileSync(f_pth, "utf-8");
 
@@ -250,7 +250,7 @@ class NicoMocks {
             { encodedQueryParams: true });
         this.search_html_nock
             .matchHeader("accept-encoding", "gzip")
-            .get(`/${target}/${encodeURIComponent(word)}`)
+            .get(`/${target}/${encodeURIComponent(word1)}`)
             .query(query_json)
             .delay(delay)
             .reply(code, html,{
@@ -259,14 +259,21 @@ class NicoMocks {
                     "nicosid=12345.67890; expires=Mon, 13-Oct-2031 10:10:10 GMT; Max-Age=315360000; path=/; domain=.nicovideo.jp"
                 ]
             })  
-            .get(`/${target}/${encodeURIComponent(word)}`)
+            .get(`/${target}/${encodeURIComponent(word2)}`)
             .query(query_json)
             .matchHeader("cookie", "nicosid=12345.67890; nico_gc=1srch_s%3Df%26srch_o%3Dd")
             .delay(delay)
-            .reply(code, html,{
-                "Set-Cookie": [
-                    "nico_gc=2srch_s%3Df%26srch_o%3Dd; expires=Sun, 14-Nov-2021 00:00:00 GMT; Max-Age=2592000; path=/; domain=.nicovideo.jp",
-                ]
+            .reply((uri, reqbody)=>{ // eslint-disable-line no-unused-vars
+                if(word1 == word2){
+                    return [code, html, {
+                        "Set-Cookie": [
+                            "nico_gc=2srch_s%3Df%26srch_o%3Dd; expires=Sun, 14-Nov-2021 00:00:00 GMT; Max-Age=2592000; path=/; domain=.nicovideo.jp",
+                        ]
+                    }];
+                }else{
+                    return [code, html];  
+                }
+
             });
     }
 }

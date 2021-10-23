@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { NicoXMLFile, NicoJsonFile, 
+const { NicoXMLFile, NicoJsonFile, NicoDataFile,
     getIDFromFilename, getCommonNameFromFilename } = require("../app/js/nico-data-file");
 
 const setParams = (nico_file, params) => {
@@ -79,4 +79,9 @@ test("getIDFromFilename", (t) => {
 test("getCommonNameFromFilename", (t) => {
     t.is(getCommonNameFromFilename("test - [sm00].00 - [sm10].mp4"), "test - [sm00].00");
     t.is(getCommonNameFromFilename("test - [00].00 - [10].mp4"), "test - [00].00");
+});
+
+test("cnvFilename", (t) => {
+    const nd = new NicoDataFile();
+    t.is("＼／：？”＊＜＞｜＃", nd._cnvFilename("\\/:?\"*<>|#"));
 });

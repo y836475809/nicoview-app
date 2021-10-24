@@ -171,12 +171,13 @@ class NicoClientRequest {
                         this._resStreamData(res, resolve, reject);
                     } 
                 }else{
+                    const isgzip = this._isgzip(res);
                     if(this._isgzip(res)){
                         const gzip = zlib.createGunzip();
                         res.pipe(gzip);
-                        this._resData(gzip, url, resolve, reject);
+                        this._resData(gzip, url, isgzip, resolve, reject);
                     }else{
-                        this._resData(res, url, resolve, reject);
+                        this._resData(res, url, isgzip, resolve, reject);
                     }
                 }
             });
@@ -236,13 +237,13 @@ class NicoClientRequest {
         });
     }
 
-    _resData(res, url, resolve, reject){
+    _resData(res, url, isgzip, resolve, reject){
         const is_binary = this._encoding == "binary";
         let str_data = "";
         let binary_data = [];
 
         res.on("data", (chunk) => {
-            if(is_binary){
+            if(is_binary || isgzip){
                 binary_data.push(Buffer.from(chunk, "binary"));
             }else{
                 str_data += chunk;
@@ -252,16 +253,28 @@ class NicoClientRequest {
             if(is_binary){
                 resolve(Buffer.concat(binary_data));
             }else{
+                let data = "";
+                try {
+                    if(isgzip){
+                        data = (new TextDecoder).decode(
+                            Uint8Array.from(Buffer.concat(binary_data)));
+                    }else{
+                        data = str_data;
+                    }
+                } catch (error) {
+                    error.message = `response data decode error:${error.message},isgzip=${isgzip},url=${url},`;
+                    reject(error);
+                }   
                 if(this._res_json){
                     try {
-                        const json_data = JSON.parse(str_data);
+                        const json_data = JSON.parse(data);
                         resolve(json_data);
                     } catch (error) {
                         error.message = `response json parse error:${error.message},url=${url},`;
                         reject(error);
                     }   
                 }else{
-                    resolve(str_data);
+                    resolve(data);
                 }
             }    
         });  

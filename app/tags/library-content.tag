@@ -192,7 +192,8 @@
                     video_item.tags = video_item.tags ? video_item.tags.join(" ") : "";
                     this.grid_table.updateItem(video_item, video_id);
 
-                    this.state.num_items =  this.grid_table.getDataLength();
+                    this.state.num_filtered_items =  this.grid_table.getDataLength();
+                    this.state.num_items += 1;
                     this.update();
                 });
 
@@ -200,7 +201,8 @@
                     const { video_id } = args;
                     this.grid_table.deleteItemById(video_id);
 
-                    this.state.num_items =  this.grid_table.getDataLength();
+                    this.state.num_filtered_items =  this.grid_table.getDataLength();
+                    this.state.num_items -= 1;
                     this.update();
                 });
 

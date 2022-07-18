@@ -723,7 +723,7 @@
 
                 try {
                     const video_item = await myapi.ipc.Library.getItem(video_id);
-                    const video_data = new this.NicoVideoData(video_item);
+                    const video_data = new NicoVideoData(video_item);
                     const ffmpeg_path = await myapi.ipc.Config.get("ffmpeg_path", "");
                     const cnv_mp4 = new ConvertMP4();
 

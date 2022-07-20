@@ -143,7 +143,7 @@
                     <div class="button-label">ダウンロード</div>
                 </div>
             </div>
-            <div class="button center-v play-history-button" onclick="{onclickPageSelect.bind(this,'play-history')}"> 
+            <div class="button center-v history-button" onclick="{onclickPageSelect.bind(this,'history')}"> 
                 <div class="button-border"></div>
                 <div>
                     <i class="center-hv fas fa-history"></i> 
@@ -163,7 +163,7 @@
             <search-page obs={obs}></search-page>
             <mylist-page obs={obs}></mylist-page>
             <download-page obs={obs}></download-page>
-            <play-history-page obs={obs}></play-history-page>
+            <history-page obs={obs}></history-page>
             <setting-page obs={obs}></setting-page>
         </div>
         <div class="page-container right">

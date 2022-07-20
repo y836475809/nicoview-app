@@ -1,4 +1,4 @@
-<play-history-page>
+<history-page>
     <style>
         :host {
             width: 100%;
@@ -77,7 +77,7 @@
                 }; 
                 this.grid_table = new GridTable("history-grid", columns, options);
 
-                this.obs.on("play-history-page:reload-items", async ()=>{
+                this.obs.on("history-page:reload-items", async ()=>{
                     await this.loadItems();
                 });
             },
@@ -108,7 +108,7 @@
                     if(items.length==0){
                         return;
                     }
-                    await myapi.ipc.popupContextMenu("play-history", {items});           
+                    await myapi.ipc.popupContextMenu("history", {items});           
                 });           
                 
                 await this.loadItems();
@@ -138,4 +138,4 @@
             }
         };
     </script>
-</play-history-page>
+</history-page>

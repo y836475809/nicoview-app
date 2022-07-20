@@ -324,7 +324,7 @@
                     }
 
                     this.obs.trigger("search-page:sidebar:reload-items");
-                    this.obs.trigger("play-history-page:reload-items");
+                    this.obs.trigger("history-page:reload-items");
                     this.obs.trigger("mylist-page:sidebar:reload-items");
 
                     await myapi.ipc.Dialog.showMessageBox({

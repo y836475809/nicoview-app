@@ -524,7 +524,7 @@ const main_mylist = (main_win) => {
 };
 
 const main_play_history = (main_win) => {
-    ipcMain.handle("app:popup-contextmenu-play-history", async (event, args) => {
+    ipcMain.handle("app:popup-contextmenu-history", async (event, args) => {
         const { items } = args;
 
         return await new Promise(resolve => {

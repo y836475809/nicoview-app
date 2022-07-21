@@ -131,7 +131,7 @@
             </div>
         </div>
         <div class="user-container">
-            <player-user obs={obs}></player-user>
+            <player-user></player-user>
         </div>
         <div class="controls-container">
             <label class="center-v comment-checkbox" title="コメントの表示/非表示">
@@ -166,11 +166,12 @@
     </div>
     
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const  myapi = window.myapi;
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
         const { SyncCommentScroll } = window.SyncCommentScroll;
+        const player_obs = riot.obs;
 
         export default {
             state:{
@@ -178,7 +179,6 @@
                 video_thumbnail_url:"",
                 comment_state:""
             },
-            obs:null,
             is_economy:false,
             is_deleted:false,
             is_online:false,
@@ -191,9 +191,7 @@
             sync_comment_scroll:null,
             sync_comment_checked:true,
             grid_table:null,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-
+            onBeforeMount() {
                 this.sync_comment_scroll = new SyncCommentScroll();
 
                 const timeFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
@@ -216,12 +214,12 @@
                 };   
                 this.grid_table = new GridTable("comment-grid", columns, options);
                 
-                this.obs.on("player-info-page:update-comments", (args)=> {
+                player_obs.on("player-info-page:update-comments", (args)=> {
                     const comments = args;
                     this.setComments(comments);
                 });
 
-                this.obs.on("player-info-page:set-viewinfo-data", (args)=> {
+                player_obs.on("player-info-page:set-viewinfo-data", (args)=> {
                     this.grid_table.resizeGrid();
 
                     const { viewinfo, comments, all_comment_num, state } = args;
@@ -281,7 +279,7 @@
                     const user_icon_url = owner.iconURL;
                     const is_saved = this.is_saved;
                     
-                    this.obs.trigger("player-user:set-data", {
+                    player_obs.trigger("player-user:set-data", {
                         user_id,
                         user_nickname,
                         user_icon_url, 
@@ -294,7 +292,7 @@
                     this.update();
                 });
 
-                this.obs.on("player-info-page:seek-update", (current_sec)=> {
+                player_obs.on("player-info-page:seek-update", (current_sec)=> {
                     if(!this.sync_comment_checked){
                         return;
                     }
@@ -303,13 +301,13 @@
                     this.grid_table.scrollRow(comment_index);
                 });
 
-                this.obs.on("player-info-page:reset-comment-scroll", ()=> {
+                player_obs.on("player-info-page:reset-comment-scroll", ()=> {
                     if(this.sync_comment_scroll){
                         this.sync_comment_scroll.reset();
                     }
                 });
                 
-                this.obs.on("player-info-page:split-resized", ()=> {
+                player_obs.on("player-info-page:split-resized", ()=> {
                     this.grid_table.resizeGrid();
                 });
             },
@@ -319,7 +317,7 @@
 
                 this.grid_table.onDblClick(async (e, data)=>{
                     const sec = data.vpos * 10 / 1000;
-                    this.obs.trigger("player-video:seek", sec);
+                    player_obs.trigger("player-video:seek", sec);
                 });
 
                 this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
@@ -378,17 +376,17 @@
             },
             onclickCommentVisibleCheck(e) {
                 const comment_visible = e.target.checked;
-                this.obs.trigger("player-video:change-comment-visible", comment_visible);
+                player_obs.trigger("player-video:change-comment-visible", comment_visible);
             },
             onclickUpdateThumbInfo(e) { // eslint-disable-line no-unused-vars
-                this.obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
+                player_obs.trigger("player-main-page:update-data", this.video_id, "thumbinfo");
             },
             onclickUpdateComment(e) { // eslint-disable-line no-unused-vars
                 logger.debug("player video info update video_id=", this.video_id);
-                this.obs.trigger("player-main-page:update-data", this.video_id, "comment");
+                player_obs.trigger("player-main-page:update-data", this.video_id, "comment");
             },
             onclickShowSettingDialog(e) { // eslint-disable-line no-unused-vars
-                this.obs.trigger("player-main-page:show-player-setting-dialog");
+                player_obs.trigger("player-main-page:show-player-setting-dialog");
             },
             setComments(comments) {
                 this.sync_comment_scroll.setComments(comments);
@@ -401,7 +399,7 @@
                 this.grid_table.scrollToTop();
             },
             triggerAddNGComment(args) {
-                this.obs.trigger("player-main-page:add-ng-comment", args);
+                player_obs.trigger("player-main-page:add-ng-comment", args);
             }
         };
     </script>

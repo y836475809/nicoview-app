@@ -28,16 +28,15 @@
     </button>
 
     <script>
+        /* globals riot */
         const myapi = window.myapi;
+        const player_obs = riot.obs;
 
         export default {
             state:{
                 video_tags:[]
             },
-            obs:null,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                
+            onBeforeMount() {            
                 this.onclickTag = (item, e) => { // eslint-disable-line no-unused-vars
                     const tag = item.name;
                     myapi.ipc.Search.searchTag({
@@ -46,7 +45,7 @@
                     });
                 };
 
-                this.obs.on("player-tag:set-tags", (video_tags) => {
+                player_obs.on("player-tag:set-tags", (video_tags) => {
                     this.state.video_tags = video_tags;
                     this.update();
                 });

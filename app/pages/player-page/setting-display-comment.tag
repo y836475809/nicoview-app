@@ -48,8 +48,9 @@
         </div>
     </div>
     <script>
-        /* globals */
+        /* globals riot */
         const myapi = window.myapi;
+        const player_obs = riot.obs;
 
         const default_params = {
             duration_sec: 4,
@@ -71,10 +72,8 @@
             fps_items:[10, 60],
             sync_interval_items:[10, 30, 60, 120],
             sync_threshold_items:[0.05, 0.1],
-            obs_dialog:null,
-            onBeforeMount(props) {
-                this.obs_dialog = props.obs;
-                this.obs_dialog.onReturn("setting-display-comment:get-default_params", ()=>{
+            onBeforeMount() {
+                player_obs.onReturn("setting-display-comment:get-default_params", ()=>{
                     return default_params;
                 });
             },
@@ -97,7 +96,7 @@
                 params[name] = value;
                 await myapi.ipc.Config.set(`comment.${name}`, value);
                 if(is_trigger){
-                    this.obs_dialog.trigger("player-video:update-comment-display-params", params);
+                    player_obs.trigger("player-video:update-comment-display-params", params);
                 }
             },
             async onchangeDuration(item, e) { // eslint-disable-line no-unused-vars
@@ -109,7 +108,7 @@
             async onclickLimitCommentCheck(e) {
                 const do_limit = e.target.checked;
                 await myapi.ipc.Config.set("comment.do_limit", do_limit);
-                this.obs_dialog.trigger("player-main-page:update-comment-display-limit", {do_limit});
+                player_obs.trigger("player-main-page:update-comment-display-limit", {do_limit});
             },
             async onclickAutoSyncCheck(e) {
                 const checked = e.target.checked;

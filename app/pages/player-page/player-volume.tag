@@ -30,13 +30,12 @@
     </div>
 
     <script>
-        /* globals */
+        /* globals riot */
         const myapi = window.myapi;
+        const player_obs = riot.obs;
 
         export default {
-            obs:null,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
+            onBeforeMount() {
             },
             async onMounted() {
                 let picker = this.$("div.picker");
@@ -66,7 +65,7 @@
                 // TODO check
                 myapi.ipc.Config.set("player.volume", volume).then();
 
-                this.obs.trigger("player-video:volume-changed", volume); 
+                player_obs.trigger("player-video:volume-changed", volume); 
             }
         };
     </script>

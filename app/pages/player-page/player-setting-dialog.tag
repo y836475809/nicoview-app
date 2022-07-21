@@ -81,10 +81,10 @@
         </div>
         <div class="settings-container">
             <div class="setting-container">
-                <setting-ng-comment obs={obs}></setting-ng-comment>
+                <setting-ng-comment></setting-ng-comment>
             </div>
             <div class="setting-container">
-                <setting-display-comment obs={obs}></setting-display-comment>
+                <setting-display-comment></setting-display-comment>
             </div>
             <div class="setting-container">
                 <setting-player-contextmenu></setting-player-contextmenu>
@@ -93,17 +93,18 @@
     </dialog>
 
     <script>
+        /* globals riot */
+        const player_obs = riot.obs;
+
         export default {
-            obs:null,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-                this.obs.on("player-setting-dialog:show", (args) => {
+            onBeforeMount() {
+                player_obs.on("player-setting-dialog:show", (args) => {
                     const { ng_items } = args;
 
                     const dialog = this.$("dialog");
                     dialog.showModal();
 
-                    this.obs.trigger("setting-ng-comment:ng-items", ng_items);
+                    player_obs.trigger("setting-ng-comment:ng-items", ng_items);
                 });
             },
             onclickClose(e) { // eslint-disable-line no-unused-vars

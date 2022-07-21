@@ -35,38 +35,38 @@
 
     <div class="player-container">
         <div class="center-hv tags-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
-            <player-tags obs={obs}></player-tags>
+            <player-tags></player-tags>
         </div>
         <div class="video-container" tabIndex="-1" 
             onkeyup={onkeyupTogglePlay}
             onmouseup={oncontextmenu}>
             <div>
-                <player-video obs={obs}></player-video>
+                <player-video></player-video>
             </div>
             <open-video-form obs={obs_open_video_form}></open-video-form>
         </div>
         <div class="center-hv controls-container" tabIndex="-1" onkeyup={onkeyupTogglePlay}>
-            <player-controls obs={obs}></player-controls>
+            <player-controls></player-controls>
         </div>
     </div>
 
     <script>
-        /* globals my_obs */
+        /* globals riot */
         const myapi = window.myapi;
+        const { MyObservable } = window.MyObservable;
+        const player_obs = riot.obs;
 
         export default {
-            obs:null,
             obs_open_video_form:null,
             contextmenu_show:false,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_open_video_form = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_open_video_form = new MyObservable();
             },
             async getPlayData() {
-                return await this.obs.triggerReturn("player-main-page:get-play-data-callback");
+                return await player_obs.triggerReturn("player-main-page:get-play-data-callback");
             },
             async getCurrentPlayTime() {
-                return await this.obs.triggerReturn("player-video:get-current-time-callback");
+                return await player_obs.triggerReturn("player-video:get-current-time-callback");
             },
             resizeVideo(org_size) {
                 const elm = this.$(".video-container");
@@ -77,7 +77,7 @@
             async oncontextmenu(e) {
                 // コンテキストメニュー表示後の画面クリックでは再生/停止しない
                 if(e.button===0 && !this.contextmenu_show){   
-                    this.obs.trigger("player-controls:play");
+                    player_obs.trigger("player-controls:play");
                 }
 
                 if(e.button === 1){
@@ -119,7 +119,7 @@
                             this.obs_open_video_form.trigger("show");
                         }
                         if(menu_id=="change-movie-size"){
-                            const org_size = await this.obs.triggerReturn("player-video:get-video-size-callback");
+                            const org_size = await player_obs.triggerReturn("player-video:get-video-size-callback");
                             this.resizeVideo(org_size);
                         }
                     }
@@ -129,7 +129,7 @@
             },
             onkeyupTogglePlay(e) {
                 if (e.keyCode === 32) {
-                    this.obs.trigger("player-controls:play");
+                    player_obs.trigger("player-controls:play");
                 }
             }
         };

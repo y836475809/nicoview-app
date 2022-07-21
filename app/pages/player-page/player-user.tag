@@ -121,11 +121,12 @@
     </div>
     
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
+        const player_obs = riot.obs;
 
         const getBase64 = (img) => {
             const canvas = document.createElement("canvas");
@@ -148,10 +149,8 @@
             user_icon_cache_enable:false,
             current_user_icon_url:"",
             is_saved:false,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-
-                this.obs.on("player-user:set-data", args => {
+            onBeforeMount() {
+                player_obs.on("player-user:set-data", args => {
                     const { user_id, user_nickname, user_icon_url, description, is_saved } = args;
 
                     this.closePopupDescription();
@@ -239,7 +238,7 @@
                 const elm = e.target;
                 if(elm.classList.contains("seekTime")){
                     const seek_time_sec = toTimeSec(e.target.dataset.seektime);
-                    this.obs.trigger("player-video:seek", seek_time_sec);
+                    player_obs.trigger("player-video:seek", seek_time_sec);
                 }
             },
             setDescription(description) {

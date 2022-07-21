@@ -25,22 +25,20 @@
     </div>
 
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+        const player_obs = riot.obs;
 
         export default {
-            obs:null,
             video_elm:null,
             play_data:null,
             comment_tl:null,
             comment_params:null,
             comment_sync_id:null,
             play_ended:false,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-
-                this.obs.on("player-video:set-play-data", async(data) => {
+            onBeforeMount() {
+                player_obs.on("player-video:set-play-data", async(data) => {
                     await this.initVideo();
 
                     this.play_data = data;
@@ -54,11 +52,11 @@
                     this.video_elm.load();
                 });
 
-                this.obs.onReturn("player-video:get-current-time-callback", () => { 
+                player_obs.onReturn("player-video:get-current-time-callback", () => { 
                     return this.video_elm.currentTime;
                 });
 
-                this.obs.onReturn("player-video:get-video-size-callback", () => { 
+                player_obs.onReturn("player-video:get-video-size-callback", () => { 
                     return {
                         width: this.video_elm.videoWidth,
                         height: this.video_elm.videoHeight
@@ -70,19 +68,19 @@
                     return;
                 }
 
-                const default_comment_params = await this.obs.triggerReturn("setting-display-comment:get-default_params");
+                const default_comment_params = await player_obs.triggerReturn("setting-display-comment:get-default_params");
                 this.comment_params = await myapi.ipc.Config.get("comment", default_comment_params);
                 
                 this.video_elm = this.$(".video-screen > video");
                 this.video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
 
                 this.video_elm.addEventListener("loadedmetadata", (event) => { // eslint-disable-line no-unused-vars
-                    this.obs.trigger("player-seek:reload", this.video_elm.duration);
+                    player_obs.trigger("player-seek:reload", this.video_elm.duration);
                 });
 
                 this.video_elm.addEventListener("loadeddata", (event) => {
                     logger.debug("loadeddata event=", event);
-                    this.obs.trigger("player-controls:loaded-data");
+                    player_obs.trigger("player-controls:loaded-data");
 
                     const { time } = this.play_data.state;
                     if(time>0){
@@ -109,8 +107,8 @@
 
                 this.video_elm.addEventListener("timeupdate", () => {
                     const current = this.video_elm.currentTime;
-                    this.obs.trigger("player-seek:seek-update", current);
-                    this.obs.trigger("player-info-page:seek-update", current);
+                    player_obs.trigger("player-seek:seek-update", current);
+                    player_obs.trigger("player-info-page:seek-update", current);
                 });
                 this.video_elm.addEventListener("progress", () => {
                     logger.debug("progressによるイベント発火");
@@ -122,7 +120,7 @@
                         const index = this.video_elm.buffered.length - 1 - i;
                         if (this.video_elm.buffered.start(index) < this.video_elm.currentTime) {
                             const time_sec = this.video_elm.buffered.end(index);
-                            this.obs.trigger("player-seek:buffered-update", time_sec);
+                            player_obs.trigger("player-seek:buffered-update", time_sec);
                             break;
                         }
                     }
@@ -146,11 +144,11 @@
                     this.play_ended = true;
                     if(this.comment_tl.enable === false || this.comment_tl.ended === true || this.comment_tl.hasComment === false){
                         // コメント非表示またはコメントが完了している場合は動画終了でpauseにする
-                        this.obs.trigger("player-controls:set-state", "pause"); 
+                        player_obs.trigger("player-controls:set-state", "pause"); 
                     }
                 });
                 
-                this.obs.on("player-video:play", () => {
+                player_obs.on("player-video:play", () => {
                     logger.debug("player play");
                     if(this.video_elm.currentTime == this.video_elm.duration){
                         if(this.comment_tl.enable === true && this.comment_tl.ended === false && this.comment_tl.hasComment === true){
@@ -160,7 +158,7 @@
                             // currentTime==durationは動画が最後まで再生されたということ
                             // この場合に再生するときは最初から再生するための処理を行う
                             logger.debug("player play restart");
-                            this.obs.trigger("player-info-page:reset-comment-scroll"); 
+                            player_obs.trigger("player-info-page:reset-comment-scroll"); 
                             this.video_elm.currentTime = 0;
                             this.comment_tl.pause();
                             this.comment_tl.seek(0);
@@ -168,7 +166,7 @@
                     }      
                     this.video_elm.play();
                 });
-                this.obs.on("player-video:pause", () => {
+                player_obs.on("player-video:pause", () => {
                     const is_ready = this.video_elm.readyState > 2;
                     if(!is_ready){
                         return;
@@ -178,28 +176,28 @@
                     this.comment_tl.pause();
                 });
 
-                this.obs.on("player-video:seek", (current) => {  
+                player_obs.on("player-video:seek", (current) => {  
                     this.seek(current); 
                 });
 
-                this.obs.on("player-video:volume-changed", (volume) => {
+                player_obs.on("player-video:volume-changed", (volume) => {
                     this.video_elm.volume = volume ;
                 });
             
-                this.obs.on("player-video:resize-begin", () => {
+                player_obs.on("player-video:resize-begin", () => {
                     if(this.comment_tl){
                         this.comment_tl.pause();
                     }
                 });
 
-                this.obs.on("window-resized", () => {
+                player_obs.on("window-resized", () => {
                     if(this.comment_tl){
                         this.createTimeLine(this.play_data.comments);
                         const current = this.video_elm.currentTime;
                         this.seek(current);
                     }
                 });
-                this.obs.on("player-video:reset-comment-timelime", () => {
+                player_obs.on("player-video:reset-comment-timelime", () => {
                     if(this.comment_tl){
                         this.createTimeLine(this.play_data.comments);
                         const current = this.video_elm.currentTime;
@@ -207,7 +205,7 @@
                     }
                 });
 
-                this.obs.on("player-video:change-comment-visible", (visible) => {
+                player_obs.on("player-video:change-comment-visible", (visible) => {
                     if(visible){
                         this.comment_tl.enable = true;
                         const current = this.video_elm.currentTime;
@@ -222,7 +220,7 @@
                     }
                 });
 
-                this.obs.on("player-video:update-comments", (args)=> {       
+                player_obs.on("player-video:update-comments", (args)=> {       
                     if(this.comment_tl){
                         const comments = args;
                         this.play_data.comments = comments;
@@ -233,7 +231,7 @@
                     }
                 });
 
-                this.obs.on("player-video:update-comment-display-params", (args)=> {  
+                player_obs.on("player-video:update-comment-display-params", (args)=> {  
                     const { duration_sec, fps } = args;     
                     if(this.comment_tl){
                         if(this.comment_params.duration_sec != duration_sec){
@@ -281,7 +279,7 @@
                 this.comment_tl.onComplete(()=>{
                     if(this.video_elm.currentTime == this.video_elm.duration){
                         // 動画終了後にコメントが流れる場合はコメント完了後にpauseにする
-                        this.obs.trigger("player-controls:set-state", "pause"); 
+                        player_obs.trigger("player-controls:set-state", "pause"); 
                     }
                 });
                 this.comment_tl.create(nico_script.getApplied(comments));

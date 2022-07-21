@@ -84,25 +84,24 @@
     <div class="seek-timer duration">{state.fmt_duration}</div>
     
     <script>
-        /* globals */
+        /* globals riot */
         const { toTimeString } = window.TimeFormat;
+        const player_obs = riot.obs;
 
         export default {
             state:{
                 fmt_current:"",
                 fmt_duration:""
             },
-            obs:null,
             buffered:0,
             duration:0,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
+            onBeforeMount() {
             },
             onMounted() {
                 this.updateSeek(0);
                 this.update();
 
-                this.obs.on("player-seek:reload", (duration) => {
+                player_obs.on("player-seek:reload", (duration) => {
                     this.duration = duration;
 
                     this.updateBuffered(0);
@@ -111,15 +110,15 @@
                     this.update();
                 });
 
-                this.obs.on("player-seek:seek-update", (current) => {
+                player_obs.on("player-seek:seek-update", (current) => {
                     this.updateSeek(current);
                 });
 
-                this.obs.on("player-seek:buffered-update", (time_sec) => {
+                player_obs.on("player-seek:buffered-update", (time_sec) => {
                     this.updateBuffered(time_sec);
                 });
 
-                this.obs.on("player-seek:redraw", () => {
+                player_obs.on("player-seek:redraw", () => {
                     this.updateBuffered(this.buffered);
                     this.updateSeek(this.current);
                 });
@@ -136,7 +135,7 @@
 
                 this.updateSeek(current);
 
-                this.obs.trigger("player-video:seek", current);
+                player_obs.trigger("player-video:seek", current);
             },
             mouseOver(e) {
                 const left = e.layerX;

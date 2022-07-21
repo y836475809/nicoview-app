@@ -50,16 +50,16 @@
     </div>
 
     <script>
-        /* globals */
+        /* globals riot */
         const myapi = window.myapi;
         const { GridTable } = window.GridTable;
+        const player_obs = riot.obs;
 
         export default {
             obs_dialog:null,
             grid_table:null,
-            onBeforeMount(props) {
-                this.obs_dialog = props.obs;
-                this.obs_dialog.on("setting-ng-comment:ng-items", (args) => {
+            onBeforeMount() {
+                player_obs.on("setting-ng-comment:ng-items", (args) => {
                     this.setup(args);
                 });
             },
@@ -80,7 +80,7 @@
                     return item.value;
                 });
 
-                this.obs_dialog.trigger("player-main-page:delete-ng-comment", { 
+                player_obs.trigger("player-main-page:delete-ng-comment", { 
                     ng_texts, ng_user_ids 
                 });
 

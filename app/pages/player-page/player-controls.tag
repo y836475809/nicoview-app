@@ -67,15 +67,18 @@
         <div class="move-start" title="最初に移動" onclick={moveStart}>
             <i class="fas fa-circle"></i>
         </div>
-        <player-seek obs={obs}></player-seek>
+        <player-seek></player-seek>
     </div>
     <div class="center-v volume">
-        <player-volume obs={obs}></player-volume>
+        <player-volume></player-volume>
     </div>
     <div class="center-v toggle-info" title="動画情報の表示/非表示">
         <span class="fas fa-info" onclick={toggleInfoview}></span>
     </div>
     <script>
+        /* globals riot */
+        const player_obs = riot.obs;
+
         const  button_class_map = new Map([
             ["play", "fas fa-play"],
             ["pause", "fas fa-pause"],
@@ -94,20 +97,18 @@
                 button_class:""
             },
             current_state:"stop",
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                
+            onBeforeMount() {
                 this.state.button_class = button_class_map.get(state_button_map.get("stop"));
 
-                this.obs.on("player-controls:play", ()=> {
+                player_obs.on("player-controls:play", ()=> {
                     this.play();
                 });
 
-                this.obs.on("player-controls:loaded-data", ()=> {
+                player_obs.on("player-controls:loaded-data", ()=> {
                     this.setPlayEnable(true);
                 });
                 
-                this.obs.on("player-controls:set-state", (state)=> {
+                player_obs.on("player-controls:set-state", (state)=> {
                     this.updateState(state);
                 });
             },
@@ -115,8 +116,8 @@
                 this.updateState("play");
                 this.setPlayEnable(false);
 
-                this.obs.on("window-resized", () => { 
-                    this.obs.trigger("player-seek:redraw");
+                player_obs.on("window-resized", () => { 
+                    player_obs.trigger("player-seek:redraw");
                 });
             },
             updateState(state) {
@@ -148,19 +149,19 @@
                 if(this.isStop()){
                     this.updateState("play");
                 }else if(this.isPlay()){
-                    this.obs.trigger("player-video:pause");
+                    player_obs.trigger("player-video:pause");
                     this.updateState("pause");
                 }else{
-                    this.obs.trigger("player-video:play");
+                    player_obs.trigger("player-video:play");
                     this.updateState("play");
                 }
             },
             toggleInfoview() {
-                this.obs.trigger("player-main-page:toggle-infoview");
+                player_obs.trigger("player-main-page:toggle-infoview");
             },
             moveStart() {
-                this.obs.trigger("player-info-page:reset-comment-scroll");
-                this.obs.trigger("player-video:seek", 0);
+                player_obs.trigger("player-info-page:reset-comment-scroll");
+                player_obs.trigger("player-video:seek", 0);
             }
         };
     </script>

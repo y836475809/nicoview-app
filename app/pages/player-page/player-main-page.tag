@@ -26,24 +26,25 @@
     </style>
 
     <div class="player-frame split left">
-        <player-page obs={obs}></player-page>
+        <player-page></player-page>
     </div>
     <div class="gutter" onmousedown={mousedown}></div>
     <div class="info-frame split right">
-        <player-info-page obs={obs}>
-        </player-info-page>
+        <player-info-page></player-info-page>
     </div>
 
-    <player-setting-dialog obs={obs}></player-setting-dialog>
+    <player-setting-dialog></player-setting-dialog>
 
     <script>
-        /* globals my_obs logger ModalDialog */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { NicoVideoData } = window.NicoVideoData;
+        const { MyObservable } = window.MyObservable;
+        const player_obs = riot.obs;
 
         const play_msg_map = new Map([
             ["startWatch", "watch取得開始"],
@@ -55,7 +56,6 @@
         ]);
 
         export default {
-            obs:null,
             obs_modal_dialog:null,
             modal_dialog:null,
             comment_filter:null,
@@ -66,9 +66,8 @@
             stop_resize_event:false,
             resize_begin:false,
             timer:null,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-                this.obs_modal_dialog = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_modal_dialog = new MyObservable();
 
                 myapi.ipc.onPlayVideo(async (args)=>{
                     const { video_id, online, time, video_item } = args;
@@ -95,11 +94,11 @@
                     logger.setLevel(level);
                 });
 
-                this.obs.onReturn("player-main-page:get-play-data-callback", () => {
+                player_obs.onReturn("player-main-page:get-play-data-callback", () => {
                     return this.play_data;
                 });
 
-                this.obs.on("player-main-page:update-data", async(video_id, update_target) => {
+                player_obs.on("player-main-page:update-data", async(video_id, update_target) => {
                     if(this.modal_dialog.isOpend()){
                         return;
                     }
@@ -144,13 +143,13 @@
                             this.comment_filter.setPlayTime(updated_video_item.play_time);
                             const filtered_comments = this.comment_filter.getCommnets();
 
-                            this.obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
-                            this.obs.trigger("player-info-page:set-viewinfo-data", {
+                            player_obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
+                            player_obs.trigger("player-info-page:set-viewinfo-data", {
                                 viewinfo: viewinfo, 
                                 comments: filtered_comments,
                                 all_comment_num: comments.length,
                             });
-                            this.obs.trigger("player-video:update-comments", filtered_comments);
+                            player_obs.trigger("player-video:update-comments", filtered_comments);
                         }   
                     } catch (error) {
                         if(!error.cancel){
@@ -164,7 +163,7 @@
                     this.obs_modal_dialog.trigger("close");
                 });
 
-                this.obs.on("player-main-page:add-ng-comment", async (args) => {
+                player_obs.on("player-main-page:add-ng-comment", async (args) => {
                     const { ng_texts, ng_user_ids } = args;
 
                     this.comment_filter.ng_comment.addNGTexts(ng_texts);
@@ -180,11 +179,11 @@
                     }
 
                     const comments = this.comment_filter.getCommnets();
-                    this.obs.trigger("player-video:update-comments", comments);
-                    this.obs.trigger("player-info-page:update-comments", comments);
+                    player_obs.trigger("player-video:update-comments", comments);
+                    player_obs.trigger("player-info-page:update-comments", comments);
                 });
 
-                this.obs.on("player-main-page:delete-ng-comment", async (args) => {
+                player_obs.on("player-main-page:delete-ng-comment", async (args) => {
                     const { ng_texts, ng_user_ids } = args;
 
                     this.comment_filter.ng_comment.deleteNGTexts(ng_texts);
@@ -200,26 +199,26 @@
                     }
 
                     const comments = this.comment_filter.getCommnets();
-                    this.obs.trigger("player-video:update-comments", comments);
-                    this.obs.trigger("player-info-page:update-comments", comments);
+                    player_obs.trigger("player-video:update-comments", comments);
+                    player_obs.trigger("player-info-page:update-comments", comments);
                 });
 
-                this.obs.on("player-main-page:update-comment-display-limit", (args) => {
+                player_obs.on("player-main-page:update-comment-display-limit", (args) => {
                     const { do_limit } = args;
 
                     this.comment_filter.setLimit(do_limit);
                     const comments = this.comment_filter.getCommnets();
-                    this.obs.trigger("player-video:update-comments", comments);
-                    this.obs.trigger("player-info-page:update-comments", comments);
+                    player_obs.trigger("player-video:update-comments", comments);
+                    player_obs.trigger("player-info-page:update-comments", comments);
                 });
 
-                this.obs.on("player-main-page:show-player-setting-dialog", () => {
-                    this.obs.trigger("player-setting-dialog:show", {
+                player_obs.on("player-main-page:show-player-setting-dialog", () => {
+                    player_obs.trigger("player-setting-dialog:show", {
                         ng_items : this.comment_filter.ng_comment.getNGItems(),
                     });
                 });
 
-                this.obs.on("player-main-page:toggle-infoview", async () => {
+                player_obs.on("player-main-page:toggle-infoview", async () => {
                     await this.toggleInfoview();
                 });
 
@@ -231,13 +230,13 @@
 
                     if(this.resize_begin===false){
                         this.resize_begin = true;
-                        this.obs.trigger("player-video:resize-begin");
+                        player_obs.trigger("player-video:resize-begin");
                     }
 
                     clearTimeout(this.timer);
                     this.timer = setTimeout(() => {
                         this.resize_begin = false;
-                        this.obs.trigger("window-resized");    
+                        player_obs.trigger("window-resized");    
                     }, timeout);
                 });
             },
@@ -292,8 +291,8 @@
             },
             async mouseup(e) { // eslint-disable-line no-unused-vars
                 if(this.gutter_move){
-                    this.obs.trigger("player-video:reset-comment-timelime");
-                    this.obs.trigger("player-info-page:split-resized");
+                    player_obs.trigger("player-video:reset-comment-timelime");
+                    player_obs.trigger("player-info-page:split-resized");
 
                     const ve = this.$(".info-frame");
                     await myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
@@ -323,14 +322,14 @@
 
                 const title = `${video.title}[${video.video_id}][${video.video_type}]`;
                 document.title = title;
-                this.obs.trigger("player-controls:set-state", "play"); 
-                this.obs.trigger("player-video:set-play-data", { 
+                player_obs.trigger("player-controls:set-state", "play"); 
+                player_obs.trigger("player-video:set-play-data", { 
                     video_data: video_data,
                     comments: filtered_comments,
                     state: state
                 });
-                this.obs.trigger("player-tag:set-tags", thumb_info.tags);
-                this.obs.trigger("player-info-page:set-viewinfo-data", { 
+                player_obs.trigger("player-tag:set-tags", thumb_info.tags);
+                player_obs.trigger("player-info-page:set-viewinfo-data", { 
                     viewinfo: viewinfo, 
                     comments: filtered_comments,
                     all_comment_num: comments.length,
@@ -468,7 +467,7 @@
                         pe.style.width = `calc(100% - ${infoview_width}px)`;
 
                         // 非表示->表示の場合はコメントリストをリサイズする
-                        this.obs.trigger("player-info-page:split-resized");
+                        player_obs.trigger("player-info-page:split-resized");
                         this.stop_resize_event = false;
                     },100); 
                 }else{

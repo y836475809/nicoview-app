@@ -41,12 +41,13 @@
     const myapi = window.myapi;
     var { logger } = window.logger; // eslint-disable-line
     var { ModalDialog } = window.ModalDialog; // eslint-disable-line
-    var my_obs = window.MyObservable; // eslint-disable-line
-
-    const obs = my_obs.createObs();
+    const { MyObservable } = window.MyObservable;
+        
+    riot.obs = new MyObservable();
+    
     myapi.ipc.onLoadContent(async ()=>{
         await riot.compile();
-        riot.mount("player-main-page", {obs});
+        riot.mount("player-main-page");
     });
 </script>
 

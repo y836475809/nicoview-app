@@ -168,11 +168,13 @@
     </div>
 
     <script>
-        /* globals my_obs logger ModalDialog */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { ImportFile } = window.ImportFile;
         const { ImportNNDDSetting } = window.ImportNNDDSetting;
         const { MouseGesture } = window.MouseGesture;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         const setInputValue = (tag, selector, value) => {          
             const elm = tag.$(selector);
@@ -199,14 +201,11 @@
         };
         
         export default {
-            obs:null,
             modal_dialog:null,
             mouse_gesture:null,
             obs_modal_dialog:null,
-
-            onBeforeMount(props) {
-                this.obs = props.obs;
-                this.obs_modal_dialog = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_modal_dialog = new MyObservable();
                 this.modal_dialog = null;
 
                 this.state.import_items = ImportNNDDSetting.getItems();
@@ -245,7 +244,7 @@
                 this.mouse_gesture.setGesture(gesture, item.action);
                 const config = this.mouse_gesture.config;
                 await myapi.ipc.Config.set(this.mouse_gesture.name, config);
-                this.obs.trigger("main-page:update-mousegesture-config", { config });
+                main_obs.trigger("main-page:update-mousegesture-config", { config });
             },
             async onclickSelectDataDir(e) { // eslint-disable-line no-unused-vars
                 const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
@@ -323,9 +322,9 @@
                         await import_nndd.call(import_item.name);
                     }
 
-                    this.obs.trigger("search-page:sidebar:reload-items");
-                    this.obs.trigger("history-page:reload-items");
-                    this.obs.trigger("mylist-page:sidebar:reload-items");
+                    main_obs.trigger("search-page:sidebar:reload-items");
+                    main_obs.trigger("history-page:reload-items");
+                    main_obs.trigger("mylist-page:sidebar:reload-items");
 
                     await myapi.ipc.Dialog.showMessageBox({
                         message: "インポート完了"

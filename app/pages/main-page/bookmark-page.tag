@@ -26,10 +26,12 @@
     </aside>
 
     <script>
-        /* globals my_obs */
+        /* globals riot */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const time_format = window.TimeFormat;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         const resizeHeight = (tag, items) => {
             const sidebar = tag.$(".sidebar");
@@ -41,13 +43,11 @@
         };
 
         export default {
-            obs:null,
             obs_listview:null,
             sb_button_icon:"fas fa-chevron-left",
             name: "bookmark",
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_listview = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_listview = new MyObservable();
 
                 this.geticon = (item) => {  // eslint-disable-line no-unused-vars
                     return "fas fa-bookmark fa-lg";
@@ -76,8 +76,8 @@
                         const video_id = items[0].data.video_id;
                         const exist = await myapi.ipc.Library.hasItem(video_id);
                         if(exist){
-                            this.obs.trigger("main-page:select-page", "library");
-                            this.obs.trigger("library-page:scrollto", video_id);     
+                            main_obs.trigger("main-page:select-page", "library");
+                            main_obs.trigger("library-page:scrollto", video_id);     
                         } 
                     }
                     if(menu_id=="toggle-mark"){
@@ -93,7 +93,7 @@
                     }, false);
                 });
                 
-                this.obs.on("bookmark-page:add-items", items => {
+                main_obs.on("bookmark-page:add-items", items => {
                     const bk_items = items.map(item => {
                         return {
                             title: item.title,

@@ -18,17 +18,15 @@
     </div>    
 
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
+        const main_obs = riot.obs;
 
         export default {
-            obs:null,
             grid_table:null,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-
+            onBeforeMount() {
                 myapi.ipc.Download.onUpdateItem(async ()=>{
                     const video_ids = await myapi.ipc.Download.getIncompleteIDs();
                     const items = this.grid_table.dataView.getItems();
@@ -77,7 +75,7 @@
                 }; 
                 this.grid_table = new GridTable("history-grid", columns, options);
 
-                this.obs.on("history-page:reload-items", async ()=>{
+                main_obs.on("history-page:reload-items", async ()=>{
                     await this.loadItems();
                 });
             },
@@ -93,13 +91,13 @@
                         Command.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(main_obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(main_obs, [data]);
                     }
                     if(cmd_id == "download"){
-                        Command.addDownloadItems(this.obs, [data]);
+                        Command.addDownloadItems(main_obs, [data]);
                     }
                 });
 

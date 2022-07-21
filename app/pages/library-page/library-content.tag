@@ -155,7 +155,7 @@
     </div>
 
     <script>
-        /* globals my_obs logger ModalDialog */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoVideoData } = window.NicoVideoData;
@@ -163,6 +163,8 @@
         const { NicoUpdate } = window.NicoUpdate;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { JsonDataConverter } = window.NicoDataConverter;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         const wait = async (msec) => {
             await new Promise(resolve => setTimeout(resolve, msec)); 
@@ -174,13 +176,11 @@
                 num_items:0,
             },
             search_targets:[],
-            obs:null,
             obs_modal_dialog:null,
             modal_dialog:null,
             grid_table:null,
             onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_modal_dialog = my_obs.createObs();
+                this.obs_modal_dialog = new MyObservable();
 
                 this.search_targets = props.search_targets;
 
@@ -262,7 +262,7 @@
                 };   
                 this.grid_table = new GridTable("library-grid", columns, options);
 
-                this.obs.on("library-page:search-item-dlbclicked", (item) => {
+                main_obs.on("library-page:search-item-dlbclicked", (item) => {
                     const query = item.query;
                     const target_ids = item.target_ids;
 
@@ -273,12 +273,12 @@
                     this.filterItems(query, target_ids);      
                 });
 
-                this.obs.on("library-page:convert-video", async (args) => { 
+                main_obs.on("library-page:convert-video", async (args) => { 
                     const video_id = args;
                     await this.convertVideo(video_id);          
                 });   
                 
-                this.obs.on("library-page:play", async (item) => { 
+                main_obs.on("library-page:play", async (item) => { 
                     const video_id = item.id;
                     const video_item = await myapi.ipc.Library.getItem(video_id);
                     if(video_item===null){
@@ -293,7 +293,7 @@
                     await myapi.ipc.Library.updateItemProps(video_id, props);
                 });
 
-                this.obs.on("library-page:scrollto", async (video_id) => { 
+                main_obs.on("library-page:scrollto", async (video_id) => { 
                     const rows = this.grid_table.getRowsByIds([video_id]);
                     if(rows.length > 0){
                         this.grid_table.scrollRow(rows[0], true);
@@ -332,11 +332,11 @@
                     }
 
                     if(cmd_id == "stack"){
-                        Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(main_obs, [data]);
                     }
 
                     if(cmd_id == "bookmark"){
-                        Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(main_obs, [data]);
                     }
                 });
 
@@ -508,7 +508,7 @@
                     item.target_ids = target_ids;
                 }
 
-                this.obs.trigger("library-page:sidebar:add-search-item", { item });
+                main_obs.trigger("library-page:sidebar:add-search-item", { item });
             },
             loadLibraryItems(items) {
                 this.grid_table.setData(items);

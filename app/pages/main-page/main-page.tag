@@ -193,21 +193,19 @@
     </div>
 
     <script>
-        /* globals logger */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { MouseGesture } = window.MouseGesture;
+        const main_obs = riot.obs;
 
         export default {
             state:{
                 donwnload_item_num:0
             },
-            obs:null,
             mouse_gesture:null,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-
+            onBeforeMount() {
                 this.mouse_gesture = new MouseGesture();
-                this.obs.on("main-page:update-mousegesture-config", (args)=>{
+                main_obs.on("main-page:update-mousegesture-config", (args)=>{
                     const { config } = args;
                     this.mouse_gesture.config = config;
                 });
@@ -218,8 +216,8 @@
                     this.mouse_gesture.config = config;
                 })(); 
                 
-                this.mouse_gesture.setActionSearchBackPage(()=>{this.obs.trigger("search-page:back-page");});
-                this.mouse_gesture.setActionSearchFowardPage(()=>{this.obs.trigger("search-page:forward-page");});
+                this.mouse_gesture.setActionSearchBackPage(()=>{main_obs.trigger("search-page:back-page");});
+                this.mouse_gesture.setActionSearchFowardPage(()=>{main_obs.trigger("search-page:forward-page");});
                 this.mouse_gesture.setActionShowPalyer(()=>{
                     myapi.ipc.showyPlayer();
                 });
@@ -251,36 +249,36 @@
                     logger.setLevel(level);
                 });
 
-                this.obs.on("main-page:select-page", (page_name)=>{
+                main_obs.on("main-page:select-page", (page_name)=>{
                     this.select_page(page_name);
                 });  
 
                 myapi.ipc.Search.onSearchTag((args)=>{
-                    this.obs.trigger("main-page:select-page", "search");
-                    this.obs.trigger("search-page:search-tag", args);
+                    main_obs.trigger("main-page:select-page", "search");
+                    main_obs.trigger("search-page:search-tag", args);
                 });
 
                 myapi.ipc.MyList.onLoad((args)=>{
-                    this.obs.trigger("main-page:select-page", "mylist");
-                    this.obs.trigger("mylist-page:load-mylist", args);
+                    main_obs.trigger("main-page:select-page", "mylist");
+                    main_obs.trigger("mylist-page:load-mylist", args);
                 });
 
                 myapi.ipc.Download.onAddItems((args)=>{
                     const items = args;
-                    this.obs.trigger("download-page:add-download-items", items);
+                    main_obs.trigger("download-page:add-download-items", items);
                 });
                 myapi.ipc.Download.onDeleteItems((args)=>{
                     const items = args;
-                    this.obs.trigger("download-page:delete-download-items", items);
+                    main_obs.trigger("download-page:delete-download-items", items);
                 });
 
                 myapi.ipc.Stack.onAddItems((args)=>{
-                    this.obs.trigger("play-stack-page:add-items", args);
+                    main_obs.trigger("play-stack-page:add-items", args);
                 });
 
                 myapi.ipc.Bookmark.onAddItems((args)=>{
                     const bk_items = args;
-                    this.obs.trigger("bookmark-page:add-items", bk_items);
+                    main_obs.trigger("bookmark-page:add-items", bk_items);
                 });
             },
             async onMounted() {

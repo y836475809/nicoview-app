@@ -17,16 +17,16 @@
     </div>
 
     <script>
-        /* globals my_obs */
+        /* globals riot */
         const myapi = window.myapi;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         export default {
-            obs:null,
             obs_listview:null,
             name:"library-search",
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_listview = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_listview = new MyObservable();
 
                 const target_map = new Map();
                 this.props.search_targets.forEach(target=>{
@@ -60,13 +60,13 @@
                     await myapi.ipc.Library.updateSearchItems(items);
                 });
 
-                this.obs.on("library-page:sidebar:add-search-item", (args) => {
+                main_obs.on("library-page:sidebar:add-search-item", (args) => {
                     const { item } = args;
                     this.obs_listview.trigger("addList", { items:[item] });
                 });
 
                 this.obs_listview.on("item-dlbclicked", (item) => {
-                    this.obs.trigger("library-page:search-item-dlbclicked", item);
+                    main_obs.trigger("library-page:search-item-dlbclicked", item);
                 });
             },
             async onMounted() {

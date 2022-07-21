@@ -60,19 +60,20 @@
     </div>
 
     <script>
-        /* globals my_obs logger */
+        /* globals riot logger */
         const EventEmitter = window.EventEmitter;
         const myapi = window.myapi;
         const { NicoDownloader } = window.NicoDownloader;
         const { GridTableDownloadItem, DownloadState } = window.GridTableDownloadItem;
         const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         export default {
             state:{
                 dl_disabled:""
             },
-            obs:null,
             obs_schedule:null,
             download_schedule:null,
             event_em:null,
@@ -80,9 +81,8 @@
             grid_table_dl:null,
             nico_down:null,
             cancel_download:false,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_schedule = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_schedule = new MyObservable();
 
                 this.event_em = new EventEmitter(); 
                 this.event_em.on("download-start", ()=>{
@@ -94,11 +94,11 @@
                     this.update();
                 });
 
-                this.obs.on("download-page:add-download-items", async (items) => {
+                main_obs.on("download-page:add-download-items", async (items) => {
                     await this.addDownloadItems(items);
                 });
 
-                this.obs.on("download-page:delete-download-items", async (video_ids) => {
+                main_obs.on("download-page:delete-download-items", async (video_ids) => {
                     await this.deleteDownloadItems(video_ids);
                 });
             },
@@ -164,10 +164,10 @@
                             Command.play(data, false);
                         }
                         if(cmd_id == "stack"){
-                            Command.addStackItems(this.obs, [data]);
+                            Command.addStackItems(main_obs, [data]);
                         }
                         if(cmd_id == "bookmark"){
-                            Command.addBookmarkItems(this.obs, [data]);
+                            Command.addBookmarkItems(main_obs, [data]);
                         }
                     });
                     this.grid_table_dl.onMoveRows(async ()=>{

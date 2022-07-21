@@ -95,25 +95,24 @@
     </div>
 
     <script>
+        /* globals riot */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const { toTimeString } = window.TimeFormat;
+        const main_obs = riot.obs;
 
         export default {
             state:{
                 items:[]
             },
-            obs:null,
             item_duration:300,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-
+            onBeforeMount() {
                 this.getTime = (item) => {
                     const time = item.time?item.time:0;
                     return toTimeString(time);
                 };
 
-                this.obs.on("play-stack-page:add-items", async (args) => {
+                main_obs.on("play-stack-page:add-items", async (args) => {
                     const { items } = args;
 
                     this.addItems(items);

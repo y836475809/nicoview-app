@@ -196,11 +196,13 @@
     </div>
 
     <script>
-        /* globals my_obs logger ModalDialog */
+        /* globals riot logger ModalDialog */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         const createItem = (value, saved, reg_download) => {
             return {
@@ -239,18 +241,16 @@
             },
             sort_items:searchItems.sortItems,
             search_target_items:searchItems.searchTargetItems,
-            obs:null,
             obs_modal_dialog:null,
             pagination_obs:null,
             nico_search_params:null,
             nico_search:null,
             grid_table:null,
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_modal_dialog = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_modal_dialog = new MyObservable();
                 this.modal_dialog = null;
 
-                this.pagination_obs = my_obs.createObs();
+                this.pagination_obs = new MyObservable();
 
                 const search_limit = 32;
                 const search_context = myapi.getUserAgent();
@@ -320,7 +320,7 @@
                     this.grid_table.updateCells(video_id, { saved:false });
                 });
 
-                this.obs.on("search-page:item-dlbclicked", async (item) => {
+                main_obs.on("search-page:item-dlbclicked", async (item) => {
                     const cond = item;
                     const elm = this.getSearchInputElm();
                     elm.value = cond.query;
@@ -335,7 +335,7 @@
                     await this.search();
                 });
 
-                this.obs.on("search-page:search-tag", async (args)=> {
+                main_obs.on("search-page:search-tag", async (args)=> {
                     const { query, search_target } = args;
                     const elm = this.getSearchInputElm();
                     elm.value = query;
@@ -347,7 +347,7 @@
                     await this.search();
                 });
 
-                this.obs.on("search-page:search", async (args)=> {
+                main_obs.on("search-page:search", async (args)=> {
                     const { query, sort_order, sort_name, search_target, page } = args;
                     const elm = this.getSearchInputElm();
                     elm.value = query;
@@ -363,14 +363,14 @@
                     await this.search();
                 });
 
-                this.obs.on("search-page:forward-page", () => {
+                main_obs.on("search-page:forward-page", () => {
                     if(!this.canSearch()){
                         return;
                     }
                     this.pagination_obs.trigger("forward");
                 });
 
-                this.obs.on("search-page:back-page", () => {
+                main_obs.on("search-page:back-page", () => {
                     if(!this.canSearch()){
                         return;
                     }
@@ -398,13 +398,13 @@
                         Command.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(main_obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(main_obs, [data]);
                     }
                     if(cmd_id == "download"){
-                        Command.addDownloadItems(this.obs, [data]);
+                        Command.addDownloadItems(main_obs, [data]);
                     }
                 });
                 this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
@@ -623,7 +623,7 @@
                     page: 1
                 };
                 
-                this.obs.trigger("search-page:sidebar:add-item", cond);
+                main_obs.trigger("search-page:sidebar:add-item", cond);
             }
         };
     </script>

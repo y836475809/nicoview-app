@@ -21,17 +21,17 @@
     </div>
 
     <script>
-        /* globals my_obs */
+        /* globals riot */
         const myapi = window.myapi;
         const { searchItems } = window.NicoSearch;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         export default {
-            obs:null,
             obs_listview:null,
             name:"nico-search",
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_listview = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_listview = new MyObservable();
                 
                 this.geticon = (item) => {
                     const search_target = item.cond.search_target;
@@ -69,17 +69,17 @@
                 });
 
                 this.obs_listview.on("item-dlbclicked", (item) => {
-                    this.obs.trigger("search-page:item-dlbclicked", item.cond);
+                    main_obs.trigger("search-page:item-dlbclicked", item.cond);
                 });
 
-                this.obs.on("search-page:sidebar:add-item", (cond) => {
+                main_obs.on("search-page:sidebar:add-item", (cond) => {
                     const items = [
                         { title: cond.query, type:cond.search_target , cond: cond }
                     ];
                     this.obs_listview.trigger("addList", { items });
                 });
 
-                this.obs.on("search-page:sidebar:reload-items", async () => {
+                main_obs.on("search-page:sidebar:reload-items", async () => {
                     await this.loadItems();
                 });
             },

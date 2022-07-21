@@ -62,7 +62,9 @@
     <div class="label center-hv">ヒット件数: {state.search_result_num.toLocaleString()}</div>
 
     <script>
-        /* globals my_obs */
+        /* globals */
+        const { MyObservable } = window.MyObservable;
+
         export default {
             state:{
                 page_num:1,
@@ -73,7 +75,7 @@
             obs_page_selector:null,
             onBeforeMount(props) {
                 this.pagination_obs = props.obs;
-                this.obs_page_selector = my_obs.createObs();
+                this.obs_page_selector = new MyObservable();
 
                 this.pagination_obs.on("set-page-num", (args) => {
                     const { page_num } = args;

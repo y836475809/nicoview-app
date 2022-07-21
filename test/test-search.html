@@ -12,16 +12,16 @@
 </head>
 
 <body>
-    <search-page></search-page>
+    <sidebar-page page_name="search"></sidebar-page>
 </body>
 
 <script type="riot" src="../app/pages/common/listview.tag"></script>
 <script type="riot" src="../app/pages/common/modal-dialog.tag"></script>
+<script type="riot" src="../app/pages/common/sidebar-page.tag"></script>
 <script type="riot" src="../app/pages/search-page/search-page-selector.tag"></script>
 <script type="riot" src="../app/pages/search-page/pagination.tag"></script>
 <script type="riot" src="../app/pages/search-page/search-sidebar.tag"></script>
 <script type="riot" src="../app/pages/search-page/search-content.tag"></script>
-<script type="riot" src="../app/pages/search-page/search-page.tag"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
 <script>
     /* globals riot */
@@ -33,7 +33,7 @@
 
     (async function main() {
         await riot.compile();
-        riot.mount("search-page");
+        riot.mount("sidebar-page");
     }());
 </script>
 

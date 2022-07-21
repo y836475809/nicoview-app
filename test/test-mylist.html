@@ -13,14 +13,14 @@
 </head>
 
 <body>
-    <mylist-page></mylist-page>
+    <sidebar-page page_name="mylist"></sidebar-page>
 </body>
 
 <script type="riot" src="../app/pages/common/modal-dialog.tag"></script>
 <script type="riot" src="../app/pages/common/listview.tag"></script>
+<script type="riot" src="../app/pages/common/sidebar-page.tag"></script>
 <script type="riot" src="../app/pages/mylist-page/mylist-sidebar.tag"></script>
 <script type="riot" src="../app/pages/mylist-page/mylist-content.tag"></script>
-<script type="riot" src="../app/pages/mylist-page/mylist-page.tag"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
 <script>
     /* globals riot */
@@ -32,7 +32,7 @@
 
     (async function main() {
         await riot.compile();
-        riot.mount("mylist-page");
+        riot.mount("sidebar-page");
     }());
 </script>
 

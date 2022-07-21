@@ -159,12 +159,12 @@
             </div>
         </div>
         <div class="page-container left">
-            <library-page></library-page>
-            <search-page></search-page>
-            <mylist-page></mylist-page>
-            <download-page></download-page>
-            <history-page></history-page>
-            <setting-page></setting-page>
+            <sidebar-page id="library-page" page_name="library"></sidebar-page>
+            <sidebar-page id="search-page" page_name="search"></sidebar-page>
+            <sidebar-page id="mylist-page" page_name="mylist"></sidebar-page>
+            <download-page id="download-page"></download-page>
+            <history-page id="history-page"></history-page>
+            <setting-page id="setting-page"></setting-page>
         </div>
         <div class="page-container right">
             <div class="bookmark-page dialog-shadow">
@@ -317,7 +317,7 @@
                     (elm) => {
                         elm.style.zIndex = 0;
                     });
-                const page = this.$(`${page_name}-page`);
+                const page = this.$(`#${page_name}-page`);
                 page.style.zIndex = 1;
 
                 this.changeClass(

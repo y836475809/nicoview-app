@@ -26,12 +26,13 @@
     /* globals riot */
     var { logger } = window.logger; // eslint-disable-line
     var { ModalDialog } = window.ModalDialog; // eslint-disable-line
-    var my_obs = window.MyObservable; // eslint-disable-line
+    const { MyObservable } = window.MyObservable;
+
+    riot.obs = new MyObservable();
 
     (async function main() {
         await riot.compile();
-        const obs = my_obs.createObs();
-        riot.mount("mylist-page", { obs });
+        riot.mount("mylist-page");
     }());
 </script>
 

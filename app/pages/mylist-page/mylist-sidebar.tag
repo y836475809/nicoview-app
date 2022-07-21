@@ -18,18 +18,18 @@
     </div>
 
     <script>
-        /* globals my_obs */
+        /* globals riot */
         const myapi = window.myapi;
+        const { MyObservable } = window.MyObservable;
+        const main_obs = riot.obs;
 
         export default {
-            obs:null,
             obs_listview:null,
             name:"mylist",
             items:[],
             confirm:["delete"],
-            onBeforeMount(props) {
-                this.obs = props.obs; 
-                this.obs_listview = my_obs.createObs();
+            onBeforeMount() {
+                this.obs_listview = new MyObservable();
 
                 this.getTooltip = (item) => {
                     const { title, creator } = item;
@@ -49,14 +49,14 @@
                 });
 
                 this.obs_listview.on("item-dlbclicked", (item) => {
-                    this.obs.trigger("mylist-page:item-dlbclicked", item);
+                    main_obs.trigger("mylist-page:item-dlbclicked", item);
                 });
                 
                 this.obs_listview.on("items-deleted", (args) => {
-                    this.obs.trigger("mylist-page:items-deleted", args);
+                    main_obs.trigger("mylist-page:items-deleted", args);
                 });
 
-                this.obs.on("mylist-page:sidebar:add-item", (args) => {
+                main_obs.on("mylist-page:sidebar:add-item", (args) => {
                     const { title, mylist_id, creator } = args;
                     const items = [
                         { title, mylist_id, creator }
@@ -64,11 +64,11 @@
                     this.obs_listview.trigger("addList", { items });
                 });
 
-                this.obs.onReturn("mylist-page:sidebar:get-items", () => {
+                main_obs.onReturn("mylist-page:sidebar:get-items", () => {
                     return {items:this.items};
                 });
 
-                this.obs.on("mylist-page:sidebar:select-item", (args) => {
+                main_obs.on("mylist-page:sidebar:select-item", (args) => {
                     const { mylist_id } = args;
                     const index = this.items.findIndex(item => {
                         return item.mylist_id == mylist_id;
@@ -81,7 +81,7 @@
                     this.obs_listview.trigger("select-item-by-index", { index });
                 });
 
-                this.obs.on("mylist-page:sidebar:reload-items", async () => {
+                main_obs.on("mylist-page:sidebar:reload-items", async () => {
                     await this.loadItems();
                 });
             },

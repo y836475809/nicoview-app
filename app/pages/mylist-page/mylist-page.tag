@@ -1,21 +1,11 @@
-
-
 <mylist-page>
     <div class="split-page">
         <div class="left">
-            <mylist-sidebar obs={obs}></mylist-sidebar>
+            <mylist-sidebar></mylist-sidebar>
         </div>
         <div class="gutter"></div>
         <div class="right">
-            <mylist-content obs={obs}></mylist-content>
+            <mylist-content></mylist-content>
         </div>
-    </div>    
-    <script>
-        export default {
-            obs:null,
-            onBeforeMount(props) {
-                this.obs = props.obs;
-            }
-        };
-    </script>
+    </div>
 </mylist-page>

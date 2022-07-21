@@ -91,13 +91,16 @@
     </div>
 
     <script>
-        /* globals my_obs logger ModalDialog */
+        /* globals logger ModalDialog riot */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
         const { progressDailog } = window.ModalDialogUtil;
+        const { MyObservable } = window.MyObservable;
+
+        const main_obs = riot.obs;
 
         const getMylistID = (tag) => {
             const elm = tag.$(".mylist-input");
@@ -107,12 +110,11 @@
             const elm = tag.$(".mylist-input");
             elm.value = id;
         };
-        
+
         export default {
             state:{
                 mylist_description:""
             },
-            obs:null,
             obs_modal_dialog:null,
             modal_dialog:null,
             nico_mylist_image_cache:null,
@@ -121,9 +123,8 @@
             loaded_mylist_id:null,
             grid_table:null,
             is_current_fav:false,
-            onBeforeMount(props) {  
-                this.obs = props.obs; 
-                this.obs_modal_dialog = my_obs.createObs();
+            onBeforeMount() {  
+                this.obs_modal_dialog = new MyObservable();
 
                 myapi.ipc.Download.onUpdateItem(async ()=>{
                     const video_ids = await myapi.ipc.Download.getIncompleteIDs();
@@ -149,7 +150,7 @@
                     this.grid_table.updateCells(video_id, { saved:false });
                 });
 
-                this.obs.on("mylist-page:item-dlbclicked", async (item) => {
+                main_obs.on("mylist-page:item-dlbclicked", async (item) => {
                     const mylist_id = item.mylist_id;
                     if(this.loaded_mylist_id == mylist_id){
                         await this.updateMylist();
@@ -168,7 +169,7 @@
                     }
                 });
 
-                this.obs.on("mylist-page:load-mylist", async(mylist_id)=> {
+                main_obs.on("mylist-page:load-mylist", async(mylist_id)=> {
                     setMylistID(this, mylist_id);
                     try {
                         if(await this.existMylist(mylist_id)){
@@ -176,7 +177,7 @@
                         }else{
                             await this.getMylist(mylist_id);
                         }
-                        this.obs.trigger("mylist-page:sidebar:select-item", { mylist_id });
+                        main_obs.trigger("mylist-page:sidebar:select-item", { mylist_id });
                     } catch (error) {
                         if(!error.cancel){
                             logger.error(error);
@@ -188,7 +189,7 @@
                     }   
                 });
 
-                this.obs.on("mylist-page:items-deleted", async (args)=> {
+                main_obs.on("mylist-page:items-deleted", async (args)=> {
                     const { items } = args;
                     items.forEach(item => {
                         const mylist_id = item.mylist_id;
@@ -262,7 +263,7 @@
                         if(!ret){
                             return;
                         }
-                        this.obs.trigger("library-page:convert-video", video_id);
+                        main_obs.trigger("library-page:convert-video", video_id);
                     }else{
                         Command.play(data, false);
                     }
@@ -272,13 +273,13 @@
                         await this.play(data, false);
                     }
                     if(cmd_id == "stack"){
-                        Command.addStackItems(this.obs, [data]);
+                        Command.addStackItems(main_obs, [data]);
                     }
                     if(cmd_id == "bookmark"){
-                        Command.addBookmarkItems(this.obs, [data]);
+                        Command.addBookmarkItems(main_obs, [data]);
                     }
                     if(cmd_id == "download"){
-                        Command.addDownloadItems(this.obs, [data]);
+                        Command.addDownloadItems(main_obs, [data]);
                     }
                 });
                 
@@ -296,7 +297,7 @@
                         return;
                     }
                     if(menu_id=="convert-video"){
-                        this.obs.trigger("library-page:convert-video", video_id); 
+                        main_obs.trigger("library-page:convert-video", video_id); 
                     }
                 });   
 
@@ -305,7 +306,7 @@
                 });
             },
             async getMylistIDList() {
-                const { items } = await this.obs.triggerReturn("mylist-page:sidebar:get-items");
+                const { items } = await main_obs.triggerReturn("mylist-page:sidebar:get-items");
                 const mylist_id_list = items.map(item => {
                     return item.mylist_id;
                 });
@@ -326,7 +327,7 @@
                     if(!ret){
                         return;
                     }
-                    this.obs.trigger("library-page:convert-video", video_id);
+                    main_obs.trigger("library-page:convert-video", video_id);
                 }else{
                     Command.play(item, online);
                 }
@@ -356,7 +357,7 @@
                 }else{
                     this.is_current_fav = false;
                 }
-                this.obs.trigger("mylist-page:sidebar:select-item", { mylist_id: mylist.mylist_id });
+                main_obs.trigger("mylist-page:sidebar:select-item", { mylist_id: mylist.mylist_id });
                 this.update();
 
                 this.setData(mylist);
@@ -403,7 +404,7 @@
                     mylist_id: mylist_id,
                     creator: mylist.creator
                 };
-                this.obs.trigger("mylist-page:sidebar:add-item", item);
+                main_obs.trigger("mylist-page:sidebar:add-item", item);
                 this.nico_mylist_store.save(mylist_id, this.nico_mylist.xml);
             },
             cacheImage(mylist_id) {

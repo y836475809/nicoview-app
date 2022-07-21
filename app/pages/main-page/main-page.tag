@@ -159,19 +159,19 @@
             </div>
         </div>
         <div class="page-container left">
-            <library-page obs={obs}></library-page>
-            <search-page obs={obs}></search-page>
-            <mylist-page obs={obs}></mylist-page>
-            <download-page obs={obs}></download-page>
-            <history-page obs={obs}></history-page>
-            <setting-page obs={obs}></setting-page>
+            <library-page></library-page>
+            <search-page></search-page>
+            <mylist-page></mylist-page>
+            <download-page></download-page>
+            <history-page></history-page>
+            <setting-page></setting-page>
         </div>
         <div class="page-container right">
             <div class="bookmark-page dialog-shadow">
-                <bookmark-page obs={obs}></bookmark-page>
+                <bookmark-page></bookmark-page>
             </div>
             <div class="play-stack-page dialog-shadow">
-                <play-stack-page obs={obs}></play-stack-page>
+                <play-stack-page></play-stack-page>
             </div>
         </div>
         <div class="main-sidebar right">

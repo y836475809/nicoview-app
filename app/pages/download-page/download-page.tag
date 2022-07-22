@@ -60,7 +60,7 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const EventEmitter = window.EventEmitter;
         const myapi = window.myapi;
         const { NicoDownloader } = window.NicoDownloader;
@@ -68,6 +68,7 @@
         const { Command } = window.Command;
         const { ScheduledTask } = window.ScheduledTask;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
         const main_obs = riot.obs;
 
         export default {

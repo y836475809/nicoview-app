@@ -91,7 +91,7 @@
     </div>
 
     <script>
-        /* globals logger riot */
+        /* globals riot */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
@@ -100,6 +100,7 @@
         const { ModalDialog } = window.ModalDialog;
         const { progressDailog } = window.ModalDialogUtil;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
 
         const main_obs = riot.obs;
 

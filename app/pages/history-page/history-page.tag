@@ -18,10 +18,11 @@
     </div>    
 
     <script>
-        /* globals riot logger */
+        /* globals riot  */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
+        const { logger } = window.logger;
         const main_obs = riot.obs;
 
         export default {

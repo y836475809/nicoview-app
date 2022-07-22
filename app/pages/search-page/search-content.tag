@@ -196,13 +196,14 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
         const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
         const main_obs = riot.obs;
 
         const createItem = (value, saved, reg_download) => {

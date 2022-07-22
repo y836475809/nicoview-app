@@ -155,7 +155,7 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoVideoData } = window.NicoVideoData;
@@ -165,6 +165,7 @@
         const { JsonDataConverter } = window.NicoDataConverter;
         const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
         const main_obs = riot.obs;
 
         const wait = async (msec) => {

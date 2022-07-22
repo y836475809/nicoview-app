@@ -25,9 +25,10 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { CommentTimeLine, NicoScript } = window.CommentTimeLine;
+        const { logger } = window.logger;
         const player_obs = riot.obs;
 
         export default {

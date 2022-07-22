@@ -166,11 +166,12 @@
     </div>
     
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const  myapi = window.myapi;
         const { GridTable } = window.GridTable;
         const time_format = window.TimeFormat;
         const { SyncCommentScroll } = window.SyncCommentScroll;
+        const { logger } = window.logger;
         const player_obs = riot.obs;
 
         export default {

@@ -36,7 +36,7 @@
     <player-setting-dialog></player-setting-dialog>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
@@ -45,6 +45,7 @@
         const { NicoVideoData } = window.NicoVideoData;
         const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
         const player_obs = riot.obs;
 
         const play_msg_map = new Map([

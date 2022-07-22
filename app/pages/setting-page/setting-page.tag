@@ -168,13 +168,14 @@
     </div>
 
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { ImportFile } = window.ImportFile;
         const { ImportNNDDSetting } = window.ImportNNDDSetting;
         const { MouseGesture } = window.MouseGesture;
         const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
+        const { logger } = window.logger;
         const main_obs = riot.obs;
 
         const setInputValue = (tag, selector, value) => {          

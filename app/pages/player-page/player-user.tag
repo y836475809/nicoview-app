@@ -121,11 +121,12 @@
     </div>
     
     <script>
-        /* globals riot logger */
+        /* globals riot */
         const myapi = window.myapi;
         const { Command } = window.Command;
         const NicoURL = window.NicoURL;
         const { toTimeSec } = window.TimeFormat;
+        const { logger } = window.logger;
         const player_obs = riot.obs;
 
         const getBase64 = (img) => {

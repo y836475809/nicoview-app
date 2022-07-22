@@ -155,7 +155,7 @@
     </div>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter } = window.GridTable;
         const { NicoVideoData } = window.NicoVideoData;
@@ -163,6 +163,7 @@
         const { NicoUpdate } = window.NicoUpdate;
         const { ConvertMP4, needConvertVideo } = window.VideoConverter;
         const { JsonDataConverter } = window.NicoDataConverter;
+        const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
         const main_obs = riot.obs;
 

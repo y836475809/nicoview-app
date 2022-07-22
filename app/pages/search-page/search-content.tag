@@ -196,11 +196,12 @@
     </div>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoSearchParams, NicoSearch, searchItems } = window.NicoSearch;
+        const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
         const main_obs = riot.obs;
 

@@ -91,12 +91,13 @@
     </div>
 
     <script>
-        /* globals logger ModalDialog riot */
+        /* globals logger riot */
         const myapi = window.myapi;
         const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = window.GridTable;
         const { Command } = window.Command;
         const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = window.NicoMylist;
         const { needConvertVideo } = window.VideoConverter;
+        const { ModalDialog } = window.ModalDialog;
         const { progressDailog } = window.ModalDialogUtil;
         const { MyObservable } = window.MyObservable;
 

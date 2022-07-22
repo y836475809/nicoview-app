@@ -36,13 +36,14 @@
     <player-setting-dialog></player-setting-dialog>
 
     <script>
-        /* globals riot logger ModalDialog */
+        /* globals riot logger */
         const myapi = window.myapi;
         const { NicoPlay } = window.NicoPlay;
         const { NicoUpdate } = window.NicoUpdate;
         const { CommentFilter } = window.CommentFilter;
         const { toTimeSec } = window.TimeFormat;
         const { NicoVideoData } = window.NicoVideoData;
+        const { ModalDialog } = window.ModalDialog;
         const { MyObservable } = window.MyObservable;
         const player_obs = riot.obs;
 

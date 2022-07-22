@@ -4,7 +4,6 @@ process.once("loaded", () => {
     global.EventEmitter = require("events");
     global.logger = require(`${root_dir}/app/js/logger`);
     global.myapi = require(`${root_dir}/app/js/my-api`);
-    global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
     global.MyObservable = require(`${root_dir}/app/js/my-observable`);
 });
 
@@ -42,4 +41,5 @@ window.addEventListener("load", () => {
     global.CommentFilter = require(`${root_dir}/app/js/comment-filter`);
     global.SyncCommentScroll = require(`${root_dir}/app/js/sync-comment-scroll`);
     global.Command = require(`${root_dir}/app/js/command`);
+    global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
 });

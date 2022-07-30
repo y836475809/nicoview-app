@@ -11,23 +11,13 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e; // eslint-disable-line no-unused-vars
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.error(msg);
-
-    try {
-        await global.RendererDailog.showMessageBox("error", msg);
-    } catch (error) {
-        alert(msg);
-    }
+    global.logger.logger.error(msg);
+    alert(msg);
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.error(e.reason);
-   
-    try {
-        await global.RendererDailog.showMessageBox("error", e.reason.message);
-    } catch (error) {
-        alert(e.reason.message);
-    }
+    global.logger.logger.error(e.reason);
+    alert(e.reason.message);
 } );
 
 window.addEventListener("load", () => {

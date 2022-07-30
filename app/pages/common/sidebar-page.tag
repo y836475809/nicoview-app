@@ -1,6 +1,34 @@
 <sidebar-page>
+    <style>
+        .split-page {
+            width: 100%;
+            height: 100%;
+            --left-width: 300px;
+            display: flex;
+        }
+        .split-page > .gutter {    
+            width: 4px;
+            border-left: 1px solid var(--control-border-color);
+            background-color: var(--control-color);
+        } 
+        .split-page > .left{
+            background-color: var(--control-color);
+            width: var(--left-width);
+            overflow: auto;
+        }
+        .split-page > .left > * > div {
+            width: calc(100%  - 5px);
+            height: 100%;
+        }
+        .split-page > .right{
+            background-color: var(--control-color);
+            width: calc(100%);
+            height: 100%;
+            overflow-y: hidden;
+        }
+    </style>
     <div class="split-page">
-        <div class="left">
+        <div class="left {listview_name}">
             <library-sidebar if={is_library} search_targets={search_targets}>
             </library-sidebar>
             <search-sidebar if={is_search}></search-sidebar>
@@ -16,6 +44,8 @@
     <script>
         export default {
             onBeforeMount(prop) {
+                this.listview_name = `listview-${prop.page_name}`;
+                
                 /** @type {string} */
                 const page_name = prop.page_name;
                 this.is_library = page_name=="library";

@@ -14,7 +14,7 @@
         "html"
     ],
     "settings": {
-        "html/html-extensions": [".html", ".tag"]
+        "html/html-extensions": [".html", ".riot"]
     },
     "rules": {
         "indent": [

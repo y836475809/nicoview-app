@@ -1,13 +1,13 @@
 .split-page > .left.listview-library  {
-    --left-width: 100px !important;
+    --left-width: 300px !important;
 }
 
 .split-page > .left.listview-search {
-    --left-width: 200px !important;
+    --left-width: 300px !important;
 }
 
 .split-page > .left.listview-mylist {
-    --left-width: 500px !important;
+    --left-width: 300px !important;
 }
 
 bookmark-page {

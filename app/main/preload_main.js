@@ -51,4 +51,23 @@ window.addEventListener("load", () => {
     global.MouseGesture = require(`${root_dir}/app/js/mouse-gesture`);
     global.ModalDialog = require(`${root_dir}/app/js/modal-dialog`);
     global.ModalDialogUtil = require(`${root_dir}/app/js/modal-dialog-util`);
+
+    global.RiotJS = {
+        Listview : require("../pages/common/listview.riot.js"),
+        ModalDialog : require("../pages/common/modal-dialog.riot.js"),
+        SettingPage : require("../pages/setting-page/setting-page.riot.js"),
+        HistoryPage : require("../pages/history-page/history-page.riot.js"),
+        DownloadPage : require("../pages/download-page/download-page.riot.js"),
+        SettingDlSch : require("../pages/download-page/setting-download-schedule.riot.js"),
+        MyListSidebar : require("../pages/mylist-page/mylist-sidebar.riot.js"),
+        MyListContent : require("../pages/mylist-page/mylist-content.riot.js"),
+        SearchSidebar : require("../pages/search-page/search-sidebar.riot.js"),
+        PagingNation : require("../pages/search-page/pagination.riot.js"),
+        SearchContent : require("../pages/search-page/search-content.riot.js"),
+        LibraryContent : require("../pages/library-page/library-content.riot.js"),
+        LibrarySidebar : require("../pages/library-page/library-sidebar.riot.js"),
+        BookmarkPage : require("../pages/main-page/bookmark-page.riot.js"),
+        PlayStackPage : require("../pages/main-page/play-stack-page.riot.js"),
+        MainPage : require("../pages/main-page/main-page.riot.js")
+    };
 });

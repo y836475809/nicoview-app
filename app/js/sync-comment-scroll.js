@@ -1,4 +1,8 @@
 class SyncCommentScroll {
+    /**
+     * 
+     * @param {[]} comments 
+     */
     setComments(comments){
         this.comments = comments;
         this.reset();
@@ -9,6 +13,11 @@ class SyncCommentScroll {
         this.comment_index = 0;
     }
     
+    /**
+     * 
+     * @param {number} current_sec 
+     * @returns {number}
+     */
     getCommentIndex(current_sec){
         if(!this.comments){
             return 0;

@@ -4,6 +4,8 @@ const cheerio = require("cheerio");
 /**
  * 
  * @param {string} xml 
+ * @param {boolean} is_owner 
+ * @returns {(CommentThreadData[]|CommentItem[])[]}
  */
 const xml_comment = (xml, is_owner) => {
     let $ = cheerio.load(xml);
@@ -174,6 +176,11 @@ const json_thumb_info = (nico_api) => {
     };
 };
 
+/**
+ * 
+ * @param {string} json_str 
+ * @returns {(CommentThreadData[]|CommentItem[])[]}
+ */
 const json_comment = (json_str) => {
     const json_data = JSON.parse(json_str);
     
@@ -190,6 +197,11 @@ const json_comment = (json_str) => {
     return threads.concat(chats);
 };
 
+/**
+ * 
+ * @param {(CommentThreadData[]|CommentItem[])[]} comment_data 
+ * @returns {CommentItem[]}
+ */
 const makeComments = (comment_data) => {
     const comments = comment_data.filter(value => {
         return Object.prototype.hasOwnProperty.call(value, "chat") 

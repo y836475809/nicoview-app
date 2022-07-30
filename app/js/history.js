@@ -1,10 +1,17 @@
 
 class History {
     setup(history_max){
+        /** @type {number} */
         this.history_max = history_max;
+
+        /** @type {HistoryItem[]} */
         this.history_items = [];
     }
 
+    /**
+     * 
+     * @param {HistoryItem[]} items 
+     */
     setData(items){
         this.history_items = items; //TODO need copy?
         this.history_items.sort((a, b) => {
@@ -14,11 +21,15 @@ class History {
         });
     }  
 
+    /**
+     * 
+     * @returns {HistoryItem[]}
+     */
     getData(){
         return this.history_items;
     }
     
-    add(new_item){
+    add(new_item){     
         const index = this.history_items.findIndex(item => item.id === new_item.id);
         if(index === -1){
             if(this.history_items.length >= this.history_max){

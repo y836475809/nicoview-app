@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+      "target": "es2020",
+      "baseUrl": "./",
+      "paths": {
+        "@js/*": ["app/js/*"]
+      }
+    },
+    "exclude": [ 
+      "node_modules", 
+      "data", 
+      "build", 
+      "tmp" 
+    ]
+  }
+  

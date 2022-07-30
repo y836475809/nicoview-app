@@ -79,6 +79,7 @@
     <script>
         export default {
             state:{
+                /** @type {{num:number, class_name:string}[]} */
                 items:[]
             },
             obs:null,

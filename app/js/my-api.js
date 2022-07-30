@@ -6,6 +6,12 @@ const getUserAgent = () => {
     return process.env["user_agent"];
 };
 
+/**
+ * 
+ * @param {string} name 
+ * @param {*} data 
+ * @returns {Promise<string>}
+ */
 const popupContextMenu = async (name, data) => {
     const channel = `app:popup-contextmenu-${name}`;
     return await ipcRenderer.invoke(channel, data);            
@@ -17,6 +23,13 @@ const onLoadContent = (func) => {
     });
 };
 
+
+/**
+ * 
+ * @param {function({
+ *      video_id:string, online:boolean, time:number, video_item:LibraryData}
+ * ):void} func 
+ */
 const onPlayVideo = (func) => {  
     ipcRenderer.on("app:play-video", (event, args)=>{
         func(args);
@@ -47,6 +60,11 @@ const Config = {
 };
 
 const Dialog = {
+    /**
+     * 
+     * @param {*} param0 
+     * @returns {Promise<boolean>} true:ok false:cancel
+     */
     showMessageBox: async ({type="info", message="", okcancel=false}={}) => {
         return await ipcRenderer.invoke("app:show-message-box", {
             type: type,
@@ -54,9 +72,18 @@ const Dialog = {
             okcancel: okcancel
         });  
     },
+    /**
+     * @async
+     * @returns {Promise.<string>}
+     */
     showSelectFolderDialog: async () => {
         return await ipcRenderer.invoke("app:show-select-folder-dialog");  
     },
+    /**
+     * @async
+     * @param {{name:string, exts:string, multi_select:boolean}} param0 
+     * @returns {Promise.<string[]>}
+     */
     showSelectFileDialog: async ({name="All", exts=["*"], multi_select=false}) => {
         return await ipcRenderer.invoke("app:show-select-file-dialog", {
             name, exts, multi_select
@@ -65,12 +92,25 @@ const Dialog = {
 };
 
 const Download = {
+    /**
+     * 
+     * @returns {string[]}
+     */
     getIncompleteIDs: async () => {  
         return await ipcRenderer.invoke("download:getIncompleteIDs");
     },
+    /**
+     * 
+     * @returns {Promise<DownloadItem[]>}
+     */
     getItems: async () => {  
         return await ipcRenderer.invoke("download:getItems");
     },
+    /**
+     * 
+     * @param {DownloadItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateItems: async (items) => {  
         return await ipcRenderer.invoke("download:updateItems", {items});
     },
@@ -102,15 +142,32 @@ const NGList = {
 };
 
 const MyList = {
+    /**
+     * 
+     * @returns {Promise<string>}
+     */
     getMyListDir: async () => {
         return path.join(await Config.get("data_dir", ""), "mylist");
     },
+    /**
+     * 
+     * @returns {Promise<MyListListItem[]>}
+     */
     getItems: async ()=> {
         return await ipcRenderer.invoke("mylist:getItems");
     },
+    /**
+     * 
+     * @param {MyListListItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateItems: async (items) => {  
         return await ipcRenderer.invoke("mylist:updateItems", {items});
     },
+    /**
+     * 
+     * @param {string} mylist_id 
+     */
     load: (mylist_id)=>{
         ipcRenderer.send("app:load-mylist", mylist_id);
     },
@@ -126,6 +183,10 @@ const PlayHistory = {
     addItem: (item)=>{
         ipcRenderer.send("history:addItem", {item});
     },
+    /**
+     * 
+     * @returns {HistoryItem[]}
+     */
     getItems: async ()=>{
         return await ipcRenderer.invoke("history:getItems");
     },
@@ -162,6 +223,10 @@ const Setting = {
             throw new Error(`NNDDのシステムパス "${system_dir}" が見つからない\n${error.message}`);
         }  
     },
+    /**
+     * 
+     * @param {function({level:string})} func 
+     */
     onChangeLogLevel: (func) => {  
         ipcRenderer.on("setting:on-change-log-level", (event, args)=>{
             func(args);
@@ -170,16 +235,33 @@ const Setting = {
 };
 
 const Stack = {
+    /**
+     * 
+     * @returns {Promise<StackItem[]>}
+     */
     getItems: async ()=>{
         return await ipcRenderer.invoke("stack:getItems");
     },
+    /**
+     * 
+     * @param {StackItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateItems: async (items) => {  
         return await ipcRenderer.invoke("stack:updateItems", {items});
     },
+    /**
+     * 
+     * @param {StackItem[]} items 
+     */
     addItems: (items)=>{
         ipcRenderer.send("app:add-stack-items", {items});
     },
 
+    /**
+     * 
+     * @param {function({items:StackItem[]})} func 
+     */
     onAddItems: (func)=>{
         ipcRenderer.on("app:add-stack-items", (event, args)=>{
             func(args);
@@ -188,16 +270,33 @@ const Stack = {
 };
 
 const Bookmark = {
+    /**
+     * 
+     * @param {BookmarkItem[]} items 
+     */
     addItems: (items)=>{
         ipcRenderer.send("app:add-bookmarks", items);
     },
+    /**
+     * 
+     * @returns {Promise<BookmarkItem[]>}
+     */
     getItems: async ()=>{
         return await ipcRenderer.invoke("bookmark:getItems");
     },
+    /**
+     * 
+     * @param {BookmarkListItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateItems: async (items) => {  
         return await ipcRenderer.invoke("bookmark:updateItems", {items});
     },
 
+    /**
+     * 
+     * @param {function(BookmarkItem):void} func 
+     */
     onAddItems: (func) => {
         ipcRenderer.on("app:add-bookmarks", (event, args)=>{
             func(args);
@@ -206,9 +305,18 @@ const Bookmark = {
 };
 
 const Search = {
+    /**
+     * 
+     * @returns {SearchListItem[]}
+     */
     getItems: async ()=>{
         return await ipcRenderer.invoke("nico-search:getItems");
     },
+    /**
+     * 
+     * @param {SearchListItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateItems: async (items) => {  
         return await ipcRenderer.invoke("nico-search:updateItems", {items});
     },
@@ -227,15 +335,35 @@ const Library = {
     load: async () => {
         return await ipcRenderer.invoke("library:load");
     },
+    /**
+     * 
+     * @param {string} video_id 
+     * @returns {Promise<LibraryData>}
+     */
     getItem: async (video_id)=>{
         return await ipcRenderer.invoke("library:getItem", {video_id});
     },
+    /**
+     * 
+     * @param {LibraryData} item 
+     * @returns {Promise<void>}
+     */
     addItem: async (item) => {  
         return await ipcRenderer.invoke("library:addItem", {item});
     },
+    /**
+     * 
+     * @param {string} video_id 
+     * @returns {Promise<void>}
+     */
     deleteItem: async (video_id) => {  
         return await ipcRenderer.invoke("library:deleteItem", {video_id});
     },
+    /**
+     * 
+     * @param {string} video_id 
+     * @returns {Promise<boolean>} true:has
+     */
     hasItem: async (video_id) => {  
         return await ipcRenderer.invoke("library:has", {video_id});
     },
@@ -248,29 +376,54 @@ const Library = {
         return await ipcRenderer.invoke("library:addDownloadItem", {download_item});
     },
 
+    /**
+     * 
+     * @returns {LibrarySearchItem[]}
+     */
     getSearchItems: async () => {
         return await ipcRenderer.invoke("library-search:getItems");
     },
     
+    /**
+     * 
+     * @param {LibrarySearchItem[]} items 
+     * @returns {Promise<void>}
+     */
     updateSearchItems: async (items) => {  
         return await ipcRenderer.invoke("library-search:updateItems", {items});
     },
 
+    /**
+     * 
+     * @param {function({items:LibraryData[]})} func 
+     */
     onInit: (func) => {
         ipcRenderer.on("library:on-init", (event, args)=>{
             func(args);
         });
     },
+    /**
+     * 
+     * @param {function({video_item:LibraryData}):void} func 
+     */
     onAddItem: (func) => {
         ipcRenderer.on("library:on-add-item", (event, args)=>{
             func(args);
         });
     },
+    /**
+     * 
+     * @param {function({video_id:string}):void} func 
+     */
     onDeleteItem: (func) => {
         ipcRenderer.on("library:on-delete-item", (event, args)=>{
             func(args);
         });
     },
+    /**
+     * 
+     * @param {function({video_id:string, props:{}}):void} func 
+     */
     onUpdateItem: (func) => {
         ipcRenderer.on("library:on-update-item", (event, args)=>{
             func(args);
@@ -279,6 +432,11 @@ const Library = {
 };
 
 const UserIconCache = {
+    /**
+     * 
+     * @param {string} img_url 
+     * @returns {string}
+     */
     get: async (img_url) => {
         return await ipcRenderer.invoke("user-icon:get", { img_url });
     },

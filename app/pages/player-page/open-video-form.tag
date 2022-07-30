@@ -49,63 +49,6 @@
     </div>
 
     <script>
-        /* globals */
-        const { Command } = window.Command;
-        const NICO_URL = window.NicoURL;
-
-        const formVisible = (tag, visible) => {
-            const elm = tag.$(".open-form");
-            elm.style.display = visible===true?"":"none";
-        };
-        const isURL = (value) => {
-            return value.startsWith(`${NICO_URL.VIDEO}/watch/`);
-        };
-        const getVideoID = (value) => {
-            if(isURL(value)){
-                return value.split("/").pop();
-            }else{
-                return value;
-            }
-        };
-        const playByVideoID = (tag) => {
-            const elm = tag.$(".open-form input");
-            const video_id = getVideoID(elm.value);
-            if(!video_id) {
-                return;
-            }
-            const online = false; // ローカル再生を優先
-            Command.play({
-                id: video_id,
-                time: 0
-            }, online);
-        };
-
-        export default {
-            onBeforeMount(props) {
-                props.obs.on("show", () => {
-                    formVisible(this, true);
-                    const elm = this.$(".open-form input");
-                    elm.value = "";
-                    elm.focus();
-                });
-            },
-            onMounted() {
-                formVisible(this, false);
-            },
-            stopProp(e) {
-                e.stopPropagation();
-            },
-            onkeydownPlay(e) {
-                if(e.code == "Enter"){
-                    playByVideoID(this,);
-                }
-            },
-            onclickPlay(e) { // eslint-disable-line no-unused-vars
-                playByVideoID(this);
-            },
-            onclickClose(e) { // eslint-disable-line no-unused-vars
-                formVisible(this, false);
-            }
-        };
+        export default window.RiotJS.OpenVideoForm;
     </script>    
 </open-video-form>  

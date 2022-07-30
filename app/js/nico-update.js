@@ -9,7 +9,7 @@ const { deepCopy } = require("./deepcopy");
 class NicoUpdate {
     /**
      * 
-     * @param {Object} video_item 
+     * @param {LibraryData} video_item 
      */
     constructor(video_item){
         if(video_item){
@@ -20,7 +20,10 @@ class NicoUpdate {
         this.nico_comment = null;
         this.nico_thumbnail = null;
     }
-
+    /**
+     * 
+     * @param {LibraryData} video_item 
+     */
     setVideoItem(video_item){
         this.video_item = video_item;
         this.org_video_item = deepCopy(video_item);

@@ -208,6 +208,11 @@ class NicoMylistImageCache {
         }
     }
 
+    /**
+     * 
+     * @param {string} mylist_id 
+     * @param {HTMLImageElement} img 
+     */
     setImage(mylist_id, img){
         this.loadCache(mylist_id);
 

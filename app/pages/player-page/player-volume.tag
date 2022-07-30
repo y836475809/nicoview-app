@@ -30,43 +30,6 @@
     </div>
 
     <script>
-        /* globals riot */
-        const myapi = window.myapi;
-        const player_obs = riot.obs;
-
-        export default {
-            onBeforeMount() {
-            },
-            async onMounted() {
-                let picker = this.$("div.picker");
-                let slider = this.$("div.slider");   
-                const volume = await myapi.ipc.Config.get("player.volume", 0.5);
-                picker.style.left = volume * slider.clientWidth - 5 + "px";
-
-            },
-            picker_mousedown(e) {
-                let picker = this.$("div.picker");
-                const left = parseInt(picker.style.left) + e.layerX;
-                this.updateVolume(left);
-
-                e.stopPropagation();
-            },
-            slider_mousedown(e) {
-                const left = e.layerX;
-                this.updateVolume(left);
-            },
-            updateVolume(pos) {
-                let picker = this.$("div.picker");
-                picker.style.left = (pos - 5) + "px";
-
-                let slider = this.$("div.slider");
-                const volume = pos / slider.clientWidth;
-
-                // TODO check
-                myapi.ipc.Config.set("player.volume", volume).then();
-
-                player_obs.trigger("player-video:volume-changed", volume); 
-            }
-        };
+        export default window.RiotJS.PlayerVolume;
     </script>
 </player-volume>

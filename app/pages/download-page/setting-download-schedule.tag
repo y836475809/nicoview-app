@@ -51,66 +51,6 @@
     </div>
 
     <script> 
-        export default {
-            obs:null,
-            hours:[],
-            minutes:[],
-            onBeforeMount(props) {
-                this.obs =  props.obs;
-                
-                for (let index = 0; index < 24; index++) {
-                    this.hours.push(index);
-                }
-                for (let index = 0; index < 60; index++) {
-                    this.minutes.push(index);
-                }
-
-                this.obs.on("set-params", (args)=>{
-                    const { date, enable } = args;
-                    const { h_elm, m_elm, ck_elm } = this.getParamElms();
-                                
-                    h_elm.options[date.hour].selected = true;
-                    m_elm.options[date.minute].selected = true;
-                    ck_elm.checked = enable;
-
-                    this.changeEnable(enable);
-                });
-            },
-            getParamElms() {
-                const h_elm = this.$(".hour-select");
-                const m_elm = this.$(".minute-select");
-                const ck_elm = this.$(".schedule-enable-check");
-                return { h_elm, m_elm, ck_elm };
-            },
-            changeEnable(enable) {
-                const { h_elm, m_elm } = this.getParamElms();
-
-                h_elm.disabled = !enable;
-                m_elm.disabled = !enable;
-
-                const label_elms = this.$$(".label");
-                label_elms.forEach(elm => {
-                    if(enable){
-                        elm.classList.remove("disabled");
-                    }else{
-                        elm.classList.add("disabled");
-                    }   
-                });
-            },
-            onChangeParams(e) { // eslint-disable-line no-unused-vars
-                const { h_elm, m_elm, ck_elm } = this.getParamElms();
-
-                const hour = parseInt(h_elm.value);
-                const minute = parseInt(m_elm.value);
-                const enable = ck_elm.checked;
-
-                this.changeEnable(enable);
-
-                this.obs.trigger("change-params", { 
-                    date: { hour: hour, minute: minute },
-                    enable: enable
-                });
-            }
-        };
+        export default window.RiotJS.SettingDlSch;
     </script>
 </setting-download-schedule>

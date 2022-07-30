@@ -93,24 +93,6 @@
     </dialog>
 
     <script>
-        /* globals riot */
-        const player_obs = riot.obs;
-
-        export default {
-            onBeforeMount() {
-                player_obs.on("player-setting-dialog:show", (args) => {
-                    const { ng_items } = args;
-
-                    const dialog = this.$("dialog");
-                    dialog.showModal();
-
-                    player_obs.trigger("setting-ng-comment:ng-items", ng_items);
-                });
-            },
-            onclickClose(e) { // eslint-disable-line no-unused-vars
-                const dialog = this.$("dialog");
-                dialog.close();
-            }
-        };
+        export default window.RiotJS.PlayerSettingDialog;
     </script>
 </player-setting-dialog>

@@ -1,15 +1,26 @@
 
 class NGComment {
     constructor(){
+        /** @type {string[]} */
         this._ng_texts = [];
+        /** @type {string[]} */
         this._ng_user_ids = [];
     }
 
+    /**
+     * 
+     * @param {string[]} ng_texts 
+     * @param {string[]} ng_user_ids 
+     */
     setNGComments(ng_texts, ng_user_ids){
         this._ng_texts = ng_texts;
         this._ng_user_ids = ng_user_ids;
     }
 
+    /**
+     * 
+     * @returns {NGItems}
+     */
     getNGComments(){
         return {
             ng_texts: this._ng_texts,
@@ -17,6 +28,11 @@ class NGComment {
         };
     }
 
+    /**
+     * 
+     * @param {CommentItem[]} comments 
+     * @returns {CommentItem[]}
+     */
     getComments(comments){
         return comments.filter(comment=>{
             const has_ng_text = this._ng_texts.includes(comment.content);
@@ -31,6 +47,10 @@ class NGComment {
         });
     }
 
+    /**
+     * 
+     * @param {string[]} texts 
+     */
     addNGTexts(texts){
         texts.forEach(text => {
             if(!this._ng_texts.includes(text)){
@@ -39,6 +59,10 @@ class NGComment {
         });
     }
 
+    /**
+     * 
+     * @param {string[]} user_ids 
+     */
     addNGUserIDs(user_ids){
         user_ids.forEach(user_id => {
             if(!this._ng_user_ids.includes(user_id)){
@@ -47,18 +71,30 @@ class NGComment {
         });
     }
 
+    /**
+     * 
+     * @param {string[]} texts 
+     */
     deleteNGTexts(texts){
         this._ng_texts = this._ng_texts.filter(text => {
             return !texts.includes(text);
         });
     }
 
+    /**
+     * 
+     * @param {string[]} user_ids 
+     */
     deleteNGUserIDs(user_ids){
         this._ng_user_ids = this._ng_user_ids.filter(user_id => {
             return !user_ids.includes(user_id);
         });
     }
 
+    /**
+     * 
+     * @returns {NGItems}
+     */
     getNGItems(){
         return {
             ng_texts: this._ng_texts, 
@@ -89,6 +125,12 @@ class CommentNumLimit {
         this.num_per_min = num_per_min;
     }
 
+    /**
+     * 
+     * @param {CommentItem[]} comments 
+     * @param {number} play_time_sec 
+     * @returns {CommentItem[]} 
+     */
     getComments(comments, play_time_sec){
         if(comments.length === 0){
             return [];
@@ -109,7 +151,11 @@ class CommentNumLimit {
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
+     * @returns {
+     *      owner_comments:CommentItem[], 
+     *      user_comments:CommentItem[]
+     * }
      */
     _splitByUserID(comments){
         const owner_comments = [];
@@ -128,7 +174,7 @@ class CommentNumLimit {
     /**
      * コメントをvposで昇順ソート
      * vposが同じの場合、noで昇順ソート
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
      */
     _sortByVPos(comments){
         comments.sort((a, b) => {
@@ -143,7 +189,7 @@ class CommentNumLimit {
 
     /**
      * コメントを最新の投稿日順にソート
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
      */
     _sortDescByPostDate(comments){
         comments.sort((a, b) => {
@@ -180,7 +226,7 @@ class CommentNumLimit {
     /**
      * commentsをnumで分割して返す
      * (動画の長さによるコメントと残りのコメントに分割する)
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
      * @param {Number} num 動画の長さによるコメント数
      */
     _split(comments, num){
@@ -194,7 +240,7 @@ class CommentNumLimit {
 
     /**
      * コメントをvposで動画時間の１分毎に分割して返す
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
      * @param {Number} play_time_sec 
      */
     _splitParMinute(comments, play_time_sec){
@@ -221,7 +267,7 @@ class CommentNumLimit {
 
     /**
      * 
-     * @param {Array<Array>} comments_list 
+     * @param {Array<CommentItem[]>} comments_list 
      * @param {Number} num 
      */
     _getNumEach(comments_list, num){
@@ -239,14 +285,27 @@ class CommentFilter {
         this._do_limit = true;
     }
 
+    /**
+     * 
+     * @param {CommentItem[]} commnets 
+     */
     setComments(commnets){
         this._comments =  JSON.parse(JSON.stringify(commnets));
     }
 
+    /**
+     * 
+     * @param {boolean} do_limit 
+     */
     setLimit(do_limit){
         this._do_limit = do_limit;
     }
 
+    /**
+     * 
+     * @param {string[]} ng_texts 
+     * @param {string[]} ng_user_ids 
+     */
     setNGComments(ng_texts, ng_user_ids){
         this.ng_comment.setNGComments(ng_texts, ng_user_ids);
     }
@@ -255,6 +314,10 @@ class CommentFilter {
         return this.ng_comment.getNGComments();
     }
 
+    /**
+     * 
+     * @param {number} play_time_sec 
+     */
     setPlayTime(play_time_sec){
         this._play_time_sec = play_time_sec;
     }

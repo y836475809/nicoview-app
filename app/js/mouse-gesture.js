@@ -66,25 +66,48 @@ class MouseGesture {
         this._config = value;
     }
 
+    /**
+     * 
+     * @param {string} gesture 
+     * @param {string} action 
+     */
     setGesture(gesture, action) {  
         this._config[action] = gesture;
     }
 
+    /**
+     * 
+     * @param {string} action 
+     */
     setActionSearchBackPage(action) {
         const action_name = this._action_names.search_back_page;
         this._action_map[action_name] = action;
     }
 
+    /**
+     * 
+     * @param {string} action 
+     */
     setActionSearchFowardPage(action) {
         const action_name = this._action_names.search_forward_page;
         this._action_map[action_name] = action;
     }
 
+    /**
+     * 
+     * @param {string} action 
+     */
     setActionShowPalyer(action) {
         const action_name = this._action_names.all_show_player;
         this._action_map[action_name] = action;
     }
 
+    /**
+     * 
+     * @param {string} page 
+     * @param {string} gesture 
+     * @returns {boolean}
+     */
     action(page, gesture) {
         for (const [action_name, config_gesture] of Object.entries(this._config)) {
             if(action_name.startsWith(page)) {
@@ -100,10 +123,18 @@ class MouseGesture {
         return false;
     }
 
+    /**
+     * 
+     * @param {string} on_gesture 
+     */
     onGesture(on_gesture) {
         this._on_gesture = on_gesture;
     }
 
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
     mouseDown(e) {
         this._mouseDown(e.button, {
             x: e.pageX,
@@ -111,6 +142,10 @@ class MouseGesture {
         });
     }
 
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
     mouseUp(e) {
         this._mouseUp({
             x: e.pageX,
@@ -123,6 +158,11 @@ class MouseGesture {
         this._start_pos = null;
     }
 
+    /**
+     * 
+     * @param {number} button 
+     * @param {{x:number, y:number}} pos 
+     */
     _mouseDown(button, pos) {
         if (button === 2) {
             this._gutter = true;
@@ -132,6 +172,10 @@ class MouseGesture {
         }
     }
 
+    /**
+     * 
+     * @param {{x:number, y:number}} pos 
+     */
     _mouseUp(pos) {
         if (this._gutter && this._start_pos) {
             let dir_x = this._start_pos.x - pos.x;

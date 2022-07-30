@@ -12,6 +12,10 @@ class Logger {
         }
     }
 
+    /**
+     * 
+     * @param {string} level 
+     */
     setLevel(level){
         if(level=="debug"){
             log.transports.console.level = "debug";
@@ -22,6 +26,10 @@ class Logger {
         }
     }
 
+    /**
+     * 
+     * @returns {string}
+     */
     getPath(){
         return log.transports.file.getFile().path;
     }

@@ -27,6 +27,11 @@ const getURLKind = (url) => {
     throw new Error(`unknown kind url=${url}`);
 };
 
+/**
+ * 
+ * @param {string} url 
+ * @returns {string}
+ */
 const getMylistID = (url) => {
     const kind = getURLKind(url);
     if(kind=="mylist"){

@@ -16,6 +16,7 @@
     <script>
         export default {
             onBeforeMount(prop) {
+                /** @type {string} */
                 const page_name = prop.page_name;
                 this.is_library = page_name=="library";
                 this.is_search = page_name=="search";

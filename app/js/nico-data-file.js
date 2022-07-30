@@ -3,19 +3,23 @@ const fs = require("fs");
 const NicoDataParser = require("./nico-data-parser");
 
 class NicoDataFile {
+    /**
+     * 
+     * @param {string} id 
+     */
     constructor(id){
         this.id = id;
     }
 
-    set commonFilename(name){
+    set commonFilename(/** @type {string} */ name){
         this.common_filename = `${this._cnvFilename(name)} - [${this.id}]`;
     }
 
-    set dirPath(dir_path){
+    set dirPath(/** @type {string} */ dir_path){
         this.dir_path = dir_path;
     }
     
-    set thumbnailSize(thumbnail_size){
+    set thumbnailSize(/** @type {string} */ thumbnail_size){
         this.thumbnail_size = thumbnail_size;
     }
     
@@ -31,7 +35,7 @@ class NicoDataFile {
         return this.video_type;
     }
 
-    set videoType(video_type){
+    set videoType(/** @type {string} */ video_type){
         this.video_type = video_type;
     }
 
@@ -51,6 +55,11 @@ class NicoDataFile {
         return `${this.common_filename}.${this.video_type}`;
     }
 
+    /**
+     * 
+     * @param {string} name 
+     * @returns 
+     */
     _cnvFilename(name){
         // \/:?*"<>|
         return name
@@ -90,13 +99,17 @@ class NicoXMLFile extends NicoDataFile {
 
     /**
      * 
-     * @returns {Array} comments 
+     * @returns {CommentItem[]} comments 
      */
     getComments() {
         const comment_data = this.getCommentData();
         return NicoDataParser.makeComments(comment_data);
     }
 
+    /**
+     * 
+     * @returns {(CommentThreadData[]|CommentItem[])[]}
+     */
     getCommentData(){
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
@@ -105,6 +118,10 @@ class NicoXMLFile extends NicoDataFile {
         return owner_comment_data.concat(user_comment_data);
     }
 
+    /**
+     * 
+     * @returns {ThumbInfo}
+     */
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const xml = fs.readFileSync(file_path, "utf-8");
@@ -159,16 +176,28 @@ class NicoJsonFile extends NicoDataFile {
         }
     }
 
+    /**
+     * 
+     * @returns {CommentItem[]}
+     */
     getComments() {
         const comment_data = this.getCommentData();
         return NicoDataParser.makeComments(comment_data);
     }
 
+    /**
+     * 
+     * @returns {(CommentThreadData[]|CommentItem[])[]}
+     */
     getCommentData(){
         const text = fs.readFileSync(this.commentPath, "utf-8");
         return NicoDataParser.json_comment(text);
     }
 
+    /**
+     * 
+     * @returns {ThumbInfo}
+     */
     getThumbInfo() {
         const file_path = this.thumbInfoPath;
         const text = fs.readFileSync(file_path, "utf-8");
@@ -178,11 +207,22 @@ class NicoJsonFile extends NicoDataFile {
 }
 
 class NicoVideoData {
+    /**
+     * 
+     * @param {LibraryData} video_item 
+     */
     constructor(video_item){
+        /** @type {NicoDataFile} */
         this.nico_data = this._getData(video_item);
     }
 
+    /**
+     * 
+     * @param {LibraryData} video_item 
+     * @returns {NicoDataFile}
+     */
     _getData(video_item){
+        /** @type {NicoDataFile} */
         let nico_data = null;
 
         const data_type = video_item.data_type;
@@ -215,10 +255,18 @@ class NicoVideoData {
         return this.nico_data.thumbImgPath;
     }
 
+    /**
+     * 
+     * @returns {CommentItem[]}
+     */
     getComments() {
         return this.nico_data.getComments();
     }
 
+    /**
+     * 
+     * @returns  {(CommentThreadData[]|CommentItem[])[]}
+     */
     getCommentData() {
         return this.nico_data.getCommentData();
     }
@@ -227,6 +275,10 @@ class NicoVideoData {
         return this.nico_data.thumbInfoPath;
     }
 
+    /**
+     * 
+     * @returns {ThumbInfo}
+     */
     getThumbInfo() {
         const thumb_info = this.nico_data.getThumbInfo();
         const thumb_img_path = this.getThumbImgPath();
@@ -235,10 +287,18 @@ class NicoVideoData {
         return thumb_info;
     }
 
+    /**
+     * 
+     * @returns {boolean} true:削除済み
+     */
     getIsDeleted() {
         return this.nico_data.is_deleted;
     }
 
+    /**
+     * 
+     * @returns {boolean} true:エコノミー
+     */
     getIsEconomy() {
         return this.nico_data.is_economy;
     }

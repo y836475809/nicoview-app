@@ -91,6 +91,10 @@ class NicoSearchParams {
         };
     }
 
+    /**
+     * 
+     * @param {string} name 
+     */
     api(name){
         this._api = name;
     }
@@ -99,10 +103,18 @@ class NicoSearchParams {
         return this._api;
     }
 
+    /**
+     * 
+     * @param {string} name 
+     */
     service(name){
         this._service = name;
     }
 
+    /**
+     * 
+     * @param {string} query 
+     */
     query(query){
         this._query = query;
         this._resetParams();
@@ -112,6 +124,10 @@ class NicoSearchParams {
         return this._query.length === 0;
     }
 
+    /**
+     * 
+     * @param {string} kind 
+     */
     target(kind){
         this._search_target = kind;
         if(kind=="keyword"){
@@ -125,14 +141,27 @@ class NicoSearchParams {
         }
     }
 
+    /**
+     * 
+     * @param {number} num 
+     */
     page(num){
         this._page = num;
     }
     
+    /**
+     * 
+     * @param {string} name 
+     */
     sortName(name){
         this._sort_name = name;
         this._resetParams();
     }
+
+    /**
+     * 
+     * @param {string} order 
+     */
     sortOder(order){
         this._sort_order = order;
         this._resetParams();
@@ -179,7 +208,10 @@ class NicoSearchParams {
 
 class NicoSearch {
     constructor() { 
+        /** @type {NicoClientRequest} */
         this._req = null;
+
+        /** @type {{}} */
         this._cookie_html = null;
     }
 
@@ -189,6 +221,11 @@ class NicoSearch {
         }
     }
 
+    /**
+     * 
+     * @param {NicoSearchParams} params 
+     * @returns {SearchResult}
+     */
     async search(params){   
         const service = params._service;
         const page = params._page;

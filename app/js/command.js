@@ -5,6 +5,11 @@ const isMainProcess = () => {
     return process.type == "browser";
 };
 
+/**
+ * 
+ * @param {string} channel 
+ * @param {*} args 
+ */
 const send = (channel, args) => {
     const win = BrowserWindow.getAllWindows().find(bw=>{
         return bw._tag == "main";
@@ -13,6 +18,11 @@ const send = (channel, args) => {
 };
 
 class Command {
+    /**
+     * 
+     * @param {{id:string, time:number}} item 
+     * @param {boolean} online 
+     */
     static play(item, online) {
         const video_item = {
             video_id : item.id,
@@ -27,6 +37,11 @@ class Command {
         }  
     }
 
+    /**
+     * 
+     * @param {MyObservable} obs 
+     * @param {{id:string, title:string, thumb_img:string}[]} items 
+     */
     static addStackItems(obs, items) {
         const stack_items = items.map(item => {
             return {
@@ -43,6 +58,11 @@ class Command {
         }
     }
 
+    /**
+     * 
+     * @param {MyObservable} obs 
+     * @param {{id:string, title:string}[]} items 
+     */
     static addBookmarkItems(obs, items) {
         const bk_items = items.map(item => {
             return {
@@ -59,6 +79,11 @@ class Command {
         } 
     }
 
+    /**
+     * 
+     * @param {MyObservable} obs 
+     * @param {{id:string, title:string, thumb_img:string}[]} items 
+     */
     static addDownloadItems(obs, items) {
         if(isMainProcess()){
             send("app:add-download-items", items);
@@ -67,6 +92,11 @@ class Command {
         } 
     }
 
+    /**
+     * 
+     * @param {MyObservable} obs 
+     * @param {{id:string}[]} items 
+     */
     static deleteDownloadItems(obs, items) {
         const video_ids = items.map(value => {
             return value.id;
@@ -79,6 +109,10 @@ class Command {
         }
     }
 
+    /**
+     * 
+     * @param {string} mylist_id 
+     */
     static loadMylist(mylist_id) {
         if(isMainProcess()){
             send("app:load-mylist", mylist_id);

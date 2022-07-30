@@ -17,62 +17,6 @@
     </div>
 
     <script>
-        /* globals riot */
-        const myapi = window.myapi;
-        const { MyObservable } = window.MyObservable;
-        const main_obs = riot.obs;
-
-        export default {
-            obs_listview:null,
-            name:"library-search",
-            onBeforeMount() {
-                this.obs_listview = new MyObservable();
-
-                const target_map = new Map();
-                this.props.search_targets.forEach(target=>{
-                    target_map.set(target.id, target.title);
-                });
-
-                this.gettooltip = (item) => {
-                    const target_ids = item.target_ids;
-                    if(!target_ids){
-                        return item.title;
-                    }
-                    const target_titles = target_ids.map(target_id=>{
-                        if(target_map.has(target_id)){
-                            return target_map.get(target_id);
-                        }else{
-                            return `${target_id}に対応する項目がない`;
-                        }
-                    });
-                    return `${item.title}\n検索対象:${target_titles.join(", ")}`;
-                };
-                this.geticon = (item) => {
-                    const target_ids = item.target_ids;
-                    if(target_ids){
-                        return "fas fa-filter";
-                    }
-                    return null;
-                };
-
-                this.obs_listview.on("changed", async (args) => {
-                    const { items } = args;
-                    await myapi.ipc.Library.updateSearchItems(items);
-                });
-
-                main_obs.on("library-page:sidebar:add-search-item", (args) => {
-                    const { item } = args;
-                    this.obs_listview.trigger("addList", { items:[item] });
-                });
-
-                this.obs_listview.on("item-dlbclicked", (item) => {
-                    main_obs.trigger("library-page:search-item-dlbclicked", item);
-                });
-            },
-            async onMounted() {
-                const items = await myapi.ipc.Library.getSearchItems();
-                this.obs_listview.trigger("loadData", { items });
-            }
-        };
+        export default window.RiotJS.LibrarySidebar;
     </script>
 </library-sidebar>

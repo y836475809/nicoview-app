@@ -6,6 +6,13 @@ process.once("loaded", () => {
     global.myapi = require(`${root_dir}/app/js/my-api`);
     global.CommentTimeLine = require(`${root_dir}/app/js/comment-timeline`);
     global.MyObservable = require(`${root_dir}/app/js/my-observable`);
+
+    if(process.env["test_nicoappview"] ?? false){
+        global.logger.logger.debug("test_nicoappview");
+        
+        global.TestComments = require("../../test/test-comments");
+        global.TestTag = require("../../test/test-tag");
+    }
 });
 
 window.addEventListener( "error", async e => {

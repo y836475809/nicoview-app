@@ -18,10 +18,6 @@
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
 <script>
     /* globals riot */
-    const { MyObservable } = window.MyObservable;
-
-    riot.obs = new MyObservable();
-
     (async function main() {
         await riot.compile();
         riot.mount("setting-page");

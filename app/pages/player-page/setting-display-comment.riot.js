@@ -1,8 +1,8 @@
-/* globals riot */
 const  myapi = require("../../js/my-api");
+const { window_obs } = require("../../js/my-observable");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 const default_params = {
     duration_sec: 4,

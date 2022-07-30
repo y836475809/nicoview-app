@@ -38,11 +38,12 @@ class MyObservable {
     }
 }
 
-const createObs = () => {
-    return new MyObservable();
-};
+if(!global._nicoviewapp_window_obs){
+    global._nicoviewapp_window_obs = new MyObservable();
+}
+const window_obs = global._nicoviewapp_window_obs;
 
 module.exports = {
     MyObservable,
-    createObs
+    window_obs
 };

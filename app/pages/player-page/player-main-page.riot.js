@@ -1,4 +1,3 @@
-/* globals riot */
 const  myapi = require("../../js/my-api");
 const { NicoPlay } = require("../../js/nico-play");
 const { NicoUpdate } = require("../../js/nico-update");
@@ -6,11 +5,11 @@ const { CommentFilter } = require("../../js/comment-filter");
 const { toTimeSec } = require("../../js/time-format");
 const { NicoVideoData } = require("../../js/nico-data-file");
 const { ModalDialog } = require("../../js/modal-dialog");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 const play_msg_map = new Map([
     ["startWatch", "watch取得開始"],

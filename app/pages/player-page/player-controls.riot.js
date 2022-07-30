@@ -1,7 +1,7 @@
-/* globals riot */
+const { window_obs } = require("../../js/my-observable");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 const  button_class_map = new Map([
     ["play", "fas fa-play"],

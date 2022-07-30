@@ -48,9 +48,6 @@
     <script>
         /* globals riot */
         const myapi = window.myapi;
-        const { MyObservable } = window.MyObservable;
-        
-        riot.obs = new MyObservable();
 
         myapi.ipc.Config.set("download.wait_time", 10).then();
 

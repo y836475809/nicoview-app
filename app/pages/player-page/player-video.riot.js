@@ -1,10 +1,10 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { CommentTimeLine, NicoScript } = require("../../js/comment-timeline");
+const { window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 module.exports = {
     /** @type {HTMLVideoElement} */

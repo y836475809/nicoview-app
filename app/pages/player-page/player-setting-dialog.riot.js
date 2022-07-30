@@ -1,7 +1,7 @@
-/* globals riot */
+const { window_obs } = require("../../js/my-observable");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 module.exports = {
     onBeforeMount() {

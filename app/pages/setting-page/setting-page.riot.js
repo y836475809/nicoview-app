@@ -1,14 +1,13 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { ImportFile } = require("../../js/import-file");
 const { ImportNNDDSetting } = require("../../js/import-nndd-setting");
 const { MouseGesture } = require("../../js/mouse-gesture");
 const { ModalDialog } = require("../../js/modal-dialog");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 /**
  * 

@@ -1,9 +1,8 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 module.exports = {
     /** @type {MyObservable} */

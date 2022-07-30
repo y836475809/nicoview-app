@@ -1,10 +1,10 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { Command } = require("../../js/command");
 const { toTimeString } = require("../../js/time-format");
+const { window_obs } = require("../../js/my-observable");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 module.exports = {
     state:{

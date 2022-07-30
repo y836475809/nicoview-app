@@ -1,15 +1,14 @@
-/* globals riot */
 const EventEmitter = require("events");
 const myapi = require("../../js/my-api");
 const { NicoDownloader } = require("../../js/nico-downloader");
 const { GridTableDownloadItem, DownloadState } = require("../../js/gridtable-downloaditem");
 const { Command } = require("../../js/command");
 const { ScheduledTask } = require("../../js/scheduled-task");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 module.exports = {
     state:{

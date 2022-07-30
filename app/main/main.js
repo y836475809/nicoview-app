@@ -60,6 +60,8 @@ if(app.commandLine.getSwitchValue("test")){
         const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
         setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
     }
+
+    process.env["test_nicoappview"] = true;
 }
 
 process.on("uncaughtException", (error) => {

@@ -1,14 +1,13 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = require("../../js/gridtable");
 const { Command } = require("../../js/command");
 const { NicoSearchParams, NicoSearch, searchItems } = require("../../js/nico-search");
 const { ModalDialog } = require("../../js/modal-dialog");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 /**
  * 検索ページのグリッドテーブルに追加するアイテムを生成

@@ -1,12 +1,12 @@
-/* globals riot */
 const  myapi = require("../../js/my-api");
 const { GridTable } = require("../../js/gridtable");
 const time_format = require("../../js/time-format");
 const { SyncCommentScroll } = require("../../js/sync-comment-scroll");
+const { window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const player_obs = riot.obs;
+const player_obs = window_obs;
 
 module.exports = {
     state:{

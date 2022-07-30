@@ -1,4 +1,3 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { GridTable, wrapFormatter, buttonFormatter } = require("../../js/gridtable");
 const { NicoVideoData } = require("../../js/nico-data-file");
@@ -7,11 +6,11 @@ const { NicoUpdate } = require("../../js/nico-update");
 const { ConvertMP4, needConvertVideo } = require("../../js/video-converter");
 const { JsonDataConverter } = require("../../js/nico-data-converter");
 const { ModalDialog } = require("../../js/modal-dialog");
-const { MyObservable } = require("../../js/my-observable");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 /**
  * 

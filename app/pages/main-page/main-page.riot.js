@@ -1,10 +1,10 @@
-/* globals riot */
 const myapi = require("../../js/my-api");
 const { MouseGesture } = require("../../js/mouse-gesture");
+const { window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
-const main_obs = riot.obs;
+const main_obs = window_obs;
 
 module.exports = {
     state:{

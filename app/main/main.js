@@ -45,8 +45,7 @@ let do_app_quit = false;
 
 let main_html_path = path.join(app_dir, "html", "index.html");
 const player_html_path = path.join(app_dir, "html", "player.html");
-const preload_main_path = path.join(app_dir, "main", "preload_main.js");
-const preload_player_path = path.join(app_dir, "main", "preload_player.js");
+const preload_path = path.join(app_dir, "main", "preload.js");
 let config_fiiename = "config.json";
 
 if(app.commandLine.getSwitchValue("test")){
@@ -191,7 +190,7 @@ function createWindow() {
     state.webPreferences =  {
         nodeIntegration: false,
         contextIsolation: false,
-        preload: preload_main_path,
+        preload: preload_path,
         spellcheck: false
     };
     main_win = new BrowserWindow(state);
@@ -258,7 +257,7 @@ function createWindow() {
     });
 
     // アプリケーションのindex.htmlの読み込み
-    main_win.loadURL(main_html_path);
+    main_win.loadURL(`${main_html_path}?window=main`);
 
     if(config.get("open_devtools", false)){
         // DevToolsを開く
@@ -612,7 +611,7 @@ const createPlayerWindow = () => {
         state.webPreferences =  {
             nodeIntegration: false,
             contextIsolation: false,
-            preload: preload_player_path,
+            preload: preload_path,
             spellcheck: false
         };
         player_win = new BrowserWindow(state);
@@ -642,7 +641,7 @@ const createPlayerWindow = () => {
             resolve();
         });
 
-        player_win.loadURL(player_html_path);
+        player_win.loadURL(`${player_html_path}?window=player`);
 
         player_win.on("close", e => { // eslint-disable-line no-unused-vars
             if(player_win){

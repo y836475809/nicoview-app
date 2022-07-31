@@ -7,8 +7,8 @@ const { NicoMockResponse } = require("./nico-mock-response");
 /* eslint-disable no-console */
 
 const options = { 
-    key: fs.readFileSync(path.join(__dirname, "orekey.pem")),
-    cert: fs.readFileSync(path.join(__dirname, "orecert.pem"))
+    key: fs.readFileSync(path.join(__dirname, "cert", "key.pem")),
+    cert: fs.readFileSync(path.join(__dirname, "cert", "cert.pem"))
 };
 
 class NicoMockServer {

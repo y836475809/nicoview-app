@@ -13,3 +13,4 @@ test/data/
 /test/mock_server/data/*.jpeg
 /test/mock_server/data/*.mp4
 /test/mock_server/data/html/*.html
+*.pem

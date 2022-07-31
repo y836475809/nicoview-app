@@ -24,8 +24,7 @@ module.exports = {
     picker_mousedown(e) {
         /** @type {HTMLElement} */
         let picker = this.$("div.picker");
-        /** @deprecated */
-        const x = e.layerX;
+        const x = e.offsetX;
         const left = parseInt(picker.style.left) + x;
         this.updateVolume(left);
 
@@ -36,8 +35,7 @@ module.exports = {
      * @param {MouseEvent} e 
      */
     slider_mousedown(e) {
-        /** @deprecated */
-        const left = e.layerX;
+        const left = e.offsetX;
         this.updateVolume(left);
     },
     /**

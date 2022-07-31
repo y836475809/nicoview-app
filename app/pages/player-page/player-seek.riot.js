@@ -53,7 +53,7 @@ module.exports = {
 
         /** @type {HTMLElement} */
         const seek_container = this.$(".seek-container");
-        const left = e.layerX;
+        const left = e.offsetX;
         const per = left / seek_container.clientWidth;
         const current = per * this.duration;
 
@@ -62,7 +62,7 @@ module.exports = {
         player_obs.trigger("player-video:seek", current);
     },
     mouseOver(e) {
-        const left = e.layerX;
+        const left = e.offsetX;
 
         const seek_container = this.$(".seek-container");
         const rect = seek_container.getBoundingClientRect();

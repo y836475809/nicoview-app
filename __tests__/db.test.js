@@ -9,6 +9,7 @@ class testMapDB extends MapDB {
         super({autonum:2});
         this.test_log = [];
         this.exist_log = exist_log;
+        this.createTable([{name:"path", id:"id"}, {name:"video", id:"id"}]);
     }
 
     async _readFile(file_path){
@@ -83,7 +84,7 @@ test("db non", async t => {
 
 test("db1", async t => {
     const db = new MapDB({use_log:false});
-    db.createTable(["p", "v"]);
+    db.createTable([{name:"p", id:"id"}, {name:"v", id:"id"}]);
 
     const p_list = [
         {id:"1", dirpath: "n1-data1"},

@@ -10,6 +10,7 @@ class MapDB {
         const fullpath = path.resolve(filename);
         this.db_path = fullpath;
         this.log_path = this._getLogFilePath(fullpath);
+        this.id_map = new Map();
         this.db_map = new Map();
         this.cmd_log_count = 0;
     }
@@ -19,16 +20,21 @@ class MapDB {
         const ext = path.extname(db_file_path);
         return path.join(dir, `${path.basename(db_file_path, ext)}.log`);
     }
-
-    createTable(names) {
+    
+    createTable(name_id_pairs) {
+        this.id_map.clear();
         this.db_map.clear();
-        names.forEach(name => {
+
+        name_id_pairs.forEach(name_id_pair => {
+            const { name, id } = name_id_pair;
+            this.id_map.set(name, id);
             this.db_map.set(name, new Map());
         });
     }
 
     setData(name, data_list){
-        this.db_map.set(name, this._convertMap("id", data_list));
+        const id = this.id_map.get(name);
+        this.db_map.set(name, this._convertMap(id, data_list));
     }
 
     async load() {
@@ -37,7 +43,8 @@ class MapDB {
             const obj = JSON.parse(jsonString);
             const r_map = new Map(obj);
             r_map.forEach((value, key) => {
-                this.db_map.set(key, this._convertMap("id", value));
+                const id = this.id_map.get(key);
+                this.db_map.set(key, this._convertMap(id, value));
             });
         }
 
@@ -88,13 +95,17 @@ class MapDB {
     }
 
     async insert(name, data) {
+        const id = this.id_map.get(name);
         const map = this.db_map.get(name);
-        map.set(data.id, data);
+        map.set(data[id], data);
 
+        const value = {};
+        value[id] = id;
+        value["data"] = data;
         await this._log({
             target: name,
             type: "insert",
-            value: { id: data.id, data: data }
+            value: value
         });
     }
 
@@ -102,10 +113,13 @@ class MapDB {
         const map = this.db_map.get(name);
         map.delete(id);  
         
+        const value = {};
+        value[id] = id;
+        value["data"] = {};
         await this._log({
             target: name,
             type: "delete",
-            value: { id: id, data: {} }
+            value: value
         });
     }
 
@@ -118,10 +132,13 @@ class MapDB {
         map.set(id,
             Object.assign(map.get(id), props));
 
+        const value = {};
+        value[id] = id;
+        value["data"] = props;
         await this._log({
             target: name,
             type: "update",
-            value: { id: id, data: props }
+            value: value
         });
     }
 
@@ -227,23 +244,23 @@ class MapDB {
             if (!this.db_map.has(target)) {
                 return;
             }
-
+            const id = this.id_map.get(target);
             const data_map = this.db_map.get(target);
             const value = item.value;
             if (item.type == "insert") {
-                data_map.set(value.id, value.data);
+                data_map.set(value[id], value.data);
             }
 
             if (item.type == "delete") {
-                data_map.delete(value.id);
+                data_map.delete(value[id]);
             }
 
             if (item.type == "update") {
-                if (!data_map.has(value.id)) {
+                if (!data_map.has(value[id])) {
                     return;
                 }
-                data_map.set(value.id,
-                    Object.assign(data_map.get(value.id), value.data));
+                data_map.set(value[id],
+                    Object.assign(data_map.get(value[id]), value.data));
             }
         });
     }
@@ -253,6 +270,9 @@ class LibraryDB {
     constructor({ filename = "./db.json", autonum = 10 } = {}) {
         this.params = { filename: filename, autonum: autonum };
         this._db = this._createDB(this.params);
+
+        this.name_id_paies = [{name:"path",id:"id"}, {name:"video", id:"id"}];
+        this._db.createTable(this.name_id_paies);
     }
 
     _createDB(params) {
@@ -261,7 +281,7 @@ class LibraryDB {
 
     async load() {
         this._db = this._createDB(this.params);
-        this._db.createTable(["path", "video"]);
+        this._db.createTable(this.name_id_paies);
         await this._db.load();
     }
 

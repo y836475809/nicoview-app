@@ -9,7 +9,7 @@ class ImportFile {
         this.video_filepath = video_filepath;
         this.dir = path.dirname(video_filepath);
         this.filename = path.basename(video_filepath);
-        this.id = getIDFromFilename(this.filename);
+        this.video_id = getIDFromFilename(this.filename);
         this.common_filename = getCommonNameFromFilename(this.filename);
     }
     async createLibraryItem(){        
@@ -23,7 +23,7 @@ class ImportFile {
         return {
             data_type:data_type,
             thumbnail_size: thumbnail_size,
-            id: video.video_id, 
+            video_id: video.video_id, 
             dirpath: this.dir,
             title: video.title,
             video_type: video.video_type,
@@ -52,7 +52,7 @@ class ImportFile {
 
     async _getThumbnailSize(){
         const nico_vieo_data = new NicoVideoData({
-            id              : this.id,
+            video_id        : this.video_id,
             data_type       : "json",
             dirpath         : this.dir,
             common_filename : this.common_filename,
@@ -68,7 +68,7 @@ class ImportFile {
 
     async _existThumbInfo(data_type){
         const nico_vieo_data = new NicoVideoData({
-            id              : this.id,
+            video_id        : this.video_id,
             data_type       : data_type,
             dirpath         : this.dir,
             common_filename : this.common_filename,
@@ -79,7 +79,7 @@ class ImportFile {
 
     _getThumbInfo(data_type){
         const nico_video_data = new NicoVideoData({
-            id              : this.id,
+            video_id        : this.video_id,
             data_type       : data_type,
             dirpath         : this.dir,
             common_filename : this.common_filename

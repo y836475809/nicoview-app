@@ -72,7 +72,7 @@ test("createLibraryItem xml", async t => {
     const lib_item = await im_file.createLibraryItem();
     t.is(lib_item.data_type, "xml");
     t.is(lib_item.thumbnail_size, "S");
-    t.is(lib_item.id, "sm100");
+    t.is(lib_item.video_id, "sm100");
     t.is(lib_item.dirpath, dir);
     t.is(lib_item.title, "import test xml");
     t.is(lib_item.video_type, "mp4");
@@ -91,7 +91,7 @@ test("createLibraryItem json", async t => {
     const lib_item = await im_file.createLibraryItem();
     t.is(lib_item.data_type, "json");
     t.is(lib_item.thumbnail_size, "S");
-    t.is(lib_item.id, "sm100");
+    t.is(lib_item.video_id, "sm100");
     t.is(lib_item.dirpath, dir);
     t.is(lib_item.title, "import test json");
     t.is(lib_item.video_type, "mp4");

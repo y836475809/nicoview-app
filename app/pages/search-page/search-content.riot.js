@@ -19,7 +19,7 @@ const main_obs = window_obs;
 const createItem = (value, saved, reg_download) => {
     return {
         thumb_img: value.thumbnailUrl,
-        id: value.contentId,
+        video_id: value.contentId,
         title: value.title,
         info: `ID:${value.contentId}<br>
                 再生:${value.viewCounter.toLocaleString()}<br>
@@ -34,7 +34,7 @@ const createItem = (value, saved, reg_download) => {
 const createEmptyItem = () => {
     return {
         thumb_img: "",
-        id: "",
+        video_id: "",
         title: "",
         info: "",
         play_time: -1,
@@ -114,7 +114,7 @@ module.exports = {
         const options = {
             rowHeight: 100,
         };   
-        this.grid_table = new GridTable("search-grid", columns, options);
+        this.grid_table = new GridTable("search-grid", columns, options, "video_id");
 
         this.pagination_obs.on("move-page", async args => {
             const { page_num } = args;
@@ -128,7 +128,7 @@ module.exports = {
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
-                const video_id = item.id;
+                const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 this.grid_table.dataView.updateItem(video_id, item);    
@@ -137,7 +137,7 @@ module.exports = {
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
-            const video_id = video_item.id;
+            const video_id = video_item.video_id;
             this.grid_table.updateCells(video_id, { saved:true });
         });
 
@@ -219,7 +219,7 @@ module.exports = {
         this.grid_table.init(grid_container);
         this.grid_table.setupResizer(".search-grid-container");
         this.grid_table.onDblClick((e, data)=>{
-            if(data.id){
+            if(data.video_id){
                 Command.play(data, false);
             }
         });
@@ -239,7 +239,7 @@ module.exports = {
         });
         this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
             const items = this.grid_table.getSelectedDatas().filter(value => {
-                return value.id!="";
+                return value.video_id!="";
             });
             if(items.length===0){
                 return;

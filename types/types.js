@@ -163,7 +163,7 @@
  * @property {string} title
  * @property {number} viewCounter
  * @property {number} commentCounter
- * @property {number} contenlengthSecondstId
+ * @property {number} lengthSeconds
  * @property {number} startTime
  * @property {string[]} tags
  */

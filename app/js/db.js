@@ -271,7 +271,7 @@ class LibraryDB {
         this.params = { filename: filename, autonum: autonum };
         this._db = this._createDB(this.params);
 
-        this.name_id_paies = [{name:"path",id:"id"}, {name:"video", id:"id"}];
+        this.name_id_paies = [{name:"path",id:"id"}, {name:"video", id:"video_id"}];
         this._db.createTable(this.name_id_paies);
     }
 

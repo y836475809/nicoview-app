@@ -9,7 +9,7 @@ class testMapDB extends MapDB {
         super({autonum:2});
         this.test_log = [];
         this.exist_log = exist_log;
-        this.createTable([{name:"path", id:"id"}, {name:"video", id:"id"}]);
+        this.createTable([{name:"path", id:"id"}, {name:"video", id:"video_id"}]);
     }
 
     async _readFile(file_path){
@@ -19,7 +19,7 @@ class testMapDB extends MapDB {
                 {"id":"0","dirpath":"c:/data"}
                 ]],
                 ["video", [
-                {"id":"sm1","dirpath_id":"0","tags":["tag1"]}
+                {"video_id":"sm1","dirpath_id":"0","tags":["tag1"]}
                 ]]]`;
             return data;
         }
@@ -27,8 +27,8 @@ class testMapDB extends MapDB {
         if(file_path.match(/db\.log/)){
             return `
             {"target":"path","type":"insert","value":{"id":"1","data":{"id":"1","dirpath":"c:/data1"}}}
-            {"target":"video","type":"insert","value":{"id":"sm2","data":{"id":"sm2","dirpath_id":"1","tags":["tag2"]}}}
-            {"target":"video","type":"update","value":{"id":"sm1","data":{"tags":["tag1","tag2","tag3"]}}}
+            {"target":"video","type":"insert","value":{"video_id":"sm2","data":{"video_id":"sm2","dirpath_id":"1","tags":["tag2"]}}}
+            {"target":"video","type":"update","value":{"video_id":"sm1","data":{"tags":["tag1","tag2","tag3"]}}}
             `;
         }
     }
@@ -134,7 +134,7 @@ test("db delete", async t => {
     const db = new testMapDB();
     await db.load();
 
-    t.deepEqual(db.find("video", "sm1"), {id:"sm1",dirpath_id:"0", tags:["tag1"]});
+    t.deepEqual(db.find("video", "sm1"), {video_id:"sm1",dirpath_id:"0", tags:["tag1"]});
     db.delete("video", "sm1");
     t.is(db.find("video", "sm1"), null);
 });
@@ -195,8 +195,8 @@ test("db4", async t => {
     ]);
 
     t.deepEqual(db.findAll("video"), [
-        {id:"sm1",dirpath_id:"0",tags:["tag1","tag2","tag3"]},
-        {id:"sm2",dirpath_id:"1",tags:["tag2"]},
+        {video_id:"sm1",dirpath_id:"0",tags:["tag1","tag2","tag3"]},
+        {video_id:"sm2",dirpath_id:"1",tags:["tag2"]},
     ]);
 
     t.deepEqual(db.test_log, [
@@ -210,14 +210,14 @@ test("db path", async t => {
     const db = new testLibraryDB();
     await db.load();
 
-    await db.insert("c:/data", {id:"sm2"});
-    t.deepEqual(db.find("sm2"), {id:"sm2",dirpath_id:"0", dirpath:"c:/data"});
+    await db.insert("c:/data", {video_id:"sm2"});
+    t.deepEqual(db.find("sm2"), {video_id:"sm2",dirpath_id:"0", dirpath:"c:/data"});
 
-    await db.insert("c:/data1", {id:"sm3"});
-    t.deepEqual(db.find("sm3"), {id:"sm3",dirpath_id:"1", dirpath:"c:/data1"});
+    await db.insert("c:/data1", {video_id:"sm3"});
+    t.deepEqual(db.find("sm3"), {video_id:"sm3",dirpath_id:"1", dirpath:"c:/data1"});
 
-    await db.insert("c:/data1", {id:"sm4"});
-    t.deepEqual(db.find("sm4"), {id:"sm4",dirpath_id:"1", dirpath:"c:/data1"});
+    await db.insert("c:/data1", {video_id:"sm4"});
+    t.deepEqual(db.find("sm4"), {video_id:"sm4",dirpath_id:"1", dirpath:"c:/data1"});
 });
 
 test("db log", async t => {
@@ -226,8 +226,8 @@ test("db log", async t => {
     await db.load();
 
     t.deepEqual(db.findAll(), [
-        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1","tag2","tag3"]},
-        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
+        {video_id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1","tag2","tag3"]},
+        {video_id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 });
 
@@ -238,12 +238,12 @@ test("db setdata", async t => {
         {id:"1",dirpath:"c:/data1"}
     ]);
     db.setVideoData([
-        {id:"sm1",dirpath_id:"0",tags:["tag1"]},
-        {id:"sm2",dirpath_id:"1",tags:["tag2"]}
+        {video_id:"sm1",dirpath_id:"0",tags:["tag1"]},
+        {video_id:"sm2",dirpath_id:"1",tags:["tag2"]}
     ]);
     t.deepEqual(db.findAll(), [
-        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
-        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
+        {video_id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
+        {video_id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 });
 
@@ -255,12 +255,12 @@ test("db deepcopy", async t => {
         {id:"1",dirpath:"c:/data1"}
     ]);
     db.setVideoData([
-        {id:"sm1",dirpath_id:"0",tags:["tag1"]},
-        {id:"sm2",dirpath_id:"1",tags:["tag2"]}
+        {video_id:"sm1",dirpath_id:"0",tags:["tag1"]},
+        {video_id:"sm2",dirpath_id:"1",tags:["tag2"]}
     ]);
     t.deepEqual(db.findAll(), [
-        {id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
-        {id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
+        {video_id:"sm1", dirpath_id:"0", dirpath:"c:/data", tags:["tag1"]},
+        {video_id:"sm2", dirpath_id:"1", dirpath:"c:/data1", tags:["tag2"]},
     ]);
 
     const path_map = db._db.db_map.get("path");
@@ -268,6 +268,6 @@ test("db deepcopy", async t => {
     t.deepEqual(path_map.get("1"), {id:"1",dirpath:"c:/data1"});
 
     const video_map = db._db.db_map.get("video");
-    t.deepEqual(video_map.get("sm1"), {id:"sm1", dirpath_id:"0", tags:["tag1"]});
-    t.deepEqual(video_map.get("sm2"), {id:"sm2", dirpath_id:"1", tags:["tag2"]});
+    t.deepEqual(video_map.get("sm1"), {video_id:"sm1", dirpath_id:"0", tags:["tag1"]});
+    t.deepEqual(video_map.get("sm2"), {video_id:"sm2", dirpath_id:"1", tags:["tag2"]});
 });

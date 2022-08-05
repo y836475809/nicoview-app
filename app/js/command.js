@@ -25,7 +25,7 @@ class Command {
      */
     static play(item, online) {
         const video_item = {
-            video_id : item.id,
+            video_id : item.video_id,
             time : item.time?item.time:0,
             online: online
         };

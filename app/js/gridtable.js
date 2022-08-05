@@ -42,11 +42,7 @@ const wrapFormatter = (row, cell, value, columnDef, dataContext) => { // eslint-
     return `<div class="wrap-gridtable-cell">${value}</div>`;
 };
 
-const buttonFormatter = (opts, row, cell, value, columnDef, dataContext)=> {
-    if(!dataContext.id){
-        return "";
-    }
-    
+const buttonFormatter = (opts, row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
     const map = new Map();
     map.set("play", {title:"再生", icon:"fas fa-play"});
     map.set("stack", {title:"後で見る", icon:"fas fa-stream"});
@@ -91,8 +87,9 @@ const splitBySpace = (search_string) => {
 };
 
 class GridTable {
-    constructor(name, columns, options){
+    constructor(name, columns, options, obj_id_prop="id"){
         this.name = name;
+        this.obj_id_prop = obj_id_prop;
         // this.id = `#${id}`;
 
         this.columns = columns.map(val => {
@@ -292,7 +289,7 @@ class GridTable {
 
     setData(data){
         this.dataView.beginUpdate();
-        this.dataView.setItems(data);
+        this.dataView.setItems(data, this.obj_id_prop);
         this.dataView.setFilter(this._filter, this.target_column_ids);
         this.dataView.reSort();
         this.dataView.endUpdate();
@@ -310,7 +307,7 @@ class GridTable {
 
     deleteItems(items){
         items.forEach(item => {
-            this.dataView.deleteItem(item.id);
+            this.dataView.deleteItem(item[this.obj_id_prop]);
         });
         this.clearSelected();
         this.grid.invalidate();

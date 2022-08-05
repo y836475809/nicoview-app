@@ -5,14 +5,14 @@ const NicoDataParser = require("./nico-data-parser");
 class NicoDataFile {
     /**
      * 
-     * @param {string} id 
+     * @param {string} video_id 
      */
-    constructor(id){
-        this.id = id;
+    constructor(video_id){
+        this.video_id = video_id;
     }
 
     set commonFilename(/** @type {string} */ name){
-        this.common_filename = `${this._cnvFilename(name)} - [${this.id}]`;
+        this.common_filename = `${this._cnvFilename(name)} - [${this.video_id}]`;
     }
 
     set dirPath(/** @type {string} */ dir_path){
@@ -227,9 +227,9 @@ class NicoVideoData {
 
         const data_type = video_item.data_type;
         if(data_type=="xml"){
-            nico_data = new NicoXMLFile(video_item.id);
+            nico_data = new NicoXMLFile(video_item.video_id);
         } else if(data_type=="json"){
-            nico_data = new NicoJsonFile(video_item.id);
+            nico_data = new NicoJsonFile(video_item.video_id);
         }else{
             throw new Error(`${data_type} is unkown`);
         }
@@ -305,14 +305,14 @@ class NicoVideoData {
 }
 
 const getNicoDataFilePaths = (video_item) => {
-    const xml_item = new NicoXMLFile(video_item.id);
+    const xml_item = new NicoXMLFile(video_item.video_id);
     xml_item.dirPath        = video_item.dirpath;
     xml_item.commonFilename = video_item.common_filename;
     xml_item.videoType      = video_item.video_type;
     xml_item.thumbnailSize  = video_item.thumbnail_size;
     xml_item.is_deleted     = video_item.is_deleted;
 
-    const json_item = new NicoJsonFile(video_item.id);
+    const json_item = new NicoJsonFile(video_item.video_id);
     json_item.dirPath        = video_item.dirpath;
     json_item.commonFilename = video_item.common_filename;
     json_item.videoType      = video_item.video_type;

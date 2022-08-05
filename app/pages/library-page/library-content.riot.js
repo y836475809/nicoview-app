@@ -46,7 +46,7 @@ module.exports = {
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_data = new NicoVideoData(video_item);
-            const video_id = video_item.id;
+            const video_id = video_item.video_id;
             video_item.thumb_img = video_data.getThumbImgPath();
             video_item.tags = video_item.tags ? video_item.tags.join(" ") : "";
             this.grid_table.updateItem(video_item, video_id);
@@ -95,7 +95,7 @@ module.exports = {
             return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
         };
         const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const video_id = dataContext.id;
+            const video_id = dataContext.video_id;
             const video_type = dataContext.video_type;
             const video_quality = dataContext.is_economy?"画質: エコノミー":"";
             return `<div>
@@ -121,7 +121,7 @@ module.exports = {
         const options = {
             rowHeight: 135,
         };   
-        this.grid_table = new GridTable("library-grid", columns, options);
+        this.grid_table = new GridTable("library-grid", columns, options, "video_id");
 
         main_obs.on("library-page:search-item-dlbclicked", (
             /** @type {LibrarySearchItem} */ item) => {
@@ -141,22 +141,6 @@ module.exports = {
             await this.convertVideo(video_id);          
         });   
         
-        main_obs.on("library-page:play", async (item) => { 
-            /** @type {string} */
-            const video_id = item.id;
-            const video_item = await myapi.ipc.Library.getItem(video_id);
-            if(video_item===null){
-                return;
-            }
-        
-            const props = { 
-                last_play_date : new Date().getTime(),
-                play_count : video_item.play_count + 1
-            };
-            logger.debug("update library video_id=", video_id, ", props=", props);
-            await myapi.ipc.Library.updateItemProps(video_id, props);
-        });
-
         main_obs.on("library-page:scrollto", async (video_id) => { 
             const rows = this.grid_table.getRowsByIds([video_id]);
             if(rows.length > 0){
@@ -236,7 +220,7 @@ module.exports = {
                     await this.convertNicoDataToNNDD(items);
                 }
                 if(menu_id=="delete"){
-                    const video_ids = items.map(item => item.id);
+                    const video_ids = items.map(item => item.video_id);
                     const ret = await myapi.ipc.Dialog.showMessageBox({
                         message: "動画を削除しますか?",
                         okcancel: true
@@ -249,7 +233,7 @@ module.exports = {
             }else{
                 const menu_id = await myapi.ipc.popupContextMenu("library-convert-video", {items});
                 if(menu_id=="convert-video"){
-                    const video_id = items[0].id;
+                    const video_id = items[0].video_id;
                     await this.convertVideo(video_id);
                 }   
             }
@@ -450,9 +434,9 @@ module.exports = {
                 this.obs_modal_dialog.trigger("update-message", 
                     `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
-                this.grid_table.updateCell(item.id, "state", "更新中");
+                this.grid_table.updateCell(item.video_id, "state", "更新中");
                 try {
-                    const video_item = await myapi.ipc.Library.getItem(item.id);
+                    const video_item = await myapi.ipc.Library.getItem(item.video_id);
                     nico_update = new NicoUpdate(video_item);
                     const result = await func(nico_update);
                     if(result){
@@ -464,15 +448,15 @@ module.exports = {
                             this.grid_table.updateCells(result.video_id, {thumb_img});
                         }
                     }
-                    this.grid_table.updateCell(item.id, "state", "更新完了");       
+                    this.grid_table.updateCell(item.video_id, "state", "更新完了");       
                 } catch (error) {
                     if(error.cancel===true){   
-                        this.grid_table.updateCell(item.id, "state", "更新キャンセル");
+                        this.grid_table.updateCell(item.video_id, "state", "更新キャンセル");
                         throw error;
                     }else{
                         error_items.push(item);
                         logger.error(error);
-                        this.grid_table.updateCell(item.id, "state", `更新失敗: ${error.message}`);
+                        this.grid_table.updateCell(item.video_id, "state", `更新失敗: ${error.message}`);
                     }
                 }
                 if(cur_update < items.length){
@@ -531,26 +515,26 @@ module.exports = {
                 this.obs_modal_dialog.trigger("update-message", 
                     `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
 
-                this.grid_table.updateCell(item.id, "state", "変換中");
+                this.grid_table.updateCell(item.video_id, "state", "変換中");
                 try {
-                    const video_item = await myapi.ipc.Library.getItem(item.id);
+                    const video_item = await myapi.ipc.Library.getItem(item.video_id);
                     if(video_item.data_type == "json"){
                         const cnv_nico = new JsonDataConverter(video_item);
                         await cnv_nico.convertThumbInfo();
                         await cnv_nico.convertComment();
                         await cnv_nico.convertThumbnai();
-                        this.grid_table.updateCell(item.id, "state", "変換完了");
+                        this.grid_table.updateCell(item.video_id, "state", "変換完了");
                     }else{
-                        this.grid_table.updateCell(item.id, "state", "変換不要");
+                        this.grid_table.updateCell(item.video_id, "state", "変換不要");
                     }
                 } catch (error) {
                     if(error.cancel===true){   
-                        this.grid_table.updateCell(item.id, "state", "変換キャンセル");
+                        this.grid_table.updateCell(item.video_id, "state", "変換キャンセル");
                         throw error;
                     }else{
                         error_items.push(item);
                         logger.error(error);
-                        this.grid_table.updateCell(item.id, "state", `変換失敗: ${error.message}`);
+                        this.grid_table.updateCell(item.video_id, "state", `変換失敗: ${error.message}`);
                     }
                 }
                 if(cur_update < items.length){
@@ -695,7 +679,7 @@ module.exports = {
      * @returns 
      */
     async play(item, online) {
-        const video_id = item.id;
+        const video_id = item.video_id;
         const video_type = item.video_type;
 
         if(!online && needConvertVideo(video_type)){

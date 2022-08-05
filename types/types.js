@@ -78,7 +78,7 @@
  * @property {string[]} tags
  * @property {boolean} is_economy
  * @property {boolean} is_deleted
- * @property {string} id
+ * @property {string} video_id
  * @property {number} play_time
  */
 
@@ -101,7 +101,7 @@
  * @property {string} tags
  * @property {boolean} is_economy
  * @property {boolean} is_deleted
- * @property {string} id
+ * @property {string} video_id
  * @property {number} play_time
  */
 

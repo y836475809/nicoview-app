@@ -75,7 +75,7 @@ const player = (play_win) => {
                     label: "ダウンロードに追加", click() {
                         const items = [{
                             thumb_img: thumbnailURL,
-                            id: video_id,
+                            video_id: video_id,
                             title: title,
                             state: 0
                         }];

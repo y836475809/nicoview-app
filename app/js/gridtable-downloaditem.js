@@ -28,7 +28,7 @@ const getDlStateClass = (state) => {
 };
 
 const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
-    const video_id = dataContext.id;
+    const video_id = dataContext.video_id;
     return `ID: ${video_id}`;
 }; 
 
@@ -54,7 +54,7 @@ class GridTableDownloadItem {
             enableCellNavigation: true,
             enableColumnReorder: false,
         };
-        this.grid_table = new GridTable("download-item-grid", columns, options);
+        this.grid_table = new GridTable("download-item-grid", columns, options, "video_id");
         this.grid_table.init(container);
             
         this.grid_table.dataView.onRowCountChanged.subscribe((e, args) => { // eslint-disable-line no-unused-vars
@@ -177,14 +177,14 @@ class GridTableDownloadItem {
         items.forEach(item => {
             const dv_items = this.grid_table.dataView.getItems();
             const fd_item = dv_items.find(value=>{
-                return value.id == item.id;
+                return value.video_id == item.video_id;
             });
             if(fd_item===undefined){
                 item["state"] = state;
                 item["progress"] = "";
                 this.grid_table.dataView.addItem(item);
             }else{
-                this.grid_table.dataView.deleteItem(fd_item.id);
+                this.grid_table.dataView.deleteItem(fd_item.video_id);
                 fd_item["state"] = state;
                 fd_item["progress"] = "";
                 this.grid_table.dataView.addItem(fd_item);
@@ -204,15 +204,16 @@ class GridTableDownloadItem {
     }
 
     clearItems(target_state){
-        const items = this.grid_table.dataView.getItems().map(item=>{
-            return {
-                id: item.id,
-                state: item.state,
-            };
-        });
+        // const items = this.grid_table.dataView.getItems().map(item=>{
+        //     return {
+        //         id: item.id,
+        //         state: item.state,
+        //     };
+        // });
+        const items = this.grid_table.dataView.getItems();
         items.forEach(item => {
             if(item.state === target_state){
-                this.grid_table.dataView.deleteItem(item.id);
+                this.grid_table.dataView.deleteItem(item.video_id);
             }
         });
     }
@@ -248,7 +249,7 @@ class GridTableDownloadItem {
                 return null;
             }
             const item = this.grid_table.dataView.getItemByIdx(find_index);
-            return item.id;
+            return item.video_id;
         }
 
         const index = this.grid_table.dataView.getIdxById(video_id);
@@ -260,14 +261,14 @@ class GridTableDownloadItem {
                 return null;
             }
             const item = this.grid_table.dataView.getItemByIdx(find_index);
-            return item.id;
+            return item.video_id;
         }
 
         let next_index = index + 1;
         for (let index = next_index; index < items.length; index++) {
             const item = this.grid_table.dataView.getItemByIdx(index);
             if(item && (item.state == DownloadState.wait || item.state == DownloadState.error)){
-                return item.id;
+                return item.video_id;
             }
         }
         

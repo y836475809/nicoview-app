@@ -105,7 +105,7 @@ module.exports = {
                         return;
                     }
                     const video_ids = items.map(value => {
-                        return value.id;
+                        return value.video_id;
                     });
                     await this.deleteDownloadItems(video_ids);
                 }
@@ -182,7 +182,7 @@ module.exports = {
             }
             return {
                 thumb_img: value.thumb_img,
-                id: value.id,
+                video_id: value.video_id,
                 title: value.title,
                 state: state
             };
@@ -191,7 +191,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {{id:string, title:string, thumb_img:string}[]} items 
+     * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
     async addDownloadItems(items) {
         this.grid_table_dl.addItems(items, DownloadState.wait);
@@ -298,39 +298,39 @@ module.exports = {
                 });
 
                 if(result.type==NicoDownloader.ResultType.complete){
-                    const download_item = this.nico_down.getDownloadedItem();
-                    await myapi.ipc.Library.addDownloadItem(download_item);
+                    const downloaded_item = this.nico_down.getDownloadedItem();
+                    await myapi.ipc.Library.addDownloadItem(downloaded_item);
 
                     this.grid_table_dl.updateItem(video_id, {
                         progress: "終了", 
                         state: DownloadState.complete
                     });
-                    logger.debug(`download complete id=${video_id}`);
+                    logger.debug(`download complete video_id=${video_id}`);
                 }else if(result.type==NicoDownloader.ResultType.cancel){
                     this.grid_table_dl.updateItem(video_id, {
                         progress: "キャンセル", 
                         state: DownloadState.wait
                     });
-                    logger.debug(`download cancel id=${video_id}`);
+                    logger.debug(`download cancel video_id=${video_id}`);
                 }else if(result.type==NicoDownloader.ResultType.skip){ 
                     this.grid_table_dl.updateItem(video_id, {
                         progress: `スキップ: ${result.reason}`, 
                         state: DownloadState.wait
                     });
-                    logger.debug(`download skip id=${video_id}: `, result.reason);
+                    logger.debug(`download skip video_id=${video_id}: `, result.reason);
                 }else if(result.type==NicoDownloader.ResultType.error){ 
                     this.grid_table_dl.updateItem(video_id, {
                         progress: `エラー: ${result.reason.message}`, 
                         state: DownloadState.error
                     });
-                    logger.debug(`download id=${video_id}: `, result.reason);
+                    logger.debug(`download video_id=${video_id}: `, result.reason);
                 }
         
                 await this.onChangeDownloadItem();
                 this.nico_down = null;
             }
         } catch (error) {
-            logger.error(`download id=${video_id}: `, error);
+            logger.error(`download video_id=${video_id}: `, error);
             await myapi.ipc.Dialog.showMessageBox({
                 type: "error",
                 message: error.message

@@ -82,7 +82,7 @@ class Command {
     /**
      * 
      * @param {MyObservable} obs 
-     * @param {{id:string, title:string, thumb_img:string}[]} items 
+     * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
     static addDownloadItems(obs, items) {
         if(isMainProcess()){
@@ -95,11 +95,11 @@ class Command {
     /**
      * 
      * @param {MyObservable} obs 
-     * @param {{id:string}[]} items 
+     * @param {{video_id:string}[]} items 
      */
     static deleteDownloadItems(obs, items) {
         const video_ids = items.map(value => {
-            return value.id;
+            return value.video_id;
         });
 
         if(isMainProcess()){

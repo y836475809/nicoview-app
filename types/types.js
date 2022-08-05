@@ -25,11 +25,28 @@
 
 /**
  * @typedef {Object} DownloadItem 
- * @property {string} id
+ * @property {string} video_id
  * @property {string} title
  * @property {number} state
  * @property {string} thumb_img
  */
+
+/**
+ *  ダウンロード完了時に通達されるダウンロードデータ
+ * @typedef {Object} DownloadedItem 
+ * @property {string} data_type json or xml
+ * @property {string} dirpath
+ * @property {string} video_id
+ * @property {string} title
+ * @property {string} video_type
+ * @property {boolean} is_economy
+ * @property {number} play_time
+ * @property {number} pub_date
+ * @property {string[]} tags
+ * @property {boolean} is_deleted
+ * @property {string} thumbnail_size S or L
+ */
+ 
  
 /**
  * @typedef {Object} MyListListItem 

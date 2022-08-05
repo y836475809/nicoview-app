@@ -405,7 +405,7 @@ app.on("ready", async ()=>{
         const ids = [];
         items.forEach(item => {
             if(item.state != 2){
-                ids.push(item.id);
+                ids.push(item.video_id);
             } 
         });
         return ids;

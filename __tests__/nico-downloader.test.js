@@ -83,7 +83,7 @@ test("downloader dmc", async (t) => {
     t.deepEqual(item, { 
         data_type:"json", 
         dirpath: dist_dir,
-        id: "sm12345678", 
+        video_id: "sm12345678", 
         title: "test",
         video_type: "mp4",
         is_economy: false,
@@ -161,7 +161,7 @@ test("downloader dmc low quality", async (t) => {
     t.deepEqual(item, { 
         data_type:"json", 
         dirpath: dist_dir,
-        id: "sm12345678",       
+        video_id: "sm12345678",       
         title: "test",
         video_type: "mp4",
         is_economy: true,

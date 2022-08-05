@@ -225,6 +225,10 @@ class NicoDownloader {
         }
     }
 
+    /**
+     * 
+     * @returns {DownloadedItem}
+     */
     getDownloadedItem(){
         const video = this._nico_api.getVideo();
         const tags = this._nico_api.getTags().map((value) => {
@@ -236,7 +240,7 @@ class NicoDownloader {
         return {
             data_type:"json", 
             dirpath: this.dist_dir,
-            id: video.id,
+            video_id: video.id,
             title: video.title,
             video_type: video.videoType,
             is_economy: !this.videoinfo.maxQuality,

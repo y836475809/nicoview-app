@@ -17,7 +17,7 @@ module.exports = {
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
-                const video_id = item.id;
+                const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 this.grid_table.dataView.updateItem(video_id, item);    
@@ -26,7 +26,7 @@ module.exports = {
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
-            const video_id = video_item.id;
+            const video_id = video_item.video_id;
             this.grid_table.updateCells(video_id, { saved:true });
         });
 
@@ -43,7 +43,7 @@ module.exports = {
         
         const history_infoFormatter = infoFormatter.bind(this, 
             (value, dataContext)=>{ 
-                return `<div>ID: ${dataContext.id}</div>`;
+                return `<div>ID: ${dataContext.video_id}</div>`;
             });
 
         const columns = [
@@ -57,7 +57,7 @@ module.exports = {
         const options = {
             rowHeight: 100,
         }; 
-        this.grid_table = new GridTable("history-grid", columns, options);
+        this.grid_table = new GridTable("history-grid", columns, options, "video_id");
 
         main_obs.on("history-page:reload-items", async ()=>{
             await this.loadItems();
@@ -99,7 +99,7 @@ module.exports = {
         const video_ids = await myapi.ipc.Download.getIncompleteIDs();
         for (let i=0; i<items.length; i++) {
             const item = items[i];
-            const video_id = item.id;
+            const video_id = item.video_id;
             item.saved = await myapi.ipc.Library.hasItem(video_id);
             item.reg_download = video_ids.includes(video_id);  
         }

@@ -433,7 +433,7 @@ app.on("ready", async ()=>{
 
         main_win.webContents.send("history:on-update-item", args);
 
-        const video_id = item.id;
+        const video_id = item.video_id;
         const video_item = library.getItem(video_id);
         if(video_item===null){
             return;

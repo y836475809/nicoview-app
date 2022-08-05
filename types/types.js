@@ -3,7 +3,7 @@
  * 再生履歴
  * @typedef {Object} HistoryItem
  * @property {string} thumb_img 
- * @property {string} id
+ * @property {string} video_id
  * @property {string} title
  * @property {number} play_date
  * @property {number} time

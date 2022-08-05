@@ -30,27 +30,23 @@ class History {
     }
     
     add(new_item){     
-        const index = this.history_items.findIndex(item => item.id === new_item.id);
+        const index = this.history_items.findIndex(item => item.video_id === new_item.video_id);
         if(index === -1){
             if(this.history_items.length >= this.history_max){
                 this.history_items.pop();
             }
             this.history_items.unshift({
-                thumb_img: new_item.image,
-                id: new_item.id,
+                thumb_img: new_item.thumb_img,
+                video_id: new_item.video_id,
                 title: new_item.title,
                 play_date: Date.now(), 
-                time: 0,
-                url: new_item.url                
+                time: 0             
             }); 
         }else{
             let item = this.history_items[index];
             item.play_date = Date.now();
-            if(new_item.url != item.url){
-                item.url = new_item.url;
-            }
-            if(new_item.image != item.thumb_img){
-                item.thumb_img = new_item.image;
+            if(new_item.thumb_img != item.thumb_img){
+                item.thumb_img = new_item.thumb_img;
             }
             this.history_items.sort((a, b) => {
                 if (a.play_date < b.play_date) return 1;

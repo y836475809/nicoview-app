@@ -320,8 +320,8 @@ module.exports = {
         });   
         
         myapi.ipc.PlayHistory.addItem({
-            id: video.video_id, 
-            image: video.thumbnailURL, 
+            video_id: video.video_id, 
+            thumb_img: video.thumbnailURL, 
             title: video.title,  
         });
     },

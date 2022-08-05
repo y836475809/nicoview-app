@@ -68,7 +68,7 @@ module.exports = {
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
-                const video_id = item.id;
+                const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
                 this.grid_table.dataView.updateItem(video_id, item);    
@@ -77,7 +77,7 @@ module.exports = {
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
-            const video_id = video_item.id;
+            const video_id = video_item.video_id;
             this.grid_table.updateCells(video_id, { saved:true });
         });
 
@@ -174,7 +174,7 @@ module.exports = {
 
         const mylist_infoFormatter = infoFormatter.bind(this, 
             (value, dataContext)=>{ 
-                return `<div>ID: ${dataContext.id}</div>`;
+                return `<div>ID: ${dataContext.video_id}</div>`;
             });
         const columns = [
             {id: "no", name: "#"},
@@ -190,7 +190,7 @@ module.exports = {
         const options = {
             rowHeight: 100,
         };    
-        this.grid_table = new GridTable("mylist-grid", columns, options);
+        this.grid_table = new GridTable("mylist-grid", columns, options, "video_id");
     },
     async onMounted() {
         const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
@@ -202,7 +202,7 @@ module.exports = {
         this.grid_table.setupResizer(".mylist-grid-container");
         this.grid_table.onDblClick(async (e, data)=>{
             /** @type {string} */
-            const video_id = data.id;
+            const video_id = data.video_id;
             /** @type {LibraryData} */
             const video_item = await myapi.ipc.Library.getItem(video_id);
             if(needConvertVideo(video_item)===true){      
@@ -238,7 +238,7 @@ module.exports = {
             if(items.length==0){
                 return;
             }
-            const video_id = items[0].id;
+            const video_id = items[0].video_id;
             const video_item = await myapi.ipc.Library.getItem(video_id);
             const need_convert = needConvertVideo(video_item);
             const context_menu_type = need_convert?"convert-video":"main";
@@ -278,12 +278,12 @@ module.exports = {
     },
     /**
      * 
-     * @param {{id:string}} item 
+     * @param {{video_id:string}} item 
      * @param {boolean} online 
      * @returns {Promise<void>}
      */
     async play(item, online) {
-        const video_id = item.id;
+        const video_id = item.video_id;
         const video_item = await myapi.ipc.Library.getItem(video_id);
         if(!online && needConvertVideo(video_item)){       
             const ret = await myapi.ipc.Dialog.showMessageBox({
@@ -349,7 +349,7 @@ module.exports = {
         const video_ids = await myapi.ipc.Download.getIncompleteIDs();
         for (let i=0; i<mylist_items.length; i++) {
             const item = mylist_items[i];
-            const video_id = item.id;
+            const video_id = item.video_id;
             item.saved = await myapi.ipc.Library.hasItem(video_id);
             item.reg_download = video_ids.includes(video_id);  
             item.mylist_id = mylist.mylist_id;

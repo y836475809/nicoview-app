@@ -30,7 +30,7 @@ test("nico mylist parse xml", t => {
             {
                 no: 1,
                 title: "動画3",
-                id: "sm12345678",
+                video_id: "sm12345678",
                 link: "http://www.nicovideo.jp/watch/sm12345678",
                 description: "動画3メモ",
                 thumb_img: "http://tn.smilevideo.jp/smile?i=12345678.63399.M",
@@ -40,7 +40,7 @@ test("nico mylist parse xml", t => {
             {
                 no: 2,
                 title: "動画2",
-                id: "sm20",
+                video_id: "sm20",
                 link: "http://www.nicovideo.jp/watch/sm20",
                 description: "動画2メモ1\r\n動画2メモ2\r\n動画2メモ3",
                 thumb_img: "http://tn.smilevideo.jp/smile?i=20.M",
@@ -50,7 +50,7 @@ test("nico mylist parse xml", t => {
             {
                 no: 3,
                 title: "動画1",
-                id: "sm10",
+                video_id: "sm10",
                 link: "http://www.nicovideo.jp/watch/sm10",
                 description: "動画1メモ1\r\n動画1メモ2\r\n動画1メモ3\r\n動画1メモ4",
                 thumb_img: "http://tn.smilevideo.jp/smile?i=10",
@@ -82,7 +82,7 @@ test("nico mylist result is correct", t => {
         creator: "--",
         items: [{
             title : "--",
-            id: "--",
+            video_id: "--",
             link : "--",
             thumb_img: "--",
             length: "--",
@@ -156,7 +156,7 @@ test("nico mylist result is incorrect", t => {
         creator: "--",
         items: [{
             title : "",
-            id: "--",
+            video_id: "--",
             link : "--",
             thumb_img: "--",
             length: "--",
@@ -172,7 +172,7 @@ test("nico mylist result is incorrect", t => {
         creator: "--",
         items: [{
             title : "--",
-            id: "",
+            video_id: "",
             link : "--",
             thumb_img: "--",
             length: "--",
@@ -188,7 +188,7 @@ test("nico mylist result is incorrect", t => {
         creator: "--",
         items: [{
             title : "--",
-            id: "--",
+            video_id: "--",
             link : "",
             thumb_img: "--",
             length: "--",

@@ -69,7 +69,7 @@ class NicoMylistReader {
             items.push( {
                 no: i+1,
                 title: item.find("title").text(),
-                id: video_id,
+                video_id: video_id,
                 link: link,
                 description: description.memo,
                 thumb_img: description.thumbnail_src,
@@ -123,7 +123,7 @@ class NicoMylistReader {
         && mylist.creator
         && mylist.items.every(item => {
             return item.title 
-                && item.id 
+                && item.video_id 
                 && item.link 
                 && item.thumb_img
                 && item.length

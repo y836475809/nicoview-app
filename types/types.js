@@ -59,7 +59,7 @@
  * @typedef {Object} MyListVideoItem
  * @property {number} no
  * @property {string} title
- * @property {string} id
+ * @property {string} video_id
  * @property {string} link
  * @property {string} description
  * @property {string} thumb_img

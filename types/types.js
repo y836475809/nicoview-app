@@ -220,7 +220,7 @@
  * 後で見る(スタック)
  * @typedef {Object} StackItem 
  * @property {string} title
- * @property {string} id
+ * @property {string} video_id
  * @property {string} thumb_img
  * @property {number} [time]
  * @property {string} [state]

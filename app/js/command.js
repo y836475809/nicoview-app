@@ -40,12 +40,12 @@ class Command {
     /**
      * 
      * @param {MyObservable} obs 
-     * @param {{id:string, title:string, thumb_img:string}[]} items 
+     * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
     static addStackItems(obs, items) {
         const stack_items = items.map(item => {
             return {
-                id: item.id,
+                video_id: item.video_id,
                 title: item.title, 
                 thumb_img:item.thumb_img
             };

@@ -46,7 +46,7 @@ const playByVideoID = (tag) => {
     }
     const online = false; // ローカル再生を優先
     Command.play({
-        id: video_id,
+        video_id: video_id,
         time: 0
     }, online);
 };

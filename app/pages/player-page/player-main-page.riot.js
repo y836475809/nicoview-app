@@ -420,7 +420,7 @@ module.exports = {
             await this.play_by_video_data(video_data, viewinfo, comments, state);      
         } catch (error) {
             if(!error.cancel){
-                logger.error(`id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
+                logger.error(`video_id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
                 await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
                     message: error.message

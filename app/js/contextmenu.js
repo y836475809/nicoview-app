@@ -193,11 +193,11 @@ const player_watch_link = (play_win) => {
         return await new Promise(resolve => {
             const menu_items = [
                 { label: "再生", click() {
-                    Command.play({id:video_id}, false);
+                    Command.play({video_id}, false);
                     resolve(null);
                 }},
                 { label: "オンラインで再生", click() {
-                    Command.play({id:video_id}, true);
+                    Command.play({video_id}, true);
                     resolve(null);
                 }},
                 { label: "URLをコピー", click() {

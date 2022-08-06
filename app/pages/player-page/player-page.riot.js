@@ -73,7 +73,7 @@ module.exports = {
                     const time = await this.getCurrentPlayTime();
                     myapi.ipc.Stack.addItems([
                         {
-                            id: video_id,
+                            video_id: video_id,
                             title: title, 
                             thumb_img:thumbnailURL,
                             time: time

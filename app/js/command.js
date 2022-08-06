@@ -20,7 +20,7 @@ const send = (channel, args) => {
 class Command {
     /**
      * 
-     * @param {{id:string, time:number}} item 
+     * @param {{video_id:string, time:number}} item 
      * @param {boolean} online 
      */
     static play(item, online) {

@@ -76,7 +76,7 @@ module.exports = {
         const video_id = paths.pop();
 
         Command.play({
-            id : video_id,
+            video_id : video_id,
             time : 0
         }, false);
         return false;

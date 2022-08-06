@@ -1,17 +1,18 @@
 const fs = require("fs");
 const path = require("path");
-const sql = require("sql.js");
+const initSqlJs = require('sql.js');
 const { getCommonNameFromFilename } = require("./nico-data-file");
 
 class DBConverter {
     /**
      * 
      * @param {string} db_file_path 
+     * @returns {Promise<void>}
      */
-    init(db_file_path) {
-        const data = fs.readFileSync(db_file_path);
-        const uint_8array = new Uint8Array(data);
-        this.db = new sql.Database(uint_8array);
+    async init(db_file_path) {
+        const SQL = await initSqlJs();
+        const file_buf = fs.readFileSync(db_file_path);
+        this.db = new SQL.Database(file_buf);
     }
     get_dirpath() {
         return this.dirpath_list;
@@ -116,7 +117,7 @@ class DBConverter {
 
 const importNNDDDB = async (db_file_path)=>{
     const db_converter = new DBConverter();
-    db_converter.init(db_file_path);
+    await db_converter.init(db_file_path);
     db_converter.read();
     const path_data_list = db_converter.get_dirpath();
     const video_data_list = db_converter.get_video();

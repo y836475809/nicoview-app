@@ -4,9 +4,9 @@ const { DBConverter } = require("../app/js/import-nndd-db");
 
 const db_file_path = `${__dirname}/data/sample.db`;
 
-test("sqlite db dirpath", (t) => {
+test("sqlite db dirpath", async (t) => {
     const db = new DBConverter();
-    db.init(db_file_path);
+    await db.init(db_file_path);
     db._read_dirpath();
     const dirpath_list = db.get_dirpath();
     t.deepEqual(dirpath_list, 
@@ -17,9 +17,9 @@ test("sqlite db dirpath", (t) => {
     );    
 });
 
-test("sqlite db tag", (t) => {
+test("sqlite db tag", async (t) => {
     const db = new DBConverter();
-    db.init(db_file_path);
+    await db.init(db_file_path);
     db._read_tag_string();
     db._read_tag();
     const tag_map = db.tag_map;
@@ -34,9 +34,9 @@ test("sqlite db tag", (t) => {
     ); 
 });
 
-test("sqlite db video", (t) => {
+test("sqlite db video", async (t) => {
     const db = new DBConverter();
-    db.init(db_file_path);
+    await db.init(db_file_path);
     db.read();
     const video_list = db.get_video();
 
@@ -65,9 +65,9 @@ test("sqlite db video", (t) => {
     t.deepEqual(sm5.tags, ["タグ3", "タグ4", "タグ5"]);
 });
 
-test("sqlite db item", (t) => {
+test("sqlite db item", async (t) => {
     const db = new DBConverter();
-    db.init(db_file_path);
+    await db.init(db_file_path);
     db.read();
     const video_list = db.get_video();
 

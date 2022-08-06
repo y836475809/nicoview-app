@@ -61,7 +61,7 @@ module.exports = {
      * @param {boolean} value 
      */
     setPlayEnable(value) {
-        this.play_disabled = !value;
+        this.state.play_disabled = !value;
         this.update();
     },
     isPlay() {

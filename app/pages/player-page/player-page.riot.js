@@ -64,7 +64,7 @@ module.exports = {
                     const current_time = await this.getCurrentPlayTime();
                     const bk_item = {
                         title: title,
-                        id: video_id,
+                        video_id: video_id,
                         time: current_time
                     };
                     myapi.ipc.Bookmark.addItems([bk_item]);

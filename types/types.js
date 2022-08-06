@@ -212,7 +212,7 @@
  * ブックマーク
  * @typedef {Object} BookmarkItem 
  * @property {string} title
- * @property {string} id
+ * @property {string} video_id
  * @property {number} time
  */
 

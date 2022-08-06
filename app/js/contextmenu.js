@@ -59,7 +59,7 @@ const player = (play_win) => {
                     label: "ブックマーク", click() {
                         const items = [{
                             title: title,
-                            id: video_id
+                            video_id: video_id
                         }];
                         Command.addBookmarkItems(null, items);
                         resolve(null);
@@ -309,7 +309,7 @@ const listview_bookmark = (main_win) => {
                     label: "再生", click() {
                         const { video_id, time } = items[0].data;
                         Command.play({
-                            id: video_id,
+                            video_id: video_id,
                             time: time
                         }, false);
                         resolve(null);
@@ -320,7 +320,7 @@ const listview_bookmark = (main_win) => {
                     label: "オンラインで再生", click() {
                         const { video_id, time } = items[0].data;
                         Command.play({
-                            id: video_id,
+                            video_id: video_id,
                             time: time
                         }, true);
                         resolve(null);

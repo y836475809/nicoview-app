@@ -82,7 +82,7 @@ module.exports = {
             /** @type {BookmarkListItem} */ item) => {  
             const { video_id, time } = item.data;
             Command.play({
-                id : video_id,
+                video_id : video_id,
                 time : time
             }, false);
         });
@@ -94,7 +94,7 @@ module.exports = {
                     title: item.title,
                     type: "video",
                     data: {
-                        video_id: item.id,
+                        video_id: item.video_id,
                         time: item.time
                     }
                 };

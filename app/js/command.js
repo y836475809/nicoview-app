@@ -61,13 +61,13 @@ class Command {
     /**
      * 
      * @param {MyObservable} obs 
-     * @param {{id:string, title:string}[]} items 
+     * @param {{video_id:string, title:string}[]} items 
      */
     static addBookmarkItems(obs, items) {
         const bk_items = items.map(item => {
             return {
                 title: item.title,
-                id: item.id,
+                video_id: item.video_id,
                 time: 0
             };
         });

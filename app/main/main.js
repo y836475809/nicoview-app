@@ -61,6 +61,8 @@ if(app.commandLine.getSwitchValue("test")){
     }
 
     process.env["test_nicoappview"] = true;
+    // テスト時はテスト用のユーザーデータフォルダを使用
+    app.setPath("userData", `${app.getPath("userData")}-test`);
 }
 
 process.on("uncaughtException", (error) => {
@@ -191,7 +193,8 @@ function createWindow() {
         nodeIntegration: false,
         contextIsolation: false,
         preload: preload_path,
-        spellcheck: false
+        spellcheck: false,
+        sandbox: false
     };
     main_win = new BrowserWindow(state);
     main_win._tag = "main";
@@ -612,7 +615,8 @@ const createPlayerWindow = () => {
             nodeIntegration: false,
             contextIsolation: false,
             preload: preload_path,
-            spellcheck: false
+            spellcheck: false,
+            sandbox: false
         };
         player_win = new BrowserWindow(state);
         player_win.removeMenu();

@@ -180,7 +180,9 @@ module.exports = {
             ghostClass: "listview-item-ghost-class",
             draggable: ".listview-item",
             onSort: (evt) => {  // eslint-disable-line no-unused-vars
-                this.sortItems();
+                const src_index  = evt.oldDraggableIndex;
+                const target_index  = evt.newDraggableIndex;
+                this.moveItem(src_index, target_index);
             }
         });
     },
@@ -218,14 +220,24 @@ module.exports = {
         });
         return ret;
     },
-    sortItems() {
-        const order = this.sortable.toArray().map(value=>Number(value));
-        const sorted_items = [];
-        order.forEach(value => {
-            sorted_items.push(this.state.items[value]);
-        });
-        this.state.items = sorted_items;
+    /**
+     * リストのsrc_index位置のアイテムをtarget_index位置に移動させる
+     * (アイテムのドラッグドロップでの移動)
+     * @param {number} src_index 移動元index
+     * @param {number} target_index 移動先index
+     */
+    moveItem(src_index, target_index) {
+        const items = JSON.parse(JSON.stringify(this.state.items));
+        const src_item = items[src_index];
+        items.splice(src_index, 1);
+        items.splice(target_index, 0, src_item);
 
+        // 一旦クリア状態で更新させないと正常な並びにならない
+        this.state.items.splice(0);
+        this.update();
+
+        // 移動させた状態で更新
+        this.state.items = items;
         this.update();
 
         this.triggerChange();

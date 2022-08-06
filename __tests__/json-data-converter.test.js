@@ -36,7 +36,7 @@ class TestPathJsonDataConverter extends JsonDataConverter{
 test.beforeEach(t => {
     const video_item = {
         data_type: "json", 
-        id: "sm10",
+        video_id: "sm10",
         dirpath_id: 1,
         dirpath: __dirname,
         title: "test title",

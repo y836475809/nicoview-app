@@ -33,7 +33,7 @@ class NicoUpdate {
     _getResult(update_thumbnail=false){
         const props = this._getChangedProps(this.org_video_item, this.video_item);
         return {
-            video_id:this.video_item.id,
+            video_id:this.video_item.video_id,
             props:props,
             update_thumbnail:update_thumbnail,
         };
@@ -144,7 +144,7 @@ class NicoUpdate {
         }
 
         if(!this._validateComment(comments_diff)){
-            throw new Error(`${this.video_item.id}の差分コメントが正しくないデータです`);
+            throw new Error(`${this.video_item.video_id}の差分コメントが正しくないデータです`);
         }
 
         const updated_comment_data =this._margeCommentData(cur_comment_data, comments_diff);
@@ -232,7 +232,7 @@ class NicoUpdate {
         const thumbImg = await this._getThumbImg(thumb_url);
         
         if(!this._validateThumbnail(thumbImg)){
-            throw new Error(`${this.video_item.id}のサムネイルが正しくないデータです`);
+            throw new Error(`${this.video_item.video_id}のサムネイルが正しくないデータです`);
         }
 
         this._writeFile(img_path, thumbImg, "binary");
@@ -255,7 +255,7 @@ class NicoUpdate {
 
         const nico_api = watch_data.nico_api;
         if(!nico_api.validate()){
-            throw new Error(`${this.video_item.id}のwatch dataが正しくないデータです`);
+            throw new Error(`${this.video_item.video_id}のwatch dataが正しくないデータです`);
         }
 
         const is_deleted = nico_api.isDeletedVideo();
@@ -267,7 +267,7 @@ class NicoUpdate {
         }
 
         if(is_deleted===true){
-            throw new Error(`${this.video_item.id}は削除されています`);
+            throw new Error(`${this.video_item.video_id}は削除されています`);
         }
 
         return nico_api;
@@ -279,17 +279,17 @@ class NicoUpdate {
         }
 
         if(this.video_item.is_deleted===true){
-            throw new Error(`${this.video_item.id}は削除されています`);
+            throw new Error(`${this.video_item.video_id}は削除されています`);
         }
     }
 
     _getNicoFileData(){
-        const nico_xml = new NicoXMLFile(this.video_item.id);
+        const nico_xml = new NicoXMLFile(this.video_item.video_id);
         nico_xml.dirPath = this.video_item.dirpath;
         nico_xml.commonFilename = this.video_item.common_filename;
         nico_xml.thumbnailSize = this.video_item.thumbnail_size;
 
-        const nico_json = new NicoJsonFile(this.video_item.id);
+        const nico_json = new NicoJsonFile(this.video_item.video_id);
         nico_json.dirPath = this.video_item.dirpath;
         nico_json.commonFilename = this.video_item.common_filename;
         nico_json.thumbnailSize = this.video_item.thumbnail_size;
@@ -407,7 +407,7 @@ class NicoUpdate {
 
     async _getWatchData(){
         this.nico_watch = new NicoWatch();
-        const watch_data = await this.nico_watch.watch(this.video_item.id);
+        const watch_data = await this.nico_watch.watch(this.video_item.video_id);
         return watch_data;
     }
 

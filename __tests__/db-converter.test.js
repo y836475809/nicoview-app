@@ -48,11 +48,11 @@ test("sqlite db video", (t) => {
 
     t.is(sm1.data_type, "xml");
 
-    t.is(sm1.id, "sm1");
-    t.is(sm2.id, "sm2");
-    t.is(sm3.id, "sm3");
-    t.is(sm4.id, "sm4");
-    t.is(sm5.id, "sm5");
+    t.is(sm1.video_id, "sm1");
+    t.is(sm2.video_id, "sm2");
+    t.is(sm3.video_id, "sm3");
+    t.is(sm4.video_id, "sm4");
+    t.is(sm5.video_id, "sm5");
 
     t.is(sm1.title, "サンプル1");
     t.is(sm1.common_filename, "サンプル1");
@@ -75,7 +75,7 @@ test("sqlite db item", (t) => {
     t.deepEqual(sm1, {
         data_type: "xml",
         dirpath_id: 1,
-        id: "sm1",
+        video_id: "sm1",
         title: "サンプル1",
         video_type: "mp4",
         common_filename: "サンプル1",

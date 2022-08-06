@@ -9,7 +9,7 @@ test.beforeEach(async t => {
     [1, 2, 3, 4, 5, 6].map(value => {
         return {
             data_type: "json", 
-            id: `sm${value}`,
+            video_id: `sm${value}`,
             dirpath_id: 1,
             dirpath: "/data/",
             title: `サンプル${value}`,
@@ -20,7 +20,7 @@ test.beforeEach(async t => {
             thumbnail_size: "L"
         };
     }).forEach(video_item => {
-        video_item_map[video_item.id] = video_item;
+        video_item_map[video_item.video_id] = video_item;
     });
 
     Object.assign(video_item_map["sm2"], {

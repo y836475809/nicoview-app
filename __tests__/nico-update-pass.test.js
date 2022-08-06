@@ -88,7 +88,7 @@ class TestNicoUpdate extends NicoUpdate {
 
 test.beforeEach(t => {
     const video_item = {
-        id : test_video_id,
+        video_id : test_video_id,
         data_type : "xml",
         dirpath : "/data/",
         common_filename: test_video_id,

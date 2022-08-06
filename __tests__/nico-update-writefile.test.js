@@ -33,7 +33,7 @@ test.beforeEach(t => {
     }
 
     t.context.video_item = {
-        id : "sm10",
+        video_id : "sm10",
         data_type : "xml",
         common_filename: "test"
     };

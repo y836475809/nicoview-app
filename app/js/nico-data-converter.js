@@ -101,11 +101,11 @@ class JsonDataConverter {
     }
 
     _getNicoFileData(video_item){
-        const nico_xml = new NicoXMLFile(video_item.id);
+        const nico_xml = new NicoXMLFile(video_item.video_id);
         nico_xml.dirPath = video_item.dirpath;
         nico_xml.commonFilename = video_item.common_filename;
 
-        const nico_json = new NicoJsonFile(video_item.id);
+        const nico_json = new NicoJsonFile(video_item.video_id);
         nico_json.dirPath = video_item.dirpath;
         nico_json.commonFilename = video_item.common_filename;
         nico_json.thumbnailSize = video_item.thumbnail_size;

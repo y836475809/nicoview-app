@@ -36,7 +36,7 @@ const byteToString = (byte) => {
 test.beforeEach(async t => {
     const video_item = {
         data_type:"json", 
-        id: TestData.video_id,
+        video_id: TestData.video_id,
         dirpath_id: 1,
         dirpath: "/data/",
         title: "サンプル12345678",

@@ -121,7 +121,7 @@ class TestNicoUpdate extends NicoUpdate {
     constructor(){
         const video_item = {
             data_type: "xml", 
-            id: "sm100",
+            video_id: "sm100",
             dirpath: "/data/",
             common_filename: "sm100",
             is_deleted: false,

@@ -96,7 +96,7 @@ class ImportNNDDSetting {
             const m = title.match(/\s-\s\[(.+)\](?:.*)$/);
             data.push({
                 thumb_img: decodeURIComponent(item.attr("thumburl")),
-                id: m[1],
+                video_id: m[1],
                 title: title,
                 time: 0,
                 play_date: parseInt(item.attr("playdate")),

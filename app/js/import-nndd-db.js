@@ -106,7 +106,7 @@ class DBConverter {
                 modification_date, creation_date, pub_date, last_play_date,
                 play_count, tags, is_economy, is_deleted
             };
-            item.id = key;
+            item.video_id = key;
             item.play_time = time;
             
             return item;

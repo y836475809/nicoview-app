@@ -220,7 +220,7 @@ test("timeout dmc heart beat options", async (t) => {
     }
 });
 
-test.cb("timeout dmc heart beat post",  (t) => {
+test("timeout dmc heart beat post",  async (t) => {
     t.plan(4);
 
     nico_mocks.dmc_hb(1, mock_timeout);
@@ -229,12 +229,15 @@ test.cb("timeout dmc heart beat post",  (t) => {
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat();
     setHBLifetime(nico_video, 1*1000);
-    nico_video.postHeartBeat((error)=>{
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.is(nico_mocks.hb_options_count, 1);
-        t.is(nico_mocks.hb_post_count, 1); 
-        t.end();           
+
+    await new Promise(resolve => {
+        nico_video.postHeartBeat((error)=>{
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.is(nico_mocks.hb_options_count, 1);
+            t.is(nico_mocks.hb_post_count, 1); 
+            resolve();           
+        });
     });
 });
 
@@ -276,7 +279,7 @@ test("stop by hb options error 500 dmc heart beat", async(t) => {
     }
 });
 
-test.cb("stop by hb post error 403 dmc heart beat", (t) => {
+test("stop by hb post error 403 dmc heart beat", async (t) => {
     t.plan(5);
     
     nico_mocks.dmc_hb_post_error(403);
@@ -284,21 +287,23 @@ test.cb("stop by hb post error 403 dmc heart beat", (t) => {
     const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
-  
     setHBLifetime(nico_video, 1*1000);
-    nico_video.postHeartBeat((error=>{
-        t.is(nico_mocks.hb_options_count, 1);
-        t.is(nico_mocks.hb_post_count, 0); 
-        
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.regex(error.message, /403:/);
-        
-        t.end();
-    }));
+
+    await new Promise(resolve => {
+        nico_video.postHeartBeat((error=>{
+            t.is(nico_mocks.hb_options_count, 1);
+            t.is(nico_mocks.hb_post_count, 0); 
+            
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.regex(error.message, /403:/);
+            
+            resolve();
+        }));
+    });
 });
 
-test.cb("stop by hb post error 500 dmc heart beat", (t) => {
+test("stop by hb post error 500 dmc heart beat", async (t) => {
     t.plan(5);
     
     nico_mocks.dmc_hb_post_error(500);
@@ -306,16 +311,18 @@ test.cb("stop by hb post error 500 dmc heart beat", (t) => {
     const nico_video = t.context.nico_video;
     nico_video.dmc_session = { session: { id:"12345678" } };
     nico_video.optionsHeartBeat().then(()=>{});
-  
     setHBLifetime(nico_video, 1*1000);
-    nico_video.postHeartBeat((error=>{
-        t.is(nico_mocks.hb_options_count, 1);
-        t.is(nico_mocks.hb_post_count, 0); 
-        
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.regex(error.message, /500:/);
-        
-        t.end();
-    }));
+
+    await new Promise(resolve => {
+        nico_video.postHeartBeat((error=>{
+            t.is(nico_mocks.hb_options_count, 1);
+            t.is(nico_mocks.hb_post_count, 0); 
+            
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.regex(error.message, /500:/);
+            
+            resolve();
+        }));
+    });
 });

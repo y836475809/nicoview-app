@@ -98,25 +98,27 @@ test.beforeEach(t => {
     t.context.nico_update = new TestNicoUpdate(video_item);
 });
 
-test.cb("updateThumbInfo, db=xml, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbInfo, db=xml, not deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
 
-    nico_update.updateThumbInfo().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_setTags",
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertComment",
-            "_setDBtype",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateThumbInfo().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_setTags",
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertComment",
+                "_setDBtype",
+            ]);
+            resolve();
+        });
     });
 });
 
@@ -134,25 +136,27 @@ test("updateThumbInfo, db=xml, not deleted in nico, deleted in db", async(t) => 
     await t.throwsAsync(nico_update.updateThumbInfo());
 });
 
-test.cb("updateThumbInfo, db=json, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbInfo, db=json, not deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
 
-    nico_update.updateThumbInfo().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_setTags",
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertComment",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateThumbInfo().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_setTags",
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertComment",
+            ]);
+            resolve();
+        });
     });
 });
 
@@ -173,238 +177,260 @@ test("updateThumbInfo, db=json, not deleted in nico, deleted in db", async(t) =>
 });
 
 
-test.cb("updateComment, db=xml, not deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=xml, not deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
 
-    nico_update.updateComment().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-            "_setTags",
-            "_setDBtype",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+                "_setTags",
+                "_setDBtype",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=xml, comments_diff is empty, not deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=xml, comments_diff is empty, not deleted in nico, not deleted in db", async (t) => {
     t.plan(2);
 
     const nico_update = t.context.nico_update;
     nico_update._comments_diff= [];
 
-    nico_update.updateComment().then((result)=>{
-        t.is(result, undefined);
-        t.deepEqual(nico_update.log, []);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.is(result, undefined);
+            t.deepEqual(nico_update.log, []);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=xml, deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=xml, deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update._is_deleted_in_nico = true;
 
-    nico_update.updateComment().then((result)=>{
-        t.truthy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-            "_setTags",
-            "_setDBtype",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.truthy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+                "_setTags",
+                "_setDBtype",
+            ]);
+            resolve();
+        });
     });
 });
 
 
-test.cb("updateComment, db=xml, not deleted in nico, deleted in db", (t) => {
+test("updateComment, db=xml, not deleted in nico, deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.is_deleted = true;
 
-    nico_update.updateComment().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-            "_setTags",
-            "_setDBtype",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+                "_setTags",
+                "_setDBtype",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=json, not deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=json, not deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
 
-    nico_update.updateComment().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=json, comments_diff is empty, not deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=json, comments_diff is empty, not deleted in nico, not deleted in db", async (t) => {
     t.plan(2);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
     nico_update._comments_diff = [];
 
-    nico_update.updateComment().then((result)=>{
-        t.is(result, undefined);
-        t.deepEqual(nico_update.log, []);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.is(result, undefined);
+            t.deepEqual(nico_update.log, []);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=json, deleted in nico, not deleted in db", (t) => {
+test("updateComment, db=json, deleted in nico, not deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
     nico_update._is_deleted_in_nico = true;
 
-    nico_update.updateComment().then((result)=>{
-        t.truthy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.truthy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateComment, db=json, not deleted in nico, deleted in db", (t) => {
+test("updateComment, db=json, not deleted in nico, deleted in db", async (t) => {
     t.plan(4);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
     nico_update.video_item.is_deleted = true;
 
-    nico_update.updateComment().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_writeFile",
-            "_isDataTypeJson",
-            "_convertThumbInfo",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateComment().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_writeFile",
+                "_isDataTypeJson",
+                "_convertThumbInfo",
+            ]);
+            resolve();
+        });
     });
 });
 
 
-test.cb("updateThumbnail, db=xml, thumb_size=S, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbnail, db=xml, thumb_size=S, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
 
-    nico_update.updateThumbnail().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "S");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].jpeg`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_isDataTypeJson",
-            "_getThumbImg:url-S",   
-            "_writeFile",
-            "_setThumbnailSize:S",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateThumbnail().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "S");
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].jpeg`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_isDataTypeJson",
+                "_getThumbImg:url-S",   
+                "_writeFile",
+                "_setThumbnailSize:S",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbnail, db=json, thumb_size=S, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
 
-    nico_update.updateThumbnail().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_isDataTypeJson",
-            "_getThumbImg:url-L",
-            "_writeFile",
-            "_setThumbnailSize:L",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateThumbnail().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "L");
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_isDataTypeJson",
+                "_getThumbImg:url-L",
+                "_writeFile",
+                "_setThumbnailSize:L",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("updateThumbnail, db=json, thumb_size=L, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbnail, db=json, thumb_size=L, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
     nico_update.video_item.thumbnail_size = "L";
 
-    nico_update.updateThumbnail().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_isDataTypeJson",
-            "_getThumbImg:url-L",
-            "_writeFile",
-            "_setThumbnailSize:L",
-        ]);
-        t.end();
-    });
+    await new Promise(resolve => {
+        nico_update.updateThumbnail().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "L");
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_isDataTypeJson",
+                "_getThumbImg:url-L",
+                "_writeFile",
+                "_setThumbnailSize:L",
+            ]);
+            resolve();
+        });
+    });                             
 });
 
-test.cb("updateThumbnail, db=json, thumb_size=L, large_thumb_url=null, not deleted in nico, not deleted in db", (t) => {
+test("updateThumbnail, db=json, thumb_size=L, large_thumb_url=null, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
@@ -412,15 +438,17 @@ test.cb("updateThumbnail, db=json, thumb_size=L, large_thumb_url=null, not delet
     nico_update.video_item.thumbnail_size = "L";
     nico_update._large_thumb_url = null;
 
-    nico_update.updateThumbnail().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, []);
-        t.is(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_isDataTypeJson",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.updateThumbnail().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "L");
+            t.deepEqual(nico_update.paths, []);
+            t.is(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_isDataTypeJson",
+            ]);
+            resolve();
+        });
     });
 });
 
@@ -439,58 +467,62 @@ test("updateThumbnail, not deleted in nico, deleted in db", async(t) => {
 });
 
 
-test.cb("update, db=xml, not deleted in nico, not deleted in db", (t) => {
+test("update, db=xml, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
 
-    nico_update.update().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`),
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`),
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_setTags",
-            "_writeFile",
-            "_writeFile",
-            "_getThumbImg:url-L",
-            "_writeFile",
-            "_setThumbnailSize:L",
-            "_isDataTypeJson",
-            "_setDBtype",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.update().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "L");
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`),
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`),
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_setTags",
+                "_writeFile",
+                "_writeFile",
+                "_getThumbImg:url-L",
+                "_writeFile",
+                "_setThumbnailSize:L",
+                "_isDataTypeJson",
+                "_setDBtype",
+            ]);
+            resolve();
+        });
     });
 });
 
-test.cb("update, db=json, not deleted in nico, not deleted in db", (t) => {
+test("update, db=json, not deleted in nico, not deleted in db", async (t) => {
     t.plan(5);
 
     const nico_update = t.context.nico_update;
     nico_update.video_item.data_type = "json";
 
-    nico_update.update().then((result)=>{
-        t.falsy(nico_update.video_item.is_deleted);
-        t.is(nico_update.video_item.thumbnail_size, "L");
-        t.deepEqual(nico_update.paths, [
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`),
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`),
-            path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
-        ]);
-        t.not(result, undefined);
-        t.deepEqual(nico_update.log, [
-            "_setTags",
-            "_writeFile",
-            "_writeFile",
-            "_getThumbImg:url-L",
-            "_writeFile",
-            "_setThumbnailSize:L",
-            "_isDataTypeJson",
-        ]);
-        t.end();
+    await new Promise(resolve => {
+        nico_update.update().then((result)=>{
+            t.falsy(nico_update.video_item.is_deleted);
+            t.is(nico_update.video_item.thumbnail_size, "L");
+            t.deepEqual(nico_update.paths, [
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbInfo].json`),
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][Comment].json`),
+                path.normalize(`/data/${test_video_id} - [${test_video_id}][ThumbImg].L.jpeg`)
+            ]);
+            t.not(result, undefined);
+            t.deepEqual(nico_update.log, [
+                "_setTags",
+                "_writeFile",
+                "_writeFile",
+                "_getThumbImg:url-L",
+                "_writeFile",
+                "_setThumbnailSize:L",
+                "_isDataTypeJson",
+            ]);
+            resolve();
+        });
     });
 });

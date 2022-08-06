@@ -47,22 +47,22 @@ test("options", async (t) => {
     t.is(body, "ok");
 });
 
-test.cb("options cancel", (t) => {
+test("options cancel", async (t) => {
     t.plan(1);
 
     nock_options(2*1000);
-
     const req = new NicoClientRequest();
-    setTimeout(()=>{
-        req.cancel();
-    }, 1000);
 
-    req.options(test_url)
-        .then()
-        .catch(error=>{
+    await new Promise(resolve => {
+        setTimeout(()=>{
+            req.cancel();
+        }, 1000);
+        
+        req.options(test_url).then().catch(error=>{
             t.truthy(error.cancel);
-            t.end();
+            resolve();
         });
+    });
 });
 
 test("options timeout", async (t) => {

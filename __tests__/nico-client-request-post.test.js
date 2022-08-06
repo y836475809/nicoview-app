@@ -54,22 +54,22 @@ test("post", async (t) => {
     t.deepEqual(ret, {key:"ok"});
 });
 
-test.cb("post cancel", (t) => {
+test("post cancel", async (t) => {
     t.plan(1);
 
     nock_post({delay:2*1000});
-
     const req = new NicoClientRequest();
-    setTimeout(()=>{
-        req.cancel();
-    }, 1000);
 
-    req.post(test_url, {json:json_data})
-        .then()
-        .catch(error=>{
+    await new Promise(resolve => {
+        setTimeout(()=>{
+            req.cancel();
+        }, 1000);
+
+        req.post(test_url, {json:json_data}).then().catch(error=>{
             t.truthy(error.cancel);
-            t.end();
+            resolve();
         });
+    });
 });
 
 test("post json error", async (t) => {
@@ -96,27 +96,30 @@ test("post repeat", async (t) => {
     t.is(post_count, 2);
 });
 
-test.cb("post repeat check async", (t) => {
+test("post repeat check async", async (t) => {
     t.plan(2);
 
     nock_post();
 
     const log = [];
     let int_id = null;
-    setTimeout(()=>{
-        clearInterval(int_id);
-        t.is(post_count, 2);
-        t.deepEqual(log, ["log1", {key:"ok"}, {key:"ok"}]);
-        t.end();
-    },2500);
 
-    const req = new NicoClientRequest();
-    int_id = setInterval(() => { 
-        req.post(test_url, {json:json_data})
-            .then((ret)=>{log.push(ret);});
-    }, 1000);  
-    
-    log.push("log1");
+    await new Promise(resolve => {
+        setTimeout(()=>{
+            clearInterval(int_id);
+            t.is(post_count, 2);
+            t.deepEqual(log, ["log1", {key:"ok"}, {key:"ok"}]);
+            resolve();
+        },2500);
+
+        const req = new NicoClientRequest();
+        int_id = setInterval(() => { 
+            req.post(test_url, {json:json_data})
+                .then((ret)=>{log.push(ret);});
+        }, 1000);  
+
+        log.push("log1");
+    });
 });
 
 test("post repeat stop", async (t) => {

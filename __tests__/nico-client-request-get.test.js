@@ -47,22 +47,22 @@ test.afterEach(t => {
     nock.cleanAll();
 });
 
-test.cb("get cancel", (t) => {
+test("get cancel", async (t) => {
     t.plan(1);
 
     nock_get(2*1000);
-
     const req = new NicoClientRequest();
-    setTimeout(()=>{
-        req.cancel();
-    }, 1000);
 
-    req.get(test_url)
-        .then()
-        .catch(error=>{
+    await new Promise(resolve => {
+        setTimeout(()=>{
+            req.cancel();
+        }, 1000);
+        
+        req.get(test_url).then().catch(error=>{
             t.truthy(error.cancel);
-            t.end();
+            resolve();
         });
+    });
 });
 
 test("get stream", async (t) => {

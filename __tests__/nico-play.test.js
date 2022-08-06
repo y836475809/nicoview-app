@@ -75,30 +75,29 @@ test("nico play dmc", async (t) => {
     nico_play.stopHB();
 });
 
-test.cb("nico play dmc cancel", (t) => {
+test("nico play dmc cancel", async (t) => {
     t.plan(2);
 
-    nico_mocks.watch(3000);
-    // nico_mocks.comment();
-    // nico_mocks.dmc_session();
-    // nico_mocks.dmc_hb();
+    await new Promise(resolve => {
+        nico_mocks.watch(3000);
+        
+        const nico_play = createNicoPlay();
+    
+        setTimeout(()=>{
+            nico_play.cancel();
+        },1000);
 
-    const nico_play = createNicoPlay();
-
-    setTimeout(()=>{
-        nico_play.cancel();
-    },1000);
-
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.truthy(error.cancel);
-        t.is(state_log, "startWatch:");
-        t.end();
+        nico_play.play(TestData.video_id).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.truthy(error.cancel);
+            t.is(state_log, "startWatch:");
+            resolve();
+        });
     });
 });
 
-test.cb("nico play dmc cancel hb", (t) => {
+test("nico play dmc cancel hb",async (t) => {
     t.plan(4);
 
     nico_mocks.watch();
@@ -108,29 +107,31 @@ test.cb("nico play dmc cancel hb", (t) => {
 
     const nico_play = createNicoPlay(hb_1s_rate);
 
-    setTimeout(()=>{
-        nico_play.cancel();
-    },2500);
+    await new Promise(resolve => {
+        setTimeout(()=>{
+            nico_play.cancel();
+        },2500);
 
-    setTimeout(()=>{
-        t.is(nico_mocks.hb_options_count, 1);
-        t.is(nico_mocks.hb_post_count, 2);  
-        t.is(state_log, 
-            "startWatch:finishWatch:"
-            + "startComment:finishComment:"
-            + "startHeartBeat:startPlayVideo:"
-            + "cancelHeartBeat:");  
-        t.end();
-    },6000);   
+        setTimeout(()=>{
+            t.is(nico_mocks.hb_options_count, 1);
+            t.is(nico_mocks.hb_post_count, 2);  
+            t.is(state_log, 
+                "startWatch:finishWatch:"
+                + "startComment:finishComment:"
+                + "startHeartBeat:startPlayVideo:"
+                + "cancelHeartBeat:");  
+            resolve();
+        },6000);   
 
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.is(error, undefined);
-    });     
+        nico_play.play(TestData.video_id).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.is(error, undefined);
+        });   
+    });  
 });
 
-test.cb("nico play dmc error watch", (t) => {
+test("nico play dmc error watch", async (t) => {
     t.plan(3);
 
     nico_mocks.watch(1, 404);
@@ -140,17 +141,19 @@ test.cb("nico play dmc error watch", (t) => {
 
     const nico_play = createNicoPlay(hb_1s_rate);
 
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.is(state_log, "startWatch:");
-        t.end();
+    await new Promise(resolve => {
+        nico_play.play(TestData.video_id).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.is(state_log, "startWatch:");
+            resolve();
+        });
     });
 });
 
-test.cb("nico play dmc error comment", (t) => {
+test("nico play dmc error comment", async (t) => {
     t.plan(3);
 
     nico_mocks.watch();
@@ -160,17 +163,19 @@ test.cb("nico play dmc error comment", (t) => {
 
     const nico_play = createNicoPlay(hb_1s_rate);
 
-    nico_play.play(TestData.video_id,).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.is(state_log, "startWatch:finishWatch:startComment:");
-        t.end();
+    await new Promise(resolve => {
+        nico_play.play(TestData.video_id,).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.is(state_log, "startWatch:finishWatch:startComment:");
+            resolve();
+        });
     });
 });
 
-test.cb("nico play dmc error dmc_session", (t) => {
+test("nico play dmc error dmc_session", async (t) => {
     t.plan(5);
 
     nico_mocks.watch();
@@ -180,21 +185,23 @@ test.cb("nico play dmc error dmc_session", (t) => {
 
     const nico_play = createNicoPlay(hb_1s_rate);
 
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.is(state_log, 
-            "startWatch:finishWatch:"
-            + "startComment:finishComment:");
-        t.is(nico_mocks.hb_options_count, 0);
-        t.is(nico_mocks.hb_post_count, 0);
-        t.end();
+    await new Promise(resolve => {
+        nico_play.play(TestData.video_id).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.is(state_log, 
+                "startWatch:finishWatch:"
+                + "startComment:finishComment:");
+            t.is(nico_mocks.hb_options_count, 0);
+            t.is(nico_mocks.hb_post_count, 0);
+            resolve();
+        });
     });
 });
 
-test.cb("nico play dmc error hb_options", (t) => {
+test("nico play dmc error hb_options", async (t) => {
     t.plan(5);
 
     nico_mocks.watch();
@@ -204,17 +211,19 @@ test.cb("nico play dmc error hb_options", (t) => {
 
     const nico_play = createNicoPlay(hb_1s_rate);
 
-    nico_play.play(TestData.video_id).then((result)=>{
-        t.not(result, undefined);
-    }).catch(error => {
-        t.is(error.cancel, undefined);
-        t.is(error.name, "Error");
-        t.is(state_log, 
-            "startWatch:finishWatch:"
-            + "startComment:finishComment:");
-        t.is(nico_mocks.hb_options_count, 0);
-        t.is(nico_mocks.hb_post_count, 0);
-        t.end();
+    await new Promise(resolve => {
+        nico_play.play(TestData.video_id).then((result)=>{
+            t.not(result, undefined);
+        }).catch(error => {
+            t.is(error.cancel, undefined);
+            t.is(error.name, "Error");
+            t.is(state_log, 
+                "startWatch:finishWatch:"
+                + "startComment:finishComment:");
+            t.is(nico_mocks.hb_options_count, 0);
+            t.is(nico_mocks.hb_post_count, 0);
+            resolve();
+        });
     });
 });
 

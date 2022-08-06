@@ -307,6 +307,12 @@ class CommentFilter {
      * @param {string[]} ng_user_ids 
      */
     setNGComments(ng_texts, ng_user_ids){
+        if(!ng_texts){
+            ng_texts = [];
+        }
+        if(!ng_user_ids){
+            ng_user_ids = [];
+        }
         this.ng_comment.setNGComments(ng_texts, ng_user_ids);
     }
 

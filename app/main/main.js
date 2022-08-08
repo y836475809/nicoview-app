@@ -7,7 +7,7 @@ process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
 
 const { Config } = require("../js/config");
 const { Library } = require("../js/library");
-const { History } = require("../js/play-history");
+const { History } = require("../js/history");
 const { importNNDDDB } = require("../js/import-nndd-db");
 const { getNicoDataFilePaths } = require("../js/nico-data-file");
 const { logger } = require("../js/logger");

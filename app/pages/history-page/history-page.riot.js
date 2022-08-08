@@ -36,8 +36,8 @@ module.exports = {
             this.grid_table.updateCells(video_id, { saved:false });
         });
 
-        myapi.ipc.PlayHistory.onUpdateItem(async ()=>{
-            const items = await myapi.ipc.PlayHistory.getItems();
+        myapi.ipc.History.onUpdateItem(async ()=>{
+            const items = await myapi.ipc.History.getItems();
             this.setData(items);
         });
         
@@ -108,7 +108,7 @@ module.exports = {
     },
     async loadItems() {
         try {
-            const items = await myapi.ipc.PlayHistory.getItems();
+            const items = await myapi.ipc.History.getItems();
             this.setData(items);
         } catch (error) {
             logger.error(error);

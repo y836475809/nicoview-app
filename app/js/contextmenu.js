@@ -523,7 +523,7 @@ const main_mylist = (main_win) => {
     });
 };
 
-const main_play_history = (main_win) => {
+const main_history = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-history", async (event, args) => {
         const { items } = args;
 
@@ -618,7 +618,7 @@ const setupContextmenu = (main_win, player_win, config, history, store) => {
     main_library(main_win);
     main_library_convert_video(main_win);
     main_mylist(main_win);
-    main_play_history(main_win);
+    main_history(main_win);
     main_search(main_win);
 };
 

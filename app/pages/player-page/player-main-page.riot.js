@@ -319,7 +319,7 @@ module.exports = {
             state: state
         });   
         
-        myapi.ipc.PlayHistory.addItem({
+        myapi.ipc.History.addItem({
             video_id: video.video_id, 
             thumb_img: video.thumbnailURL, 
             title: video.title,  

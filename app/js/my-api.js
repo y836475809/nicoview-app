@@ -179,7 +179,7 @@ const MyList = {
     },
 };
 
-const PlayHistory = {
+const History = {
     addItem: (item)=>{
         ipcRenderer.send("history:addItem", {item});
     },
@@ -466,7 +466,7 @@ const myapi = {
         Download,
         NGList,
         MyList,
-        PlayHistory,
+        History,
         Setting,
         Stack,
         Bookmark,

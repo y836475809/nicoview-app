@@ -48,7 +48,6 @@ module.exports = {
             const video_data = new NicoVideoData(video_item);
             const video_id = video_item.video_id;
             video_item.thumb_img = video_data.getThumbImgPath();
-            video_item.tags = video_item.tags ? video_item.tags.join(" ") : "";
             this.grid_table.updateItem(video_item, video_id);
 
             this.state.num_filtered_items =  this.grid_table.getDataLength();
@@ -82,7 +81,6 @@ module.exports = {
             const library_items = items.map(value=>{
                 const video_data = new NicoVideoData(value);
                 value.thumb_img = video_data.getThumbImgPath();
-                value.tags = value.tags ? value.tags.join(" ") : "";
                 return value;
             });
             this.loadLibraryItems(library_items);
@@ -155,6 +153,9 @@ module.exports = {
         this.grid_table.setupResizer(".library-grid-container");
 
         this.grid_table.setFilter((column_id, value, word) => { 
+            if(Array.isArray(value) && value.join(" ").toLowerCase.indexOf(word.toLowerCase()) != -1) {
+                return true;
+            }
             if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
                 return true;
             }   

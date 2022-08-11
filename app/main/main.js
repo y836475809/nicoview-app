@@ -5,6 +5,35 @@ const path = require("path");
 
 process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
 
+const app_dir = path.join(__dirname, "/..");
+
+let main_html_path = path.join(app_dir, "html", "index.html");
+const player_html_path = path.join(app_dir, "html", "player.html");
+const preload_path = path.join(app_dir, "main", "preload.js");
+let config_fiiename = "config.json";
+
+if(app.commandLine.getSwitchValue("test")){
+    // テスト用に設定
+    const { TestParams } = require("../../test/test-params");
+    const test_params = new TestParams(app_dir);
+    test_params.load();
+    main_html_path = test_params.main_html_path;
+    config_fiiename = test_params.config_fiiename;
+
+    if(test_params.use_mock_server){
+        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
+        setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
+    }
+
+    process.env["test_nicoappview"] = true;
+    // テスト時はテスト用のユーザーデータフォルダを使用
+    app.setPath("userData", `${app.getPath("userData")}-test`);
+
+    // 環境変数にログファイルパスを設定
+    process.env["nicoappview_log_file_path"] = 
+        path.join(app.getPath("userData"), "logs/app.log");
+}
+
 const { Config } = require("../js/config");
 const { Library } = require("../js/library");
 const { History } = require("../js/history");
@@ -34,8 +63,6 @@ const json_store = new JsonStore(async ()=>{
 });
 const user_icon_cache = new UserIconCache();
 
-const app_dir = path.join(__dirname, "/..");
-
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
 /** @type {BrowserWindow} */
@@ -43,28 +70,6 @@ let main_win = null;
 let main_win_menu = null;
 let player_win = null;
 let do_app_quit = false;
-
-let main_html_path = path.join(app_dir, "html", "index.html");
-const player_html_path = path.join(app_dir, "html", "player.html");
-const preload_path = path.join(app_dir, "main", "preload.js");
-let config_fiiename = "config.json";
-
-if(app.commandLine.getSwitchValue("test")){
-    const { TestParams } = require("../../test/test-params");
-    const test_params = new TestParams(app_dir);
-    test_params.load();
-    main_html_path = test_params.main_html_path;
-    config_fiiename = test_params.config_fiiename;
-
-    if(test_params.use_mock_server){
-        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
-        setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
-    }
-
-    process.env["test_nicoappview"] = true;
-    // テスト時はテスト用のユーザーデータフォルダを使用
-    app.setPath("userData", `${app.getPath("userData")}-test`);
-}
 
 process.on("uncaughtException", (error) => {
     logger.error("uncaught exception:", error);

@@ -3,6 +3,10 @@ const log = require("electron-log");
 class Logger {
     constructor(){
         log.transports.file.fileName = "app.log";
+        const log_file_path = process.env["nicoappview_log_file_path"];
+        if(log_file_path){
+            log.transports.file.resolvePath = () => log_file_path;
+        }
 
         log.transports.console.level = "info";
         log.transports.file.level = "info";

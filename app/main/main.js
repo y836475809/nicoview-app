@@ -38,6 +38,7 @@ const app_dir = path.join(__dirname, "/..");
 
 // ウィンドウオブジェクトをグローバル参照をしておくこと。
 // しないと、ガベージコレクタにより自動的に閉じられてしまう。
+/** @type {BrowserWindow} */
 let main_win = null;
 let main_win_menu = null;
 let player_win = null;
@@ -185,6 +186,17 @@ const changeLogLevel = (args) => {
     }
 };
 
+/**
+ * user css適用が終わってroitタグのマウントOKであることを通知する
+ * @param {BrowserWindow} win 
+ */
+const notifyRiotReady = async (win) => {
+    const code = "\
+    const elms = document.getElementsByTagName('body'); \
+    elms[0].dataset.mountready = 'true';";
+    await win.webContents.executeJavaScript(code);
+};
+
 function createWindow() {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -252,8 +264,7 @@ function createWindow() {
 
     main_win.webContents.on("did-finish-load", async () => { 
         user_css.apply(main_win);
-        main_win.webContents.send("app:on-load-content");
-
+        await notifyRiotReady(main_win);
         main_win.webContents.on("context-menu", (e, props) => {
             popupInputContextMenu(main_win, props);
         });
@@ -622,8 +633,7 @@ const createPlayerWindow = () => {
         player_win.removeMenu();
         player_win.webContents.on("did-finish-load", async () => {
             user_css.apply(player_win);
-            player_win.webContents.send("app:on-load-content");
-
+            await notifyRiotReady(player_win);
             player_win.webContents.on("context-menu", (e, props) => {
                 popupInputContextMenu(player_win, props);
             });

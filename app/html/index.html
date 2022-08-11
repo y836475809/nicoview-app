@@ -43,16 +43,9 @@
     <script type="riot" src="../pages/mylist-page/mylist-content.riot"></script>
 
     <script src="../../node_modules/riot/riot+compiler.min.js"></script>
+    <script src="./riot-mount.js"></script>
     
     <script>
-        /* globals riot */
-        const myapi = window.myapi;
-
-        myapi.ipc.Config.set("download.wait_time", 10).then();
-
-        myapi.ipc.onLoadContent(async ()=>{
-            await riot.compile();
-            riot.mount("main-page");
-        });
+        roitMount("main-page"); // eslint-disable-line no-undef
     </script>
 </html>

@@ -1,7 +1,6 @@
 
 process.once("loaded", () => {
     global.logger = require("../../app/js/logger");
-    global.myapi = require("../../app/js/my-api");
 
     if(process.env["test_nicoappview"] ?? false){
         global.logger.logger.debug("test_nicoappview");

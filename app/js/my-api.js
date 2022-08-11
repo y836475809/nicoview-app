@@ -17,13 +17,6 @@ const popupContextMenu = async (name, data) => {
     return await ipcRenderer.invoke(channel, data);            
 };
 
-const onLoadContent = (func) => {
-    ipcRenderer.on("app:on-load-content", (event, ...args)=>{
-        func(...args);
-    });
-};
-
-
 /**
  * 
  * @param {function({
@@ -456,7 +449,7 @@ const myapi = {
     
     ipc: {
         popupContextMenu,
-        onLoadContent,
+        // onLoadContent,
         onPlayVideo,
         playerReady,
         showyPlayer,

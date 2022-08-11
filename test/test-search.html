@@ -22,12 +22,9 @@
 <script type="riot" src="../app/pages/search-page/search-sidebar.riot"></script>
 <script type="riot" src="../app/pages/search-page/search-content.riot"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script src="../app/html/riot-mount.js"></script>
 <script>
-    /* globals riot */
-    (async function main() {
-        await riot.compile();
-        riot.mount("sidebar-page");
-    }());
+    roitMount("sidebar-page"); // eslint-disable-line no-undef
 </script>
 
 </html>

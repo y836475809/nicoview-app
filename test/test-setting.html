@@ -16,12 +16,9 @@
 <script type="riot" src="../app/pages/common/modal-dialog.riot"></script>
 <script type="riot" src="../app/pages/setting-page/setting-page.riot"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
+<script src="../app/html/riot-mount.js"></script>
 <script>
-    /* globals riot */
-    (async function main() {
-        await riot.compile();
-        riot.mount("setting-page");
-    }());
+    roitMount("setting-page"); // eslint-disable-line no-undef
 </script>
 
 </html>

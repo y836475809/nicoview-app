@@ -173,7 +173,7 @@ module.exports = {
         await this.clearDownloadItems(DownloadState.complete);
     },
     async onChangeDownloadItem() {
-        /** @type {DownloadItem[]} */
+        /** @type {RegDownloadItem[]} */
         const grid_data = this.grid_table_dl.getData();
         const items = grid_data.map(value => {
             let state = DownloadState.complete;

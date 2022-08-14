@@ -127,7 +127,7 @@ module.exports = {
         });
 
         main_obs.on("mylist-page:items-deleted", async (args)=> {
-            /** @type {{items:MyListListItem[]}} */
+            /** @type {{items:MyListIndexItem[]}} */
             const { items } = args;
             items.forEach(item => {
                 const mylist_id = item.mylist_id;
@@ -203,7 +203,7 @@ module.exports = {
         this.grid_table.onDblClick(async (e, data)=>{
             /** @type {string} */
             const video_id = data.video_id;
-            /** @type {LibraryData} */
+            /** @type {LibraryItem} */
             const video_item = await myapi.ipc.Library.getItem(video_id);
             if(needConvertVideo(video_item)===true){      
                 const ret = await myapi.ipc.Dialog.showMessageBox({
@@ -260,7 +260,7 @@ module.exports = {
      * @returns {Promise<string[]>}
      */
     async getMylistIDList() {
-        /** @type {{items:MyListListItem[]}} */
+        /** @type {{items:MyListIndexItem[]}} */
         const { items } = await main_obs.triggerReturn("mylist-page:sidebar:get-items");
         const mylist_id_list = items.map(item => {
             return item.mylist_id;
@@ -316,7 +316,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {MyListData} mylist 
+     * @param {MyListItem} mylist 
      * @param {boolean} update_image_cache_id 
      */
     async setMylist(mylist, update_image_cache_id=true) {
@@ -340,7 +340,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {MyListData} mylist 
+     * @param {MyListItem} mylist 
      */
     async setData(mylist) {
         this.loaded_mylist_id = mylist.mylist_id;
@@ -369,7 +369,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {MyListData} mylist 
+     * @param {MyListItem} mylist 
      * @returns 
      */
     async addMylist(mylist) {

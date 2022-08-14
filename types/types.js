@@ -13,7 +13,7 @@
  * サイドバーのリストアイテム
  * @typedef {Object} ListItem 
  * @property {string} title 表示名
- * @property {string} [state] 表示状態 保存時に削除
+ * @property {string} state 表示状態
  * @property {boolean} marked true:アイコンを赤色にする
  */
 
@@ -24,10 +24,11 @@
  */
 
 /**
- * @typedef {Object} DownloadItem 
+ * ダウンロード
+ * @typedef {Object} RegDownloadItem 
  * @property {string} video_id
  * @property {string} title
- * @property {number} state
+ * @property {number} state wait: 0,downloading: 1,complete: 2, error: 3
  * @property {string} thumb_img
  */
 
@@ -49,13 +50,15 @@
  
  
 /**
- * @typedef {Object} MyListListItem 
+ * mylistの見出し
+ * @typedef {Object} MyListIndexItem 
  * @property {string} title
  * @property {string} mylist_id id
  * @property {string} creator
  */
 
 /**
+ * mylistの動画
  * @typedef {Object} MyListVideoItem
  * @property {number} no
  * @property {string} title
@@ -68,7 +71,8 @@
  */
 
 /**
- * @typedef {Object} MyListData 
+ * mylist
+ * @typedef {Object} MyListItem 
  * @property {string} title
  * @property {string} mylist_id
  * @property {string} link
@@ -78,52 +82,30 @@
  */
 
 /**
- * ライブラリデータ
- * @typedef {Object} LibraryData 
+ * ライブラリの動画情報
+ * @typedef {Object} LibraryItem
  * @property {string} data_type
  * @property {string} title
+ * @property {string} video_id
  * @property {string} video_type
  * @property {number} dirpath_id
  * @property {string} dirpath
  * @property {string} common_filename
  * @property {string} thumbnail_size
+ * @property {string} [thumb_img]
  * @property {number} modification_date
  * @property {number} creation_date
  * @property {number} pub_date
  * @property {number} last_play_date
  * @property {number} play_count
+ * @property {number} play_time
  * @property {string[]} tags
  * @property {boolean} is_economy
  * @property {boolean} is_deleted
- * @property {string} video_id
- * @property {number} play_time
  */
 
 /**
- * ライブラのグリッドテーブルのデータ
- * @typedef {Object} LibraryGridTableData 
- * @property {string} data_type
- * @property {string} title
- * @property {string} video_type
- * @property {number} dirpath_id
- * @property {string} dirpath
- * @property {string} common_filename
- * @property {string} thumbnail_size
- * @property {string} thumb_img
- * @property {number} modification_date
- * @property {number} creation_date
- * @property {number} pub_date
- * @property {number} last_play_date
- * @property {number} play_count
- * @property {string} tags
- * @property {boolean} is_economy
- * @property {boolean} is_deleted
- * @property {string} video_id
- * @property {number} play_time
- */
-
-/**
- * ライブラリ検索リストアイテム
+ * ライブラリ検索条件
  * @typedef {Object} LibrarySearchItem 
  * @property {string} title
  * @property {string} query
@@ -133,6 +115,7 @@
 
 /**
  * ニコニコ動画検索ソート種類
+ * 検索ページのソート種類項目を生成するためのデータ
  * @typedef {Object} SearchSortItem 
  * @property {string} title
  * @property {string} name
@@ -141,6 +124,7 @@
 
 /**
  * ニコニコ動画検索対象条件
+ * 検索ページの検索対象項目を生成するためのデータ
  * @typedef {Object} SearchTargetItem 
  * @property {string} title
  * @property {string} target
@@ -166,15 +150,15 @@
 
 /**
  * ニコニコ動画検索結果の検索数、ページ数情報
- * @typedef {Object} SearchPageInfo 
+ * @typedef {Object} SearchResultPageItem 
  * @property {number} page_num
  * @property {number} total_page_num
  * @property {number} search_result_num
  */
 
 /**
- * ニコニコ動画検索結果(グリッドテーブル情報)
- * @typedef {Object} SearchResultItem 
+ * ニコニコ動画検索結果の動画情報
+ * @typedef {Object} SearchResultVideoItem 
  * @property {string} thumbnailUrl
  * @property {string} contentId
  * @property {string} title
@@ -188,8 +172,8 @@
 /**
  * ニコニコ動画検索結果
  * @typedef {Object} SearchResult 
- * @property {SearchPageInfo} page_ifno
- * @property {SearchResultItem[]} list
+ * @property {SearchResultPageItem} page_ifno
+ * @property {SearchResultVideoItem[]} list
  */
 
 /**

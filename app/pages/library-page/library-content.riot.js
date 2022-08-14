@@ -77,7 +77,7 @@ module.exports = {
         myapi.ipc.Library.onInit((args) =>{
             const {items} = args;
 
-            /** @type {LibraryGridTableData[]} */
+            /** @type {LibraryItem[]} */
             const library_items = items.map(value=>{
                 const video_data = new NicoVideoData(value);
                 value.thumb_img = video_data.getThumbImgPath();
@@ -387,7 +387,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {LibraryGridTableData[]} items 
+     * @param {LibraryItem[]} items 
      */
     loadLibraryItems(items) {
         this.grid_table.setData(items);
@@ -398,7 +398,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {LibraryData[]} items 
+     * @param {LibraryItem[]} items 
      * @param {function(nico_update:NicoUpdate):NicoUpdateResult} func 
      * @returns 
      */
@@ -485,7 +485,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {LibraryData[]} items 
+     * @param {LibraryItem[]} items 
      * @returns 
      */
     async convertNicoDataToNNDD(items) {
@@ -675,7 +675,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {LibraryData} item 
+     * @param {LibraryItem} item 
      * @param {boolean} online 
      * @returns 
      */

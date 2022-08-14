@@ -332,7 +332,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {LibraryData} video_item 
+     * @param {LibraryItem} video_item 
      * @param {number} time 
      */
     async playVideoItem(video_item, time=0) {

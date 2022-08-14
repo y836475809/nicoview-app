@@ -11,7 +11,7 @@ const main_obs = window_obs;
 
 /**
  * 検索ページのグリッドテーブルに追加するアイテムを生成
- * @param {SearchResultItem} value 
+ * @param {SearchResultVideoItem} value 
  * @param {boolean} saved 
  * @param {boolean} reg_download 
  * @returns 

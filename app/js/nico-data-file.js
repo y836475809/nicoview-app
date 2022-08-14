@@ -209,7 +209,7 @@ class NicoJsonFile extends NicoDataFile {
 class NicoVideoData {
     /**
      * 
-     * @param {LibraryData} video_item 
+     * @param {LibraryItem} video_item 
      */
     constructor(video_item){
         /** @type {NicoDataFile} */
@@ -218,7 +218,7 @@ class NicoVideoData {
 
     /**
      * 
-     * @param {LibraryData} video_item 
+     * @param {LibraryItem} video_item 
      * @returns {NicoDataFile}
      */
     _getData(video_item){

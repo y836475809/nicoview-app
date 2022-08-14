@@ -20,7 +20,7 @@ const popupContextMenu = async (name, data) => {
 /**
  * 
  * @param {function({
- *      video_id:string, online:boolean, time:number, video_item:LibraryData}
+ *      video_id:string, online:boolean, time:number, video_item:LibraryItem}
  * ):void} func 
  */
 const onPlayVideo = (func) => {  
@@ -94,14 +94,14 @@ const Download = {
     },
     /**
      * 
-     * @returns {Promise<DownloadItem[]>}
+     * @returns {Promise<RegDownloadItem[]>}
      */
     getItems: async () => {  
         return await ipcRenderer.invoke("download:getItems");
     },
     /**
      * 
-     * @param {DownloadItem[]} items 
+     * @param {RegDownloadItem[]} items 
      * @returns {Promise<void>}
      */
     updateItems: async (items) => {  
@@ -144,14 +144,14 @@ const MyList = {
     },
     /**
      * 
-     * @returns {Promise<MyListListItem[]>}
+     * @returns {Promise<MyListIndexItem[]>}
      */
     getItems: async ()=> {
         return await ipcRenderer.invoke("mylist:getItems");
     },
     /**
      * 
-     * @param {MyListListItem[]} items 
+     * @param {MyListIndexItem[]} items 
      * @returns {Promise<void>}
      */
     updateItems: async (items) => {  
@@ -331,14 +331,14 @@ const Library = {
     /**
      * 
      * @param {string} video_id 
-     * @returns {Promise<LibraryData>}
+     * @returns {Promise<LibraryItem>}
      */
     getItem: async (video_id)=>{
         return await ipcRenderer.invoke("library:getItem", {video_id});
     },
     /**
      * 
-     * @param {LibraryData} item 
+     * @param {LibraryItem} item 
      * @returns {Promise<void>}
      */
     addItem: async (item) => {  
@@ -388,7 +388,7 @@ const Library = {
 
     /**
      * 
-     * @param {function({items:LibraryData[]})} func 
+     * @param {function({items:LibraryItem[]})} func 
      */
     onInit: (func) => {
         ipcRenderer.on("library:on-init", (event, args)=>{
@@ -397,7 +397,7 @@ const Library = {
     },
     /**
      * 
-     * @param {function({video_item:LibraryData}):void} func 
+     * @param {function({video_item:LibraryItem}):void} func 
      */
     onAddItem: (func) => {
         ipcRenderer.on("library:on-add-item", (event, args)=>{

@@ -58,6 +58,7 @@ class Logger {
 if(!global._nicoviewapp_logger){
     global._nicoviewapp_logger = new Logger();
 }
+/** @type {Logger} */
 const logger = global._nicoviewapp_logger;
 module.exports = { 
     logger

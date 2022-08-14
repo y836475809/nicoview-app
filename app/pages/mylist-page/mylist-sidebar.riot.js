@@ -10,7 +10,7 @@ module.exports = {
 
     name:"mylist",
 
-    /** @type {MyListListItem[]} */
+    /** @type {MyListIndexItem[]} */
     items:[],
 
     confirm:["delete"],
@@ -30,7 +30,7 @@ module.exports = {
         };
 
         this.obs_listview.on("changed", async (args) => {
-            /** @type {{items:MyListListItem[]}} */
+            /** @type {{items:MyListIndexItem[]}} */
             const { items } = args;
             this.items = items;
 

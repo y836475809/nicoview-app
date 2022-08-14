@@ -12,9 +12,9 @@ module.exports = {
     onBeforeMount() {
         this.obs_listview = new MyObservable();
         
-        /** @param {SearchListItem} item */
+        /** @param {SearchCond} item */
         this.geticon = (item) => {
-            const search_target = item.cond.search_target;
+            const search_target = item.search_target;
             if(search_target == "keyword"){
                 return "fas fa-ellipsis-h nico-search-item-adjust";
             }
@@ -33,39 +33,34 @@ module.exports = {
             search_target_map.set(item.target, item.title);
         });
     
-        /** @param {SearchListItem} item */
+        /** @param {SearchCond} item */
         this.getTooltip = (item) => {
-            const cond = item.cond;
+            const cond = item;
             const sort = sort_map.get(`${cond.sort_name}${cond.sort_order}`);
             const target = search_target_map.get(cond.search_target);
             return `${item.title}\n並び順: ${sort}\n種類: ${target}`;
         };
 
+        /** @param {SearchCond} item */
+        this.getTitle = (item) => {
+            return item.query;
+        };
+
         this.obs_listview.on("changed", async (args) => {
-            /** @type {{items:SearchListItem[]}} */
+            /** @type {{items:SearchCond[]}} */
             const { items } = args;
-            items.forEach(item => {
-                delete item.type;
-            });
             await myapi.ipc.Search.updateItems(items);
         });
 
-        this.obs_listview.on("item-dlbclicked", (item) => {
-            /** @type {SearchListItem} */
-            const list_item = item;
-            main_obs.trigger("search-page:item-dlbclicked", list_item.cond);
+        this.obs_listview.on("item-dlbclicked", (
+            /** @type {SearchCond} */ item) => {
+            main_obs.trigger("search-page:item-dlbclicked", item);
         });
 
-        main_obs.on("search-page:sidebar:add-item", (cond) => {
-            /** @type {SearchCond} */
-            const search_cond = cond;
-            const items = [
-                { 
-                    title: search_cond.query, 
-                    type:search_cond.search_target , 
-                    cond: search_cond 
-                }
-            ];
+        main_obs.on("search-page:sidebar:add-item", (
+            /** @type {SearchCond} */ cond) => {
+            const item = Object.assign({}, cond);
+            const items = [item];
             this.obs_listview.trigger("addList", { items });
         });
 
@@ -78,9 +73,6 @@ module.exports = {
     },
     async loadItems() {
         const items = await myapi.ipc.Search.getItems();
-        items.forEach(item => {
-            item.type = item.cond.search_target;
-        });
         this.obs_listview.trigger("loadData", { items });
     }
 };

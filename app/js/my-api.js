@@ -300,14 +300,14 @@ const Bookmark = {
 const Search = {
     /**
      * 
-     * @returns {SearchListItem[]}
+     * @returns {SearchCond[]}
      */
     getItems: async ()=>{
         return await ipcRenderer.invoke("nico-search:getItems");
     },
     /**
      * 
-     * @param {SearchListItem[]} items 
+     * @param {SearchCond[]} items 
      * @returns {Promise<void>}
      */
     updateItems: async (items) => {  

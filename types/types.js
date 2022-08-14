@@ -141,14 +141,6 @@
  */
 
 /**
- * ニコニコ動画検索サイドバーのリストアイテム
- * @typedef {Object} SearchListItem 
- * @property {string} title
- * @property {boolean} [marked]
- * @property {SearchCond} cond
- */
-
-/**
  * ニコニコ動画検索結果の検索数、ページ数情報
  * @typedef {Object} SearchResultPageItem 
  * @property {number} page_num

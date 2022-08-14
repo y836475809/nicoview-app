@@ -12,7 +12,7 @@ module.exports = {
     onBeforeMount() {
         this.obs_listview = new MyObservable();
         
-        /** @param {SearchCond} item */
+        /** @param {NicoSearchParamsItem} item */
         this.geticon = (item) => {
             const search_target = item.search_target;
             if(search_target == "keyword"){
@@ -33,7 +33,7 @@ module.exports = {
             search_target_map.set(item.target, item.title);
         });
     
-        /** @param {SearchCond} item */
+        /** @param {NicoSearchParamsItem} item */
         this.getTooltip = (item) => {
             const cond = item;
             const sort = sort_map.get(`${cond.sort_name}${cond.sort_order}`);
@@ -41,25 +41,24 @@ module.exports = {
             return `${item.title}\n並び順: ${sort}\n種類: ${target}`;
         };
 
-        /** @param {SearchCond} item */
+        /** @param {NicoSearchParamsItem} item */
         this.getTitle = (item) => {
             return item.query;
         };
 
         this.obs_listview.on("changed", async (args) => {
-            /** @type {{items:SearchCond[]}} */
+            /** @type {{items:NicoSearchParamsItem[]}} */
             const { items } = args;
             await myapi.ipc.Search.updateItems(items);
         });
 
         this.obs_listview.on("item-dlbclicked", (
-            /** @type {SearchCond} */ item) => {
+            /** @type {NicoSearchParamsItem} */ item) => {
             main_obs.trigger("search-page:item-dlbclicked", item);
         });
 
         main_obs.on("search-page:sidebar:add-item", (
-            /** @type {SearchCond} */ cond) => {
-            const item = Object.assign({}, cond);
+            /** @type {NicoSearchParamsItem} */ item) => {
             const items = [item];
             this.obs_listview.trigger("addList", { items });
         });

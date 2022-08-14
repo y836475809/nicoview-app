@@ -11,7 +11,7 @@ const main_obs = window_obs;
 
 /**
  * 検索ページのグリッドテーブルに追加するアイテムを生成
- * @param {SearchResultVideoItem} value 
+ * @param {NicoSearchResultVideoItem} value 
  * @param {boolean} saved 
  * @param {boolean} reg_download 
  * @returns 
@@ -52,10 +52,10 @@ module.exports = {
         search_target_title:"",
     },
 
-    /** @type {SearchSortItem} */
+    /** @type {NicoSearchSortItem} */
     sort_items:searchItems.sortItems,
 
-    /** @type {SearchTargetItem} */
+    /** @type {NicoSearchTargetItem} */
     search_target_items:searchItems.searchTargetItems,
 
     /** @type {MyObservable} */
@@ -147,7 +147,7 @@ module.exports = {
         });
 
         main_obs.on("search-page:item-dlbclicked", async (
-            /** @type {SearchCond} */ item) => {
+            /** @type {NicoSearchParamsItem} */ item) => {
             const elm = this.getSearchInputElm();
             elm.value = item.query;
             this.nico_search_params.target(item.search_target);
@@ -156,7 +156,7 @@ module.exports = {
             this.nico_search_params.sortName(item.sort_name);
             this.nico_search_params.sortOder(item.sort_order);
 
-            this.setSearchCondState(item.sort_name, item.sort_order, item.search_target);
+            this.setSearchState(item.sort_name, item.sort_order, item.search_target);
 
             await this.search();
         });
@@ -169,13 +169,13 @@ module.exports = {
             this.nico_search_params.target(search_target);
             this.nico_search_params.query(query);
             
-            this.setSearchCondState(null, null, search_target);
+            this.setSearchState(null, null, search_target);
 
             await this.search();
         });
 
         main_obs.on("search-page:search", async (args)=> {
-            /** @type {SearchCond} */
+            /** @type {NicoSearchParamsItem} */
             const cond = args;
             const { query, sort_order, sort_name, search_target, page } = cond;
             const elm = this.getSearchInputElm();
@@ -186,7 +186,7 @@ module.exports = {
             this.nico_search_params.sortOder(sort_order);
             this.nico_search_params.page(page);
             
-            this.setSearchCondState(sort_name, sort_order, search_target);
+            this.setSearchState(sort_name, sort_order, search_target);
             this.pagination_obs.trigger("set-page-num", { page_num:page });
 
             await this.search();
@@ -247,7 +247,7 @@ module.exports = {
             await myapi.ipc.popupContextMenu("search", {items});
         });
 
-        const { api, sort_item, search_target_item } = await this.loadSearchCond();
+        const { api, sort_item, search_target_item } = await this.loadSearchConfig();
         this.state.api_checked = api=="snapshot"?"checked":"";
         this.state.sort_title = sort_item.title;
         this.state.search_target_title = search_target_item.title;
@@ -264,7 +264,7 @@ module.exports = {
             oncancel: this.onCancelSearch
         });
     },
-    async loadSearchCond() {
+    async loadSearchConfig() {
         const { api, sort, search_target } = await myapi.ipc.Config.get("search.condition",  {
             api:"snapshot",
             sort:{ name:"startTime", order:"-" },
@@ -280,7 +280,7 @@ module.exports = {
 
         return { api, sort_item, search_target_item };
     },
-    async saveSearchCond() {
+    async saveSearchConfig() {
         const api = this.nico_search_params.getAPI();
         const { sort_name, sort_order, search_target } = this.nico_search_params.getParams();
         await myapi.ipc.Config.set("search.condition", {
@@ -309,10 +309,10 @@ module.exports = {
         const api = elm.checked?"snapshot":"html";
         this.nico_search_params.api(api);
         
-        this.saveSearchCond();
+        this.saveSearchConfig();
     },
     async onchangeSort(item, e) { // eslint-disable-line no-unused-vars
-        /** @type {SearchSortItem} */
+        /** @type {NicoSearchSortItem} */
         const search_sort_item = item;
         const { title, name, order } = search_sort_item;
 
@@ -322,12 +322,12 @@ module.exports = {
         this.nico_search_params.sortName(name);
         this.nico_search_params.sortOder(order);
 
-        this.saveSearchCond();
+        this.saveSearchConfig();
 
         await this.search();
     },
     async onchangeTarget(item, e) { // eslint-disable-line no-unused-vars
-        /** @type {SearchTargetItem} */
+        /** @type {NicoSearchTargetItem} */
         const search_target_item = item;
         const { title, target } = search_target_item;
 
@@ -336,7 +336,7 @@ module.exports = {
 
         this.nico_search_params.target(target);
 
-        this.saveSearchCond();
+        this.saveSearchConfig();
 
         await this.search();
     },
@@ -370,7 +370,7 @@ module.exports = {
         this.grid_table.clearSelected();
         try {
             
-            /** @type {SearchResult} */
+            /** @type {NicoSearchResultItem} */
             let search_result = null;
             if(this.nico_search_params.getAPI()=="snapshot"){
                 search_result = await this.nico_search.search(this.nico_search_params);
@@ -399,7 +399,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {SearchResult} search_result 
+     * @param {NicoSearchResultItem} search_result 
      */
     async setData(search_result) {     
         const page_info = search_result.page_ifno;
@@ -429,7 +429,7 @@ module.exports = {
      * @param {string} sort_order 
      * @param {string} search_target 
      */
-    setSearchCondState(sort_name, sort_order, search_target) {
+    setSearchState(sort_name, sort_order, search_target) {
         if(sort_name){
             const result = this.sort_items.find(item => {
                 return item.name == sort_name && item.order == sort_order;

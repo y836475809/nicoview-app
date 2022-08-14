@@ -116,7 +116,7 @@
 /**
  * ニコニコ動画検索ソート種類
  * 検索ページのソート種類項目を生成するためのデータ
- * @typedef {Object} SearchSortItem 
+ * @typedef {Object} NicoSearchSortItem 
  * @property {string} title
  * @property {string} name
  * @property {string} order
@@ -125,14 +125,14 @@
 /**
  * ニコニコ動画検索対象条件
  * 検索ページの検索対象項目を生成するためのデータ
- * @typedef {Object} SearchTargetItem 
+ * @typedef {Object} NicoSearchTargetItem 
  * @property {string} title
  * @property {string} target
  */
 
 /**
  * ニコニコ動画検索条件
- * @typedef {Object} SearchCond 
+ * @typedef {Object} NicoSearchParamsItem
  * @property {string} query
  * @property {string} sort_name
  * @property {string} sort_order
@@ -142,7 +142,7 @@
 
 /**
  * ニコニコ動画検索結果の検索数、ページ数情報
- * @typedef {Object} SearchResultPageItem 
+ * @typedef {Object} NicoSearchResultPageItem 
  * @property {number} page_num
  * @property {number} total_page_num
  * @property {number} search_result_num
@@ -150,7 +150,7 @@
 
 /**
  * ニコニコ動画検索結果の動画情報
- * @typedef {Object} SearchResultVideoItem 
+ * @typedef {Object} NicoSearchResultVideoItem 
  * @property {string} thumbnailUrl
  * @property {string} contentId
  * @property {string} title
@@ -163,9 +163,9 @@
 
 /**
  * ニコニコ動画検索結果
- * @typedef {Object} SearchResult 
- * @property {SearchResultPageItem} page_ifno
- * @property {SearchResultVideoItem[]} list
+ * @typedef {Object} NicoSearchResultItem
+ * @property {NicoSearchResultPageItem} page_ifno
+ * @property {NicoSearchResultVideoItem[]} list
  */
 
 /**

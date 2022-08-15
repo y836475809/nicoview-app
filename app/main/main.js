@@ -501,18 +501,9 @@ app.on("ready", async ()=>{
             };
         }
 
-        try {
-            await library.delete(video_id);
-        } catch (error) {
-            return {
-                success:false,
-                error:error
-            };
-        }
-
         /**
-         * @type {Array}
-         */
+        * @type {string[]}
+        */
         const paths = getNicoDataFilePaths(video_item);
 
         const exist_paths = [];
@@ -528,14 +519,25 @@ app.on("ready", async ()=>{
 
         for (let index = 0; index < exist_paths.length; index++) {
             const file_path = exist_paths[index];
-            const result = shell.moveItemToTrash(file_path);
-            if(!result){
+            try {
+                await shell.trashItem(file_path);
+            } catch (error) {
                 return {
                     success:false,
                     error:new Error(`${file_path}のゴミ箱への移動に失敗`)
                 };
             }
         }
+
+        try {
+            await library.delete(video_id);
+        } catch (error) {
+            return {
+                success:false,
+                error:error
+            };
+        }
+       
         return {
             success:true,
             error:null

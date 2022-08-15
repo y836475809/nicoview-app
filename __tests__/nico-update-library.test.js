@@ -61,7 +61,7 @@ class TestNicoUpdate extends NicoUpdate {
         return { nico_api: this.nico_api };
     }
     _getCurrentCommentData(){
-        return [];
+        return {threads:[], chats:[]};
     }
     async _getComments(nico_api, cur_comments){ // eslint-disable-line no-unused-vars
         return [{}];
@@ -92,7 +92,7 @@ class TestNicoUpdateTags extends NicoUpdate {
         return [{}];
     }
     _getCurrentCommentData(){
-        return [];
+        return {threads:[], chats:[]};
     }
     async _getThumbImg(url){ // eslint-disable-line no-unused-vars
         return "jpeg";

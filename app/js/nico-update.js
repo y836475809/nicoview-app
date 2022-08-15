@@ -130,8 +130,8 @@ class NicoUpdate {
     }
     
     async _updateComment(nico_api, nico_json){
-        const cur_comment_data = this._getCurrentCommentData();
-        const cur_comments = cur_comment_data.filter(value => {
+        const {threads, chats} = this._getCurrentCommentData();
+        const cur_comments = chats.filter(value => {
             return Object.prototype.hasOwnProperty.call(value, "chat");
         }).map(value => {
             return {
@@ -147,13 +147,13 @@ class NicoUpdate {
             throw new Error(`${this.video_item.video_id}の差分コメントが正しくないデータです`);
         }
 
-        const updated_comment_data =this._margeCommentData(cur_comment_data, comments_diff);
+        const updated_comment_data = this._margeCommentData(threads, chats, comments_diff);
         this._writeFile(nico_json.commentPath, updated_comment_data, "json");
         return true;
     }
 
-    _margeCommentData(current_data, diff_data){
-        const current = this._getCommentDataProps(current_data);
+    _margeCommentData(cu_threads, cu_chats, diff_data){
+        const current = this._getCommentDataProps(cu_threads);
         const diff = this._getCommentDataProps(diff_data);
 
         let owner_threads = current.owner_threads;
@@ -165,8 +165,7 @@ class NicoUpdate {
         if(diff.user_threads.length>0){
             user_threads = diff.user_threads; 
         }
-        const comments = current.comments.concat(diff.comments);
-        
+        const comments = cu_chats.concat(diff.comments);
         return owner_threads.concat(user_threads).concat(comments);
     }
 

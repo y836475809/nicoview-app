@@ -24,9 +24,11 @@ class XMLDataConverter {
     }
 
     _convertComment(owner_xml, user_xml){
-        const owner_comment_data = NicoDataParser.xml_comment(owner_xml, true);
-        const user_comment_data = NicoDataParser.xml_comment(user_xml, false);
-        return owner_comment_data.concat(user_comment_data);
+        const owner = NicoDataParser.xml_comment(owner_xml, true);
+        const user = NicoDataParser.xml_comment(user_xml, false);
+        const threads = owner.threads.concat(user.threads);
+        const chats = owner.chats.concat(user.chats);
+        return threads.concat(chats);
     }
 
     _convertThumbinfo(xml){

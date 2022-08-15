@@ -180,7 +180,7 @@ class TestNicoUpdate extends NicoUpdate {
         return this._img_data;
     }
     _getCurrentCommentData(){
-        return [];
+        return {threads:[], chats:[]};
     }
 }
 

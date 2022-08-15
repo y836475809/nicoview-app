@@ -5,7 +5,7 @@ const cheerio = require("cheerio");
  * 
  * @param {string} xml 
  * @param {boolean} is_owner 
- * @returns {(CommentThreadData[]|CommentItem[])[]}
+ * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
  */
 const xml_comment = (xml, is_owner) => {
     let $ = cheerio.load(xml);
@@ -27,7 +27,7 @@ const xml_comment = (xml, is_owner) => {
         threads.push({thread:obj});
     });
 
-    let comments = [];
+    let chats = [];
     $("chat").each(function (i, el) {
         const item = $(el);
         if(!item.attr("deleted")){
@@ -53,11 +53,10 @@ const xml_comment = (xml, is_owner) => {
             if(user_id){
                 obj.user_id = user_id;
             }
-            comments.push({chat:obj});
+            chats.push({chat:obj});
         }
     });
-
-    return threads.concat(comments);
+    return {threads, chats};
 };
 
 const xml_thumb_info_tags = ($) => {
@@ -179,31 +178,33 @@ const json_thumb_info = (nico_api) => {
 /**
  * 
  * @param {string} json_str 
- * @returns {(CommentThreadData[]|CommentItem[])[]}
+ * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
  */
 const json_comment = (json_str) => {
     const json_data = JSON.parse(json_str);
     
+    /** @type {CommentThreadData[]} */
     const threads = json_data.filter(value => {
         return Object.prototype.hasOwnProperty.call(value, "thread");
     });
 
+    /** @type {CommentChatData[]} */
     const chats =  json_data.filter(value => {
         return Object.prototype.hasOwnProperty.call(value, "chat");
     }).filter(value => {
         return !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
     });
 
-    return threads.concat(chats);
+    return {threads, chats};
 };
 
 /**
  * 
- * @param {(CommentThreadData[]|CommentItem[])[]} comment_data 
+ * @param {CommentChatData[]} chats 
  * @returns {CommentItem[]}
  */
-const makeComments = (comment_data) => {
-    const comments = comment_data.filter(value => {
+const makeComments = (chats) => {
+    const comments = chats.filter(value => {
         return Object.prototype.hasOwnProperty.call(value, "chat") 
             && !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
     }).map(value => {

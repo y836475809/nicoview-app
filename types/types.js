@@ -197,7 +197,7 @@
 
 /**
  * ニコニコ動画コメントのスレッド情報
- * @typedef {Object} CommentThreadData
+ * @typedef {Object} CommentThreadItem
  * @property {number} [fork]
  * @property {number} last_res 
  * @property {number} resultcode 
@@ -220,6 +220,16 @@
  * @property {string} [thread] 未使用
  * @property {string} user_id
  * @property {number} vpos
+ */
+
+/**
+ * @typedef {Object} CommentThreadData
+ * @property {CommentThreadItem} thread 
+ */
+
+/**
+ * @typedef {Object} CommentChatData
+ * @property {CommentItem} chat
  */
 
 /**

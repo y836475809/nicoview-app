@@ -1,6 +1,6 @@
 const test = require("ava");
 const { NicoUpdate } = require("../app/js/nico-update");
-
+const { jsonParser } = require("./helper/json_parser");
 const owner_data = require("./data/owner-comment.json");
 const no_owner_data = require("./data/no-owner-comment.json");
 
@@ -91,7 +91,7 @@ class TestNicoUpdate extends NicoUpdate {
     constructor(current_comment_data, diff_comment_data){
         super({data_type:"json", common_filename:"test"});
         this.data = null;
-        this.current_comment_data = current_comment_data;
+        this.current_comment_data = jsonParser(current_comment_data);
         this.diff_comment_data = diff_comment_data;
     }
     _getCurrentCommentData(){

@@ -16,67 +16,64 @@ const hasEqProps = (obj, props) => {
 
 test("parse xml user comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample.xml`, "utf-8");
-    const obj = NicoDataParser.xml_comment(xml, false);
-    t.deepEqual(obj[0].thread, {
-        resultcode:0,
-        thread:"1505300000",
-        server_time:1505310000,
-        last_res:10,
-        ticket:"0x00000000",
-        revision:1,
-    });
-    t.deepEqual(obj[1].thread, {
-        resultcode:0,
-        thread:"1505300000",
-        server_time:1505310000,
-        last_res:10,
-        ticket:"0x00000000",
-        revision:1,
-    });
-    t.true(hasEqProps(obj[2].chat, 
-        {no:1, vpos:400, date:0, user_id:"AAA", mail:"naka medium 184", content:"AAAテスト"}
-    ));
-    t.true(hasEqProps(obj[3].chat, 
-        {no:2,  vpos:300, date:1, user_id:"BBB", mail:"184", content:"BBBあ"}
-    ));
-    t.true(hasEqProps(obj[4].chat, 
-        {no:3,  vpos:1500, date:2, user_id:"CCC", mail:"184", content:"CCCテスト"}
-    ));
-    t.true(hasEqProps(obj[5].chat, 
-        {no:4,  vpos:4000, date:3, user_id:"CCC", mail:"184", content:"CCCテストテスト"}
-    ));
-    t.true(hasEqProps(obj[6].chat, 
-        {no:5,  vpos:100, date:4, user_id:"DDD", mail:"184 device:3DS", content:"DDDテスト"}
-    ));
-    t.true(hasEqProps(obj[7].chat, 
-        {no:6,  vpos:4500, date:5, user_id:"EEE", mail:"184", content:"EEEテスト"}
-    ));
+    const {threads, chats} = NicoDataParser.xml_comment(xml, false);
+    t.deepEqual(threads, [
+        {
+            thread: {
+                resultcode:0,
+                thread:"1505300000",
+                server_time:1505310000,
+                last_res:10,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        },{
+            thread: {
+                resultcode:0,
+                thread:"1505300000",
+                server_time:1505310000,
+                last_res:10,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        }
+    ]);
+    t.deepEqual(chats, [
+        {chat: {no:1, vpos:400, date:0, user_id:"AAA", mail:"naka medium 184", content:"AAAテスト"}},
+        {chat: {no:2, vpos:300, date:1, user_id:"BBB", mail:"184", content:"BBBあ"}},
+        {chat: {no:3, vpos:1500, date:2, user_id:"CCC", mail:"184", content:"CCCテスト"}},
+        {chat: {no:4, vpos:4000, date:3, user_id:"CCC", mail:"184", content:"CCCテストテスト"}},
+        {chat: {no:5, vpos:100, date:4, user_id:"DDD", mail:"184 device:3DS", content:"DDDテスト"}},
+        {chat: {no:6, vpos:4500, date:5, user_id:"EEE", mail:"184", content:"EEEテスト"}}
+    ]);
 });
 
 test("parse xml owner comment", (t) => {
     const xml = fs.readFileSync(`${dir}/sample[Owner].xml`, "utf-8");
-    const obj = NicoDataParser.xml_comment(xml, true);
-    t.deepEqual(obj[0].thread, {
-        resultcode:0,
-        fork:1,
-        thread:"1505300000",
-        server_time:1505310000,
-        last_res:2,
-        ticket:"0x00000000",
-        revision:1,
-    });
-    t.true(hasEqProps(obj[1].chat, 
-        {no:1, vpos:100, date:1000, fork:1, content:"owner1"}
-    ));
-    t.true(hasEqProps(obj[2].chat, 
-        {no:2,  vpos:200, date:2000, fork:1, mail:"shita", content:"owner2"}
-    ));
+    const {threads, chats} = NicoDataParser.xml_comment(xml, true);
+    t.deepEqual(threads, [
+        {
+            thread: {
+                resultcode:0,
+                fork:1,
+                thread:"1505300000",
+                server_time:1505310000,
+                last_res:2,
+                ticket:"0x00000000",
+                revision:1,
+            }
+        }
+    ]);
+    t.deepEqual(chats, [
+        {chat: {no:1, vpos:100, date:1000, fork:1, content:"owner1"}},
+        {chat: {no:2,  vpos:200, date:2000, fork:1, mail:"shita", content:"owner2"}}
+    ]);
 });
 
 test("parse xml comment deleted", (t) => {
     const xml = fs.readFileSync(`${dir}/sample-deleted.xml`, "utf-8");
-    const obj = NicoDataParser.xml_comment(xml, false);
-    t.deepEqual(obj[0].thread, {
+    const {threads, chats} = NicoDataParser.xml_comment(xml, false);
+    t.deepEqual(threads[1].thread, {
         resultcode:0,
         thread:"1505300000",
         server_time:1505310000,
@@ -84,21 +81,13 @@ test("parse xml comment deleted", (t) => {
         ticket:"0x00000000",
         revision:1,
     });
-    t.deepEqual(obj[1].thread, {
-        resultcode:0,
-        thread:"1505300000",
-        server_time:1505310000,
-        last_res:10,
-        ticket:"0x00000000",
-        revision:1,
-    });
-    t.true(hasEqProps(obj[2].chat, 
+    t.true(hasEqProps(chats[0].chat, 
         {no:1,  vpos:100, date:10, user_id:"AAA", mail:"184", content:"AAAテスト"}
     ));
-    t.true(hasEqProps(obj[3].chat, 
+    t.true(hasEqProps(chats[1].chat, 
         {no:3,  vpos:300, date:30, user_id:"BBB", mail:"184", content:"BBBテスト"}
     ));
-    t.true(hasEqProps(obj[4].chat, 
+    t.true(hasEqProps(chats[2].chat, 
         {no:4,  vpos:400, date:40, user_id:"CCC", mail:"184", content:"CCCテスト"}
     ));
 });
@@ -190,69 +179,75 @@ test("parse json thumb info tags", t => {
 
 test("parse json no owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/no-owner-comment.json`, "utf-8");
-    const comment = NicoDataParser.json_comment(text);
+    const {threads, chats} = NicoDataParser.json_comment(text);
 
-    t.is(comment.length, 3);
+    t.is(threads.length, 1);
+    t.is(chats.length, 2);
 
-    t.deepEqual(comment[0].thread,
+    t.deepEqual(threads, [
         {
-            resultcode:0,
-            thread:"1234567890",
-            server_time:1546694145,
-            last_res:2,
-            ticket:"0xb18d801d",
-            revision:1,
-            click_revision:3
+            thread:{
+                resultcode:0,
+                thread:"1234567890",
+                server_time:1546694145,
+                last_res:2,
+                ticket:"0xb18d801d",
+                revision:1,
+                click_revision:3
+            }
         }
-    );
-    t.true(hasEqProps(comment[1].chat, 
+    ]);
+    t.true(hasEqProps(chats[0].chat, 
         {no:1, vpos:100, date:1522161709, user_id:"abcdefg", mail:"184", content:"comment1"}));
-    t.true(hasEqProps(comment[2].chat, 
+    t.true(hasEqProps(chats[1].chat, 
         {no:2, vpos:200, date:1522161986, user_id:"hijklmn", mail:"184", content:"comment2"}));
 });
 
 test("parse json owner comment", (t) => {
     const text = fs.readFileSync(`${dir}/owner-comment.json`, "utf-8");
-    const comment = NicoDataParser.json_comment(text);
+    const {threads, chats} = NicoDataParser.json_comment(text);
     
-    t.is(comment.length, 7);
+    t.is(threads.length, 3);
+    t.is(chats.length, 4);
 
-    t.deepEqual(comment[0].thread, 
+    t.deepEqual(threads, [ 
         {
-            resultcode:0,
-            thread:"01234567890",
-            fork: 1,
-            server_time:1546694359,
-            last_res:2,
-            ticket:"0x1234567890",
-            revision:1,
-        });
-    t.deepEqual(comment[1].thread, 
-        {
-            resultcode:0,
-            thread:"1234567890",
-            server_time:1546694359,
-            last_res:3336,
-            ticket:"0x83d23581",
-            revision:2,
-        });
-    t.deepEqual(comment[2].thread, 
-        {
-            resultcode:0,
-            thread:"1234567890",
-            server_time:1546694359,
-            last_res:5,
-            ticket:"0x83d23581",
-            revision:2,
-        });
-
-    t.true(hasEqProps(comment[3].chat, 
+            thread: {
+                resultcode:0,
+                thread:"01234567890",
+                fork: 1,
+                server_time:1546694359,
+                last_res:2,
+                ticket:"0x1234567890",
+                revision:1,
+            }
+        },{
+            thread: {
+                resultcode:0,
+                thread:"1234567890",
+                server_time:1546694359,
+                last_res:3336,
+                ticket:"0x83d23581",
+                revision:2,
+            }
+        },{
+            thread: {
+                resultcode:0,
+                thread:"1234567890",
+                server_time:1546694359,
+                last_res:5,
+                ticket:"0x83d23581",
+                revision:2, 
+            }
+        }
+    ]);
+    t.true(hasEqProps(chats[0].chat, 
         {no:1, vpos:100, date:1360996778, fork:1, mail:"shita green small", content:"owner comment1\ncomment1"}));
-    t.true(hasEqProps(comment[4].chat, 
+    t.true(hasEqProps(chats[1].chat, 
         {no:2, vpos:200, date:1360996778, fork:1, mail:"shita green small", content:"owner comment2"}));
-    t.true(hasEqProps(comment[5].chat, 
+    t.true(hasEqProps(chats[2].chat, 
         {no:16, vpos:300, date:1359607148, user_id:"abcdefg", mail:"184", content:"comment3"}));
-    t.true(hasEqProps(comment[6].chat, 
+    t.true(hasEqProps(chats[3].chat, 
         {no:17, vpos:400, date:1359607224, user_id:"hijklnm", mail:"184", content:"comment4"}));
 });
 

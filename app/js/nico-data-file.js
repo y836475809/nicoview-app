@@ -11,6 +11,22 @@ class NicoDataFile {
         this.video_id = video_id;
     }
 
+    /**
+     * 
+     * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
+     */
+    getCommentData(){
+        throw Error("not implement getCommentData");
+    }
+
+    /**
+     * 
+     * @returns {CommentItem[]}
+     */
+    getComments() {
+        throw Error("not implement getComments");
+    }
+
     set commonFilename(/** @type {string} */ name){
         this.common_filename = `${this._cnvFilename(name)} - [${this.video_id}]`;
     }
@@ -102,20 +118,22 @@ class NicoXMLFile extends NicoDataFile {
      * @returns {CommentItem[]} comments 
      */
     getComments() {
-        const comment_data = this.getCommentData();
-        return NicoDataParser.makeComments(comment_data);
+        const {chats} = this.getCommentData();
+        return NicoDataParser.makeComments(chats);
     }
 
     /**
      * 
-     * @returns {(CommentThreadData[]|CommentItem[])[]}
+     * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
      */
     getCommentData(){
         const owner_xml = fs.readFileSync(this.ownerCommentPath, "utf-8");
         const user_xml = fs.readFileSync(this.commentPath, "utf-8");
-        const owner_comment_data = NicoDataParser.xml_comment(owner_xml, true);
-        const user_comment_data = NicoDataParser.xml_comment(user_xml, false);
-        return owner_comment_data.concat(user_comment_data);
+        const owner = NicoDataParser.xml_comment(owner_xml, true);
+        const user = NicoDataParser.xml_comment(user_xml, false);
+        const threads = owner.threads.concat(user.threads);
+        const chats = owner.chats.concat(user.chats);
+        return {threads, chats};
     }
 
     /**
@@ -181,13 +199,13 @@ class NicoJsonFile extends NicoDataFile {
      * @returns {CommentItem[]}
      */
     getComments() {
-        const comment_data = this.getCommentData();
-        return NicoDataParser.makeComments(comment_data);
+        const {chats} = this.getCommentData();
+        return NicoDataParser.makeComments(chats);
     }
 
     /**
      * 
-     * @returns {(CommentThreadData[]|CommentItem[])[]}
+     * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
      */
     getCommentData(){
         const text = fs.readFileSync(this.commentPath, "utf-8");
@@ -262,11 +280,7 @@ class NicoVideoData {
     getComments() {
         return this.nico_data.getComments();
     }
-
-    /**
-     * 
-     * @returns  {(CommentThreadData[]|CommentItem[])[]}
-     */
+    
     getCommentData() {
         return this.nico_data.getCommentData();
     }

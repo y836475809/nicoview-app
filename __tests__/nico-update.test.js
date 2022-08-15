@@ -1,6 +1,7 @@
 const test = require("ava");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
+const { jsonParser } = require("./helper/json_parser");
 const NicoDataParser = require("../app/js/nico-data-parser");
 const { NicoAPI } = require("../app/js/niconico");
 const { NicoUpdate } = require("../app/js/nico-update");
@@ -13,10 +14,11 @@ class TestNicoUpdate extends NicoUpdate {
         super(video_item);
         this.paths = [];
         this.data = [];
+        this._no_owner_comment = jsonParser(TestData.no_owner_comment);
     }
     
     _getCurrentCommentData(){
-        return TestData.no_owner_comment;
+        return this._no_owner_comment;
     }
 
     _writeFile(file_path, data){

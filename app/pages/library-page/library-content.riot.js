@@ -4,7 +4,6 @@ const { NicoVideoData } = require("../../js/nico-data-file");
 const { Command } = require("../../js/command");
 const { NicoUpdate } = require("../../js/nico-update");
 const { ConvertMP4, needConvertVideo } = require("../../js/video-converter");
-const { JsonDataConverter } = require("../../js/nico-data-converter");
 const { ModalDialog } = require("../../js/modal-dialog");
 const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
@@ -216,9 +215,6 @@ module.exports = {
                     this.updateNicoData(items, async (nico_update)=>{
                         return await nico_update.update();
                     });
-                }
-                if(menu_id=="conver-to-xml"){
-                    await this.convertNicoDataToNNDD(items);
                 }
                 if(menu_id=="delete"){
                     const video_ids = items.map(item => item.video_id);
@@ -480,84 +476,6 @@ module.exports = {
         }else{
             await myapi.ipc.Dialog.showMessageBox({
                 message: `更新完了(${cur_update}/${items.length})`
-            });
-        }
-    },
-    /**
-     * 
-     * @param {LibraryItem[]} items 
-     * @returns 
-     */
-    async convertNicoDataToNNDD(items) {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-
-        let cnv_cancel = false;
-        this.obs_modal_dialog.trigger("show", {
-            message: "...",
-            buttons: ["cancel"],
-            cb: ()=>{
-                cnv_cancel = true;
-            }
-        });
-        
-        let cur_update = 0;
-        const error_items = [];
-        try {    
-            for(let item of items) {
-                if(cnv_cancel===true){
-                    const error = new Error("cancel");
-                    error.cancel=true;   
-                    throw error;
-                }
-                
-                cur_update++;
-                this.obs_modal_dialog.trigger("update-message", 
-                    `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
-
-                this.grid_table.updateCell(item.video_id, "state", "変換中");
-                try {
-                    const video_item = await myapi.ipc.Library.getItem(item.video_id);
-                    if(video_item.data_type == "json"){
-                        const cnv_nico = new JsonDataConverter(video_item);
-                        await cnv_nico.convertThumbInfo();
-                        await cnv_nico.convertComment();
-                        await cnv_nico.convertThumbnai();
-                        this.grid_table.updateCell(item.video_id, "state", "変換完了");
-                    }else{
-                        this.grid_table.updateCell(item.video_id, "state", "変換不要");
-                    }
-                } catch (error) {
-                    if(error.cancel===true){   
-                        this.grid_table.updateCell(item.video_id, "state", "変換キャンセル");
-                        throw error;
-                    }else{
-                        error_items.push(item);
-                        logger.error(error);
-                        this.grid_table.updateCell(item.video_id, "state", `変換失敗: ${error.message}`);
-                    }
-                }
-                if(cur_update < items.length){
-                    await wait(100);
-                }
-                this.obs_modal_dialog.trigger("update-message", 
-                    `NNDD形式に変換中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
-            }                
-        } catch (error) {
-            this.obs_modal_dialog.trigger("update-message", "変換キャンセル");
-        }
-
-        this.obs_modal_dialog.trigger("close");
-
-        if(error_items.length > 0){
-            await myapi.ipc.Dialog.showMessageBox({
-                type: "error",
-                message: `${error_items.length}個がNNDD形式への変換に失敗\n詳細はログを参照`
-            });
-        }else{
-            await myapi.ipc.Dialog.showMessageBox({
-                message: `NNDD形式への変換完了(${cur_update}/${items.length})`
             });
         }
     },

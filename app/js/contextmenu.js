@@ -443,11 +443,6 @@ const main_library = (main_win) => {
                 },
                 { type: "separator" },
                 { 
-                    id:"conver-to-xml",
-                    label: "NNDD形式(XML)に変換",
-                },
-                { type: "separator" },
-                { 
                     id:"delete",
                     label: "削除", 
                 }

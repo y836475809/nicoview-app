@@ -32,7 +32,7 @@ module.exports = {
 
         /**
          * 
-         * @param {BookmarkListItem} item 
+         * @param {BookmarkItem} item 
          * @returns {string}
          */
         this.geticon = (item) => {  // eslint-disable-line no-unused-vars
@@ -41,32 +41,32 @@ module.exports = {
 
         /**
          * 
-         * @param {BookmarkListItem} item 
+         * @param {BookmarkItem} item 
          * @returns {string}
          */
         this.getTitle = (item) => {
-            const { title, data } = item;
-            if(data.time>0){
-                return `[${time_format.toTimeString(data.time)}] ${title}`;
+            const { title, time } = item;
+            if(time>0){
+                return `[${time_format.toTimeString(time)}] ${title}`;
             }else{
                 return title;
             }
         };
 
         this.obs_listview.on("changed", async (args) => {
-            /** @type {{items:BookmarkListItem[]}} */
+            /** @type {{items:BookmarkItem[]}} */
             const { items } = args;
             await myapi.ipc.Bookmark.updateItems(items);
             resizeHeight(this, items);
         });
 
         this.obs_listview.onReturn("show-contextmenu", async (e, args) => {
-            /** @type {{items:BookmarkListItem[]}} */
+            /** @type {{items:BookmarkItem[]}} */
             const { items } = args;
 
             const menu_id = await myapi.ipc.popupContextMenu("listview-bookmark", {items});
             if(menu_id=="go-to-library"){
-                const video_id = items[0].data.video_id;
+                const video_id = items[0].video_id;
                 const exist = await myapi.ipc.Library.hasItem(video_id);
                 if(exist){
                     main_obs.trigger("main-page:select-page", "library");
@@ -79,8 +79,8 @@ module.exports = {
         });
 
         this.obs_listview.on("item-dlbclicked", (
-            /** @type {BookmarkListItem} */ item) => {  
-            const { video_id, time } = item.data;
+            /** @type {BookmarkItem} */ item) => {  
+            const { video_id, time } = item;
             Command.play({
                 video_id : video_id,
                 time : time
@@ -89,17 +89,7 @@ module.exports = {
         
         main_obs.on("bookmark-page:add-items", (
             /** @type {BookmarkItem[]} */ items) => {
-            const bk_items = items.map(item => {
-                return {
-                    title: item.title,
-                    type: "video",
-                    data: {
-                        video_id: item.video_id,
-                        time: item.time
-                    }
-                };
-            });
-            this.obs_listview.trigger("addList", { items:bk_items });
+            this.obs_listview.trigger("addList", { items });
         });
     },
     async onMounted() {

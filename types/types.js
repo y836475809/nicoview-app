@@ -177,19 +177,12 @@
  */
 
 /**
- * ブックマークリストアイテム
- * @typedef {Object} BookmarkListItem 
- * @property {string} title
- * @property {string} type
- * @property {{video_id:string, time:number}} data
- */
-
-/**
  * ブックマーク
  * @typedef {Object} BookmarkItem 
  * @property {string} title
  * @property {string} video_id
  * @property {number} time
+ * @property {boolean} [marked]
  */
 
 /**

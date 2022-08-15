@@ -279,7 +279,7 @@ const Bookmark = {
     },
     /**
      * 
-     * @param {BookmarkListItem[]} items 
+     * @param {BookmarkItem[]} items 
      * @returns {Promise<void>}
      */
     updateItems: async (items) => {  

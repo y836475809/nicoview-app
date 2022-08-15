@@ -307,7 +307,7 @@ const listview_bookmark = (main_win) => {
                 { 
                     id: "play",
                     label: "再生", click() {
-                        const { video_id, time } = items[0].data;
+                        const { video_id, time } = items[0];
                         Command.play({
                             video_id: video_id,
                             time: time
@@ -318,7 +318,7 @@ const listview_bookmark = (main_win) => {
                 { 
                     id: "play",
                     label: "オンラインで再生", click() {
-                        const { video_id, time } = items[0].data;
+                        const { video_id, time } = items[0];
                         Command.play({
                             video_id: video_id,
                             time: time

@@ -31,7 +31,7 @@ window.addEventListener("load", () => {
             SettingPage   : require("../pages/setting-page/setting-page.riot.js"),
             HistoryPage   : require("../pages/history-page/history-page.riot.js"),
             DownloadPage  : require("../pages/download-page/download-page.riot.js"),
-            SettingDlSch  : require("../pages/download-page/setting-download-schedule.riot.js"),
+            SettingDlSch  : require("../pages/download-page/download-schedule.riot.js"),
             MyListSidebar : require("../pages/mylist-page/mylist-sidebar.riot.js"),
             MyListContent : require("../pages/mylist-page/mylist-content.riot.js"),
             SearchSidebar : require("../pages/search-page/search-sidebar.riot.js"),

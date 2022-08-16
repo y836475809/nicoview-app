@@ -57,16 +57,16 @@ module.exports = {
             this.setComments(comments);
         });
 
-        player_obs.on("player-info-page:set-viewinfo-data", (args)=> {
+        player_obs.on("player-info-page:set-data", (args)=> {
             this.grid_table.resizeGrid();
 
             /** @type {{
-             * viewinfo:ViewInfo, comments:CommentItem[], 
+             * thumb_info:ThumbInfo, comments:CommentItem[], 
              * all_comment_num:number, state:PlayState}} */
-            const { viewinfo, comments, all_comment_num, state } = args;
+            const { thumb_info, comments, all_comment_num, state } = args;
 
-            this.is_economy = viewinfo.is_economy;
-            this.is_deleted = viewinfo.is_deleted;
+            this.is_economy = thumb_info.is_economy;
+            this.is_deleted = thumb_info.is_deleted;
 
             if(state){
                 this.is_online = state.is_online;
@@ -86,7 +86,6 @@ module.exports = {
                 this.is_saved = false;
             }
 
-            const thumb_info = viewinfo.thumb_info;
             const video = thumb_info.video;
             const thread = thumb_info.thread;
             const owner = thumb_info.owner;

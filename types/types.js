@@ -272,14 +272,8 @@
  * @property {VideoTag[]} tags
  * @property {{commentCount:number}} thread
  * @property {ThumbVideo} video
- */
-
-/**
- * ViewInfo
- * @typedef {Object} ViewInfo 
- * @property {boolean} is_deleted
- * @property {boolean} is_economy
- * @property {ThumbInfo} thumb_info
+ * @property {boolean} [is_deleted] true:動画がニコニコ動画から削除済み
+ * @property {boolean} [is_economy] true:エコノミー動画
  */
 
 /**

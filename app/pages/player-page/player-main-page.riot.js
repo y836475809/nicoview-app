@@ -107,20 +107,19 @@ module.exports = {
                     await myapi.ipc.Library.updateItemProps(result.video_id, result.props);
                     const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
                     const video_data = new NicoVideoData(updated_video_item);
-                    const viewinfo = {
-                        is_economy: video_data.getIsEconomy(),
-                        is_deleted: video_data.getIsDeleted(),
-                        thumb_info: video_data.getThumbInfo()
-                    };
+
+                    const thumb_info = video_data.getThumbInfo();
+                    thumb_info.is_economy = video_data.getIsEconomy();
+                    thumb_info.is_deleted = video_data.getIsDeleted();
 
                     const comments = video_data.getComments();
                     this.comment_filter.setComments(comments);
                     this.comment_filter.setPlayTime(updated_video_item.play_time);
                     const filtered_comments = this.comment_filter.getCommnets();
 
-                    player_obs.trigger("player-tag:set-tags", viewinfo.thumb_info.tags);
-                    player_obs.trigger("player-info-page:set-viewinfo-data", {
-                        viewinfo: viewinfo, 
+                    player_obs.trigger("player-tag:set-tags", thumb_info.tags);
+                    player_obs.trigger("player-info-page:set-data", {
+                        thumb_info: thumb_info, 
                         comments: filtered_comments,
                         all_comment_num: comments.length,
                     });
@@ -279,16 +278,15 @@ module.exports = {
     /**
      * 
      * @param {{src:string, type:string}} video_data 
-     * @param {ViewInfo} viewinfo 
+     * @param {ThumbInfo} thumb_info 
      * @param {CommentItem[]} comments 
      * @param {PlayState} state 
      */
-    async play_by_video_data(video_data, viewinfo, comments, state) { 
+    async play_by_video_data(video_data, thumb_info, comments, state) { 
         if(!/mp4/.test(video_data.type)){
             throw new Error(`${video_data.type}形式は再生できません`);
         }
 
-        const thumb_info = viewinfo.thumb_info;
         const video = thumb_info.video;
         const play_time_sec = toTimeSec(video.duration);
 
@@ -312,8 +310,8 @@ module.exports = {
             state: state
         });
         player_obs.trigger("player-tag:set-tags", thumb_info.tags);
-        player_obs.trigger("player-info-page:set-viewinfo-data", { 
-            viewinfo: viewinfo, 
+        player_obs.trigger("player-info-page:set-data", { 
+            thumb_info: thumb_info, 
             comments: filtered_comments,
             all_comment_num: comments.length,
             state: state
@@ -349,13 +347,13 @@ module.exports = {
                 src: video_data.getVideoPath(),
                 type: `video/${video_data.getVideoType()}`,
             };
-            const viewinfo = {
-                is_economy: video_data.getIsEconomy(),
-                is_deleted: video_data.getIsDeleted(),
-                thumb_info: video_data.getThumbInfo()      
-            };      
+
+            const thumb_info = video_data.getThumbInfo();
+            thumb_info.is_economy = video_data.getIsEconomy();
+            thumb_info.is_deleted = video_data.getIsDeleted();
+
             const comments = video_data.getComments();
-            await this.play_by_video_data(video, viewinfo, comments, state);
+            await this.play_by_video_data(video, thumb_info, comments, state);
         } catch (error) {
             logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
             await myapi.ipc.Dialog.showMessageBox({
@@ -407,17 +405,16 @@ module.exports = {
                 src: video_url,
                 type: `video/${thumb_info.video.video_type}`,
             };
-            const viewinfo = {
-                is_economy: is_economy,
-                is_deleted: is_deleted,
-                thumb_info:thumb_info,
-            };
+            
+            thumb_info.is_economy = is_economy;
+            thumb_info.is_deleted = is_deleted;
+
             comments.sort((a, b) => {
                 if (a.vpos < b.vpos) return -1;
                 if (a.vpos > b.vpos) return 1;
                 return 0;
             });
-            await this.play_by_video_data(video_data, viewinfo, comments, state);      
+            await this.play_by_video_data(video_data, thumb_info, comments, state);      
         } catch (error) {
             if(!error.cancel){
                 logger.error(`video_id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);

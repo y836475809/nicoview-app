@@ -24,8 +24,14 @@ const popup = (parent_win, menu_items, resolve, cb=()=>{}) => {
     context_menu.popup({window: parent_win});
 };
 
-const getMenuEnable = (menu_id, data) => {
-    const { title, thumbnailURL } = data;
+/**
+ * 
+ * @param {string} menu_id 
+ * @param {CurrentPlayVideo} play_video 
+ * @returns {boolean} true:menu_idの項目有効
+ */
+const getMenuEnable = (menu_id, play_video) => {
+    const { title, thumbnailURL } = play_video;
 
     if(menu_id == "show-open-video-form"){
         return true;
@@ -46,8 +52,8 @@ const getMenuEnable = (menu_id, data) => {
 
 const player = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player", async (event, args) => {
-        const { play_data } = args;
-        const { video_id, title, thumbnailURL, online } = play_data;
+        const { play_video } = args;
+        const { video_id, title, thumbnailURL, online } = play_video;
         return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const menu_items = [
                 { 
@@ -124,7 +130,7 @@ const player = (play_win) => {
 
             popup(play_win, menu_items, resolve, (menu_item)=>{
                 const id = menu_item.id;
-                menu_item.enabled = getMenuEnable(id, play_data);
+                menu_item.enabled = getMenuEnable(id, play_video);
             });
         });
     });

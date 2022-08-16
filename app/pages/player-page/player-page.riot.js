@@ -13,10 +13,10 @@ module.exports = {
     },
     /**
      * 
-     * @returns {NicoPlayData}
+     * @returns {CurrentPlayVideo}
      */
-    async getPlayData() {
-        return await player_obs.triggerReturn("player-main-page:get-play-data-callback");
+    async getCurrentPlayVideo() {
+        return await player_obs.triggerReturn("player-main-page:get-current-play-video");
     },
     /**
      * 
@@ -56,10 +56,10 @@ module.exports = {
         if(e.button===2){
             this.contextmenu_show = true;
 
-            const play_data = await this.getPlayData(); 
-            const menu_id = await myapi.ipc.popupContextMenu("player", { play_data });
+            const play_video = await this.getCurrentPlayVideo(); 
+            const menu_id = await myapi.ipc.popupContextMenu("player", { play_video });
             if(menu_id){
-                const { video_id, title, thumbnailURL, online } = play_data; // eslint-disable-line no-unused-vars
+                const { video_id, title, thumbnailURL, online } = play_video; // eslint-disable-line no-unused-vars
                 if(menu_id=="add-bookmark-time"){
                     const current_time = await this.getCurrentPlayTime();
                     const bk_item = {

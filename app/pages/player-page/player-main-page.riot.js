@@ -33,8 +33,8 @@ module.exports = {
     /** @type {NicoPlay} */
     nico_play:null,
 
-    /** @type {NicoPlayData} */
-    play_data:null,
+    /** @type {CurrentPlayVideo} */
+    current_play_video:null,
 
     gutter:false,
     gutter_move:false,
@@ -47,7 +47,7 @@ module.exports = {
         myapi.ipc.onPlayVideo(async (args)=>{
             const { video_id, online, time, video_item } = args;
 
-            this.play_data = { 
+            this.current_play_video = { 
                 video_id: video_id, 
                 title: null,
                 thumbnailURL: null,
@@ -69,8 +69,8 @@ module.exports = {
             logger.setLevel(level);
         });
 
-        player_obs.onReturn("player-main-page:get-play-data-callback", () => {
-            return this.play_data;
+        player_obs.onReturn("player-main-page:get-current-play-video", () => {
+            return this.current_play_video;
         });
 
         player_obs.on("player-main-page:update-data", async(video_id, update_target) => {
@@ -290,7 +290,7 @@ module.exports = {
         const video = thumb_info.video;
         const play_time_sec = toTimeSec(video.duration);
 
-        this.play_data = {
+        this.current_play_video = {
             video_id: video.video_id, 
             title: video.title,
             thumbnailURL: video.thumbnailURL,

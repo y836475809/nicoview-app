@@ -285,8 +285,9 @@
  */
 
 /**
- * NicoPlayData
- * @typedef {Object} NicoPlayData 
+ * 現在再生中の動画情報
+ * 再読み込み、ブックマーク、「後で見る」を実行に情報
+ * @typedef {Object} CurrentPlayVideo 
  * @property {string} video_id
  * @property {string} title
  * @property {string} thumbnailURL

@@ -16,8 +16,8 @@ module.exports = {
     /** @type {CommentTimeLine} */
     comment_tl:null,
 
-    /** @type {CommentParams}  */
-    comment_params:null,
+    /** @type {CommentConfig}  */
+    comment_config:null,
     comment_sync_id:null,
     play_ended:false,
     onBeforeMount() {
@@ -51,8 +51,8 @@ module.exports = {
             return;
         }
 
-        const default_comment_params = await player_obs.triggerReturn("setting-display-comment:get-default_params");
-        this.comment_params = await myapi.ipc.Config.get("comment", default_comment_params);
+        const default_comment_config = await player_obs.triggerReturn("setting-display-comment:get-default-commnet-config");
+        this.comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
         
         this.video_elm = this.$(".video-screen > video");
         this.video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
@@ -218,25 +218,25 @@ module.exports = {
         player_obs.on("player-video:update-comment-display-params", (args)=> {  
             const { duration_sec, fps } = args;     
             if(this.comment_tl){
-                if(this.comment_params.duration_sec != duration_sec){
-                    this.comment_params.duration_sec = duration_sec;
-                    this.comment_params.fps = fps;
+                if(this.comment_config.duration_sec != duration_sec){
+                    this.comment_config.duration_sec = duration_sec;
+                    this.comment_config.fps = fps;
 
                     this.createTimeLine(this.play_data.comments);
                     const current = this.video_elm.currentTime;
                     this.seek(current);
                     return;
                 }
-                if(this.comment_params.fps != fps){
-                    this.comment_params.duration_sec = duration_sec;
-                    this.comment_params.fps = fps;
+                if(this.comment_config.fps != fps){
+                    this.comment_config.duration_sec = duration_sec;
+                    this.comment_config.fps = fps;
 
                     this.comment_tl.setFPS(fps);
                     return;
                 }
             }else{
-                this.comment_params.duration_sec = duration_sec;
-                this.comment_params.fps = fps;
+                this.comment_config.duration_sec = duration_sec;
+                this.comment_config.fps = fps;
             }
         });
     },
@@ -255,7 +255,7 @@ module.exports = {
     createTimeLine(comments) {
         const row_num = 12;
         const comment_font_family = this.getCommentFontFamily();
-        const  { duration_sec, fps } = this.comment_params;
+        const  { duration_sec, fps } = this.comment_config;
         const parent = this.$(".video-screen");
 
         const nico_script = new NicoScript();
@@ -276,10 +276,10 @@ module.exports = {
         if(this.comment_sync_id){
             clearInterval(this.comment_sync_id);
         }
-        if(this.comment_params.auto_sync_checked){
+        if(this.comment_config.auto_sync_checked){
             const last_time_sec = this.comment_tl.lastTimeSec;
-            const interval_ms = this.comment_params.auto_sync_interval*1000;
-            const threshold_sec = this.comment_params.auto_sync_threshold;
+            const interval_ms = this.comment_config.auto_sync_interval*1000;
+            const threshold_sec = this.comment_config.auto_sync_threshold;
             this.comment_sync_id = setInterval(()=>{
                 if(!this.comment_tl){
                     if(this.comment_sync_id){

@@ -298,14 +298,14 @@
  */
 
 /**
- * Comment params
- * @typedef {Object} CommentParams
- * @property {boolean} auto_sync_checked
- * @property {number} auto_sync_interval
- * @property {number} auto_sync_threshold
- * @property {number} fps
- * @property {boolean} do_limit
- * @property {number} duration_sec
+ * コメント表示の設定
+ * @typedef {Object} CommentConfig
+ * @property {boolean} auto_sync_checked true:動画時間にコメント同期
+ * @property {number} auto_sync_interval 同期チェック間隔(sec)
+ * @property {number} auto_sync_threshold 同期ずれ時間閾値(sec) 同期チェック時これ以上ずれていたら同期調整する
+ * @property {number} fps コメントfps, 大きいほど動きが滑らか
+ * @property {boolean} do_limit true:一分間に表示するコメント数を制限する
+ * @property {number} duration_sec コメント表示時間
  */
 
 /**

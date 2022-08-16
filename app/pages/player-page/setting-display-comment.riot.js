@@ -4,7 +4,8 @@ const { window_obs } = require("../../js/my-observable");
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
-const default_params = {
+/** @type {CommentConfig} */
+const default_comment_config = {
     duration_sec: 4,
     fps: 10,
     do_limit: true,
@@ -33,26 +34,26 @@ module.exports = {
     sync_interval_items:[10, 30, 60, 120],
     sync_threshold_items:[0.05, 0.1],
     onBeforeMount() {
-        player_obs.onReturn("setting-display-comment:get-default_params", ()=>{
-            return default_params;
+        player_obs.onReturn("setting-display-comment:get-default-commnet-config", ()=>{
+            return default_comment_config;
         });
     },
     async onMounted() {
-        /** @type {CommentParams} */
-        const params = await myapi.ipc.Config.get("comment", default_params);
+        /** @type {CommentConfig} */
+        const comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
         
-        setup(this, "duration", this.duration_items, params.duration_sec);
-        setup(this, "fps", this.fps_items, params.fps);
+        setup(this, "duration", this.duration_items, comment_config.duration_sec);
+        setup(this, "fps", this.fps_items, comment_config.fps);
 
         /** @type {HTMLInputElement} */
         const ch_elm = this.$(".comment-do-limit-checkbox");
-        ch_elm.checked = params.do_limit;
+        ch_elm.checked = comment_config.do_limit;
 
         /** @type {HTMLInputElement} */
         const auto_sync_ch_elm = this.$(".auto-sync-checkbox");
-        auto_sync_ch_elm.checked = params.auto_sync_checked;
-        setup(this, "sync_interval", this.sync_interval_items, params.auto_sync_interval);
-        setup(this, "sync_threshold", this.sync_threshold_items, params.auto_sync_threshold);
+        auto_sync_ch_elm.checked = comment_config.auto_sync_checked;
+        setup(this, "sync_interval", this.sync_interval_items, comment_config.auto_sync_interval);
+        setup(this, "sync_threshold", this.sync_threshold_items, comment_config.auto_sync_threshold);
     },
     /**
      * 
@@ -60,12 +61,12 @@ module.exports = {
      * @param {any} value 
      * @param {boolean} is_trigger 
      */
-    async changeParams(name, value, is_trigger=true){
-        const params = await myapi.ipc.Config.get("comment", default_params);
-        params[name] = value;
+    async changeConfig(name, value, is_trigger=true){
+        const comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
+        comment_config[name] = value;
         await myapi.ipc.Config.set(`comment.${name}`, value);
         if(is_trigger){
-            player_obs.trigger("player-video:update-comment-display-params", params);
+            player_obs.trigger("player-video:update-comment-display-params", comment_config);
         }
     },
     /**
@@ -74,7 +75,7 @@ module.exports = {
      * @param {Event} e 
      */
     async onchangeDuration(item, e) { // eslint-disable-line no-unused-vars
-        await this.changeParams("duration_sec", parseInt(item));
+        await this.changeConfig("duration_sec", parseInt(item));
     },
     /**
      * 
@@ -82,7 +83,7 @@ module.exports = {
      * @param {Event} e 
      */
     async onchangeFPS(item, e) { // eslint-disable-line no-unused-vars
-        await this.changeParams("fps", parseInt(item));
+        await this.changeConfig("fps", parseInt(item));
     },
     /**
      * 
@@ -99,7 +100,7 @@ module.exports = {
         /** @type {HTMLInputElement} */
         const elm = e.target;
         const checked = elm.checked;
-        await this.changeParams("auto_sync_checked", checked, false);
+        await this.changeConfig("auto_sync_checked", checked, false);
     },
     /**
      * 
@@ -108,7 +109,7 @@ module.exports = {
      */
     async onchangeAutoSyncInterval(item, e) { // eslint-disable-line no-unused-vars
         const interval = item;
-        await this.changeParams("auto_sync_interval", interval, false);
+        await this.changeConfig("auto_sync_interval", interval, false);
     },
     /**
      * 
@@ -117,6 +118,6 @@ module.exports = {
      */
     async onchangeAutoSyncThreshold(item, e) { // eslint-disable-line no-unused-vars
         const threshold = item;
-        await this.changeParams("auto_sync_threshold", threshold, false);
+        await this.changeConfig("auto_sync_threshold", threshold, false);
     }
 };

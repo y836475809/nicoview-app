@@ -6,13 +6,13 @@ const player_obs = window_obs;
 
 module.exports = {
     state:{
-        /** @type {TagInfo[]} */
+        /** @type {VideoTag[]} */
         video_tags:[]
     },
     onBeforeMount() {  
         /**
          * 
-         * @param {TagInfo} item 
+         * @param {VideoTag} item 
          * @param {Event} e 
          */          
         this.onclickTag = (item, e) => { // eslint-disable-line no-unused-vars
@@ -24,7 +24,7 @@ module.exports = {
         };
 
         player_obs.on("player-tag:set-tags", (
-            /** @type {TagInfo[]} */ video_tags) => {
+            /** @type {VideoTag[]} */ video_tags) => {
             this.state.video_tags = video_tags;
             this.update();
         });

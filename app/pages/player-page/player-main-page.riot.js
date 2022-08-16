@@ -281,7 +281,7 @@ module.exports = {
      * @param {{src:string, type:string}} video_data 
      * @param {ViewInfo} viewinfo 
      * @param {CommentItem[]} comments 
-     * @param {PlayerPlayState} state 
+     * @param {PlayState} state 
      */
     async play_by_video_data(video_data, viewinfo, comments, state) { 
         if(!/mp4/.test(video_data.type)){

@@ -233,8 +233,8 @@
  */
 
 /**
- * owner
- * @typedef {Object} OwnerInfo 
+ * オーナー情報
+ * @typedef {Object} Owner 
  * @property {string} iconURL
  * @property {string} id
  * @property {string} nickname
@@ -242,15 +242,16 @@
 
 /**
  * 動画タグ
- * @typedef {Object} TagInfo 
+ * @typedef {Object} VideoTag 
  * @property {string} id
  * @property {boolean} isLocked
  * @property {string} name
  */
 
 /**
+ * ニコニコ動画情報
  * 動画情報
- * @typedef {Object} VideoInfo 
+ * @typedef {Object} ThumbVideo
  * @property {string} description
  * @property {number} duration
  * @property {string} largeThumbnailURL
@@ -264,12 +265,13 @@
  */
 
 /**
- * ThumbInfo
+ * ニコニコ動画情報
+ * オーナー、タグ、動画情報
  * @typedef {Object} ThumbInfo 
- * @property {OwnerInfo} owner
- * @property {TagInfo[]} tags
+ * @property {Owner} owner
+ * @property {VideoTag[]} tags
  * @property {{commentCount:number}} thread
- * @property {VideoInfo} video
+ * @property {ThumbVideo} video
  */
 
 /**
@@ -281,11 +283,11 @@
  */
 
 /**
- * PlayStateInfo
- * @typedef {Object} PlayStateInfo 
+ * PlayState
+ * @typedef {Object} PlayState 
  * @property {boolean} [is_online]
  * @property {boolean} [is_saved]
- * @property {number} time
+ * @property {number} [time]
  */
 
 /**
@@ -309,19 +311,11 @@
  */
 
 /**
- * player play state
- * @typedef {Object} PlayerPlayState
- * @property {boolean} is_online
- * @property {boolean} is_saved
- * @property {number} time
- */
-
-/**
  * player play data
  * @typedef {Object} PlayerPlayData
  * @property {{src:string, type:string}} video_data
  * @property {CommentItem[]} comments
- * @property {PlayerPlayState} state
+ * @property {PlayState} state
  */
 
 /**

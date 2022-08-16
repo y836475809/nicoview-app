@@ -62,7 +62,7 @@ module.exports = {
 
             /** @type {{
              * viewinfo:ViewInfo, comments:CommentItem[], 
-             * all_comment_num:number, state:PlayStateInfo}} */
+             * all_comment_num:number, state:PlayState}} */
             const { viewinfo, comments, all_comment_num, state } = args;
 
             this.is_economy = viewinfo.is_economy;

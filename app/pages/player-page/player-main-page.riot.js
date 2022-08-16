@@ -277,14 +277,14 @@ module.exports = {
     },
     /**
      * 
-     * @param {{src:string, type:string}} video_data 
+     * @param {VideoElemProp} video_elem_prop 
      * @param {ThumbInfo} thumb_info 
      * @param {CommentItem[]} comments 
-     * @param {PlayState} state 
+     * @param {VideoOption} video_option 
      */
-    async play_by_video_data(video_data, thumb_info, comments, state) { 
-        if(!/mp4/.test(video_data.type)){
-            throw new Error(`${video_data.type}形式は再生できません`);
+    async play_by_video_data(video_elem_prop, thumb_info, comments, video_option) { 
+        if(!/mp4/.test(video_elem_prop.type)){
+            throw new Error(`${video_elem_prop.type}形式は再生できません`);
         }
 
         const video = thumb_info.video;
@@ -294,7 +294,7 @@ module.exports = {
             video_id: video.video_id, 
             title: video.title,
             thumbnailURL: video.thumbnailURL,
-            online: state.is_online
+            online: video_option.is_online
         };
 
         this.comment_filter.setComments(comments);
@@ -305,16 +305,16 @@ module.exports = {
         document.title = title;
         player_obs.trigger("player-controls:set-state", "play"); 
         player_obs.trigger("player-video:set-play-data", { 
-            video_data: video_data,
+            video_elem_prop: video_elem_prop,
             comments: filtered_comments,
-            state: state
+            video_option: video_option
         });
         player_obs.trigger("player-tag:set-tags", thumb_info.tags);
         player_obs.trigger("player-info-page:set-data", { 
             thumb_info: thumb_info, 
             comments: filtered_comments,
             all_comment_num: comments.length,
-            state: state
+            video_option: video_option
         });   
         
         myapi.ipc.History.addItem({
@@ -336,14 +336,14 @@ module.exports = {
     async playVideoItem(video_item, time=0) {
         this.cancelPlay();
 
-        const state = { 
+        const video_option = { 
             is_online: false,
             is_saved: true,
             time: time
         };
         try {
             const video_data = new NicoVideoData(video_item);
-            const video = {
+            const video_elem_prop = {
                 src: video_data.getVideoPath(),
                 type: `video/${video_data.getVideoType()}`,
             };
@@ -353,9 +353,9 @@ module.exports = {
             thumb_info.is_deleted = video_data.getIsDeleted();
 
             const comments = video_data.getComments();
-            await this.play_by_video_data(video, thumb_info, comments, state);
+            await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);
         } catch (error) {
-            logger.error(`id=${video_item.id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
+            logger.error(`id=${video_item.id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
             await myapi.ipc.Dialog.showMessageBox({
                 type: "error",
                 message: error.message
@@ -369,7 +369,7 @@ module.exports = {
         
         this.cancelPlay();
 
-        const state = { 
+        const video_option = { 
             is_online: true,
             is_saved: is_saved,
             time: time
@@ -401,7 +401,7 @@ module.exports = {
             const {is_economy, is_deleted, comments, thumb_info, video_url} = 
                 await this.nico_play.play(video_id);
                 
-            const video_data = {
+            const video_elem_prop = {
                 src: video_url,
                 type: `video/${thumb_info.video.video_type}`,
             };
@@ -414,10 +414,10 @@ module.exports = {
                 if (a.vpos > b.vpos) return 1;
                 return 0;
             });
-            await this.play_by_video_data(video_data, thumb_info, comments, state);      
+            await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);      
         } catch (error) {
             if(!error.cancel){
-                logger.error(`video_id=${video_id}, online=${state.is_online}, is_saved=${state.is_saved}`, error);
+                logger.error(`video_id=${video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
                 await myapi.ipc.Dialog.showMessageBox({
                     type: "error",
                     message: error.message

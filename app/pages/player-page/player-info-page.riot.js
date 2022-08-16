@@ -62,15 +62,15 @@ module.exports = {
 
             /** @type {{
              * thumb_info:ThumbInfo, comments:CommentItem[], 
-             * all_comment_num:number, state:PlayState}} */
-            const { thumb_info, comments, all_comment_num, state } = args;
+             * all_comment_num:number, video_option:VideoOption}} */
+            const { thumb_info, comments, all_comment_num, video_option } = args;
 
             this.is_economy = thumb_info.is_economy;
             this.is_deleted = thumb_info.is_deleted;
 
-            if(state){
-                this.is_online = state.is_online;
-                this.is_saved = state.is_saved;
+            if(video_option){
+                this.is_online = video_option.is_online;
+                this.is_saved = video_option.is_saved;
             }
             
             if(this.is_economy===undefined){

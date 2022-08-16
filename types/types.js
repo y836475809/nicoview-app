@@ -277,11 +277,26 @@
  */
 
 /**
- * PlayState
- * @typedef {Object} PlayState 
- * @property {boolean} [is_online]
- * @property {boolean} [is_saved]
- * @property {number} [time]
+ * 動画再生で使用するオプション
+ * @typedef {Object} VideoOption 
+ * @property {boolean} [is_online] true:オンライン再生を優先
+ * @property {boolean} [is_saved] true:動画保存済み
+ * @property {number} [time] 再生開始時間(sec)
+ */
+
+/**
+ * ビデオ要素に設定する値
+ * @typedef {Object} VideoElemProp
+ * @property {string} src 動画url
+ * @property {string} type 動画形式
+ */
+
+/**
+ * 動画再生情報
+ * @typedef {Object} PlayData
+ * @property {VideoElemProp} video_elem_prop ビデオ要素に設定する値
+ * @property {CommentItem[]} comments 動画コメント
+ * @property {VideoOption} video_option 再生状態
  */
 
 /**
@@ -303,14 +318,6 @@
  * @property {number} fps コメントfps, 大きいほど動きが滑らか
  * @property {boolean} do_limit true:一分間に表示するコメント数を制限する
  * @property {number} duration_sec コメント表示時間
- */
-
-/**
- * player play data
- * @typedef {Object} PlayerPlayData
- * @property {{src:string, type:string}} video_data
- * @property {CommentItem[]} comments
- * @property {PlayState} state
  */
 
 /**

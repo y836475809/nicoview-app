@@ -10,7 +10,7 @@ module.exports = {
     /** @type {HTMLVideoElement} */
     video_elm:null,
 
-    /** @type {PlayerPlayData} */
+    /** @type {PlayData} */
     play_data:null,
 
     /** @type {CommentTimeLine} */
@@ -26,9 +26,9 @@ module.exports = {
 
             this.play_data = data;
 
-            const video_data = this.play_data.video_data;
-            this.video_elm.src = video_data.src;
-            this.video_elm.type = video_data.type;
+            const {src, type} = this.play_data.video_elem_prop;
+            this.video_elm.src = src;
+            this.video_elm.type = type;
 
             this.createTimeLine(this.play_data.comments);
 
@@ -65,7 +65,7 @@ module.exports = {
             logger.debug("loadeddata event=", event);
             player_obs.trigger("player-controls:loaded-data");
 
-            const { time } = this.play_data.state;
+            const { time } = this.play_data.video_option;
             if(time>0){
                 this.video_elm.currentTime = time;
             }

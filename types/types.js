@@ -327,17 +327,8 @@
 /**
  * NG comment item
  * @typedef {Object} NGCommentItem
- * @property {number} id
- * @property {string} title
  * @property {string} type text or user_id
  * @property {string} value
- */
-
-/**
- * NG item
- * @typedef {Object} NGItems
- * @property {string[]} ng_texts
- * @property {string[]} ng_user_ids
  */
 
 /** 

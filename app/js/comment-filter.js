@@ -1,6 +1,12 @@
+const NGType = Object.freeze({
+    Text:"text",
+    UserId:"user_id"
+});
 
 class NGComment {
     constructor(){
+        /** @type {NGCommentItem[]} */
+        this._ng_commnet_items = [];
         /** @type {string[]} */
         this._ng_texts = [];
         /** @type {string[]} */
@@ -9,23 +15,41 @@ class NGComment {
 
     /**
      * 
-     * @param {string[]} ng_texts 
-     * @param {string[]} ng_user_ids 
+     * @param {NGCommentItem[]} ng_commnet_items 
      */
-    setNGComments(ng_texts, ng_user_ids){
-        this._ng_texts = ng_texts;
-        this._ng_user_ids = ng_user_ids;
+    setNGCommentItems(ng_commnet_items){
+        this._ng_commnet_items = ng_commnet_items;
+        this._updateItem();
     }
 
     /**
      * 
-     * @returns {NGItems}
+     * @param {string} ng_type NGType
+     * @returns {string[]}
      */
-    getNGComments(){
-        return {
-            ng_texts: this._ng_texts,
-            ng_user_ids: this._ng_user_ids
-        };
+    _getNGItems(ng_type){
+        const items = this._ng_commnet_items.filter(item => {
+            return item.type == ng_type;
+        }).map(item => {
+            return item.value;
+        });
+        return items;
+    }
+
+    _updateItem(){
+        const ng_texts = this._getNGItems(NGType.Text);
+        this._ng_texts = [...new Set(ng_texts)];
+
+        const ng_user_ids = this._getNGItems(NGType.UserId);
+        this._ng_user_ids = [...new Set(ng_user_ids)];
+    }
+
+    /**
+     * 
+     * @returns {NGCommentItem[]}
+     */
+    getNGCommentItems(){
+        return this._ng_commnet_items;
     }
 
     /**
@@ -49,14 +73,25 @@ class NGComment {
 
     /**
      * 
+     * @param {string[]} items 
+     * @param {string} ng_type 
+     */
+    _addNGItems(items, ng_type){
+        items.forEach(value => {
+            this._ng_commnet_items.push({
+                type:ng_type,
+                value:value
+            });
+        });
+        this._updateItem();
+    }
+
+    /**
+     * 
      * @param {string[]} texts 
      */
     addNGTexts(texts){
-        texts.forEach(text => {
-            if(!this._ng_texts.includes(text)){
-                this._ng_texts.push(text);
-            }
-        });
+        this._addNGItems(texts, NGType.Text);
     }
 
     /**
@@ -64,11 +99,22 @@ class NGComment {
      * @param {string[]} user_ids 
      */
     addNGUserIDs(user_ids){
-        user_ids.forEach(user_id => {
-            if(!this._ng_user_ids.includes(user_id)){
-                this._ng_user_ids.push(user_id);
+        this._addNGItems(user_ids, NGType.UserId);
+    }
+
+    /**
+     * 
+     * @param {string[]} items 
+     * @param {string} ng_type 
+     */
+    _deleteNGItems(items, ng_type){
+        this._ng_commnet_items = this._ng_commnet_items.filter(item => {
+            if(item.type!=ng_type){
+                return true;
             }
+            return !items.includes(item.value);
         });
+        this._updateItem(); 
     }
 
     /**
@@ -76,9 +122,7 @@ class NGComment {
      * @param {string[]} texts 
      */
     deleteNGTexts(texts){
-        this._ng_texts = this._ng_texts.filter(text => {
-            return !texts.includes(text);
-        });
+        this._deleteNGItems(texts, NGType.Text);
     }
 
     /**
@@ -86,20 +130,7 @@ class NGComment {
      * @param {string[]} user_ids 
      */
     deleteNGUserIDs(user_ids){
-        this._ng_user_ids = this._ng_user_ids.filter(user_id => {
-            return !user_ids.includes(user_id);
-        });
-    }
-
-    /**
-     * 
-     * @returns {NGItems}
-     */
-    getNGItems(){
-        return {
-            ng_texts: this._ng_texts, 
-            ng_user_ids: this._ng_user_ids
-        };
+        this._deleteNGItems(user_ids, NGType.UserId);
     }
 }
 
@@ -303,21 +334,14 @@ class CommentFilter {
 
     /**
      * 
-     * @param {string[]} ng_texts 
-     * @param {string[]} ng_user_ids 
+     * @param {NGCommentItem[]} ng_commnet_items 
      */
-    setNGComments(ng_texts, ng_user_ids){
-        if(!ng_texts){
-            ng_texts = [];
-        }
-        if(!ng_user_ids){
-            ng_user_ids = [];
-        }
-        this.ng_comment.setNGComments(ng_texts, ng_user_ids);
+    setNGCommentItems(ng_commnet_items){
+        this.ng_comment.setNGCommentItems(ng_commnet_items);
     }
 
-    getNGComments(){
-        return this.ng_comment.getNGComments();
+    getNGCommentItems(){
+        return this.ng_comment.getNGCommentItems();
     }
 
     /**
@@ -341,6 +365,7 @@ class CommentFilter {
 
 module.exports = {
     NGComment,
+    NGType,
     CommentNumLimit,
     CommentFilter
 };

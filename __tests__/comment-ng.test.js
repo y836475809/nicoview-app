@@ -18,6 +18,18 @@ test.beforeEach(t => {
     t.context.delete_cf.addNGUserIDs(["id1", "id2", "id3"]);
 });
 
+test("ng commnet setNGCommentItems update ng items", t => {
+    const ng_items = [
+        { type: "text", value: "text1" },
+        { type: "user_id", value: "user_id1"},
+    ];
+    const ngc = new NGComment();
+    ngc.setNGCommentItems(ng_items);
+    
+    t.deepEqual(ngc._ng_texts, ["text1"]);
+    t.deepEqual(ngc._ng_user_ids, ["user_id1"]);
+});
+
 test("add ng words, ng user ids", t => {
     const cf = t.context.cf;
 

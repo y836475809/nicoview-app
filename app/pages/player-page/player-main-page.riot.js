@@ -145,7 +145,7 @@ module.exports = {
             this.comment_filter.ng_comment.addNGTexts(ng_texts);
             this.comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
             try {
-                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
+                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
             } catch (error) {
                 logger.error("player main save ng comment", error);
                 await myapi.ipc.Dialog.showMessageBox({
@@ -165,7 +165,7 @@ module.exports = {
             this.comment_filter.ng_comment.deleteNGTexts(ng_texts);
             this.comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
             try {
-                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGComments());
+                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
             } catch (error) {
                 logger.error("player main save comment ng", error);
                 await myapi.ipc.Dialog.showMessageBox({
@@ -190,7 +190,7 @@ module.exports = {
 
         player_obs.on("player-main-page:show-player-setting-dialog", () => {
             player_obs.trigger("player-setting-dialog:show", {
-                ng_items : this.comment_filter.ng_comment.getNGItems(),
+                ng_commnet_items : this.comment_filter.ng_comment.getNGCommentItems(),
             });
         });
 
@@ -232,10 +232,10 @@ module.exports = {
         
         try {
             const do_limit = await myapi.ipc.Config.get("comment.do_limit", true);
-            const { ng_texts, ng_user_ids } = await myapi.ipc.NGList.getItems();
+            const ng_commnet_items = await myapi.ipc.NGList.getItems();
             this.comment_filter = new CommentFilter();
             this.comment_filter.setLimit(do_limit);
-            this.comment_filter.setNGComments(ng_texts, ng_user_ids);
+            this.comment_filter.setNGCommentItems(ng_commnet_items);
         } catch (error) {
             logger.error("player main load ng comment", error);
             await myapi.ipc.Dialog.showMessageBox({

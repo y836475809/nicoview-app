@@ -39,7 +39,7 @@ const createEmptyItem = () => {
         info: "",
         play_time: -1,
         pub_date: -1,
-        tags: "",
+        tags: [],
         saved: false,
         reg_download: false,
     };

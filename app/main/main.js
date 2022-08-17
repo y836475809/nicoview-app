@@ -214,7 +214,6 @@ function createWindow() {
         sandbox: false
     };
     main_win = new BrowserWindow(state);
-    main_win._tag = "main";
     if (state.maximized) {
         main_win.maximize();
     }

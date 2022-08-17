@@ -12,7 +12,8 @@ const isMainProcess = () => {
  */
 const send = (channel, args) => {
     const win = BrowserWindow.getAllWindows().find(bw=>{
-        return bw._tag == "main";
+        const url = bw.webContents.getURL();
+        return url.includes("main");
     });
     win.webContents.send(channel, args);
 };

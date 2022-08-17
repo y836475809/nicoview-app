@@ -3,16 +3,6 @@ const NICO_URL = require("../../js/nico-url");
 
 /**
  * 
- * @param {RiotComponent} tag 
- * @param {boolean} visible 
- */
-const formVisible = (tag, visible) => {
-    /** @type {HTMLElement} */
-    const elm = tag.$(".open-form");
-    elm.style.display = visible===true?"":"none";
-};
-/**
- * 
  * @param {string} value video id or url
  * @returns {boolean} true:nico url
  */
@@ -32,31 +22,38 @@ const getVideoID = (value) => {
     }
 };
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @returns {void}
- */
-const playByVideoID = (tag) => {
-    /** @type {HTMLInputElement} */
-    const elm = tag.$(".open-form input");
-    const video_id = getVideoID(elm.value);
-    if(!video_id) {
-        return;
-    }
-    const online = false; // ローカル再生を優先
-    Command.play({
-        video_id: video_id,
-        time: 0
-    }, online);
-};
-
 module.exports = {
+    /**
+     * 
+     * @param {boolean} visible 
+     */
+    formVisible(visible){
+        /** @type {HTMLElement} */
+        const elm = this.$(".open-form");
+        elm.style.display = visible===true?"":"none";
+    },
+    /**
+     * 
+     * @returns {void}
+     */
+    playByVideoID(){
+        /** @type {HTMLInputElement} */
+        const elm = this.$(".open-form input");
+        const video_id = getVideoID(elm.value);
+        if(!video_id) {
+            return;
+        }
+        const online = false; // ローカル再生を優先
+        Command.play({
+            video_id: video_id,
+            time: 0
+        }, online);
+    },
     onBeforeMount(props) {
         /** @type {MyObservable} */
         const obs = props.obs;
         obs.on("show", () => {
-            formVisible(this, true);
+            this.formVisible(true);
             /** @type {HTMLInputElement} */
             const elm = this.$(".open-form input");
             elm.value = "";
@@ -64,7 +61,7 @@ module.exports = {
         });
     },
     onMounted() {
-        formVisible(this, false);
+        this.formVisible(false);
     },
     /**
      * 
@@ -79,7 +76,7 @@ module.exports = {
      */
     onkeydownPlay(e) {
         if(e.code == "Enter"){
-            playByVideoID(this,);
+            this.playByVideoID();
         }
     },
     /**
@@ -87,13 +84,13 @@ module.exports = {
      * @param {Event} e 
      */
     onclickPlay(e) { // eslint-disable-line no-unused-vars
-        playByVideoID(this);
+        this.playByVideoID();
     },
     /**
      * 
      * @param {Event} e 
      */
     onclickClose(e) { // eslint-disable-line no-unused-vars
-        formVisible(this, false);
+        this.formVisible(false);
     }
 };

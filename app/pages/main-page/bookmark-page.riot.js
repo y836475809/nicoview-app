@@ -6,27 +6,25 @@ const { MyObservable, window_obs } = require("../../js/my-observable");
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {[]} items 
- */
-const resizeHeight = (tag, items) => {
-    /** @type {HTMLElement} */
-    const sidebar = tag.$(".sidebar");
-    /** @type {HTMLElement} */
-    const content = tag.$(".content");
-    const item_height = 30;
-    const new_height = items.length*item_height;
-    sidebar.style.height = (new_height + 35) + "px";
-    content.style.height = new_height + "px";
-};
-
 module.exports = {
     /** @type {MyObservable} */
     obs_listview:null,
     sb_button_icon:"fas fa-chevron-left",
     name: "bookmark",
+    /**
+     * 
+     * @param {BookmarkItem[]} items 
+     */
+    resizeHeight(items){
+        /** @type {HTMLElement} */
+        const sidebar = this.$(".sidebar");
+        /** @type {HTMLElement} */
+        const content = this.$(".content");
+        const item_height = 30;
+        const new_height = items.length*item_height;
+        sidebar.style.height = (new_height + 35) + "px";
+        content.style.height = new_height + "px";
+    },
     onBeforeMount() {
         this.obs_listview = new MyObservable();
 
@@ -57,7 +55,7 @@ module.exports = {
             /** @type {{items:BookmarkItem[]}} */
             const { items } = args;
             await myapi.ipc.Bookmark.updateItems(items);
-            resizeHeight(this, items);
+            this.resizeHeight(items);
         });
 
         this.obs_listview.onReturn("show-contextmenu", async (e, args) => {
@@ -96,7 +94,6 @@ module.exports = {
         // TODO error対応
         const items = await myapi.ipc.Bookmark.getItems();
         this.obs_listview.trigger("loadData", { items });
-
-        resizeHeight(this, items);
+        this.resizeHeight(items);
     }
 }; 

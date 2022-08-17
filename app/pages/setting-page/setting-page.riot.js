@@ -9,51 +9,6 @@ const { logger } = require("../../js/logger");
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} selector 
- * @param {string} value 
- */
-const setInputValue = (tag, selector, value) => {          
-    const elm = tag.$(selector);
-    elm.value = value;
-};
-
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} selector 
- * @param {boolean} value 
- */
-const setCheckValue = (tag, selector, value) => {          
-    const elm = tag.$(selector);
-    elm.checked = value;
-};
-
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {MouseGesture} mouse_gesture 
- */
-const setupMouseGesture = async (tag, mouse_gesture) => {
-    const config = await myapi.ipc.Config.get(
-        mouse_gesture.name, mouse_gesture.defaultConfig);
-
-    for (const [key, value] of Object.entries(config)) {
-        const gesture = value;
-        const class_name = `mg-${key}`;
-
-        /** @type {HTMLSelectElement} */
-        const elem = tag.$(`.${class_name}`);
-        for(let i = 0; i < elem.options.length; i++) {
-            if(elem.options[i].value == gesture){
-                elem.options[i].selected = true ;
-            }
-        }
-    }
-};
-
 module.exports = {
     state: {
         /** @type {{name:string, title:string}[]} */
@@ -71,6 +26,48 @@ module.exports = {
     
     /** @type {MyObservable} */
     obs_modal_dialog:null,
+
+    /**
+     * 
+     * @param {string} selector 
+     * @param {string} value 
+     */
+    setInputValue(selector, value) { 
+        /** @type {HTMLInputElement} */
+        const elm = this.$(selector);
+        elm.value = value;
+    },
+    /**
+     * 
+     * @param {string} selector 
+     * @param {boolean} value 
+     */
+    setCheckValue(selector, value) {
+        /** @type {HTMLInputElement} */          
+        const elm = this.$(selector);
+        elm.checked = value;
+    },
+    /**
+     * 
+     * @param {MouseGesture} mouse_gesture 
+     */
+    async setupMouseGesture(mouse_gesture){
+        const config = await myapi.ipc.Config.get(
+            mouse_gesture.name, mouse_gesture.defaultConfig);
+    
+        for (const [key, value] of Object.entries(config)) {
+            const gesture = value;
+            const class_name = `mg-${key}`;
+    
+            /** @type {HTMLSelectElement} */
+            const elem = this.$(`.${class_name}`);
+            for(let i = 0; i < elem.options.length; i++) {
+                if(elem.options[i].value == gesture){
+                    elem.options[i].selected = true ;
+                }
+            }
+        }
+    },
     onBeforeMount() {
         this.obs_modal_dialog = new MyObservable();
         this.modal_dialog = null;
@@ -88,18 +85,18 @@ module.exports = {
         this.state.mouse_gesture_items = gesture_items;
     },
     async onMounted() {
-        setInputValue(this, ".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
-        setInputValue(this, ".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
-        setInputValue(this, ".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-        setInputValue(this, ".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", ""));
-        setCheckValue(this, ".user_icon_cache", await myapi.ipc.Config.get("user_icon_cache", false));  
+        this.setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
+        this.setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
+        this.setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
+        this.setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", ""));
+        this.setCheckValue(".user_icon_cache", await myapi.ipc.Config.get("user_icon_cache", false));  
         
         for (let index = 0; index < this.state.import_items.length; index++) {
             const import_item = this.state.import_items[index];
-            setCheckValue(this, `.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
+            this.setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
         }
 
-        await setupMouseGesture(this, this.mouse_gesture);
+        await this.setupMouseGesture(this.mouse_gesture);
     
         this.modal_dialog = new ModalDialog(this.root, "setting-md", {
             obs:this.obs_modal_dialog,
@@ -118,7 +115,7 @@ module.exports = {
         if(dir == null){
             return;
         }
-        setInputValue(this, ".data-dir-input", dir);
+        this.setInputValue(".data-dir-input", dir);
         await myapi.ipc.Config.set("data_dir", dir);
     },
     async onclickSelectDownloadDir(e) { // eslint-disable-line no-unused-vars
@@ -126,7 +123,7 @@ module.exports = {
         if(dir == null){
             return; 
         }
-        setInputValue(this, ".download-dir-input", dir);
+        this.setInputValue(".download-dir-input", dir);
         await myapi.ipc.Config.set("download.dir", dir);
     },
     async onclickSelectffmpegPath(e) { // eslint-disable-line no-unused-vars
@@ -136,7 +133,7 @@ module.exports = {
         if(file_path == null){
             return;
         }
-        setInputValue(this, ".ffmpeg-path-input", file_path);
+        this.setInputValue(".ffmpeg-path-input", file_path);
         await myapi.ipc.Config.set("ffmpeg_path", file_path);
     },
     async onclickNNDDSystemDir(e) { // eslint-disable-line no-unused-vars
@@ -144,7 +141,7 @@ module.exports = {
         if(dir == null){
             return; 
         }
-        setInputValue(this, ".nndd-system-path-input", dir);
+        this.setInputValue(".nndd-system-path-input", dir);
         await myapi.ipc.Config.set("nndd.system_path", dir);
     },
     async onclickCheckNNDDImportItem(item, e) {  // eslint-disable-line no-unused-vars

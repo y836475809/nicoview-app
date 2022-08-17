@@ -14,25 +14,23 @@ const default_comment_config = {
     auto_sync_threshold: 0.1
 };
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} name 
- * @param {number[]} items 
- * @param {number} value 
- */
-const setup = (tag, name, items, value) => {
-    const index = items.findIndex(item => item === value);
-    /** @type {HTMLInputElement[]} */
-    const elms = tag.$$(`input[name='${name}']`);
-    elms[index].checked = true;
-};
-
 module.exports = {
     duration_items:[3, 4, 5],
     fps_items:[10, 60],
     sync_interval_items:[10, 30, 60, 120],
     sync_threshold_items:[0.05, 0.1],
+    /**
+     * 
+     * @param {string} name 
+     * @param {number[]} items 
+     * @param {number} value 
+     */
+    setup(name, items, value){
+        const index = items.findIndex(item => item === value);
+        /** @type {HTMLInputElement[]} */
+        const elms = this.$$(`input[name='${name}']`);
+        elms[index].checked = true;
+    },
     onBeforeMount() {
         player_obs.onReturn("setting-display-comment:get-default-commnet-config", ()=>{
             return default_comment_config;
@@ -42,8 +40,8 @@ module.exports = {
         /** @type {CommentConfig} */
         const comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
         
-        setup(this, "duration", this.duration_items, comment_config.duration_sec);
-        setup(this, "fps", this.fps_items, comment_config.fps);
+        this.setup("duration", this.duration_items, comment_config.duration_sec);
+        this.setup("fps", this.fps_items, comment_config.fps);
 
         /** @type {HTMLInputElement} */
         const ch_elm = this.$(".comment-do-limit-checkbox");
@@ -52,8 +50,8 @@ module.exports = {
         /** @type {HTMLInputElement} */
         const auto_sync_ch_elm = this.$(".auto-sync-checkbox");
         auto_sync_ch_elm.checked = comment_config.auto_sync_checked;
-        setup(this, "sync_interval", this.sync_interval_items, comment_config.auto_sync_interval);
-        setup(this, "sync_threshold", this.sync_threshold_items, comment_config.auto_sync_threshold);
+        this.setup("sync_interval", this.sync_interval_items, comment_config.auto_sync_interval);
+        this.setup("sync_threshold", this.sync_threshold_items, comment_config.auto_sync_threshold);
     },
     /**
      * 

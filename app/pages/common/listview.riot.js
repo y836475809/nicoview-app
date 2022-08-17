@@ -3,27 +3,6 @@ const myapi = require("../../js/my-api");
 
 const default_icon = "fas fa-square listview-item-default-icon";
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @returns {string}
- */
-const getInputValue = (tag) => {
-    /** @type {HTMLInputElement} */
-    const elm = tag.$(".listview-input");
-    return elm.value.toLowerCase();
-};
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} value 
- */
-const setInputValue = (tag, value) => {
-    /** @type {HTMLInputElement} */
-    const elm = tag.$(".listview-input");
-    elm.value = value;
-};
-
 module.exports = {
     state: {
         /** @type {ListItem[]} */
@@ -47,6 +26,25 @@ module.exports = {
     
     /** @type {(selector:string)=>HTMLElement[]} */
     _$$:null,// eslint-disable-line no-unused-vars
+
+    /**
+     * 
+     * @returns {string}
+     */
+    getInputValue(){
+        /** @type {HTMLInputElement} */
+        const elm = this.$(".listview-input");
+        return elm.value.toLowerCase();
+    },
+    /**
+     * 
+     * @param {string} value 
+     */
+    setInputValue(value){
+        /** @type {HTMLInputElement} */
+        const elm = this.$(".listview-input");
+        elm.value = value;
+    },
     onBeforeMount(props) {
         this.obs = props.obs;
         
@@ -106,7 +104,7 @@ module.exports = {
                     item.state = "listview-item-show-anime";
                 });
 
-                const query = getInputValue(this);
+                const query = this.getInputValue();
                 this.filter(query);
                 this.triggerChange();
             }, 50);
@@ -271,16 +269,16 @@ module.exports = {
      */
     onkeydownSearchInput(e) {
         if(e.code == "Enter"){
-            const query = getInputValue(this);
+            const query = this.getInputValue();
             this.filter(query);
         }
     },
     onclickSearch(e) { // eslint-disable-line no-unused-vars
-        const query = getInputValue(this);
+        const query = this.getInputValue();
         this.filter(query);
     },
     onclickShowAll(e) { // eslint-disable-line no-unused-vars
-        setInputValue(this, "");
+        this.setInputValue("");
         this.filter("");
     },
     /**

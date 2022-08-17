@@ -10,22 +10,21 @@ const changeParams = async(name, value) => {
     params[name] = value;
     await myapi.ipc.Config.set(`player.contextmenu.${name}`, value);
 };
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} name 
- * @param {number[]} items 
- * @param {number} value 
- */
-const setRadioValue = (tag, name, items, value) => {
-    const index = items.findIndex(item => item === value);
-    /** @type {HTMLInputElement[]} */
-    const elms = tag.$$(`input[name='${name}']`);
-    elms[index].checked = true;
-};
 
 module.exports = {
     menu_num_items:[5, 10, 20],
+    /**
+     * 
+     * @param {string} name 
+     * @param {number[]} items 
+     * @param {number} value 
+     */
+    setRadioValue(name, items, value){
+        const index = items.findIndex(item => item === value);
+        /** @type {HTMLInputElement[]} */
+        const elms = this.$$(`input[name='${name}']`);
+        elms[index].checked = true;
+    },
     onBeforeMount(props) { // eslint-disable-line no-unused-vars
     },
     async onMounted() {
@@ -33,8 +32,8 @@ module.exports = {
             history_num: 5,
             stack_num: 5
         });
-        setRadioValue(this, "history_num", this.menu_num_items, params.history_num);
-        setRadioValue(this, "stack_num", this.menu_num_items, params.stack_num);
+        this.setRadioValue("history_num", this.menu_num_items, params.history_num);
+        this.setRadioValue("stack_num", this.menu_num_items, params.stack_num);
     },
     async onchangeHistoryMenuItemNum(item, e) { // eslint-disable-line no-unused-vars
         await changeParams("history_num", parseInt(item));

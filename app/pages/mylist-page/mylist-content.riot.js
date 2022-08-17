@@ -11,28 +11,6 @@ const { logger } = require("../../js/logger");
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-/**
- * 
- * @param {RiotComponent} tag 
- * @returns {string}
- */
-const getMylistID = (tag) => {
-    /** @type {HTMLInputElement} */
-    const elm = tag.$(".mylist-input");
-    return elm.value;
-};
-
-/**
- * 
- * @param {RiotComponent} tag 
- * @param {string} id 
- */
-const setMylistID = (tag, id) => {
-    /** @type {HTMLInputElement} */
-    const elm = tag.$(".mylist-input");
-    elm.value = id;
-};
-
 module.exports = {
     state:{
         mylist_description:""
@@ -59,6 +37,25 @@ module.exports = {
     /** @type {GridTable} */
     grid_table:null,
     is_current_fav:false,
+
+    /**
+     * 
+     * @returns {string}
+     */
+    getMylistID(){
+        /** @type {HTMLInputElement} */
+        const elm = this.$(".mylist-input");
+        return elm.value;
+    },
+    /**
+     * 
+     * @param {string} id 
+     */
+    setMylistID(id){
+        /** @type {HTMLInputElement} */
+        const elm = this.$(".mylist-input");
+        elm.value = id;
+    },
     onBeforeMount() {  
         this.obs_modal_dialog = new MyObservable();
 
@@ -94,7 +91,7 @@ module.exports = {
             }else{
                 try {
                     const mylist = this.nico_mylist_store.load(mylist_id);
-                    setMylistID(this, mylist_id);
+                    this.setMylistID(mylist_id);
                     await this.setMylist(mylist); 
                 } catch (error) {
                     logger.error(error);
@@ -107,7 +104,7 @@ module.exports = {
         });
 
         main_obs.on("mylist-page:load-mylist", async(mylist_id)=> {
-            setMylistID(this, mylist_id);
+            this.setMylistID(mylist_id);
             try {
                 if(await this.existMylist(mylist_id)){
                     await this.setMylist(this.nico_mylist_store.load(mylist_id)); 
@@ -135,7 +132,7 @@ module.exports = {
                 this.nico_mylist_image_cache.delete(mylist_id);
             }); 
 
-            const mylist_id = getMylistID(this);
+            const mylist_id = this.getMylistID();
             if(await this.hasMylistID(mylist_id)){
                 this.is_current_fav = true;
             }else{
@@ -426,7 +423,7 @@ module.exports = {
         });
         
         try {
-            const mylist_id = getMylistID(this);
+            const mylist_id = this.getMylistID();
             await this.getMylist(mylist_id);
 
             const mylist_id_list = await this.getMylistIDList();
@@ -458,7 +455,7 @@ module.exports = {
         await this.updateMylist();
     },
     async onclickSaveMylist(e) { // eslint-disable-line no-unused-vars
-        const mylist_id = getMylistID(this);
+        const mylist_id = this.getMylistID();
         if(await this.existMylist(mylist_id)){
             this.is_current_fav = true;
             this.update();

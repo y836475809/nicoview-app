@@ -290,7 +290,7 @@ class GridTable {
     setData(data){
         this.dataView.beginUpdate();
         this.dataView.setItems(data, this.obj_id_prop);
-        this.dataView.setFilter(this._filter, this.target_column_ids);
+        this.dataView.setFilter(this._filter);
         this.dataView.reSort();
         this.dataView.endUpdate();
         this.grid.invalidate();        

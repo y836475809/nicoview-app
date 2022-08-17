@@ -10,7 +10,7 @@ class FixedComment{
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentElm[]} comments 
      */
     createRowIndexMap(comments){
         this.id_row_map = new Map();

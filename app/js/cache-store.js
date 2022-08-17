@@ -2,13 +2,18 @@ const path = require("path");
 const fs = require("fs");
 
 class CacheStore {
+    /**
+     * 
+     * @param {string} dir_path 保存先ディレクトリパス
+     * @param {string} fname 保存ファイル名 
+     */
     constructor(dir_path, fname){
         this.file_path =  path.join(dir_path, fname);
         this.cache = new Map();
         this.dirty = false;
     }
 
-    set(key ,value, force=false){
+    set(key, value, force=false){
         if(force){
             this.dirty = true;
             this.cache.set(key, value);
@@ -19,7 +24,6 @@ class CacheStore {
     }
 
     has(key){
-
         return this.cache.has(key);
     }
 

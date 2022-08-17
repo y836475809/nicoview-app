@@ -8,7 +8,7 @@ const isMainProcess = () => {
 /**
  * 
  * @param {string} channel 
- * @param {*} args 
+ * @param {any} args 
  */
 const send = (channel, args) => {
     const win = BrowserWindow.getAllWindows().find(bw=>{
@@ -22,7 +22,7 @@ class Command {
     /**
      * 
      * @param {{video_id:string, time:number}} item 
-     * @param {boolean} online 
+     * @param {boolean} online true:オンライン再生を優先
      */
     static play(item, online) {
         const video_item = {

@@ -8,7 +8,7 @@ const timeout_msec = 120*1000;
 class NicoCookie {
     /**
      * 
-     * @param {Array<String>} cookies 
+     * @param {String[]} cookies 
      * @param {String} name 
      */
     static getValue(cookies, name){

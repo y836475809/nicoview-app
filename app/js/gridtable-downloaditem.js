@@ -175,6 +175,7 @@ class GridTableDownloadItem {
 
     addItems(items, state){
         items.forEach(item => {
+            /** @type {RegDownloadItem[]} */
             const dv_items = this.grid_table.dataView.getItems();
             const fd_item = dv_items.find(value=>{
                 return value.video_id == item.video_id;
@@ -210,6 +211,7 @@ class GridTableDownloadItem {
         //         state: item.state,
         //     };
         // });
+        /** @type {RegDownloadItem[]} */
         const items = this.grid_table.dataView.getItems();
         items.forEach(item => {
             if(item.state === target_state){
@@ -239,6 +241,7 @@ class GridTableDownloadItem {
     }
 
     getNext(video_id){
+        /** @type {RegDownloadItem[]} */
         const items = this.grid_table.dataView.getItems();
 
         if(!video_id){
@@ -248,6 +251,7 @@ class GridTableDownloadItem {
             if(find_index<0){
                 return null;
             }
+            /** @type {RegDownloadItem} */
             const item = this.grid_table.dataView.getItemByIdx(find_index);
             return item.video_id;
         }
@@ -260,12 +264,14 @@ class GridTableDownloadItem {
             if(find_index<0){
                 return null;
             }
+            /** @type {RegDownloadItem} */
             const item = this.grid_table.dataView.getItemByIdx(find_index);
             return item.video_id;
         }
 
         let next_index = index + 1;
         for (let index = next_index; index < items.length; index++) {
+            /** @type {RegDownloadItem} */
             const item = this.grid_table.dataView.getItemByIdx(index);
             if(item && (item.state == DownloadState.wait || item.state == DownloadState.error)){
                 return item.video_id;

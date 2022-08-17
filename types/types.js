@@ -233,6 +233,19 @@
  */
 
 /**
+ * 動画に流れるコメント要素
+ * @typedef {Object} CommentElm
+ * @property {string} content 本文 
+ * @property {number} duration
+ * @property {number} no
+ * @property {string} user_id
+ * @property {number} vpos
+ * @property {string} type ue:固定、上に表示 shita:固定、下に表示 naka:流れる
+ * @property {string} color 文字色
+ * @property {string} font_size フォントサイズ
+ */
+
+/**
  * オーナー情報
  * @typedef {Object} Owner 
  * @property {string} iconURL
@@ -329,5 +342,6 @@
 
 /** 
  * @typedef {import("@js/my-observable").MyObservable} MyObservable
+ * @typedef {import("@js/modal-dialog").ModalDialog} ModalDialog
  * @typedef {import("node_modules/riot/riot").RiotComponent} RiotComponent
  */

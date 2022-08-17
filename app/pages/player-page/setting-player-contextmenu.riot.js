@@ -19,7 +19,7 @@ const changeParams = async(name, value) => {
  */
 const setRadioValue = (tag, name, items, value) => {
     const index = items.findIndex(item => item === value);
-    /** @type {HTMLInputElement} */
+    /** @type {HTMLInputElement[]} */
     const elms = tag.$$(`input[name='${name}']`);
     elms[index].checked = true;
 };

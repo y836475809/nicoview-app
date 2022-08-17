@@ -40,6 +40,11 @@ class ImportFile {
         };
     }
 
+    /**
+     * 
+     * @param {VideoTag[]} thumb_info_tags 
+     * @returns {string[]}
+     */
     _getTags(thumb_info_tags){
         if(!thumb_info_tags){
             return [];

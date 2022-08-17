@@ -1,5 +1,9 @@
 
 class History {
+    /**
+     * 
+     * @param {number} history_max 履歴保存最大数
+     */
     setup(history_max){
         /** @type {number} */
         this.history_max = history_max;
@@ -29,6 +33,13 @@ class History {
         return this.history_items;
     }
     
+    /**
+     * 
+     * @param {{
+     * video_id:string, 
+     * thumb_img:string,
+     * title:string }} new_item 履歴に追加する動画情報
+     */
     add(new_item){     
         const index = this.history_items.findIndex(item => item.video_id === new_item.video_id);
         if(index === -1){

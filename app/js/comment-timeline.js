@@ -34,7 +34,8 @@ class NicoScript {
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
+     * @returns {CommentItem[]}
      */
     getApplied(comments){
         const script_comments = comments.filter(comment => {
@@ -50,8 +51,9 @@ class NicoScript {
 
     /**
      * 
-     * @param {Array} script_comments 
-     * @param {Array} normal_comments 
+     * @param {CommentItem[]} script_comments 
+     * @param {CommentItem[]} normal_comments 
+     * @returns {CommentItem[]}
      */
     _applyDefault(script_comments, normal_comments){
         const f = script_comments.find(comment => {
@@ -91,6 +93,11 @@ class NicoScript {
         });
     }
 
+    /**
+     * 
+     * @param {string} text 
+     * @returns {boolean} true:スクリプトと判定
+     */
     _hasScript(text){
         return this._scritp_re.test(text);
     }
@@ -157,6 +164,7 @@ class CommentOptionParser {
     /**
      * 
      * @param {String} mail 
+     * @returns {string|null}
      */
     _getType(mail){
         const type = mail.match(/^ue\s|\sue\s|\sue$|^naka\s|\snaka\s|\snaka$|^shita\s|\sshita\s|\sshita$/gi);
@@ -172,6 +180,7 @@ class CommentOptionParser {
     /**
      * 
      * @param {String} mail 
+     * @returns {string|null}
      */
     _getFontSize(mail){
         const size = mail.match(/^big\s|\sbig\s|\sbig$|^middle\s|\smiddle\s|\smiddle$|^small\s|\ssmall\s|\ssmall$/gi);
@@ -188,6 +197,7 @@ class CommentOptionParser {
      * 
      * @param {String} mail 
      * @param {String} user_id 
+     * @returns {{type:string, font_size:string, color:string}}
      */
     parse(mail, user_id){
         const options = {
@@ -295,7 +305,7 @@ class CommentTimeLine {
     }
 
     /**
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
      */
     create(comments) {
         this._has_comment = comments.length > 0;
@@ -326,9 +336,9 @@ class CommentTimeLine {
                 comments[comments.length-1].vpos/100 + this.duration_sec;
         }
         
-        const [flow_comments,
+        const {flow_comments,
             fixed_top_comments,
-            fixed_bottom_comments] = this._getEachComments(comments);
+            fixed_bottom_comments} = this._getEachComments(comments);
 
         this._createFlowTL(flow_comments);
         this._createFixedTL(fixed_top_comments, fixed_bottom_comments);
@@ -336,7 +346,7 @@ class CommentTimeLine {
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentElm[]} comments 
      */
     _createFlowTL(comments){
         const view_width = this.area_size.width;
@@ -372,8 +382,8 @@ class CommentTimeLine {
 
     /**
      * 
-     * @param {Array} top_comments 
-     * @param {Array} bottom_comments 
+     * @param {CommentElm[]} top_comments 
+     * @param {CommentElm[]} bottom_comments 
      */
     _createFixedTL(top_comments, bottom_comments){
         const fixed_top_cmt = new FixedComment(this.row_num);
@@ -445,6 +455,11 @@ class CommentTimeLine {
         this._paused = true;
     }
 
+    /**
+     * 
+     * @param {number} seek_sec 
+     * @returns {void}
+     */
     seek(seek_sec){
         if(seek_sec < this.lastTimeSec){
             this._ended = false;
@@ -458,6 +473,10 @@ class CommentTimeLine {
         this.timeLine.time(seek_sec, false);
     }
 
+    /**
+     * 現在の再生時刻を返す
+     * @returns {number}
+     */
     getCurrentTime(){
         return this.timeLine.time();
     }
@@ -479,6 +498,12 @@ class CommentTimeLine {
         return Math.max(...lens);
     }
 
+    /**
+     * 
+     * @param {CommentElm} comment 
+     * @param {DocumentFragment} fragment 
+     * @returns {{elm:HTMLDivElement, text_width:number}}
+     */
     _createElm(comment, fragment){
         const elm = document.createElement("div");
         elm.classList.add("comment");
@@ -514,7 +539,7 @@ class CommentTimeLine {
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentElm[]} comments 
      * @param {FlowComment} flow_cmt 
      * @param {DocumentFragment} fragment 
      */
@@ -571,7 +596,12 @@ class CommentTimeLine {
 
     /**
      * 
-     * @param {Array} comments 
+     * @param {CommentItem[]} comments 
+     * @returns {{
+     * flow_comments:CommentElm[],
+     * fixed_top_comments:CommentElm[],
+     * fixed_bottom_comments:CommentElm[]
+     * }}
      */
     _getEachComments(comments) {
         const flow_comments = [];
@@ -605,10 +635,11 @@ class CommentTimeLine {
             }
         }); 
         
-        return [
+        return {
             flow_comments, 
             fixed_top_comments, 
-            fixed_bottom_comments];
+            fixed_bottom_comments
+        };
     }
 }
 

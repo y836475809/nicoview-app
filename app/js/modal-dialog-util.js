@@ -2,10 +2,10 @@ const { logger } = require("./logger");
 const myapi = require("./my-api");
 
 /**
- * @param {*} modal_dialog 
- * @param {*} dialog_obs 
+ * @param {ModalDialog} modal_dialog 
+ * @param {MyObservable} dialog_obs 
  * @param {{message: String, cb:Function}} dailog_params
- * @param {*} func 
+ * @param {()=>void} func 
  * @returns 
  */
 const progressDailog = async (modal_dialog, dialog_obs, dailog_params, func) => {

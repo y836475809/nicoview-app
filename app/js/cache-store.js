@@ -39,7 +39,7 @@ class CacheStore {
 
     save(){
         if(this.dirty){
-            const ary = Array.from(this.cache.entries(this.cache));
+            const ary = Array.from(this.cache.entries());
             this._save(ary); 
             this.dirty = false;  
         }   

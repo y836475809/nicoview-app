@@ -395,7 +395,7 @@ module.exports = {
     /**
      * 
      * @param {LibraryItem[]} items 
-     * @param {function(nico_update:NicoUpdate):NicoUpdateResult} func 
+     * @param {(nico_update:NicoUpdate)=>NicoUpdateResult} func 
      * @returns 
      */
     async updateNicoData(items, func) {

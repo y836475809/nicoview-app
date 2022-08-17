@@ -45,7 +45,7 @@ module.exports = {
     /** @type {(selector:string)=>HTMLElement} */
     _$:null, // eslint-disable-line no-unused-vars
     
-    /** @type {(selector:string)=>HTMLElement[]>} */
+    /** @type {(selector:string)=>HTMLElement[]} */
     _$$:null,// eslint-disable-line no-unused-vars
     onBeforeMount(props) {
         this.obs = props.obs;
@@ -196,7 +196,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {ListItem} items 
+     * @param {ListItem[]} items 
      */
     triggerDelete(items) {
         /** @type {ListItem[]} */
@@ -353,7 +353,7 @@ module.exports = {
     /**
      * 
      * @param {ListItem} item 
-     * @param {Event} e 
+     * @param {MouseEvent} e 
      */
     async onmouseUp(item, e) {
         this.setSelected(e.target, item);
@@ -377,7 +377,7 @@ module.exports = {
     /**
      * 
      * @param {ListItem} item 
-     * @param {Event} e 
+     * @param {MouseEvent} e 
      */
     onmouseDown(item, e) {
         this.setSelected(e.target, item);

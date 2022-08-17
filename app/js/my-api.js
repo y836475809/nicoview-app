@@ -55,7 +55,7 @@ const Config = {
 const Dialog = {
     /**
      * 
-     * @param {*} param0 
+     * @param {{type:string, message:string, okcancel:boolean}} param0 
      * @returns {Promise<boolean>} true:ok false:cancel
      */
     showMessageBox: async ({type="info", message="", okcancel=false}={}) => {
@@ -67,14 +67,14 @@ const Dialog = {
     },
     /**
      * @async
-     * @returns {Promise.<string>}
+     * @returns {Promise<string>}
      */
     showSelectFolderDialog: async () => {
         return await ipcRenderer.invoke("app:show-select-folder-dialog");  
     },
     /**
      * @async
-     * @param {{name:string, exts:string, multi_select:boolean}} param0 
+     * @param {{name:string, exts:string[], multi_select:boolean}} param0 
      * @returns {Promise.<string[]>}
      */
     showSelectFileDialog: async ({name="All", exts=["*"], multi_select=false}) => {
@@ -87,7 +87,7 @@ const Dialog = {
 const Download = {
     /**
      * 
-     * @returns {string[]}
+     * @returns {Promise<string[]>}
      */
     getIncompleteIDs: async () => {  
         return await ipcRenderer.invoke("download:getIncompleteIDs");
@@ -178,7 +178,7 @@ const History = {
     },
     /**
      * 
-     * @returns {HistoryItem[]}
+     * @returns {Promise<HistoryItem[]>}
      */
     getItems: async ()=>{
         return await ipcRenderer.invoke("history:getItems");
@@ -300,7 +300,7 @@ const Bookmark = {
 const Search = {
     /**
      * 
-     * @returns {NicoSearchParamsItem[]}
+     * @returns {Promise<NicoSearchParamsItem[]>}
      */
     getItems: async ()=>{
         return await ipcRenderer.invoke("nico-search:getItems");
@@ -371,7 +371,7 @@ const Library = {
 
     /**
      * 
-     * @returns {LibrarySearchItem[]}
+     * @returns {Promise<LibrarySearchItem[]>}
      */
     getSearchItems: async () => {
         return await ipcRenderer.invoke("library-search:getItems");
@@ -428,7 +428,7 @@ const UserIconCache = {
     /**
      * 
      * @param {string} img_url 
-     * @returns {string}
+     * @returns {Promise<string>}
      */
     get: async (img_url) => {
         return await ipcRenderer.invoke("user-icon:get", { img_url });

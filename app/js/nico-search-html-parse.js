@@ -4,10 +4,11 @@ const { toTimeSec } = require("./time-format");
 /**
  * 
  * @param {String} value 
+ * @returns {number}
  */
 const getInt = (value) => {
     if(value===undefined){
-        return value;
+        return 0;
     }
     return parseInt(value.replace(/,/g, ""));
 };

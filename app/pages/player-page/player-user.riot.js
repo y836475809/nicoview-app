@@ -83,8 +83,8 @@ module.exports = {
     },
     /**
      * 
-     * @param {Event} e 
-     * @returns {boolean}
+     * @param {MouseEvent} e 
+     * @returns {Promise<boolean>}
      */
     async watchLinkMouseUp(e) {
         e.preventDefault(); 
@@ -121,7 +121,7 @@ module.exports = {
     /**
      * 
      * @param {MouseEvent} e 
-     * @returns {boolean}
+     * @returns {Promise<boolean>}
      */
     async mylistLinkMouseUp(e) {
         e.preventDefault(); 
@@ -141,7 +141,7 @@ module.exports = {
     /**
      * 
      * @param {MouseEvent} e 
-     * @returns {boolean}
+     * @returns {Promise<boolean>}
      */
     async linkMouseUp(e) {
         e.preventDefault(); 

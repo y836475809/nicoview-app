@@ -52,10 +52,10 @@ module.exports = {
         search_target_title:"",
     },
 
-    /** @type {NicoSearchSortItem} */
+    /** @type {NicoSearchSortItem[]} */
     sort_items:searchItems.sortItems,
 
-    /** @type {NicoSearchTargetItem} */
+    /** @type {NicoSearchTargetItem[]} */
     search_target_items:searchItems.searchTargetItems,
 
     /** @type {MyObservable} */

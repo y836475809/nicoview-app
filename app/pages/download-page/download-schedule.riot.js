@@ -43,7 +43,7 @@ module.exports = {
      * 
      * @returns {{
      * h_elm: HTMLSelectElement, 
-     * m_elm: HTMLSelectElement, , 
+     * m_elm: HTMLSelectElement, 
      * ck_elm: HTMLInputElement
      * }}
      */

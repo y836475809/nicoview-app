@@ -13,14 +13,14 @@ module.exports = {
     },
     /**
      * 
-     * @returns {CurrentPlayVideo}
+     * @returns {Promise<CurrentPlayVideo>}
      */
     async getCurrentPlayVideo() {
         return await player_obs.triggerReturn("player-main-page:get-current-play-video");
     },
     /**
      * 
-     * @returns {number}
+     * @returns {Promise<number>}
      */
     async getCurrentPlayTime() {
         return await player_obs.triggerReturn("player-video:get-current-time-callback");

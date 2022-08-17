@@ -17,7 +17,7 @@ module.exports = {
         this.obs_page_selector = new MyObservable();
 
         this.pagination_obs.on("set-page-num", (args) => {
-            /** @type {number} */
+            /** @type {{page_num:number}} */
             const { page_num } = args;
 
             this.state.page_num = page_num;

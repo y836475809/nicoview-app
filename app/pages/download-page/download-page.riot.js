@@ -86,7 +86,7 @@ module.exports = {
 
         try {
             this.grid_table_dl.onContextMenu(async e=>{ // eslint-disable-line no-unused-vars
-                /** @type {DownloadItem[]} */
+                /** @type {RegDownloadItem[]} */
                 const items = this.grid_table_dl.grid_table.getSelectedDatas();
                 if(items.length==0){
                     return;

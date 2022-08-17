@@ -224,7 +224,7 @@ class NicoSearch {
     /**
      * 
      * @param {NicoSearchParams} params 
-     * @returns {NicoSearchResultItem}
+     * @returns {Promise<NicoSearchResultItem>}
      */
     async search(params){   
         const service = params._service;

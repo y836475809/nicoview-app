@@ -183,10 +183,10 @@ class CommentNumLimit {
     /**
      * 
      * @param {CommentItem[]} comments 
-     * @returns {
+     * @returns {{
      *      owner_comments:CommentItem[], 
      *      user_comments:CommentItem[]
-     * }
+     * }}
      */
     _splitByUserID(comments){
         const owner_comments = [];

@@ -12,7 +12,7 @@ const changeParams = async(name, value) => {
 };
 /**
  * 
- * @param {Element} tag 
+ * @param {RiotComponent} tag 
  * @param {string} name 
  * @param {number[]} items 
  * @param {number} value 

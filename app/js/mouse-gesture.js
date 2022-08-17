@@ -77,7 +77,7 @@ class MouseGesture {
 
     /**
      * 
-     * @param {string} action 
+     * @param {()=>void} action 
      */
     setActionSearchBackPage(action) {
         const action_name = this._action_names.search_back_page;
@@ -86,7 +86,7 @@ class MouseGesture {
 
     /**
      * 
-     * @param {string} action 
+     * @param {()=>void} action 
      */
     setActionSearchFowardPage(action) {
         const action_name = this._action_names.search_forward_page;
@@ -95,7 +95,7 @@ class MouseGesture {
 
     /**
      * 
-     * @param {string} action 
+     * @param {()=>void} action 
      */
     setActionShowPalyer(action) {
         const action_name = this._action_names.all_show_player;
@@ -125,7 +125,7 @@ class MouseGesture {
 
     /**
      * 
-     * @param {string} on_gesture 
+     * @param {(gesture:string)=>void} on_gesture 
      */
     onGesture(on_gesture) {
         this._on_gesture = on_gesture;

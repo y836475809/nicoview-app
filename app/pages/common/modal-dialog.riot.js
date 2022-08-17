@@ -11,10 +11,10 @@ module.exports = {
     /** @type {MyObservable} */
     obs_dialog: null,
 
-    /** @type {boolean} */
+    /** @type {()=>void} */
     on_cancel: null,
 
-    /** @type {function(string):void>} */
+    /** @type {(string)=>void} */
     cb:null,
     onBeforeMount(props) {
         this.state.message = "";

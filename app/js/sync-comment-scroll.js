@@ -1,7 +1,7 @@
 class SyncCommentScroll {
     /**
      * 
-     * @param {[]} comments 
+     * @param {CommentItem[]} comments 
      */
     setComments(comments){
         this.comments = comments;

@@ -52,7 +52,7 @@ module.exports = {
         };
 
         this.obs_listview.on("changed", async (args) => {
-            /** @type {items:LibrarySearchItem[]} */
+            /** @type {{items:LibrarySearchItem[]}} */
             const { items } = args;
             await myapi.ipc.Library.updateSearchItems(items);
         });

@@ -253,7 +253,7 @@
  * 動画情報
  * @typedef {Object} ThumbVideo
  * @property {string} description
- * @property {number} duration
+ * @property {string} duration 動画時間(mm:ssの形式)
  * @property {string} largeThumbnailURL
  * @property {number} mylistCount
  * @property {string} postedDateTime

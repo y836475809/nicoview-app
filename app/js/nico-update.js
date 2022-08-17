@@ -9,7 +9,7 @@ const { deepCopy } = require("./deepcopy");
 class NicoUpdate {
     /**
      * 
-     * @param {LibraryItem} video_item 
+     * @param {LibraryItem} [video_item] 
      */
     constructor(video_item){
         if(video_item){
@@ -60,7 +60,7 @@ class NicoUpdate {
 
     /**
      * 
-     * @returns {boolean} true:update false:not update 
+     * @returns {Promise<{video_id:string, props:{}, update_thumbnail:boolean}>}
      */
     async update(){
         this._checkVideoDeleted();

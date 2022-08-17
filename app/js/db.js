@@ -174,7 +174,7 @@ class MapDB {
 
     async _safeWriteFile(file_path, data) {
         const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
-        this._writeFile(tmp_path, data, "utf-8");
+        this._writeFile(tmp_path, data);
         this._rename(tmp_path, file_path);
     }
 

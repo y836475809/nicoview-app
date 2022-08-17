@@ -355,7 +355,7 @@ module.exports = {
             const comments = video_data.getComments();
             await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);
         } catch (error) {
-            logger.error(`id=${video_item.id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
+            logger.error(`id=${video_item.video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
             await myapi.ipc.Dialog.showMessageBox({
                 type: "error",
                 message: error.message

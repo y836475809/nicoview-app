@@ -38,7 +38,7 @@ module.exports = {
             const cond = item;
             const sort = sort_map.get(`${cond.sort_name}${cond.sort_order}`);
             const target = search_target_map.get(cond.search_target);
-            return `${item.title}\n並び順: ${sort}\n種類: ${target}`;
+            return `${item.query}\n並び順: ${sort}\n種類: ${target}`;
         };
 
         /** @param {NicoSearchParamsItem} item */

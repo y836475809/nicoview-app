@@ -267,7 +267,7 @@ module.exports = {
     /**
      * 
      * @param {string} id 
-     * @returns {boolean}
+     * @returns {Promise<boolean>}
      */
     async existMylist(id) {
         const ids = await this.getMylistIDList();

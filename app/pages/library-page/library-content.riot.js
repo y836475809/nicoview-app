@@ -190,6 +190,7 @@ module.exports = {
         });
 
         this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
+            /** @type {LibraryItem[]} */
             const items = this.grid_table.getSelectedDatas();
             if(items.length==0){
                 return;
@@ -329,7 +330,7 @@ module.exports = {
     /**
      * 
      * @param {string} query 
-     * @param {string[]} target_ids 
+     * @param {string[]} [target_ids] 指定しない場合全項目が対象
      */
     filterItems(query, target_ids) {
         this.grid_table.filterData(query, target_ids);

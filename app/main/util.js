@@ -138,7 +138,7 @@ const popupInputContextMenu = (bw, props) => {
             {
                 id: "canSelectAll",
                 label: "すべて選択",
-                role: "selectall",
+                role: "selectAll",
             },
         ]);
         input_context_menu.items.forEach(item => {

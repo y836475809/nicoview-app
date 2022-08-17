@@ -18,7 +18,7 @@ const toDateString = (time) => {
 };
 
 /**
- * 秒からmm:ss表示に変換
+ * 秒をmm:ss表示にする
  * @param {number} time_sec 秒
  * @returns {string} mm:ss表示
  */

@@ -152,9 +152,6 @@ module.exports = {
         this.grid_table.setupResizer(".library-grid-container");
 
         this.grid_table.setFilter((column_id, value, word) => { 
-            if(Array.isArray(value) && value.join(" ").toLowerCase.indexOf(word.toLowerCase()) != -1) {
-                return true;
-            }
             if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
                 return true;
             }   
@@ -165,7 +162,11 @@ module.exports = {
             if(column_id=="is_economy"){
                 return item[column_id]?"エコノミー":"";
             }
-            return String(item[column_id]);
+            const value = item[column_id];
+            if(Array.isArray(value)){
+                return value.join(" ").toLowerCase();
+            }
+            return String(value);
         });
 
         this.grid_table.onDblClick(async (e, data)=>{

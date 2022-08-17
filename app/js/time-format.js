@@ -17,9 +17,14 @@ const toDateString = (time) => {
     return `${year}/${month}/${day} ${hour}:${min}:${sec}`;
 };
 
+/**
+ * 秒からmm:ss表示に変換
+ * @param {number} time_sec 秒
+ * @returns {string} mm:ss表示
+ */
 const toTimeString = (time_sec) => {
-    const sec = parseInt(time_sec % 60);
-    let min = parseInt(time_sec / 60);
+    const sec = Math.floor(time_sec % 60);
+    const min = Math.floor(time_sec / 60);
 
     const s_min = ("0" + min).slice(-2);
     const s_sec = ("0" + sec).slice(-2);

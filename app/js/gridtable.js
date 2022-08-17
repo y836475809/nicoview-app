@@ -125,7 +125,7 @@ class GridTable {
         }
         
         this.on_dblclick = (e, data)=>{};     // eslint-disable-line no-unused-vars
-        this.on_button_click = (e, data)=>{}; // eslint-disable-line no-unused-vars
+        this.on_button_click = (e, cmd_id, data)=>{}; // eslint-disable-line no-unused-vars
         this.on_context_menu = (e)=>{};       // eslint-disable-line no-unused-vars
         this.filter = (column_id, value, word) => { return true; }; // eslint-disable-line no-unused-vars
         this.target_column_ids = [];

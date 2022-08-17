@@ -3,7 +3,7 @@ const { toTimeString } = require("./time-format");
 const { getWatchURL } = require("./nico-url"); 
 const { Command } = require("./command"); 
 
-const popup = (parent_win, menu_items, resolve, cb=()=>{}) => {
+const popup = (parent_win, menu_items, resolve, cb=(arg)=>{}) => { // eslint-disable-line no-unused-vars
     menu_items.forEach(menu_item => {
         if(menu_item.type != "separator"){
             if(!menu_item.click){         

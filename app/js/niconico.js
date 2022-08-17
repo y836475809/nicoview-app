@@ -163,10 +163,7 @@ class NicoAPI {
 
         // TODO コメントサーバーはownerやuserで全部同じであるとしている
         if(url_set.size > 1){
-            let msg;
-            for (let url of url_set) {
-                msg += url + ", ";
-            }
+            const msg = [...url_set].join(", ");
             throw new Error(`several comment servers: ${msg}`);
         }
         return threads[0].server;

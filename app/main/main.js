@@ -435,7 +435,7 @@ app.on("ready", async ()=>{
     history.setup(history_max);  
     history.setData(items);
     ipcMain.handle("history:getItems", (event, args) => { // eslint-disable-line no-unused-vars
-        return history.getData("history");
+        return history.getData();
     });
     ipcMain.handle("history:updateItems", async (event, args) => {
         const { items } = args;

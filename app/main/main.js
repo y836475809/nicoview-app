@@ -25,7 +25,7 @@ if(app.commandLine.getSwitchValue("test")){
         setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
     }
 
-    process.env["test_nicoappview"] = true;
+    process.env["test_nicoappview"] = "true";
     // テスト時はテスト用のユーザーデータフォルダを使用
     app.setPath("userData", `${app.getPath("userData")}-test`);
 

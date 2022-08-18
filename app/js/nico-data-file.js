@@ -175,9 +175,10 @@ class NicoXMLFile extends NicoDataFile {
         const file_path = this.thumbInfoPath;
         const xml = fs.readFileSync(file_path, "utf-8");
         const thumb_info = NicoDataParser.xml_thumb_info(xml);
+        /** @type {VideoTag[]} */
         const tags = thumb_info.tags.map((value, index) => {
             return {
-                id: index+1,
+                id: String(index+1),
                 name: value.text,
                 isLocked: value.lock,
             };

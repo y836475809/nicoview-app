@@ -5,22 +5,46 @@ const { logger } = require("./logger");
 
 class MapDB {
     constructor({ filename = "./db.json", autonum = 10, use_log = true } = {}) {
+        /** @type {number} */
         this.autonum = autonum;
+
+        /** @type {boolean} */
         this.use_log = use_log;
+
+        /** @type {string} */
         const fullpath = path.resolve(filename);
+
+        /** @type {string} */
         this.db_path = fullpath;
+
+        /** @type {string} */
         this.log_path = this._getLogFilePath(fullpath);
+
+        /** @type {Map<string, string>} */
         this.id_map = new Map();
+
+        /** @type {Map<string, Map<any, any>>} */
         this.db_map = new Map();
+
+        /** @type {number} */
         this.cmd_log_count = 0;
     }
 
+    /**
+     * 
+     * @param {string} db_file_path 
+     * @returns {string} ログファイルのフルパス
+     */
     _getLogFilePath(db_file_path) {
         const dir = path.dirname(db_file_path);
         const ext = path.extname(db_file_path);
         return path.join(dir, `${path.basename(db_file_path, ext)}.log`);
     }
     
+    /**
+     * テーブル生成
+     * @param {{name:string,id:string}[]} name_id_pairs 生成するテーブル名とidにする項目名のペアのリスト
+     */
     createTable(name_id_pairs) {
         this.id_map.clear();
         this.db_map.clear();
@@ -32,6 +56,11 @@ class MapDB {
         });
     }
 
+    /**
+     * 
+     * @param {string} name テーブル名
+     * @param {any[]} data_list 
+     */
     setData(name, data_list){
         const id = this.id_map.get(name);
         this.db_map.set(name, this._convertMap(id, data_list));
@@ -56,18 +85,26 @@ class MapDB {
     }
 
     /**
-     * 
-     * @param {String} name 
-     * @param {Array} ary 
+     * データリストをmapに変換する
+     * @param {string} id テーブルのidにするid
+     * @param {Array} ary データリスト
+     * @returns {Map<any, any>}
      */
-    _convertMap(name, ary) {
+    _convertMap(id, ary) {
+        /** @type {Map<any, any>} */
         const map = new Map();
         ary.forEach(value => {
-            map.set(value[name], value);
+            map.set(value[id], value);
         });
         return map;
     }
 
+    /**
+     * テーブルにidが存在するかを判定
+     * @param {string} name テーブル名
+     * @param {string} id 
+     * @returns {boolean} true:idが存在する
+     */
     exist(name, id) {
         if (!this.db_map.has(name)) {
             return false;
@@ -75,6 +112,12 @@ class MapDB {
         return this.db_map.get(name).has(id);
     }
 
+    /**
+     * テーブルのidのデータを検索して最初に見つけたデータを返す
+     * @param {string} name テーブル名
+     * @param {string} id 
+     * @returns {any|null} データ
+     */
     find(name, id) {
         if (!this.db_map.has(name)) {
             return null;
@@ -86,6 +129,11 @@ class MapDB {
         return deepCopy(map.get(id));
     }
 
+    /**
+     * テーブルのidの全データを返す
+     * @param {string} name テーブル名
+     * @returns {any[]}
+     */
     findAll(name) {
         if (!this.db_map.has(name)) {
             return [];
@@ -94,6 +142,12 @@ class MapDB {
         return deepCopy(Array.from(map.values()));
     }
 
+    /**
+     * テーブル名のテーブルにデータを挿入する
+     * @param {string} name テーブル名
+     * @param {any} data 
+     * @returns {Promise<void>}
+     */
     async insert(name, data) {
         const id = this.id_map.get(name);
         const map = this.db_map.get(name);
@@ -109,6 +163,12 @@ class MapDB {
         });
     }
 
+    /**
+     * テーブル名のテーブルのidのデータを削除する
+     * @param {string} name テーブル名
+     * @param {string} id 
+     * @returns {Promise<void>}
+     */
     async delete(name, id) {
         const map = this.db_map.get(name);
         map.delete(id);  
@@ -123,6 +183,13 @@ class MapDB {
         });
     }
 
+    /**
+     * テーブル名のテーブルのidのデータをpropsで更新する
+     * @param {string} name テーブル名
+     * @param {string} id 
+     * @param {{}} props 
+     * @returns {Promise<void>}
+     */
     async update(name, id, props) {
         const map = this.db_map.get(name);
         if (!map.has(id)) {
@@ -155,6 +222,18 @@ class MapDB {
         this.cmd_log_count = 0;
     }
 
+    /**
+     * テーブルのデータを下のようなデータ毎の一行形式のjson文字列に変換する
+     * [ テーブル名,[
+     *      {data1},
+     *      {data2},
+     *      ...
+     *    ]
+     * ]
+     * @param {string} key テーブル名
+     * @param {any[]} ary データのリスト
+     * @returns {string} json文字列
+     */
     _convertString(key, ary) {
         const output = ary.map(value => {
             return JSON.stringify(value, null, 0);
@@ -163,6 +242,11 @@ class MapDB {
         return `["${key}", [\n${output}\n]]`;
     }
 
+    /**
+     * ファイルの存在確認
+     * @param {string} file_path ファイルパス
+     * @returns {Promise<boolean>} true:存在している
+     */
     async _existFile(file_path) {
         try {
             await fs.promises.stat(file_path);
@@ -172,12 +256,25 @@ class MapDB {
         }
     }
 
+    /**
+     * ファイル書き込み
+     * 一度別ファイル名で書き込んで問題なければファイル名にリネームする
+     * @param {string} file_path ファイル名
+     * @param {any} data
+     * @returns {Promise<void>}  
+     */
     async _safeWriteFile(file_path, data) {
         const tmp_path = path.join(path.dirname(file_path), `~${path.basename(file_path)}`);
         this._writeFile(tmp_path, data);
         this._rename(tmp_path, file_path);
     }
 
+    /**
+     * データ操作のログをログファイルに追記して
+     * ログ数が閾値以上の場合DBファイルにログのデータを反映してログを削除する
+     * @param {any} cmd データ操作
+     * @returns {Promise<void>} 
+     */
     async _log(cmd) {
         if (!this.use_log) {
             return;
@@ -192,15 +289,29 @@ class MapDB {
         }
     }
 
+    /**
+     * データ操作ログを削除する
+     * @returns {Promise<void>} 
+     */
     async _deletelog() {
         await this._unlink(this.log_path);
     }
 
+    /**
+     * データ操作をログファイルに追記する
+     * @param {any} cmd データ操作
+     * @returns {Promise<void>} 
+     */
     async _writelog(cmd) {
         const data = JSON.stringify(cmd, null, 0);
         await this._appendFile(this.log_path, `${data}\n`);
     }
 
+    /**
+     * データ操作のログファイルを読み込む
+     * @param {string} log_path 
+     * @returns {Promise<any[]>} データ操作リスト
+     */
     async _readlog(log_path) {
         if (!await this._existFile(log_path)) {
             return [];
@@ -235,8 +346,8 @@ class MapDB {
     }
 
     /**
-     * 
-     * @param {Array} cmd_logs 
+     * データ操作ログをDBに反映させる
+     * @param {any[]} cmd_logs 
      */
     _applyCmdLog(cmd_logs) {
         cmd_logs.forEach(item => {
@@ -266,8 +377,13 @@ class MapDB {
     }
 }
 
+/**
+ * ライブラリ用DB
+ */
 class LibraryDB {
     constructor({ filename = "./db.json", autonum = 10 } = {}) {
+        // autonum データ操作ログ保存数閾値
+        /** @type {{filename:string,autonum:number}} */
         this.params = { filename: filename, autonum: autonum };
         this._db = this._createDB(this.params);
 
@@ -275,6 +391,11 @@ class LibraryDB {
         this._db.createTable(this.name_id_paies);
     }
 
+    /**
+     * 
+     * @param {{filename:string,autonum:number}} params 
+     * @returns {MapDB}
+     */
     _createDB(params) {
         return new MapDB(params);
     }
@@ -285,6 +406,11 @@ class LibraryDB {
         await this._db.load();
     }
 
+    /**
+     * ライブラリDB保存
+     * @param {boolean} force true:データ操作ログがない(DBに変更がない)場合でも書き込む
+     * @returns {Promise<void>} 
+     */
     async save(force=true){
         if(force===false && this._db.cmd_log_count==0){
             logger.debug("no library writing");
@@ -295,17 +421,35 @@ class LibraryDB {
         await this._db.save(); 
     }
 
+    /**
+     * ディレクトリデータ(動画データ保存先)のリストをpathテーブルに設定する
+     * @param {{id:string,dirpath:string}[]} data_list 
+     */
     setPathData(data_list){
         this._db.setData("path", data_list);
     }
+    /**
+     * ライブラリデータ(動画データ)のリストをvideoテーブルに設定する
+     * @param {LibraryItem[]} data_list 
+     */
     setVideoData(data_list){
         this._db.setData("video", data_list);
     }
 
+    /**
+     * ライブラリにvideo_idのデータが存在するかの判定
+     * @param {string} video_id 動画id
+     * @returns {boolean} true:データが存在する
+     */
     exist(video_id) {
         return this._db.exist("video", video_id);
     }
 
+    /**
+     * ライブラリDBから最初に見つかった動画idのデータを返す
+     * @param {string} video_id 動画id
+     * @returns {LibraryItem} ライブラリデータ
+     */
     find(video_id) {
         const video_item = this._db.find("video", video_id);
         if(video_item===null){
@@ -316,6 +460,10 @@ class LibraryDB {
         return video_item;
     }
 
+    /**
+     * ライブラリDBから全データを返す
+     * @returns {LibraryItem[]} ライブラリデータ
+     */
     findAll() {
         const video_items = this._db.findAll("video");
         video_items.forEach(item => {
@@ -325,6 +473,12 @@ class LibraryDB {
         return video_items;
     }
 
+    /**
+     * ライブラリDBにデータを挿入する
+     * @param {string} dirpath 
+     * @param {LibraryItem} video_data
+     * @returns {Promise<void>} 
+     */
     async insert(dirpath, video_data) {
         const cp_video_data = { ...video_data };
         const dirpath_id = await this._getPathID(dirpath);
@@ -334,19 +488,39 @@ class LibraryDB {
         await this._db.insert("video", cp_video_data);
     }
 
+    /**
+     * ライブラリDBの動画idのデータを削除する
+     * @param {string} video_id 動画id
+     * @returns {Promise<void>} 
+     */
     async delete(video_id) {
         await this._db.delete("video", video_id);
     }
 
+    /**
+     * ライブラリDBの動画idのデータにpropsを反映する
+     * @param {string} video_id 動画id
+     * @param {{}} props プロパティ
+     * @returns {Promise<void>} 
+     */
     async update(video_id, props) {
         this._deleteNoUseProp(props);
         await this._db.update("video", video_id, props);
     }
 
+    /**
+     * DBに不要なデータをpropsから削除する
+     * @param {{dirpath?:string}} props 
+     */
     _deleteNoUseProp(props){
         delete props.dirpath; 
     }
 
+    /**
+     * path DBで未使用のidを返す
+     * @param {string} dirpath 
+     * @returns {Promise<string>} id
+     */
     async _getPathID(dirpath) {
         const path_map = this._db.db_map.get("path");
         for (let [k, v] of path_map) {

@@ -23,9 +23,9 @@ class NGComment {
     }
 
     /**
-     * 
-     * @param {string} ng_type NGType
-     * @returns {string[]}
+     * テキスト or ユーザーidのNGリストを返す
+     * @param {string} ng_type NGType.Text:NGコメントテキスト NGType.UserId:NGユーザーid 
+     * @returns {string[]} NGリスト
      */
     _getNGItems(ng_type){
         const items = this._ng_commnet_items.filter(item => {
@@ -45,7 +45,7 @@ class NGComment {
     }
 
     /**
-     * 
+     * NGコメントアイテムリストを返す
      * @returns {NGCommentItem[]}
      */
     getNGCommentItems(){
@@ -53,9 +53,9 @@ class NGComment {
     }
 
     /**
-     * 
-     * @param {CommentItem[]} comments 
-     * @returns {CommentItem[]}
+     * NGコメントを取り除いたコメントリストを返す
+     * @param {CommentItem[]} comments コメントリスト 
+     * @returns {CommentItem[]} コメントリスト
      */
     getComments(comments){
         return comments.filter(comment=>{
@@ -72,9 +72,9 @@ class NGComment {
     }
 
     /**
-     * 
-     * @param {string[]} items 
-     * @param {string} ng_type 
+     * NGリストを追加
+     * @param {string[]} items NGリスト
+     * @param {string} ng_type NGType.Text:NGコメントテキスト NGType.UserId:NGユーザーid 
      */
     _addNGItems(items, ng_type){
         items.forEach(value => {
@@ -87,7 +87,7 @@ class NGComment {
     }
 
     /**
-     * 
+     * NGコメントを追加
      * @param {string[]} texts 
      */
     addNGTexts(texts){
@@ -95,7 +95,7 @@ class NGComment {
     }
 
     /**
-     * 
+     * NGユーザーidを追加
      * @param {string[]} user_ids 
      */
     addNGUserIDs(user_ids){
@@ -103,9 +103,9 @@ class NGComment {
     }
 
     /**
-     * 
-     * @param {string[]} items 
-     * @param {string} ng_type 
+     * 登録してあるNGリストを削除
+     * @param {string[]} items NGリスト
+     * @param {string} ng_type NGType.Text:NGコメントテキスト NGType.UserId:NGユーザーid 
      */
     _deleteNGItems(items, ng_type){
         this._ng_commnet_items = this._ng_commnet_items.filter(item => {
@@ -118,7 +118,7 @@ class NGComment {
     }
 
     /**
-     * 
+     * 登録してあるNGコメントテキストを削除
      * @param {string[]} texts 
      */
     deleteNGTexts(texts){
@@ -126,7 +126,7 @@ class NGComment {
     }
 
     /**
-     * 
+     * 登録してあるNGユーザーidを削除
      * @param {string[]} user_ids 
      */
     deleteNGUserIDs(user_ids){
@@ -297,9 +297,10 @@ class CommentNumLimit {
     }
 
     /**
-     * 
-     * @param {Array<CommentItem[]>} comments_list 
-     * @param {Number} num 
+     * 1分毎のコメントリストから指定数のコメントを取得して返す
+     * @param {Array<CommentItem[]>} comments_list 1分毎のコメントリスト
+     * @param {Number} num 指定数
+     * @returns {CommentItem[]} コメントリスト
      */
     _getNumEach(comments_list, num){
         return comments_list.map(comments => {

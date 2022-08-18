@@ -255,7 +255,7 @@ module.exports = {
     /**
      * 
      * @param {string} target_id 
-     * @returns {HTMLElement}
+     * @returns {HTMLInputElement}
      */
     getSearchTargetElm(target_id) {
         const id = this.getSearchTargetElmID(target_id);
@@ -393,7 +393,7 @@ module.exports = {
     /**
      * 
      * @param {LibraryItem[]} items 
-     * @param {(nico_update:NicoUpdate)=>NicoUpdateResult} func 
+     * @param {(nico_update:NicoUpdate)=>Promise<NicoUpdateResult>} func 
      * @returns 
      */
     async updateNicoData(items, func) {

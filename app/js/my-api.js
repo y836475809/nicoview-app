@@ -347,7 +347,7 @@ const Library = {
     /**
      * 
      * @param {string} video_id 
-     * @returns {Promise<void>}
+     * @returns {Promise<{success:boolean,error:Error}>}
      */
     deleteItem: async (video_id) => {  
         return await ipcRenderer.invoke("library:deleteItem", {video_id});

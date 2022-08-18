@@ -1,6 +1,10 @@
 const ipc = require("electron").ipcRenderer;
 const { BrowserWindow, ipcMain } = require("electron");
 
+/**
+ * メインプロセスで実行されてるかどうかを判定する
+ * @returns {boolean} true:メインプロセスで実行
+ */
 const isMainProcess = () => {
     return process.type == "browser";
 };
@@ -20,8 +24,8 @@ const send = (channel, args) => {
 
 class Command {
     /**
-     * 
-     * @param {{video_id:string, time:number}} item 
+     * 動画再生
+     * @param {{video_id:string, time?:number}} item 
      * @param {boolean} online true:オンライン再生を優先
      */
     static play(item, online) {
@@ -39,7 +43,7 @@ class Command {
     }
 
     /**
-     * 
+     * 「後で見る」に追加
      * @param {MyObservable} obs 
      * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
@@ -60,7 +64,7 @@ class Command {
     }
 
     /**
-     * 
+     * ブックマークに追加
      * @param {MyObservable} obs 
      * @param {{video_id:string, title:string}[]} items 
      */
@@ -81,7 +85,7 @@ class Command {
     }
 
     /**
-     * 
+     * 動画をダウンロード登録
      * @param {MyObservable} obs 
      * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
@@ -94,7 +98,7 @@ class Command {
     }
 
     /**
-     * 
+     * 動画をダウンロード登録から削除
      * @param {MyObservable} obs 
      * @param {{video_id:string}[]} items 
      */
@@ -111,8 +115,8 @@ class Command {
     }
 
     /**
-     * 
-     * @param {string} mylist_id 
+     * 保存済みマイリストを読み込む
+     * @param {string} mylist_id 読み込むマイリストid
      */
     static loadMylist(mylist_id) {
         if(isMainProcess()){

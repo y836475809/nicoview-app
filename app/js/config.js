@@ -4,12 +4,23 @@ const fsPromises = fs.promises;
 const { deepCopy } = require("./deepcopy");
 const { logger } = require("./logger");
 
+/**
+ * 設定
+ * param1.param2
+ */
 class Config {
     setup(config_path){
         this.config_path = config_path;
         this._initJsonData();
     }
 
+    /**
+     * キーの値を返す
+     * キーは"."で区切る
+     * @param {string} key キー 
+     * @param {any} value デフォルト値
+     * @returns {any}
+     */
     get(key, value) {
         const obj = this._getObj(key, this.json_data);
         if (obj === null || obj === undefined) {
@@ -25,6 +36,11 @@ class Config {
         return obj;
     }
 
+    /**
+     * keyにvalueを設定する
+     * @param {string} key 
+     * @param {any} value 
+     */
     set(key, value) {
         this._setObj(key, value, this.json_data);
     }

@@ -33,7 +33,7 @@ class NicoScript {
     }
 
     /**
-     * 
+     * スクリプト、通常コメントにオプションを適用して返す
      * @param {CommentItem[]} comments 
      * @returns {CommentItem[]}
      */
@@ -50,7 +50,7 @@ class NicoScript {
     }
 
     /**
-     * 
+     * スクリプト、通常コメントにオプションを適用して返す
      * @param {CommentItem[]} script_comments 
      * @param {CommentItem[]} normal_comments 
      * @returns {CommentItem[]}
@@ -94,7 +94,7 @@ class NicoScript {
     }
 
     /**
-     * 
+     * スクリプトかどうかを判定する
      * @param {string} text 
      * @returns {boolean} true:スクリプトと判定
      */
@@ -162,9 +162,9 @@ class CommentOptionParser {
     }
 
     /**
-     * 
+     * コメント位置(ue,shita,naka)をmailから取得して返す
      * @param {String} mail 
-     * @returns {string|null}
+     * @returns {string|null} コメント位置
      */
     _getType(mail){
         const type = mail.match(/^ue\s|\sue\s|\sue$|^naka\s|\snaka\s|\snaka$|^shita\s|\sshita\s|\sshita$/gi);
@@ -178,9 +178,9 @@ class CommentOptionParser {
     }
 
     /**
-     * 
+     * コメントのフォントサイズ(big,middle,small)を返す
      * @param {String} mail 
-     * @returns {string|null}
+     * @returns {string|null} フォントサイズ
      */
     _getFontSize(mail){
         const size = mail.match(/^big\s|\sbig\s|\sbig$|^middle\s|\smiddle\s|\smiddle$|^small\s|\ssmall\s|\ssmall$/gi);
@@ -194,7 +194,7 @@ class CommentOptionParser {
     }
 
     /**
-     * 
+     * オプション(mail)をパースして各情報(位置、フォントサイズ等)を返す
      * @param {String} mail 
      * @param {String} user_id 
      * @returns {{type:string, font_size:string, color:string}}
@@ -251,13 +251,16 @@ class CommentOptionParser {
     }
 }
 
+/**
+ * 動画上にコメントを流す
+ */
 class CommentTimeLine {
     /**
      * 
-     * @param {HTMLElement} parent_elm 
-     * @param {Number} duration_sec 
-     * @param {Number} row_num 
-     * @param {String} comment_font_family 
+     * @param {HTMLElement} parent_elm コメントの親要素
+     * @param {Number} duration_sec 表示時間
+     * @param {Number} row_num コメント表示の最大行数
+     * @param {String} comment_font_family コメントフォントファミリー名
      */
     constructor(parent_elm, duration_sec, row_num, comment_font_family){
         this.parent_elm = parent_elm;
@@ -284,18 +287,34 @@ class CommentTimeLine {
         this._on_complete = on_complete;
     }
 
+    /**
+     * コメントが一時停止しているかどうかを判定する
+     * @returns {boolean} true:一時停止中
+     */
     get paused(){
         return this._paused;
     }
 
+    /**
+     * コメントが終わっているかどうかを判定する
+     * @returns {boolean} true:コメントが終わっている
+     */
     get ended(){
         return this._ended;
     }
 
+    /**
+     * コメントがあるかどうかを判定する
+     * @returns {boolean} true:コメントがある
+     */
     get hasComment(){
         return this._has_comment;
     }
 
+    /**
+     * 最後のコメントが消える時点の時間を返す
+     * @returns {number}
+     */
     get lastTimeSec(){
         return this._last_time_sec;
     }
@@ -305,7 +324,8 @@ class CommentTimeLine {
     }
 
     /**
-     * @param {CommentItem[]} comments 
+     * コメント要素生成
+     * @param {CommentItem[]} comments コメントリスト
      */
     create(comments) {
         this._has_comment = comments.length > 0;
@@ -345,8 +365,8 @@ class CommentTimeLine {
     }
 
     /**
-     * 
-     * @param {CommentElm[]} comments 
+     * 通常(流れる)コメント要素生成
+     * @param {CommentElm[]} comments 通常コメントリスト
      */
     _createFlowTL(comments){
         const view_width = this.area_size.width;
@@ -381,9 +401,9 @@ class CommentTimeLine {
     }
 
     /**
-     * 
-     * @param {CommentElm[]} top_comments 
-     * @param {CommentElm[]} bottom_comments 
+     * 固定コメント要素を生成
+     * @param {CommentElm[]} top_comments 上固定コメントリスト
+     * @param {CommentElm[]} bottom_comments 下固定コメントリスト
      */
     _createFixedTL(top_comments, bottom_comments){
         const fixed_top_cmt = new FixedComment(this.row_num);
@@ -489,6 +509,12 @@ class CommentTimeLine {
         this.ctx = canvas.getContext("2d");
     }
 
+    /**
+     * コメント本文の長さを返す
+     * @param {string} text コメント本文
+     * @param {number} font_size フォントサイズ
+     * @returns コメント本文の長さ
+     */
     _getTextWidth(text, font_size){
         this.ctx.font = `${font_size}px ${this.comment_font_family}`;
         // 改行で分割して一番長いものを採用
@@ -499,7 +525,7 @@ class CommentTimeLine {
     }
 
     /**
-     * 
+     * fragmentにコメント要素を追加してその要素を返す
      * @param {CommentElm} comment 
      * @param {DocumentFragment} fragment 
      * @returns {{elm:HTMLDivElement, text_width:number}}
@@ -538,7 +564,7 @@ class CommentTimeLine {
     }
 
     /**
-     * 
+     * 通常コメント要素をfragmentに追加する
      * @param {CommentElm[]} comments 
      * @param {FlowComment} flow_cmt 
      * @param {DocumentFragment} fragment 
@@ -564,11 +590,11 @@ class CommentTimeLine {
     }
 
     /**
-     * 
-     * @param {String} pos_type 
+     * 固定コメント要素をfragmentに追加する
+     * @param {String} pos_type ue:上固定表示 shita:下固定表示
      * @param {Array} comments 
      * @param {FixedComment} fixed_cmt 
-     * @param {Number} row_h 
+     * @param {Number} row_h コメントを表示する位置(高さ)
      * @param {DocumentFragment} fragment 
      */
     _createFixedParams(pos_type, comments, fixed_cmt, row_h, fragment){
@@ -595,8 +621,8 @@ class CommentTimeLine {
     }
 
     /**
-     * 
-     * @param {CommentItem[]} comments 
+     * コメントリストから通常、上固定、下固定コメント要素リストを生成する
+     * @param {CommentItem[]} comments コメントリスト
      * @returns {{
      * flow_comments:CommentElm[],
      * fixed_top_comments:CommentElm[],

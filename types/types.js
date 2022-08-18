@@ -88,7 +88,7 @@
  * @property {string} title
  * @property {string} video_id
  * @property {string} video_type
- * @property {number} dirpath_id
+ * @property {string} dirpath_id
  * @property {string} dirpath
  * @property {string} common_filename
  * @property {string} thumbnail_size

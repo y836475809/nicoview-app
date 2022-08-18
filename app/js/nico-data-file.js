@@ -9,6 +9,8 @@ class NicoDataFile {
      */
     constructor(video_id){
         this.video_id = video_id;
+        this.is_deleted = false;
+        this.is_economy = false;
     }
 
     /**
@@ -25,6 +27,14 @@ class NicoDataFile {
      */
     getComments() {
         throw Error("not implement getComments");
+    }
+
+    /**
+     * 
+     * @returns {ThumbInfo}
+     */
+    getThumbInfo() {
+        throw new Error("not implement getThumbInfo");
     }
 
     set commonFilename(/** @type {string} */ name){
@@ -53,6 +63,27 @@ class NicoDataFile {
 
     set videoType(/** @type {string} */ video_type){
         this.video_type = video_type;
+    }
+
+    /**
+     * @return {string}
+     */
+    get commentFilename(){
+        throw new Error("not implement commentFilename");
+    }
+    
+    /**
+     * @return {string}
+     */
+    get thumbInfoFilename(){
+        throw new Error("not implement thumbInfoFilename");
+    }
+
+    /**
+     * @return {string}
+     */
+    get thumbImgFilename(){
+        throw new Error("not implement thumbImgFilename");
     }
 
     get commentPath(){

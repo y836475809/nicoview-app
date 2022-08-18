@@ -66,10 +66,6 @@ module.exports = {
         myapi.ipc.Library.onUpdateItem((args) => {
             const {video_id, props} = args;
             logger.debug("library:on-update-item video_id=", video_id, " props=", props);
-
-            if(Array.isArray(props.tags)){
-                props.tags = props.tags.join(" ");
-            }
             this.grid_table.updateCells(video_id, props);
         });
 

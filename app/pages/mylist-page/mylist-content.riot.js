@@ -4,12 +4,41 @@ const { Command } = require("../../js/command");
 const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = require("../../js/nico-mylist");
 const { needConvertVideo } = require("../../js/video-converter");
 const { ModalDialog } = require("../../js/modal-dialog");
-const { progressDailog } = require("../../js/modal-dialog-util");
 const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
+
+/**
+ * @param {ModalDialog} modal_dialog 
+ * @param {MyObservable} dialog_obs 
+ * @param {{message: String, cb:Function}} dailog_params
+ * @param {()=>void} func 
+ * @returns 
+ */
+const progressDailog = async (modal_dialog, dialog_obs, dailog_params, func) => {
+    if(modal_dialog.isOpend()){
+        return;
+    }
+    dialog_obs.trigger("show", {
+        message: dailog_params.message,
+        buttons: ["cancel"],
+        cb: dailog_params.cb
+    });
+    try {
+        await func();
+    } catch (error) {
+        if(!error.cancel){
+            logger.error(error);
+            await myapi.ipc.Dialog.showMessageBox({
+                type: "error",
+                message: error.message
+            });
+        }
+    }
+    dialog_obs.trigger("close");
+};
 
 module.exports = {
     state:{

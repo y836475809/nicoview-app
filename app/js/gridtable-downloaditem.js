@@ -1,9 +1,5 @@
-require("slickgrid/lib/jquery.event.drag-2.3.0");
-require("slickgrid/lib/jquery.event.drop-2.3.0");
-require("slickgrid/plugins/slick.rowmovemanager");
 const { GridTable, wrapFormatter, buttonFormatter } = require("./gridtable");
 
-/* globals Slick */
 
 const DownloadState = Object.freeze({
     wait: 0,
@@ -66,66 +62,6 @@ class GridTableDownloadItem {
             this.grid_table.grid.invalidateRows(args.rows);
             this.grid_table.grid.render();
         });
-
-        const moveRowsPlugin = new Slick.RowMoveManager({
-            cancelEditOnDrag: true
-        });
-
-        moveRowsPlugin.onBeforeMoveRows.subscribe((e, data) => {
-            for (let i = 0; i < data.rows.length; i++) {
-                if (data.rows[i] == data.insertBefore || data.rows[i] == data.insertBefore - 1) {
-                    e.stopPropagation();
-                    return false;
-                }
-            }
-            return true;
-        });
-
-        moveRowsPlugin.onMoveRows.subscribe((e, args) => {
-            let data = this.grid_table.dataView.getItems();
-            let extractedRows = [], left, right;
-            const rows = args.rows;
-            const insertBefore = args.insertBefore;
-            left = data.slice(0, insertBefore);
-            right = data.slice(insertBefore, data.length);
-
-            rows.sort(function(a,b) { return a-b; });
-
-            for (let i = 0; i < rows.length; i++) {
-                extractedRows.push(data[rows[i]]);
-            }
-
-            rows.reverse();
-
-            for (let i = 0; i < rows.length; i++) {
-                const row = rows[i];
-                if (row < insertBefore) {
-                    left.splice(row, 1);
-                } else {
-                    right.splice(row - insertBefore, 1);
-                }
-            }
-
-            data = left.concat(extractedRows.concat(right));
-
-            const selectedRows = [];
-            for (let i = 0; i < rows.length; i++){
-                selectedRows.push(left.length + i);
-            }
-
-            this.grid_table.grid.resetActiveCell();
-            this.grid_table.dataView.beginUpdate();
-            this.grid_table.dataView.setItems(data);
-            this.grid_table.dataView.endUpdate();
-
-            this.grid_table.grid.setSelectedRows(selectedRows);
-
-            this.on_move_rows();
-        });
-
-        this.grid_table.grid.registerPlugin(moveRowsPlugin); 
-
-        this.on_move_rows = ()=>{};
     }
 
     onContextMenu(on_context_menu){
@@ -144,10 +80,6 @@ class GridTableDownloadItem {
         this.grid_table.onButtonClick((e, cmd_id, data)=>{
             on_click(e, cmd_id, data);
         });
-    }
-
-    onMoveRows(on_move_rows){
-        this.on_move_rows = on_move_rows;
     }
 
     setData(items){
@@ -205,12 +137,6 @@ class GridTableDownloadItem {
     }
 
     clearItems(target_state){
-        // const items = this.grid_table.dataView.getItems().map(item=>{
-        //     return {
-        //         id: item.id,
-        //         state: item.state,
-        //     };
-        // });
         /** @type {RegDownloadItem[]} */
         const items = this.grid_table.dataView.getItems();
         items.forEach(item => {
@@ -238,47 +164,6 @@ class GridTableDownloadItem {
             const column_index = this.grid_table.grid.getColumnIndex("thumb_img");
             this.grid_table.grid.updateCell(row_index, column_index);
         }
-    }
-
-    getNext(video_id){
-        /** @type {RegDownloadItem[]} */
-        const items = this.grid_table.dataView.getItems();
-
-        if(!video_id){
-            const find_index = items.findIndex(item=>{
-                return (item.state == DownloadState.wait || item.state == DownloadState.error); 
-            });
-            if(find_index<0){
-                return null;
-            }
-            /** @type {RegDownloadItem} */
-            const item = this.grid_table.dataView.getItemByIdx(find_index);
-            return item.video_id;
-        }
-
-        const index = this.grid_table.dataView.getIdxById(video_id);
-        if(index===undefined){
-            const find_index = items.findIndex(item=>{
-                return (item.state == DownloadState.wait || item.state == DownloadState.error); 
-            });
-            if(find_index<0){
-                return null;
-            }
-            /** @type {RegDownloadItem} */
-            const item = this.grid_table.dataView.getItemByIdx(find_index);
-            return item.video_id;
-        }
-
-        let next_index = index + 1;
-        for (let index = next_index; index < items.length; index++) {
-            /** @type {RegDownloadItem} */
-            const item = this.grid_table.dataView.getItemByIdx(index);
-            if(item && (item.state == DownloadState.wait || item.state == DownloadState.error)){
-                return item.video_id;
-            }
-        }
-        
-        return null;
     }
 }
 

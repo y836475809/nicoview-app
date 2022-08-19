@@ -124,9 +124,6 @@ module.exports = {
                     Command.addBookmarkItems(main_obs, [data]);
                 }
             });
-            this.grid_table_dl.onMoveRows(async ()=>{
-                await this.onChangeDownloadItem();
-            });
 
             this.grid_table_dl.grid_table.setupResizer(".download-grid-container");
             const items = await myapi.ipc.Download.getItems();
@@ -232,18 +229,21 @@ module.exports = {
         await this.onChangeDownloadItem();
     },
     /**
-     * 
+     * ダウンロード待ち、状態更新
      * @param {number} wait_time 
-     * @param {function():boolean} do_cancel 
-     * @param {function(string):void} on_progress callback
+     * @param {string} video_id
+     * @param {()=>boolean} do_cancel 
      */
-    async wait(wait_time, do_cancel, on_progress) {
+    async wait(wait_time, video_id, do_cancel) {
         for (let index = wait_time; index >= 0; index--) {
             if(do_cancel()){
                 break;
             }
             await new Promise(resolve => setTimeout(resolve, 1000));
-            on_progress(`待機中 ${index}秒`);
+            this.grid_table_dl.updateItem(video_id, {
+                progress: `待機中 ${index}秒`, 
+                state: DownloadState.wait
+            });
         }   
     },
     async startDownload() {
@@ -262,25 +262,24 @@ module.exports = {
         let video_id = null;
         try {
             this.cancel_download = false;
-            while(!this.cancel_download){
-                video_id = this.grid_table_dl.getNext(video_id);
-                if(!video_id){
-                    break;
+            /** @type {RegDownloadItem[]} */
+            const donwload_items = this.grid_table_dl.getData();
+            for(const item of donwload_items){
+                if(item.state == DownloadState.complete){
+                    continue;
+                }
+                if(item.state == DownloadState.downloading){
+                    continue;
                 }
 
-                await this.wait(wait_time, ()=>{ 
-                    return this.cancel_download || !this.grid_table_dl.hasItem(video_id);
-                }, (progress)=>{ 
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: progress, 
-                        state: DownloadState.wait
-                    });
+                video_id = item.video_id;
+                await this.wait(wait_time, video_id, ()=>{ 
+                    return this.cancel_download 
+                        || !this.grid_table_dl.hasItem(video_id);
                 });
-
                 if(!this.grid_table_dl.hasItem(video_id)){
                     continue;
                 }
-                
                 if(this.cancel_download){
                     this.grid_table_dl.updateItem(video_id, {
                         progress: "キャンセル", 
@@ -288,7 +287,7 @@ module.exports = {
                     });
                     break;
                 }
-
+                
                 this.nico_down = new NicoDownloader(video_id, download_dir);
                 const result = await this.nico_down.download((progress)=>{
                     this.grid_table_dl.updateItem(video_id, {

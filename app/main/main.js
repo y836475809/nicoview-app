@@ -68,6 +68,8 @@ const user_icon_cache = new UserIconCache();
 /** @type {BrowserWindow} */
 let main_win = null;
 let main_win_menu = null;
+
+/** @type {BrowserWindow} */
 let player_win = null;
 let do_app_quit = false;
 
@@ -202,7 +204,7 @@ const notifyRiotReady = async (win) => {
     await win.webContents.executeJavaScript(code);
 };
 
-function createWindow() {
+const createMainWindow = () => {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
     state.title = `${app.name} ${app.getVersion()}`;
@@ -310,7 +312,57 @@ function createWindow() {
         }
         main_win = null;
     });
-}
+};
+
+const createPlayerWindow = () => {
+    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
+        if(player_win !== null){
+            resolve();
+            return;
+        }
+        const state = config.get("player.window.state", { width: 800, height: 600 });
+        state.webPreferences =  {
+            nodeIntegration: false,
+            contextIsolation: false,
+            preload: preload_path,
+            spellcheck: false,
+            sandbox: false
+        };
+        player_win = new BrowserWindow(state);
+        player_win.removeMenu();
+        player_win.webContents.on("did-finish-load", async () => {
+            user_css.apply(player_win);
+            await notifyRiotReady(player_win);
+            player_win.webContents.on("context-menu", (e, props) => {
+                popupInputContextMenu(player_win, props);
+            });
+        });
+
+        if (state.maximized) {
+            player_win.maximize();
+        }
+
+        ipcMain.once("app:player-ready", (event, args) => { // eslint-disable-line no-unused-vars
+            if(config.get("open_devtools", false)){
+                player_win.webContents.openDevTools();
+            }
+            player_win.on("close", (e) => { // eslint-disable-line no-unused-vars
+                config.set("player.window.state", getWindowState(player_win));
+                player_win = null;
+            });
+
+            resolve();
+        });
+
+        player_win.loadURL(`${player_html_path}?window=player`);
+
+        player_win.on("close", e => { // eslint-disable-line no-unused-vars
+            if(player_win){
+                player_win.webContents.closeDevTools();
+            }
+        });
+    });  
+};
 
 // このメソッドはElectronが初期化を終えて、ブラウザウィンドウを作成可能になった時に呼び出される。
 // 幾つかのAPIはこのイベントの後でしか使えない。
@@ -601,7 +653,7 @@ app.on("ready", async ()=>{
         path.join(config.get("data_dir", ""), "user_icon"),
         config.get("user_icon_cache", false));
     
-    createWindow();
+    createMainWindow();
     
     setupContextmenu(main_win, player_win, config, history, store);
 });
@@ -617,56 +669,6 @@ app.on("window-all-closed", () => {
 app.on("activate", () => {
     // macOS では、ドックをクリックされた時にウィンドウがなければ新しく作成する。
     if (main_win === null) {
-        createWindow();
+        createMainWindow();
     }
 });
-
-const createPlayerWindow = () => {
-    return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
-        if(player_win !== null){
-            resolve();
-            return;
-        }
-        const state = config.get("player.window.state", { width: 800, height: 600 });
-        state.webPreferences =  {
-            nodeIntegration: false,
-            contextIsolation: false,
-            preload: preload_path,
-            spellcheck: false,
-            sandbox: false
-        };
-        player_win = new BrowserWindow(state);
-        player_win.removeMenu();
-        player_win.webContents.on("did-finish-load", async () => {
-            user_css.apply(player_win);
-            await notifyRiotReady(player_win);
-            player_win.webContents.on("context-menu", (e, props) => {
-                popupInputContextMenu(player_win, props);
-            });
-        });
-
-        if (state.maximized) {
-            player_win.maximize();
-        }
-
-        ipcMain.once("app:player-ready", (event, args) => { // eslint-disable-line no-unused-vars
-            if(config.get("open_devtools", false)){
-                player_win.webContents.openDevTools();
-            }
-            player_win.on("close", (e) => { // eslint-disable-line no-unused-vars
-                config.set("player.window.state", getWindowState(player_win));
-                player_win = null;
-            });
-
-            resolve();
-        });
-
-        player_win.loadURL(`${player_html_path}?window=player`);
-
-        player_win.on("close", e => { // eslint-disable-line no-unused-vars
-            if(player_win){
-                player_win.webContents.closeDevTools();
-            }
-        });
-    });  
-};

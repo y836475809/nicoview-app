@@ -1,10 +1,8 @@
+const { logger } = require("../../app/js/logger");
 
 process.once("loaded", () => {
-    global.logger = require("../../app/js/logger");
-
     if(process.env["test_nicoappview"] ?? false){
-        global.logger.logger.debug("test_nicoappview");
-        
+        logger.debug("test_nicoappview");
         global.TestComments = require("../../test/test-comments");
         global.TestTag = require("../../test/test-tag");
     }
@@ -13,12 +11,12 @@ process.once("loaded", () => {
 window.addEventListener( "error", async e => {
     const { message, filename, lineno, colno } = e; // eslint-disable-line no-unused-vars
     const msg = `${message}\n${filename}:${lineno}`;
-    global.logger.logger.error(msg);
+    logger.error(msg);
     alert(msg);
 } );
 
 window.addEventListener( "unhandledrejection", async e => {
-    global.logger.logger.error(e.reason);
+    logger.error(e.reason);
     alert(e.reason.message);
 } );
 

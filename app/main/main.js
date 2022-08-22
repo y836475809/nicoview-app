@@ -13,25 +13,12 @@ const preload_path = path.join(app_dir, "main", "preload.js");
 let config_fiiename = "config.json";
 
 if(app.commandLine.getSwitchValue("test")){
-    // テスト用に設定
-    const { TestParams } = require("../../test/test-params");
-    const test_params = new TestParams(app_dir);
-    test_params.load();
-    main_html_path = test_params.main_html_path;
-    config_fiiename = test_params.config_fiiename;
-
-    if(test_params.use_mock_server){
-        const { setupMockServer } = require("../../test/mock_server/nico-mock-server");
-        setupMockServer(test_params.mock_server_port, test_params.mock_server_wait_msec);
-    }
-
-    process.env["test_nicoappview"] = "true";
-    // テスト時はテスト用のユーザーデータフォルダを使用
-    app.setPath("userData", `${app.getPath("userData")}-test`);
-
-    // 環境変数にログファイルパスを設定
-    process.env["nicoappview_log_file_path"] = 
-        path.join(app.getPath("userData"), "logs/app.log");
+    // テスト用設定
+    const { TestEnv } = require("../../test/test-env");
+    const test_env = new TestEnv(app_dir);
+    test_env.setup();
+    main_html_path = test_env.main_html_path;
+    config_fiiename = test_env.config_fiiename;
 }
 
 const { Config } = require("../js/config");

@@ -165,8 +165,8 @@
         </div>
     </div>
     <div class="listview-menu-container">
-        <ul class="listview-list">
-            <li class="listview-item {item.state}" data-id={i} each={ (item, i) in state.items }
+        <ul class="listview-list {state.name}">
+            <li class="listview-item {item.state}" draggable="true" data-index={i} each={ (item, i) in state.items }
                 title={getTooltip(item)}>
                 <div class="dblclick center-hv" title="クリック動作"
                     onclick={onclickItem.bind(this,item)} 

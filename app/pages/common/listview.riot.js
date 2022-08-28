@@ -1,17 +1,18 @@
-const Sortable = require("sortablejs");
 const myapi = require("../../js/my-api");
+const { ListviewDragDrop } = require("./listview-drag-drop");
 
 const default_icon = "fas fa-square listview-item-default-icon";
 
 module.exports = {
     state: {
         /** @type {ListItem[]} */
-        items:[]
+        items:[],
+        name:""
     },
     item_duration: 300,
 
-    /** @type {Sortable} */
-    sortable:null,
+    /** @type {ListviewDragDrop} */
+    lv_dd:null,
 
     /** @type {MyObservable} */
     obs:null,
@@ -82,11 +83,16 @@ module.exports = {
 
         this.confirm = !props.confirm?[]:props.confirm;
 
+        this.state.name = `listview-dd-${props.name}`;
+        this.lv_dd = new ListviewDragDrop(this.state.name, this.moveItem);
+
         this.obs.on("loadData", async (args) => {
             /** @type {{items: ListItem[]}} */
             const { items } = args;
             this.state.items = items;
             this.update();
+            
+            this.lv_dd.setup_drag_drop();
         });
 
         this.obs.on("addList", async (args) => {
@@ -172,17 +178,6 @@ module.exports = {
     onMounted() {
         const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
         this.item_duration = parseInt(prop);
-
-        const elm = this._$(".listview-list");
-        this.sortable = Sortable.create(elm, {
-            ghostClass: "listview-item-ghost-class",
-            draggable: ".listview-item",
-            onSort: (evt) => {  // eslint-disable-line no-unused-vars
-                const src_index  = evt.oldDraggableIndex;
-                const target_index  = evt.newDraggableIndex;
-                this.moveItem(src_index, target_index);
-            }
-        });
     },
     triggerChange() {
         /** @type {ListItem[]} */
@@ -191,6 +186,8 @@ module.exports = {
             return item;
         });
         this.obs.trigger("changed", {items});
+
+        this.lv_dd.setup_drag_drop();
     },
     /**
      * 
@@ -230,10 +227,6 @@ module.exports = {
         items.splice(src_index, 1);
         items.splice(target_index, 0, src_item);
 
-        // 一旦クリア状態で更新させないと正常な並びにならない
-        this.state.items.splice(0);
-        this.update();
-
         // 移動させた状態で更新
         this.state.items = items;
         this.update();
@@ -259,9 +252,6 @@ module.exports = {
         });
 
         this.update();
-
-        const dofilter = query!="";
-        this.sortable.option("disabled", dofilter);
     },
     /**
      * 

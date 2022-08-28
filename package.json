@@ -34,7 +34,6 @@
     "gsap": "^3.10.4",
     "riot": "^7.0.2",
     "slickgrid": "^2.4.45",
-    "sortablejs": "^1.15.0",
     "sql.js": "^1.7.0"
   },
   "build": {

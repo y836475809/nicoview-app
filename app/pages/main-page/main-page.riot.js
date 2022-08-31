@@ -43,7 +43,7 @@ module.exports = {
             if(cu_index<0){
                 return;
             }
-            const page_name = items[cu_index].tagName.toLowerCase();
+            const page_name = items[cu_index].id.toLowerCase();
             if( this.mouse_gesture.action(page_name, gesture)){
                 return;
             }

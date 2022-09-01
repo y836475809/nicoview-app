@@ -12,30 +12,20 @@ module.exports = {
     },
     /** @type {MouseGesture} */
     mouse_gesture:null,
-    onBeforeMount() {
+    async onBeforeMount() {
         this.mouse_gesture = new MouseGesture();
+        this.mouse_gesture.enable = await myapi.ipc.Config.get("use_mouse_gesture", true);
         main_obs.on("main-page:update-mousegesture-config", (args)=>{
-            const { config } = args;
-            this.mouse_gesture.config = config;
-        });
-
-        (async()=>{
-            const config = await  myapi.ipc.Config.get(
-                this.mouse_gesture.name,  this.mouse_gesture.defaultConfig);
-            this.mouse_gesture.config = config;
-        })(); 
-        
-        this.mouse_gesture.setActionSearchBackPage(()=>{main_obs.trigger("search-page:back-page");});
-        this.mouse_gesture.setActionSearchFowardPage(()=>{main_obs.trigger("search-page:forward-page");});
-        this.mouse_gesture.setActionShowPalyer(()=>{
-            myapi.ipc.showyPlayer();
+            const { use_mouse_gesture } = args;
+            this.mouse_gesture.enable = use_mouse_gesture;
         });
 
         this.mouse_gesture.onGesture((gesture)=>{
-            if( this.mouse_gesture.action("all-page", gesture)){
+            const dir = this.mouse_gesture.gesture;
+            if(gesture == dir.up){
+                myapi.ipc.showyPlayer();
                 return;
             }
-            
             const items = [...this.$$(".page-container.left > *")];
             const cu_index = items.findIndex(item=>{
                 return item.style.zIndex > 0;
@@ -44,8 +34,11 @@ module.exports = {
                 return;
             }
             const page_name = items[cu_index].id.toLowerCase();
-            if( this.mouse_gesture.action(page_name, gesture)){
-                return;
+            if(page_name == "search-page" && gesture == dir.left){
+                main_obs.trigger("search-page:back-page");
+            }
+            if(page_name == "search-page" && gesture == dir.right){
+                main_obs.trigger("search-page:forward-page");
             }
         });
 

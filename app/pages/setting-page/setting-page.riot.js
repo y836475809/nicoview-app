@@ -1,7 +1,6 @@
 const myapi = require("../../js/my-api");
 const { ImportFile } = require("../../js/import-file");
 const { ImportNNDDSetting } = require("../../js/import-nndd-setting");
-const { MouseGesture } = require("../../js/mouse-gesture");
 const { ModalDialog } = require("../../js/modal-dialog");
 const { MyObservable, window_obs } = require("../../js/my-observable");
 const { logger } = require("../../js/logger");
@@ -13,16 +12,10 @@ module.exports = {
     state: {
         /** @type {{name:string, title:string}[]} */
         import_items:[],
-
-        /** @type {{text:string, action:string}[]} */
-        mouse_gesture_items:[]
     },
 
     /** @type {ModalDialog} */
     modal_dialog:null,
-    
-    /** @type {MouseGesture} */
-    mouse_gesture:null,
     
     /** @type {MyObservable} */
     obs_modal_dialog:null,
@@ -47,42 +40,20 @@ module.exports = {
         const elm = this.$(selector);
         elm.checked = value;
     },
-    /**
-     * 
-     * @param {MouseGesture} mouse_gesture 
-     */
-    async setupMouseGesture(mouse_gesture){
-        const config = await myapi.ipc.Config.get(
-            mouse_gesture.name, mouse_gesture.defaultConfig);
-    
-        for (const [key, value] of Object.entries(config)) {
-            const gesture = value;
-            const class_name = `mg-${key}`;
-    
-            /** @type {HTMLSelectElement} */
-            const elem = this.$(`.${class_name}`);
-            for(let i = 0; i < elem.options.length; i++) {
-                if(elem.options[i].value == gesture){
-                    elem.options[i].selected = true ;
-                }
-            }
-        }
-    },
     onBeforeMount() {
         this.obs_modal_dialog = new MyObservable();
         this.modal_dialog = null;
 
         this.state.import_items = ImportNNDDSetting.getItems();
 
-        this.mouse_gesture = new MouseGesture();
-        const gesture_items = [];
-        for(const item of this.mouse_gesture.items){
-            const obj = {};
-            Object.assign(obj, item);
-            obj.class = `mg-${item.action}`;
-            gesture_items.push(obj);
-        }
-        this.state.mouse_gesture_items = gesture_items;
+        this.mouse_gesture_text = () => {
+            return [
+                "右ボタン押しながら",
+                "動画検索ページ: 左で前ページに移動",
+                "動画検索ページ: 右で次ページに移動",
+                "全てのページ: 上でプレイヤーを前面に表示"
+            ].join("\n");
+        };
     },
     async onMounted() {
         this.setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
@@ -90,25 +61,24 @@ module.exports = {
         this.setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
         this.setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", ""));
         this.setCheckValue(".user_icon_cache", await myapi.ipc.Config.get("user_icon_cache", false));  
-        
+        this.setCheckValue(".use_mouse_gesture", await myapi.ipc.Config.get("use_mouse_gesture", true));  
+
         for (let index = 0; index < this.state.import_items.length; index++) {
             const import_item = this.state.import_items[index];
             this.setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
         }
-
-        await this.setupMouseGesture(this.mouse_gesture);
     
         this.modal_dialog = new ModalDialog(this.root, "setting-md", {
             obs:this.obs_modal_dialog,
             testname:"setting-md"
         });
     },
-    async onchangeMgSelect(item, e){
-        const gesture = e.target.value;
-        this.mouse_gesture.setGesture(gesture, item.action);
-        const config = this.mouse_gesture.config;
-        await myapi.ipc.Config.set(this.mouse_gesture.name, config);
-        main_obs.trigger("main-page:update-mousegesture-config", { config });
+    async onclickUseMg(e){
+        const checked = e.target.checked;
+        main_obs.trigger("main-page:update-mousegesture-config", { 
+            use_mouse_gesture: checked
+        });
+        await myapi.ipc.Config.set("use_mouse_gesture", checked);
     },
     async onclickSelectDataDir(e) { // eslint-disable-line no-unused-vars
         const dir = await myapi.ipc.Dialog.showSelectFolderDialog();

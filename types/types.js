@@ -158,7 +158,7 @@
  * @property {number} commentCounter
  * @property {number} lengthSeconds
  * @property {number} startTime
- * @property {string[]} tags
+ * @property {string} tags
  */
 
 /**

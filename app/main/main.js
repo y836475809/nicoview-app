@@ -196,6 +196,7 @@ const createMainWindow = () => {
     const state = config.get("main.window.state", { width: 1000, height: 600 });
     state.title = `${app.name} ${app.getVersion()}`;
     state.webPreferences =  {
+        backgroundThrottling: false,
         nodeIntegration: false,
         contextIsolation: false,
         preload: preload_path,
@@ -309,6 +310,7 @@ const createPlayerWindow = () => {
         }
         const state = config.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
+            backgroundThrottling: false,
             nodeIntegration: false,
             contextIsolation: false,
             preload: preload_path,

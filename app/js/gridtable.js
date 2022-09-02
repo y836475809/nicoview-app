@@ -43,6 +43,9 @@ const wrapFormatter = (row, cell, value, columnDef, dataContext) => { // eslint-
 };
 
 const buttonFormatter = (opts, row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
+    if(!dataContext.video_id){
+        return "";
+    }
     const map = new Map();
     map.set("play", {title:"再生", icon:"fas fa-play"});
     map.set("stack", {title:"後で見る", icon:"fas fa-stream"});

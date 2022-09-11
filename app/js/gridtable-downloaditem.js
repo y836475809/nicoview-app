@@ -139,7 +139,13 @@ class GridTableDownloadItem {
     clearItems(target_state){
         /** @type {RegDownloadItem[]} */
         const items = this.grid_table.dataView.getItems();
-        items.forEach(item => {
+        const del_items = items.map(item=>{
+            return {
+                video_id: item.video_id,
+                state: item.state,
+            };
+        });
+        del_items.forEach(item => {
             if(item.state === target_state){
                 this.grid_table.dataView.deleteItem(item.video_id);
             }

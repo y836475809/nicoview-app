@@ -77,11 +77,11 @@
     </style>
 
     <div class="stack-container">
-        <div class={getItemClass(item)} data-id={i} each={ (item, i) in state.items }>
+        <div class={getItemClass(item)} data-id={i} title={item.title} each={ (item, i) in state.items }>
             <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
                 <div style="display:flex; flex-direction:column;">
-                    <div class="title" title={item.title} >
+                    <div class="title">
                         {item.title}
                     </div> 
                     <div class="title">{getTime(item)}</div>

@@ -53,6 +53,11 @@ module.exports = {
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
+        this.getBodyCellHtml = (item) => {
+            const col_data = this.col_map.get(item.id);
+            const h = col_data.ft(item);
+            return col_data.ft(item);
+        };
 
         const hello = debounce((e)=>{
             const scroll_top = e.target.scrollTop;
@@ -106,11 +111,16 @@ module.exports = {
             this.row_height = option.row_height?option.row_height:60;
         });
 
-        this.obs.onReturn("set-header", (args) => {
+        this.obs.onReturn("set-columns", (args) => {
             /** @type {{items: []}} */
             const { items } = args;
-            this.state.table_heads = items;
+            this.col_map = new Map();
+            const columns = items;
+            columns.forEach(col => {
+                this.col_map.set(col.id, col);
+            });
 
+            this.state.table_heads = columns;
             const el_width = this.el_width>0?this.el_width:items.length*150;
             const elm = this.$(".row-container");
             elm.style.width = (el_width + items.length*2) + "px"; 
@@ -135,5 +145,11 @@ module.exports = {
     },
     onclickItem(item, e) {
         console.log(item);
+        if (e.target.classList.contains("cmd-btn")) {
+            const cmd_id = e.target.dataset.cmdid;
+            this.obs.trigger("cmd", {cmd_id, item});
+            e.stopPropagation();
+            return;
+        }
     }
 };

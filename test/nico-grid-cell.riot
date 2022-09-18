@@ -1,0 +1,14 @@
+<nico-grid-cell>
+    <style>
+    </style>
+    <script>
+        export default {
+            setInnerHTML() {
+                this.root.innerHTML = this.props.html;
+            },
+            onMounted() {
+                this.setInnerHTML();
+            },
+        };
+    </script>
+</nico-grid-cell>           

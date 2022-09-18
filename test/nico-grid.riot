@@ -36,6 +36,8 @@
             display: block;
         }
         .nico-grid-container .row-container > .row {
+            display: flex; 
+            flex-wrap: nowrap;
             height:100px;
         }
         .nico-grid-container .row-container > .row > .body-cell {
@@ -70,8 +72,8 @@
             <div class="row-container">
                 <div class="row {getRowClass(table_row)}" onclick={onclickItem.bind(this,table_row.data)}
                     style={getRowStyle(table_row)} each={table_row in state.table_rows}>
-                    <div class="body-cell" style={getBodyCellStyle(item)} 
-                        each={item in table_row.data}>{item.data}</div>
+                    <nico-grid-cell class="body-cell" style={getBodyCellStyle(item)} 
+                        html={getBodyCellHtml(item)} each={item in table_row.data}></nico-grid-cell>
                 </div>
             </div>
             <div class="nico-grid-anchor"></div>

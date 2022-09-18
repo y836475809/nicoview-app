@@ -10,6 +10,7 @@
     "test-mylist": "electron . --test=test-mylist",
     "test-comment": "electron . --test=test-comment",
     "test-tag": "electron . --test=test-tag",
+    "test-nico-grid": "electron . --test=test-nico-grid",
     "main": "electron .",
     "eslint": "eslint ./app/**/*.js ./app/html/*.html ./__tests__/**/*.js ./test/**/*.js ./test/*.html || exit 0",
     "test": "ava -v -s",

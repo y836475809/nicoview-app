@@ -30,5 +30,10 @@
         "use_mock_server": false,
         "main": "../test/test-tag.html",
         "config_fiiename": "config-debug.json"
+    },
+    "test-nico-grid": {
+        "use_mock_server": false,
+        "main": "../test/test-nico-grid.html",
+        "config_fiiename": "config-debug.json"
     }
 }

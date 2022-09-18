@@ -1,83 +1,81 @@
 <nico-grid>
     <style>
-        :host {
-            position: absolute;
-            padding: 2px;
+        .nico-grid-container {
             width: 100%;
             height: 100%;
-            border: 1px solid blue;
         }
-        
-        .data-table {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            border-collapse: collapse;
-            display: block;
-            border: 1px solid red;
-        }
-        .test-header {
-            flex-shrink: 0;
-            border: 1px solid gray;
-            width: 100px;
-            height:25px;
-        }
-        .test-col {
-            display: inline-block;
-            border: 1px solid gray;
-            height: 100%;
-            width: 150px;
-        }
-        .test-row {
-            height:100px;
-        }
-        .ppp {
-            position: absolute;
-            top: 0px;
-            width: 1px;
-            height: 1px;
-        }
-        .table-target {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            overflow: auto; 
-        }
-        .test-header-container {
+
+        .nico-grid-container > .header {
             width: 100%;
             overflow: hidden;
         }
-        .test-header-cont2 {
+        .nico-grid-container .header-cell-container {
             position: relative;
             display: flex; 
             flex-wrap: nowrap;
             width: 100%;
         }
-        .row-odd {
+        .nico-grid-container .header-cell {
+            flex-shrink: 0;
+            border: 1px solid gray;
+            width: 100px;
+            height:25px;
+        }
+
+        .nico-grid-container > .body {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: auto; 
+        }
+        .nico-grid-container .row-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            border-collapse: collapse;
+            display: block;
+        }
+        .nico-grid-container .row-container > .row {
+            height:100px;
+        }
+        .nico-grid-container .row-container > .row > .body-cell {
+            display: inline-block;
+            border: 1px solid gray;
+            height: 100%;
+            width: 150px;
+        }
+
+        .nico-grid-anchor {
+            position: absolute;
+            top: 0px;
+            width: 1px;
+            height: 1px;
+        }
+
+        .nico-grid-row-odd {
             background: rgb(240, 240, 240);
         }
-        .row-even {
-            background: whitesmoke;
-        }
     </style>
-    
-    <div class="test-header-container">
-        <div class="test-header-cont2">
-            <div class="test-header" style={getHeaderStyle(heaer)} 
-                each={heaer in state.table_heads}>
-                {heaer.name}
+
+    <div class="nico-grid-container">
+        <div class="header">
+            <div class="header-cell-container">
+                <div class="header-cell" style={getHeaderCellStyle(heaer)} 
+                    each={heaer in state.table_heads}>
+                    {heaer.name}
+                </div>
             </div>
         </div>
-    </div>
-    <div class='table-target'>
-        <div class='data-table'>
-            <div class="test-row {getRowClass(table_row)}" onclick={onclickItem.bind(this,table_row.data)}
-                style={getStyle(table_row)} each={table_row in state.table_rows}>
-                <div class="test-col" style={getCellStyle(item)} 
-                    each={item in table_row.data}>{item.data}</div>
+        <div class="body">
+            <div class="row-container">
+                <div class="row {getRowClass(table_row)}" onclick={onclickItem.bind(this,table_row.data)}
+                    style={getRowStyle(table_row)} each={table_row in state.table_rows}>
+                    <div class="body-cell" style={getBodyCellStyle(item)} 
+                        each={item in table_row.data}>{item.data}</div>
+                </div>
             </div>
+            <div class="nico-grid-anchor"></div>
         </div>
-        <div class="ppp"></div>
     </div>
 
     <script>

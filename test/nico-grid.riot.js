@@ -14,7 +14,7 @@ module.exports = {
         table_heads:[],
         table_rows:[],
     },
-    mmm: [],
+    data_list: [],
     cell_widths:{},
     el_width: 0,
     /** @type {MyObservable} */
@@ -28,14 +28,14 @@ module.exports = {
         this.row_height = props.row_height;
     },
     onMounted() {
-        this.getHeaderStyle = (item) => {
+        this.getHeaderCellStyle = (item) => {
             let w = 150;
             if(item.id in this.cell_widths){
                 w = this.cell_widths[item.id];
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
-        this.getStyle = (item) => {
+        this.getRowStyle = (item) => {
             const index = item.index;
             const top = index*this.row_height - this.top_offset;
             return `height:${this.row_height}px; top:${top}px;`;
@@ -43,11 +43,11 @@ module.exports = {
         this.getRowClass = (item) => {
             const index = item.index;
             if(index % 2 == 1){
-                return "row-odd";
+                return "nico-grid-row-odd";
             }
             return "";
         };
-        this.getCellStyle = (item) => {
+        this.getBodyCellStyle = (item) => {
             let w = 150;
             if(item.id in this.cell_widths){
                 w = this.cell_widths[item.id];
@@ -56,38 +56,43 @@ module.exports = {
         };
 
         const hello = debounce((e)=>{
-            const scroll = e.target.scrollTop;
-            const te = this.$(".data-table");
+            const scroll_top = e.target.scrollTop;
+            const te = this.$(".row-container");
             const range = te.clientHeight; 
             
             console.log(`scroll=${scroll}, range=${range}`);
 
-            this.top_offset = scroll % this.row_height;
+            this.top_offset = scroll_top % this.row_height;
             console.log(`top_offset=${this.top_offset}`);
 
-            const s = Math.floor(scroll/this.row_height);
-            let end = Math.floor(s + range/this.row_height + 0.5);
-            te.style.top = (scroll - this.top_offset) + "px";
-            console.log(`start=${s}, end=${end}`);
+            const start_index = Math.floor(scroll_top/this.row_height);
+            let end_index = Math.floor(start_index + range/this.row_height + 0.5);
+            te.style.top = (scroll_top - this.top_offset) + "px";
+            console.log(`start=${start_index}, end=${end_index}`);
 
             this.state.table_rows = [];
             this.update();
-            if(this.mmm.length == 0){
+
+            if(this.data_list.length == 0){
                 return;
             }
-            if(this.mmm.length <= end){
-                end = this.mmm.length;
+            if(this.data_list.length <= end_index){
+                end_index = this.data_list.length;
             }
-            this.state.table_rows = this.mmm.slice(s, end);
+            this.state.table_rows = this.data_list.slice(start_index, end_index);
             this.update();
         }, 100);
-        const tt = this.$(".table-target");
-        tt.addEventListener('scroll',hello);
-        tt.addEventListener('scroll', (e) => {
-            const scrollLeft = e.target.scrollLeft;
+
+        /** @type {HTMLElement} */
+        const body_elm = this.$(".body");
+        body_elm.addEventListener("scroll",hello);
+        body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
-            const h = this.$("#table-cont .test-header-cont2");
-            h.style.left = (-scrollLeft * 1) + "px";
+            const target_elm = e.target;
+            const scrollLeft = target_elm.scrollLeft;
+            /** @type {HTMLElement} */
+            const header_cont_elm = this.$(".header-cell-container");
+            header_cont_elm.style.left = (-scrollLeft * 1) + "px";
         });
 
         this.obs.onReturn("set-option", (args) => {
@@ -106,23 +111,23 @@ module.exports = {
             this.state.table_heads = items;
 
             const el_width = this.el_width>0?this.el_width:items.length*150;
-            const elm = this.$(".data-table");
+            const elm = this.$(".row-container");
             elm.style.width = (el_width + items.length*2) + "px"; 
             this.update();
         });
         this.obs.onReturn("set-data", (args) => {
             /** @type {{items: []}} */
             const { items } = args;
-            this.mmm = [];
+            this.data_list = [];
             items.forEach((item, i) => {
-                this.mmm.push({
+                this.data_list.push({
                     index:i,
                     data:items[i]
                 });
             });
-            this.state.table_rows = this.mmm.slice(0, 20);
-            const ppp_e = this.$(".ppp");
-            ppp_e.style.top = (this.mmm.length * this.row_height) + "px";
+            this.state.table_rows = this.data_list.slice(0, 20);
+            const anchor_elm = this.$(".nico-grid-anchor");
+            anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
             this.update();
         });

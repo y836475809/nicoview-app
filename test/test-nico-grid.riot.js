@@ -26,22 +26,33 @@ module.exports = {
             items:header
         });
 
-        const mmm = [];
-        for(let i=0; i<50; i++){
-            let data = [];
-            for(let j=0; j<10; j++){
-                data.push({
-                    id: i,
-                    data: `i=${i}, data${j+1}`
-                });
+        const mk_data = (size) => {
+            const data_list = [];
+            for(let i=0; i<size; i++){
+                let data = [];
+                for(let j=0; j<10; j++){
+                    data.push({
+                        id: i,
+                        data: `i=${i}, data${j+1}`
+                    });
+                }
+                data_list.push(data);
             }
-            mmm.push(data);
-        }
-        
-        const btn1 = document.getElementById("test-modal1");
+            return data_list
+        };
+
+        const btn1 = document.getElementById("gt-btn1");
         btn1.onclick = async () => {
+            const data_list = mk_data(50);
             await this.obs.triggerReturn("set-data", {
-                items:mmm
+                items:data_list
+            });
+        };
+        const btn2 = document.getElementById("gt-btn2");
+        btn2.onclick = async () => {
+            const data_list = mk_data(10000);
+            await this.obs.triggerReturn("set-data", {
+                items:data_list
             });
         };
     }

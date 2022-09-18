@@ -19,7 +19,8 @@ module.exports = {
         }
         await this.obs.triggerReturn("set-option", {
             option:{
-                cell_widths
+                column_width: cell_widths,
+                row_height:60
             }
         });
         await this.obs.triggerReturn("set-header", {
@@ -38,7 +39,7 @@ module.exports = {
                 }
                 data_list.push(data);
             }
-            return data_list
+            return data_list;
         };
 
         const btn1 = document.getElementById("gt-btn1");

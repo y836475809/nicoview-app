@@ -15,7 +15,7 @@ module.exports = {
         table_rows:[],
     },
     data_list: [],
-    cell_widths:{},
+    column_width:{},
     el_width: 0,
     /** @type {MyObservable} */
     obs: null,
@@ -25,13 +25,12 @@ module.exports = {
 
     onBeforeMount(props) {        
         this.obs = props.obs;
-        this.row_height = props.row_height;
     },
     onMounted() {
         this.getHeaderCellStyle = (item) => {
             let w = 150;
-            if(item.id in this.cell_widths){
-                w = this.cell_widths[item.id];
+            if(item.id in this.column_width){
+                w = this.column_width[item.id];
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
@@ -49,8 +48,8 @@ module.exports = {
         };
         this.getBodyCellStyle = (item) => {
             let w = 150;
-            if(item.id in this.cell_widths){
-                w = this.cell_widths[item.id];
+            if(item.id in this.column_width){
+                w = this.column_width[item.id];
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
@@ -99,10 +98,12 @@ module.exports = {
             const { option } = args;
             this.el_width = 0;
             /** @type {[]} */
-            this.cell_widths = option.cell_widths;
-            Object.keys(this.cell_widths).forEach(key => {
-                this.el_width += this.cell_widths[key];
+            this.column_width = option.column_width;
+            Object.keys(this.column_width).forEach(key => {
+                this.el_width += this.column_width[key];
             });
+
+            this.row_height = option.row_height?option.row_height:60;
         });
 
         this.obs.onReturn("set-header", (args) => {

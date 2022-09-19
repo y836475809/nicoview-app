@@ -37,21 +37,31 @@ module.exports = {
             }
         });
         this.obs.on("cmd",(args) => {
-            const { cmd_id, item } = args;
-            console.log("cmd_id=", cmd_id, ", item=", item);
+            const { cmd_id, data } = args;
+            console.log("cmd_id=", cmd_id, ", data=", data);
         });
 
         const mk_data = (size) => {
+            const src_db = {
+                tags: "タグ, コメント",
+                video_id: "sm",
+                thumb_img: "サムネイル",
+                title: "名前",
+                command: "操作",
+                info: "情報",
+                pub_date: "投稿日",
+                play_time: "時間",  
+            };
             const data_list = [];
-            for(let i=0; i<size; i++){
-                let data = [];
+            for(let i=0; i<size; i++){  
+                const clone_data = {};
+                Object.assign(clone_data, src_db);
                 columns.forEach(col => {
-                    data.push({
-                        id: col.id,
-                        data: `i=${i}, name=${col.name}`
-                    });
+                    const val = clone_data[col.id];
+                    clone_data[col.id] = `${val}${i}`;
                 });
-                data_list.push(data);
+                clone_data["video_id"] = `${clone_data["video_id"]}${i}`;
+                data_list.push(clone_data);
             }
             return data_list;
         };

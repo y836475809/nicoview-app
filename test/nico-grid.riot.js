@@ -28,10 +28,10 @@ module.exports = {
         this.obs = props.obs;
     },
     onMounted() {
-        this.getHeaderCellStyle = (item) => {
+        this.getHeaderCellStyle = (heaer) => {
             let w = 150;
-            if(item.id in this.column_width){
-                w = this.column_width[item.id];
+            if(heaer.id in this.column_width){
+                w = this.column_width[heaer.id];
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
@@ -60,7 +60,6 @@ module.exports = {
         };
         this.getBodyCellHtml = (item) => {
             const col_data = this.col_map.get(item.id);
-            const h = col_data.ft(item);
             return col_data.ft(item);
         };
 
@@ -88,7 +87,8 @@ module.exports = {
             if(this.data_list.length <= end_index){
                 end_index = this.data_list.length;
             }
-            this.state.table_rows = this.data_list.slice(start_index, end_index);
+            this.state.table_rows = this.cnvData(
+                this.data_list.slice(start_index, end_index), start_index);
             this.update();
         }, 100);
 
@@ -134,19 +134,37 @@ module.exports = {
         this.obs.onReturn("set-data", (args) => {
             /** @type {{items: []}} */
             const { items } = args;
-            this.data_list = [];
-            items.forEach((item, i) => {
-                this.data_list.push({
-                    index:i,
-                    data:items[i]
-                });
-            });
-            this.state.table_rows = this.data_list.slice(0, 20);
+            this.data_list = items;
+ 
+            this.row_data_list = [];
+            const f_size = 20;
+            const min_size = Math.min(f_size, this.data_list.length);
+            const row_items = items.slice(0, min_size);        
+            this.state.table_rows = this.cnvData(row_items, 0); //this.data_list.slice(0, 20);
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
             this.update();
         });
+    },
+    cnvData(data_list, start_index){
+        const row_data_list = [];
+        data_list.forEach((item, i) => {
+            const data = [];
+            this.col_map.forEach((value, key)=>{
+                if(key in item){
+                    data.push({
+                        id: key,
+                        data: item[key]
+                    });
+                }
+            });
+            row_data_list.push({
+                index: start_index + i,
+                data:data
+            });
+        });
+        return row_data_list;
     },
     /**
      * 
@@ -193,13 +211,13 @@ module.exports = {
      * @returns 
      */
     onclickItem(item, e) {
-        const data = item.data;
         const index = item.index;
         this._updateSelect(index, e.ctrlKey, e.shiftKey);
 
-        console.log(data);
+        console.log(this.data_list[index]);
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
+            const data = this.data_list[index];
             this.obs.trigger("cmd", {cmd_id, data});
             e.stopPropagation();
             return;

@@ -15,6 +15,8 @@ module.exports = {
         table_rows:[],
     },
     data_list: [],
+    key_id_data_map:new Map(),
+    col_map:new Map(),
     column_width:{},
     el_width: 0,
     /** @type {MyObservable} */
@@ -78,8 +80,7 @@ module.exports = {
             te.style.top = (scroll_top - this.top_offset) + "px";
             console.log(`start=${start_index}, end=${end_index}`);
 
-            this.state.table_rows = [];
-            this.update();
+            this.update({table_rows:[]});
 
             if(this.data_list.length == 0){
                 return;
@@ -119,7 +120,7 @@ module.exports = {
         this.obs.onReturn("set-columns", (args) => {
             /** @type {{items: []}} */
             const { items } = args;
-            this.col_map = new Map();
+            this.col_map.clear();
             const columns = items;
             columns.forEach(col => {
                 this.col_map.set(col.id, col);
@@ -132,9 +133,16 @@ module.exports = {
             this.update();
         });
         this.obs.onReturn("set-data", (args) => {
-            /** @type {{items: []}} */
-            const { items } = args;
+            /** @type {{key_id: string, items: []}} */
+            const { key_id, items } = args;
+            this.key_id = key_id;
             this.data_list = items;
+
+            this.key_id_data_map.clear();
+            this.data_list.forEach(item=>{
+                const id = item[key_id];
+                this.key_id_data_map.set(id, item);
+            });
  
             this.row_data_list = [];
             const f_size = 20;
@@ -146,6 +154,57 @@ module.exports = {
 
             this.update();
         });
+        this.obs.on("update-item", (args) => {
+            const {id, props} = args;
+            this.updateItem(id, props);
+        });
+    },
+    _getRowIndex(id){
+        const row_i = this.state.table_rows.findIndex((row)=>{
+            const data = this.data_list[row.index];
+            return id == data[this.key_id];
+        });
+        return row_i;
+    },
+    _updateStateRows(id, item){
+        const row_i = this._getRowIndex(id);
+        if(row_i == -1){
+            return;
+        }
+
+        const data = [];
+        this.col_map.forEach((value, key)=>{
+            if(key in item){
+                data.push({
+                    id: key,
+                    data: item[key]
+                });
+            }
+        });
+        const table_rows = this.state.table_rows;
+        const index = table_rows[row_i].index;
+        table_rows[row_i] = {
+            index: index,
+            data:data
+        };
+        this.update({
+            table_rows:[]
+        });
+        this.update({
+            table_rows:table_rows
+        });
+    },
+    updateItem(id, props){
+        const item = this.key_id_data_map.get(id);
+        if(item === undefined){
+            return;
+        }
+        Object.keys(props).forEach(key=>{
+            if(item[key]!==undefined){
+                item[key] = props[key];
+            }
+        });
+        this._updateStateRows(id, item);
     },
     cnvData(data_list, start_index){
         const row_data_list = [];

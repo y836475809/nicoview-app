@@ -70,6 +70,7 @@ module.exports = {
         btn1.onclick = async () => {
             const data_list = mk_data(50);
             await this.obs.triggerReturn("set-data", {
+                key_id: "video_id",
                 items:data_list
             });
         };
@@ -77,7 +78,18 @@ module.exports = {
         btn2.onclick = async () => {
             const data_list = mk_data(10000);
             await this.obs.triggerReturn("set-data", {
+                key_id: "video_id",
                 items:data_list
+            });
+        };
+        const btn3 = document.getElementById("gt-btn3");
+        btn3.onclick = () => {
+            this.obs.trigger("update-item", {
+                id: "sm5",
+                props:{
+                    thumb_img:"update thumb_img",
+                    title:"update title",
+                }
             });
         };
     }

@@ -25,6 +25,10 @@ module.exports = {
     row_height:100,
     top_offset:0,
     selected_indexs:[],
+    sort_params: {
+        key: "",
+        asc: true
+    },
 
     onBeforeMount(props) {        
         this.obs = props.obs;
@@ -115,6 +119,8 @@ module.exports = {
             });
 
             this.row_height = option.row_height?option.row_height:60;
+
+            this.sort_params = option.sort_params;
         });
 
         this.obs.onReturn("set-columns", (args) => {
@@ -138,6 +144,8 @@ module.exports = {
             this.key_id = key_id;
             this.data_list = items.map( item => ({...item}));
 
+            this._sort(this.sort_params.key, this.sort_params.asc);
+
             this.key_id_data_map.clear();
             this.data_list.forEach(item=>{
                 const id = item[key_id];
@@ -147,7 +155,7 @@ module.exports = {
             this.row_data_list = [];
             const f_size = 20;
             const min_size = Math.min(f_size, this.data_list.length);
-            const row_items = items.slice(0, min_size);        
+            const row_items = this.data_list.slice(0, min_size);        
             this.state.table_rows = this.cnvData(row_items, 0); //this.data_list.slice(0, 20);
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
@@ -157,6 +165,10 @@ module.exports = {
         this.obs.on("update-item", (args) => {
             const {id, props} = args;
             this.updateItem(id, props);
+        });
+        this.obs.on("sort-data", (args) => {
+            const {key, asc} = args;
+            this._sort(key, asc);
         });
     },
     _getRowIndex(id){
@@ -205,6 +217,37 @@ module.exports = {
             }
         });
         this._updateStateRows(id, item);
+    },
+    _sort(key, asc){
+        let order = 1;
+        if(!asc){
+            order = -1;
+        }
+        this.data_list.sort((a, b)=>{
+            if(a[key] < b[key]){
+                return -1*order;
+            }
+            if(a[key] > b[key]){
+                return 1*order;
+            }
+            return 0;
+        });
+        
+        const table_rows = this.state.table_rows;
+        if(table_rows.length==0){
+            return;
+        }
+        const s = table_rows[0].index;
+        const e = table_rows.slice(-1)[0].index;
+        if(s == e){
+            return;
+        }
+        this.update({
+            table_rows:[]
+        });
+        this.state.table_rows = this.cnvData(
+            this.data_list.slice(s, e), s);
+        this.update();
     },
     cnvData(data_list, start_index){
         const row_data_list = [];

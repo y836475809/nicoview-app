@@ -33,7 +33,11 @@ module.exports = {
         await this.obs.triggerReturn("set-option", {
             option:{
                 column_width: cell_widths,
-                row_height:60
+                row_height:60,
+                sort_params: {
+                    key: "title",
+                    asc: false
+                },
             }
         });
         this.obs.on("cmd",(args) => {
@@ -91,6 +95,15 @@ module.exports = {
                     title:"update title",
                 }
             });
+        };
+        let asc = true;
+        const btn4 = document.getElementById("gt-btn4");
+        btn4.onclick = () => {
+            this.obs.trigger("sort-data", {
+                key: "title",
+                asc: asc
+            });
+            asc = !asc;
         };
     }
 };

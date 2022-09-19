@@ -22,6 +22,7 @@ module.exports = {
     header_height:30,
     row_height:100,
     top_offset:0,
+    selected_indexs:[],
 
     onBeforeMount(props) {        
         this.obs = props.obs;
@@ -40,11 +41,15 @@ module.exports = {
             return `height:${this.row_height}px; top:${top}px;`;
         };
         this.getRowClass = (item) => {
+            const classes = [];
             const index = item.index;
             if(index % 2 == 1){
-                return "nico-grid-row-odd";
+                classes.push("nico-grid-row-odd");
             }
-            return "";
+            if(this.selected_indexs.includes(index)){
+                classes.push("nico-grid-row-select");
+            }
+            return classes.join(" ");
         };
         this.getBodyCellStyle = (item) => {
             let w = 150;
@@ -143,11 +148,59 @@ module.exports = {
             this.update();
         });
     },
+    /**
+     * 
+     * @param {number} index 
+     * @param {boolean} ctrlKey 
+     * @param {boolean} shiftKey 
+     */
+    _updateSelect(index, ctrlKey, shiftKey){
+        if(!ctrlKey && !shiftKey){
+            /** @type {HTMLElement[]} */
+            const row_elms = this.$$(".row");
+            row_elms.forEach(elm=>{
+                elm.classList.remove("nico-grid-row-select");
+            });
+            this.selected_indexs = [];
+            this.update();
+            this.selected_indexs.push(index);
+        }
+        if(ctrlKey && !shiftKey){
+            if(this.selected_indexs.includes(index)){
+                const sel_i = this.selected_indexs.indexOf(index);
+                this.selected_indexs.splice(sel_i, 1);
+            }else{
+                this.selected_indexs.push(index);
+            }  
+        }
+        if(!ctrlKey && shiftKey){
+            if(this.selected_indexs.length>0){
+                const last_index = this.selected_indexs.slice(-1)[0];
+                const s = Math.min(index, last_index);
+                const e = Math.max(index, last_index);
+                const size = e -s;
+                this.selected_indexs = [];
+                this.update();
+                this.selected_indexs = [...Array(size + 1)].map((_, i) => i + s);
+            }
+        }
+        this.update();
+    },
+    /**
+     * 
+     * @param {*} item 
+     * @param {PointerEvent} e 
+     * @returns 
+     */
     onclickItem(item, e) {
-        console.log(item);
+        const data = item.data;
+        const index = item.index;
+        this._updateSelect(index, e.ctrlKey, e.shiftKey);
+
+        console.log(data);
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
-            this.obs.trigger("cmd", {cmd_id, item});
+            this.obs.trigger("cmd", {cmd_id, data});
             e.stopPropagation();
             return;
         }

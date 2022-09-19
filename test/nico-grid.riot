@@ -57,6 +57,9 @@
         .nico-grid-row-odd {
             background: rgb(240, 240, 240);
         }
+        .nico-grid-row-select {
+            background: #6190cd6b;
+        }
     </style>
 
     <div class="nico-grid-container">
@@ -70,7 +73,7 @@
         </div>
         <div class="body">
             <div class="row-container">
-                <div class="row {getRowClass(table_row)}" onclick={onclickItem.bind(this,table_row.data)}
+                <div class="row {getRowClass(table_row)}" onclick={onclickItem.bind(this,table_row)}
                     style={getRowStyle(table_row)} each={table_row in state.table_rows}>
                     <nico-grid-cell class="body-cell" style={getBodyCellStyle(item)} 
                         html={getBodyCellHtml(item)} each={item in table_row.data}></nico-grid-cell>

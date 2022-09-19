@@ -121,7 +121,7 @@ module.exports = {
             /** @type {{items: []}} */
             const { items } = args;
             this.col_map.clear();
-            const columns = items;
+            const columns = items.map( item => ({...item}));
             columns.forEach(col => {
                 this.col_map.set(col.id, col);
             });
@@ -136,7 +136,7 @@ module.exports = {
             /** @type {{key_id: string, items: []}} */
             const { key_id, items } = args;
             this.key_id = key_id;
-            this.data_list = items;
+            this.data_list = items.map( item => ({...item}));
 
             this.key_id_data_map.clear();
             this.data_list.forEach(item=>{

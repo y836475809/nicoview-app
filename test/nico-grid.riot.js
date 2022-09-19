@@ -15,6 +15,7 @@ module.exports = {
         table_rows:[],
     },
     data_list: [],
+    key_id: "",
     key_id_data_map:new Map(),
     col_map:new Map(),
     column_width:{},
@@ -170,6 +171,13 @@ module.exports = {
             const {key, asc} = args;
             this._sort(key, asc);
         });
+        this.obs.on("delete-items", (args) => {
+            const {ids} = args;
+            this.deleteItems(ids);
+        });
+        this.obs.onReturn("get-selected-data-list", () => {
+            return this.getSelectedDatas();
+        });
     },
     _getRowIndex(id){
         const row_i = this.state.table_rows.findIndex((row)=>{
@@ -248,6 +256,73 @@ module.exports = {
         this.state.table_rows = this.cnvData(
             this.data_list.slice(s, e), s);
         this.update();
+    },
+    _updateVisibleRows(){
+        /** @type {HTMLElement} */
+        const body_elm = this.$(".body");
+        const scroll_top = body_elm.scrollTop;
+        const row_cont_elm = this.$(".row-container");
+        const range = row_cont_elm.clientHeight; 
+
+        const start_i = Math.floor(scroll_top/this.row_height);
+        let end_i = Math.floor(start_i + range/this.row_height + 0.5);
+        if(this.data_list.length <= end_i){
+            end_i = this.data_list.length;
+        }
+        
+        this.update({table_rows:[]});
+        this.state.table_rows = this.cnvData(
+            this.data_list.slice(start_i, end_i), start_i);
+        this.update();
+    },
+    getSelectedDatas(){
+        const sel_data_list = [];
+        this.selected_indexs.forEach(sel_index=>{
+            sel_data_list.push(this.data_list[sel_index]);
+        });
+        return sel_data_list.map( item => ({...item}));
+    },
+    /**
+     * 
+     * @param {string[]} ids 
+     */
+    deleteItems(ids){
+        const has_keys = [];
+        ids.forEach(id => {
+            if(this.key_id_data_map.has(id)){
+                has_keys.push(id);
+            }
+        });
+        if(has_keys.length == 0){
+            return;
+        }
+
+        this.data_list = this.data_list.filter(data => {
+            return !ids.includes(data[this.key_id]);
+        });
+        ids.forEach(id => {
+            this.key_id_data_map.delete(id);
+        });
+
+        this.selected_indexs = [];
+
+        /** @type {HTMLElement} */
+        const anchor_elm = this.$(".nico-grid-anchor");
+        anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+
+        /** @type {HTMLElement} */
+        const body_elm = this.$(".body");
+        const org_sc_top = body_elm.scrollTop;
+        const sc_move = has_keys.length * this.row_height;
+        if(sc_move < body_elm.scrollTop){
+            body_elm.scrollTop -= sc_move;
+        }else{
+            body_elm.scrollTop = 0;
+        }
+
+        if(org_sc_top == body_elm.scrollTop){
+            this._updateVisibleRows();
+        } 
     },
     cnvData(data_list, start_index){
         const row_data_list = [];

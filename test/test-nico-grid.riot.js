@@ -105,5 +105,16 @@ module.exports = {
             });
             asc = !asc;
         };
+        const btn5 = document.getElementById("gt-btn5");
+        btn5.onclick = async () => {
+            /** @type {[]} */
+            const sel_data_list = await this.obs.triggerReturn("get-selected-data-list")
+            const ids = sel_data_list.map(data=>{
+                return data["video_id"];
+            });
+            this.obs.trigger("delete-items", {
+                ids: ids
+            });
+        };
     }
 };

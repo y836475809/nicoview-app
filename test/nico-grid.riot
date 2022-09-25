@@ -20,6 +20,7 @@
             border: 1px solid gray;
             width: 100px;
             height:25px;
+            user-select: none;
         }
 
         .nico-grid-container > .body {
@@ -62,11 +63,12 @@
         }
     </style>
 
-    <div class="nico-grid-container">
-        <div class="header">
+    <div class="nico-grid-container" onmouseup={mouseup}>
+        <div class="header" onmousemove={mousemove}
+         onmouseup={mouseup}>
             <div class="header-cell-container">
                 <div class="header-cell" style={getHeaderCellStyle(heaer)} 
-                    each={heaer in state.table_heads}>
+                    onmousedown={mousedown.bind(this,i)} each={(heaer, i) in state.table_heads}>
                     {heaer.name}
                 </div>
             </div>

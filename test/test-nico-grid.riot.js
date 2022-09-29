@@ -6,40 +6,28 @@ module.exports = {
     onBeforeMount() {
         this.row_height = 60;
         this.obs = new MyObservable();
-    },
-    async onMounted() {  
 
         const ft = (cell_data) => {
             return `<a href="">${cell_data.data}</a>`;
         };
         const cmd_opt = ["play", "stack", "bookmark", "download"];
-        const columns = [
-            {id: "thumb_img", name: "サムネイル", ft:ft},
-            {id: "title", name: "名前", ft:ft},
-            {id: "command", name: "操作", ft:buttonFormatter.bind(this, cmd_opt)},
-            {id: "info", name: "情報", ft:ft},
-            {id: "pub_date", name: "投稿日", ft:ft},
-            {id: "play_time", name: "時間", ft:ft},
-            {id: "tags", name: "タグ, コメント", ft:ft},
+        this.columns = [
+            {id: "thumb_img", name: "サムネイル", width:150, ft:ft},
+            {id: "title",     name: "名前",       width:150, ft:ft},
+            {id: "command",   name: "操作",       width:150, ft:buttonFormatter.bind(this, cmd_opt)},
+            {id: "info",      name: "情報",       width:150, ft:ft},
+            {id: "pub_date",  name: "投稿日",     width:150, ft:ft},
+            {id: "play_time", name: "時間",       width:150, ft:ft},
+            {id: "tags",      name: "タグ, コメント", width:150, ft:ft},
         ];
-        await this.obs.triggerReturn("set-columns", {
-            items:columns
-        });
-
-        const cell_widths = {};
-        for(let i=0; i<columns.length; i++){
-            cell_widths[columns[i].id] = 150;
-        }
-        await this.obs.triggerReturn("set-option", {
-            option:{
-                column_width: cell_widths,
-                row_height:60,
-                sort_params: {
-                    key: "title",
-                    asc: false
-                },
-            }
-        });
+        this.header_height = 30;
+        this.row_height = 60;
+        this.sort = {
+            key: "title",
+            asc: false
+        };
+    },
+    async onMounted() {  
         this.obs.on("cmd",(args) => {
             const { cmd_id, data } = args;
             console.log("cmd_id=", cmd_id, ", data=", data);
@@ -60,9 +48,9 @@ module.exports = {
             for(let i=0; i<size; i++){  
                 const clone_data = {};
                 Object.assign(clone_data, src_db);
-                columns.forEach(col => {
-                    const val = clone_data[col.id];
-                    clone_data[col.id] = `${val}${i}`;
+                Object.keys(src_db).forEach(key => {
+                    const val = clone_data[key];
+                    clone_data[key] = `${val}${i}`; 
                 });
                 clone_data["video_id"] = `${clone_data["video_id"]}${i}`;
                 data_list.push(clone_data);

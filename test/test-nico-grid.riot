@@ -20,7 +20,14 @@
     <button id="gt-btn4" type=button}>sort</button>
     <button id="gt-btn5" type=button}>delate sel</button>
     <div class="test-container1">
-        <nico-grid obs={obs}></nico-grid>
+        <nico-grid 
+            obs={obs}
+            columns={columns}
+            header_height={header_height}
+            row_height={row_height}
+            sort={sort}
+            >
+        </nico-grid>
     </div>
     <script>
         export default window.TestNicoGrid;

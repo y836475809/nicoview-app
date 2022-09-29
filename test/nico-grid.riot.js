@@ -26,7 +26,7 @@ module.exports = {
     row_height:100,
     top_offset:0,
     selected_indexs:[],
-    sort_params: {
+    sort: {
         key: "",
         asc: true
     },
@@ -39,6 +39,17 @@ module.exports = {
 
     onBeforeMount(props) {        
         this.obs = props.obs;
+        this.header_height = props.header_height;
+        this.row_height = props.row_height;
+        this.sort = props.sort;
+
+        this.columns = props.columns;
+        this.el_width = 0;
+        this.columns.forEach(column => {
+            this.el_width += column.width;
+            this.column_width[column.id] = column.width;
+            this.col_map.set(column.id, column);
+        });
     },
     onMounted() {
         this.getHeaderCellStyle = (heaer) => {
@@ -116,42 +127,19 @@ module.exports = {
             header_cont_elm.style.left = (-scrollLeft * 1) + "px";
         });
 
-        this.obs.onReturn("set-option", (args) => {
-            const { option } = args;
-            this.el_width = 0;
-            /** @type {[]} */
-            this.column_width = option.column_width;
-            Object.keys(this.column_width).forEach(key => {
-                this.el_width += this.column_width[key];
-            });
+        this.state.table_heads = this.columns;
+        const el_width = this.el_width>0?this.el_width:this.columns.length*150;
+        const elm = this.$(".row-container");
+        elm.style.width = (el_width + this.columns.length*2) + "px"; 
+        this.update();
 
-            this.row_height = option.row_height?option.row_height:60;
-
-            this.sort_params = option.sort_params;
-        });
-
-        this.obs.onReturn("set-columns", (args) => {
-            /** @type {{items: []}} */
-            const { items } = args;
-            this.col_map.clear();
-            const columns = items.map( item => ({...item}));
-            columns.forEach(col => {
-                this.col_map.set(col.id, col);
-            });
-
-            this.state.table_heads = columns;
-            const el_width = this.el_width>0?this.el_width:items.length*150;
-            const elm = this.$(".row-container");
-            elm.style.width = (el_width + items.length*2) + "px"; 
-            this.update();
-        });
         this.obs.onReturn("set-data", (args) => {
             /** @type {{key_id: string, items: []}} */
             const { key_id, items } = args;
             this.key_id = key_id;
             this.data_list = items.map( item => ({...item}));
 
-            this._sort(this.sort_params.key, this.sort_params.asc);
+            this._sort(this.sort.key, this.sort.asc);
 
             this.key_id_data_map.clear();
             this.data_list.forEach(item=>{

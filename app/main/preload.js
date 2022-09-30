@@ -8,6 +8,7 @@ process.once("loaded", () => {
         
         global.TestNicoGrid = require("../../test/test-nico-grid.riot.js");
         global.RiotNicoGrid = require("../../test/nico-grid.riot.js");
+        global.RiotNicoGridHeader = require("../../test/nico-grid-header.riot.js");
     }
 });
 

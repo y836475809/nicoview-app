@@ -1,0 +1,34 @@
+<nico-grid-header>
+    <style>
+        .nico-grid-header {
+            width: 100%;
+            overflow: hidden;
+        }
+        .nico-grid-header > .header-cell-container {
+            position: relative;
+            display: flex; 
+            flex-wrap: nowrap;
+            width: 100%;
+        }
+        .header-cell-container > .header-cell {
+            flex-shrink: 0;
+            border: 1px solid gray;
+            width: 100px;
+            height:25px;
+            user-select: none;
+        }
+    </style>
+
+    <div class="nico-grid-header">
+        <div class="header-cell-container">
+            <div class="header-cell" style={getHeaderCellStyle(heaer)} 
+                onmousedown={mousedown.bind(this,i)} each={(heaer, i) in state.table_heads}>
+                {heaer.name}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        export default window.RiotNicoGridHeader;
+    </script>
+</nico-grid-header>

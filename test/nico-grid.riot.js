@@ -11,7 +11,6 @@ const debounce = (fn, interval) => {
 
 module.exports = {
     state:{
-        table_heads:[],
         table_rows:[],
     },
     data_list: [],
@@ -31,12 +30,6 @@ module.exports = {
         asc: true
     },
 
-    /** @type {HTMLElement} */
-    header_handle_elm:null,
-    /** @type {HTMLElement} */
-    target_header_elm:null,
-    
-
     onBeforeMount(props) {        
         this.obs = props.obs;
         this.header_height = props.header_height;
@@ -52,13 +45,6 @@ module.exports = {
         });
     },
     onMounted() {
-        this.getHeaderCellStyle = (heaer) => {
-            let w = 150;
-            if(heaer.id in this.column_width){
-                w = this.column_width[heaer.id];
-            }
-            return `height:${this.header_height}px; width:${w}px;`;
-        };
         this.getRowStyle = (item) => {
             const index = item.index;
             const top = index*this.row_height - this.top_offset;
@@ -127,11 +113,9 @@ module.exports = {
             header_cont_elm.style.left = (-scrollLeft * 1) + "px";
         });
 
-        this.state.table_heads = this.columns;
         const el_width = this.el_width>0?this.el_width:this.columns.length*150;
         const elm = this.$(".row-container");
         elm.style.width = (el_width + this.columns.length*2) + "px"; 
-        this.update();
 
         this.obs.onReturn("set-data", (args) => {
             /** @type {{key_id: string, items: []}} */
@@ -172,97 +156,6 @@ module.exports = {
         this.obs.onReturn("get-selected-data-list", () => {
             return this.getSelectedDatas();
         });
-
-        this.gutter = false;
-        this.header_handle_elm = null;
-        this.target_header_elm = null;
-    },
-
-    /**
-     * 
-     * @param {MouseEvent} e 
-     */
-    mousemove(e) {
-        if(e.buttons==0){
-            this.gutter = false;
-        }
-        if(this.gutter){  
-            if(this.header_handle_elm){
-                const move_right = e.pageX - this.px > 0;
-                this.px = e.pageX;
-
-                /** @type {HTMLElement[]} */
-                const h_ces =this.$$(".header-cell");
-                for(const h_cell of h_ces){
-                    const pos = h_cell.offsetLeft + h_cell.clientWidth -10;
-                    const ne = h_cell.nextElementSibling;
-                    if(!ne){
-                        break;
-                    }
-                    const ne_pos = ne.offsetLeft + 10;
-                    // console.log("offsetLeft=",h_cell.offsetLeft, 
-                    //     ", clientWidth=",h_cell.clientWidth, 
-                    //     ", pos=", pos,
-                    //     ", ne_pos=", ne_pos,
-                    //     ", e.x=",e.x);
-                    const cx = e.clientX;
-                    if(pos < cx &&  cx < ne_pos){
-                        if(move_right){
-                            /** @type {HTMLElement} */
-                            if(ne.nextElementSibling){
-                                const h_cont =this.$(".header-cell-container");
-                                h_cont.insertBefore(this.target_header_elm, ne.nextElementSibling);
-                            }
-                        }else{
-                            const h_cont =this.$(".header-cell-container");
-                            h_cont.insertBefore(this.target_header_elm, h_cell);
-                        }
-                        break;
-                    }
-                }
-                this.header_handle_elm.style.left = `${e.pageX - this.header_handle_offst_left}px`;
-            }
-        }
-    },
-    /**
-     * 
-     * @param {number} i 
-     * @param {MouseEvent} e 
-     */
-    mousedown(i, e) {
-        /** @type {HTMLElement} */
-        const hc = this.$(".header-cell-container");
-        const target_rect = hc.getBoundingClientRect();
-        this.header_handle_offst_left = target_rect.left + e.offsetX;
-        this.px = e.pageX;
-
-        console.log("mousedown i=", i);
-        this.gutter = true;
-        const hh_elm = document.createElement('span');
-        hh_elm.innerText = "pppp";
-        hh_elm.style.background = "red";
-        hh_elm.style.width = "150px";
-        hh_elm.style.position = "absolute";
-        hh_elm.style.opacity = "50%";
-        hh_elm.style.top = "10px";
-        hh_elm.style.left = `${e.target.offsetLeft}px`;
-        /** @type {HTMLElement} */
-        hc.appendChild(hh_elm);
-
-        this.header_handle_elm = hh_elm;
-        this.target_header_elm = e.target;
-    },
-    mouseup(e) {
-        if(!this.gutter){
-            return;
-        }
-        if(this.header_handle_elm){
-            /** @type {HTMLElement} */
-            const hc = this.$(".header-cell-container");
-            hc.removeChild(this.header_handle_elm);
-            this.header_handle_elm = null;
-        }
-        this.gutter = false;
     },
 
     _getRowIndex(id){

@@ -13,12 +13,12 @@ module.exports = {
         const cmd_opt = ["play", "stack", "bookmark", "download"];
         this.columns = [
             {id: "thumb_img", name: "サムネイル", width:150, ft:ft},
-            {id: "title",     name: "名前",       width:150, ft:ft},
-            {id: "command",   name: "操作",       width:150, ft:buttonFormatter.bind(this, cmd_opt)},
-            {id: "info",      name: "情報",       width:150, ft:ft},
-            {id: "pub_date",  name: "投稿日",     width:150, ft:ft},
+            {id: "title",     name: "名前",       width:100, ft:ft},
+            {id: "command",   name: "操作",       width:120, ft:buttonFormatter.bind(this, cmd_opt)},
+            {id: "info",      name: "情報",       width:160, ft:ft},
+            {id: "pub_date",  name: "投稿日",     width:200, ft:ft},
             {id: "play_time", name: "時間",       width:150, ft:ft},
-            {id: "tags",      name: "タグ, コメント", width:150, ft:ft},
+            {id: "tags",      name: "コメント",   width:150, ft:ft},
         ];
         this.header_height = 30;
         this.row_height = 60;

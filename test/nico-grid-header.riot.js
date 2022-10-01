@@ -15,8 +15,7 @@ module.exports = {
         this.column_width = props.column_width;
     },
     onMounted() {
-        this.state.table_heads = this.columns;
-
+        this.state.table_heads = this.columns.map( item => ({...item}));
         this.getHeaderCellStyle = (heaer) => {
             let w = 150;
             if(heaer.id in this.column_width){
@@ -111,6 +110,37 @@ module.exports = {
         this.header_handle_elm = hh_elm;
         this.target_header_elm = e.target;
     },
+    update_header_order(){
+        /** @type {HTMLElement[]} */
+        const h_ces = this.$$(".header-cell");
+
+        let is_changed = false;
+        h_ces.forEach((cell, i)=>{
+            const col_id = cell.dataset.columnid;
+            if(this.columns[i].id !=col_id){
+                is_changed = true;
+            }
+        });
+        if(!is_changed){
+            return;
+        }
+
+        const src_columns = this.columns.map( item => ({...item}));
+        this.columns = [];
+        h_ces.forEach(cell => {
+            const col_id = cell.dataset.columnid;
+            const target_cols = src_columns.filter(colum => colum.id == col_id);
+            if(target_cols.length == 1){
+                this.columns.push(target_cols[0]);
+            }
+        });
+
+        this.update({
+            table_heads:[]
+        });
+        this.state.table_heads = this.columns.map( item => ({...item}));
+        this.update();
+    },
     mouseup(e) {
         console.log("mousedown i=");
         if(this.header_handle_elm){
@@ -119,6 +149,8 @@ module.exports = {
             const hc = this.$(".header-cell-container");
             hc.removeChild(this.header_handle_elm);
             this.header_handle_elm = null;
+
+            this.update_header_order();
         }
     }
 };

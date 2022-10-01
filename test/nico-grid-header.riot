@@ -22,7 +22,9 @@
     <div class="nico-grid-header">
         <div class="header-cell-container">
             <div class="header-cell" style={getHeaderCellStyle(heaer)} 
-                onmousedown={mousedown.bind(this,i)} each={(heaer, i) in state.table_heads}>
+                onmousedown={mousedown.bind(this,i)} 
+                data-columnid={heaer.id}
+                each={(heaer, i) in state.table_heads}>
                 {heaer.name}
             </div>
         </div>

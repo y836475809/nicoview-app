@@ -138,6 +138,17 @@ module.exports = {
         this.obs.onReturn("get-selected-data-list", () => {
             return this.getSelectedDatas();
         });
+        this.obs.on("scroll-to", (args) => {
+            const {id, value} = args;
+            const index = this.data_list.findIndex(item=>{
+                return item[id] == value;
+            });
+            if(index == -1){
+                return;
+            }
+            const body_elm = this.$(".body");
+            body_elm.scrollTop = index * this.row_height;
+        });
 
         this.obs_header.on("header-changed", (args) => {
             const {columns, column_width} = args;

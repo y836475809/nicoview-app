@@ -23,7 +23,7 @@ module.exports = {
         this.header_height = 30;
         this.row_height = 60;
         this.sort = {
-            key: "title",
+            key: "",
             asc: false
         };
     },
@@ -52,7 +52,6 @@ module.exports = {
                     const val = clone_data[key];
                     clone_data[key] = `${val}${i}`; 
                 });
-                clone_data["video_id"] = `${clone_data["video_id"]}${i}`;
                 data_list.push(clone_data);
             }
             return data_list;
@@ -103,6 +102,15 @@ module.exports = {
             this.obs.trigger("delete-items", {
                 ids: ids
             });
+        };
+        let scroll_target = 20;
+        const btn6 = document.getElementById("gt-btn6");
+        btn6.onclick = () => {
+            this.obs.trigger("scroll-to", {
+                id: "video_id",
+                value: `sm${scroll_target}`
+            });
+            scroll_target += 1;
         };
     }
 };

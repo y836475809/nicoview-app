@@ -9,10 +9,14 @@ module.exports = {
     /** @type {HTMLElement} */
     target_header_elm:null,
 
+    /** @type {MyObservable} */
+    obs:null,
+
     onBeforeMount(props) {        
         this.header_height = props.header_height;
         this.columns = props.columns;
         this.column_width = props.column_width;
+        this.obs = props.obs;
     },
     onMounted() {
         this.state.table_heads = this.columns.map( item => ({...item}));
@@ -87,8 +91,6 @@ module.exports = {
         const target_rect = hc.getBoundingClientRect();
         this.header_handle_offst_left = target_rect.left + e.offsetX;
         this.px = e.pageX;
-
-        console.log("mousedown i=", i);
         this.gutter = true;
         const hh_elm = document.createElement('span');
         hh_elm.innerText = "pppp";
@@ -116,7 +118,7 @@ module.exports = {
             }
         });
         if(!is_changed){
-            return;
+            return false;
         }
 
         const src_columns = this.columns.map( item => ({...item}));
@@ -134,11 +136,12 @@ module.exports = {
         });
         this.state.table_heads = this.columns.map( item => ({...item}));
         this.update();
+        return true;
     },
     update_header_width(){
         const hc = this.$(".header-cell-container");
         if(this.hc_width == hc.offsetWidth){
-            return;
+            return false;
         }
 
         /** @type {HTMLElement[]} */
@@ -151,9 +154,11 @@ module.exports = {
             }
         });
         this.update();
+        return true;
     },
     mouseup(e) {
-        console.log("mousedown i=");
+        let is_order_updated = false;
+        let is_width_updated = false;
         if(this.header_handle_elm){
             e.preventDefault();
             /** @type {HTMLElement} */
@@ -161,8 +166,15 @@ module.exports = {
             hc.removeChild(this.header_handle_elm);
             this.header_handle_elm = null;
 
-            this.update_header_order();
+            is_order_updated = this.update_header_order();
         }
-        this.update_header_width();
+        is_width_updated = this.update_header_width();
+
+        if(is_order_updated || is_width_updated){
+            this.obs.trigger("header-changed", {
+                columns:this.columns,
+                column_width:this.column_width
+            });
+        }
     }
 };

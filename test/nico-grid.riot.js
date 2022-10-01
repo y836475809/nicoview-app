@@ -1,3 +1,4 @@
+const { MyObservable } = require("../app/js/my-observable");
 
 const debounce = (fn, interval) => {
     let timer;
@@ -43,6 +44,8 @@ module.exports = {
             this.column_width[column.id] = column.width;
             this.col_map.set(column.id, column);
         });
+
+        this.obs_header = new MyObservable();
     },
     onMounted() {
         this.getRowStyle = (item) => {
@@ -74,31 +77,7 @@ module.exports = {
         };
 
         const hello = debounce((e)=>{
-            const scroll_top = e.target.scrollTop;
-            const te = this.$(".row-container");
-            const range = te.clientHeight; 
-            
-            console.log(`scroll=${scroll}, range=${range}`);
-
-            this.top_offset = scroll_top % this.row_height;
-            console.log(`top_offset=${this.top_offset}`);
-
-            const start_index = Math.floor(scroll_top/this.row_height);
-            let end_index = Math.floor(start_index + range/this.row_height + 0.5);
-            te.style.top = (scroll_top - this.top_offset) + "px";
-            console.log(`start=${start_index}, end=${end_index}`);
-
-            this.update({table_rows:[]});
-
-            if(this.data_list.length == 0){
-                return;
-            }
-            if(this.data_list.length <= end_index){
-                end_index = this.data_list.length;
-            }
-            this.state.table_rows = this.cnvData(
-                this.data_list.slice(start_index, end_index), start_index);
-            this.update();
+            this._update_rows();
         }, 100);
 
         /** @type {HTMLElement} */
@@ -156,6 +135,48 @@ module.exports = {
         this.obs.onReturn("get-selected-data-list", () => {
             return this.getSelectedDatas();
         });
+
+        this.obs_header.on("header-changed", (args) => {
+            const {columns, column_width} = args;
+            this.el_width = 0;
+            this.col_map.clear();
+            this.columns = columns.map( item => ({...item}));
+            this.columns.forEach(column => {
+                const col_id = column.id;
+                const col_w = column_width[col_id];
+                this.el_width += col_w;
+                this.column_width[column.id] = col_w;
+                this.col_map.set(column.id, column);
+            });
+            const elm = this.$(".row-container");
+            elm.style.width = (this.el_width + 20) + "px"; 
+            this._update_rows();
+        });
+    },
+    _update_rows(){
+        const body_elm = this.$(".body");
+        const scroll_top = body_elm.scrollTop;
+        const te = this.$(".row-container");
+        const range = te.clientHeight; 
+        // console.log(`scroll=${scroll}, range=${range}`);
+        this.top_offset = scroll_top % this.row_height;
+        // console.log(`top_offset=${this.top_offset}`);
+        const start_index = Math.floor(scroll_top/this.row_height);
+        let end_index = Math.floor(start_index + range/this.row_height + 0.5);
+        te.style.top = (scroll_top - this.top_offset) + "px";
+        // console.log(`start=${start_index}, end=${end_index}`);
+
+        this.update({table_rows:[]});
+
+        if(this.data_list.length == 0){
+            return;
+        }
+        if(this.data_list.length <= end_index){
+            end_index = this.data_list.length;
+        }
+        this.state.table_rows = this.cnvData(
+            this.data_list.slice(start_index, end_index), start_index);
+        this.update();
     },
 
     _getRowIndex(id){

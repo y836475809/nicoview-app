@@ -82,13 +82,7 @@ module.exports = {
     mousedown(i, e) {
         /** @type {HTMLElement} */
         const hc = this.$(".header-cell-container");
-
-        this.range = [];
-        /** @type {HTMLElement[]} */
-        const h_ces =this.$$(".header-cell");
-        for(let inx=0; inx<h_ces.length; inx++){
-            this.range.push(h_ces[i].offsetWidth);
-        }
+        this.hc_width = hc.offsetWidth;
 
         const target_rect = hc.getBoundingClientRect();
         this.header_handle_offst_left = target_rect.left + e.offsetX;
@@ -141,6 +135,23 @@ module.exports = {
         this.state.table_heads = this.columns.map( item => ({...item}));
         this.update();
     },
+    update_header_width(){
+        const hc = this.$(".header-cell-container");
+        if(this.hc_width == hc.offsetWidth){
+            return;
+        }
+
+        /** @type {HTMLElement[]} */
+        const h_ces = this.$$(".header-cell");
+        h_ces.forEach(cell => {
+            const col_w = cell.offsetWidth;
+            const col_id = cell.dataset.columnid;
+            if(col_id in this.column_width){
+                this.column_width[col_id] = col_w;
+            }
+        });
+        this.update();
+    },
     mouseup(e) {
         console.log("mousedown i=");
         if(this.header_handle_elm){
@@ -152,5 +163,6 @@ module.exports = {
 
             this.update_header_order();
         }
+        this.update_header_width();
     }
 };

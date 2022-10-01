@@ -8,7 +8,7 @@
             position: relative;
             display: flex; 
             flex-wrap: nowrap;
-            width: 100%;
+            width: fit-content;
         }
         .header-cell-container > .header-cell {
             flex-shrink: 0;
@@ -16,6 +16,8 @@
             width: 100px;
             height:25px;
             user-select: none;
+            resize : horizontal;
+            overflow: hidden;
         }
     </style>
 

@@ -103,6 +103,9 @@ module.exports = {
             this.data_list = items.map( item => ({...item}));
 
             this._sort(this.sort.key, this.sort.asc);
+            this.obs_header.trigger("changed-sort", {
+                sort: this.sort
+            });
 
             this.key_id_data_map.clear();
             this.data_list.forEach(item=>{
@@ -151,6 +154,19 @@ module.exports = {
             const elm = this.$(".row-container");
             elm.style.width = (this.el_width + 20) + "px"; 
             this._update_rows();
+        });
+        this.obs_header.on("header-clicked", (args) => {
+            const {id} = args;
+            if(this.sort.key == id){
+                this.sort.asc = !this.sort.asc;
+            }else{
+                this.sort.key = id;
+                this.sort.asc = true;
+            }
+            this._sort(this.sort.key, this.sort.asc);
+            this.obs_header.trigger("changed-sort", {
+                sort: this.sort
+            });
         });
     },
     _update_rows(){
@@ -254,7 +270,7 @@ module.exports = {
             table_rows:[]
         });
         this.state.table_rows = this.cnvData(
-            this.data_list.slice(s, e), s);
+            this.data_list.slice(s, e+1), s);
         this.update();
     },
     _updateVisibleRows(){

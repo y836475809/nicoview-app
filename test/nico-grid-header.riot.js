@@ -12,6 +12,11 @@ module.exports = {
     /** @type {MyObservable} */
     obs:null,
 
+    sort: {
+        key: "",
+        asc: true
+    },
+
     onBeforeMount(props) {        
         this.header_height = props.header_height;
         this.columns = props.columns;
@@ -27,6 +32,13 @@ module.exports = {
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
+        this.getHeaderTitle = (heaer) => {
+            let order = "";
+            if(heaer.id == this.sort.key){
+                order = this.sort.asc?"▲":"▼";
+            }
+            return `${order}${heaer.name}`;
+        };
 
         document.addEventListener('mouseup', (e) => {
             this.mouseup(e);
@@ -34,6 +46,12 @@ module.exports = {
 
         document.addEventListener('mousemove', (e) => {
             this.mousemove(e);
+        });
+
+        this.obs.on("changed-sort", (args) => {
+            const {sort} = args;
+            Object.assign(this.sort, sort);
+            this.update();
         });
 
         this.update();
@@ -80,10 +98,9 @@ module.exports = {
     },
     /**
      * 
-     * @param {number} i 
      * @param {MouseEvent} e 
      */
-    mousedown(i, e) {
+    mousedown(e) {
         /** @type {HTMLElement} */
         const hc = this.$(".header-cell-container");
         this.hc_width = hc.offsetWidth;
@@ -156,6 +173,20 @@ module.exports = {
         this.update();
         return true;
     },
+    getHeaderCellByPoint(x, y){
+        /** @type {HTMLElement} */
+        const elm = document.elementFromPoint(x, y);
+        if(!elm){
+            return null;
+        }
+        if(!elm.classList.contains("header-cell")){
+            return null;
+        }
+        if(!elm.dataset.columnid){
+            return null;
+        }
+        return elm;
+    },
     mouseup(e) {
         let is_order_updated = false;
         let is_width_updated = false;
@@ -175,6 +206,15 @@ module.exports = {
                 columns:this.columns,
                 column_width:this.column_width
             });
+        }
+        
+        if(!is_order_updated && !is_width_updated){
+            const hc_elm = this.getHeaderCellByPoint(e.clientX, e.clientY)
+            if(hc_elm){
+                this.obs.trigger("header-clicked", {
+                    id: hc_elm.dataset.columnid
+                });
+            }
         }
     }
 };

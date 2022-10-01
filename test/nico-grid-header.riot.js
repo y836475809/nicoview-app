@@ -103,6 +103,14 @@ module.exports = {
         }
         this.header_handle_elm.style.left = `${e.pageX - this.header_handle_offst_left}px`;
     },
+    isResizeArea(elm, cx){
+        const s_pos = elm.offsetLeft + 10;
+        const e_pos = elm.offsetLeft + elm.clientWidth - 10; 
+        if(s_pos < cx && cx < e_pos){
+            return false;
+        }
+        return true;
+    },
     /**
      * 
      * @param {MouseEvent} e 
@@ -114,6 +122,11 @@ module.exports = {
 
         const target_rect = hc.getBoundingClientRect();
         this.clientX_offset = target_rect.left;
+
+        if(this.isResizeArea(e.target, e.clientX - this.clientX_offset)){
+            return;
+        }
+
         this.header_handle_offst_left = target_rect.left + e.offsetX;
         this.px = e.pageX;
         this.gutter = true;

@@ -73,13 +73,20 @@ module.exports = {
         /** @type {HTMLElement[]} */
         const h_ces =this.$$(".header-cell");
         for(const h_cell of h_ces){
-            const pos = h_cell.offsetLeft + h_cell.clientWidth -10;
+            let pos = 0;
+            let ne_pos = 0;
             const ne = h_cell.nextElementSibling;
             if(!ne){
                 break;
             }
-            const ne_pos = ne.offsetLeft + 10;
-            const cx = e.clientX;
+            if(move_right){
+                pos = ne.offsetLeft + ne.clientWidth / 2;
+                ne_pos = ne.offsetLeft + ne.clientWidth;    
+            }else{
+                pos = h_cell.offsetLeft;
+                ne_pos = h_cell.offsetLeft + h_cell.clientWidth / 2;
+            }
+            const cx = e.clientX - this.clientX_offset;
             if(pos < cx &&  cx < ne_pos){
                 if(move_right){
                     /** @type {HTMLElement} */
@@ -106,17 +113,21 @@ module.exports = {
         this.hc_width = hc.offsetWidth;
 
         const target_rect = hc.getBoundingClientRect();
+        this.clientX_offset = target_rect.left;
         this.header_handle_offst_left = target_rect.left + e.offsetX;
         this.px = e.pageX;
         this.gutter = true;
+
+        /** @type {HTMLElement} */
+        const h_cell = e.target;
         const hh_elm = document.createElement('span');
-        hh_elm.innerText = "pppp";
-        hh_elm.style.background = "red";
-        hh_elm.style.width = "150px";
+        hh_elm.innerText = h_cell.textContent;
+        hh_elm.style.background = "gray";
+        hh_elm.style.width = h_cell.offsetWidth + "px";
+        hh_elm.style.height = h_cell.offsetHeight + "px";
         hh_elm.style.position = "absolute";
         hh_elm.style.opacity = "50%";
-        hh_elm.style.top = "10px";
-        hh_elm.style.left = `${e.target.offsetLeft}px`;
+        hh_elm.style.left = `${h_cell.offsetLeft}px`;
         /** @type {HTMLElement} */
         hc.appendChild(hh_elm);
 

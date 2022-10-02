@@ -14,6 +14,7 @@ module.exports = {
     state:{
         table_rows:[],
     },
+    src_data_list: [],
     data_list: [],
     key_id: "",
     key_id_data_map:new Map(),
@@ -104,7 +105,8 @@ module.exports = {
             /** @type {{key_id: string, items: []}} */
             const { key_id, items } = args;
             this.key_id = key_id;
-            this.data_list = items.map( item => ({...item}));
+            this.src_data_list = items.map( item => ({...item}));
+            this.data_list = this.src_data_list;
 
             this._sort(this.sort.key, this.sort.asc);
             this.obs_header.trigger("changed-sort", {
@@ -153,6 +155,14 @@ module.exports = {
             const body_elm = this.$(".body");
             body_elm.scrollTop = index * this.row_height;
         });
+        this.obs.on("filter", (args) => {
+            const {ids, word} = args;
+            this._filter(ids, word);
+
+            const anchor_elm = this.$(".nico-grid-anchor");
+            anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+            this._update_rows();
+        });
 
         this.obs_header.on("header-changed", (args) => {
             const {columns, column_width} = args;
@@ -182,6 +192,30 @@ module.exports = {
             this.obs_header.trigger("changed-sort", {
                 sort: this.sort
             });
+        });
+    },
+    /**
+     * 
+     * @param {string[]} target_ids 
+     * @param {string} word 
+     */
+    _filter(target_ids, word){
+        if(this.src_data_list.length==0){
+            return;
+        }
+        if(!word){
+            this.data_list = this.src_data_list;
+            return;
+        }
+        this.data_list = this.src_data_list.filter(item=>{
+            const keys = target_ids.length==0?Object.keys(item):target_ids;
+            for(const k of keys){
+                const value = String(item[k]).toLowerCase();
+                if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
+                    return true;
+                }
+            }
+            return false;
         });
     },
     _update_rows(){
@@ -259,35 +293,27 @@ module.exports = {
         this._updateStateRows(id, item);
     },
     _sort(key, asc){
+        if(!this.src_data_list || !this.data_list){
+            return;
+        }
+
         let order = 1;
         if(!asc){
             order = -1;
         }
-        this.data_list.sort((a, b)=>{
-            if(a[key] < b[key]){
-                return -1*order;
-            }
-            if(a[key] > b[key]){
-                return 1*order;
-            }
-            return 0;
+        [this.src_data_list, this.data_list].forEach(data_list=>{
+            data_list.sort((a, b)=>{
+                if(a[key] < b[key]){
+                    return -1*order;
+                }
+                if(a[key] > b[key]){
+                    return 1*order;
+                }
+                return 0;
+            }); 
         });
-        
-        const table_rows = this.state.table_rows;
-        if(table_rows.length==0){
-            return;
-        }
-        const s = table_rows[0].index;
-        const e = table_rows.slice(-1)[0].index;
-        if(s == e){
-            return;
-        }
-        this.update({
-            table_rows:[]
-        });
-        this.state.table_rows = this.cnvData(
-            this.data_list.slice(s, e+1), s);
-        this.update();
+
+        this._update_rows();
     },
     _updateVisibleRows(){
         /** @type {HTMLElement} */
@@ -329,6 +355,9 @@ module.exports = {
             return;
         }
 
+        this.src_data_list = this.src_data_list.filter(data => {
+            return !ids.includes(data[this.key_id]);
+        });
         this.data_list = this.data_list.filter(data => {
             return !ids.includes(data[this.key_id]);
         });

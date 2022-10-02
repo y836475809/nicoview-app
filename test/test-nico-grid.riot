@@ -11,6 +11,9 @@
             height: calc(100% - 60px);
             border: 2px solid green;
         }
+        .gt-checkbox {
+            margin-right: 5px;
+        }
     </style>
     <div style="display: flex;">
         <button id="gt-btn1" type=button}>data size50</button>
@@ -22,6 +25,15 @@
         <input id="gt-file1" type="file"> 
     </div>
     <div style="display: flex;">
+        <div class="gt-checkbox">
+            <input type="checkbox" id="gt-title"><label for="gt-title">title</label>
+        </div>
+        <div class="gt-checkbox">
+            <input type="checkbox" id="gt-info"><label for="gt-info">info</label>
+        </div>
+        <div class="gt-checkbox">
+            <input type="checkbox" id="gt-tags"><label for="gt-tags">tags</label>
+        </div>
         <input id="gt-txt1" type="text">
     </div>
     <div class="test-container1">

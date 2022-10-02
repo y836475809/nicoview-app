@@ -131,5 +131,33 @@ module.exports = {
                 items:data_list
             });
         };
+
+        const txt1 = document.getElementById("gt-txt1");
+        txt1.onkeydown = (e) => {
+            if (e.code.toLowerCase()!="enter"){
+                return;
+            }
+            const title_ch = document.getElementById("gt-title");
+            const info_ch = document.getElementById("gt-info");
+            const tags_ch = document.getElementById("gt-tags");
+            const ids = [];
+            if(title_ch.checked){
+                ids.push("title");
+            }
+            if(info_ch.checked){
+                ids.push("info");
+            }
+            if(tags_ch.checked){
+                ids.push("tags");
+            }
+            if(ids){
+                console.log("----=", ids);
+            }
+            const word = e.target.value;
+            this.obs.trigger("filter", {
+                ids: ids,
+                word: word
+            });
+        };
     }
 };

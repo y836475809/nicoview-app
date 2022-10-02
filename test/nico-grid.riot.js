@@ -156,8 +156,10 @@ module.exports = {
             body_elm.scrollTop = index * this.row_height;
         });
         this.obs.on("filter", (args) => {
-            const {ids, word} = args;
-            this._filter(ids, word);
+            /** @type {{ids:string[], text:string}} */
+            const {ids, text} = args;
+            const words = text.split(" ");
+            this.data_list = this._filter(ids, words);
 
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
@@ -197,25 +199,26 @@ module.exports = {
     /**
      * 
      * @param {string[]} target_ids 
-     * @param {string} word 
+     * @param {string[]} words 
+     * @returns {any[]}
      */
-    _filter(target_ids, word){
+    _filter(target_ids, words){
         if(this.src_data_list.length==0){
             return;
         }
-        if(!word){
-            this.data_list = this.src_data_list;
-            return;
+        if(words.length==0){
+            return this.src_data_list;
         }
-        this.data_list = this.src_data_list.filter(item=>{
+        return this.src_data_list.filter(item=>{
             const keys = target_ids.length==0?Object.keys(item):target_ids;
-            for(const k of keys){
-                const value = String(item[k]).toLowerCase();
-                if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
-                    return true;
+            return words.every(word => {
+                for(const k of keys){
+                    const value = String(item[k]).toLowerCase();
+                    if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
+                        return true;
+                    }
                 }
-            }
-            return false;
+            });
         });
     },
     _update_rows(){

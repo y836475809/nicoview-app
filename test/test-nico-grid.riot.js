@@ -150,13 +150,10 @@ module.exports = {
             if(tags_ch.checked){
                 ids.push("tags");
             }
-            if(ids){
-                console.log("----=", ids);
-            }
-            const word = e.target.value;
+            const text = e.target.value;
             this.obs.trigger("filter", {
                 ids: ids,
-                word: word
+                text: text
             });
         };
     }

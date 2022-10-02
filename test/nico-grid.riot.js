@@ -202,6 +202,7 @@ module.exports = {
         if(this.data_list.length == 0){
             return;
         }
+        end_index += 1;
         if(this.data_list.length <= end_index){
             end_index = this.data_list.length;
         }

@@ -8,15 +8,19 @@ module.exports = {
         this.row_height = 60;
         this.obs = new MyObservable();
 
-        const ft = (cell_data) => {
-            return `<a href="">${cell_data.data}</a>`;
+        const ft = (id, value, data) => {
+            return `<a href="">${value}</a>`;
+        };
+        const ft_info = (id, value, data) => {
+            const video_id = data["video_id"];
+            return `id: ${video_id}`;
         };
         const cmd_opt = ["play", "stack", "bookmark", "download"];
         this.columns = [
             {id: "thumb_img", name: "サムネイル", width:150, ft:ft},
-            {id: "title",     name: "名前",       width:100, ft:ft},
+            {id: "title",     name: "名前",       width:100},
             {id: "command",   name: "操作",       width:120, ft:buttonFormatter.bind(this, cmd_opt)},
-            {id: "info",      name: "情報",       width:160, ft:ft},
+            {id: "info",      name: "情報",       width:160, ft:ft_info},
             {id: "pub_date",  name: "投稿日",     width:200, ft:ft},
             {id: "play_time", name: "時間",       width:150, ft:ft},
             {id: "tags",      name: "コメント",   width:150, ft:ft},

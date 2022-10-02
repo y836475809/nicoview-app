@@ -73,7 +73,10 @@ module.exports = {
         };
         this.getBodyCellHtml = (item) => {
             const col_data = this.col_map.get(item.id);
-            return col_data.ft(item);
+            if(!col_data.ft){
+                return item.value;
+            }
+            return col_data.ft(item.id, item.value, item.data);
         };
 
         const hello = debounce((e)=>{
@@ -356,17 +359,15 @@ module.exports = {
         data_list.forEach((item, i) => {
             const data = [];
             this.col_map.forEach((value, key)=>{
+                let d_value = "";
                 if(key in item){
-                    data.push({
-                        id: key,
-                        data: item[key]
-                    });
-                }else{
-                    data.push({
-                        id: key,
-                        data: ""
-                    });
+                    d_value = item[key];
                 }
+                data.push({
+                    id: key,
+                    value: d_value,
+                    data: item
+                });
             });
             row_data_list.push({
                 index: start_index + i,

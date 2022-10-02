@@ -85,6 +85,7 @@ module.exports = {
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
+        body_elm.style.height = `calc(100% - ${this.header_height}px)`;
         body_elm.addEventListener("scroll",hello);
         body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
@@ -187,7 +188,7 @@ module.exports = {
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const te = this.$(".row-container");
-        const range = te.clientHeight; 
+        const range = body_elm.offsetHeight; 
         // console.log(`scroll=${scroll}, range=${range}`);
         this.top_offset = scroll_top % this.row_height;
         // console.log(`top_offset=${this.top_offset}`);

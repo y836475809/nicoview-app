@@ -3,25 +3,27 @@
         :host {
             width: 100%;
             height: 100%;
-            padding: 2px;
-            border: 1px solid blue;
         }
         .test-container1 {
             position: relative;
             left: 30px;
             width: 90%;
-            height: 90%;
+            height: calc(100% - 60px);
             border: 2px solid green;
         }
     </style>
-    <button id="gt-btn1" type=button}>data size50</button>
-    <button id="gt-btn2" type=button}>data size10000</button>
-    <button id="gt-btn3" type=button}>update item i=5</button>
-    <button id="gt-btn4" type=button}>sort</button>
-    <button id="gt-btn5" type=button}>delate sel</button>
-    <button id="gt-btn6" type=button}>scroll video=20</button>
-    <input id="gt-file1" type="file">
-    <input id="gt-txt1" type="text">
+    <div style="display: flex;">
+        <button id="gt-btn1" type=button}>data size50</button>
+        <button id="gt-btn2" type=button}>data size10000</button>
+        <button id="gt-btn3" type=button}>update item i=5</button>
+        <button id="gt-btn4" type=button}>sort</button>
+        <button id="gt-btn5" type=button}>delate sel</button>
+        <button id="gt-btn6" type=button}>scroll video=20</button>
+        <input id="gt-file1" type="file"> 
+    </div>
+    <div style="display: flex;">
+        <input id="gt-txt1" type="text">
+    </div>
     <div class="test-container1">
         <nico-grid 
             obs={obs}

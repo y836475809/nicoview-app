@@ -40,14 +40,6 @@ module.exports = {
             return `${order}${heaer.name}`;
         };
 
-        document.addEventListener('mouseup', (e) => {
-            this.mouseup(e);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            this.mousemove(e);
-        });
-
         this.obs.on("changed-sort", (args) => {
             const {sort} = args;
             Object.assign(this.sort, sort);
@@ -122,6 +114,14 @@ module.exports = {
 
         const target_rect = hc.getBoundingClientRect();
         this.clientX_offset = target_rect.left;
+
+        const listener = (e) => {
+            this.mouseup(e);
+            document.removeEventListener("mouseup", listener);
+            document.removeEventListener("mousemove", this.mousemove);
+        };
+        document.addEventListener("mouseup", listener);
+        document.addEventListener("mousemove", this.mousemove);
 
         if(this.isResizeArea(e.target, e.clientX - this.clientX_offset)){
             return;

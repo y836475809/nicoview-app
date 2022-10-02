@@ -361,6 +361,11 @@ module.exports = {
                         id: key,
                         data: item[key]
                     });
+                }else{
+                    data.push({
+                        id: key,
+                        data: ""
+                    });
                 }
             });
             row_data_list.push({

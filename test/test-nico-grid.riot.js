@@ -1,5 +1,6 @@
 const { MyObservable } = require("../app/js/my-observable");
 const { buttonFormatter } = require("./nico-grid-formatter");
+const fs = require("fs");
 
 module.exports = {
     obs: null,
@@ -111,6 +112,20 @@ module.exports = {
                 value: `sm${scroll_target}`
             });
             scroll_target += 1;
+        };
+
+        const file1 = document.getElementById("gt-file1");
+        file1.onchange = async (e) => {
+            /** @type {HTMLInputElement} */
+            const file_elm = e.target;
+            const files = file_elm.files;
+            const fp = files[0].path;
+            const text = fs.readFileSync(fp, "utf-8");
+            const data_list = JSON.parse(text);
+            await this.obs.triggerReturn("set-data", {
+                key_id: "video_id",
+                items:data_list
+            });
         };
     }
 };

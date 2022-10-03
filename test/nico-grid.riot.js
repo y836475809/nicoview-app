@@ -143,6 +143,10 @@ module.exports = {
             const {ids} = args;
             this.deleteItems(ids);
         });
+        this.obs.on("add-items", (args) => {
+            const {items} = args;
+            this.addItems(items);
+        });
         this.obs.onReturn("get-selected-data-list", () => {
             return this.getSelectedDatas();
         });
@@ -393,6 +397,25 @@ module.exports = {
         if(org_sc_top == body_elm.scrollTop){
             this._updateVisibleRows();
         } 
+    },
+    /**
+     * 
+     * @param {any[]} items 
+     */
+    addItems(items){
+        items.forEach(item=>{
+            const id = item[this.key_id];
+            this.key_id_data_map.set(id, item);
+        });
+
+        this.src_data_list = this.src_data_list.concat(items);
+        this.data_list = this.data_list.concat(items);
+        this._sort(this.sort.key, this.sort.asc);
+
+        this.selected_indexs = [];
+        const anchor_elm = this.$(".nico-grid-anchor");
+        anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+        this._update_rows();
     },
     cnvData(data_list, start_index){
         const row_data_list = [];

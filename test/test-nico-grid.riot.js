@@ -37,8 +37,7 @@ module.exports = {
             const { cmd_id, data } = args;
             console.log("cmd_id=", cmd_id, ", data=", data);
         });
-
-        const mk_data = (size) => {
+        const mk_data = (name) => {
             const src_db = {
                 tags: "タグ, コメント",
                 video_id: "sm",
@@ -49,14 +48,18 @@ module.exports = {
                 pub_date: "投稿日",
                 play_time: "時間",  
             };
+            const clone_data = {};
+            Object.assign(clone_data, src_db);
+            Object.keys(src_db).forEach(key => {
+                const val = clone_data[key];
+                clone_data[key] = `${val}${name}`; 
+            });
+            return clone_data;
+        };
+        const mk_data_list = (size) => {
             const data_list = [];
             for(let i=0; i<size; i++){  
-                const clone_data = {};
-                Object.assign(clone_data, src_db);
-                Object.keys(src_db).forEach(key => {
-                    const val = clone_data[key];
-                    clone_data[key] = `${val}${i}`; 
-                });
+                const clone_data = mk_data(i);
                 data_list.push(clone_data);
             }
             return data_list;
@@ -64,7 +67,7 @@ module.exports = {
 
         const btn1 = document.getElementById("gt-btn1");
         btn1.onclick = async () => {
-            const data_list = mk_data(50);
+            const data_list = mk_data_list(50);
             await this.obs.triggerReturn("set-data", {
                 key_id: "video_id",
                 items:data_list
@@ -72,7 +75,7 @@ module.exports = {
         };
         const btn2 = document.getElementById("gt-btn2");
         btn2.onclick = async () => {
-            const data_list = mk_data(10000);
+            const data_list = mk_data_list(10000);
             await this.obs.triggerReturn("set-data", {
                 key_id: "video_id",
                 items:data_list
@@ -100,13 +103,23 @@ module.exports = {
         const btn5 = document.getElementById("gt-btn5");
         btn5.onclick = async () => {
             /** @type {[]} */
-            const sel_data_list = await this.obs.triggerReturn("get-selected-data-list")
+            const sel_data_list = await this.obs.triggerReturn("get-selected-data-list");
             const ids = sel_data_list.map(data=>{
                 return data["video_id"];
             });
             this.obs.trigger("delete-items", {
                 ids: ids
             });
+        };
+
+        let new_data_i = 10000000;
+        const add_btn = document.getElementById("gt-add-btn");
+        add_btn.onclick = () => {
+            const new_data = mk_data(new_data_i);
+            this.obs.trigger("add-items", {
+                items:[new_data]
+            });
+            new_data_i++;
         };
         let scroll_target = 20;
         const btn6 = document.getElementById("gt-btn6");

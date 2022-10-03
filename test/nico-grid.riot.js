@@ -127,6 +127,7 @@ module.exports = {
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
+            this.selected_indexs = [];
             this._scrollTo(0);
             this.update();
         });
@@ -161,6 +162,7 @@ module.exports = {
             const words = text.split(" ");
             this.data_list = this._filter(ids, words);
 
+            this.selected_indexs = [];
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
             this._update_rows();

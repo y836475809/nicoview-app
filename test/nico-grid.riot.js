@@ -127,6 +127,7 @@ module.exports = {
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
+            this._scrollTo(0);
             this.update();
         });
         this.obs.on("update-item", (args) => {
@@ -152,8 +153,7 @@ module.exports = {
             if(index == -1){
                 return;
             }
-            const body_elm = this.$(".body");
-            body_elm.scrollTop = index * this.row_height;
+            this._scrollTo(index * this.row_height);
         });
         this.obs.on("filter", (args) => {
             /** @type {{ids:string[], text:string}} */
@@ -220,6 +220,10 @@ module.exports = {
                 }
             });
         });
+    },
+    _scrollTo(value){
+        const body_elm = this.$(".body");
+        body_elm.scrollTop = value;
     },
     _update_rows(){
         const body_elm = this.$(".body");
@@ -381,7 +385,7 @@ module.exports = {
         if(sc_move < body_elm.scrollTop){
             body_elm.scrollTop -= sc_move;
         }else{
-            body_elm.scrollTop = 0;
+            this._scrollTo(0);
         }
 
         if(org_sc_top == body_elm.scrollTop){

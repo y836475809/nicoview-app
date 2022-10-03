@@ -12,7 +12,10 @@ const debounce = (fn, interval) => {
 
 module.exports = {
     state:{
-        table_rows:[],
+        /** @type {number[]} */
+        data_indexs:[],
+        /** @type {string[]} */
+        ids:[]
     },
     src_data_list: [],
     data_list: [],
@@ -44,40 +47,41 @@ module.exports = {
             this.el_width += column.width;
             this.column_width[column.id] = column.width;
             this.col_map.set(column.id, column);
+            this.state.ids.push(column.id);
         });
 
         this.obs_header = new MyObservable();
     },
     onMounted() {
-        this.getRowStyle = (item) => {
-            const index = item.index;
-            const top = index*this.row_height - this.top_offset;
+        this.getRowStyle = (data_index) => {
+            const top = data_index*this.row_height - this.top_offset;
             return `height:${this.row_height}px; top:${top}px;`;
         };
-        this.getRowClass = (item) => {
+        this.getRowClass = (data_index) => {
             const classes = [];
-            const index = item.index;
-            if(index % 2 == 1){
+            if(data_index % 2 == 1){
                 classes.push("nico-grid-row-odd");
             }
-            if(this.selected_indexs.includes(index)){
+            if(this.selected_indexs.includes(data_index)){
                 classes.push("nico-grid-row-select");
             }
             return classes.join(" ");
         };
-        this.getBodyCellStyle = (item) => {
+        this.getBodyCellStyle = (id) => {
             let w = 150;
-            if(item.id in this.column_width){
-                w = this.column_width[item.id];
+            if(id in this.column_width){
+                w = this.column_width[id];
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
-        this.getBodyCellHtml = (item) => {
-            const col_data = this.col_map.get(item.id);
+        this.getBodyCellHtml = (data_index, id) => {
+            const data = this.data_list[data_index];
+            const value = data[id];
+            const col_data = this.col_map.get(id);
             if(!col_data.ft){
-                return item.value;
+                return value;
             }
-            return col_data.ft(item.id, item.value, item.data);
+            return col_data.ft(id, value, data);
         };
 
         const hello = debounce((e)=>{
@@ -122,8 +126,7 @@ module.exports = {
             this.row_data_list = [];
             const f_size = 20;
             const min_size = Math.min(f_size, this.data_list.length);
-            const row_items = this.data_list.slice(0, min_size);        
-            this.state.table_rows = this.cnvData(row_items, 0); //this.data_list.slice(0, 20);
+            this.state.data_indexs = this.cnvData(0, min_size);
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
@@ -176,6 +179,7 @@ module.exports = {
             const {columns, column_width} = args;
             this.el_width = 0;
             this.col_map.clear();
+            this.state.ids = [];
             this.columns = columns.map( item => ({...item}));
             this.columns.forEach(column => {
                 const col_id = column.id;
@@ -183,6 +187,7 @@ module.exports = {
                 this.el_width += col_w;
                 this.column_width[column.id] = col_w;
                 this.col_map.set(column.id, column);
+                this.state.ids.push(column.id);
             });
             const elm = this.$(".row-container");
             elm.style.width = (this.el_width + 20) + "px"; 
@@ -244,7 +249,7 @@ module.exports = {
         te.style.top = (scroll_top - this.top_offset) + "px";
         // console.log(`start=${start_index}, end=${end_index}`);
 
-        this.update({table_rows:[]});
+        this.update({data_indexs:[]});
 
         if(this.data_list.length == 0){
             return;
@@ -253,45 +258,16 @@ module.exports = {
         if(this.data_list.length <= end_index){
             end_index = this.data_list.length;
         }
-        this.state.table_rows = this.cnvData(
-            this.data_list.slice(start_index, end_index), start_index);
+        this.state.data_indexs = this.cnvData(start_index, end_index);
         this.update();
     },
 
     _getRowIndex(id){
-        const row_i = this.state.table_rows.findIndex((row)=>{
+        const row_i = this.state.rows.findIndex((row)=>{
             const data = this.data_list[row.index];
             return id == data[this.key_id];
         });
         return row_i;
-    },
-    _updateStateRows(id, item){
-        const row_i = this._getRowIndex(id);
-        if(row_i == -1){
-            return;
-        }
-
-        const data = [];
-        this.col_map.forEach((value, key)=>{
-            if(key in item){
-                data.push({
-                    id: key,
-                    data: item[key]
-                });
-            }
-        });
-        const table_rows = this.state.table_rows;
-        const index = table_rows[row_i].index;
-        table_rows[row_i] = {
-            index: index,
-            data:data
-        };
-        this.update({
-            table_rows:[]
-        });
-        this.update({
-            table_rows:table_rows
-        });
     },
     updateItem(id, props){
         const item = this.key_id_data_map.get(id);
@@ -303,7 +279,7 @@ module.exports = {
                 item[key] = props[key];
             }
         });
-        this._updateStateRows(id, item);
+        this._update_rows();
     },
     _sort(key, asc){
         if(!this.src_data_list || !this.data_list){
@@ -341,9 +317,8 @@ module.exports = {
             end_i = this.data_list.length;
         }
         
-        this.update({table_rows:[]});
-        this.state.table_rows = this.cnvData(
-            this.data_list.slice(start_i, end_i), start_i);
+        this.update({data_indexs:[]});
+        this.state.data_indexs = this.cnvData(start_i, end_i);
         this.update();
     },
     getSelectedDatas(){
@@ -417,26 +392,17 @@ module.exports = {
         anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
         this._update_rows();
     },
-    cnvData(data_list, start_index){
+    /**
+     * 
+     * @param {number} start_index 
+     * @param {number} end_index 
+     * @returns {number[]}
+     */
+    cnvData(start_index, end_index){
         const row_data_list = [];
-        data_list.forEach((item, i) => {
-            const data = [];
-            this.col_map.forEach((value, key)=>{
-                let d_value = "";
-                if(key in item){
-                    d_value = item[key];
-                }
-                data.push({
-                    id: key,
-                    value: d_value,
-                    data: item
-                });
-            });
-            row_data_list.push({
-                index: start_index + i,
-                data:data
-            });
-        });
+        for(let i=start_index; i<end_index; i++){
+            row_data_list.push(i);
+        }
         return row_data_list;
     },
     /**
@@ -479,18 +445,17 @@ module.exports = {
     },
     /**
      * 
-     * @param {*} item 
+     * @param {number} data_index 
      * @param {PointerEvent} e 
      * @returns 
      */
-    onclickItem(item, e) {
-        const index = item.index;
-        this._updateSelect(index, e.ctrlKey, e.shiftKey);
+    onclickItem(data_index, e) {
+        this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
 
-        console.log(this.data_list[index]);
+        console.log(this.data_list[data_index]);
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
-            const data = this.data_list[index];
+            const data = this.data_list[data_index];
             this.obs.trigger("cmd", {cmd_id, data});
             e.stopPropagation();
             return;

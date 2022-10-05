@@ -1,7 +1,8 @@
 
 module.exports = {
     state:{
-        table_heads:[]
+        /** @type {string[]} */
+        column_ids:[]
     },
     header_height:30,
     /** @type {HTMLElement} */
@@ -12,6 +13,9 @@ module.exports = {
     /** @type {MyObservable} */
     obs:null,
 
+    /** @type {string[]} */
+    column_ids:[],
+
     sort: {
         key: "",
         asc: true
@@ -19,25 +23,27 @@ module.exports = {
 
     onBeforeMount(props) {        
         this.header_height = props.header_height;
-        this.columns = props.columns;
-        this.column_width = props.column_width;
+        this.column_ids = props.column_ids;
+        this.column_props_map = props.column_props_map;
         this.obs = props.obs;
     },
     onMounted() {
-        this.state.table_heads = this.columns.map( item => ({...item}));
-        this.getHeaderCellStyle = (heaer) => {
+        this.state.column_ids = [...this.column_ids];
+
+        this.getHeaderCellStyle = (column_id) => {
             let w = 150;
-            if(heaer.id in this.column_width){
-                w = this.column_width[heaer.id];
+            if(this.column_props_map.has(column_id)){
+                w = this.column_props_map.get(column_id).width;
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
-        this.getHeaderTitle = (heaer) => {
+        this.getHeaderTitle = (column_id) => {
             let order = "";
-            if(heaer.id == this.sort.key){
+            if(column_id == this.sort.key){
                 order = this.sort.asc?"▲":"▼";
             }
-            return `${order}${heaer.name}`;
+            const name = this.column_props_map.get(column_id).name;
+            return `${order}${name}`;
         };
 
         this.obs.on("changed-sort", (args) => {
@@ -154,7 +160,7 @@ module.exports = {
         let is_changed = false;
         h_ces.forEach((cell, i)=>{
             const col_id = cell.dataset.columnid;
-            if(this.columns[i].id !=col_id){
+            if(this.column_ids[i] != col_id){
                 is_changed = true;
             }
         });
@@ -162,20 +168,16 @@ module.exports = {
             return false;
         }
 
-        const src_columns = this.columns.map( item => ({...item}));
-        this.columns = [];
+        this.column_ids = [];
         h_ces.forEach(cell => {
             const col_id = cell.dataset.columnid;
-            const target_cols = src_columns.filter(colum => colum.id == col_id);
-            if(target_cols.length == 1){
-                this.columns.push(target_cols[0]);
-            }
+            this.column_ids.push(col_id);
         });
 
         this.update({
-            table_heads:[]
+            column_ids:[]
         });
-        this.state.table_heads = this.columns.map( item => ({...item}));
+        this.state.column_ids = [...this.column_ids];
         this.update();
         return true;
     },
@@ -190,8 +192,8 @@ module.exports = {
         h_ces.forEach(cell => {
             const col_w = cell.offsetWidth;
             const col_id = cell.dataset.columnid;
-            if(col_id in this.column_width){
-                this.column_width[col_id] = col_w;
+            if(this.column_props_map.has(col_id)){
+                this.column_props_map.get(col_id).width = col_w;
             }
         });
         this.update();
@@ -211,6 +213,11 @@ module.exports = {
         }
         return elm;
     },
+    getColumnPropsMap(){
+        return new Map(JSON.parse(
+            JSON.stringify(Array.from(this.column_props_map))
+        ));
+    },
     mouseup(e) {
         let is_order_updated = false;
         let is_width_updated = false;
@@ -227,8 +234,8 @@ module.exports = {
 
         if(is_order_updated || is_width_updated){
             this.obs.trigger("header-changed", {
-                columns:this.columns,
-                column_width:this.column_width
+                column_ids: [...this.column_ids],
+                column_props_map: this.getColumnPropsMap()
             });
         }
         

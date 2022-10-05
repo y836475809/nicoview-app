@@ -13,17 +13,18 @@ const debounce = (fn, interval) => {
 module.exports = {
     state:{
         /** @type {number[]} */
-        data_indexs:[],
+        data_indexes:[],
         /** @type {string[]} */
-        ids:[]
+        column_ids:[]
     },
     src_data_list: [],
     data_list: [],
     key_id: "",
     key_id_data_map:new Map(),
-    col_map:new Map(),
-    column_width:{},
-    el_width: 0,
+
+    /** @type Map<string, any> */
+    column_props_map:new Map(),
+
     /** @type {MyObservable} */
     obs: null,
     header_height:30,
@@ -41,16 +42,26 @@ module.exports = {
         this.row_height = props.row_height;
         this.sort = props.sort;
 
-        this.columns = props.columns;
-        this.el_width = 0;
-        this.columns.forEach(column => {
-            this.el_width += column.width;
-            this.column_width[column.id] = column.width;
-            this.col_map.set(column.id, column);
-            this.state.ids.push(column.id);
-        });
+        this.cell_ft = new Map();
 
+        props.columns.forEach(column => {
+            this.column_props_map.set(column.id, {
+                name:column.name,
+                width:column.width,
+            });
+            this.cell_ft.set(column.id, column.ft);
+            this.state.column_ids.push(column.id);
+        });
         this.obs_header = new MyObservable();
+
+        this.getColumnIds = () => {
+            return [...this.state.column_ids];
+        };
+        this.getColumnPropsMap = () => {
+            return new Map(JSON.parse(
+                JSON.stringify(Array.from(this.column_props_map))
+            ));
+        };
     },
     onMounted() {
         this.getRowStyle = (data_index) => {
@@ -69,19 +80,19 @@ module.exports = {
         };
         this.getBodyCellStyle = (id) => {
             let w = 150;
-            if(id in this.column_width){
-                w = this.column_width[id];
+            if(this.column_props_map.has(id)){
+                w = this.column_props_map.get(id).width;
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
         this.getBodyCellHtml = (data_index, id) => {
             const data = this.data_list[data_index];
             const value = data[id];
-            const col_data = this.col_map.get(id);
-            if(!col_data.ft){
+            const ft = this.cell_ft.get(id);
+            if(!ft){
                 return value;
             }
-            return col_data.ft(id, value, data);
+            return ft(id, value, data);
         };
 
         const hello = debounce((e)=>{
@@ -101,9 +112,9 @@ module.exports = {
             header_cont_elm.style.left = (-scrollLeft * 1) + "px";
         });
 
-        const el_width = this.el_width>0?this.el_width:this.columns.length*150;
+        const el_width = this._getRowContainerWidth();
         const elm = this.$(".row-container");
-        elm.style.width = (el_width + this.columns.length*2) + "px"; 
+        elm.style.width = (el_width + this.column_props_map.size*2) + "px"; 
 
         this.obs.onReturn("set-data", (args) => {
             /** @type {{key_id: string, items: []}} */
@@ -126,7 +137,7 @@ module.exports = {
             this.row_data_list = [];
             const f_size = 20;
             const min_size = Math.min(f_size, this.data_list.length);
-            this.state.data_indexs = this.cnvData(0, min_size);
+            this.state.data_indexes = this.cnvData(0, min_size);
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
@@ -176,21 +187,15 @@ module.exports = {
         });
 
         this.obs_header.on("header-changed", (args) => {
-            const {columns, column_width} = args;
-            this.el_width = 0;
-            this.col_map.clear();
-            this.state.ids = [];
-            this.columns = columns.map( item => ({...item}));
-            this.columns.forEach(column => {
-                const col_id = column.id;
-                const col_w = column_width[col_id];
-                this.el_width += col_w;
-                this.column_width[column.id] = col_w;
-                this.col_map.set(column.id, column);
-                this.state.ids.push(column.id);
-            });
+            const {column_ids, column_props_map} = args;
+            
+            this.state.column_ids = column_ids;
+            this.column_props_map = column_props_map;
+            
+            const el_width = this._getRowContainerWidth();
             const elm = this.$(".row-container");
-            elm.style.width = (this.el_width + 20) + "px"; 
+            elm.style.width = (el_width + 20) + "px"; 
+            
             this._update_rows();
         });
         this.obs_header.on("header-clicked", (args) => {
@@ -206,6 +211,11 @@ module.exports = {
                 sort: this.sort
             });
         });
+    },
+    _getRowContainerWidth(){
+        return Array.from(this.column_props_map.values()).reduce((a, b) => {
+            return a + b.width;
+        }, 0);
     },
     /**
      * 
@@ -249,7 +259,7 @@ module.exports = {
         te.style.top = (scroll_top - this.top_offset) + "px";
         // console.log(`start=${start_index}, end=${end_index}`);
 
-        this.update({data_indexs:[]});
+        this.update({data_indexes:[]});
 
         if(this.data_list.length == 0){
             return;
@@ -258,7 +268,7 @@ module.exports = {
         if(this.data_list.length <= end_index){
             end_index = this.data_list.length;
         }
-        this.state.data_indexs = this.cnvData(start_index, end_index);
+        this.state.data_indexes = this.cnvData(start_index, end_index);
         this.update();
     },
 
@@ -317,8 +327,8 @@ module.exports = {
             end_i = this.data_list.length;
         }
         
-        this.update({data_indexs:[]});
-        this.state.data_indexs = this.cnvData(start_i, end_i);
+        this.update({data_indexes:[]});
+        this.state.data_indexes = this.cnvData(start_i, end_i);
         this.update();
     },
     getSelectedDatas(){

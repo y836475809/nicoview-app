@@ -48,16 +48,16 @@
     <div class="nico-grid-container">
         <nico-grid-header
             header_height={header_height}
-            columns={columns}
-            column_width={column_width}
+            column_ids={getColumnIds()}
+            column_props_map={getColumnPropsMap()}
             obs={obs_header}
         ></nico-grid-header>
         <div class="body">
             <div class="row-container">
                 <div class="row {getRowClass(data_index)}" onclick={onclickItem.bind(this,data_index)}
-                    style={getRowStyle(data_index)} each={data_index in state.data_indexs}>
-                    <nico-grid-cell class="body-cell" style={getBodyCellStyle(id)} 
-                        html={getBodyCellHtml(data_index, id)} each={id in state.ids}></nico-grid-cell>
+                    style={getRowStyle(data_index)} each={data_index in state.data_indexes}>
+                    <nico-grid-cell class="body-cell" style={getBodyCellStyle(column_id)} 
+                        html={getBodyCellHtml(data_index, column_id)} each={column_id in state.column_ids}></nico-grid-cell>
                 </div>
             </div>
             <div class="nico-grid-anchor"></div>

@@ -215,6 +215,21 @@ module.exports = {
                 sort: this.sort
             });
         });
+
+        let resize_timer = null;
+        const resize_obs = new ResizeObserver(() => {
+            if(resize_timer){
+                clearTimeout(resize_timer);
+            }
+            resize_timer = setTimeout(() => {
+                if(this.data_list.length > 0){
+                    this._update_rows();
+                }       
+                resize_timer = null;
+            }, 200);
+        });
+        const container_elm = this.$(".nico-grid-container");
+        resize_obs.observe(container_elm);
     },
     _getRowContainerWidth(){
         return Array.from(this.column_props_map.values()).reduce((a, b) => {

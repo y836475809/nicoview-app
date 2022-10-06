@@ -185,6 +185,8 @@ module.exports = {
             this.sel_data_key_ids = [];
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+            
+            this._scrollTo(0);
             this._update_rows();
         });
 

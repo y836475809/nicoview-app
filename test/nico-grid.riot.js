@@ -22,7 +22,7 @@ module.exports = {
     key_id: "",
     key_id_data_map:new Map(),
 
-    /** @type Map<string, any> */
+    /** @type {Map<string, any>} */
     column_props_map:new Map(),
 
     /** @type {MyObservable} */
@@ -30,7 +30,8 @@ module.exports = {
     header_height:30,
     row_height:100,
     top_offset:0,
-    selected_indexs:[],
+    /** @type {string[]} */
+    sel_data_key_ids:[],
     sort: {
         key: "",
         asc: true
@@ -73,7 +74,8 @@ module.exports = {
             if(data_index % 2 == 1){
                 classes.push("nico-grid-row-odd");
             }
-            if(this.selected_indexs.includes(data_index)){
+            const id = this.data_list[data_index][this.key_id];
+            if(this.sel_data_key_ids.includes(id)){
                 classes.push("nico-grid-row-select");
             }
             return classes.join(" ");
@@ -141,7 +143,7 @@ module.exports = {
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
 
-            this.selected_indexs = [];
+            this.sel_data_key_ids = [];
             this._scrollTo(0);
             this.update();
         });
@@ -162,7 +164,7 @@ module.exports = {
             this.addItems(items);
         });
         this.obs.onReturn("get-selected-data-list", () => {
-            return this.getSelectedDatas();
+            return this.getSelectedDataList();
         });
         this.obs.on("scroll-to", (args) => {
             const {id, value} = args;
@@ -180,7 +182,7 @@ module.exports = {
             const words = text.split(" ");
             this.data_list = this._filter(ids, words);
 
-            this.selected_indexs = [];
+            this.sel_data_key_ids = [];
             const anchor_elm = this.$(".nico-grid-anchor");
             anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
             this._update_rows();
@@ -331,10 +333,15 @@ module.exports = {
         this.state.data_indexes = this.cnvData(start_i, end_i);
         this.update();
     },
-    getSelectedDatas(){
+    getSelectedDataList(){
         const sel_data_list = [];
-        this.selected_indexs.forEach(sel_index=>{
-            sel_data_list.push(this.data_list[sel_index]);
+        this.sel_data_key_ids.forEach(id => {
+            const f_index = this.data_list.findIndex(d => {
+                return id == d[this.key_id];
+            });
+            if(f_index >= 0){
+                sel_data_list.push(this.data_list[f_index]);
+            }
         });
         return sel_data_list.map( item => ({...item}));
     },
@@ -363,7 +370,15 @@ module.exports = {
             this.key_id_data_map.delete(id);
         });
 
-        this.selected_indexs = [];
+        this.sel_data_key_ids = [];
+        ids.forEach(id => {
+            if(this.sel_data_key_ids.includes(id)){
+                const sel_i = this.sel_data_key_ids.indexOf(id);
+                if(sel_i >= 0){
+                    this.sel_data_key_ids.splice(sel_i, 1);
+                }
+            }
+        });
 
         /** @type {HTMLElement} */
         const anchor_elm = this.$(".nico-grid-anchor");
@@ -397,7 +412,6 @@ module.exports = {
         this.data_list = this.data_list.concat(items);
         this._sort(this.sort.key, this.sort.asc);
 
-        this.selected_indexs = [];
         const anchor_elm = this.$(".nico-grid-anchor");
         anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
         this._update_rows();
@@ -422,33 +436,53 @@ module.exports = {
      * @param {boolean} shiftKey 
      */
     _updateSelect(index, ctrlKey, shiftKey){
+        const id = this.data_list[index][this.key_id];
         if(!ctrlKey && !shiftKey){
             /** @type {HTMLElement[]} */
             const row_elms = this.$$(".row");
             row_elms.forEach(elm=>{
                 elm.classList.remove("nico-grid-row-select");
             });
-            this.selected_indexs = [];
+            this.sel_data_key_ids = [];
             this.update();
-            this.selected_indexs.push(index);
+            this.sel_data_key_ids.push(id);
         }
         if(ctrlKey && !shiftKey){
-            if(this.selected_indexs.includes(index)){
-                const sel_i = this.selected_indexs.indexOf(index);
-                this.selected_indexs.splice(sel_i, 1);
+            if(this.sel_data_key_ids.includes(id)){
+                const sel_i = this.sel_data_key_ids.indexOf(id);
+                if(sel_i >= 0){
+                    this.sel_data_key_ids.splice(sel_i, 1);
+                }
             }else{
-                this.selected_indexs.push(index);
+                this.sel_data_key_ids.push(id);
             }  
         }
         if(!ctrlKey && shiftKey){
-            if(this.selected_indexs.length>0){
-                const last_index = this.selected_indexs.slice(-1)[0];
+            if(this.sel_data_key_ids.length>0){
+                const indexs = [];
+                this.sel_data_key_ids.forEach(id => {
+                    const f_index = this.data_list.findIndex(data => {
+                        return id == data[this.key_id];
+                    });
+                    if(f_index >= 0){
+                        indexs.push(f_index);
+                    }
+                });
+                indexs.sort((a, b) => {
+                    return a - b;
+                });
+
+                const last_index = indexs.slice(-1)[0];
                 const s = Math.min(index, last_index);
                 const e = Math.max(index, last_index);
-                const size = e -s;
-                this.selected_indexs = [];
+                const size = e - s;
+                this.sel_data_key_ids = [];
                 this.update();
-                this.selected_indexs = [...Array(size + 1)].map((_, i) => i + s);
+                const new_indexs = [...Array(size + 1)].map((_, i) => i + s);
+                new_indexs.forEach(idx => {
+                    const sel_data = this.data_list[idx];
+                    this.sel_data_key_ids.push(sel_data[this.key_id]);
+                });
             }
         }
         this.update();

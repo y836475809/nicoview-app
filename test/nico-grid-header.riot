@@ -12,18 +12,24 @@
         }
         .header-cell-container > .header-cell {
             flex-shrink: 0;
-            border: 1px solid gray;
+            border-top: 1px solid gray;
+            border-bottom: 1px solid gray;
+            border-right: 1px solid gray;
             width: 100px;
             height:25px;
             user-select: none;
             resize : horizontal;
             overflow: hidden;
+            padding: 5px;
+        }
+        .header-cell-container > .header-cell:first-child {
+            border-left: 1px solid gray;
         }
     </style>
 
     <div class="nico-grid-header">
         <div class="header-cell-container">
-            <div class="header-cell" style={getHeaderCellStyle(column_id)} 
+            <div class="header-cell center-v" style={getHeaderCellStyle(column_id)} 
                 onmousedown={mousedown}
                 data-columnid={column_id}
                 each={column_id in state.column_ids}>

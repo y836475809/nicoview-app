@@ -186,16 +186,19 @@ module.exports = {
             this._update_rows();
         });
 
-        this.obs_header.on("header-changed", (args) => {
-            const {column_ids, column_props_map} = args;
+        this.obs_header.on("header-order-changed", (args) => {
+            const {column_ids} = args;
             
             this.state.column_ids = column_ids;
-            this.column_props_map = column_props_map;
+            this._update_rows();
+        });
+        this.obs_header.on("header-width-changed", (args) => {
+            const {column_props_map} = args;
             
+            this.column_props_map = column_props_map;
             const el_width = this._getRowContainerWidth();
             const elm = this.$(".row-container");
             elm.style.width = (el_width + 20) + "px"; 
-            
             this._update_rows();
         });
         this.obs_header.on("header-clicked", (args) => {

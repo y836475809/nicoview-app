@@ -54,53 +54,6 @@ module.exports = {
 
         this.update();
     },
-    /**
-     * 
-     * @param {MouseEvent} e 
-     */
-    mousemove(e) {
-        if(e.buttons==0){
-            return;
-        }
-        if(!this.header_handle_elm){
-            return;
-        }
-        const move_right = e.pageX - this.px > 0;
-        this.px = e.pageX;
-
-        /** @type {HTMLElement[]} */
-        const h_ces =this.$$(".header-cell");
-        for(const h_cell of h_ces){
-            let pos = 0;
-            let ne_pos = 0;
-            const ne = h_cell.nextElementSibling;
-            if(!ne){
-                break;
-            }
-            if(move_right){
-                pos = ne.offsetLeft + ne.clientWidth / 2;
-                ne_pos = ne.offsetLeft + ne.clientWidth;    
-            }else{
-                pos = h_cell.offsetLeft;
-                ne_pos = h_cell.offsetLeft + h_cell.clientWidth / 2;
-            }
-            const cx = e.clientX - this.clientX_offset;
-            if(pos < cx &&  cx < ne_pos){
-                if(move_right){
-                    /** @type {HTMLElement} */
-                    if(ne.nextElementSibling){
-                        const h_cont =this.$(".header-cell-container");
-                        h_cont.insertBefore(this.target_header_elm, ne.nextElementSibling);
-                    }
-                }else{
-                    const h_cont =this.$(".header-cell-container");
-                    h_cont.insertBefore(this.target_header_elm, h_cell);
-                }
-                break;
-            }
-        }
-        this.header_handle_elm.style.left = `${e.pageX - this.header_handle_offst_left}px`;
-    },
     isResizeArea(elm, cx){
         const s_pos = elm.offsetLeft + 10;
         const e_pos = elm.offsetLeft + elm.clientWidth - 10; 
@@ -108,51 +61,7 @@ module.exports = {
             return false;
         }
         return true;
-    },
-    /**
-     * 
-     * @param {MouseEvent} e 
-     */
-    mousedown(e) {
-        /** @type {HTMLElement} */
-        const hc = this.$(".header-cell-container");
-        this.hc_width = hc.offsetWidth;
-
-        const target_rect = hc.getBoundingClientRect();
-        this.clientX_offset = target_rect.left;
-
-        const listener = (e) => {
-            this.mouseup(e);
-            document.removeEventListener("mouseup", listener);
-            document.removeEventListener("mousemove", this.mousemove);
-        };
-        document.addEventListener("mouseup", listener);
-        document.addEventListener("mousemove", this.mousemove);
-
-        if(this.isResizeArea(e.target, e.clientX - this.clientX_offset)){
-            return;
-        }
-
-        this.header_handle_offst_left = target_rect.left + e.offsetX;
-        this.px = e.pageX;
-        this.gutter = true;
-
-        /** @type {HTMLElement} */
-        const h_cell = e.target;
-        const hh_elm = document.createElement('span');
-        hh_elm.innerText = h_cell.textContent;
-        hh_elm.style.background = "gray";
-        hh_elm.style.width = h_cell.offsetWidth + "px";
-        hh_elm.style.height = h_cell.offsetHeight + "px";
-        hh_elm.style.position = "absolute";
-        hh_elm.style.opacity = "50%";
-        hh_elm.style.left = `${h_cell.offsetLeft}px`;
-        /** @type {HTMLElement} */
-        hc.appendChild(hh_elm);
-
-        this.header_handle_elm = hh_elm;
-        this.target_header_elm = e.target;
-    },
+    }, 
     update_header_order(){
         /** @type {HTMLElement[]} */
         const h_ces = this.$$(".header-cell");
@@ -218,34 +127,135 @@ module.exports = {
             JSON.stringify(Array.from(this.column_props_map))
         ));
     },
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
+    mousemove(e) {
+        if(e.buttons == 0){
+            return;
+        }
+        if(this.do_resize){
+            return;
+        }
+        if(e.buttons == 1 && !this.header_handle_elm){
+            /** @type {HTMLElement} */
+            const h_cell = e.target;
+            const hh_elm = document.createElement('span');
+            hh_elm.innerText = h_cell.textContent;
+            hh_elm.style.background = "gray";
+            hh_elm.style.width = h_cell.offsetWidth + "px";
+            hh_elm.style.height = h_cell.offsetHeight + "px";
+            hh_elm.style.position = "absolute";
+            hh_elm.style.opacity = "50%";
+            hh_elm.style.left = `${h_cell.offsetLeft}px`;
+            /** @type {HTMLElement} */
+            const hc = this.$(".header-cell-container");
+            hc.appendChild(hh_elm);
+
+            this.header_handle_elm = hh_elm;
+        }
+
+        const move_right = e.pageX - this.px > 0;
+        this.px = e.pageX;
+
+        /** @type {HTMLElement[]} */
+        const h_ces =this.$$(".header-cell");
+        for(const h_cell of h_ces){
+            let pos = 0;
+            let ne_pos = 0;
+            /** @type {HTMLElement} */
+            const ne = h_cell.nextElementSibling;
+            if(!ne){
+                break;
+            }
+            if(move_right){
+                pos = ne.offsetLeft + ne.clientWidth / 2;
+                ne_pos = ne.offsetLeft + ne.clientWidth;    
+            }else{
+                pos = h_cell.offsetLeft;
+                ne_pos = h_cell.offsetLeft + h_cell.clientWidth / 2;
+            }
+            const cx = e.clientX - this.clientX_offset;
+            if(pos < cx &&  cx < ne_pos){
+                if(move_right){
+                    /** @type {HTMLElement} */
+                    if(ne.nextElementSibling){
+                        const h_cont =this.$(".header-cell-container");
+                        h_cont.insertBefore(this.target_header_elm, ne.nextElementSibling);
+                    }
+                }else{
+                    const h_cont =this.$(".header-cell-container");
+                    h_cont.insertBefore(this.target_header_elm, h_cell);
+                }
+                break;
+            }
+        }
+        this.header_handle_elm.style.left = `${e.pageX - this.header_handle_offst_left}px`;
+    },
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
+    mousedown(e) {
+        if(e.buttons != 1){
+            return;
+        }
+
+        /** @type {HTMLElement} */
+        const hc = this.$(".header-cell-container");
+        this.hc_width = hc.offsetWidth;
+
+        const target_rect = hc.getBoundingClientRect();
+        this.clientX_offset = target_rect.left;
+
+        const listener = (e) => {
+            this.mouseup(e);
+            document.removeEventListener("mouseup", listener);
+            document.removeEventListener("mousemove", this.mousemove);
+        };
+        document.addEventListener("mouseup", listener);
+        document.addEventListener("mousemove", this.mousemove);
+
+        this.header_handle_offst_left = target_rect.left + e.offsetX;
+        this.px = e.pageX;
+        this.target_header_elm = e.target;
+
+        this.do_resize = false;
+        if(this.isResizeArea(e.target, e.clientX - this.clientX_offset)){
+            this.do_resize = true;
+            return;
+        }
+    },
     mouseup(e) {
-        let is_order_updated = false;
-        let is_width_updated = false;
-        if(this.header_handle_elm){
-            e.preventDefault();
+        e.preventDefault();
+
+        if(this.header_handle_elm){      
             /** @type {HTMLElement} */
             const hc = this.$(".header-cell-container");
             hc.removeChild(this.header_handle_elm);
             this.header_handle_elm = null;
 
-            is_order_updated = this.update_header_order();
+            this.update_header_order();
+            this.obs.trigger("header-order-changed", {
+                column_ids: [...this.column_ids]
+            });
+            return;
         }
-        is_width_updated = this.update_header_width();
 
-        if(is_order_updated || is_width_updated){
-            this.obs.trigger("header-changed", {
-                column_ids: [...this.column_ids],
+        if(this.do_resize){
+            this.update_header_width();
+            this.obs.trigger("header-width-changed", {
                 column_props_map: this.getColumnPropsMap()
             });
+            return;
         }
-        
-        if(!is_order_updated && !is_width_updated){
-            const hc_elm = this.getHeaderCellByPoint(e.clientX, e.clientY)
-            if(hc_elm){
-                this.obs.trigger("header-clicked", {
-                    column_id: hc_elm.dataset.columnid
-                });
-            }
+
+        const hc_elm = this.getHeaderCellByPoint(e.clientX, e.clientY);
+        if(hc_elm){
+            this.obs.trigger("header-clicked", {
+                column_id: hc_elm.dataset.columnid
+            });
         }
     }
 };

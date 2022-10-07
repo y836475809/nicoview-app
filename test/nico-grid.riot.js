@@ -10,6 +10,8 @@ const debounce = (fn, interval) => {
     };
 };
 
+const row_cont_margin = 20;
+
 module.exports = {
     state:{
         /** @type {number[]} */
@@ -114,7 +116,7 @@ module.exports = {
 
         const el_width = this._getRowContainerWidth();
         const elm = this.$(".row-container");
-        elm.style.width = (el_width + this.column_props_map.size*2) + "px"; 
+        elm.style.width = (el_width + row_cont_margin) + "px"; 
 
         this.obs.onReturn("set-data", (args) => {
             /** @type {{key_id: string, items: []}} */
@@ -198,7 +200,8 @@ module.exports = {
             this.column_props_map = column_props_map;
             const el_width = this._getRowContainerWidth();
             const elm = this.$(".row-container");
-            elm.style.width = (el_width + 20) + "px"; 
+            elm.style.width = (el_width + row_cont_margin) + "px"; 
+
             this._update_rows();
         });
         this.obs_header.on("header-clicked", (args) => {
@@ -512,8 +515,7 @@ module.exports = {
      */
     onclickItem(data_index, e) {
         this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
-
-        console.log(this.data_list[data_index]);
+        
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
             const data = this.data_list[data_index];

@@ -80,31 +80,29 @@ module.exports = {
             }
             return classes.join(" ");
         };
-        this.getBodyCellStyle = (id) => {
+        this.getBodyCellStyle = (column_id) => {
             let w = 150;
-            if(this.column_props_map.has(id)){
-                w = this.column_props_map.get(id).width;
+            if(this.column_props_map.has(column_id)){
+                w = this.column_props_map.get(column_id).width;
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
-        this.getBodyCellHtml = (data_index, id) => {
+        this.getBodyCellHtml = (data_index, column_id) => {
             const data = this.data_list[data_index];
-            const value = data[id];
-            const ft = this.cell_ft.get(id);
+            const value = data[column_id];
+            const ft = this.cell_ft.get(column_id);
             if(!ft){
                 return value;
             }
-            return ft(id, value, data);
+            return ft(column_id, value, data);
         };
-
-        const hello = debounce((e)=>{
-            this._update_rows();
-        }, 100);
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
         body_elm.style.height = `calc(100% - ${this.header_height}px)`;
-        body_elm.addEventListener("scroll",hello);
+        body_elm.addEventListener("scroll", debounce((e)=>{
+            this._update_rows();
+        }, 100));
         body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
             const target_elm = e.target;
@@ -140,10 +138,9 @@ module.exports = {
             const f_size = 20;
             const min_size = Math.min(f_size, this.data_list.length);
             this.state.data_indexes = this.cnvData(0, min_size);
-            const anchor_elm = this.$(".nico-grid-anchor");
-            anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
-
             this.sel_data_key_ids = [];
+
+            this._updateAnchorPos();
             this._scrollTo(0);
             this.update();
         });
@@ -183,9 +180,8 @@ module.exports = {
             this.data_list = this._filter(ids, words);
 
             this.sel_data_key_ids = [];
-            const anchor_elm = this.$(".nico-grid-anchor");
-            anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
-            
+
+            this._updateAnchorPos();
             this._scrollTo(0);
             this._update_rows();
         });
@@ -203,11 +199,12 @@ module.exports = {
             this._update_rows();
         });
         this.obs_header.on("header-clicked", (args) => {
-            const {id} = args;
-            if(this.sort.key == id){
+            /** @type {{column_id: string}} */
+            const {column_id} = args;
+            if(this.sort.key == column_id){
                 this.sort.asc = !this.sort.asc;
             }else{
-                this.sort.key = id;
+                this.sort.key = column_id;
                 this.sort.asc = true;
             }
             this._sort(this.sort.key, this.sort.asc);
@@ -230,6 +227,11 @@ module.exports = {
         });
         const container_elm = this.$(".nico-grid-container");
         resize_obs.observe(container_elm);
+    },
+    _updateAnchorPos(){
+        /** @type {HTMLElement} */
+        const elm = this.$(".nico-grid-anchor");
+        elm.style.top = (this.data_list.length * this.row_height) + "px";
     },
     _getRowContainerWidth(){
         return Array.from(this.column_props_map.values()).reduce((a, b) => {
@@ -268,21 +270,20 @@ module.exports = {
     _update_rows(){
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
-        const te = this.$(".row-container");
         const range = body_elm.offsetHeight; 
-        // console.log(`scroll=${scroll}, range=${range}`);
-        this.top_offset = scroll_top % this.row_height;
-        // console.log(`top_offset=${this.top_offset}`);
         const start_index = Math.floor(scroll_top/this.row_height);
         let end_index = Math.floor(start_index + range/this.row_height + 0.5);
-        te.style.top = (scroll_top - this.top_offset) + "px";
-        // console.log(`start=${start_index}, end=${end_index}`);
+
+        const row_cont_elm = this.$(".row-container");
+        this.top_offset = scroll_top % this.row_height;
+        row_cont_elm.style.top = (scroll_top - this.top_offset) + "px";
 
         this.update({data_indexes:[]});
 
         if(this.data_list.length == 0){
             return;
         }
+
         end_index += 1;
         if(this.data_list.length <= end_index){
             end_index = this.data_list.length;
@@ -364,13 +365,13 @@ module.exports = {
     },
     /**
      * 
-     * @param {string[]} ids 
+     * @param {string[]} key_ids 
      */
-    deleteItems(ids){
+    deleteItems(key_ids){
         const has_keys = [];
-        ids.forEach(id => {
-            if(this.key_id_data_map.has(id)){
-                has_keys.push(id);
+        key_ids.forEach(key_id => {
+            if(this.key_id_data_map.has(key_id)){
+                has_keys.push(key_id);
             }
         });
         if(has_keys.length == 0){
@@ -378,28 +379,26 @@ module.exports = {
         }
 
         this.src_data_list = this.src_data_list.filter(data => {
-            return !ids.includes(data[this.key_id]);
+            return !key_ids.includes(data[this.key_id]);
         });
         this.data_list = this.data_list.filter(data => {
-            return !ids.includes(data[this.key_id]);
+            return !key_ids.includes(data[this.key_id]);
         });
-        ids.forEach(id => {
-            this.key_id_data_map.delete(id);
+        key_ids.forEach(key_id => {
+            this.key_id_data_map.delete(key_id);
         });
 
         this.sel_data_key_ids = [];
-        ids.forEach(id => {
-            if(this.sel_data_key_ids.includes(id)){
-                const sel_i = this.sel_data_key_ids.indexOf(id);
+        key_ids.forEach(key_id => {
+            if(this.sel_data_key_ids.includes(key_id)){
+                const sel_i = this.sel_data_key_ids.indexOf(key_id);
                 if(sel_i >= 0){
                     this.sel_data_key_ids.splice(sel_i, 1);
                 }
             }
         });
 
-        /** @type {HTMLElement} */
-        const anchor_elm = this.$(".nico-grid-anchor");
-        anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+        this._updateAnchorPos();
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
@@ -428,9 +427,7 @@ module.exports = {
         this.src_data_list = this.src_data_list.concat(items);
         this.data_list = this.data_list.concat(items);
         this._sort(this.sort.key, this.sort.asc);
-
-        const anchor_elm = this.$(".nico-grid-anchor");
-        anchor_elm.style.top = (this.data_list.length * this.row_height) + "px";
+        this._updateAnchorPos();
         this._update_rows();
     },
     /**

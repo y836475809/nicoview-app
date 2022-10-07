@@ -243,7 +243,7 @@ module.exports = {
             const hc_elm = this.getHeaderCellByPoint(e.clientX, e.clientY)
             if(hc_elm){
                 this.obs.trigger("header-clicked", {
-                    id: hc_elm.dataset.columnid
+                    column_id: hc_elm.dataset.columnid
                 });
             }
         }

@@ -507,15 +507,28 @@ module.exports = {
         }
         this.update();
     },
-    /**
-     * 
-     * @param {number} data_index 
-     * @param {PointerEvent} e 
-     * @returns 
-     */
-    onclickItem(data_index, e) {
+    onMouseDown(e){
+        if(e.buttons != 2){
+            return;
+        }
+        this.start_pos = {
+            x: e.pageX,
+            y: e.pageY,
+        };
+    },
+    onMouseUp(data_index, e){
+        if(this.start_pos){
+            const data = this.data_list[data_index];
+            const key_id = data[this.key_id];
+            if(!this.sel_data_key_ids.includes(key_id)){
+                this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
+            }
+            this.popupContextMenu(e);
+            return;
+        }
+
         this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
-        
+
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
             const data = this.data_list[data_index];
@@ -523,5 +536,21 @@ module.exports = {
             e.stopPropagation();
             return;
         }
+    },
+    popupContextMenu(e){
+        if(!this.start_pos){
+            return;
+        }
+        const distance = 20;
+        const x = Math.abs(this.start_pos.x - e.pageX);
+        const y = Math.abs(this.start_pos.y - e.pageY);
+        this.start_pos = null;
+        if(x > distance || y > distance){
+            return;
+        }
+        if(this.sel_data_key_ids.length==0){
+            return;
+        }
+        this.obs.trigger("show-contexmenu", {e});
     }
 };

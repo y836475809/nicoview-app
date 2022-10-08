@@ -1,5 +1,6 @@
 const { MyObservable } = require("../app/js/my-observable");
 const { buttonFormatter } = require("./nico-grid-formatter");
+const myapi = require("../app/js/my-api");
 const fs = require("fs");
 
 module.exports = {
@@ -36,6 +37,12 @@ module.exports = {
         this.obs.on("cmd",(args) => {
             const { cmd_id, data } = args;
             console.log("cmd_id=", cmd_id, ", data=", data);
+        });
+        this.obs.on("show-contexmenu", async (args) => {
+            const menu_id = await myapi.ipc.popupContextMenu("library", {items:[]});
+            if(!menu_id){
+                return;
+            }
         });
         const mk_data = (name) => {
             const src_db = {

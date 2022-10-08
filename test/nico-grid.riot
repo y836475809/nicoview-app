@@ -57,8 +57,8 @@
             obs={obs_header}
         ></nico-grid-header>
         <div class="body">
-            <div class="row-container">
-                <div class="row {getRowClass(data_index)}" onclick={onclickItem.bind(this,data_index)}
+            <div class="row-container" onmousedown={onMouseDown} >
+                <div class="row {getRowClass(data_index)}" onmouseup={onMouseUp.bind(this,data_index)}
                     style={getRowStyle(data_index)} each={data_index in state.data_indexes}>
                     <nico-grid-cell class="body-cell" style={getBodyCellStyle(column_id)} 
                         html={getBodyCellHtml(data_index, column_id)} each={column_id in state.column_ids}></nico-grid-cell>

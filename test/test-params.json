@@ -32,7 +32,7 @@
         "config_fiiename": "config-debug.json"
     },
     "test-nico-grid": {
-        "use_mock_server": false,
+        "use_mock_server": true,
         "main": "../test/test-nico-grid.html",
         "config_fiiename": "config-debug.json"
     }

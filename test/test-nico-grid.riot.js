@@ -1,5 +1,5 @@
 const { MyObservable } = require("../app/js/my-observable");
-const { buttonFormatter } = require("./nico-grid-formatter");
+const { buttonFormatter, imageFormatter } = require("./nico-grid-formatter");
 const myapi = require("../app/js/my-api");
 const fs = require("fs");
 
@@ -18,7 +18,7 @@ module.exports = {
         };
         const cmd_opt = ["play", "stack", "bookmark", "download"];
         this.columns = [
-            {id: "thumb_img", name: "サムネイル", width:150, ft:ft},
+            {id: "thumb_img", name: "サムネイル", width:150, ft:imageFormatter},
             {id: "title",     name: "名前",       width:100},
             {id: "command",   name: "操作",       width:120, ft:buttonFormatter.bind(this, cmd_opt)},
             {id: "info",      name: "情報",       width:160, ft:ft_info},
@@ -26,8 +26,9 @@ module.exports = {
             {id: "play_time", name: "時間",       width:150, ft:ft},
             {id: "tags",      name: "コメント",   width:150, ft:ft},
         ];
+        
         this.header_height = 30;
-        this.row_height = 60;
+        this.row_height = 100;
         this.sort = {
             key: "",
             asc: false
@@ -60,6 +61,10 @@ module.exports = {
             Object.keys(src_db).forEach(key => {
                 const val = clone_data[key];
                 clone_data[key] = `${val}${name}`; 
+                if(key == "thumb_img"){
+                    const url = "https://nicovideo.cdn.nimg.jp/thumbnails";
+                    clone_data[key] = `${url}/${name}/${name}.1234`;
+                }  
             });
             return clone_data;
         };

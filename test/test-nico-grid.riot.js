@@ -28,7 +28,7 @@ module.exports = {
         ];
         
         this.header_height = 30;
-        this.row_height = 100;
+        this.row_height = 135;
         this.sort = {
             key: "",
             asc: false
@@ -150,10 +150,19 @@ module.exports = {
             const files = file_elm.files;
             const fp = files[0].path;
             const text = fs.readFileSync(fp, "utf-8");
-            const data_list = JSON.parse(text);
+            const library_data = JSON.parse(text);
+            const data_dir = library_data.path;
+            const video_data_list = library_data.video;
+            video_data_list.forEach(data => {
+                const title = data.title;
+                const video_id = data.video_id;
+                const img_size = data.thumbnail_size == "L"?".L":"";
+                const img_name = `${title} - [${video_id}][ThumbImg]${img_size}.jpeg`;
+                data.thumb_img = `${data_dir}/${img_name}`;
+            });
             await this.obs.triggerReturn("set-data", {
                 key_id: "video_id",
-                items:data_list
+                items: video_data_list
             });
         };
 

@@ -30,7 +30,7 @@ const imageFormatter = (id, value, data)=> {
     if(!value){
         return "";
     }
-    return `<img class="gridtable-thumbnail" src="${value}"/>`;
+    return `<div class="nico-grid-img-holder"/>`;
 };
 
 // eslint-disable-next-line no-unused-vars

@@ -1,4 +1,5 @@
 const { MyObservable } = require("../app/js/my-observable");
+const { ImgElementCache } = require("./nico-grid-img-cache");
 
 const debounce = (fn, interval) => {
     let timer;
@@ -38,6 +39,8 @@ module.exports = {
         key: "",
         asc: true
     },
+    /** @type {ImgElementCache} */
+    img_elm_cache: null,
 
     onBeforeMount(props) {        
         this.obs = props.obs;
@@ -46,6 +49,10 @@ module.exports = {
         this.sort = props.sort;
 
         this.cell_ft = new Map();
+
+        // TODO capacity=20
+        this.img_elm_cache = 
+            new ImgElementCache(20, ["nico-grid-thumb"]);
 
         props.columns.forEach(column => {
             this.column_props_map.set(column.id, {
@@ -233,6 +240,33 @@ module.exports = {
         });
         const container_elm = this.$(".nico-grid-container");
         resize_obs.observe(container_elm);
+    },
+    // eslint-disable-next-line no-unused-vars
+    onUpdated(props, state) {
+        this.appendThumbImg();
+    },
+    appendThumbImg() {
+        if(this.data_list.length==0){
+            return;
+        }
+        if(!this.data_list[0].thumb_img){
+            return;
+        }
+
+        const urls = [];
+        this.state.data_indexes.forEach(idx=>{
+            urls.push(this.data_list[idx].thumb_img);
+        });
+        if(urls.length==0){
+            return;
+        }
+        const img_elms = this.$$(".nico-grid-img-holder");
+        if(img_elms.length==0){
+            return;
+        }
+        this.img_elm_cache.getImg(urls, (i, img_elm) => {
+            img_elms[i].appendChild(img_elm);
+        });
     },
     _updateAnchorPos(){
         /** @type {HTMLElement} */

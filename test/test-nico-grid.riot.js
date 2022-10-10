@@ -197,5 +197,11 @@ module.exports = {
                 text: text
             });
         };
+
+        const get_data_len_btn = document.getElementById("gt-data-len");
+        get_data_len_btn.onclick = async () => {
+            const data_len = await this.obs.triggerReturn("get-data-length");
+            console.log("data_len=", data_len);
+        };
     }
 };

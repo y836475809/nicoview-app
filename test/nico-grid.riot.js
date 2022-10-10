@@ -211,6 +211,9 @@ module.exports = {
             this._scrollTo(0);
             this._update_rows();
         });
+        this.obs.onReturn("get-data-length", () => {
+            return this.data_list.length;
+        });
 
         this.obs_header.on("header-order-changed", (args) => {
             const {column_ids} = args;

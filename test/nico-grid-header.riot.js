@@ -253,6 +253,11 @@ module.exports = {
 
         const hc_elm = this.getHeaderCellByPoint(e.clientX, e.clientY);
         if(hc_elm){
+            const column_id = hc_elm.dataset.columnid;
+            const column_props = this.column_props_map.get(column_id);
+            if(!column_props.sortable){
+                return;
+            }
             this.obs.trigger("header-clicked", {
                 column_id: hc_elm.dataset.columnid
             });

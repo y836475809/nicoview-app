@@ -20,7 +20,7 @@ module.exports = {
             {id: "info",      name: "情報",       width:160, ft:ft_info},
             {id: "pub_date",  name: "投稿日",     width:200},
             {id: "play_time", name: "時間",       width:150},
-            {id: "tags",      name: "コメント",   width:150, ft:tagsFormatter.bind(this, " ")},
+            {id: "tags",      name: "コメント",   width:150, sortable:false, ft:tagsFormatter.bind(this, " ")},
         ];
         
         this.header_height = 30;

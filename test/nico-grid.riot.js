@@ -12,6 +12,19 @@ const debounce = (fn, interval) => {
     };
 };
 
+const getSortable = (column) => {
+    const column_id = column.id;
+    const sortable = column.sortable;
+    const non_sortable_ids = ["thumb_img", "command"];
+    if(non_sortable_ids.includes(column_id)){
+        return false;
+    }
+    if(sortable == undefined){
+        return true;
+    }
+    return sortable;
+};
+
 const row_cont_margin = 20;
 
 module.exports = {
@@ -59,6 +72,7 @@ module.exports = {
             this.column_props_map.set(column.id, {
                 name:column.name,
                 width:column.width,
+                sortable: getSortable(column)
             });
 
             const ft = column.ft?column.ft:getFormatter(column.id);

@@ -154,10 +154,10 @@ module.exports = {
             const data_dir = library_data.path;
             const video_data_list = library_data.video;
             video_data_list.forEach(data => {
-                const title = data.title;
+                const filename = data.common_filename;
                 const video_id = data.video_id;
                 const img_size = data.thumbnail_size == "L"?".L":"";
-                const img_name = `${title} - [${video_id}][ThumbImg]${img_size}.jpeg`;
+                const img_name = `${filename} - [${video_id}][ThumbImg]${img_size}.jpeg`;
                 data.thumb_img = `${data_dir}/${img_name}`;
             });
             await this.obs.triggerReturn("set-data", {

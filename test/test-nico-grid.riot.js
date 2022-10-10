@@ -56,6 +56,8 @@ module.exports = {
                 pub_date: "投稿日",
                 play_time: "時間",  
             };
+            const date1 = new Date("2000/1/1 12:00:00").getTime();
+            const date2 = new Date("2020/1/1 12:00:00").getTime();
             const clone_data = {};
             Object.assign(clone_data, src_db);
             Object.keys(src_db).forEach(key => {
@@ -65,6 +67,15 @@ module.exports = {
                     const url = "https://nicovideo.cdn.nimg.jp/thumbnails";
                     clone_data[key] = `${url}/${name}/${name}.1234`;
                 }  
+                if(key == "tags"){
+                    clone_data[key] = ["tag1", "tag2"].join(" ");
+                }
+                if(key == "pub_date"){
+                    clone_data[key] = Math.floor(Math.random() * (date2 - date1 + 1) + date1);
+                }
+                if(key == "play_time"){
+                    clone_data[key] = Math.floor(Math.random() * 2000);
+                }
             });
             return clone_data;
         };

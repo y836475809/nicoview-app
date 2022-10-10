@@ -11,7 +11,7 @@ const buttonFormatter = (opts, id, value, data) => {
     map.set("bookmark", {title:"ブックマーク", icon:"fas fa-bookmark"});
     map.set("download", {title:"ダウンロードに追加", icon:"fas fa-download"});
     
-    const btn_class = "center-hv gridtable-button cmd-btn";
+    const btn_class = "center-hv nico-grid-button cmd-btn";
     let buttons = "";
     opts.forEach(opt => {
         if(map.has(opt)){
@@ -56,19 +56,64 @@ const numberFormatter = (id, value, data)=> {
 
 // eslint-disable-next-line no-unused-vars
 const wrapFormatter = (id, value, data) => {
-    return `<div class="wrap-gridtable-cell">${value}</div>`;
+    return `<div class="nico-grid-wrap-cell">${value}</div>`;
 };
 
 // eslint-disable-next-line no-unused-vars
 const infoFormatter = (mk_content, id, value, data)=> {
     let content = mk_content(value, data);
     if(data.saved){
-        content += "<div title='ローカル保存済み' class='state-content state-saved'><i class='fas fa-hdd'></i></div>";
+        const title = "ローカル保存済み";
+        const div_class = "nico-grid-state-content nico-grid-state-saved";
+        const btn_class = "fas fa-hdd";
+        content += `<div title='${title}' class='${div_class}'><i class='${btn_class}'></i></div>`;
     }
     if(data.reg_download){
-        content += "<div title='ダウンロード登録済み' class='state-content state-reg-download'><i class='fas fa-download'></i></div>";
+        const title = "ダウンロード登録済み";
+        const div_class = "nico-grid-state-content nico-grid-state-reg-download";
+        const btn_class = "fas fa-hdd";
+        content += `<div title='${title}' class='${div_class}'><i class='${btn_class}'></i></div>`;
     }
     return content;
+};
+
+/**
+ * 
+ * @param {string[]} tags 
+ * @returns {string}
+ */
+const mkTagsContent = (tags) => {
+    let content = "";
+    tags.forEach(tag => {
+        content += `<div class='nico-grid-tag-content'>${tag}</div>`;
+    });
+    const title = tags.join("\n");
+    return `<div title="${title}" class='nico-grid-wrap-cell'>${content}</div>`;
+};
+
+// eslint-disable-next-line no-unused-vars
+const tagsFormatter = (delimiter, id, value, data)=> {
+    if(!value){
+        return "";
+    }
+    const tags = Array.isArray(value)?value:value.split(delimiter);
+    return mkTagsContent(tags);
+};
+
+const cmd_opt = ["play", "stack", "bookmark", "download"];
+const formatterItems = [
+    {id:"command", ft: buttonFormatter.bind(this, cmd_opt)},
+    {id:"thumb_img", ft: imageFormatter},
+    {id:"_date", ft: dateFormatter},
+    {id:"_time", ft: timeFormatter},
+    {id:"_count", ft: numberFormatter}
+];
+const getFormatter = (id) => {
+    const ft_item = formatterItems.find(item => {
+        return id.endsWith(item.id);
+    });
+    const ft = ft_item?ft_item.ft:wrapFormatter;
+    return ft;
 };
 
 module.exports = {
@@ -79,4 +124,6 @@ module.exports = {
     numberFormatter,
     wrapFormatter,
     infoFormatter,
+    tagsFormatter,
+    getFormatter,
 };

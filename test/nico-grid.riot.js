@@ -1,5 +1,6 @@
 const { MyObservable } = require("../app/js/my-observable");
 const { ImgElementCache } = require("./nico-grid-img-cache");
+const { getFormatter } = require("./nico-grid-formatter");
 
 const debounce = (fn, interval) => {
     let timer;
@@ -59,7 +60,9 @@ module.exports = {
                 name:column.name,
                 width:column.width,
             });
-            this.cell_ft.set(column.id, column.ft);
+
+            const ft = column.ft?column.ft:getFormatter(column.id);
+            this.cell_ft.set(column.id, ft);
             this.state.column_ids.push(column.id);
         });
         this.obs_header = new MyObservable();

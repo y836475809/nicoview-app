@@ -29,6 +29,9 @@ module.exports = {
             key: "",
             asc: false
         };
+        this.filter_target_ids = [
+            "title", "tags", "video_id"
+        ];
     },
     async onMounted() {  
         this.obs.on("cmd",(args) => {

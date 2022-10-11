@@ -56,6 +56,9 @@ module.exports = {
     /** @type {ImgElementCache} */
     img_elm_cache: null,
 
+    /** @type {string[]} */
+    filter_target_ids: [],
+
     onBeforeMount(props) {        
         this.obs = props.obs;
         this.header_height = props.header_height;
@@ -79,6 +82,12 @@ module.exports = {
             this.cell_ft.set(column.id, ft);
             this.state.column_ids.push(column.id);
         });
+
+        this.filter_target_ids = props.filter_target_ids;
+        if(!this.filter_target_ids){
+            this.filter_target_ids = Array.from(this.column_props_map.keys());
+        }
+
         this.obs_header = new MyObservable();
 
         this.getColumnIds = () => {
@@ -311,10 +320,14 @@ module.exports = {
         if(words.length==0){
             return this.src_data_list;
         }
+        
+        const keys = target_ids.length>0?target_ids:this.filter_target_ids;
         return this.src_data_list.filter(item=>{
-            const keys = target_ids.length==0?Object.keys(item):target_ids;
             return words.every(word => {
                 for(const k of keys){
+                    if(item[k] == undefined){
+                        continue;
+                    }
                     const value = String(item[k]).toLowerCase();
                     if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
                         return true;

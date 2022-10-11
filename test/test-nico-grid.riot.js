@@ -151,6 +151,9 @@ module.exports = {
         };
 
         const file1 = document.getElementById("gt-file1");
+        file1.onclick = (e) => {
+            e.target.value = "";
+        };
         file1.onchange = async (e) => {
             /** @type {HTMLInputElement} */
             const file_elm = e.target;

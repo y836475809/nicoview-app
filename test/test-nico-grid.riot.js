@@ -144,14 +144,18 @@ module.exports = {
             });
             new_data_i++;
         };
-        let scroll_target = 20;
-        const btn6 = document.getElementById("gt-btn6");
-        btn6.onclick = () => {
-            this.obs.trigger("scroll-to", {
+        const scroll_index_btn = document.getElementById("gt-scroll-index-btn");
+        scroll_index_btn.onclick = async () => {
+            /** @type {HTMLInputElement} */
+            const txt_elm = document.getElementById("gt-scroll-index");
+            const target = Number(txt_elm.value);
+            const index = await this.obs.triggerReturn("get-index-by-id", {
                 id: "video_id",
-                value: `sm${scroll_target}`
+                value: `sm${target}`   
             });
-            scroll_target += 1;
+            this.obs.trigger("scroll-to-index", {
+                index
+            });
         };
 
         const file1 = document.getElementById("gt-file1");

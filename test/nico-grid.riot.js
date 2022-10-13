@@ -208,6 +208,20 @@ module.exports = {
             }
             this._scrollTo(index * this.row_height);
         });
+        this.obs.onReturn("get-index-by-id", (args) => {
+            const {id, value} = args;
+            const index = this.data_list.findIndex(item=>{
+                return item[id] == value;
+            });
+            return index;
+        });
+        this.obs.on("scroll-to-index", (args) => {
+            const {index} = args;
+            if(index == -1){
+                return;
+            }
+            this._scrollTo(index * this.row_height);
+        });
         this.obs.on("filter", (args) => {
             /** @type {{ids:string[], text:string}} */
             const {ids, text} = args;

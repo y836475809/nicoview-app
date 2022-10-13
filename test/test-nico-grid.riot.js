@@ -21,6 +21,7 @@ module.exports = {
             {id: "pub_date",  name: "投稿日",     width:200},
             {id: "play_time", name: "時間",       width:150},
             {id: "tags",      name: "コメント",   width:150, sortable:false, ft:tagsFormatter.bind(this, " ")},
+            {id: "state",     name: "状態",   width:150},
         ];
         
         this.header_height = 30;
@@ -208,6 +209,18 @@ module.exports = {
         get_data_len_btn.onclick = async () => {
             const data_len = await this.obs.triggerReturn("get-data-length");
             console.log("data_len=", data_len);
+        };
+
+        let state_count = 0;
+        const inc_count_btn = document.getElementById("gt-inc-count");
+        inc_count_btn.onclick = async () => {
+            this.obs.trigger("update-item", {
+                id: "sm1",
+                props:{
+                    state: `state:${state_count}`
+                }
+            });
+            state_count++;
         };
     }
 };

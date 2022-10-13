@@ -378,9 +378,7 @@ module.exports = {
             return;
         }
         Object.keys(props).forEach(key=>{
-            if(item[key]!==undefined){
-                item[key] = props[key];
-            }
+            item[key] = props[key];
         });
         this._update_rows();
     },

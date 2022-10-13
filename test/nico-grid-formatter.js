@@ -56,6 +56,9 @@ const numberFormatter = (id, value, data)=> {
 
 // eslint-disable-next-line no-unused-vars
 const wrapFormatter = (id, value, data) => {
+    if(!value){
+        return "";
+    }
     return `<div class="nico-grid-wrap-cell">${value}</div>`;
 };
 

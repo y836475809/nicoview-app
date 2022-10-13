@@ -216,11 +216,21 @@ module.exports = {
             return index;
         });
         this.obs.on("scroll-to-index", (args) => {
-            const {index} = args;
+            const {index, pos} = args;
             if(index == -1){
                 return;
             }
-            this._scrollTo(index * this.row_height);
+            if(pos == "top"){
+                this._scrollTo(index * this.row_height);
+            }
+            if(pos == "bottom"){
+                const body_elm = this.$(".body");
+                const range = body_elm.clientHeight; 
+                const num = Math.floor(range / this.row_height);
+                const offset = range % this.row_height;
+                const pos = (index - num + 1) * this.row_height - offset;
+                this._scrollTo(pos);
+            }
         });
         this.obs.on("filter", (args) => {
             /** @type {{ids:string[], text:string}} */

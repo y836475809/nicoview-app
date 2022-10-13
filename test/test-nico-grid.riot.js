@@ -153,8 +153,10 @@ module.exports = {
                 id: "video_id",
                 value: `sm${target}`   
             });
+            const view_top_ch = document.getElementById("gt-scroll-view-top");
             this.obs.trigger("scroll-to-index", {
-                index
+                index,
+                pos:view_top_ch.checked?"top":"bottom"
             });
         };
 

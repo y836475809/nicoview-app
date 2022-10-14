@@ -16,8 +16,8 @@ module.exports = {
     /** @type {string[]} */
     column_ids:[],
 
-    sort: {
-        key: "",
+    sort_param: {
+        id: "",
         asc: true
     },
 
@@ -39,16 +39,16 @@ module.exports = {
         };
         this.getHeaderTitle = (column_id) => {
             let order = "";
-            if(column_id == this.sort.key){
-                order = this.sort.asc?"▲":"▼";
+            if(column_id == this.sort_param.id){
+                order = this.sort_param.asc?"▲":"▼";
             }
             const name = this.column_props_map.get(column_id).name;
             return `${order}${name}`;
         };
 
         this.obs.on("changed-sort", (args) => {
-            const {sort} = args;
-            Object.assign(this.sort, sort);
+            const {sort_param} = args;
+            Object.assign(this.sort_param, sort_param);
             this.update();
         });
 

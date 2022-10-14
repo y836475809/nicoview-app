@@ -34,8 +34,8 @@ module.exports = {
         /** @type {string[]} */
         column_ids:[]
     },
-    src_data_list: [],
     data_list: [],
+    view_data_list: [],
     key_id: "",
     key_id_data_map:new Map(),
 
@@ -49,8 +49,8 @@ module.exports = {
     top_offset:0,
     /** @type {string[]} */
     sel_data_key_ids:[],
-    sort: {
-        key: "",
+    sort_param: {
+        id: "",
         asc: true
     },
     /** @type {ImgElementCache} */
@@ -63,7 +63,7 @@ module.exports = {
         this.obs = props.obs;
         this.header_height = props.header_height;
         this.row_height = props.row_height;
-        this.sort = props.sort;
+        this.sort_param = props.sort_param;
 
         this.cell_ft = new Map();
 
@@ -109,7 +109,7 @@ module.exports = {
             if(data_index % 2 == 1){
                 classes.push("nico-grid-row-odd");
             }
-            const id = this.data_list[data_index][this.key_id];
+            const id = this.view_data_list[data_index][this.key_id];
             if(this.sel_data_key_ids.includes(id)){
                 classes.push("nico-grid-row-select");
             }
@@ -123,7 +123,7 @@ module.exports = {
             return `height:${this.row_height}px; width:${w}px;`;
         };
         this.getBodyCellHtml = (data_index, column_id) => {
-            const data = this.data_list[data_index];
+            const data = this.view_data_list[data_index];
             const value = data[column_id];
             const ft = this.cell_ft.get(column_id);
             if(!ft){
@@ -136,7 +136,7 @@ module.exports = {
         const body_elm = this.$(".body");
         body_elm.style.height = `calc(100% - ${this.header_height}px)`;
         body_elm.addEventListener("scroll", debounce((e)=>{
-            this._update_rows();
+            this.update_rows();
         }, 100));
         body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
@@ -147,7 +147,7 @@ module.exports = {
             header_cont_elm.style.left = (-scrollLeft * 1) + "px";
         });
 
-        const el_width = this._getRowContainerWidth();
+        const el_width = this.getRowContainerWidth();
         const elm = this.$(".row-container");
         elm.style.width = (el_width + row_cont_margin) + "px"; 
 
@@ -155,28 +155,27 @@ module.exports = {
             /** @type {{key_id: string, items: []}} */
             const { key_id, items } = args;
             this.key_id = key_id;
-            this.src_data_list = items.map( item => ({...item}));
-            this.data_list = this.src_data_list;
+            this.data_list = items.map( item => ({...item}));
+            this.view_data_list = this.data_list;
 
-            this._sort(this.sort.key, this.sort.asc);
+            this.sort(this.sort_param.id, this.sort_param.asc);
             this.obs_header.trigger("changed-sort", {
-                sort: this.sort
+                sort_param: this.sort_param
             });
 
             this.key_id_data_map.clear();
-            this.data_list.forEach(item=>{
+            this.view_data_list.forEach(item=>{
                 const id = item[key_id];
                 this.key_id_data_map.set(id, item);
             });
  
-            this.row_data_list = [];
             const f_size = 20;
-            const min_size = Math.min(f_size, this.data_list.length);
+            const min_size = Math.min(f_size, this.view_data_list.length);
             this.state.data_indexes = this.cnvData(0, min_size);
             this.sel_data_key_ids = [];
 
-            this._updateAnchorPos();
-            this._scrollTo(0);
+            this.updateAnchorPos();
+            this.scrollTo(0);
             this.update();
         });
         this.obs.on("update-item", (args) => {
@@ -184,8 +183,8 @@ module.exports = {
             this.updateItem(id, props);
         });
         this.obs.on("sort-data", (args) => {
-            const {key, asc} = args;
-            this._sort(key, asc);
+            const {id, asc} = args;
+            this.sort(id, asc);
         });
         this.obs.on("delete-items", (args) => {
             const {ids} = args;
@@ -201,7 +200,7 @@ module.exports = {
         this.obs.on("set-selected-by-index", (args) => {
             const {index} = args;
 
-            const sel_data = this.data_list.slice(index, index + 1);
+            const sel_data = this.view_data_list.slice(index, index + 1);
             if(!sel_data.length){
                 return;
             }
@@ -211,17 +210,17 @@ module.exports = {
         });
         this.obs.on("scroll-to", (args) => {
             const {id, value} = args;
-            const index = this.data_list.findIndex(item=>{
+            const index = this.view_data_list.findIndex(item=>{
                 return item[id] == value;
             });
             if(index == -1){
                 return;
             }
-            this._scrollTo(index * this.row_height);
+            this.scrollTo(index * this.row_height);
         });
         this.obs.onReturn("get-index-by-id", (args) => {
             const {id, value} = args;
-            const index = this.data_list.findIndex(item=>{
+            const index = this.view_data_list.findIndex(item=>{
                 return item[id] == value;
             });
             return index;
@@ -232,7 +231,7 @@ module.exports = {
                 return;
             }
             if(pos == "top"){
-                this._scrollTo(index * this.row_height);
+                this.scrollTo(index * this.row_height);
             }
             if(pos == "bottom"){
                 const body_elm = this.$(".body");
@@ -240,53 +239,53 @@ module.exports = {
                 const num = Math.floor(range / this.row_height);
                 const offset = range % this.row_height;
                 const pos = (index - num + 1) * this.row_height - offset;
-                this._scrollTo(pos);
+                this.scrollTo(pos);
             }
         });
         this.obs.on("filter", (args) => {
             /** @type {{ids:string[], text:string}} */
             const {ids, text} = args;
             const words = text.split(" ");
-            this.data_list = this._filter(ids, words);
+            this.view_data_list = this.filter(ids, words);
 
             this.sel_data_key_ids = [];
 
-            this._updateAnchorPos();
-            this._scrollTo(0);
-            this._update_rows();
+            this.updateAnchorPos();
+            this.scrollTo(0);
+            this.update_rows();
         });
         this.obs.onReturn("get-data-length", () => {
-            return this.data_list.length;
+            return this.view_data_list.length;
         });
 
         this.obs_header.on("header-order-changed", (args) => {
             const {column_ids} = args;
             
             this.state.column_ids = column_ids;
-            this._update_rows();
+            this.update_rows();
         });
         this.obs_header.on("header-width-changed", (args) => {
             const {column_props_map} = args;
             
             this.column_props_map = column_props_map;
-            const el_width = this._getRowContainerWidth();
+            const el_width = this.getRowContainerWidth();
             const elm = this.$(".row-container");
             elm.style.width = (el_width + row_cont_margin) + "px"; 
 
-            this._update_rows();
+            this.update_rows();
         });
         this.obs_header.on("header-clicked", (args) => {
             /** @type {{column_id: string}} */
             const {column_id} = args;
-            if(this.sort.key == column_id){
-                this.sort.asc = !this.sort.asc;
+            if(this.sort_param.id == column_id){
+                this.sort_param.asc = !this.sort_param.asc;
             }else{
-                this.sort.key = column_id;
-                this.sort.asc = true;
+                this.sort_param.id = column_id;
+                this.sort_param.asc = true;
             }
-            this._sort(this.sort.key, this.sort.asc);
+            this.sort(this.sort_param.id, this.sort_param.asc);
             this.obs_header.trigger("changed-sort", {
-                sort: this.sort
+                sort_param: this.sort_param
             });
         });
 
@@ -296,8 +295,8 @@ module.exports = {
                 clearTimeout(resize_timer);
             }
             resize_timer = setTimeout(() => {
-                if(this.data_list.length > 0){
-                    this._update_rows();
+                if(this.view_data_list.length > 0){
+                    this.update_rows();
                 }       
                 resize_timer = null;
             }, 200);
@@ -310,16 +309,16 @@ module.exports = {
         this.appendThumbImg();
     },
     appendThumbImg() {
-        if(this.data_list.length==0){
+        if(this.view_data_list.length==0){
             return;
         }
-        if(!this.data_list[0].thumb_img){
+        if(!this.view_data_list[0].thumb_img){
             return;
         }
 
         const urls = [];
         this.state.data_indexes.forEach(idx=>{
-            urls.push(this.data_list[idx].thumb_img);
+            urls.push(this.view_data_list[idx].thumb_img);
         });
         if(urls.length==0){
             return;
@@ -332,12 +331,12 @@ module.exports = {
             img_elms[i].appendChild(img_elm);
         });
     },
-    _updateAnchorPos(){
+    updateAnchorPos(){
         /** @type {HTMLElement} */
         const elm = this.$(".nico-grid-anchor");
-        elm.style.top = (this.data_list.length * this.row_height) + "px";
+        elm.style.top = (this.view_data_list.length * this.row_height) + "px";
     },
-    _getRowContainerWidth(){
+    getRowContainerWidth(){
         return Array.from(this.column_props_map.values()).reduce((a, b) => {
             return a + b.width;
         }, 0);
@@ -348,16 +347,16 @@ module.exports = {
      * @param {string[]} words 
      * @returns {any[]}
      */
-    _filter(target_ids, words){
-        if(this.src_data_list.length==0){
+    filter(target_ids, words){
+        if(this.data_list.length==0){
             return;
         }
         if(words.length==0){
-            return this.src_data_list;
+            return this.data_list;
         }
         
         const keys = target_ids.length>0?target_ids:this.filter_target_ids;
-        return this.src_data_list.filter(item=>{
+        return this.data_list.filter(item=>{
             return words.every(word => {
                 for(const k of keys){
                     if(item[k] == undefined){
@@ -371,11 +370,11 @@ module.exports = {
             });
         });
     },
-    _scrollTo(value){
+    scrollTo(value){
         const body_elm = this.$(".body");
         body_elm.scrollTop = value;
     },
-    _update_rows(){
+    update_rows(){
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const range = body_elm.offsetHeight; 
@@ -388,24 +387,16 @@ module.exports = {
 
         this.update({data_indexes:[]});
 
-        if(this.data_list.length == 0){
+        if(this.view_data_list.length == 0){
             return;
         }
 
         end_index += 1;
-        if(this.data_list.length <= end_index){
-            end_index = this.data_list.length;
+        if(this.view_data_list.length <= end_index){
+            end_index = this.view_data_list.length;
         }
         this.state.data_indexes = this.cnvData(start_index, end_index);
         this.update();
-    },
-
-    _getRowIndex(id){
-        const row_i = this.state.rows.findIndex((row)=>{
-            const data = this.data_list[row.index];
-            return id == data[this.key_id];
-        });
-        return row_i;
     },
     updateItem(id, props){
         const item = this.key_id_data_map.get(id);
@@ -415,10 +406,15 @@ module.exports = {
         Object.keys(props).forEach(key=>{
             item[key] = props[key];
         });
-        this._update_rows();
+        this.update_rows();
     },
-    _sort(key, asc){
-        if(!this.src_data_list || !this.data_list){
+    /**
+     * 
+     * @param {string} id 
+     * @param {boolean} asc 
+     */
+    sort(id, asc){
+        if(!this.data_list || !this.view_data_list){
             return;
         }
 
@@ -426,21 +422,21 @@ module.exports = {
         if(!asc){
             order = -1;
         }
-        [this.src_data_list, this.data_list].forEach(data_list=>{
+        [this.data_list, this.view_data_list].forEach(data_list=>{
             data_list.sort((a, b)=>{
-                if(a[key] < b[key]){
+                if(a[id] < b[id]){
                     return -1*order;
                 }
-                if(a[key] > b[key]){
+                if(a[id] > b[id]){
                     return 1*order;
                 }
                 return 0;
             }); 
         });
 
-        this._update_rows();
+        this.update_rows();
     },
-    _updateVisibleRows(){
+    updateVisibleRows(){
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
@@ -449,8 +445,8 @@ module.exports = {
 
         const start_i = Math.floor(scroll_top/this.row_height);
         let end_i = Math.floor(start_i + range/this.row_height + 0.5);
-        if(this.data_list.length <= end_i){
-            end_i = this.data_list.length;
+        if(this.view_data_list.length <= end_i){
+            end_i = this.view_data_list.length;
         }
         
         this.update({data_indexes:[]});
@@ -460,11 +456,11 @@ module.exports = {
     getSelectedDataList(){
         const sel_data_list = [];
         this.sel_data_key_ids.forEach(id => {
-            const f_index = this.data_list.findIndex(d => {
+            const f_index = this.view_data_list.findIndex(d => {
                 return id == d[this.key_id];
             });
             if(f_index >= 0){
-                sel_data_list.push(this.data_list[f_index]);
+                sel_data_list.push(this.view_data_list[f_index]);
             }
         });
         return sel_data_list.map( item => ({...item}));
@@ -484,10 +480,10 @@ module.exports = {
             return;
         }
 
-        this.src_data_list = this.src_data_list.filter(data => {
+        this.data_list = this.data_list.filter(data => {
             return !key_ids.includes(data[this.key_id]);
         });
-        this.data_list = this.data_list.filter(data => {
+        this.view_data_list = this.view_data_list.filter(data => {
             return !key_ids.includes(data[this.key_id]);
         });
         key_ids.forEach(key_id => {
@@ -504,7 +500,7 @@ module.exports = {
             }
         });
 
-        this._updateAnchorPos();
+        this.updateAnchorPos();
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
@@ -513,11 +509,11 @@ module.exports = {
         if(sc_move < body_elm.scrollTop){
             body_elm.scrollTop -= sc_move;
         }else{
-            this._scrollTo(0);
+            this.scrollTo(0);
         }
 
         if(org_sc_top == body_elm.scrollTop){
-            this._updateVisibleRows();
+            this.updateVisibleRows();
         } 
     },
     /**
@@ -530,11 +526,11 @@ module.exports = {
             this.key_id_data_map.set(id, item);
         });
 
-        this.src_data_list = this.src_data_list.concat(items);
         this.data_list = this.data_list.concat(items);
-        this._sort(this.sort.key, this.sort.asc);
-        this._updateAnchorPos();
-        this._update_rows();
+        this.view_data_list = this.view_data_list.concat(items);
+        this.sort(this.sort_param.id, this.sort_param.asc);
+        this.updateAnchorPos();
+        this.update_rows();
     },
     /**
      * 
@@ -543,11 +539,11 @@ module.exports = {
      * @returns {number[]}
      */
     cnvData(start_index, end_index){
-        const row_data_list = [];
+        const index_list = [];
         for(let i=start_index; i<end_index; i++){
-            row_data_list.push(i);
+            index_list.push(i);
         }
-        return row_data_list;
+        return index_list;
     },
     /**
      * 
@@ -555,8 +551,8 @@ module.exports = {
      * @param {boolean} ctrlKey 
      * @param {boolean} shiftKey 
      */
-    _updateSelect(index, ctrlKey, shiftKey){
-        const id = this.data_list[index][this.key_id];
+    updateSelect(index, ctrlKey, shiftKey){
+        const id = this.view_data_list[index][this.key_id];
         if(!ctrlKey && !shiftKey){
             /** @type {HTMLElement[]} */
             const row_elms = this.$$(".row");
@@ -581,7 +577,7 @@ module.exports = {
             if(this.sel_data_key_ids.length>0){
                 const indexs = [];
                 this.sel_data_key_ids.forEach(id => {
-                    const f_index = this.data_list.findIndex(data => {
+                    const f_index = this.view_data_list.findIndex(data => {
                         return id == data[this.key_id];
                     });
                     if(f_index >= 0){
@@ -600,7 +596,7 @@ module.exports = {
                 this.update();
                 const new_indexs = [...Array(size + 1)].map((_, i) => i + s);
                 new_indexs.forEach(idx => {
-                    const sel_data = this.data_list[idx];
+                    const sel_data = this.view_data_list[idx];
                     this.sel_data_key_ids.push(sel_data[this.key_id]);
                 });
             }
@@ -618,20 +614,20 @@ module.exports = {
     },
     onMouseUp(data_index, e){
         if(this.start_pos){
-            const data = this.data_list[data_index];
+            const data = this.view_data_list[data_index];
             const key_id = data[this.key_id];
             if(!this.sel_data_key_ids.includes(key_id)){
-                this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
+                this.updateSelect(data_index, e.ctrlKey, e.shiftKey);
             }
             this.popupContextMenu(e);
             return;
         }
 
-        this._updateSelect(data_index, e.ctrlKey, e.shiftKey);
+        this.updateSelect(data_index, e.ctrlKey, e.shiftKey);
 
         if (e.target.classList.contains("cmd-btn")) {
             const cmd_id = e.target.dataset.cmdid;
-            const data = this.data_list[data_index];
+            const data = this.view_data_list[data_index];
             this.obs.trigger("cmd", {cmd_id, data});
             e.stopPropagation();
             return;

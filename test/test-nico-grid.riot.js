@@ -26,8 +26,8 @@ module.exports = {
         
         this.header_height = 30;
         this.row_height = 135;
-        this.sort = {
-            key: "",
+        this.sort_param = {
+            id: "",
             asc: false
         };
         this.filter_target_ids = [
@@ -118,7 +118,7 @@ module.exports = {
         const btn4 = document.getElementById("gt-btn4");
         btn4.onclick = () => {
             this.obs.trigger("sort-data", {
-                key: "title",
+                id: "title",
                 asc: asc
             });
             asc = !asc;

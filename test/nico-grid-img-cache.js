@@ -59,6 +59,7 @@ class ImgElementCache {
         }
         const img = new Image();
         this._cache.set(img_src, img);
+        img.loading = "lazy";
         img.classList.add(...this._img_classes);
         img.src = img_src;
     }

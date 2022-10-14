@@ -1,4 +1,6 @@
 
+const resize_area_margin = 10;
+
 module.exports = {
     state:{
         /** @type {string[]} */
@@ -72,8 +74,8 @@ module.exports = {
      * @returns {boolean}
      */
     isResizeArea(elm, cx){
-        const s_pos = elm.offsetLeft + 10;
-        const e_pos = elm.offsetLeft + elm.clientWidth - 10; 
+        const s_pos = elm.offsetLeft + resize_area_margin;
+        const e_pos = elm.offsetLeft + elm.clientWidth - resize_area_margin; 
         if(s_pos < cx && cx < e_pos){
             return false;
         }

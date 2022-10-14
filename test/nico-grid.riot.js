@@ -31,6 +31,11 @@ const getSortable = (column) => {
 };
 
 const row_cont_margin = 20;
+const img_cache_capacity = 20;
+const default_column_width = 150;
+const init_view_num = 20;
+const view_margin_num = 1;
+const scroll_event_interval = 100;
 
 module.exports = {
     state:{
@@ -76,7 +81,7 @@ module.exports = {
 
         // TODO capacity=20
         this.img_elm_cache = 
-            new ImgElementCache(20, ["nico-grid-thumb"]);
+            new ImgElementCache(img_cache_capacity, ["nico-grid-thumb"]);
 
         props.columns.forEach(column => {
             this.column_props_map.set(column.id, {
@@ -138,7 +143,7 @@ module.exports = {
          * @returns {string}
          */
         this.getBodyCellStyle = (column_id) => {
-            let w = 150;
+            let w = default_column_width;
             if(this.column_props_map.has(column_id)){
                 w = this.column_props_map.get(column_id).width;
             }
@@ -165,7 +170,7 @@ module.exports = {
         body_elm.style.height = `calc(100% - ${this.header_height}px)`;
         body_elm.addEventListener("scroll", debounce((e)=>{
             this.update_rows();
-        }, 100));
+        }, scroll_event_interval));
         body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
             const target_elm = e.target;
@@ -197,8 +202,7 @@ module.exports = {
                 this.key_id_data_map.set(id, item);
             });
  
-            const f_size = 20;
-            const min_size = Math.min(f_size, this.view_data_list.length);
+            const min_size = Math.min(init_view_num, this.view_data_list.length);
             this.state.data_indexes = this.cnvData(0, min_size);
             this.sel_data_key_ids = [];
 
@@ -439,7 +443,7 @@ module.exports = {
             return;
         }
 
-        end_index += 1;
+        end_index += view_margin_num;
         if(this.view_data_list.length <= end_index){
             end_index = this.view_data_list.length;
         }

@@ -144,14 +144,15 @@ module.exports = {
             });
             new_data_i++;
         };
-        const scroll_index_btn = document.getElementById("gt-scroll-index-btn");
-        scroll_index_btn.onclick = async () => {
-            /** @type {HTMLInputElement} */
-            const txt_elm = document.getElementById("gt-scroll-index");
-            const target = Number(txt_elm.value);
+        const scroll_video_id_txt = document.getElementById("gt-scroll-video-id-txt");
+        scroll_video_id_txt.onkeydown = async (e) => {
+            if (e.code.toLowerCase()!="enter"){
+                return;
+            }
+            const video_id = e.target.value;
             const index = await this.obs.triggerReturn("get-index-by-id", {
                 id: "video_id",
-                value: `sm${target}`   
+                value: video_id 
             });
             const view_top_ch = document.getElementById("gt-scroll-view-top");
             this.obs.trigger("scroll-to-index", {

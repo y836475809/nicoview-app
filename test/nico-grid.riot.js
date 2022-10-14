@@ -12,6 +12,11 @@ const debounce = (fn, interval) => {
     };
 };
 
+/**
+ * 
+ * @param {Object} column 
+ * @returns 
+ */
 const getSortable = (column) => {
     const column_id = column.id;
     const sortable = column.sortable;
@@ -34,7 +39,9 @@ module.exports = {
         /** @type {string[]} */
         column_ids:[]
     },
+    /** @type {Object[]} */
     data_list: [],
+    /** @type {Object[]} */
     view_data_list: [],
     key_id: "",
     key_id_data_map:new Map(),
@@ -100,10 +107,20 @@ module.exports = {
         };
     },
     onMounted() {
+        /**
+         * 
+         * @param {number} data_index 
+         * @returns {string}
+         */
         this.getRowStyle = (data_index) => {
             const top = data_index*this.row_height - this.top_offset;
             return `height:${this.row_height}px; top:${top}px;`;
         };
+        /**
+         * 
+         * @param {number} data_index 
+         * @returns {string}
+         */
         this.getRowClass = (data_index) => {
             const classes = [];
             if(data_index % 2 == 1){
@@ -115,6 +132,11 @@ module.exports = {
             }
             return classes.join(" ");
         };
+        /**
+         * 
+         * @param {string} column_id 
+         * @returns {string}
+         */
         this.getBodyCellStyle = (column_id) => {
             let w = 150;
             if(this.column_props_map.has(column_id)){
@@ -122,6 +144,12 @@ module.exports = {
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
+        /**
+         * 
+         * @param {number} data_index 
+         * @param {string} column_id 
+         * @returns {string}
+         */
         this.getBodyCellHtml = (data_index, column_id) => {
             const data = this.view_data_list[data_index];
             const value = data[column_id];
@@ -152,7 +180,7 @@ module.exports = {
         elm.style.width = (el_width + row_cont_margin) + "px"; 
 
         this.obs.onReturn("set-data", (args) => {
-            /** @type {{key_id: string, items: []}} */
+            /** @type {{key_id: string, items: Object[]}} */
             const { key_id, items } = args;
             this.key_id = key_id;
             this.data_list = items.map( item => ({...item}));
@@ -179,18 +207,22 @@ module.exports = {
             this.update();
         });
         this.obs.on("update-item", (args) => {
+            /** @type {{id: string, props: Object}} */
             const {id, props} = args;
             this.updateItem(id, props);
         });
         this.obs.on("sort-data", (args) => {
+            /** @type {{id: string, asc: boolean}} */
             const {id, asc} = args;
             this.sort(id, asc);
         });
         this.obs.on("delete-items", (args) => {
+            /** @type {{ids: string[]}} */
             const {ids} = args;
             this.deleteItems(ids);
         });
         this.obs.on("add-items", (args) => {
+            /** @type {{items: Object[]}} */
             const {items} = args;
             this.addItems(items);
         });
@@ -198,6 +230,7 @@ module.exports = {
             return this.getSelectedDataList();
         });
         this.obs.on("set-selected-by-index", (args) => {
+            /** @type {{index: number}} */
             const {index} = args;
 
             const sel_data = this.view_data_list.slice(index, index + 1);
@@ -209,6 +242,7 @@ module.exports = {
             this.update();
         });
         this.obs.on("scroll-to", (args) => {
+            /** @type {{id: string, value: any}} */
             const {id, value} = args;
             const index = this.view_data_list.findIndex(item=>{
                 return item[id] == value;
@@ -219,6 +253,7 @@ module.exports = {
             this.scrollTo(index * this.row_height);
         });
         this.obs.onReturn("get-index-by-id", (args) => {
+            /** @type {{id: string, value: any}} */
             const {id, value} = args;
             const index = this.view_data_list.findIndex(item=>{
                 return item[id] == value;
@@ -226,14 +261,15 @@ module.exports = {
             return index;
         });
         this.obs.on("scroll-to-index", (args) => {
-            const {index, pos} = args;
+            /** @type {{index: number, position: string}} */
+            const {index, position} = args;
             if(index == -1){
                 return;
             }
-            if(pos == "top"){
+            if(position == "top"){
                 this.scrollTo(index * this.row_height);
             }
-            if(pos == "bottom"){
+            if(position == "bottom"){
                 const body_elm = this.$(".body");
                 const range = body_elm.clientHeight; 
                 const num = Math.floor(range / this.row_height);
@@ -259,12 +295,14 @@ module.exports = {
         });
 
         this.obs_header.on("header-order-changed", (args) => {
+            /** @type {{column_ids:string[]}} */
             const {column_ids} = args;
             
             this.state.column_ids = column_ids;
             this.update_rows();
         });
         this.obs_header.on("header-width-changed", (args) => {
+            /** @type {{column_props_map:Map}} */
             const {column_props_map} = args;
             
             this.column_props_map = column_props_map;
@@ -316,6 +354,7 @@ module.exports = {
             return;
         }
 
+        /** @type {string[]} */
         const urls = [];
         this.state.data_indexes.forEach(idx=>{
             urls.push(this.view_data_list[idx].thumb_img);
@@ -323,6 +362,7 @@ module.exports = {
         if(urls.length==0){
             return;
         }
+        /** @type {HTMLImageElement[]} */
         const img_elms = this.$$(".nico-grid-img-holder");
         if(img_elms.length==0){
             return;
@@ -336,6 +376,10 @@ module.exports = {
         const elm = this.$(".nico-grid-anchor");
         elm.style.top = (this.view_data_list.length * this.row_height) + "px";
     },
+    /**
+     * 
+     * @returns {number}
+     */
     getRowContainerWidth(){
         return Array.from(this.column_props_map.values()).reduce((a, b) => {
             return a + b.width;
@@ -345,7 +389,7 @@ module.exports = {
      * 
      * @param {string[]} target_ids 
      * @param {string[]} words 
-     * @returns {any[]}
+     * @returns {Object[]}
      */
     filter(target_ids, words){
         if(this.data_list.length==0){
@@ -370,6 +414,10 @@ module.exports = {
             });
         });
     },
+    /**
+     * 
+     * @param {number} value 
+     */
     scrollTo(value){
         const body_elm = this.$(".body");
         body_elm.scrollTop = value;
@@ -398,6 +446,11 @@ module.exports = {
         this.state.data_indexes = this.cnvData(start_index, end_index);
         this.update();
     },
+    /**
+     * 
+     * @param {string} id 
+     * @param {Object} props 
+     */
     updateItem(id, props){
         const item = this.key_id_data_map.get(id);
         if(item === undefined){
@@ -453,6 +506,10 @@ module.exports = {
         this.state.data_indexes = this.cnvData(start_i, end_i);
         this.update();
     },
+    /**
+     * 
+     * @returns {Object[]}
+     */
     getSelectedDataList(){
         const sel_data_list = [];
         this.sel_data_key_ids.forEach(id => {
@@ -470,6 +527,7 @@ module.exports = {
      * @param {string[]} key_ids 
      */
     deleteItems(key_ids){
+        /** @type {string[]} */
         const has_keys = [];
         key_ids.forEach(key_id => {
             if(this.key_id_data_map.has(key_id)){
@@ -518,7 +576,7 @@ module.exports = {
     },
     /**
      * 
-     * @param {any[]} items 
+     * @param {Object[]} items 
      */
     addItems(items){
         items.forEach(item=>{
@@ -539,6 +597,7 @@ module.exports = {
      * @returns {number[]}
      */
     cnvData(start_index, end_index){
+        /** @type {number[]} */
         const index_list = [];
         for(let i=start_index; i<end_index; i++){
             index_list.push(i);
@@ -603,6 +662,10 @@ module.exports = {
         }
         this.update();
     },
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
     onMouseDown(e){
         if(e.buttons != 2){
             return;
@@ -612,6 +675,11 @@ module.exports = {
             y: e.pageY,
         };
     },
+    /**
+     * 
+     * @param {number} data_index 
+     * @param {MouseEvent} e 
+     */
     onMouseUp(data_index, e){
         if(this.start_pos){
             const data = this.view_data_list[data_index];
@@ -633,6 +701,10 @@ module.exports = {
             return;
         }
     },
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
     popupContextMenu(e){
         if(!this.start_pos){
             return;

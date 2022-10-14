@@ -30,6 +30,11 @@ module.exports = {
     onMounted() {
         this.state.column_ids = [...this.column_ids];
 
+        /**
+         * 
+         * @param {string} column_id 
+         * @returns  {string}
+         */
         this.getHeaderCellStyle = (column_id) => {
             let w = 150;
             if(this.column_props_map.has(column_id)){
@@ -37,6 +42,11 @@ module.exports = {
             }
             return `height:${this.header_height}px; width:${w}px;`;
         };
+        /**
+         * 
+         * @param {string} column_id 
+         * @returns {string}
+         */
         this.getHeaderTitle = (column_id) => {
             let order = "";
             if(column_id == this.sort_param.id){
@@ -47,6 +57,7 @@ module.exports = {
         };
 
         this.obs.on("changed-sort", (args) => {
+            /** @type {{sort_param:Object}} */
             const {sort_param} = args;
             Object.assign(this.sort_param, sort_param);
             this.update();
@@ -54,6 +65,12 @@ module.exports = {
 
         this.update();
     },
+    /**
+     * 
+     * @param {HTMLElement} elm 
+     * @param {number} cx 
+     * @returns {boolean}
+     */
     isResizeArea(elm, cx){
         const s_pos = elm.offsetLeft + 10;
         const e_pos = elm.offsetLeft + elm.clientWidth - 10; 
@@ -77,6 +94,7 @@ module.exports = {
             return false;
         }
 
+        /** @type {string[]} */
         this.column_ids = [];
         h_ces.forEach(cell => {
             const col_id = cell.dataset.columnid;
@@ -91,6 +109,7 @@ module.exports = {
         return true;
     },
     update_header_width(){
+        /** @type {HTMLElement} */
         const hc = this.$(".header-cell-container");
         if(this.hc_width == hc.offsetWidth){
             return false;
@@ -108,6 +127,12 @@ module.exports = {
         this.update();
         return true;
     },
+    /**
+     * 
+     * @param {number} x 
+     * @param {number} y 
+     * @returns {HTMLElement}
+     */
     getHeaderCellByPoint(x, y){
         /** @type {HTMLElement} */
         const elm = document.elementFromPoint(x, y);
@@ -122,6 +147,10 @@ module.exports = {
         }
         return elm;
     },
+    /**
+     * 
+     * @returns {Map}
+     */
     getColumnPropsMap(){
         return new Map(JSON.parse(
             JSON.stringify(Array.from(this.column_props_map))
@@ -227,6 +256,10 @@ module.exports = {
             return;
         }
     },
+    /**
+     * 
+     * @param {MouseEvent} e 
+     */
     mouseup(e) {
         e.preventDefault();
 

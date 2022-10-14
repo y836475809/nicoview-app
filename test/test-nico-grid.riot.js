@@ -157,7 +157,7 @@ module.exports = {
             const view_top_ch = document.getElementById("gt-scroll-view-top");
             this.obs.trigger("scroll-to-index", {
                 index,
-                pos:view_top_ch.checked?"top":"bottom"
+                position:view_top_ch.checked?"top":"bottom"
             });
         };
 

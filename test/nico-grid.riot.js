@@ -198,6 +198,17 @@ module.exports = {
         this.obs.onReturn("get-selected-data-list", () => {
             return this.getSelectedDataList();
         });
+        this.obs.on("set-selected-by-index", (args) => {
+            const {index} = args;
+
+            const sel_data = this.data_list.slice(index, index + 1);
+            if(!sel_data.length){
+                return;
+            }
+            this.sel_data_key_ids = [];
+            this.sel_data_key_ids.push(sel_data[0][this.key_id]);
+            this.update();
+        });
         this.obs.on("scroll-to", (args) => {
             const {id, value} = args;
             const index = this.data_list.findIndex(item=>{

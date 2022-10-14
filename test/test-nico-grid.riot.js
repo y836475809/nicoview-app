@@ -228,5 +228,16 @@ module.exports = {
             });
             state_count++;
         };
+
+        const sel_index_txt = document.getElementById("gt-sel-by-index-txt");
+        sel_index_txt.onkeydown = (e) => {
+            if (e.code.toLowerCase()!="enter"){
+                return;
+            }
+            const index = Number(e.target.value);
+            this.obs.trigger("set-selected-by-index", {
+                index
+            });
+        };
     }
 };

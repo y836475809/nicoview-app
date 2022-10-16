@@ -124,8 +124,12 @@
             <div class="row-container" onmousedown={onMouseDown} >
                 <div class="row {getRowClass(data_index)}" onmouseup={onMouseUp.bind(this,data_index)}
                     style={getRowStyle(data_index)} each={data_index in state.data_indexes}>
-                    <nico-grid-cell class="body-cell" style={getBodyCellStyle(column_id)} 
-                        html={getBodyCellHtml(data_index, column_id)} each={column_id in state.column_ids}></nico-grid-cell>
+                    <div class="body-cell" 
+                        data-dataindex={data_index}
+                        data-columnid={column_id}
+                        style={getBodyCellStyle(column_id)} 
+                        each={column_id in state.column_ids}>
+                    </div>
                 </div>
             </div>
             <div class="nico-grid-anchor"></div>

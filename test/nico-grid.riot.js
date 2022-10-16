@@ -149,21 +149,6 @@ module.exports = {
             }
             return `height:${this.row_height}px; width:${w}px;`;
         };
-        /**
-         * 
-         * @param {number} data_index 
-         * @param {string} column_id 
-         * @returns {string}
-         */
-        this.getBodyCellHtml = (data_index, column_id) => {
-            const data = this.view_data_list[data_index];
-            const value = data[column_id];
-            const ft = this.cell_ft.get(column_id);
-            if(!ft){
-                return value;
-            }
-            return ft(column_id, value, data);
-        };
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
@@ -348,6 +333,10 @@ module.exports = {
     },
     // eslint-disable-next-line no-unused-vars
     onUpdated(props, state) {
+        if(!state.data_indexes.length){
+            return;
+        }
+        this.update_cells();
         this.appendThumbImg();
     },
     appendThumbImg() {
@@ -373,6 +362,23 @@ module.exports = {
         }
         this.img_elm_cache.getImg(urls, (i, img_elm) => {
             img_elms[i].appendChild(img_elm);
+        });
+    },
+    update_cells(){
+        /** @type {HTMLElement[]} */
+        const cell_elms = this.$$(".body-cell");
+        cell_elms.forEach(elm => {
+            const data_index = Number(elm.dataset.dataindex);
+            const column_id = elm.dataset.columnid;
+            
+            const data = this.view_data_list[data_index];
+            const value = data[column_id];
+            const ft = this.cell_ft.get(column_id);
+            if(ft){
+                elm.innerHTML = ft(column_id, value, data);
+            }else{
+                elm.innerHTML = value;
+            }
         });
     },
     updateAnchorPos(){
@@ -447,8 +453,10 @@ module.exports = {
         if(this.view_data_list.length <= end_index){
             end_index = this.view_data_list.length;
         }
-        this.state.data_indexes = this.cnvData(start_index, end_index);
-        this.update();
+        const data_indexes = this.cnvData(start_index, end_index);
+        this.update({
+            data_indexes:data_indexes
+        });
     },
     /**
      * 

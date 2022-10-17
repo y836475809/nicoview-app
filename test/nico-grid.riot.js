@@ -443,8 +443,6 @@ module.exports = {
         this.top_offset = scroll_top % this.row_height;
         row_cont_elm.style.top = (scroll_top - this.top_offset) + "px";
 
-        this.update({data_indexes:[]});
-
         if(this.view_data_list.length == 0){
             return;
         }

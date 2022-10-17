@@ -361,7 +361,9 @@ module.exports = {
             return;
         }
         this.img_elm_cache.getImg(urls, (i, img_elm) => {
-            img_elms[i].appendChild(img_elm);
+            if(img_elm){
+                img_elms[i].appendChild(img_elm);
+            }   
         });
     },
     update_cells(){

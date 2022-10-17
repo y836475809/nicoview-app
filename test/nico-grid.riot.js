@@ -501,24 +501,6 @@ module.exports = {
 
         this.update_rows();
     },
-    updateVisibleRows(){
-        /** @type {HTMLElement} */
-        const body_elm = this.$(".body");
-        const scroll_top = body_elm.scrollTop;
-        const row_cont_elm = this.$(".row-container");
-        const range = row_cont_elm.clientHeight; 
-
-        const start_i = Math.floor(scroll_top/this.row_height);
-        let end_i = Math.floor(start_i + range/this.row_height + 0.5);
-        if(this.view_data_list.length <= end_i){
-            end_i = this.view_data_list.length;
-        }
-        
-        const data_indexes = this.cnvData(start_i, end_i);
-        this.update({
-            data_indexes:data_indexes
-        });
-    },
     /**
      * 
      * @returns {Object[]}
@@ -584,7 +566,7 @@ module.exports = {
         }
 
         if(org_sc_top == body_elm.scrollTop){
-            this.updateVisibleRows();
+            this.update_rows();
         } 
     },
     /**

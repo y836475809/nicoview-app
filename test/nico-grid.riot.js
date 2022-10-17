@@ -193,7 +193,7 @@ module.exports = {
 
             this.updateAnchorPos();
             this.scrollTo(0);
-            this.update();
+            this.update_rows();
         });
         this.obs.on("update-item", (args) => {
             /** @type {{id: string, props: Object}} */
@@ -336,7 +336,7 @@ module.exports = {
         if(!state.data_indexes.length){
             return;
         }
-        this.update_cells();
+        this.updateCells();
         this.appendThumbImg();
     },
     appendThumbImg() {
@@ -366,7 +366,7 @@ module.exports = {
             }   
         });
     },
-    update_cells(){
+    updateCells(){
         /** @type {HTMLElement[]} */
         const cell_elms = this.$$(".body-cell");
         cell_elms.forEach(elm => {
@@ -514,9 +514,10 @@ module.exports = {
             end_i = this.view_data_list.length;
         }
         
-        this.update({data_indexes:[]});
-        this.state.data_indexes = this.cnvData(start_i, end_i);
-        this.update();
+        const data_indexes = this.cnvData(start_i, end_i);
+        this.update({
+            data_indexes:data_indexes
+        });
     },
     /**
      * 

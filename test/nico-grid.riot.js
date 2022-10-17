@@ -182,13 +182,11 @@ module.exports = {
             });
 
             this.key_id_data_map.clear();
-            this.view_data_list.forEach(item=>{
+            this.data_list.forEach(item=>{
                 const id = item[key_id];
                 this.key_id_data_map.set(id, item);
             });
  
-            const min_size = Math.min(init_view_num, this.view_data_list.length);
-            this.state.data_indexes = this.cnvData(0, min_size);
             this.sel_data_key_ids = [];
 
             this.updateAnchorPos();

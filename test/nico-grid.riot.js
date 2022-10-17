@@ -436,11 +436,18 @@ module.exports = {
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const range = body_elm.offsetHeight; 
-        const start_index = Math.floor(scroll_top/this.row_height);
+        let start_index = Math.floor(scroll_top/this.row_height);
         let end_index = Math.floor(start_index + range/this.row_height + 0.5);
 
         const row_cont_elm = this.$(".row-container");
         this.top_offset = scroll_top % this.row_height;
+        if(start_index>view_margin_num){
+            this.top_offset += view_margin_num * this.row_height;
+            start_index = start_index - view_margin_num;
+        }else{    
+            this.top_offset += start_index * this.row_height;
+            start_index = 0;
+        }
         row_cont_elm.style.top = (scroll_top - this.top_offset) + "px";
 
         if(this.view_data_list.length == 0){

@@ -154,7 +154,7 @@ module.exports = {
         const body_elm = this.$(".body");
         body_elm.style.height = `calc(100% - ${this.header_height}px)`;
         body_elm.addEventListener("scroll", debounce((e)=>{
-            this.update_rows();
+            this.updateRows();
         }, scroll_event_interval));
         body_elm.addEventListener("scroll", (e) => {
             /** @type {HTMLElement} */
@@ -193,7 +193,7 @@ module.exports = {
 
             this.updateAnchorPos();
             this.scrollTo(0);
-            this.update_rows();
+            this.updateRows();
         });
         this.obs.on("update-item", (args) => {
             /** @type {{id: string, props: Object}} */
@@ -277,7 +277,7 @@ module.exports = {
 
             this.updateAnchorPos();
             this.scrollTo(0);
-            this.update_rows();
+            this.updateRows();
         });
         this.obs.onReturn("get-data-length", () => {
             return this.view_data_list.length;
@@ -288,7 +288,7 @@ module.exports = {
             const {column_ids} = args;
             
             this.state.column_ids = column_ids;
-            this.update_rows();
+            this.updateRows();
         });
         this.obs_header.on("header-width-changed", (args) => {
             /** @type {{column_props_map:Map}} */
@@ -299,7 +299,7 @@ module.exports = {
             const elm = this.$(".row-container");
             elm.style.width = (el_width + row_cont_margin) + "px"; 
 
-            this.update_rows();
+            this.updateRows();
         });
         this.obs_header.on("header-clicked", (args) => {
             /** @type {{column_id: string}} */
@@ -323,7 +323,7 @@ module.exports = {
             }
             resize_timer = setTimeout(() => {
                 if(this.view_data_list.length > 0){
-                    this.update_rows();
+                    this.updateRows();
                 }       
                 resize_timer = null;
             }, 200);
@@ -434,7 +434,7 @@ module.exports = {
         const body_elm = this.$(".body");
         body_elm.scrollTop = value;
     },
-    update_rows(){
+    updateRows(){
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const range = body_elm.offsetHeight; 
@@ -471,7 +471,7 @@ module.exports = {
         Object.keys(props).forEach(key=>{
             item[key] = props[key];
         });
-        this.update_rows();
+        this.updateRows();
     },
     /**
      * 
@@ -499,7 +499,7 @@ module.exports = {
             }); 
         });
 
-        this.update_rows();
+        this.updateRows();
     },
     /**
      * 
@@ -566,7 +566,7 @@ module.exports = {
         }
 
         if(org_sc_top == body_elm.scrollTop){
-            this.update_rows();
+            this.updateRows();
         } 
     },
     /**
@@ -583,7 +583,7 @@ module.exports = {
         this.view_data_list = this.view_data_list.concat(items);
         this.sort(this.sort_param.id, this.sort_param.asc);
         this.updateAnchorPos();
-        this.update_rows();
+        this.updateRows();
     },
     /**
      * 

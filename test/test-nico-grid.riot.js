@@ -5,6 +5,8 @@ const fs = require("fs");
 
 module.exports = {
     obs: null,
+    /** @type {NicoGridOptions} */
+    options: null,
     onBeforeMount() {
         this.row_height = 60;
         this.obs = new MyObservable();
@@ -24,15 +26,19 @@ module.exports = {
             {id: "state",     name: "状態",   width:150},
         ];
         
-        this.header_height = 30;
-        this.row_height = 135;
-        this.sort_param = {
-            id: "",
-            asc: false
+        this.options = {
+            header_height: 30,
+            row_height: 135,
+            sort_param: {
+                id: "",
+                asc: false
+            },
+            filter_target_ids: [
+                "title", "tags", "video_id"
+            ],
+            img_cache_capacity:20,
+            view_margin_num: 5
         };
-        this.filter_target_ids = [
-            "title", "tags", "video_id"
-        ];
     },
     async onMounted() {  
         this.obs.on("cmd",(args) => {
@@ -118,8 +124,10 @@ module.exports = {
         const btn4 = document.getElementById("gt-btn4");
         btn4.onclick = () => {
             this.obs.trigger("sort-data", {
-                id: "title",
-                asc: asc
+                sort_param: {
+                    id: "title",
+                    asc: asc
+                }
             });
             asc = !asc;
         };

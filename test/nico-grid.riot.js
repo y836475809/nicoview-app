@@ -31,10 +31,7 @@ const getSortable = (column) => {
 };
 
 const row_cont_margin = 20;
-const img_cache_capacity = 20;
 const default_column_width = 150;
-const init_view_num = 20;
-const view_margin_num = 1;
 const scroll_event_interval = 100;
 
 module.exports = {
@@ -54,35 +51,44 @@ module.exports = {
     /** @type {Map<string, any>} */
     column_props_map:new Map(),
 
+    /** @type {Map<string, any>} */
+    cell_ft:new Map(),
+
     /** @type {MyObservable} */
     obs: null,
-    header_height:30,
-    row_height:100,
     top_offset:0,
     /** @type {string[]} */
     sel_data_key_ids:[],
-    sort_param: {
-        id: "",
-        asc: true
-    },
     /** @type {ImgElementCache} */
     img_elm_cache: null,
 
-    /** @type {string[]} */
-    filter_target_ids: [],
+    /** @type {NicoGridOptions} */
+    options:null,
 
-    onBeforeMount(props) {        
-        this.obs = props.obs;
-        this.header_height = props.header_height;
-        this.row_height = props.row_height;
-        this.sort_param = props.sort_param;
-
-        this.cell_ft = new Map();
-
-        // TODO capacity=20
-        this.img_elm_cache = 
-            new ImgElementCache(img_cache_capacity, ["nico-grid-thumb"]);
-
+    initOptions(options){
+        if(!options.header_height){
+            options.header_height = 30;
+        }
+        if(!options.row_height){
+            options.row_height = 135;
+        }
+        if(!options.sort_param){
+            options.sort_param = {
+                id: "",
+                asc: true
+            };
+        }
+        if(!options.filter_target_ids){
+            options.filter_target_ids = Array.from(this.column_props_map.keys());
+        }
+        if(!options.img_cache_capacity){
+            options.img_cache_capacity = 50;
+        }
+        if(!options.view_margin_num){
+            options.view_margin_num = 5;
+        }
+    },
+    onBeforeMount(props) {  
         props.columns.forEach(column => {
             this.column_props_map.set(column.id, {
                 name:column.name,
@@ -95,10 +101,13 @@ module.exports = {
             this.state.column_ids.push(column.id);
         });
 
-        this.filter_target_ids = props.filter_target_ids;
-        if(!this.filter_target_ids){
-            this.filter_target_ids = Array.from(this.column_props_map.keys());
-        }
+        this.obs = props.obs;
+        this.options = props.options;
+        this.initOptions(this.options);
+
+        const img_cache_capacity = this.options.img_cache_capacity;
+        this.img_elm_cache = 
+            new ImgElementCache(img_cache_capacity, ["nico-grid-thumb"]);
 
         this.obs_header = new MyObservable();
 
@@ -118,8 +127,9 @@ module.exports = {
          * @returns {string}
          */
         this.getRowStyle = (data_index) => {
-            const top = data_index*this.row_height - this.top_offset;
-            return `height:${this.row_height}px; top:${top}px;`;
+            const row_height = this.options.row_height;
+            const top = data_index*row_height - this.top_offset;
+            return `height:${row_height}px; top:${top}px;`;
         };
         /**
          * 
@@ -147,12 +157,13 @@ module.exports = {
             if(this.column_props_map.has(column_id)){
                 w = this.column_props_map.get(column_id).width;
             }
-            return `height:${this.row_height}px; width:${w}px;`;
+            const row_height = this.options.row_height;
+            return `height:${row_height}px; width:${w}px;`;
         };
 
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
-        body_elm.style.height = `calc(100% - ${this.header_height}px)`;
+        body_elm.style.height = `calc(100% - ${this.options.header_height}px)`;
         body_elm.addEventListener("scroll", debounce((e)=>{
             this.updateRows();
         }, scroll_event_interval));
@@ -175,10 +186,11 @@ module.exports = {
             this.key_id = key_id;
             this.data_list = items.map( item => ({...item}));
             this.view_data_list = this.data_list;
-
-            this.sort(this.sort_param.id, this.sort_param.asc);
+            
+            const sort_param = this.options.sort_param;
+            this.sort(sort_param);
             this.obs_header.trigger("changed-sort", {
-                sort_param: this.sort_param
+                sort_param: sort_param
             });
 
             this.key_id_data_map.clear();
@@ -199,9 +211,9 @@ module.exports = {
             this.updateItem(id, props);
         });
         this.obs.on("sort-data", (args) => {
-            /** @type {{id: string, asc: boolean}} */
-            const {id, asc} = args;
-            this.sort(id, asc);
+            /** @type {{sort_param: NicoGridSortParam}} */
+            const {sort_param} = args;
+            this.sort(sort_param);
         });
         this.obs.on("delete-items", (args) => {
             /** @type {{ids: string[]}} */
@@ -237,7 +249,7 @@ module.exports = {
             if(index == -1){
                 return;
             }
-            this.scrollTo(index * this.row_height);
+            this.scrollTo(index * this.options.row_height);
         });
         this.obs.onReturn("get-index-by-id", (args) => {
             /** @type {{id: string, value: any}} */
@@ -253,15 +265,16 @@ module.exports = {
             if(index == -1){
                 return;
             }
+            const row_height = this.options.row_height;
             if(position == "top"){
-                this.scrollTo(index * this.row_height);
+                this.scrollTo(index * row_height);
             }
             if(position == "bottom"){
                 const body_elm = this.$(".body");
                 const range = body_elm.clientHeight; 
-                const num = Math.floor(range / this.row_height);
-                const offset = range % this.row_height;
-                const pos = (index - num + 1) * this.row_height - offset;
+                const num = Math.floor(range / row_height);
+                const offset = range % row_height;
+                const pos = (index - num + 1) * row_height - offset;
                 this.scrollTo(pos);
             }
         });
@@ -302,15 +315,16 @@ module.exports = {
         this.obs_header.on("header-clicked", (args) => {
             /** @type {{column_id: string}} */
             const {column_id} = args;
-            if(this.sort_param.id == column_id){
-                this.sort_param.asc = !this.sort_param.asc;
+            const sort_param = this.options.sort_param;
+            if(sort_param.id == column_id){
+                sort_param.asc = !sort_param.asc;
             }else{
-                this.sort_param.id = column_id;
-                this.sort_param.asc = true;
+                sort_param.id = column_id;
+                sort_param.asc = true;
             }
-            this.sort(this.sort_param.id, this.sort_param.asc);
+            this.sort(sort_param);
             this.obs_header.trigger("changed-sort", {
-                sort_param: this.sort_param
+                sort_param: sort_param
             });
         });
 
@@ -384,7 +398,8 @@ module.exports = {
     updateAnchorPos(){
         /** @type {HTMLElement} */
         const elm = this.$(".nico-grid-anchor");
-        elm.style.top = (this.view_data_list.length * this.row_height) + "px";
+        const row_height = this.options.row_height;
+        elm.style.top = (this.view_data_list.length * row_height) + "px";
     },
     /**
      * 
@@ -409,7 +424,7 @@ module.exports = {
             return this.data_list;
         }
         
-        const keys = target_ids.length>0?target_ids:this.filter_target_ids;
+        const keys = target_ids.length>0?target_ids:this.options.filter_target_ids;
         return this.data_list.filter(item=>{
             return words.every(word => {
                 for(const k of keys){
@@ -436,16 +451,18 @@ module.exports = {
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const range = body_elm.offsetHeight; 
-        let start_index = Math.floor(scroll_top/this.row_height);
-        let end_index = Math.floor(start_index + range/this.row_height + 0.5);
+        const row_height = this.options.row_height;
+        const view_margin_num = this.options.view_margin_num;
+        let start_index = Math.floor(scroll_top/row_height);
+        let end_index = Math.floor(start_index + range/row_height + 0.5);
 
         const row_cont_elm = this.$(".row-container");
-        this.top_offset = scroll_top % this.row_height;
+        this.top_offset = scroll_top % row_height;
         if(start_index>view_margin_num){
-            this.top_offset += view_margin_num * this.row_height;
+            this.top_offset += view_margin_num * row_height;
             start_index = start_index - view_margin_num;
         }else{    
-            this.top_offset += start_index * this.row_height;
+            this.top_offset += start_index * row_height;
             start_index = 0;
         }
         row_cont_elm.style.top = (scroll_top - this.top_offset) + "px";
@@ -480,18 +497,18 @@ module.exports = {
     },
     /**
      * 
-     * @param {string} id 
-     * @param {boolean} asc 
+     * @param {NicoGridSortParam} sort_param 
      */
-    sort(id, asc){
+    sort(sort_param){
         if(!this.data_list || !this.view_data_list){
             return;
         }
 
         let order = 1;
-        if(!asc){
+        if(!sort_param.asc){
             order = -1;
         }
+        const id = sort_param.id;
         [this.data_list, this.view_data_list].forEach(data_list=>{
             data_list.sort((a, b)=>{
                 if(a[id] < b[id]){
@@ -563,7 +580,8 @@ module.exports = {
         /** @type {HTMLElement} */
         const body_elm = this.$(".body");
         const org_sc_top = body_elm.scrollTop;
-        const sc_move = has_keys.length * this.row_height;
+        const row_height = this.options.row_height;
+        const sc_move = has_keys.length * row_height;
         if(sc_move < body_elm.scrollTop){
             body_elm.scrollTop -= sc_move;
         }else{
@@ -586,7 +604,7 @@ module.exports = {
 
         this.data_list = this.data_list.concat(items);
         this.view_data_list = this.view_data_list.concat(items);
-        this.sort(this.sort_param.id, this.sort_param.asc);
+        this.sort(this.options.sort_param);
         this.updateAnchorPos();
         this.updateRows();
     },

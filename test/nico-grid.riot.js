@@ -448,6 +448,13 @@ module.exports = {
         body_elm.scrollTop = value;
     },
     updateRows(){
+        if(this.view_data_list.length == 0){
+            this.update({
+                data_indexes:[]
+            });
+            return;
+        }
+
         const body_elm = this.$(".body");
         const scroll_top = body_elm.scrollTop;
         const range = body_elm.offsetHeight; 
@@ -466,10 +473,6 @@ module.exports = {
             start_index = 0;
         }
         row_cont_elm.style.top = (scroll_top - this.top_offset) + "px";
-
-        if(this.view_data_list.length == 0){
-            return;
-        }
 
         end_index += view_margin_num;
         if(this.view_data_list.length <= end_index){

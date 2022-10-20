@@ -1,7 +1,9 @@
 const { MyObservable } = require("../app/js/my-observable");
 const { tagsFormatter } = require("./nico-grid-formatter");
+const { NicoGridStateRestor } = require("./nico-grid-state-restor");
 const myapi = require("../app/js/my-api");
 const fs = require("fs");
+const path = require("path");
 
 module.exports = {
     obs: null,
@@ -15,7 +17,7 @@ module.exports = {
             const video_id = data["video_id"];
             return `id: ${video_id}`;
         };
-        this.columns = [
+        const columns = [
             {id: "thumb_img", name: "サムネイル", width:150},
             {id: "title",     name: "名前",       width:100},
             {id: "command",   name: "操作",       width:120},
@@ -26,13 +28,22 @@ module.exports = {
             {id: "state",     name: "状態",   width:150},
         ];
         
+        this.state_fp = path.join(__dirname, "tmp", "nico-grid-state.json");
+        let state = null;
+        try {
+            fs.accessSync(this.state_fp);
+            state = JSON.parse(fs.readFileSync(this.state_fp, "utf-8"));    
+        } catch (error) {
+            // 
+        }
+        const state_restor = new NicoGridStateRestor(state);
+        this.columns = state_restor.getColumns(state, columns);
+        const sort_param = state_restor.getSortParam(state);
+
         this.options = {
             header_height: 30,
             row_height: 135,
-            sort_param: {
-                id: "",
-                asc: false
-            },
+            sort_param: sort_param,
             filter_target_ids: [
                 "title", "tags", "video_id"
             ],
@@ -50,6 +61,11 @@ module.exports = {
             if(!menu_id){
                 return;
             }
+        });
+        this.obs.on("state-changed", async (args) => {
+            const { state } = args;
+            this.state = state;
+            console.log("state-changed state=", this.state);
         });
         const mk_data = (name) => {
             const src_db = {
@@ -247,6 +263,12 @@ module.exports = {
             this.obs.trigger("set-selected-by-index", {
                 index
             });
+        };
+
+        const get_save_state_btn = document.getElementById("gt-save-state");
+        get_save_state_btn.onclick = () => {
+            const json = JSON.stringify(this.state, null, "  ");
+            fs.writeFileSync(this.state_fp, json, "utf-8");
         };
     }
 };

@@ -300,6 +300,8 @@ module.exports = {
             
             this.state.column_ids = column_ids;
             this.updateRows();
+
+            this.triggerStateChanged();
         });
         this.obs_header.on("header-width-changed", (args) => {
             /** @type {{column_props_map:Map}} */
@@ -311,6 +313,8 @@ module.exports = {
             elm.style.width = (el_width + row_cont_margin) + "px"; 
 
             this.updateRows();
+
+            this.triggerStateChanged();
         });
         this.obs_header.on("header-clicked", (args) => {
             /** @type {{column_id: string}} */
@@ -326,6 +330,8 @@ module.exports = {
             this.obs_header.trigger("changed-sort", {
                 sort_param: sort_param
             });
+
+            this.triggerStateChanged();
         });
 
         let resize_timer = null;
@@ -741,5 +747,22 @@ module.exports = {
             return;
         }
         this.obs.trigger("show-contexmenu", {e});
+    },
+    triggerStateChanged(){
+        const columns = this.state.column_ids.map(column_id => {
+            const props = this.column_props_map.get(column_id);
+            return {
+                id: column_id,
+                width: props.width
+            };
+        });
+        const sort_param = Object.assign({}, this.options.sort_param);
+        
+        this.obs.trigger("state-changed", {
+            state: {
+                columns,
+                sort_param
+            }
+        });
     }
 };

@@ -123,6 +123,7 @@
         <div class="body">
             <div class="row-container" onmousedown={onMouseDown} >
                 <div class="row {getRowClass(data_index)}" onmouseup={onMouseUp.bind(this,data_index)}
+                    ondblclick={onDbClick.bind(this,data_index)}
                     style={getRowStyle(data_index)} each={data_index in state.data_indexes}>
                     <div class="body-cell" 
                         data-dataindex={data_index}

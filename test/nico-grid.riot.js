@@ -748,6 +748,15 @@ module.exports = {
         }
         this.obs.trigger("show-contexmenu", {e});
     },
+    /**
+     * 
+     * @param {number} data_index 
+     * @param {Event} e 
+     */
+    onDbClick(data_index, e){
+        const data = this.view_data_list[data_index];
+        this.obs.trigger("db-cliecked", {data});
+    },
     triggerStateChanged(){
         const columns = this.state.column_ids.map(column_id => {
             const props = this.column_props_map.get(column_id);

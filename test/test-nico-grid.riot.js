@@ -56,6 +56,10 @@ module.exports = {
             const { cmd_id, data } = args;
             console.log("cmd_id=", cmd_id, ", data=", data);
         });
+        this.obs.on("db-cliecked",(args) => {
+            const { data } = args;
+            console.log("db-cliecked data=", data);
+        });
         this.obs.on("show-contexmenu", async (args) => {
             const menu_id = await myapi.ipc.popupContextMenu("library", {items:[]});
             if(!menu_id){

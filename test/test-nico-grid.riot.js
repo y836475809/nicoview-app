@@ -158,16 +158,16 @@ module.exports = {
             const ids = sel_data_list.map(data=>{
                 return data["video_id"];
             });
-            this.obs.trigger("delete-items", {
+            await this.obs.triggerReturn("delete-items", {
                 ids: ids
             });
         };
 
         let new_data_i = 10000000;
         const add_btn = document.getElementById("gt-add-btn");
-        add_btn.onclick = () => {
+        add_btn.onclick = async () => {
             const new_data = mk_data(new_data_i);
-            this.obs.trigger("add-items", {
+            await this.obs.triggerReturn("add-items", {
                 items:[new_data]
             });
             new_data_i++;

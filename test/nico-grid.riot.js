@@ -215,12 +215,12 @@ module.exports = {
             const {sort_param} = args;
             this.sort(sort_param);
         });
-        this.obs.on("delete-items", (args) => {
+        this.obs.onReturn("delete-items", (args) => {
             /** @type {{ids: string[]}} */
             const {ids} = args;
             this.deleteItems(ids);
         });
-        this.obs.on("add-items", (args) => {
+        this.obs.onReturn("add-items", (args) => {
             /** @type {{items: Object[]}} */
             const {items} = args;
             this.addItems(items);

@@ -217,6 +217,9 @@ module.exports = {
             this.scrollTo(0);
             this.updateRows();
         });
+        this.obs.onReturn("get-items", () => {
+            return JSON.parse(JSON.stringify(this.data_list));
+        });
         this.obs.on("update-item", (args) => {
             /** @type {{id: string, props: Object}} */
             const {id, props} = args;

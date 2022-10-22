@@ -2,7 +2,7 @@ const time_format = require("../app/js/time-format");
 
 // eslint-disable-next-line no-unused-vars
 const buttonFormatter = (opts, id, value, data) => {
-    if(!id){
+    if(!data.video_id){
         return "";
     }
     const map = new Map();
@@ -51,6 +51,9 @@ const timeFormatter = (id, value, data)=> {
 
 // eslint-disable-next-line no-unused-vars
 const numberFormatter = (id, value, data)=> {
+    if(!value){
+        return "";
+    }
     return value.toLocaleString();
 };
 

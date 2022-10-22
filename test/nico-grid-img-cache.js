@@ -44,9 +44,13 @@ class ImgElementCache {
      */
     getImg(img_src_list, func){
         img_src_list.forEach((img_src, i)=>{
-            this._preloadImg(img_src);
-            const img_elm = this._cache.get(img_src);
-            func(i, img_elm);
+            if(img_src){
+                this._preloadImg(img_src);
+                const img_elm = this._cache.get(img_src);
+                func(i, img_elm);
+            }else{
+                func(i, null);
+            }
         });
     }
     /**

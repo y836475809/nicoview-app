@@ -92,7 +92,7 @@ module.exports = {
         props.columns.forEach(column => {
             this.column_props_map.set(column.id, {
                 name:column.name,
-                width:column.width,
+                width:column.width?column.width:default_column_width,
                 sortable: getSortable(column)
             });
 

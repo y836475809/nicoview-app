@@ -1,4 +1,4 @@
-const { MyObservable } = require("../app/js/my-observable");
+const { MyObservable } = require("../../js/my-observable");
 const { ImgElementCache } = require("./nico-grid-img-cache");
 const { getFormatter } = require("./nico-grid-formatter");
 

@@ -1,6 +1,6 @@
 const { MyObservable } = require("../app/js/my-observable");
-const { tagsFormatter } = require("./nico-grid-formatter");
-const { NicoGridStateRestor } = require("./nico-grid-state-restor");
+const { tagsFormatter } = require("../app/pages/common/nico-grid-formatter");
+const { NicoGridStateRestor } = require("../app/pages/common/nico-grid-state-restor");
 const myapi = require("../app/js/my-api");
 const fs = require("fs");
 const path = require("path");

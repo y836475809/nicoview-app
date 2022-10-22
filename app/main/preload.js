@@ -5,10 +5,7 @@ process.once("loaded", () => {
         logger.debug("test_nicoappview");
         global.TestComments = require("../../test/test-comments");
         global.TestTag = require("../../test/test-tag");
-        
         global.TestNicoGrid = require("../../test/test-nico-grid.riot.js");
-        global.RiotNicoGrid = require("../../test/nico-grid.riot.js");
-        global.RiotNicoGridHeader = require("../../test/nico-grid-header.riot.js");
     }
 });
 
@@ -66,4 +63,6 @@ window.addEventListener("load", () => {
             SettingPlayerContextMenu: require("../pages/player-page/setting-player-contextmenu.riot.js"),
         };
     }
+    global.RiotJS.NicoGrid = require("../pages/common/nico-grid.riot.js");
+    global.RiotJS.NicoGridHeader = require("../pages/common/nico-grid-header.riot.js");
 });

@@ -1,4 +1,4 @@
-const time_format = require("../app/js/time-format");
+const time_format = require("../../js/time-format");
 
 // eslint-disable-next-line no-unused-vars
 const buttonFormatter = (opts, id, value, data) => {

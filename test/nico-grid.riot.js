@@ -89,6 +89,18 @@ module.exports = {
         }
     },
     onBeforeMount(props) {  
+        this.state.column_ids = [];
+        this.state.data_indexes = [];
+        this.data_list = [];
+        this.view_data_list = [];
+        this.key_id = "";
+        this.key_id_data_map = new Map();
+        this.column_props_map = new Map();
+        this.cell_ft = new Map();
+        this.top_offset = 0;
+        this.sel_data_key_ids = [];
+        this.start_pos = null;
+
         props.columns.forEach(column => {
             this.column_props_map.set(column.id, {
                 name:column.name,

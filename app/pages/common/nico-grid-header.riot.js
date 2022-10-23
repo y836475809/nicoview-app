@@ -18,16 +18,17 @@ module.exports = {
     /** @type {string[]} */
     column_ids:[],
 
-    sort_param: {
-        id: "",
-        asc: true
-    },
+    sort_param: null,
 
     onBeforeMount(props) {        
         this.header_height = props.header_height;
         this.column_ids = props.column_ids;
         this.column_props_map = props.column_props_map;
         this.obs = props.obs;
+        this.sort_param = {
+            id: "",
+            asc: true
+        };
     },
     onMounted() {
         this.state.column_ids = [...this.column_ids];

@@ -1,18 +1,19 @@
 const { MyObservable } = require("../app/js/my-observable");
 const { tagsFormatter } = require("../app/pages/common/nico-grid-formatter");
-const { NicoGridStateRestor } = require("../app/pages/common/nico-grid-state-restor");
+const { mountNicoGrid } = require("../app/pages/common/nico-grid-state-restor");
 const myapi = require("../app/js/my-api");
 const fs = require("fs");
 const path = require("path");
 
+const nico_grid_name = "nico_grid_test";
+
 module.exports = {
     obs: null,
-    /** @type {NicoGridOptions} */
-    options: null,
     onBeforeMount() {
         this.row_height = 60;
         this.obs = new MyObservable();
-
+    },
+    async onMounted() {  
         const ft_info = (id, value, data) => {
             const video_id = data["video_id"];
             return `id: ${video_id}`;
@@ -27,31 +28,18 @@ module.exports = {
             {id: "tags",      name: "コメント",   width:150, sortable:false, ft:tagsFormatter.bind(this, " ")},
             {id: "state",     name: "状態",   width:150},
         ];
-        
-        this.state_fp = path.join(__dirname, "tmp", "nico-grid-state.json");
-        let state = null;
-        try {
-            fs.accessSync(this.state_fp);
-            state = JSON.parse(fs.readFileSync(this.state_fp, "utf-8"));    
-        } catch (error) {
-            // 
-        }
-        const state_restor = new NicoGridStateRestor(state);
-        this.columns = state_restor.getColumns(state, columns);
-        const sort_param = state_restor.getSortParam(state);
-
-        this.options = {
+        const options = {
             header_height: 30,
             row_height: 135,
-            sort_param: sort_param,
             filter_target_ids: [
                 "title", "tags", "video_id"
             ],
             img_cache_capacity:20,
             view_margin_num: 5
         };
-    },
-    async onMounted() {  
+        const state = await myapi.ipc.Config.get(`${nico_grid_name}`, null);
+        mountNicoGrid("#test-nico-grid", state, this.obs, columns, options);
+
         this.obs.on("cmd",(args) => {
             const { cmd_id, data } = args;
             console.log("cmd_id=", cmd_id, ", data=", data);
@@ -69,6 +57,7 @@ module.exports = {
         this.obs.on("state-changed", async (args) => {
             const { state } = args;
             this.state = state;
+            await myapi.ipc.Config.set(`${nico_grid_name}`, state);
             console.log("state-changed state=", this.state);
         });
         const mk_data = (name) => {
@@ -271,8 +260,9 @@ module.exports = {
 
         const get_save_state_btn = document.getElementById("gt-save-state");
         get_save_state_btn.onclick = () => {
+            const state_fp = path.join(__dirname, "tmp", "nico-grid-state.json");
             const json = JSON.stringify(this.state, null, "  ");
-            fs.writeFileSync(this.state_fp, json, "utf-8");
+            fs.writeFileSync(state_fp, json, "utf-8");
         };
     }
 };

@@ -220,6 +220,11 @@ module.exports = {
         this.obs.onReturn("get-items", () => {
             return JSON.parse(JSON.stringify(this.data_list));
         });
+        this.obs.onReturn("has-item", (args) => {
+            /** @type {{id: string}} */
+            const { id } = args;
+            return this.key_id_data_map.has(id);
+        });
         this.obs.on("update-item", (args) => {
             /** @type {{id: string, props: Object}} */
             const {id, props} = args;

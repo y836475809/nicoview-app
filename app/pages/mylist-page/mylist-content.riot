@@ -74,6 +74,12 @@
                 - var(--control-height) - var(--margin) * 3);
             overflow: hidden;
         }
+
+        .gridtable-thumbnail {
+            object-fit: contain;
+            width: 130px;
+            height: 100px;
+        }
     </style>      
 
     <div class="mylist-container">
@@ -86,8 +92,7 @@
         </div>
     </div>
     <div class="mylist-description">{state.mylist_description}</div>
-    <div class="mylist-grid-container">
-        <div class="mylist-grid"></div>
+    <div class="mylist-grid-container" id="mylist-nico-grid">
     </div>
 
     <script>

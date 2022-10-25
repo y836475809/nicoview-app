@@ -1,7 +1,8 @@
 const EventEmitter = require("events");
 const myapi = require("../../js/my-api");
 const { NicoDownloader } = require("../../js/nico-downloader");
-const { GridTableDownloadItem, DownloadState } = require("../../js/gridtable-downloaditem");
+const { buttonFormatter } = require("../../pages/common/nico-grid-formatter");
+const { mountNicoGrid } = require("../../pages/common/nico-grid-mount");
 const { Command } = require("../../js/command");
 const { ScheduledTask } = require("../../js/scheduled-task");
 const { MyObservable, window_obs } = require("../../js/my-observable");
@@ -9,6 +10,22 @@ const { logger } = require("../../js/logger");
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
+
+const DownloadState = Object.freeze({
+    wait: 0,
+    downloading: 1,
+    complete: 2,
+    error: 3
+});
+
+const message_map = new Map([
+    [DownloadState.wait, "待機"],
+    [DownloadState.downloading, "ダウンロード中"],
+    [DownloadState.complete, "ダウンロード完了"],
+    [DownloadState.error, "ダウンロード失敗"],
+]);
+
+const nico_grid_name = "nico_grid_download";
 
 module.exports = {
     state:{
@@ -26,9 +43,6 @@ module.exports = {
 
     /** @type {ScheduledTask} */
     scheduled_task:null,
-
-    /** @type {GridTableDownloadItem} */
-    grid_table_dl:null,
 
     /** @type {NicoDownloader} */
     nico_down:null,
@@ -81,53 +95,94 @@ module.exports = {
             }
         });
 
-        const grid_container = this.$(".download-grid");
-        this.grid_table_dl = new GridTableDownloadItem(grid_container);
+        const infoFormatter = (id, value, data)=> {
+            const video_id = data.video_id;
+            return `ID: ${video_id}`;
+        }; 
+        const htmlFormatter = (id, value, data)=> {
+            const msg = message_map.get(value);
+            const class_value = state==DownloadState.complete?
+                'class="download-state-complete"':"";
+            const content = `<div ${class_value}>${msg}</div><div>${data.progress}</div>`;
+            return content;
+        };
+        const columns = [
+            {id: "thumb_img", name: "サムネイル", width: 130},
+            {id: "title", name: "名前"},
+            {id: "command", name: "操作",  
+                ft: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
+            {id: "info", name: "情報", ft: infoFormatter},
+            {id: "state", name: "状態", ft: htmlFormatter}
+        ];
+        const options = {
+            header_height: 30,
+            row_height: 100,
+            img_cache_capacity:50,
+            view_margin_num: 10
+        };
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid("#download-nico-grid", state, this.nico_grid_obs, columns, options);
+        
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", async (args) => {
+            const { data } = args;
+            Command.play(data, false);
+        });
+        this.nico_grid_obs.on("cmd", async (args) => {
+            const { cmd_id, data } = args;
+            if(cmd_id == "play"){
+                Command.play(data, false);
+            }
+            if(cmd_id == "stack"){
+                Command.addStackItems(main_obs, [data]);
+            }
+            if(cmd_id == "bookmark"){
+                Command.addBookmarkItems(main_obs, [data]);
+            }
+        });
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            if(items.length==0){
+                return;
+            }
+
+            const menu_id = await myapi.ipc.popupContextMenu("download", {items});
+            if(!menu_id){
+                return;
+            }
+            if(menu_id=="delete"){
+                const ret = await myapi.ipc.Dialog.showMessageBox({
+                    message: "削除しますか?", 
+                    okcancel: true
+                });
+                if(!ret){
+                    return;
+                }
+                const video_ids = items.map(value => {
+                    return value.video_id;
+                });
+                await this.deleteDownloadItems(video_ids);
+            }
+        });
 
         try {
-            this.grid_table_dl.onContextMenu(async e=>{ // eslint-disable-line no-unused-vars
-                /** @type {RegDownloadItem[]} */
-                const items = this.grid_table_dl.grid_table.getSelectedDatas();
-                if(items.length==0){
-                    return;
-                }
-
-                const menu_id = await myapi.ipc.popupContextMenu("download", {items});
-                if(!menu_id){
-                    return;
-                }
-                if(menu_id=="delete"){
-                    const ret = await myapi.ipc.Dialog.showMessageBox({
-                        message: "削除しますか?", 
-                        okcancel: true
-                    });
-                    if(!ret){
-                        return;
-                    }
-                    const video_ids = items.map(value => {
-                        return value.video_id;
-                    });
-                    await this.deleteDownloadItems(video_ids);
-                }
-            });
-            this.grid_table_dl.onDblClick((e, data)=>{
-                Command.play(data, false);
-            });
-            this.grid_table_dl.onButtonClick((e, cmd_id, data)=>{
-                if(cmd_id == "play"){
-                    Command.play(data, false);
-                }
-                if(cmd_id == "stack"){
-                    Command.addStackItems(main_obs, [data]);
-                }
-                if(cmd_id == "bookmark"){
-                    Command.addBookmarkItems(main_obs, [data]);
-                }
-            });
-
-            this.grid_table_dl.grid_table.setupResizer(".download-grid-container");
             const items = await myapi.ipc.Download.getItems();
-            this.grid_table_dl.setData(items);
+            const dl_items = items.map(value=>{
+                const dl_item = Object.assign({...value});
+                Object.assign(dl_item, {
+                    progress: ""
+                });
+                return dl_item;
+            });
+            this.nico_grid_obs.triggerReturn("set-data", {
+                key_id: "video_id",
+                items: dl_items
+            });
+            
         } catch (error) {
             logger.error("download item load error: ", error);
             await myapi.ipc.Dialog.showMessageBox({
@@ -171,7 +226,7 @@ module.exports = {
     },
     async onChangeDownloadItem() {
         /** @type {RegDownloadItem[]} */
-        const grid_data = this.grid_table_dl.getData();
+        const grid_data = await this.nico_grid_obs.triggerReturn("get-items");
         const items = grid_data.map(value => {
             let state = DownloadState.complete;
             if(value.state !== DownloadState.complete){
@@ -191,8 +246,30 @@ module.exports = {
      * @param {{video_id:string, title:string, thumb_img:string}[]} items 
      */
     async addDownloadItems(items) {
-        this.grid_table_dl.addItems(items, DownloadState.wait);
-
+        for(const item of items){
+            /** @type {RegDownloadItem[]} */
+            const dv_items = await this.nico_grid_obs.triggerReturn("get-items");
+            const fd_item = dv_items.find(value=>{
+                return value.video_id == item.video_id;
+            });
+            if(fd_item===undefined){
+                item["state"] = DownloadState.wait;
+                item["progress"] = "";
+                await this.nico_grid_obs.triggerReturn("add-items", {
+                    items: [item]
+                });
+            }else{
+                await this.nico_grid_obs.triggerReturn("delete-items", {
+                    ids: [fd_item.video_id]
+                });
+                fd_item["state"] = DownloadState.wait;
+                fd_item["progress"] = "";
+                await this.nico_grid_obs.triggerReturn("add-items", {
+                    items: [fd_item]
+                });
+            }
+        }
+        
         await this.onChangeDownloadItem(); 
     },
     /**
@@ -204,8 +281,9 @@ module.exports = {
             const del_ids = video_ids.filter(video_id=>{
                 return video_id != this.nico_down.video_id;
             });
-            this.grid_table_dl.deleteItems(del_ids); 
-
+            await this.nico_grid_obs.triggerReturn("delete-items", {
+                ids: del_ids
+            });
             if(video_ids.includes(this.nico_down.video_id)){
                 this.cancelDownload();
 
@@ -214,7 +292,9 @@ module.exports = {
                 });
             }
         }else{
-            this.grid_table_dl.deleteItems(video_ids); 
+            await this.nico_grid_obs.triggerReturn("delete-items", {
+                ids: video_ids
+            });
         }
 
         await this.onChangeDownloadItem();
@@ -224,25 +304,35 @@ module.exports = {
      * @param {number} state 
      */
     async clearDownloadItems(state) {
-        this.grid_table_dl.clearItems(state);
-
+        const items = await this.nico_grid_obs.triggerReturn("get-items");
+        const del_ids = items.filter(item => {
+            return item.state === state;
+        }).map(item => {
+            return item.video_id;
+        });
+        await this.nico_grid_obs.triggerReturn("delete-items", {
+            ids: del_ids
+        });
         await this.onChangeDownloadItem();
     },
     /**
      * ダウンロード待ち、状態更新
      * @param {number} wait_time 
      * @param {string} video_id
-     * @param {()=>boolean} do_cancel 
+     * @param {()=>Promise<boolean>} do_cancel 
      */
     async wait(wait_time, video_id, do_cancel) {
         for (let index = wait_time; index >= 0; index--) {
-            if(do_cancel()){
+            if(await do_cancel()){
                 break;
             }
             await new Promise(resolve => setTimeout(resolve, 1000));
-            this.grid_table_dl.updateItem(video_id, {
-                progress: `待機中 ${index}秒`, 
-                state: DownloadState.wait
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props:{
+                    progress: `待機中 ${index}秒`, 
+                    state: DownloadState.wait
+                }
             });
         }   
     },
@@ -263,7 +353,7 @@ module.exports = {
         try {
             this.cancel_download = false;
             /** @type {RegDownloadItem[]} */
-            const donwload_items = this.grid_table_dl.getData();
+            const donwload_items = await this.nico_grid_obs.triggerReturn("get-items");
             for(const item of donwload_items){
                 if(item.state == DownloadState.complete){
                     continue;
@@ -273,54 +363,76 @@ module.exports = {
                 }
 
                 video_id = item.video_id;
-                await this.wait(wait_time, video_id, ()=>{ 
-                    return this.cancel_download 
-                        || !this.grid_table_dl.hasItem(video_id);
+                await this.wait(wait_time, video_id, async ()=>{ 
+                    const has_item = await this.nico_grid_obs.triggerReturn("has-item", {
+                        id: video_id
+                    });
+                    return this.cancel_download || !has_item;
                 });
-                if(!this.grid_table_dl.hasItem(video_id)){
+                const has_item = await this.nico_grid_obs.triggerReturn("has-item", {
+                    id: video_id
+                });
+                if(!has_item){
                     continue;
                 }
                 if(this.cancel_download){
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: "キャンセル", 
-                        state: DownloadState.wait
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: "キャンセル", 
+                            state: DownloadState.wait
+                        }
                     });
                     break;
                 }
                 
                 this.nico_down = new NicoDownloader(video_id, download_dir);
                 const result = await this.nico_down.download((progress)=>{
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: `${progress}`, 
-                        state: DownloadState.downloading
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: `${progress}`,  
+                            state: DownloadState.downloading
+                        }
                     });
                 });
 
                 if(result.type==NicoDownloader.ResultType.complete){
                     const downloaded_item = this.nico_down.getDownloadedItem();
                     await myapi.ipc.Library.addDownloadItem(downloaded_item);
-
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: "終了", 
-                        state: DownloadState.complete
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: "終了", 
+                            state: DownloadState.complete
+                        }
                     });
                     logger.debug(`download complete video_id=${video_id}`);
                 }else if(result.type==NicoDownloader.ResultType.cancel){
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: "キャンセル", 
-                        state: DownloadState.wait
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: "キャンセル",  
+                            state: DownloadState.wait
+                        }
                     });
                     logger.debug(`download cancel video_id=${video_id}`);
                 }else if(result.type==NicoDownloader.ResultType.skip){ 
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: `スキップ: ${result.reason}`, 
-                        state: DownloadState.wait
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: `スキップ: ${result.reason}`,  
+                            state: DownloadState.wait
+                        }
                     });
                     logger.debug(`download skip video_id=${video_id}: `, result.reason);
                 }else if(result.type==NicoDownloader.ResultType.error){ 
-                    this.grid_table_dl.updateItem(video_id, {
-                        progress: `エラー: ${result.reason.message}`, 
-                        state: DownloadState.error
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: video_id,
+                        props:{
+                            progress: `エラー: ${result.reason.message}`, 
+                            state: DownloadState.error
+                        }
                     });
                     logger.debug(`download video_id=${video_id}: `, result.reason);
                 }

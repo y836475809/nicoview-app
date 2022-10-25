@@ -101,14 +101,13 @@
         .library-grid-container {
             width: 100%;
             height: calc(100% - var(--search-button-size) - var(--margin));
-            overflow: hidden;
         }
 
-        .library-grid-container .slick-cell.l2.r2 {
+        /* .library-grid-container .slick-cell.l2.r2 {
             white-space: normal;
-        }
+        } */
 
-        .thumbnail-wrap {
+        /* .thumbnail-wrap {
             height: 135px;
             display: flex;
             justify-content: center;
@@ -123,7 +122,7 @@
             object-fit: contain;
             width: 180px;
             height: 135px;
-        }
+        } */
     </style>
 
     <div class="library-controls-container">
@@ -150,8 +149,7 @@
             </div>
         </div>
     </div>
-    <div class="library-grid-container">
-        <div class="library-grid"></div>
+    <div class="library-grid-container" id="library-nico-grid">
     </div>
 
     <script>

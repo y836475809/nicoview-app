@@ -267,7 +267,6 @@ module.exports = {
     async mouseup(e) { // eslint-disable-line no-unused-vars
         if(this.gutter_move){
             player_obs.trigger("player-video:reset-comment-timelime");
-            player_obs.trigger("player-info-page:split-resized");
 
             const ve = this.$(".info-frame");
             await myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
@@ -450,9 +449,6 @@ module.exports = {
                 // 動画サイズを可変に戻す
                 ve.style.width = infoview_width + "px";
                 pe.style.width = `calc(100% - ${infoview_width}px)`;
-
-                // 非表示->表示の場合はコメントリストをリサイズする
-                player_obs.trigger("player-info-page:split-resized");
                 this.stop_resize_event = false;
             },100); 
         }else{

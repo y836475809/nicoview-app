@@ -1,28 +1,70 @@
 const myapi = require("../../js/my-api");
-const { GridTable } = require("../../js/gridtable");
-const { window_obs } = require("../../js/my-observable");
+const { mountNicoGrid } = require("../../pages/common/nico-grid-mount");
+const { MyObservable, window_obs } = require("../../js/my-observable");
 const { NGType } = require("../../js/comment-filter");
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
-
+const nico_grid_name = "nico_grid_player_ng_commnet";
 
 module.exports = {
     /** @type {MyObservable} */
     obs_dialog:null,
 
-    /** @type {GridTable} */
-    grid_table:null,
-    onBeforeMount() {
+    async onMounted() {
         player_obs.on("setting-ng-comment:set-items", (
             /** @type {NGCommentItem[]}} */ args) => {
             this.setup(args);
+        }); 
+
+        // eslint-disable-next-line no-unused-vars
+        const wrapFormatter = (id, value, data) => { 
+            const type = data.type;
+            if(type == NGType.Text){
+                return "コメント";
+            }
+            if(type == NGType.UserId){
+                return "ユーザーID";
+            }
+            return "";
+        };
+        const columns = [
+            { id: "title", name: "種類", ft:wrapFormatter},
+            { id: "value", name: "値" },
+        ];
+        const options = {
+            header_height: 25,
+            row_height: 25,
+            img_cache_capacity:5,
+            view_margin_num: 20
+        };
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid("#player-comment-ng-nico-grid", state, this.nico_grid_obs, columns, options);
+        
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
+            if(!menu_id){
+                return;
+            }
+            if(menu_id=="delete"){
+                this.deleteSelectedItems();
+            }
+        });
+
+        player_obs.on("setting-ng-comment:set-items", async (
+            /** @type {NGCommentItem[]}} */ args) => {
+            await this.setup(args);
         });
     },
-    deleteSelectedItems() {
+    async deleteSelectedItems() {
         /** @type {NGCommentItem[]} */
-        const items = this.grid_table.getSelectedDatas();
+        const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
         if(items.length===0){
             return;
         }
@@ -42,53 +84,27 @@ module.exports = {
             ng_texts, ng_user_ids 
         });
 
-        this.grid_table.deleteItems(items);
+        const ids = items.map(item => {
+            return item.id;
+        });
+        await this.nico_grid_obs.triggerReturn("delete-items", {
+            ids: ids
+        });
     },
     /**
      * 
      * @param {NGCommentItem[]} ng_commnet_items 
      */
-    setup(ng_commnet_items) {
-        if (this.grid_table == null) {
-            const wrapFormatter = (row, cell, value, columnDef, dataContext) => { // eslint-disable-line no-unused-vars
-                const type = dataContext.type;
-                if(type == NGType.Text){
-                    return "コメント";
-                }
-                if(type == NGType.UserId){
-                    return "ユーザーID";
-                }
-                return "";
-            };
-            const columns = [
-                { id: "title", name: "種類", formatter:wrapFormatter},
-                { id: "value", name: "値" },
-            ];
-            const options = {
-                rowHeight: 25,
-            };
-            this.grid_table = new GridTable("comment-ng-grid", columns, options);
-            this.grid_table.init(".comment-ng-grid");
-            this.grid_table.setupResizer(".comment-ng-grid-container");
-            this.grid_table.onContextMenu(async (e) => { // eslint-disable-line no-unused-vars
-                const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
-                if(!menu_id){
-                    return;
-                }
-                if(menu_id=="delete"){
-                    this.deleteSelectedItems();
-                }
-            });
-        }
+    async setup(ng_commnet_items) {
         const items = ng_commnet_items.map((item, index) => {
             const obj = Object.assign({}, item);
             obj.id = index;
             return obj;
         });
-        this.grid_table.setData(items);
-
-        const container = this.$(".comment-ng-grid-container");
-        this.grid_table.resizeGrid(container.clientWidth, container.clientHeight); 
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "id",
+            items: items
+        });
     },
     onclickDelete(e) { // eslint-disable-line no-unused-vars
         this.deleteSelectedItems();

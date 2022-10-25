@@ -1,6 +1,3 @@
-@import url(../../node_modules/slickgrid/slick.grid.css);
-@import url(../../node_modules/slickgrid/css/smoothness/jquery-ui-1.11.3.custom.css);
-@import url(../../node_modules/slickgrid/slick-default-theme.css);
 @import url(../../node_modules/@fortawesome/fontawesome-free/css/all.min.css);
 
 * {
@@ -24,20 +21,6 @@ html, body {
     overflow: hidden;
 }
 
-.slick-cell.active {
-  border-style:initial;
-  border: 1px solid transparent;
-  border-right: 1px dotted silver;
-  border-bottom-color: silver;
-}
-.slick-cell.selected {
-  background-color: #6190cd6b;
-}
-
-.slick-header-column, .slick-cell {
-  user-select: none;
-}
-
 .center-hv {
   display: flex;
   justify-content: center;
@@ -53,58 +36,6 @@ html, body {
   box-shadow: 0 8px 10px 1px rgba(0,0,0,0.14), 
   0 3px 14px 2px rgba(0,0,0,0.12), 
   0 5px 5px -3px rgba(0,0,0,0.3);
-}
-
-.gridtable-thumbnail {
-  object-fit: contain;
-  width: 130px;
-  height: 100px;
-}
-
-.gridtable-button {
-  margin-top: 5px;
-  margin-right: 5px;
-  width: 25px;
-  height: 25px;
-}
-.gridtable-button,
-.gridtable-button > i {
-  font-size: 15px;
-  color: gray;
-  cursor: pointer;
-}
-.gridtable-button:hover > i,
-.gridtable-button > i:hover {
-  color: black;
-}
-
-.wrap-gridtable-cell {
-  white-space: normal;
-  overflow-wrap: break-word;
-}
-
-.tag-content {
-  display: inline-block;
-  border-radius: 2px;
-  padding: 3px 10px 3px 10px;
-  margin-right: 5px;        
-  margin-bottom: 5px;
-}
-
-.state-content {
-  display: inline-block;
-  border-radius: 2px;
-  padding: 3px 3px 3px 3px;
-  margin-right: 5px;        
-  margin-bottom: 5px;
-  font-size: 20px;
-  color: #444444;
-}
-.state-saved {
-  background-color: #7fbfff;
-}
-.state-reg-download {
-  background-color: hotpink;
 }
 
 input::placeholder {

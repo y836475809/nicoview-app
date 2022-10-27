@@ -67,7 +67,7 @@ const wrapFormatter = (id, value, data) => {
 
 // eslint-disable-next-line no-unused-vars
 const infoFormatter = (mk_content, id, value, data)=> {
-    let content = mk_content(value, data);
+    let content = mk_content(id, value, data);
     if(data.saved){
         const title = "ローカル保存済み";
         const div_class = "nico-grid-state-content nico-grid-state-saved";

@@ -212,7 +212,7 @@ module.exports = {
         };
 
         const mylist_infoFormatter = infoFormatter.bind(this, 
-            (value, data)=>{ 
+            (id, value, data)=>{ 
                 return `<div>ID: ${data.video_id}</div>`;
             });
         const columns = [

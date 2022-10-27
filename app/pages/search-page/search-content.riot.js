@@ -185,7 +185,7 @@ module.exports = {
     async onMounted() {
         const seach_infoFormatter = infoFormatter.bind(this, 
             // eslint-disable-next-line no-unused-vars
-            (value, data)=>{ 
+            (id, value, data)=>{ 
                 return `<div>${value}</div>`; 
             });
         const columns = [

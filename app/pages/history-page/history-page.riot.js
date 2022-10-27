@@ -56,7 +56,7 @@ module.exports = {
         });
     },
     async onMounted() {
-        const histroy_infoFormatter =  infoFormatter.bind(this, (value, data) => { 
+        const histroy_infoFormatter =  infoFormatter.bind(this, (id, value, data) => { 
             return `<div>ID: ${data.video_id}</div>`;
         });
         const columns = [

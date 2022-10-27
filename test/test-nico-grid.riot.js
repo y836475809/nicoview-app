@@ -28,9 +28,10 @@ module.exports = {
             {id: "tags",      name: "コメント",   width:150, sortable:false, ft:tagsFormatter.bind(this, " ")},
             {id: "state",     name: "状態",   width:150},
         ];
+        /** @type {NicoGridOptions} */
         const options = {
             header_height: 30,
-            row_height: 135,
+            row_height: 140,
             filter_target_ids: [
                 "title", "tags", "video_id"
             ],

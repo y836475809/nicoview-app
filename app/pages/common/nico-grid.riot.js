@@ -70,7 +70,7 @@ module.exports = {
             options.header_height = 30;
         }
         if(!options.row_height){
-            options.row_height = 135;
+            options.row_height = 140;
         }
         if(!options.sort_param){
             options.sort_param = {

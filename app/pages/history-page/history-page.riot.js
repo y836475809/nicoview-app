@@ -66,12 +66,8 @@ module.exports = {
             {id: "info", name: "情報",sortable: false, ft: histroy_infoFormatter},
             {id: "play_date", name: "再生日", sortable: false}
         ];
-        const options = {
-            header_height: 30,
-            row_height: 100,
-            img_cache_capacity:50,
-            view_margin_num: 5
-        };
+        /** @type {NicoGridOptions} */
+        const options = {};
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
         mountNicoGrid("#history-nico-grid", state, this.nico_grid_obs, columns, options);

@@ -197,14 +197,11 @@ module.exports = {
             {id: "play_time", name: "時間"},
             {id: "tags", name: "タグ, コメント", ft: tagsFormatter.bind(this, " ")},
         ];
+        /** @type {NicoGridOptions} */
         const options = {
-            header_height: 30,
-            row_height: 140,
             filter_target_ids: [
                 "title", "tags", "video_id"
-            ],
-            img_cache_capacity:50,
-            view_margin_num: 5
+            ]
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();

@@ -225,12 +225,8 @@ module.exports = {
             {id: "date", name: "投稿日"},
             {id: "length", name: "時間", ft: timeFormatter}
         ];
-        const options = {
-            header_height: 30,
-            row_height: 135,
-            img_cache_capacity:50,
-            view_margin_num: 5
-        };
+        /** @type {NicoGridOptions} */
+        const options = {};
         this.nico_grid_obs = new MyObservable();
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         mountNicoGrid("#mylist-nico-grid", state, this.nico_grid_obs, columns, options);

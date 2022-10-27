@@ -147,6 +147,7 @@ module.exports = {
             {id: "no", name: "番号", sortable:false},
             {id: "mail", name: "オプション", sortable:false}
         ];
+        /** @type {NicoGridOptions} */
         const options = {
             header_height: 25,
             row_height: 25,

@@ -33,6 +33,7 @@ module.exports = {
             { id: "title", name: "種類", ft:wrapFormatter},
             { id: "value", name: "値" },
         ];
+        /** @type {NicoGridOptions} */
         const options = {
             header_height: 25,
             row_height: 25,

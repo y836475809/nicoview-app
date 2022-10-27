@@ -114,10 +114,8 @@ module.exports = {
             {id: "info", name: "情報", ft: infoFormatter},
             {id: "state", name: "状態", ft: htmlFormatter}
         ];
+        /** @type {NicoGridOptions} */
         const options = {
-            header_height: 30,
-            row_height: 100,
-            img_cache_capacity:50,
             view_margin_num: 10
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);

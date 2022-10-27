@@ -142,14 +142,11 @@ module.exports = {
             {id: "last_play_date", name: "最終再生日"},
             {id: "state", name: "状況"}
         ];
+        /** @type {NicoGridOptions} */
         const options = {
-            header_height: 30,
-            row_height: 135,
             filter_target_ids: [
                 "title", "tags", "video_id"
-            ],
-            img_cache_capacity:50,
-            view_margin_num: 5
+            ]
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();

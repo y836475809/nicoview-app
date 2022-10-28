@@ -30,7 +30,6 @@ const getSortable = (column) => {
     return sortable;
 };
 
-const row_cont_margin = 20;
 const default_column_width = 150;
 const scroll_event_interval = 100;
 
@@ -190,7 +189,7 @@ module.exports = {
 
         const el_width = this.getRowContainerWidth();
         const elm = this.$(".row-container");
-        elm.style.width = (el_width + row_cont_margin) + "px"; 
+        elm.style.width = el_width + "px"; 
 
         this.obs.onReturn("set-data", (args) => {
             /** @type {{key_id: string, items: Object[]}} */
@@ -330,7 +329,7 @@ module.exports = {
             this.column_props_map = column_props_map;
             const el_width = this.getRowContainerWidth();
             const elm = this.$(".row-container");
-            elm.style.width = (el_width + row_cont_margin) + "px"; 
+            elm.style.width = el_width + "px"; 
 
             this.updateRows();
 

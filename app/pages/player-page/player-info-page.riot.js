@@ -131,6 +131,13 @@ module.exports = {
     },
     async onMounted() {
         // eslint-disable-next-line no-unused-vars
+        const commentFormatter = (id, value, data) => {
+            if(!value){
+                return "";
+            }
+            return `<div title="${value}" class="comment-text">${value}</div>`;
+        };
+        // eslint-disable-next-line no-unused-vars
         const timeFormatter = (id, value, data)=> {
             return time_format.toTimeString(value * 10 / 1000);
         };
@@ -141,7 +148,7 @@ module.exports = {
         };
         const columns = [
             {id: "vpos", name: "時間", sortable:false, ft: timeFormatter},
-            {id: "content", name: "コメント", sortable:false},
+            {id: "content", name: "コメント", sortable:false, ft:commentFormatter},
             {id: "user_id", name: "ユーザーID", sortable:false},
             {id: "date", name: "投稿日", sortable:false, ft: dateFormatter},
             {id: "no", name: "番号", sortable:false},

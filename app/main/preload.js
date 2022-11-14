@@ -6,6 +6,7 @@ process.once("loaded", () => {
         global.TestComments = require("../../test/test-comments");
         global.TestTag = require("../../test/test-tag");
         global.TestNicoGrid = require("../../test/test-nico-grid.riot.js");
+        global.TestNicoComment = require("../../test/test-nico-comment");
     }
 });
 

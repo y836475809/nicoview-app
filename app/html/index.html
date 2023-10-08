@@ -43,9 +43,12 @@
     <script type="riot" src="../pages/mylist-page/mylist-content.riot"></script>
 
     <script src="../../node_modules/riot/riot+compiler.min.js"></script>
-    <script src="./riot-mount.js"></script>
     
     <script>
-        roitMount("main-page"); // eslint-disable-line no-undef
+        /* globals riot */
+        document.addEventListener("DOMContentLoaded", async () => {
+            await riot.compile();
+            riot.mount("main-page");
+        });
     </script>
 </html>

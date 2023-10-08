@@ -35,10 +35,13 @@
 <script type="riot" src="../pages/player-page/setting-player-contextmenu.riot"></script>
 <script type="riot" src="../pages/player-page/open-video-form.riot"></script>
 <script src="../../node_modules/riot/riot+compiler.min.js"></script>
-<script src="./riot-mount.js"></script>
 
 <script>
-    roitMount("player-main-page"); // eslint-disable-line no-undef
+    /* globals riot */
+    document.addEventListener("DOMContentLoaded", async () => {
+        await riot.compile();
+        riot.mount("player-main-page");
+    });
 </script>
 
 </html>

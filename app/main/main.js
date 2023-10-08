@@ -180,17 +180,6 @@ const changeLogLevel = (args) => {
     }
 };
 
-/**
- * user css適用が終わってroitタグのマウントOKであることを通知する
- * @param {BrowserWindow} win 
- */
-const notifyRiotReady = async (win) => {
-    const code = "\
-    const elms = document.getElementsByTagName('body'); \
-    elms[0].dataset.mountready = 'true';";
-    await win.webContents.executeJavaScript(code);
-};
-
 const createMainWindow = () => {
     // ブラウザウィンドウの作成
     const state = config.get("main.window.state", { width: 1000, height: 600 });
@@ -256,12 +245,12 @@ const createMainWindow = () => {
         menu_item.checked = checked;
     });
 
-    main_win.webContents.on("did-finish-load", async () => { 
+    main_win.webContents.once("dom-ready", async () => { 
         user_css.apply(main_win);
-        await notifyRiotReady(main_win);
-        main_win.webContents.on("context-menu", (e, props) => {
-            popupInputContextMenu(main_win, props);
-        });
+    });
+
+    main_win.webContents.on("context-menu", (e, props) => {
+        popupInputContextMenu(main_win, props);
     });
 
     // アプリケーションのindex.htmlの読み込み
@@ -319,12 +308,13 @@ const createPlayerWindow = () => {
         };
         player_win = new BrowserWindow(state);
         player_win.removeMenu();
-        player_win.webContents.on("did-finish-load", async () => {
+        
+        player_win.webContents.once("dom-ready", async () => { 
             user_css.apply(player_win);
-            await notifyRiotReady(player_win);
-            player_win.webContents.on("context-menu", (e, props) => {
-                popupInputContextMenu(player_win, props);
-            });
+        });
+        
+        player_win.webContents.on("context-menu", (e, props) => {
+            popupInputContextMenu(player_win, props);
         });
 
         if (state.maximized) {

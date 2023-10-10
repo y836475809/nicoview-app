@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <meta 
+        http-equiv="Content-Security-Policy" 
+        content="
+            script-src 'self' 'unsafe-inline' 'unsafe-eval';
+            style-src 'self' 'unsafe-inline';
+        "/>
+    <link rel="stylesheet" type="text/css" href="../css/app.css">
+    <style type="text/css">
+    </style>
+</head>
+
+<body>
+    <player-main></player-main>
+</body>
+
+<script type="riot" src="../renderer/common/modal-dialog.riot"></script>
+
+<script type="riot" src="../renderer/player/player-main.riot"></script>
+<script type="riot" src="../renderer/player/player-tags.riot"></script>
+<script type="riot" src="../renderer/player/player-seek.riot"></script>
+<script type="riot" src="../renderer/player/player-volume.riot"></script>
+<script type="riot" src="../renderer/player/player-controls.riot"></script>
+<script type="riot" src="../renderer/player/player-video.riot"></script>
+<script type="riot" src="../renderer/player/player.riot"></script>
+<script type="riot" src="../renderer/player/player-info.riot"></script>
+<script type="riot" src="../renderer/player/player-user.riot"></script>
+<script type="riot" src="../renderer/player/player-setting-dialog.riot"></script>
+<script type="riot" src="../renderer/player/setting-ng-comment.riot"></script>
+<script type="riot" src="../renderer/player/setting-display-comment.riot"></script>
+<script type="riot" src="../renderer/player/setting-player-contextmenu.riot"></script>
+<script type="riot" src="../renderer/player/open-video-form.riot"></script>
+<script src="../../node_modules/riot/riot+compiler.min.js"></script>
+
+<script>
+    /* globals riot */
+    document.addEventListener("DOMContentLoaded", async () => {
+        await riot.compile();
+        riot.mount("player-main");
+    });
+</script>
+
+</html>

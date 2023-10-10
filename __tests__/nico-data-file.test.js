@@ -1,7 +1,7 @@
 const test = require("ava");
 const path = require("path");
 const { NicoXMLFile, NicoJsonFile, NicoDataFile,
-    getIDFromFilename, getCommonNameFromFilename } = require("../app/js/nico-data-file");
+    getIDFromFilename, getCommonNameFromFilename } = require("../src/lib/nico-data-file");
 
 const setParams = (nico_file, params) => {
     nico_file.dirPath = params.dirpath;

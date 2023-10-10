@@ -1,8 +1,8 @@
 const test = require("ava");
 const fsPromises = require("fs").promises;
 const { TestData } = require("./helper/nico-mock");
-const { NicoAPI } = require("../app/js/niconico");
-const { NicoUpdate } = require("../app/js/nico-update");
+const { NicoAPI } = require("../src/lib/niconico");
+const { NicoUpdate } = require("../src/lib/nico-update");
 
 const get_test_watch_data = () => {
     const nico_api = new NicoAPI();

@@ -2,9 +2,9 @@ const test = require("ava");
 const path = require("path");
 const { NicoDownLoadMocks, TestData} = require("./helper/nico-mock");
 const { jsonParser } = require("./helper/json_parser");
-const NicoDataParser = require("../app/js/nico-data-parser");
-const { NicoAPI } = require("../app/js/niconico");
-const { NicoUpdate } = require("../app/js/nico-update");
+const NicoDataParser = require("../src/lib/nico-data-parser");
+const { NicoAPI } = require("../src/lib/niconico");
+const { NicoUpdate } = require("../src/lib/nico-update");
 
 const nico_mocks = new NicoDownLoadMocks();
 const mock_timeout = 121*1000;

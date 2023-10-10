@@ -1,6 +1,6 @@
 const test = require("ava");
 
-const { deepCopy } = require("../app/js/deepcopy");
+const { deepCopy } = require("../src/lib/deepcopy");
 
 test("deepCopy number", t => {
     let obj = 1;

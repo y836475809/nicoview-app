@@ -1,7 +1,7 @@
 const test = require("ava");
 const fs = require("fs");
 const path = require("path");
-const { nicoSearchHtmlParse } = require("../app/js/nico-search-html-parse");
+const { nicoSearchHtmlParse } = require("../src/lib/nico-search-html-parse");
 
 test.before(t => {
     ["search", "tag"].forEach(name=>{

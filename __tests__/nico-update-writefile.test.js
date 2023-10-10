@@ -1,6 +1,6 @@
 const test = require("ava");
 const fs = require("fs");
-const { NicoUpdate } = require("../app/js/nico-update");
+const { NicoUpdate } = require("../src/lib/nico-update");
 
 const tmp_dir = `${__dirname}/tmp`;
 const test_file_path = `${tmp_dir}/test.json`;

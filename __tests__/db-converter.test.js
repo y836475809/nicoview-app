@@ -1,6 +1,6 @@
 const test = require("ava");
 const path = require("path");
-const { DBConverter } = require("../app/js/import-nndd-db");
+const { DBConverter } = require("../src/lib/import-nndd-db");
 
 const db_file_path = `${__dirname}/data/sample.db`;
 

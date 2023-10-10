@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta 
+            http-equiv="Content-Security-Policy" 
+            content="
+                script-src 'self' 'unsafe-inline' 'unsafe-eval';
+                style-src 'self' 'unsafe-inline';
+            "/>
+        <link rel="stylesheet" type="text/css" href="../css/app.css">
+        <style type="text/css">
+        </style>
+    </head>
+
+    <body>
+        <main></main>
+    </body>
+    <script type="riot" src="../renderer/common/listview.riot"></script>
+    <script type="riot" src="../renderer/common/modal-dialog.riot"></script>
+    <script type="riot" src="../renderer/common/sidebar.riot"></script>
+
+    <script type="riot" src="../renderer/main/main.riot"></script>
+    <script type="riot" src="../renderer/main/bookmark.riot"></script>
+    <script type="riot" src="../renderer/main/play-stack.riot"></script>
+
+    <script type="riot" src="../renderer/main/library-sidebar.riot"></script>
+    <script type="riot" src="../renderer/main/library-content.riot"></script>
+
+    <script type="riot" src="../renderer/main/search-sidebar.riot"></script>
+    <script type="riot" src="../renderer/main/search-content.riot"></script>
+    <script type="riot" src="../renderer/main/search-page-selector.riot"></script>
+    <script type="riot" src="../renderer/main/pagination.riot"></script>
+.
+    <script type="riot" src="../renderer/main/download-schedule.riot"></script>
+    <script type="riot" src="../renderer/main/download-list.riot"></script>
+
+    <script type="riot" src="../renderer/main/history.riot"></script>
+
+    <script type="riot" src="../renderer/main/setting.riot"></script>
+
+    <script type="riot" src="../renderer/main/mylist-sidebar.riot"></script>
+    <script type="riot" src="../renderer/main/mylist-content.riot"></script>
+
+    <script src="../../node_modules/riot/riot+compiler.min.js"></script>
+    
+    <script>
+        /* globals riot */
+        document.addEventListener("DOMContentLoaded", async () => {
+            await riot.compile();
+            riot.mount("main");
+        });
+    </script>
+</html>

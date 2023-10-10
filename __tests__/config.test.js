@@ -1,5 +1,5 @@
 const test = require("ava");
-const { Config } = require("../app/js/config");
+const { Config } = require("../src/lib/config");
 
 class TestConfig extends Config {
     setup(){}

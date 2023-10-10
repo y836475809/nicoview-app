@@ -1,6 +1,6 @@
 const test = require("ava");
 const fsPromises = require("fs").promises;
-const { XMLDataConverter } = require("../app/js/nico-data-converter");
+const { XMLDataConverter } = require("../src/lib/nico-data-converter");
 
 test.beforeEach(async t => {
     t.context.xml ={

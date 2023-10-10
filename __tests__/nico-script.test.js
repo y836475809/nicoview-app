@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoScript } = require("../app/js/comment-timeline");
+const { NicoScript } = require("../src/lib/comment-timeline");
 
 
 const no_script_comments =  [

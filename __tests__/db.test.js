@@ -1,7 +1,7 @@
 const test = require("ava");
 const path = require("path");
 
-const { MapDB, LibraryDB } = require("../app/js/db");
+const { MapDB, LibraryDB } = require("../src/lib/db");
 
 
 class testMapDB extends MapDB {

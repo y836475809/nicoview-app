@@ -3,7 +3,7 @@
     "mock_server_wait_msec": 500,
     "test-main": {
         "use_mock_server": true,
-        "main": "html/index.html",
+        "main": "public/index.html",
         "config_fiiename": "config-main-debug.json"
     },
     "test-search": {

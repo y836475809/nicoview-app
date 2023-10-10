@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoPlay } = require("../app/js/nico-play");
+const { NicoPlay } = require("../src/lib/nico-play");
 
 const { NicoMocks, TestData } = require("./helper/nico-mock");
 const { ProfTime } = require("./helper/ava-prof-time");

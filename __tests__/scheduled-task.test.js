@@ -1,6 +1,6 @@
 const test = require("ava");
 const sinon = require("sinon");
-const { ScheduledTask } = require("../app/js/scheduled-task");
+const { ScheduledTask } = require("../src/lib/scheduled-task");
 
 let clock = null;
 let log = [];

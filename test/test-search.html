@@ -5,26 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>test sidebar</title>
-    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
+    <link rel="stylesheet" type="text/css" href="../src/css/app.css">
     <style type="text/css">
     </style>
 </head>
 
 <body>
-    <sidebar-page page_name="search"></sidebar-page>
+    <sidebar page_name="search"></sidebar>
 </body>
 
-<script type="riot" src="../app/pages/common/listview.riot"></script>
-<script type="riot" src="../app/pages/common/modal-dialog.riot"></script>
-<script type="riot" src="../app/pages/common/sidebar-page.riot"></script>
-<script type="riot" src="../app/pages/search-page/search-page-selector.riot"></script>
-<script type="riot" src="../app/pages/search-page/pagination.riot"></script>
-<script type="riot" src="../app/pages/search-page/search-sidebar.riot"></script>
-<script type="riot" src="../app/pages/search-page/search-content.riot"></script>
+<script type="riot" src="../src/renderer/common/listview.riot"></script>
+<script type="riot" src="../src/renderer/common/modal-dialog.riot"></script>
+<script type="riot" src="../src/renderer/common/sidebar.riot"></script>
+<script type="riot" src="../src/renderer/main/search-page-selector.riot"></script>
+<script type="riot" src="../src/renderer/main/pagination.riot"></script>
+<script type="riot" src="../src/renderer/main/search-sidebar.riot"></script>
+<script type="riot" src="../src/renderer/main/search-content.riot"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
-<script src="../app/html/riot-mount.js"></script>
 <script>
-    roitMount("sidebar-page"); // eslint-disable-line no-undef
+    /* globals riot */
+    document.addEventListener("DOMContentLoaded", async () => {
+        await riot.compile();
+        riot.mount("sidebar");
+    });
 </script>
 
 </html>

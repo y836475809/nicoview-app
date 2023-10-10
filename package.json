@@ -2,7 +2,7 @@
   "name": "nicoview-app",
   "version": "0.16.33",
   "description": "electron製のニコニコ動画閲覧アプリ",
-  "main": "app/main/main.js",
+  "main": "src/main.js",
   "scripts": {
     "test-main": "electron . --test=test-main",
     "test-search": "electron . --test=test-search",
@@ -11,7 +11,7 @@
     "test-comment": "electron . --test=test-comment",
     "test-tag": "electron . --test=test-tag",
     "main": "electron .",
-    "eslint": "eslint ./app/**/*.js ./app/html/*.html ./__tests__/**/*.js ./test/**/*.js ./test/*.html || exit 0",
+    "eslint": "eslint ./src/**/*.js ./src/public/*.html ./__tests__/**/*.js ./test/**/*.js ./test/*.html || exit 0",
     "test": "ava -v -s",
     "build": "electron-builder --x64 --dir",
     "build-zip": "electron-builder --x64"
@@ -42,12 +42,12 @@
       "output": "./build"
     },
     "files": [
-      "./app/**/*",
+      "./src/**/*",
       "./icon/**/*"
     ],
     "extraResources": [
       {
-        "from": "./app/css/user.css",
+        "from": "./src/css/user.css",
         "to": "user.css"
       }
     ],

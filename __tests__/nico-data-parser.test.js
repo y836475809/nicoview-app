@@ -1,7 +1,7 @@
 const test = require("ava");
 const fs = require("fs");
 const cheerio = require("cheerio");
-const NicoDataParser = require("../app/js/nico-data-parser");
+const NicoDataParser = require("../src/lib/nico-data-parser");
 
 const dir = `${__dirname}/data`;
 

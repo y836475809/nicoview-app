@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NicoUpdate } = require("../app/js/nico-update");
+const { NicoUpdate } = require("../src/lib/nico-update");
 const { jsonParser } = require("./helper/json_parser");
 const owner_data = require("./data/owner-comment.json");
 const no_owner_data = require("./data/no-owner-comment.json");

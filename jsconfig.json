@@ -5,7 +5,7 @@
       "target": "es2020",
       "baseUrl": "./",
       "paths": {
-        "@js/*": ["app/js/*"]
+        "@lib/*": ["src/lib/*"]
       }
     },
     "exclude": [ 

@@ -1,0 +1,22 @@
+.split > .left.listview-library  {
+    --left-width: 300px !important;
+}
+
+.split > .left.listview-search {
+    --left-width: 300px !important;
+}
+
+.split > .left.listview-mylist {
+    --left-width: 300px !important;
+}
+
+bookmark {
+    --page-width: 300px !important;
+}
+
+listview .listview-item-default-icon-color {
+    color: royalblue !important;
+}
+listview .listview-item-marked-icon-color {
+    color: red !important;
+}

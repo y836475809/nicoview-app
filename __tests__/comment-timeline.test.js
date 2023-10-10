@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentTimeLine } = require("../app/js/comment-timeline");
+const { CommentTimeLine } = require("../src/lib/comment-timeline");
 
 class McokElement {
     constructor(name){

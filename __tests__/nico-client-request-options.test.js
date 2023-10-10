@@ -1,7 +1,7 @@
 const test = require("ava");
 const nock = require("nock");
 const { ProfTime } = require("./helper/ava-prof-time");
-const { NicoClientRequest } = require("../app/js/nico-client-request");
+const { NicoClientRequest } = require("../src/lib/nico-client-request");
 
 const prof_time = new ProfTime();
 

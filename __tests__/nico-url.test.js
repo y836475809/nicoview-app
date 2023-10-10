@@ -1,5 +1,5 @@
 const test = require("ava");
-const NicoUrl = require("../app/js/nico-url");
+const NicoUrl = require("../src/lib/nico-url");
 
 test("getURLKind", (t) => {
     t.is(NicoUrl.getURLKind("https://www.nicovideo.jp/watch/12345"), "watch");

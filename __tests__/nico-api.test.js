@@ -1,5 +1,5 @@
 const test = require("ava");
-const {NicoAPI} = require("../app/js/niconico");
+const {NicoAPI} = require("../src/lib/niconico");
 
 test("_getCommentServerUrl ok", (t) => {
     const threads = [

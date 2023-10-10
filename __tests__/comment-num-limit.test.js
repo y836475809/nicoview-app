@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentNumLimit } = require("../app/js/comment-filter");
+const { CommentNumLimit } = require("../src/lib/comment-filter");
 
 // vpos 100ms
 

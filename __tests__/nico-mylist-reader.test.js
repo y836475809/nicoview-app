@@ -1,6 +1,6 @@
 const test = require("ava");
 const fs = require("fs");
-const { NicoMylistReader } = require("../app/js/nico-mylist");
+const { NicoMylistReader } = require("../src/lib/nico-mylist");
 
 let mylist_xml = null;
 test.before(t => { // eslint-disable-line no-unused-vars
@@ -24,7 +24,7 @@ test("nico mylist parse xml", t => {
         title: "マイリスト1",
         mylist_id:"mylist/00000000",
         link: "http://www.nicovideo.jp/mylist/00000000",
-        description: "説明\r\n動画マイリスト",
+        description: "説明\n動画マイリスト",
         creator: "user1",
         items: [
             {
@@ -42,7 +42,7 @@ test("nico mylist parse xml", t => {
                 title: "動画2",
                 video_id: "sm20",
                 link: "http://www.nicovideo.jp/watch/sm20",
-                description: "動画2メモ1\r\n動画2メモ2\r\n動画2メモ3",
+                description: "動画2メモ1\n動画2メモ2\n動画2メモ3",
                 thumb_img: "http://tn.smilevideo.jp/smile?i=20.M",
                 length: "50:50",
                 date: "2000年1月2日 02：02：02",
@@ -52,7 +52,7 @@ test("nico mylist parse xml", t => {
                 title: "動画1",
                 video_id: "sm10",
                 link: "http://www.nicovideo.jp/watch/sm10",
-                description: "動画1メモ1\r\n動画1メモ2\r\n動画1メモ3\r\n動画1メモ4",
+                description: "動画1メモ1\n動画1メモ2\n動画1メモ3\n動画1メモ4",
                 thumb_img: "http://tn.smilevideo.jp/smile?i=10",
                 length: "0:10",
                 date: "2000年1月1日 01：01：01",

@@ -1,4 +1,4 @@
-const { MyObservable } = require("../app/js/my-observable");
+const { MyObservable } = require("../src/lib/my-observable");
 const obs = new MyObservable();
 
 const createModalFunc = (msg, buttons) => {

@@ -341,7 +341,7 @@
  */
 
 /** 
- * @typedef {import("@js/my-observable").MyObservable} MyObservable
- * @typedef {import("@js/modal-dialog").ModalDialog} ModalDialog
+ * @typedef {import("@lib/my-observable").MyObservable} MyObservable
+ * @typedef {import("@lib/modal-dialog").ModalDialog} ModalDialog
  * @typedef {import("node_modules/riot/riot").RiotComponent} RiotComponent
  */

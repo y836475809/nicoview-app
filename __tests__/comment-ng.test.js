@@ -1,5 +1,5 @@
 const test = require("ava");
-const { NGComment } = require("../app/js/comment-filter");
+const { NGComment } = require("../src/lib/comment-filter");
 
 const mkComments = () => {
     return [

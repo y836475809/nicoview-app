@@ -4,21 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test setting</title>
-    <link rel="stylesheet" type="text/css" href="../app/css/app.css">
+    <link rel="stylesheet" type="text/css" href="../src/css/app.css">
     <style type="text/css">
     </style>
 </head>
 
 <body>
-    <setting-page></setting-page>
+    <setting></setting>
 </body>
 
-<script type="riot" src="../app/pages/common/modal-dialog.riot"></script>
-<script type="riot" src="../app/pages/setting-page/setting-page.riot"></script>
+<script type="riot" src="../src/renderer/common/modal-dialog.riot"></script>
+<script type="riot" src="../src/renderer/main/setting.riot"></script>
 <script src="../node_modules/riot/riot+compiler.min.js"></script>
-<script src="../app/html/riot-mount.js"></script>
 <script>
-    roitMount("setting-page"); // eslint-disable-line no-undef
+    /* globals riot */
+    document.addEventListener("DOMContentLoaded", async () => {
+        await riot.compile();
+        riot.mount("setting");
+    });
 </script>
 
 </html>

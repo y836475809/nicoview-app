@@ -20,46 +20,61 @@ window.addEventListener( "unhandledrejection", async e => {
     alert(e.reason.message);
 } );
 
+/**
+ * 
+ * @param {string[]} module_names 
+ * @param {string} dir_name 
+ */
+const loadRiot = (module_names, dir_name) => {
+    module_names.forEach(name => {
+        const fname = `${name}.riot.js`;
+        global.NicoRiot[fname] = require(`./renderer/${dir_name}/${fname}`);
+    });
+};
+
 window.addEventListener("load", () => {
+    global.NicoRiot = {};
+
+    loadRiot([
+        "listview", 
+        "modal-dialog"
+    ], "common");
+
     const params = new URLSearchParams(window.location.search);
     if(params.get("window") == "main"){
-        global.RiotJS = {
-            Listview      : require("./renderer/common/listview.riot.js"),
-            ModalDialog   : require("./renderer/common/modal-dialog.riot.js"),
-            SettingPage   : require("./renderer/main/setting.riot.js"),
-            HistoryPage   : require("./renderer/main/history.riot.js"),
-            DownloadPage  : require("./renderer/main/download-list.riot.js"),
-            DownloadSch   : require("./renderer/main/download-schedule.riot.js"),
-            MyListSidebar : require("./renderer/main/mylist-sidebar.riot.js"),
-            MyListContent : require("./renderer/main/mylist-content.riot.js"),
-            SearchSidebar : require("./renderer/main/search-sidebar.riot.js"),
-            PagingNation  : require("./renderer/main/pagination.riot.js"),
-            SearchContent : require("./renderer/main/search-content.riot.js"),
-            LibraryContent: require("./renderer/main/library-content.riot.js"),
-            LibrarySidebar: require("./renderer/main/library-sidebar.riot.js"),
-            BookmarkPage  : require("./renderer/main/bookmark.riot.js"),
-            PlayStackPage : require("./renderer/main/play-stack.riot.js"),
-            MainPage      : require("./renderer/main/main.riot.js")
-        };
+        loadRiot([
+            "main",
+            "bookmark",
+            "play-stack",
+            "library-content",
+            "library-sidebar",
+            "pagination",
+            "search-sidebar",
+            "search-content",
+            "mylist-sidebar",
+            "mylist-content",
+            "download-list",
+            "download-schedule",
+            "history",
+            "setting",
+        ], "main");
     }
     if(params.get("window") == "player"){
-        global.RiotJS = {
-            Listview                : require("./renderer/common/listview.riot.js"),
-            ModalDialog             : require("./renderer/common/modal-dialog.riot.js"),
-            OpenVideoForm           : require("./renderer/player/open-video-form.riot.js"),
-            PlayerInfoPage          : require("./renderer/player/player-info.riot.js"),
-            PlayerMainPage          : require("./renderer/player/player-main.riot.js"),
-            PlayerPage              : require("./renderer/player/player.riot.js"),
-            PlayerSeek              : require("./renderer/player/player-seek.riot.js"),
-            PlayerTags              : require("./renderer/player/player-tags.riot.js"),
-            PlayerUser              : require("./renderer/player/player-user.riot.js"),
-            PlayerVideo             : require("./renderer/player/player-video.riot.js"),
-            PlayerVolume            : require("./renderer/player/player-volume.riot.js"),
-            PlayerControls          : require("./renderer/player/player-controls.riot.js"),
-            PlayerSettingDialog     : require("./renderer/player/player-setting-dialog.riot.js"),
-            SettingDisplayComment   : require("./renderer/player/setting-display-comment.riot.js"),
-            SettingNGComment        : require("./renderer/player/setting-ng-comment.riot.js"),
-            SettingPlayerContextMenu: require("./renderer/player/setting-player-contextmenu.riot.js"),
-        };
+        loadRiot([
+            "open-video-form",
+            "player-info",
+            "player-main",
+            "player",
+            "player-seek",
+            "player-tags",
+            "player-user",
+            "player-video",
+            "player-volume",
+            "player-controls",
+            "player-setting-dialog",
+            "setting-display-comment",
+            "setting-ng-comment",
+            "setting-player-contextmenu",
+        ], "player");
     }
 });

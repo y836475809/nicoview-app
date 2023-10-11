@@ -115,7 +115,7 @@ const duration_nc_script_comments = () => {
     ];
 };
 
-const { CommentTimeLine, NicoScript } = require("../src/lib/comment-timeline");
+const { CommentTimeLine, NicoScript } = require("../../src/lib/comment-timeline");
 
 /** @type {CommentTimeLine} */
 let commnet_tl = null;

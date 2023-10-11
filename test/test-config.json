@@ -1,0 +1,9 @@
+{
+    "mock_server_port":8098,
+    "mock_server_wait_msec": 500,
+    "use_mock_server": [
+        "main",
+        "search",
+        "mylist"
+    ]
+}

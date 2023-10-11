@@ -8,6 +8,7 @@ tmp/
 /test/sql/*.json
 /data/
 test/data/
+test/userData/
 *.lnk
 /test/mock_server/img/
 /test/mock_server/data/*.jpeg

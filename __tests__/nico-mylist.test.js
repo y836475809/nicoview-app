@@ -98,3 +98,14 @@ test("mylist 404", async t => {
         t.regex(error.message, /404:/);
     }
 });
+
+test("mylist redirection", async t => {
+    for (const code of [301, 302]) {
+        const id = "10";
+        nico_mylist_mocks.mylistRedirection(id, 100, code);
+        
+        const nico_mylist = new NicoMylist();
+        const xml = await nico_mylist.requestXML(getMylisID(id));
+        t.is(xml, `<rss>user-${id}<rss>`);
+    }
+});

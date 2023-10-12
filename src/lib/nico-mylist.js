@@ -27,9 +27,23 @@ class NicoMylist {
         return this.mylist;
     }
 
+    _isRedirection(status_code){
+        return status_code == 301 || status_code == 302;
+    }
+
     async requestXML(mylist_id){
         const url = this._getURL(mylist_id);
-        this.xml = await this._requestXML(url);
+        try {
+            this.xml = await this._requestXML(url); 
+        } catch (error) {
+            if(this._isRedirection(error.status)){
+                // リダイレクトの場合
+                const location = error.location;
+                this.xml = await this._requestXML(location);
+            }else{
+                throw error;
+            }
+        }
         return this.xml;
     }
 

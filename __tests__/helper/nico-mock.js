@@ -540,6 +540,23 @@ class NicoMylistMocks {
             .delay(delay)
             .reply(code, xml, headers);
     }
+
+    mylistRedirection(id, delay=1, code){
+        const xml = `<rss>user-${id}<rss>`;
+        const headers = {
+            "Content-Type": "application/xml",
+            "location": `https://www.nicovideo.jp/user/${id}/mylist/${id}`
+        };
+        this.myist_nock = nock("https://www.nicovideo.jp");
+        this.myist_nock
+            .get(`/mylist/${id}`)
+            .query({ rss: "2.0", numbers: 1, sort:6 })
+            .delay(delay)
+            .reply(code, xml, headers)
+            .get(`/user/${id}/mylist/${id}`)
+            .delay(delay)
+            .reply(200, xml, headers);
+    }
 }
 
 const TestData = {

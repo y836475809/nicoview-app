@@ -141,6 +141,10 @@ class NicoClientRequest {
         return status_code >= 200 && status_code < 300;
     }
 
+    _isRedirection(status_code){
+        return status_code == 301 || status_code == 302;
+    }
+
     _request(url, options, set_data_func=(req)=>{}){ // eslint-disable-line no-unused-vars
         return new Promise((resolve, reject) => {
             this._req = https.request(options, (res) => {
@@ -149,8 +153,11 @@ class NicoClientRequest {
                 this.set_cookie = res.headers["set-cookie"];
 
                 if(!this._validateStatus(res.statusCode)){
-                    const status_error = new Error(`${res.statusCode}: ${url}`);
+                    const status_error = new Error(`${res.statusCode}: ${url}`); 
                     status_error.status = res.statusCode;
+                    if(this._isRedirection(res.statusCode)){
+                        status_error.location = res.headers.location;
+                    }
                     reject(status_error);
                     return;
                 }

@@ -1,12 +1,14 @@
 const  myapi = require("../../lib/my-api");
-const { GridTable } = require("../../lib/gridtable");
+const { mountNicoGrid } = require("../common/nico-grid-mount");
 const time_format = require("../../lib/time-format");
 const { SyncCommentScroll } = require("../../lib/sync-comment-scroll");
-const { window_obs } = require("../../lib/my-observable");
+const { window_obs, MyObservable } = require("../../lib/my-observable");
 const { logger } = require("../../lib/logger");
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
+
+const nico_grid_name = "player-comment-nico-grid";
 
 module.exports = {
     state:{
@@ -26,40 +28,16 @@ module.exports = {
     /** @type {SyncCommentScroll} */
     sync_comment_scroll:null,
     sync_comment_checked:true,
-    /** @type {GridTable} */
-    grid_table:null,
     onBeforeMount() {
         this.sync_comment_scroll = new SyncCommentScroll();
-
-        const timeFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
-            return time_format.toTimeString(value * 10 / 1000);
-        };
-        const dateFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
-            //sec->ms
-            return time_format.toDateString(value * 1000);
-        };
-        const columns = [
-            {id: "vpos", name: "時間", formatter: timeFormatter},
-            {id: "content", name: "コメント"},
-            {id: "user_id", name: "ユーザーID"},
-            {id: "date", name: "投稿日", formatter: dateFormatter},
-            {id: "no", name: "番号"},
-            {id: "mail", name: "オプション"}
-        ];
-        const options = {
-            rowHeight: 25,
-        };   
-        this.grid_table = new GridTable("comment-grid", columns, options);
         
-        player_obs.on("player-info:update-comments", (args)=> {
+        player_obs.on("player-info:update-comments", async (args)=> {
             /** @type {CommentItem[]} */
             const comments = args;
-            this.setComments(comments);
+            await this.setComments(comments);
         });
 
-        player_obs.on("player-info:set-data", (args)=> {
-            this.grid_table.resizeGrid();
-
+        player_obs.on("player-info:set-data", async (args)=> {
             /** @type {{
              * thumb_info:ThumbInfo, comments:CommentItem[], 
              * all_comment_num:number, video_option:VideoOption}} */
@@ -127,7 +105,7 @@ module.exports = {
                 is_saved
             });
 
-            this.setComments(comments);
+            await this.setComments(comments);
             
             this.update();
         });
@@ -137,8 +115,11 @@ module.exports = {
                 return;
             }
 
-            const comment_index =  this.sync_comment_scroll.getCommentIndex(current_sec);
-            this.grid_table.scrollRow(comment_index);
+            const comment_index =  this.sync_comment_scroll.getCommentIndex(current_sec); 
+            this.nico_grid_obs.trigger("scroll-to-index", {
+                index: comment_index,
+                position:"bottom"
+            });
         });
 
         player_obs.on("player-info:reset-comment-scroll", ()=> {
@@ -146,28 +127,63 @@ module.exports = {
                 this.sync_comment_scroll.reset();
             }
         });
-        
-        player_obs.on("player-info:split-resized", ()=> {
-            this.grid_table.resizeGrid();
-        });
     },
-    onMounted() {
-        this.grid_table.init(".comment-grid");
-        this.grid_table.setupResizer(".comment-grid-container");
+    async onMounted() {
+        // eslint-disable-next-line no-unused-vars
+        const commentFormatter = (id, value, data) => {
+            if(!value){
+                return "";
+            }
+            return `<div title="${value}" class="comment-text">${value}</div>`;
+        };
+        // eslint-disable-next-line no-unused-vars
+        const timeFormatter = (id, value, data)=> {
+            return time_format.toTimeString(value * 10 / 1000);
+        };
+        // eslint-disable-next-line no-unused-vars
+        const dateFormatter = (id, value, data)=> {
+            //sec->ms
+            return time_format.toDateString(value * 1000);
+        };
+        const columns = [
+            {id: "vpos", name: "時間", sortable:false, ft: timeFormatter},
+            {id: "content", name: "コメント", sortable:false, ft:commentFormatter},
+            {id: "user_id", name: "ユーザーID", sortable:false},
+            {id: "date", name: "投稿日", sortable:false, ft: dateFormatter},
+            {id: "no", name: "番号", sortable:false},
+            {id: "mail", name: "オプション", sortable:false}
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {
+            header_height: 25,
+            row_height: 25,
+            filter_target_ids: [
+                "content", "user_id"
+            ],
+            img_cache_capacity:5,
+            view_margin_num: 10
+        };
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
 
-        this.grid_table.onDblClick(async (e, /** @type {CommentItem} */ data)=>{
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", (args) => {
+            const { data } = args;
             const sec = data.vpos * 10 / 1000;
             player_obs.trigger("player-video:seek", sec);
         });
-
-        this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
+        this.nico_grid_obs.on("show-contexmenu", async () => {
             const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
             if(!menu_id){
                 return;
             }
             if(menu_id=="add-comment-ng=list"){
                 /** @type {CommentItem[]} */
-                const items = this.grid_table.getSelectedDatas();
+                const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
                 const texts = items.map(item=>{
                     return item.content;
                 });
@@ -175,7 +191,7 @@ module.exports = {
             }
             if(menu_id=="add-uerid-ng=list"){
                 /** @type {CommentItem[]} */
-                const items = this.grid_table.getSelectedDatas();
+                const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
                 const user_ids = items.map(item=>{
                     return item.user_id;
                 });
@@ -241,15 +257,16 @@ module.exports = {
      * 
      * @param {CommentItem[]} comments 
      */
-    setComments(comments) {
+    async setComments(comments) {
         this.sync_comment_scroll.setComments(comments);
 
-        const grid_table_comments = comments.map((value, index) => {
+        const comment_items = comments.map((value, index) => {
             return Object.assign(value, { id: index });
         });
-        this.grid_table.clearSelected();
-        this.grid_table.setData(grid_table_comments);    
-        this.grid_table.scrollToTop();
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "id",
+            items:comment_items
+        });
     },
     /**
      * 

@@ -1,0 +1,44 @@
+<nico-grid-header>
+    <style>
+        .nico-grid-header {
+            width: 100%;
+            overflow: hidden;
+        }
+        .nico-grid-header > .header-cell-container {
+            position: relative;
+            display: flex; 
+            flex-wrap: nowrap;
+            width: fit-content;
+        }
+        .header-cell-container > .header-cell {
+            flex-shrink: 0;
+            border-top: 1px solid gray;
+            border-bottom: 1px solid gray;
+            border-right: 1px solid gray;
+            width: 100%;
+            height:25px;
+            user-select: none;
+            resize : horizontal;
+            overflow: hidden;
+            padding: 5px;
+        }
+        .header-cell-container > .header-cell:first-child {
+            border-left: 1px solid gray;
+        }
+    </style>
+
+    <div class="nico-grid-header">
+        <div class="header-cell-container">
+            <div class="header-cell center-v" style={getHeaderCellStyle(column_id)} 
+                onmousedown={mousedown}
+                data-columnid={column_id}
+                each={column_id in state.column_ids}>
+                {getHeaderTitle(column_id)}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        export default window.NicoRiot["nico-grid-header.riot.js"];
+    </script>
+</nico-grid-header>

@@ -340,6 +340,39 @@
  * @property {string} value
  */
 
+
+/**
+ * NicoGrid SortParam
+ * @typedef {Object} NicoGridSortParam
+ * @property {string} id
+ * @property {boolean} asc
+ */
+
+/**
+ * NicoGrid columns state
+ * @typedef {Object} NicoGridColumnsState
+ * @property {string} id
+ * @property {number} width
+ */
+
+/**
+ * NicoGrid options
+ * @typedef {Object} NicoGridOptions
+ * @property {Number} [header_height]
+ * @property {Number} [row_height] 
+ * @property {NicoGridSortParam} [sort_param]
+ * @property {string[]} [filter_target_ids]
+ * @property {Number} [img_cache_capacity]
+ * @property {Number} [view_margin_num]
+ */
+
+/**
+ * NicoGrid state
+ * @typedef {Object} NicoGridState
+ * @property {NicoGridColumnsState[]} columns
+ * @property {NicoGridSortParam} sort_param
+ */
+
 /** 
  * @typedef {import("@lib/my-observable").MyObservable} MyObservable
  * @typedef {import("@lib/modal-dialog").ModalDialog} ModalDialog

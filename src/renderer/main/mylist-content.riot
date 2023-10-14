@@ -74,6 +74,19 @@
                 - var(--control-height) - var(--margin) * 3);
             overflow: hidden;
         }
+
+        .mylist-grid-img-holder {
+            width: 100%;
+            height: 100%;
+            display: flex; 
+            align-items: center;
+            justify-content: center;
+        }
+
+        .mylist-grid-thumb {
+            max-width: 180px;
+            height: auto;
+        }
     </style>      
 
     <div class="mylist-container">
@@ -86,8 +99,7 @@
         </div>
     </div>
     <div class="mylist-description">{state.mylist_description}</div>
-    <div class="mylist-grid-container">
-        <div class="mylist-grid"></div>
+    <div class="mylist-grid-container" id="mylist-nico-grid">
     </div>
 
     <script>

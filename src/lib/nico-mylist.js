@@ -215,10 +215,10 @@ class NicoMylistImageCache {
                     image.src = url;
                 }
             }
-            image.classList.add("gridtable-thumbnail", "mylist-img");
+            image.classList.add("mylist-grid-thumb", "mylist-img");
             return image.outerHTML;
         }else{
-            return `<img src="${url}" class="gridtable-thumbnail mylist-img"/>`;
+            return `<img src="${url}" class="mylist-grid-thumb mylist-img"/>`;
         }
     }
 

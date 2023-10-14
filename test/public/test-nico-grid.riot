@@ -1,0 +1,60 @@
+<test-nico-grid>
+    <style>
+        :host {
+            width: 100%;
+            height: 100%;
+        }
+        .test-container1 {
+            position: relative;
+            left: 30px;
+            width: 90%;
+            height: calc(100% - 70px);
+            background-color: var(--control-color);
+        }
+        .gt-cont {
+            margin-left: 10px;
+        }
+        .gt-checkbox {
+            margin-right: 5px;
+        }
+    </style>
+    <div style="display: flex; margin-bottom: 5px;">
+        <button class="gt-cont" id="gt-btn1" type=button>data size50</button>
+        <button class="gt-cont" id="gt-btn2" type=button>data size10000</button>
+        <button class="gt-cont" id="gt-btn3" type=button>update item i=5</button>
+        <button class="gt-cont" id="gt-btn4" type=button>sort</button>
+        <button class="gt-cont" id="gt-btn5" type=button>delate sel</button>
+        <button class="gt-cont" id="gt-add-btn" type=button>add</button>
+        
+        <label class="gt-cont center-v">scroll video id</label>
+        <div class="center-v gt-checkbox">
+            <input type="checkbox" id="gt-scroll-view-top"><label for="gt-scroll-view-top">item top</label>
+        </div>
+        <input type="text" id="gt-scroll-video-id-txt" style="width: 100px;">
+        
+        <input class="gt-cont" id="gt-file1" type="file"> 
+    </div>
+    <div style="display: flex; margin-bottom: 5px;">
+        <div class="gt-cont gt-checkbox">
+            <input type="checkbox" id="gt-title"><label for="gt-title">title</label>
+        </div>
+        <div class="gt-checkbox">
+            <input type="checkbox" id="gt-info"><label for="gt-info">info</label>
+        </div>
+        <div class="gt-checkbox">
+            <input type="checkbox" id="gt-tags"><label for="gt-tags">tags</label>
+        </div>
+        <input id="gt-txt1" type="text" style="width: 100px;">
+
+        <button class="gt-cont" id="gt-data-len" type=button>get data len</button>
+        <button class="gt-cont" id="gt-inc-count" type=button>inc state count</button>
+
+        <label class="center-v gt-cont">select index</label><input type="text" id="gt-sel-by-index-txt" style="width: 100px;">
+
+        <button class="gt-cont" id="gt-save-state" type=button>save state</button>
+    </div>
+    <div class="test-container1" id="test-nico-grid"></div>
+    <script>
+        export default window.TestNicoGrid;
+    </script>
+</test-nico-grid>

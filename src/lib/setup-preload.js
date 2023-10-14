@@ -31,7 +31,9 @@ const setupPreload = () => {
 
         loadRiot([
             "listview", 
-            "modal-dialog"
+            "modal-dialog",
+            "nico-grid",
+            "nico-grid-header"
         ], "common");
 
         const params = new URLSearchParams(window.location.search);

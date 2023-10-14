@@ -1,5 +1,6 @@
 const myapi = require("../../lib/my-api");
-const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = require("../../lib/gridtable");
+const { mountNicoGrid } = require("../common/nico-grid-mount");
+const { infoFormatter, tagsFormatter } = require("../common/nico-grid-formatter");
 const { Command } = require("../../lib/command");
 const { NicoSearchParams, NicoSearch, searchItems } = require("../../lib/nico-search");
 const { ModalDialog } = require("../../lib/modal-dialog");
@@ -8,6 +9,8 @@ const { logger } = require("../../lib/logger");
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
+
+const nico_grid_name = "search-nico-grid";
 
 /**
  * 検索ページのグリッドテーブルに追加するアイテムを生成
@@ -70,8 +73,6 @@ module.exports = {
     /** @type {NicoSearch} */
     nico_search:null,
 
-    /** @type {GridTable} */
-    grid_table:null,
     onBeforeMount() {
         this.obs_modal_dialog = new MyObservable();
         this.modal_dialog = null;
@@ -83,39 +84,6 @@ module.exports = {
         this.nico_search_params = new NicoSearchParams(search_limit, search_context);
         this.nico_search = new NicoSearch();
 
-        const seach_infoFormatter = infoFormatter.bind(this, 
-            (value, dataContext)=>{ return `<div>${value}</div>`; }); // eslint-disable-line no-unused-vars
-
-        const tagsFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
-            if(!value){
-                return "";
-            }
-
-            const tags = value.split(" ");
-
-            let content = "";
-            tags.forEach(tag => {
-                content += `<div class='tag-content label-tag'>${tag}</div>`;
-            });
-            const title = tags.join("\n");
-            return `<div title="${title}" class='wrap-gridtable-cell'>${content}</div>`;
-        };
-
-        const columns = [
-            {id: "thumb_img", name: "サムネイル", width: 130},
-            {id: "title", name: "名前", formatter:wrapFormatter},
-            {id: "command", name: "操作", sortable: false, 
-                formatter: buttonFormatter.bind(this, ["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報", formatter:seach_infoFormatter},
-            {id: "pub_date", name: "投稿日"},
-            {id: "play_time", name: "時間"},
-            {id: "tags", name: "タグ, コメント", formatter:tagsFormatter},
-        ];
-        const options = {
-            rowHeight: 100,
-        };   
-        this.grid_table = new GridTable("search-grid", columns, options, "video_id");
-
         this.pagination_obs.on("move-page", async args => {
             const { page_num } = args;
             this.nico_search_params.page(page_num);
@@ -124,26 +92,34 @@ module.exports = {
 
         myapi.ipc.Download.onUpdateItem(async ()=>{
             const video_ids = await myapi.ipc.Download.getIncompleteIDs();
-            const items = this.grid_table.dataView.getItems();
-
+            const items = await this.nico_grid_obs.triggerReturn("get-items");
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
-                this.grid_table.dataView.updateItem(video_id, item);    
+                this.nico_grid_obs.trigger("update-item", {
+                    id: video_id,
+                    props: item
+                });
             }
         });
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.video_id;
-            this.grid_table.updateCells(video_id, { saved:true });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved:true }
+            });
         });
 
         myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
-            this.grid_table.updateCells(video_id, { saved:false });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved:false }
+            });
         });
 
         main_obs.on("search:item-dlbclicked", async (
@@ -207,23 +183,42 @@ module.exports = {
         });
     },
     async onMounted() {
-        /** @type {HTMLElement} */
-        const elm = this.$(".cond-menu-container1");
-        elm.addEventListener("transitionend", (event) => {
-            if(event.propertyName == "height") {
-                this.grid_table.resizeGrid();
-            }
-        });
+        const seach_infoFormatter = infoFormatter.bind(this, 
+            // eslint-disable-next-line no-unused-vars
+            (id, value, data)=>{ 
+                return `<div>${value}</div>`; 
+            });
+        const columns = [
+            {id: "thumb_img", name: "サムネイル", width: 185},
+            {id: "title", name: "名前"},
+            {id: "command", name: "操作"},
+            {id: "info", name: "情報", ft: seach_infoFormatter},
+            {id: "pub_date", name: "投稿日"},
+            {id: "play_time", name: "時間"},
+            {id: "tags", name: "タグ, コメント", ft: tagsFormatter.bind(this, " ")},
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {
+            filter_target_ids: [
+                "title", "tags", "video_id"
+            ]
+        };
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
 
-        const grid_container = this.$(".search-grid");
-        this.grid_table.init(grid_container);
-        this.grid_table.setupResizer(".search-grid-container");
-        this.grid_table.onDblClick((e, data)=>{
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", (args) => {
+            const { data } = args;
             if(data.video_id){
                 Command.play(data, false);
             }
         });
-        this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
+        this.nico_grid_obs.on("cmd", (args) => {
+            const { cmd_id, data } = args;
             if(cmd_id == "play"){
                 Command.play(data, false);
             }
@@ -237,8 +232,9 @@ module.exports = {
                 Command.addDownloadItems(main_obs, [data]);
             }
         });
-        this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
-            const items = this.grid_table.getSelectedDatas().filter(value => {
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const sel_data_list = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            const items = sel_data_list.filter(value => {
                 return value.video_id!="";
             });
             if(items.length===0){
@@ -367,7 +363,6 @@ module.exports = {
             }
         });
 
-        this.grid_table.clearSelected();
         try {
             
             /** @type {NicoSearchResultItem} */
@@ -419,9 +414,11 @@ module.exports = {
                 return createItem(value, saved, reg_download);
             })
         );
-        items.push(createEmptyItem());
-        this.grid_table.setData(items);
-        this.grid_table.scrollToTop();  
+        items.push(createEmptyItem());  
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "video_id",
+            items: items
+        });
     },
     /**
      * 

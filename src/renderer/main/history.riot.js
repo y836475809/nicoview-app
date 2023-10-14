@@ -1,76 +1,89 @@
 const myapi = require("../../lib/my-api");
-const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = require("../../lib/gridtable");
+const { infoFormatter } = require("../common/nico-grid-formatter");
+const { mountNicoGrid } = require("../common/nico-grid-mount");
 const { Command } = require("../../lib/command");
-const { window_obs } = require("../../lib/my-observable");
+const { MyObservable, window_obs } = require("../../lib/my-observable");
 const { logger } = require("../../lib/logger");
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
+const nico_grid_name = "history-nico-grid";
+
 module.exports = {
-    /** @type {GridTable} */
-    grid_table:null,
     onBeforeMount() {
         myapi.ipc.Download.onUpdateItem(async ()=>{
             const video_ids = await myapi.ipc.Download.getIncompleteIDs();
-            const items = this.grid_table.dataView.getItems();
+            const items = await this.nico_grid_obs.triggerReturn("get-items");
 
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
-                this.grid_table.dataView.updateItem(video_id, item);    
+                this.nico_grid_obs.trigger("update-item", {
+                    id: video_id,
+                    props: item
+                });   
             }
         });
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.video_id;
-            this.grid_table.updateCells(video_id, { saved:true });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved: true }
+            });
         });
 
         myapi.ipc.Library.onDeleteItem((args) => {
             /** @type {{video_id:string}} */
             const { video_id } = args;
-            this.grid_table.updateCells(video_id, { saved:false });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved: false }
+            });
         });
 
         myapi.ipc.History.onUpdateItem(async ()=>{
             const items = await myapi.ipc.History.getItems();
             this.setData(items);
         });
-        
-        const history_infoFormatter = infoFormatter.bind(this, 
-            (value, dataContext)=>{ 
-                return `<div>ID: ${dataContext.video_id}</div>`;
-            });
-
-        const columns = [
-            {id: "thumb_img", name: "サムネイル", height:100, width: 130},
-            {id: "title", name: "名前", sortable: true, formatter:wrapFormatter},
-            {id: "command", name: "操作", sortable: false, 
-                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報",sortable: false, formatter:history_infoFormatter},
-            {id: "play_date", name: "再生日", sortable: true}
-        ];
-        const options = {
-            rowHeight: 100,
-        }; 
-        this.grid_table = new GridTable("history-grid", columns, options, "video_id");
 
         main_obs.on("history:reload-items", async ()=>{
             await this.loadItems();
         });
     },
     async onMounted() {
-        const grid_container = this.$(".history-grid");
-        this.grid_table.init(grid_container);
-        this.grid_table.setupResizer(".history-grid-container");
-        this.grid_table.onDblClick((e, data)=>{
-            Command.play(data, false);
+        const histroy_infoFormatter =  infoFormatter.bind(this, (id, value, data) => { 
+            return `<div>ID: ${data.video_id}</div>`;
         });
-        this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
+        const columns = [
+            {id: "thumb_img", name: "サムネイル", width: 130},
+            {id: "title", name: "名前", sortable: false},
+            {id: "command", name: "操作"},
+            {id: "info", name: "情報",sortable: false, ft: histroy_infoFormatter},
+            {id: "play_date", name: "再生日", sortable: false}
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {};
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", (args) => {
+            const { data } = args;
+            if(data.video_id){
+                Command.play(data, false);
+            }
+        });
+        this.nico_grid_obs.on("cmd", async (args) => {
+            const { cmd_id, data } = args;
             if(cmd_id == "play"){
                 Command.play(data, false);
             }
@@ -85,14 +98,14 @@ module.exports = {
             }
         });
 
-        this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
-            const items = this.grid_table.getSelectedDatas();
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
             if(items.length==0){
                 return;
             }
-            await myapi.ipc.popupContextMenu("history", {items});           
-        });           
-        
+            await myapi.ipc.popupContextMenu("history", {items});  
+        });
+
         await this.loadItems();
     },
     async setData(items) {
@@ -103,8 +116,10 @@ module.exports = {
             item.saved = await myapi.ipc.Library.hasItem(video_id);
             item.reg_download = video_ids.includes(video_id);  
         }
-        this.grid_table.clearSelected();
-        this.grid_table.setData(items);
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "video_id",
+            items: items
+        });
     },
     async loadItems() {
         try {

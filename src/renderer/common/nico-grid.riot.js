@@ -393,14 +393,14 @@ module.exports = {
             return;
         }
         /** @type {HTMLImageElement[]} */
-        const img_elms = this.$$(".nico-grid-img-holder");
-        if(img_elms.length==0){
+        const img_holder_elms = this.$$(".nico-grid-img-holder");
+        if(img_holder_elms.length==0){
             return;
         }
-        this.img_elm_cache.getImg(urls, (i, img_elm) => {
-            if(img_elm){
-                img_elms[i].appendChild(img_elm);
-            }   
+        const img_src_list = urls.slice(0, img_holder_elms.length);
+        const img_elms = this.img_elm_cache.getImgs(img_src_list);
+        img_elms.forEach((img_src, i)=>{
+            img_holder_elms[i].appendChild(img_src);
         });
     },
     updateCells(){

@@ -37,21 +37,28 @@ class ImgElementCache {
         /** @type {Map<string, HTMLImageElement>} */
         this._cache = new LRUCache(capacity);
     }
+    
     /**
      * 
      * @param {string[]} img_src_list 
-     * @param {function(number, HTMLImageElement):void} func 
+     * @returns {HTMLImageElement[]}
      */
-    getImg(img_src_list, func){
-        img_src_list.forEach((img_src, i)=>{
-            if(img_src){
-                this._preloadImg(img_src);
-                const img_elm = this._cache.get(img_src);
-                func(i, img_elm);
-            }else{
-                func(i, null);
-            }
-        });
+    getImgs(img_src_list){
+        const values = this._cache.values();
+        for(const value of values){
+            const pe = value.parentElement;
+            if(pe){
+                while (pe.lastChild) {
+                    pe.removeChild(pe.lastChild);
+                }
+            } 
+        }
+
+        const img_elms = [];
+        for(const img_src of img_src_list){
+            img_elms.push(this._preloadImg(img_src));
+        }
+        return img_elms;
     }
     /**
      * 
@@ -59,13 +66,15 @@ class ImgElementCache {
      */
     _preloadImg(img_src) {
         if(this._cache.has(img_src)){
-            return;
+            return this._cache.get(img_src);
+        }else{
+            const img = new Image();
+            this._cache.set(img_src, img);
+            img.loading = "lazy";
+            img.classList.add(...this._img_classes);
+            img.src = img_src;
+            return img;
         }
-        const img = new Image();
-        this._cache.set(img_src, img);
-        img.loading = "lazy";
-        img.classList.add(...this._img_classes);
-        img.src = img_src;
     }
 }
 

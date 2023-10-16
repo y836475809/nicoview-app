@@ -115,9 +115,10 @@ const duration_nc_script_comments = () => {
     ];
 };
 
-const { CommentTimeLine, NicoScript } = require("../../src/lib/comment-timeline");
+// const { CommentTimeLine, NicoScript } = require("../../src/lib/comment-timeline");
+const { NicoCommentTimeLine, NicoScript } = require("../../src/lib/nico-comment-timeline");
 
-/** @type {CommentTimeLine} */
+/** @type {NicoCommentTimeLine} */
 let commnet_tl = null;
 
 const duration_sec = 4;
@@ -130,7 +131,8 @@ const createCommentTL = () => {
     const cm_style = getComputedStyle(document.documentElement);
     const font_family = cm_style.getPropertyValue("--nico-comment-font-family");
     console.log("tween font_family=", font_family);
-    commnet_tl = new CommentTimeLine(area_elm, duration_sec, 12, font_family);
+    commnet_tl = new NicoCommentTimeLine(area_elm, duration_sec, 12, font_family);
+    commnet_tl.setFPS(200);
 };
 
 const TextComments = (text) => {

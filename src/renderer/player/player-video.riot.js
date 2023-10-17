@@ -1,5 +1,5 @@
 const myapi = require("../../lib/my-api");
-const { CommentTimeLine, NicoScript } = require("../../lib/comment-timeline");
+const { NicoCommentTimeLine, NicoScript } = require("../../lib/nico-comment-timeline");
 const { window_obs } = require("../../lib/my-observable");
 const { logger } = require("../../lib/logger");
 
@@ -13,7 +13,7 @@ module.exports = {
     /** @type {PlayData} */
     play_data:null,
 
-    /** @type {CommentTimeLine} */
+    /** @type {NicoCommentTimeLine} */
     comment_tl:null,
 
     /** @type {CommentConfig}  */
@@ -263,7 +263,7 @@ module.exports = {
         if(this.comment_tl){
             this.comment_tl.clear();
         }
-        this.comment_tl = new CommentTimeLine(parent, duration_sec, row_num, comment_font_family);
+        this.comment_tl = new NicoCommentTimeLine(parent, duration_sec, row_num, comment_font_family);
         this.comment_tl.onComplete(()=>{
             if(this.video_elm.currentTime == this.video_elm.duration){
                 // 動画終了後にコメントが流れる場合はコメント完了後にpauseにする

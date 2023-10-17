@@ -132,7 +132,6 @@ const createCommentTL = () => {
     const font_family = cm_style.getPropertyValue("--nico-comment-font-family");
     console.log("tween font_family=", font_family);
     commnet_tl = new NicoCommentTimeLine(area_elm, duration_sec, 12, font_family);
-    commnet_tl.setFPS(200);
 };
 
 const TextComments = (text) => {
@@ -168,6 +167,7 @@ const createTL = (commnets)=>{
 
     createCommentTL();
     commnet_tl.create(commnets);
+    commnet_tl.setFPS(10);
 };
 
 const createFlowTL = ()=>{

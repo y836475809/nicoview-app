@@ -262,7 +262,7 @@ class TimeLine {
 
         this._current_time_ms = 0;
         this._last_time_ms = 0;
-        this._interval_id = null;
+        this._interval_id = 0;
         this._interval_ms = 100;
         this._start_index = 0; 
     }
@@ -294,16 +294,19 @@ class TimeLine {
         if(this._interval_id){
             return;
         }
-        this._interval_id = setInterval(() => {
+        let current_time = Date.now();
+        this._interval_id = Number(setInterval(() => {
+            this._current_time_ms += Date.now() - current_time;
+            current_time = Date.now();
+
             this._updateAnimetion();   
             if(this._current_time_ms >= this._last_time_ms + 100){
                 this._clearInterval();
                 if(this._on_complete){
                     this._on_complete();
                 }
-            }
-            this._current_time_ms += this._interval_ms;
-        }, this._interval_ms);
+            }  
+        }, this._interval_ms));  
     }
 
     _updateAnimetion(){
@@ -313,18 +316,19 @@ class TimeLine {
             const pre = delay + this._duration_ms + 500;
             if(this._current_time_ms > pre){
                 this._start_index = i;
-                const em = this._em_map.get(ani.id);
-                if(em.style.display == "block"){
-                    em.style.display = "none";
+                const style = this._em_map.get(ani.id).style;
+                if(style.display == "block"){
+                    style.display = "none";
                 }
                 continue;
             }    
             if(this._current_time_ms + 1000 < delay){
                 break;
             }
-            const em = this._em_map.get(ani.id);
-            if(em.style.display == "none"){
-                em.style.display = "block";
+
+            const style = this._em_map.get(ani.id).style;
+            if(style.display == "none"){
+                style.display = "block";
             }
             ani.currentTime = this._current_time_ms;
         } 
@@ -332,7 +336,7 @@ class TimeLine {
 
     _clearInterval(){
         clearInterval(this._interval_id);
-        this._interval_id = null;
+        this._interval_id = 0;
     }
 
     pause(){

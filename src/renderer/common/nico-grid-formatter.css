@@ -1,0 +1,67 @@
+
+.nico-grid-img-holder {
+  width: 100%;
+  height: 100%;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+.nico-grid-thumb {
+  max-width: 180px;
+  height: auto;
+}
+
+.nico-grid-wrap-cell {
+  width: 100%;
+  height: 100%;
+  white-space: normal;
+  overflow-wrap: break-word;
+  overflow: hidden;
+}
+
+.nico-grid-tag-content {
+  display: inline-block;
+  border-radius: 2px;
+  padding: 3px 10px 3px 10px;
+  margin-right: 5px;        
+  margin-bottom: 5px;
+  background-color: lightpink
+}
+
+.nico-grid-button {
+  margin-top: 5px;
+  margin-right: 5px;
+  width: 25px;
+  height: 25px;
+}
+
+.nico-grid-button,
+.nico-grid-button > i {
+  font-size: 15px;
+  color: gray;
+  cursor: pointer;
+}
+
+.nico-grid-button:hover > i,
+.nico-grid-button > i:hover {
+  color: black;
+}
+
+.nico-grid-state-content {
+  display: inline-block;
+  border-radius: 2px;
+  padding: 3px 3px 3px 3px;
+  margin-right: 5px;        
+  margin-bottom: 5px;
+  font-size: 20px;
+  color: #444444;
+}
+
+.nico-grid-state-saved {
+  background-color: #7fbfff;
+}
+
+.nico-grid-state-reg-download {
+  background-color: hotpink;
+}

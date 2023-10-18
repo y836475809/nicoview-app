@@ -4,6 +4,7 @@
     "use_mock_server": [
         "main",
         "search",
-        "mylist"
+        "mylist",
+        "nico-grid"
     ]
 }

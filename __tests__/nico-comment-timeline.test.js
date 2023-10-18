@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentTimeLine } = require("../src/lib/comment-timeline");
+const { NicoCommentTimeLine } = require("../src/lib/nico-comment-timeline");
 
 class McokElement {
     constructor(name){
@@ -37,7 +37,7 @@ class MockDocument {
 
 global.document = new MockDocument();
 
-class TestCommentTimeLine extends CommentTimeLine {
+class TestCommentTimeLine extends NicoCommentTimeLine {
     _createCanvas(){}
     clear(){}
     _getTextWidth(text, font_size){ // eslint-disable-line no-unused-vars
@@ -89,12 +89,12 @@ test("flow comments", t => {
                 position:"absolute",
                 fontSize: "15px",
                 top:(300/12*0 + (300/12-parseInt(elm.style.fontSize))/2) + "px",
-                left:"300px",
+                left:"305px",
                 color: "#FFFFFF"
             });
-        t.is(elm.id, "flow-comment-id0");
+        t.is(elm.id, "flow-comment0");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "flow"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(left, -400);
         t.is(delay, 0.1);
     }
@@ -107,12 +107,12 @@ test("flow comments", t => {
                 position:"absolute",
                 fontSize: "20px",
                 top: (300/12*1 + (300/12-parseInt(elm.style.fontSize))/2) +"px",
-                left:"300px",
+                left:"305px",
                 color: "#FF0000"
             });
-        t.is(elm.id, "flow-comment-id1");
+        t.is(elm.id, "flow-comment1");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "flow"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(left, -400);
         t.is(delay, 0.2);
     }
@@ -155,7 +155,7 @@ test("fixed comments no option", t => {
     t.is(ctl.fixed_params.length, 4);
 
     {
-        const { elm, delay, duration } = ctl.fixed_params[0]; 
+        const { elm, delay, pos } = ctl.fixed_params[0]; 
         t.deepEqual(elm.style,
             {
                 display:"none",
@@ -163,17 +163,17 @@ test("fixed comments no option", t => {
                 position:"absolute",
                 fontSize: "15px",
                 top: (0*(300/12) + (300/12-parseInt(elm.style.fontSize))/2)+"px",
-                left:"100px",
+                left:"305px",
                 color: "#FFFFFF"
             });
-        t.is(elm.id, "fixed-ue-comment-id0");
+        t.is(elm.id, "fixed-ue-comment0");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.1);
-        t.is(duration, 4);
+        t.is(pos, 200);
     }
     {
-        const { elm, delay, duration } = ctl.fixed_params[1]; 
+        const { elm, delay, pos } = ctl.fixed_params[1]; 
         t.deepEqual(elm.style,
             {
                 display:"none",
@@ -181,18 +181,18 @@ test("fixed comments no option", t => {
                 position:"absolute",
                 fontSize: "20px",
                 top: (1*(300/12) + (300/12-parseInt(elm.style.fontSize))/2)+"px",
-                left:"100px",
+                left:"305px",
                 color: "#FF0000"
             });
-        t.is(elm.id, "fixed-ue-comment-id1");
+        t.is(elm.id, "fixed-ue-comment1");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.2);
-        t.is(duration, 4);
+        t.is(pos, 200);
     }
     
     {
-        const { elm, delay, duration } = ctl.fixed_params[2]; 
+        const { elm, delay, pos } = ctl.fixed_params[2]; 
         t.deepEqual(elm.style,
             {
                 display:"none",
@@ -200,17 +200,17 @@ test("fixed comments no option", t => {
                 position:"absolute",
                 fontSize: "15px",
                 top: ((12-0-1)*(300/12) + (300/12-parseInt(elm.style.fontSize))/2) + "px",
-                left:"100px",
+                left:"305px",
                 color: "#FFFFFF"
             });
-        t.is(elm.id, "fixed-shita-comment-id0");
+        t.is(elm.id, "fixed-shita-comment0");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.1);
-        t.is(duration, 4);
+        t.is(pos, 200);
     }
     {
-        const { elm, delay, duration } = ctl.fixed_params[3];
+        const { elm, delay, pos } = ctl.fixed_params[3];
         t.deepEqual(elm.style,
             {
                 display:"none",
@@ -218,14 +218,14 @@ test("fixed comments no option", t => {
                 position:"absolute",
                 fontSize: "20px",
                 top: ((12-1-1)*(300/12) + (300/12-parseInt(elm.style.fontSize))/2) + "px",
-                left:"100px",
+                left:"305px",
                 color: "#FF0000"
             });
-        t.is(elm.id, "fixed-shita-comment-id1");
+        t.is(elm.id, "fixed-shita-comment1");
         t.is(elm.innerText, "text");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.2);
-        t.is(duration, 4);
+        t.is(pos, 200);
     }
 });
 
@@ -266,36 +266,36 @@ test("nico scritp @number", t => {
     t.is(ctl.flow_params.length, 1);
     {  
         const { elm, left, delay } = ctl.flow_params[0];
-        t.is(elm.id, "flow-comment-id0");
+        t.is(elm.id, "flow-comment0");
         t.is(elm.innerText, "text-owner3");
-        t.deepEqual(elm.classes, ["comment", "flow"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(left, -400);
         t.is(delay, 0.3);
     }  
 
     t.is(ctl.fixed_params.length, 3);
     {
-        const { elm, delay, duration } = ctl.fixed_params[0];
-        t.is(elm.id, "fixed-ue-comment-id0");
+        const { elm, delay, pos } = ctl.fixed_params[0];
+        t.is(elm.id, "fixed-ue-comment0");
         t.is(elm.innerText, "text-owner1");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.1);
-        t.is(duration, 5);
+        t.is(pos, 200);
     }
     {
-        const { elm, delay, duration } = ctl.fixed_params[1];
-        t.is(elm.id, "fixed-ue-comment-id1");
+        const { elm, delay, pos } = ctl.fixed_params[1];
+        t.is(elm.id, "fixed-ue-comment1");
         t.is(elm.innerText, "text-a");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.3);
-        t.is(duration, 4);
+        t.is(pos, 200);
     }
     {
-        const { elm, delay, duration } = ctl.fixed_params[2];
-        t.is(elm.id, "fixed-shita-comment-id0");
+        const { elm, delay, pos } = ctl.fixed_params[2];
+        t.is(elm.id, "fixed-shita-comment0");
         t.is(elm.innerText, "text-owner2");
-        t.deepEqual(elm.classes, ["comment", "fixed"]);
+        t.deepEqual(elm.classes, ["comment"]);
         t.is(delay, 0.2);
-        t.is(duration, 10);
+        t.is(pos, 200);
     }
 });

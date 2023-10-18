@@ -74,6 +74,13 @@
                 - var(--user-container-height) - var(--comment-controls-container-height));
             background-color: var(--control-color);
         }
+        .comment-text {
+            width: 100%;
+            height: 100%;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
 
         .icon {
             font-size: 18px;
@@ -160,8 +167,7 @@
                 </div>
             </div>
         </div>
-        <div class="comment-grid-container">
-            <div class="comment-grid"></div>
+        <div class="comment-grid-container" id="player-comment-nico-grid">
         </div>
     </div>
     

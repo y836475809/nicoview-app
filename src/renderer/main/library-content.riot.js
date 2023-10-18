@@ -1,5 +1,6 @@
 const myapi = require("../../lib/my-api");
-const { GridTable, wrapFormatter, buttonFormatter } = require("../../lib/gridtable");
+const { buttonFormatter } = require("../common/nico-grid-formatter");
+const { mountNicoGrid } = require("../common/nico-grid-mount");
 const { NicoVideoData } = require("../../lib/nico-data-file");
 const { Command } = require("../../lib/command");
 const { NicoUpdate } = require("../../lib/nico-update");
@@ -19,6 +20,8 @@ const wait = async (msec) => {
     await new Promise(resolve => setTimeout(resolve, msec)); 
 };
 
+const nico_grid_name = "library-nico-grid";
+
 module.exports = {
     state:{
         num_filtered_items:0,
@@ -34,31 +37,30 @@ module.exports = {
     /** @type {ModalDialog} */
     modal_dialog:null,
 
-    /** @type {GridTable} */
-    grid_table:null,
     onBeforeMount(props) {
         this.obs_modal_dialog = new MyObservable();
 
         /** @type {{title:string, id:string}[]} */
         this.search_targets = props.search_targets;
 
-        myapi.ipc.Library.onAddItem((args) => {
+        myapi.ipc.Library.onAddItem(async (args) => {
             const {video_item} = args;
             const video_data = new NicoVideoData(video_item);
-            const video_id = video_item.video_id;
             video_item.thumb_img = video_data.getThumbImgPath();
-            this.grid_table.updateItem(video_item, video_id);
-
-            this.state.num_filtered_items =  this.grid_table.getDataLength();
+            await this.nico_grid_obs.triggerReturn("add-items", {
+                items:[video_item]
+            });
+            this.state.num_filtered_items = await this.nico_grid_obs.triggerReturn("get-data-length");
             this.state.num_items += 1;
             this.update();
         });
 
-        myapi.ipc.Library.onDeleteItem((args) => {
+        myapi.ipc.Library.onDeleteItem(async (args) => {
             const { video_id } = args;
-            this.grid_table.deleteItemById(video_id);
-
-            this.state.num_filtered_items =  this.grid_table.getDataLength();
+            await this.nico_grid_obs.triggerReturn("delete-items", {
+                ids: [video_id]
+            });
+            this.state.num_filtered_items = await this.nico_grid_obs.triggerReturn("get-data-length");
             this.state.num_items -= 1;
             this.update();
         });
@@ -66,10 +68,13 @@ module.exports = {
         myapi.ipc.Library.onUpdateItem((args) => {
             const {video_id, props} = args;
             logger.debug("library:on-update-item video_id=", video_id, " props=", props);
-            this.grid_table.updateCells(video_id, props);
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: props
+            }); 
         });
 
-        myapi.ipc.Library.onInit((args) =>{
+        myapi.ipc.Library.onInit(async (args) =>{
             const {items} = args;
 
             /** @type {LibraryItem[]} */
@@ -78,43 +83,8 @@ module.exports = {
                 value.thumb_img = video_data.getThumbImgPath();
                 return value;
             });
-            this.loadLibraryItems(library_items);
+            await this.loadLibraryItems(library_items);
         });
-    
-        const libraryImageFormatter = (row, cell, value, columnDef, dataContext)=> {
-            if(dataContext.thumbnail_size=="L"){
-                return `<img class="thumbnail-L" src="${value}"/>`;
-            }
-            return `<div class="thumbnail-wrap"><img class="thumbnail-S" src="${value}"></div>`;
-        };
-        const infoFormatter = (row, cell, value, columnDef, dataContext)=> {
-            const video_id = dataContext.video_id;
-            const video_type = dataContext.video_type;
-            const video_quality = dataContext.is_economy?"画質: エコノミー":"";
-            return `<div>
-                ID: ${video_id}<br>
-                動画形式: ${video_type}<br>
-                ${video_quality}
-                </div>`;
-        };       
-
-        const columns = [
-            {id: "thumb_img", name: "サムネイル", width: 180, formatter: libraryImageFormatter},
-            {id: "title", name: "名前", sortable: true, formatter: wrapFormatter},
-            {id: "command", name: "操作", sortable: false, 
-                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
-            {id: "info", name: "情報", sortable: false, formatter: infoFormatter},
-            {id: "creation_date", name: "作成日", sortable: true},
-            {id: "pub_date", name: "投稿日", sortable: true},
-            {id: "play_count", name: "再生回数", sortable: true},
-            {id: "play_time", name: "時間", sortable: true},
-            {id: "last_play_date", name: "最終再生日", sortable: true},
-            {id: "state", name: "状況"}
-        ];
-        const options = {
-            rowHeight: 135,
-        };   
-        this.grid_table = new GridTable("library-grid", columns, options, "video_id");
 
         main_obs.on("library:search-item-dlbclicked", (
             /** @type {LibrarySearchItem} */ item) => {
@@ -135,42 +105,65 @@ module.exports = {
         });   
         
         main_obs.on("library:scrollto", async (video_id) => { 
-            const rows = this.grid_table.getRowsByIds([video_id]);
-            if(rows.length > 0){
-                this.grid_table.scrollRow(rows[0], true);
-                this.grid_table.setSelectedRows(rows);
-            }
+            const index = await this.nico_grid_obs.triggerReturn("get-index-by-id", {
+                id: "video_id",
+                value: video_id 
+            });
+            this.nico_grid_obs.trigger("scroll-to-index", {
+                index,
+                position:"top"
+            });
+            this.nico_grid_obs.trigger("set-selected-by-index", {
+                index
+            });
         });
     },
     async onMounted() {
-        const grid_container = this.$(".library-grid");
-        this.grid_table.init(grid_container);
-        this.grid_table.setupResizer(".library-grid-container");
-
-        this.grid_table.setFilter((column_id, value, word) => { 
-            if (value.toLowerCase().indexOf(word.toLowerCase()) != -1) {
-                return true;
-            }   
-            return false; 
-        },
-        this.search_targets.map(item=>item.id),
-        (item, column_id)=>{
-            if(column_id=="is_economy"){
-                return item[column_id]?"エコノミー":"";
-            }
-            const value = item[column_id];
-            if(Array.isArray(value)){
-                return value.join(" ").toLowerCase();
-            }
-            return String(value);
+        const infoFormatter = (id, value, data)=> {
+            const video_id = data.video_id;
+            const video_type = data.video_type;
+            const video_quality = data.is_economy?"画質: エコノミー":"";
+            return `<div>
+                ID: ${video_id}<br>
+                動画形式: ${video_type}<br>
+                ${video_quality}
+                </div>`;
+        };
+        const columns = [
+            {id: "thumb_img", name: "サムネイル", width: 180},
+            {id: "title", name: "名前"},
+            {id: "command", name: "操作", 
+                ft: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
+            {id: "info", name: "情報", sortable: false, ft: infoFormatter},
+            {id: "creation_date", name: "作成日"},
+            {id: "pub_date", name: "投稿日"},
+            {id: "play_count", name: "再生回数"},
+            {id: "play_time", name: "時間"},
+            {id: "last_play_date", name: "最終再生日"},
+            {id: "state", name: "状況"}
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {
+            filter_target_ids: [
+                "title", "tags", "video_id"
+            ]
+        };
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        this.nico_grid_obs = new MyObservable();
+        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
         });
-
-        this.grid_table.onDblClick(async (e, data)=>{
-            logger.debug("library onDblClick data=", data);
-            await this.play(data, false);
+        this.nico_grid_obs.on("db-cliecked", async (args) => {
+            const { data } = args;
+            if(data.video_id){
+                await this.play(data, false);
+            }
         });
-
-        this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
+        this.nico_grid_obs.on("cmd", async (args) => {
+            const { cmd_id, data } = args;
             if(cmd_id == "play"){
                 logger.debug("library onButtonClick data=", data);
                 await this.play(data, false);
@@ -184,11 +177,12 @@ module.exports = {
                 Command.addBookmarkItems(main_obs, [data]);
             }
         });
-
-        this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
-            /** @type {LibraryItem[]} */
-            const items = this.grid_table.getSelectedDatas();
-            if(items.length==0){
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const sel_data_list = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            const items = sel_data_list.filter(value => {
+                return value.video_id!="";
+            });
+            if(items.length===0){
                 return;
             }
             const video_type = items[0].video_type;
@@ -329,12 +323,14 @@ module.exports = {
      * @param {string[]} [target_ids] 指定しない場合全項目が対象
      */
     filterItems(query, target_ids) {
-        this.grid_table.filterData(query, target_ids);
-        this.grid_table.scrollToTop();
-        this.grid_table.clearSelected();
-
-        this.state.num_filtered_items = this.grid_table.dataView.getLength();
-        this.update();
+        this.nico_grid_obs.trigger("filter", {
+            ids: target_ids?target_ids:[],
+            text: query
+        });
+        (async ()=>{
+            this.state.num_filtered_items =  await this.nico_grid_obs.triggerReturn("get-data-length");
+            this.update();
+        })();
     },
     onclickSearch(e) { // eslint-disable-line no-unused-vars
         const elm = this.getSearchInputElm();
@@ -383,10 +379,14 @@ module.exports = {
      * 
      * @param {LibraryItem[]} items 
      */
-    loadLibraryItems(items) {
-        this.grid_table.setData(items);
+    async loadLibraryItems(items) {
         this.state.num_items = items.length;
         this.state.num_filtered_items = this.state.num_items;
+
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "video_id",
+            items: items
+        });
 
         this.update();
     },
@@ -428,8 +428,10 @@ module.exports = {
                 cur_update++;
                 this.obs_modal_dialog.trigger("update-message", 
                     `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
-
-                this.grid_table.updateCell(item.video_id, "state", "更新中");
+                this.nico_grid_obs.trigger("update-item", {
+                    id: item.video_id,
+                    props: { state: "更新中" }
+                });
                 try {
                     const video_item = await myapi.ipc.Library.getItem(item.video_id);
                     nico_update = new NicoUpdate(video_item);
@@ -440,18 +442,30 @@ module.exports = {
                             const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
                             const video_data = new NicoVideoData(updated_video_item);
                             const thumb_img = `${video_data.getThumbImgPath()}?${new Date().getTime()}`;
-                            this.grid_table.updateCells(result.video_id, {thumb_img});
+                            this.nico_grid_obs.trigger("update-item", {
+                                id: result.video_id,
+                                props: { thumb_img }
+                            }); 
                         }
                     }
-                    this.grid_table.updateCell(item.video_id, "state", "更新完了");       
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: item.video_id,
+                        props: { state: "更新完了" }
+                    });
                 } catch (error) {
                     if(error.cancel===true){   
-                        this.grid_table.updateCell(item.video_id, "state", "更新キャンセル");
+                        this.nico_grid_obs.trigger("update-item", {
+                            id: item.video_id,
+                            props: { state: "更新キャンセル" }
+                        });
                         throw error;
                     }else{
                         error_items.push(item);
                         logger.error(error);
-                        this.grid_table.updateCell(item.video_id, "state", `更新失敗: ${error.message}`);
+                        this.nico_grid_obs.trigger("update-item", {
+                            id: item.video_id,
+                            props: { state: `更新失敗: ${error.message}` }
+                        });
                     }
                 }
                 if(cur_update < items.length){
@@ -534,7 +548,10 @@ module.exports = {
         }
         
         const updateState = (state) => {
-            this.grid_table.updateCell(video_id, "state", state);
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { state }
+            });
         };
 
         try {

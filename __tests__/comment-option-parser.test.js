@@ -1,5 +1,5 @@
 const test = require("ava");
-const { CommentOptionParser } = require("../src/lib/comment-timeline");
+const { CommentOptionParser } = require("../src/lib/nico-comment-timeline");
 
 const user_id = "a";
 const owner_id = "owner";

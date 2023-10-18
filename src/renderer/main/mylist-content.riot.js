@@ -1,5 +1,6 @@
 const myapi = require("../../lib/my-api");
-const { GridTable, wrapFormatter, buttonFormatter, infoFormatter } = require("../../lib/gridtable");
+const { infoFormatter, timeFormatter } = require("../common/nico-grid-formatter");
+const { mountNicoGrid } = require("../common/nico-grid-mount");
 const { Command } = require("../../lib/command");
 const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = require("../../lib/nico-mylist");
 const { needConvertVideo } = require("../../lib/video-converter");
@@ -9,6 +10,8 @@ const { logger } = require("../../lib/logger");
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
+
+const nico_grid_name = "mylist-nico-grid";
 
 /**
  * @param {ModalDialog} modal_dialog 
@@ -63,8 +66,6 @@ module.exports = {
     /** @type {string} */
     loaded_mylist_id:null,
 
-    /** @type {GridTable} */
-    grid_table:null,
     is_current_fav:false,
 
     /**
@@ -90,26 +91,34 @@ module.exports = {
 
         myapi.ipc.Download.onUpdateItem(async ()=>{
             const video_ids = await myapi.ipc.Download.getIncompleteIDs();
-            const items = this.grid_table.dataView.getItems();
-
+            const items = await this.nico_grid_obs.triggerReturn("get-items");
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
                 const video_id = item.video_id;
                 item.saved = await myapi.ipc.Library.hasItem(video_id);
                 item.reg_download = video_ids.includes(video_id);
-                this.grid_table.dataView.updateItem(video_id, item);    
+                this.nico_grid_obs.trigger("update-item", {
+                    id: video_id,
+                    props: item
+                });    
             }
         });
 
         myapi.ipc.Library.onAddItem((args) => {
             const {video_item} = args;
             const video_id = video_item.video_id;
-            this.grid_table.updateCells(video_id, { saved:true });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved: true }
+            });
         });
 
         myapi.ipc.Library.onDeleteItem((args) => {
             const { video_id } = args;
-            this.grid_table.updateCells(video_id, { saved:false });
+            this.nico_grid_obs.trigger("update-item", {
+                id: video_id,
+                props: { saved: false }
+            });
         });
 
         main_obs.on("mylist:item-dlbclicked", async (item) => {
@@ -176,59 +185,62 @@ module.exports = {
             this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
             this.nico_mylist_image_cache.save();
         });
-
-        /**
-         * 
-         * @param {number} row 
-         * @param {*} cell 
-         * @param {string} value 
-         * @param {*} columnDef 
-         * @param {*} dataContext 
-         * @returns 
-         */
-        const imageCacheFormatter = (row, cell, value, columnDef, dataContext)=> {
-            /** @type {string} */
-            const mylist_id = dataContext.mylist_id;
-            const url = value;
-            return this.nico_mylist_image_cache.getImageHtml(mylist_id, url);
-        };
-
-        const htmlFormatter = (row, cell, value, columnDef, dataContext)=> { // eslint-disable-line no-unused-vars
-            const result = value.replace(/\r?\n/g, "<br>");
-            return `<div>${result}</div>`;
-        };
-
-        const mylist_infoFormatter = infoFormatter.bind(this, 
-            (value, dataContext)=>{ 
-                return `<div>ID: ${dataContext.video_id}</div>`;
-            });
-        const columns = [
-            {id: "no", name: "#"},
-            {id: "thumb_img", name: "サムネイル", width: 130, formatter:imageCacheFormatter},
-            {id: "title", name: "名前", formatter:wrapFormatter},
-            {id: "command", name: "操作", sortable: false, 
-                formatter: buttonFormatter.bind(this,["play", "stack", "bookmark", "download"])},
-            {id: "info", name: "情報", formatter:mylist_infoFormatter},
-            {id: "description", name: "説明", formatter:htmlFormatter},
-            {id: "date", name: "投稿日"},
-            {id: "length", name: "時間"}
-        ];
-        const options = {
-            rowHeight: 100,
-        };    
-        this.grid_table = new GridTable("mylist-grid", columns, options, "video_id");
     },
     async onMounted() {
         const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
         this.nico_mylist_store = new NicoMylistStore(mylist_dir);
         this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
-        const grid_container = this.$(".mylist-grid");
-        this.grid_table.init(grid_container);
-        this.grid_table.setupResizer(".mylist-grid-container");
-        this.grid_table.onDblClick(async (e, data)=>{
+        /**
+         * 
+         * @param {string} id 
+         * @param {string} value 
+         * @param {object} data 
+         * @returns 
+         */
+        const imageCacheFormatter = (id, value, data)=> {
+            /** @type {string} */
+            const mylist_id = data.mylist_id;
+            const url = value;
+            return `<div class="mylist-grid-img-holder">${this.nico_mylist_image_cache.getImageHtml(mylist_id, url)}</div>`;
+        };
+
+        const htmlFormatter = (id, value, data)=> {
+            const result = value.replace(/\r?\n/g, "<br>");
+            return `<div>${result}</div>`;
+        };
+
+        const mylist_infoFormatter = infoFormatter.bind(this, 
+            (id, value, data)=>{ 
+                return `<div>ID: ${data.video_id}</div>`;
+            });
+        const columns = [
+            {id: "no", name: "#"},
+            {id: "thumb_img", name: "サムネイル", width: 130, ft: imageCacheFormatter},
+            {id: "title", name: "名前"},
+            {id: "command", name: "操作"},
+            {id: "info", name: "情報", ft: mylist_infoFormatter},
+            {id: "description", name: "説明", ft: htmlFormatter},
+            {id: "date", name: "投稿日"},
+            {id: "length", name: "時間", ft: timeFormatter}
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {};
+        this.nico_grid_obs = new MyObservable();
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", async (args) => {
+            const { data } = args;
             /** @type {string} */
             const video_id = data.video_id;
+            if(!video_id){
+                return;
+            }
             /** @type {LibraryItem} */
             const video_item = await myapi.ipc.Library.getItem(video_id);
             if(needConvertVideo(video_item)===true){      
@@ -244,7 +256,8 @@ module.exports = {
                 Command.play(data, false);
             }
         });
-        this.grid_table.onButtonClick(async (e, cmd_id, data)=>{
+        this.nico_grid_obs.on("cmd", async (args) => {
+            const { cmd_id, data } = args;
             if(cmd_id == "play"){
                 await this.play(data, false);
             }
@@ -259,8 +272,8 @@ module.exports = {
             }
         });
         
-        this.grid_table.onContextMenu(async (e)=>{ // eslint-disable-line no-unused-vars
-            const items = this.grid_table.getSelectedDatas();
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
             if(items.length==0){
                 return;
             }
@@ -380,9 +393,10 @@ module.exports = {
             item.reg_download = video_ids.includes(video_id);  
             item.mylist_id = mylist.mylist_id;
         }
-        this.grid_table.clearSelected();
-        this.grid_table.setData(mylist_items);
-        this.grid_table.scrollToTop();   
+        await this.nico_grid_obs.triggerReturn("set-data", {
+            key_id: "video_id",
+            items: mylist_items
+        });  
     },
     /**
      * 

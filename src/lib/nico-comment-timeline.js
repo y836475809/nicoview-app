@@ -260,6 +260,9 @@ class TimeLine {
         /** @type {Map<string, HTMLElement>} */
         this._em_map = new Map();
 
+        /** @type {Map<string, Number>} */
+        this._delay_map = new Map();
+
         this._current_time_ms = 0;
         this._last_time_ms = 0;
         this._interval_id = 0;
@@ -288,6 +291,7 @@ class TimeLine {
         });
         this._comments = [];
         this._em_map.clear();
+        this._delay_map.clear();
     }
 
     play(){
@@ -312,7 +316,7 @@ class TimeLine {
     _updateAnimetion(){
         for(let i=this._start_index; i< this._comments.length; i++){
             const ani = this._comments[i];
-            const delay = ani.effect.getTiming().delay;
+            const delay = this._delay_map.get(ani.id);
             const pre = delay + this._duration_ms + 500;
             if(this._current_time_ms > pre){
                 this._start_index = i;
@@ -357,6 +361,7 @@ class TimeLine {
         params.forEach((param)=>{
             const { elm, left, delay } = param;
             this._em_map.set(elm.id, elm);
+            this._delay_map.set(elm.id, delay*1000);
             const move = elm.animate(
                 [
                     { transform: `translateX(${left}px)` }
@@ -376,6 +381,7 @@ class TimeLine {
         params.forEach((param)=>{
             const { elm, delay, pos } = param;
             this._em_map.set(elm.id, elm);
+            this._delay_map.set(elm.id, delay*1000);
             const move = elm.animate(
                 [
                     { transform: `translateX(${-pos}px)` },

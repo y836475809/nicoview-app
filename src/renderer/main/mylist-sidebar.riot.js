@@ -38,7 +38,7 @@ module.exports = {
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {
-            main_obs.trigger("mylis:item-dlbclicked", item);
+            main_obs.trigger("mylist:item-dlbclicked", item);
         });
         
         this.obs_listview.on("items-deleted", (args) => {

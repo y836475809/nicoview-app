@@ -1,6 +1,6 @@
 {
   "name": "nicoview-app",
-  "version": "0.16.34",
+  "version": "0.17.34",
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "src/main.js",
   "scripts": {
@@ -32,9 +32,7 @@
     "@fortawesome/fontawesome-free": "^6.1.2",
     "cheerio": "^1.0.0-rc.12",
     "electron-log": "^4.4.8",
-    "gsap": "^3.11.0",
     "riot": "^7.0.4",
-    "slickgrid": "^2.4.45",
     "sql.js": "^1.7.0"
   },
   "build": {

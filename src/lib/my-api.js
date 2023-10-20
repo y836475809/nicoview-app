@@ -55,14 +55,32 @@ const Config = {
 const Dialog = {
     /**
      * 
-     * @param {{type:string, message:string, okcancel:boolean}} param0 
+     * @param {{
+     *  type:"info"|"error"|"warning", 
+     *  message:string
+     * }} param0 
      * @returns {Promise<boolean>} true:ok false:cancel
      */
-    showMessageBox: async ({type="info", message="", okcancel=false}={}) => {
+    showMessageBoxOK: async ({type="info", message=""}) => {
         return await ipcRenderer.invoke("app:show-message-box", {
             type: type,
             message: message,
-            okcancel: okcancel
+            okcancel: false
+        });  
+    },
+    /**
+     * 
+     * @param {{
+     *  type:"info"|"error"|"warning", 
+     *  message:string
+     * }} param0 
+     * @returns {Promise<boolean>} true:ok false:cancel
+     */
+    showMessageBoxOkCancel: async ({type="info", message=""}) => {
+        return await ipcRenderer.invoke("app:show-message-box", {
+            type: type,
+            message: message,
+            okcancel: true
         });  
     },
     /**

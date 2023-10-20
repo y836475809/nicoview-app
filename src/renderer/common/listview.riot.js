@@ -209,9 +209,9 @@ module.exports = {
         if(this.confirm.includes("delete") === false){
             return true;
         }
-        const ret = await myapi.ipc.Dialog.showMessageBox({
-            message: "削除しますか?", 
-            okcancel: true
+        const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+            type: "info",
+            message: "削除しますか?"
         });
         return ret;
     },

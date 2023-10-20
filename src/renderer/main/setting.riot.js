@@ -130,7 +130,7 @@ module.exports = {
             data_dir = await myapi.ipc.Setting.getAppDataPath();
             nndd_system_dir = await myapi.ipc.Setting.getNNDDSystemPath();
         } catch (error) {
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: error.message
             });
@@ -160,12 +160,13 @@ module.exports = {
             main_obs.trigger("history:reload-items");
             main_obs.trigger("mylist:sidebar:reload-items");
 
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "info",
                 message: "インポート完了"
             });
         } catch (error) {
             logger.error(error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `インポート失敗\n${error.message}`
             });
@@ -219,13 +220,14 @@ module.exports = {
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
-        await myapi.ipc.Dialog.showMessageBox({
+        await myapi.ipc.Dialog.showMessageBoxOK({
+            type: "info",
             message: `インポート完了\n失敗:${error_files.length}`
         });
         this.obs_modal_dialog.trigger("close");
 
         if(error_files.length>0){
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
             });

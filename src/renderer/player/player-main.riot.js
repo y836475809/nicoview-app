@@ -128,7 +128,7 @@ module.exports = {
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBoxOK({
                         type: "error",
                         message: error.message
                     });
@@ -147,7 +147,7 @@ module.exports = {
                 await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
             } catch (error) {
                 logger.error("player main save ng comment", error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: `NGコメントの保存に失敗\n${error.message}`
                 });
@@ -167,7 +167,7 @@ module.exports = {
                 await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
             } catch (error) {
                 logger.error("player main save comment ng", error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: `NGコメントの保存に失敗\n${error.message}`
                 });
@@ -237,7 +237,7 @@ module.exports = {
             this.comment_filter.setNGCommentItems(ng_commnet_items);
         } catch (error) {
             logger.error("player main load ng comment", error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `NGコメントリストの読み込み失敗\n${error.message}`
             });
@@ -356,7 +356,7 @@ module.exports = {
             await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);
         } catch (error) {
             logger.error(`id=${video_item.video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: error.message
             });
@@ -418,7 +418,7 @@ module.exports = {
         } catch (error) {
             if(!error.cancel){
                 logger.error(`video_id=${video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: error.message
                 });

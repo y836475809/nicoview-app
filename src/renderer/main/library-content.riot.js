@@ -210,9 +210,9 @@ module.exports = {
                 }
                 if(menu_id=="delete"){
                     const video_ids = items.map(item => item.video_id);
-                    const ret = await myapi.ipc.Dialog.showMessageBox({
-                        message: "動画を削除しますか?",
-                        okcancel: true
+                    const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                        type: "info",
+                        message: "動画を削除しますか?"
                     });
                     if(!ret){
                         return;
@@ -232,7 +232,7 @@ module.exports = {
             await myapi.ipc.Library.load();
         } catch (error) {
             logger.error(error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `ライブラリの読み込み失敗\n${error.message}`
             });
@@ -481,12 +481,13 @@ module.exports = {
         this.obs_modal_dialog.trigger("close");
         
         if(error_items.length > 0){
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `${error_items.length}個が更新に失敗\n詳細はログを参照`
             });
         }else{
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "info",
                 message: `更新完了(${cur_update}/${items.length})`
             });
         }
@@ -530,7 +531,7 @@ module.exports = {
             }
         }
         if(error_ids.length > 0){
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `${error_ids.length}個の削除に失敗\n詳細はログを参照`
             });
@@ -570,7 +571,7 @@ module.exports = {
 
             cnv_mp4.on("cancel_error", async error=>{
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: `中断失敗\n${error.message}`
                 });
@@ -583,20 +584,22 @@ module.exports = {
             const props = {video_type:"mp4"};
             await myapi.ipc.Library.updateItemProps(video_id, props);
 
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "info",
                 message: "変換完了"
             });
             updateState("変換完了");  
 
         } catch (error) {
             if(error.cancel === true){
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
+                    type: "info",
                     message: "変換中断"
                 });
                 updateState("変換中断");   
             }else{
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: `変換失敗\n${error.message}`
                 });
@@ -617,9 +620,9 @@ module.exports = {
         const video_type = item.video_type;
 
         if(!online && needConvertVideo(video_type)){
-            const ret = await myapi.ipc.Dialog.showMessageBox({
-                message: `動画が${video_type}のため再生できません\nmp4に変換しますか?`,
-                okcancel: true
+            const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                type: "info",
+                message: `動画が${video_type}のため再生できません\nmp4に変換しますか?`
             });
             if(!ret){
                 return;

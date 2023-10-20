@@ -64,7 +64,7 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
             type: "error",
             buttons: ["OK"],
-            message: `エラー: ${reason.message}`
+            message: `エラー: ${reason}`
         });
     });
 

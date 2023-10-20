@@ -34,7 +34,7 @@ const progressDailog = async (modal_dialog, dialog_obs, dailog_params, func) => 
     } catch (error) {
         if(!error.cancel){
             logger.error(error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: error.message
             });
@@ -133,7 +133,7 @@ module.exports = {
                     await this.setMylist(mylist); 
                 } catch (error) {
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBoxOK({
                         type: "error",
                         message: error.message
                     });
@@ -153,7 +153,7 @@ module.exports = {
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBox({
+                    await myapi.ipc.Dialog.showMessageBoxOK({
                         type: "error",
                         message: error.message
                     });
@@ -244,9 +244,9 @@ module.exports = {
             /** @type {LibraryItem} */
             const video_item = await myapi.ipc.Library.getItem(video_id);
             if(needConvertVideo(video_item)===true){      
-                const ret = await myapi.ipc.Dialog.showMessageBox({
-                    message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
-                    okcancel: true
+                const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                    type: "info",
+                    message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?"
                 });
                 if(!ret){
                     return;
@@ -325,9 +325,9 @@ module.exports = {
         const video_id = item.video_id;
         const video_item = await myapi.ipc.Library.getItem(video_id);
         if(!online && needConvertVideo(video_item)){       
-            const ret = await myapi.ipc.Dialog.showMessageBox({
-                message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?",
-                okcancel: true
+            const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                type: "info",
+                message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?"
             });
             if(!ret){
                 return;
@@ -476,7 +476,7 @@ module.exports = {
         } catch (error) {
             if(!error.cancel){
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: error.message
                 });

@@ -127,7 +127,7 @@ module.exports = {
             this.setData(items);
         } catch (error) {
             logger.error(error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `再生履歴の読み込み失敗\n${error.message}`
             });

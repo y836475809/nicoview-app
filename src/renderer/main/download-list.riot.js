@@ -153,9 +153,9 @@ module.exports = {
                 return;
             }
             if(menu_id=="delete"){
-                const ret = await myapi.ipc.Dialog.showMessageBox({
-                    message: "削除しますか?", 
-                    okcancel: true
+                const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                    type: "info",
+                    message: "削除しますか?"
                 });
                 if(!ret){
                     return;
@@ -183,7 +183,7 @@ module.exports = {
             
         } catch (error) {
             logger.error("download item load error: ", error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: `ダウンロードリストの読み込み失敗\n${error.message}`
             });
@@ -286,7 +286,8 @@ module.exports = {
             if(video_ids.includes(this.nico_down.video_id)){
                 this.cancelDownload();
 
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
+                    type: "info",
                     message: `${this.nico_down.video_id}のダウンロードをキャンセル`
                 });
             }
@@ -441,7 +442,7 @@ module.exports = {
             }
         } catch (error) {
             logger.error(`download video_id=${video_id}: `, error);
-            await myapi.ipc.Dialog.showMessageBox({
+            await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
                 message: error.message
             });

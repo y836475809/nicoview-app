@@ -377,7 +377,7 @@ module.exports = {
         } catch (error) {
             if(!error.cancel){
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBox({
+                await myapi.ipc.Dialog.showMessageBoxOK({
                     type: "error",
                     message: error.message
                 });

@@ -184,7 +184,7 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         }
 
         const main_menu = () => {
-            const menu_templete = [
+            return Menu.buildFromTemplate([
                 { label: "ログ",
                     submenu: [
                         { label: "ログファイルを開く", click() {
@@ -203,8 +203,8 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
                 { label: "ヘルプ",  
                     submenu: [
                         { role: "reload" },
-                        { role: "forcereload" },
-                        { role: "toggledevtools" },
+                        { role: "forceReload" },
+                        { role: "toggleDevTools" },
                         { type: "separator" },
                         { id: "open-devtools", label: "起動時にdevtoolsを開く", type: "checkbox", checked: false, click(e) {
                             config.set("open_devtools", e.checked);
@@ -214,8 +214,7 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
                         }}
                     ]
                 },
-            ];
-            return Menu.buildFromTemplate(menu_templete);
+            ]);
         };
         
         main_win_menu = main_menu();

@@ -12,7 +12,7 @@
     "test-tag": "electron ./test/test-main.js --test=tag",
     "test-nico-grid": "electron ./test/test-main.js --test=nico-grid",
     "main": "electron .",
-    "eslint": "eslint ./src/**/*.js ./src/public/*.html ./__tests__/**/*.js ./test/**/*.js ./test/**/*.html || exit 0",
+    "eslint": "eslint ./src/**/*.js ./src/public/*.html ./__tests__/**/*.js ./test/public/*.js ./test/public/*.html || exit 0",
     "test": "ava -v -s",
     "build": "electron-builder --x64 --dir",
     "build-zip": "electron-builder --x64"

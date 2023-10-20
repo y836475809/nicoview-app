@@ -99,6 +99,8 @@ module.exports = {
     async onclickSelectffmpegPath(e) { // eslint-disable-line no-unused-vars
         const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
             name: "ffmpeg",
+            exts: ["*"],
+            multi_select: false
         });
         if(file_path == null){
             return;

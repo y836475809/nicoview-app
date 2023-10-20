@@ -93,7 +93,7 @@ const Dialog = {
     /**
      * @async
      * @param {{name:string, exts:string[], multi_select:boolean}} param0 
-     * @returns {Promise.<string[]>}
+     * @returns {Promise.<string|string[]>}
      */
     showSelectFileDialog: async ({name="All", exts=["*"], multi_select=false}) => {
         return await ipcRenderer.invoke("app:show-select-file-dialog", {

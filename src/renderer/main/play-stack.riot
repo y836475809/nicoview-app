@@ -78,7 +78,7 @@
 
     <div class="stack-container">
         <div class={getItemClass(item)} data-id={i} title={item.title} each={ (item, i) in state.items }>
-            <img class="thumb" src={item.thumb_img} onclick={onclickItem.bind(this,item)}/>
+            <img class="thumb" src={item.thumb_img} loading="lazy" onclick={onclickItem.bind(this,item)}/>
             <div class="title-wraper center-v" onclick={onclickItem.bind(this,item)}>
                 <div style="display:flex; flex-direction:column;">
                     <div class="title">

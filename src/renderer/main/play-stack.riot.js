@@ -45,7 +45,8 @@ module.exports = {
         this.item_duration = parseInt(prop);
 
         const items = await myapi.ipc.Stack.getItems();
-        this.addItems(items);
+        this.state.items = items.concat(this.state.items);
+        this.update();
     }, 
     /**
      * 

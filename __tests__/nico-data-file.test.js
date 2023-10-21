@@ -82,6 +82,12 @@ test("getCommonNameFromFilename", (t) => {
 });
 
 test("cnvFilename", (t) => {
-    const nd = new NicoDataFile();
+    const nd = new NicoDataFile("");
     t.is("＼／：？”＊＜＞｜＃", nd._cnvFilename("\\/:?\"*<>|#"));
+    t.is("test name", nd._cnvFilename("  test name"));
+    t.is("test name", nd._cnvFilename("　　test name"));
+    t.is("test name  ", nd._cnvFilename("  test name  "));
+    t.is("test name　　", nd._cnvFilename("　　test name　　"));
+    t.is("test name　 ", nd._cnvFilename(" 　test name　 "));
+    t.is("test name 　", nd._cnvFilename("　 test name 　"));
 });

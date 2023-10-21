@@ -119,7 +119,8 @@ class NicoDataFile {
             .replace(/</g, "＜")
             .replace(/>/g, "＞")
             .replace(/\|/g, "｜")
-            .replace(/#/g, "＃");
+            .replace(/#/g, "＃")
+            .trimStart();
     }
 }
 

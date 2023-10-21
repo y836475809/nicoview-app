@@ -56,14 +56,6 @@ class NicoMockServer {
                     console.log("mock server: search");
                     this.nico_mock_res.search(req, res);
                 }
-                if(req.url.startsWith("https://www.nicovideo.jp/search")){
-                    console.log("mock server: search ext");
-                    this.nico_mock_res.searchHtml(req, res, "search");
-                }
-                if(req.url.startsWith("https://www.nicovideo.jp/tag")){
-                    console.log("mock server: search ext");
-                    this.nico_mock_res.searchHtml(req, res, "tag");
-                }
                 if(req.url.startsWith("https://www.nicovideo.jp/mylist")){
                     console.log("mock server: mylist");
                     this.nico_mock_res.mylist(req, res);

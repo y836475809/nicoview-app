@@ -50,7 +50,6 @@ const createEmptyItem = () => {
 
 module.exports = {
     state:{
-        api_checked:"checked",
         sort_title:"",
         search_target_title:"",
     },
@@ -244,7 +243,6 @@ module.exports = {
         });
 
         const { api, sort_item, search_target_item } = await this.loadSearchConfig();
-        this.state.api_checked = api=="snapshot"?"checked":"";
         this.state.sort_title = sort_item.title;
         this.state.search_target_title = search_target_item.title;
         this.nico_search_params.api(api);
@@ -298,14 +296,6 @@ module.exports = {
             elm.style.left = x + "px";
             elm.style.top = y + "px";
         }
-    },
-    onclickCheckSearchAPI(e) { // eslint-disable-line no-unused-vars
-        /** @type {HTMLInputElement} */
-        const elm = this.$(".check-search-api");
-        const api = elm.checked?"snapshot":"html";
-        this.nico_search_params.api(api);
-        
-        this.saveSearchConfig();
     },
     async onchangeSort(item, e) { // eslint-disable-line no-unused-vars
         /** @type {NicoSearchSortItem} */
@@ -364,15 +354,7 @@ module.exports = {
         });
 
         try {
-            
-            /** @type {NicoSearchResultItem} */
-            let search_result = null;
-            if(this.nico_search_params.getAPI()=="snapshot"){
-                search_result = await this.nico_search.search(this.nico_search_params);
-            }                
-            if(this.nico_search_params.getAPI()=="html"){
-                search_result = await this.nico_search.searchHtml(this.nico_search_params.getParamsHtml());
-            }
+            const search_result = await this.nico_search.search(this.nico_search_params);
             this.setData(search_result);
         } catch (error) {
             if(!error.cancel){

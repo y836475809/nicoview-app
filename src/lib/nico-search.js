@@ -1,5 +1,4 @@
 const { NicoClientRequest, NicoCookie } = require("./nico-client-request");
-const { nicoSearchHtmlParse } = require("./nico-search-html-parse");
 const { NICO_URL } = require("./nico-url");
 const { logger } = require("./logger");
 
@@ -308,73 +307,6 @@ class NicoSearch {
         }
         if(nico_gc){
             this._cookie_html["nico_gc"] = nico_gc;
-        }
-    }
-
-    async searchHtml(params_ext){   
-        const { query, sort_name, sort_order, search_target, page } = params_ext;
-        const word = encodeURIComponent(query);
-        let query_json = {
-            page: page,
-            sort: sort_name,
-            order: sort_order
-        };
-        if(page==1){
-            query_json = {
-                sort: sort_name,
-                order: sort_order
-            };
-        }
-        const src_url = new URL(`https://www.nicovideo.jp/${search_target}/${word}`);
-        for(const key in query_json){
-            src_url.searchParams.append(key, query_json[key]);
-        }
-
-        this._req = new NicoClientRequest();
-        try {
-            const cookie = this._cookie_html?
-                NicoCookie.getHeader(this._cookie_html):null;
-            logger.debug("searchHtml pre request cookie_html=", this._cookie_html);
-            const body = await this._req.get(src_url.href, {
-                cookie:cookie
-            });
-            const result = nicoSearchHtmlParse(body, search_target);
-
-            this._getCookieHTML();
-            logger.debug("searchHtml post request cookie_html=", this._cookie_html);
-
-            const search_limit = 32;
-            const max_page_num = 50;
-            
-            const page_num = page;
-            const search_result_num = result.total_num;
-
-            let total_page_num = Math.ceil(search_result_num / search_limit);
-            if(total_page_num > max_page_num){
-                total_page_num = max_page_num;
-            }
-            result.page_ifno = {
-                page_num: page_num, 
-                total_page_num: total_page_num, 
-                search_result_num: search_result_num
-            };
-            return result;
-        } catch (error) {
-            if(error.status){
-                let message = `status=${error.status}, エラー`;
-                if(error.status === 400){
-                    message = `status=${error.status}, 不正なパラメータです`; 
-                }else if(error.status === 404){
-                    message = `status=${error.status}, ページが見つかりません`; 
-                }else if(error.status === 500){
-                    message = `status=${error.status}, 検索サーバの異常です`; 
-                }else if(error.status === 503){
-                    message = `status=${error.status}, サービスがメンテナンス中です`; 
-                }
-                throw new Error(message);                     
-            }else{
-                throw error;     
-            }
         }
     }
 }

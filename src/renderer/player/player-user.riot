@@ -22,6 +22,9 @@
         .user-name {
             user-select: none;
             vertical-align: middle;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
         }
         .userlist-link {
             margin-top: 5px;
@@ -98,7 +101,7 @@
     <div class="user-container">   
         <div class="user-container-normal">
             <div style="display: flex;" class="center-v">
-                <div class="user-name">投稿者: {state.user_nickname}</div>
+                <div class="user-name" title={state.user_nickname}>投稿者: {state.user_nickname}</div>
                 <div class="icon-button center-hv" onclick={onclickPopupDescription}>
                     <i title="ポップアップ表示" class="icon far fa-comment-alt"></i>
                 </div>

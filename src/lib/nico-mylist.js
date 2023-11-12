@@ -79,16 +79,16 @@ class NicoMylistReader {
             const item = $(el);
             const link = item.find("link").text();
             const video_id = this._getVideoIDFromLink(link);
-            const description = this._parseCDATA(item.find("description").text());
+            const cdata = this._parseCDATA(item.find("description").text());
             items.push( {
                 no: i+1,
                 title: item.find("title").text(),
                 video_id: video_id,
                 link: link,
-                description: description.memo,
-                thumb_img: description.thumbnail_src,
-                length: description.length,
-                date: description.date,
+                description: cdata.description,
+                thumb_img: cdata.thumbnail_src,
+                length: cdata.length,
+                date: cdata.date,
             });
         });
 
@@ -122,8 +122,12 @@ class NicoMylistReader {
 
     _parseCDATA(xml){
         const $ = cheerio.load(xml, {xmlMode: true});
+        let description = $(".nico-memo").text();
+        if(description == ""){
+            description = $(".nico-description").text();
+        }
         return {
-            memo: $(".nico-memo").text(),
+            description: description,
             thumbnail_src: $(".nico-thumbnail > img").attr("src"),
             length: $(".nico-info-length").text(),
             date: $(".nico-info-date").text(),

@@ -1,5 +1,5 @@
 const myapi = require("../../lib/my-api");
-const { infoFormatter, timeFormatter } = require("../common/nico-grid-formatter");
+const { infoFormatter, wrapFormatter } = require("../common/nico-grid-formatter");
 const { mountNicoGrid } = require("../common/nico-grid-mount");
 const { Command } = require("../../lib/command");
 const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = require("../../lib/nico-mylist");
@@ -220,9 +220,9 @@ module.exports = {
             {id: "title", name: "名前"},
             {id: "command", name: "操作"},
             {id: "info", name: "情報", ft: mylist_infoFormatter},
-            {id: "description", name: "説明", ft: htmlFormatter},
+            {id: "description", name: "説明", ft: wrapFormatter},
             {id: "date", name: "投稿日"},
-            {id: "length", name: "時間", ft: timeFormatter}
+            {id: "length", name: "時間", ft: htmlFormatter}
         ];
         /** @type {NicoGridOptions} */
         const options = {};

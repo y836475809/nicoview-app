@@ -2,11 +2,6 @@ const test = require("ava");
 const fs = require("fs");
 const { NicoMylistReader } = require("../src/lib/nico-mylist");
 
-let mylist_xml = null;
-test.before(t => { // eslint-disable-line no-unused-vars
-    mylist_xml = fs.readFileSync(`${__dirname}/data/mylist00000000.xml`, "utf-8");
-});
-
 test("nico mylist get video id from link", t => {
     const mrd = new NicoMylistReader();
     t.is("sm12345",
@@ -18,6 +13,7 @@ test("nico mylist get video id from link", t => {
 
 test("nico mylist parse xml", t => {
     const mrd = new NicoMylistReader();
+    const mylist_xml = fs.readFileSync(`${__dirname}/data/mylist00000000.xml`, "utf-8");
     const mylist = mrd.parse("mylist/00000000", mylist_xml);
 
     t.deepEqual(mylist, {
@@ -52,7 +48,7 @@ test("nico mylist parse xml", t => {
                 title: "動画1",
                 video_id: "sm10",
                 link: "http://www.nicovideo.jp/watch/sm10",
-                description: "動画1メモ1\n動画1メモ2\n動画1メモ3\n動画1メモ4",
+                description: `動画1説明1\n動画1説明2\n動画1説明3\n動画1説明4`,
                 thumb_img: "http://tn.smilevideo.jp/smile?i=10",
                 length: "0:10",
                 date: "2000年1月1日 01：01：01",

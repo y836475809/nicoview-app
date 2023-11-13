@@ -64,6 +64,10 @@ module.exports = {
     /** @type {NicoGridOptions} */
     options:null,
 
+    /**
+     * 
+     * @param {NicoGridOptions} options 
+     */
     initOptions(options){
         if(!options.header_height){
             options.header_height = 30;
@@ -74,7 +78,8 @@ module.exports = {
         if(!options.sort_param){
             options.sort_param = {
                 id: "",
-                asc: true
+                asc: true,
+                enable: true
             };
         }
         if(!options.filter_target_ids){
@@ -336,6 +341,10 @@ module.exports = {
             this.triggerStateChanged();
         });
         this.obs_header.on("header-clicked", (args) => {
+            if(!this.options.sort_param.enable){
+                return;
+            }
+
             /** @type {{column_id: string}} */
             const {column_id} = args;
             const sort_param = this.options.sort_param;

@@ -225,7 +225,13 @@ module.exports = {
             {id: "length", name: "時間", ft: htmlFormatter}
         ];
         /** @type {NicoGridOptions} */
-        const options = {};
+        const options = {
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: false
+            }
+        };
         this.nico_grid_obs = new MyObservable();
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);

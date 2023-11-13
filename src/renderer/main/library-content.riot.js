@@ -146,7 +146,12 @@ module.exports = {
         const options = {
             filter_target_ids: [
                 "title", "tags", "video_id"
-            ]
+            ],
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: true
+            }
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();

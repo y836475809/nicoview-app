@@ -346,6 +346,7 @@
  * @typedef {Object} NicoGridSortParam
  * @property {string} id
  * @property {boolean} asc
+ * @property {boolean} enable
  */
 
 /**

@@ -26,19 +26,6 @@ class NicoGridStateRestor {
         });
         return ordered_columns;
     }
-    /**
-     * 
-     * @returns {NicoGridSortParam}
-     */
-    getSortParam(state){
-        if(!state){
-            return {
-                id: "",
-                asc: true
-            };
-        }
-        return state.sort_param; 
-    }
 }
 
 /**
@@ -59,8 +46,11 @@ const mountNicoGrid = (selector, state, obs, columns, options) => {
 
     const state_restor = new NicoGridStateRestor(state);
     prop.columns = state_restor.getColumns(state, columns);
-    const sort_param = state_restor.getSortParam(state);
-    prop.options.sort_param = sort_param;
+
+    if(state != null && state.sort_param != null){
+        prop.options.sort_param = state.sort_param;
+    }
+
     riot.mount(selector, prop, "nico-grid");
 };
 

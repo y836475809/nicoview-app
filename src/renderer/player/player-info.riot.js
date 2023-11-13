@@ -161,7 +161,12 @@ module.exports = {
                 "content", "user_id"
             ],
             img_cache_capacity:5,
-            view_margin_num: 10
+            view_margin_num: 10,
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: false
+            }
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();

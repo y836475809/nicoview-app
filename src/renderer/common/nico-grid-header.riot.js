@@ -27,7 +27,8 @@ module.exports = {
         this.obs = props.obs;
         this.sort_param = {
             id: "",
-            asc: true
+            asc: true,
+            enable: true
         };
     },
     onMounted() {

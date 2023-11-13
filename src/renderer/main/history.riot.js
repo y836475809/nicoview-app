@@ -67,7 +67,13 @@ module.exports = {
             {id: "play_date", name: "再生日", sortable: false}
         ];
         /** @type {NicoGridOptions} */
-        const options = {};
+        const options = {
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: false
+            }
+        };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
         mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);

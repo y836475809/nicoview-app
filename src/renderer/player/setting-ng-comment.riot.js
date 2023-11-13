@@ -33,7 +33,12 @@ module.exports = {
             header_height: 25,
             row_height: 25,
             img_cache_capacity:5,
-            view_margin_num: 20
+            view_margin_num: 20,
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: false
+            }
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();

@@ -48,7 +48,7 @@ module.exports = {
 
         myapi.ipc.History.onUpdateItem(async ()=>{
             const items = await myapi.ipc.History.getItems();
-            this.setData(items);
+            this.setData(items, true);
         });
 
         main_obs.on("history:reload-items", async ()=>{
@@ -114,7 +114,7 @@ module.exports = {
 
         await this.loadItems();
     },
-    async setData(items) {
+    async setData(items, fix_scroll) {
         const video_ids = await myapi.ipc.Download.getIncompleteIDs();
         for (let i=0; i<items.length; i++) {
             const item = items[i];
@@ -124,13 +124,14 @@ module.exports = {
         }
         await this.nico_grid_obs.triggerReturn("set-data", {
             key_id: "video_id",
-            items: items
+            items: items,
+            fix_scroll: fix_scroll
         });
     },
     async loadItems() {
         try {
             const items = await myapi.ipc.History.getItems();
-            this.setData(items);
+            this.setData(items, false);
         } catch (error) {
             logger.error(error);
             await myapi.ipc.Dialog.showMessageBoxOK({

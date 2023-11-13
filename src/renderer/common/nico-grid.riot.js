@@ -197,8 +197,8 @@ module.exports = {
         elm.style.width = el_width + "px"; 
 
         this.obs.onReturn("set-data", (args) => {
-            /** @type {{key_id: string, items: Object[]}} */
-            const { key_id, items } = args;
+            /** @type {{key_id: string, items: Object[], fix_scroll: boolean}} */
+            const { key_id, items, fix_scroll } = args;
             this.key_id = key_id;
             this.data_list = items.map( item => ({...item}));
             this.view_data_list = this.data_list;
@@ -218,7 +218,9 @@ module.exports = {
             this.sel_data_key_ids = [];
 
             this.updateAnchorPos();
-            this.scrollTo(0);
+            if(!fix_scroll){
+                this.scrollTo(0);
+            }
             this.updateRows();
         });
         this.obs.onReturn("get-items", () => {

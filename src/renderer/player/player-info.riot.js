@@ -27,7 +27,10 @@ module.exports = {
     mylist_counter:0,
     /** @type {SyncCommentScroll} */
     sync_comment_scroll:null,
-    sync_comment_checked:true,
+
+    viode_seek_sec: 0,
+    viode_curret_ms: 0,
+
     onBeforeMount() {
         this.sync_comment_scroll = new SyncCommentScroll();
         
@@ -111,15 +114,21 @@ module.exports = {
         });
 
         player_obs.on("player-info:seek-update", (current_sec)=> {
-            if(!this.sync_comment_checked){
+            if(Math.abs(current_sec - this.viode_seek_sec) > 1){
+                // シークが1秒より大きい場合、コメント同期する
+                this.viode_seek_sec = current_sec;
+                this.syncComment(current_sec);
+                return; 
+            }
+            this.viode_seek_sec = current_sec;
+
+            if(Date.now() - this.viode_curret_ms < 500){
+                // 前回のシークからの間隔が500ms以内の場合、コメント同期しない
                 return;
             }
+            this.viode_curret_ms = Date.now();
 
-            const comment_index =  this.sync_comment_scroll.getCommentIndex(current_sec); 
-            this.nico_grid_obs.trigger("scroll-to-index", {
-                index: comment_index,
-                position:"bottom"
-            });
+            this.syncComment(current_sec);
         });
 
         player_obs.on("player-info:reset-comment-scroll", ()=> {
@@ -207,6 +216,17 @@ module.exports = {
         /** @type {HTMLInputElement} */
         const ch_elm = this.$(".comment-checkbox.comment-visible");
         ch_elm.checked = true; 
+    },
+    /**
+     * 
+     * @param {Number} current_sec 
+     */
+    syncComment(current_sec) {
+        const comment_index =  this.sync_comment_scroll.getCommentIndex(current_sec);
+        this.nico_grid_obs.trigger("scroll-to-index", {
+            index: comment_index,
+            position:"bottom"
+        });
     },
     enableDonwload() {
         return this.is_deleted === false && this.is_saved === false;

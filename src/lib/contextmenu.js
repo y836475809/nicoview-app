@@ -284,6 +284,21 @@ const player_setting_ngcomment = (player_win) => {
     });
 };
 
+const player_tag = (play_win) => {
+    // eslint-disable-next-line no-unused-vars
+    ipcMain.handle("app:popup-contextmenu-player-tag", async (event, args) => {
+        return await new Promise(resolve => {
+            const menu_items = [
+                { 
+                    id:"search-library",
+                    label: "ライブラリを検索",
+                }
+            ];
+            popup(play_win, menu_items, resolve);
+        });
+    });
+};
+
 const getBookMarkMenuEnable = (type, items) => {
     if(items.length === 0) {
         return false;
@@ -611,6 +626,7 @@ const setupContextmenu = (main_win, player_win, config, history, store) => {
     player_link(player_win);
     player_text(player_win);
     player_setting_ngcomment(player_win);
+    player_tag(player_win);
 
     listview_bookmark(main_win);
     listview_toggle_mark(main_win);

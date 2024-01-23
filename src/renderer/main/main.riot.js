@@ -83,6 +83,12 @@ module.exports = {
             const bk_items = args;
             main_obs.trigger("bookmark:add-items", bk_items);
         });
+
+        myapi.ipc.Library.onSearch((args)=>{
+            const { query } = args;
+            main_obs.trigger("main:select-page", "library");
+            main_obs.trigger("library:search", query);
+        });
     },
     async onMounted() {
         this.select_page("library");

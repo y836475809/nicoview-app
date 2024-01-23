@@ -98,6 +98,15 @@ module.exports = {
             this.filterItems(query, target_ids);      
         });
 
+        main_obs.on("library:search", (
+            /** @type {string} */ query) => {
+            const target_ids = this.getSearchTargetIDs();
+            const search_elm = this.getSearchInputElm();
+            search_elm.value = query;
+            this.setSearchTargets(target_ids);
+            this.filterItems(query, target_ids);      
+        });
+
         main_obs.on("library:convert-video", async (args) => { 
             /** @type {string} */
             const video_id = args;

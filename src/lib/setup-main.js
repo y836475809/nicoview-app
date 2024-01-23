@@ -386,6 +386,7 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
 
         const app_msg_list = [
             { name:"search-tag", focus:true },
+            { name:"search-library", focus:true },
             { name:"load-mylist", focus:true },
             { name:"add-bookmarks", focus:false },
             { name:"add-download-item", focus:false },

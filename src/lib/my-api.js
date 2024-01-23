@@ -440,6 +440,15 @@ const Library = {
             func(args);
         });
     },
+    
+    search: (param) => {
+        ipcRenderer.send("app:search-library", param);
+    },
+    onSearch: (func) => {  
+        ipcRenderer.on("app:search-library", (event, args)=>{
+            func(args);
+        });
+    },
 };
 
 const UserIconCache = {

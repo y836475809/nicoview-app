@@ -23,7 +23,7 @@
     </style>
     
     <button type="button" class="tag-button" 
-        each={(item, i) in state.video_tags} onclick={onclickTag.bind(this,item)}>
+        each={(item, i) in state.video_tags} onclick={onclickTag.bind(this,item)} onmouseup={oncontextmenu.bind(this,item)}>
         {item.name}<div class="tag-lock" if={item.isLocked}>[lock]</div>
     </button>
 

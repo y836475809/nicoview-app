@@ -1,6 +1,7 @@
 const cheerio = require("cheerio");
 const { NicoClientRequest } = require("./nico-client-request");
 const { getWatchURL } = require("./nico-url");
+const { convToLegacyComments } = require("./nico-data-converter");
 const { logger } = require("./logger");
 
 class NicoAPI {
@@ -28,8 +29,8 @@ class NicoAPI {
         return this._owner;
     }
 
-    getCommentServerUrl(){
-        return this._commnet_server_url;
+    getNvComment(){
+        return this._nvComment;
     }
 
     getCommentOwnerThread(){
@@ -88,9 +89,9 @@ class NicoAPI {
         };
 
         const threads = this._api_data.comment.threads;
-        this._commnet_server_url = this._getCommentServerUrl(threads);
         this._owner_threads = threads.filter(thread => thread.isActive && thread.isOwnerThread);
         this._user_threads = threads.filter(thread => thread.isActive && !thread.isOwnerThread);
+        this._nvComment = this._api_data.comment.nvComment;
 
         const tags = this._api_data.tag.items;
         this._tags = tags.map(item => {
@@ -148,25 +149,6 @@ class NicoAPI {
     _typeOf(obj) {
         const toString = Object.prototype.toString;
         return toString.call(obj).slice(8, -1).toLowerCase();
-    }
-
-    /**
-     * api_dataのthreadsからコメントサーバのurlを取得する
-     * @param {Array} threads 
-     * @returns 
-     */
-    _getCommentServerUrl(threads){
-        const url_set = new Set();
-        threads.forEach(item=>{
-            url_set.add(item.server);
-        });
-
-        // TODO コメントサーバーはownerやuserで全部同じであるとしている
-        if(url_set.size > 1){
-            const msg = [...url_set].join(", ");
-            throw new Error(`several comment servers: ${msg}`);
-        }
-        return threads[0].server;
     }
 }
 
@@ -368,7 +350,12 @@ class NicoVideo {
 }
 
 class NicoComment {
+    /**
+     * 
+     * @param {NicoAPI} nico_api 
+     */
     constructor(nico_api) {
+        /** @type {NicoAPI} */
         this._nico_api = nico_api;
         this._r_no = 0;
         this._p_no = 0;
@@ -381,18 +368,16 @@ class NicoComment {
         }
     }
 
-    isSuccess(response){
-        return response[2].thread.resultcode===0;
-    }
-
     async getComment() {
-        const josn = this._get_comment_json();
-        return await this._post(josn);
+        const nv_commnets = await this._post();
+        const chats = convToLegacyComments(nv_commnets);
+        return chats;
     }
 
     async getCommentDiff(res_from) {
-        const josn = this._get_comment_diff_json(res_from);
-        return await this._post(josn);
+        throw Error("not implement getCommentDiff");
+        // const josn = this._get_comment_diff_json(res_from);
+        // return await this._post(josn);
     }
 
     _get_comment_json(){
@@ -410,9 +395,15 @@ class NicoComment {
         return josn;       
     }
 
-    async _post(post_data){
+    async _post(){
+        const nvComment = this._nico_api.getNvComment();
+        const post_data = {
+            "params": nvComment["params"],
+            "additionals": {},
+            "threadKey": nvComment["threadKey"]
+        };
+        const url = `${nvComment["server"]}/v1/threads`;
         this._req = new NicoClientRequest();
-        const url = `${this._nico_api.getCommentServerUrl()}/api.json/`;
         return await this._req.post(url, {json:post_data});
     }
 

@@ -73,6 +73,8 @@ class NicoClientRequest {
 
         const json_str = JSON.stringify(json);
         const options = this._getOptions(url, "POST");
+        options.headers["X-Frontend-Id"] = "6";
+        options.headers["X-Frontend-Version"] = "0";
         options.headers["Content-Type"] = "application/json";
         options.headers["Content-Length"] = json_str.length;
 

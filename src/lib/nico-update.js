@@ -130,64 +130,37 @@ class NicoUpdate {
     }
     
     async _updateComment(nico_api, nico_json){
-        const {threads, chats} = this._getCurrentCommentData();
-        const cur_comments = chats.filter(value => {
-            return Object.prototype.hasOwnProperty.call(value, "chat");
-        }).map(value => {
-            return {
-                no: value.chat.no
-            };
-        });
-        const comments_diff = await this._getComments(nico_api, cur_comments);
-        if(comments_diff.length===0){
-            return false;
+        const { chats } = this._getCurrentCommentData();
+        const new_comments = await this._getComments(nico_api);
+        const marge_commnets = this._margeCommentData(chats, new_comments);
+        if(marge_commnets.length > 0){
+            if(!this._validateComment(marge_commnets)){
+                throw new Error(`${this.video_item.video_id}の更新コメントが正しくないデータです`);
+            }
+            this._writeFile(nico_json.commentPath, marge_commnets, "json");
         }
 
-        if(!this._validateComment(comments_diff)){
-            throw new Error(`${this.video_item.video_id}の差分コメントが正しくないデータです`);
-        }
-
-        const updated_comment_data = this._margeCommentData(threads, chats, comments_diff);
-        this._writeFile(nico_json.commentPath, updated_comment_data, "json");
         return true;
     }
-
-    _margeCommentData(cu_threads, cu_chats, diff_data){
-        const current = this._getCommentDataProps(cu_threads);
-        const diff = this._getCommentDataProps(diff_data);
-
-        let owner_threads = current.owner_threads;
-        if(diff.owner_threads.length>0){
-            owner_threads = diff.owner_threads; 
+    
+    /**
+     * 
+     * @param {CommentChatData[]} cur_comments 
+     * @param {CommentChatData[]} new_comments 
+     * @returns {CommentChatData[]}
+     */
+    _margeCommentData(cur_comments, new_comments){
+        const cur_no_set = new Set();
+        cur_comments.forEach(item => {
+            cur_no_set.add(item.chat.no);
+        });
+        const comments = new_comments.filter(item => {
+            return !cur_no_set.has(item.chat.no);
+        });
+        if(comments.length == 0){
+            return [];
         }
-
-        let user_threads = current.user_threads;
-        if(diff.user_threads.length>0){
-            user_threads = diff.user_threads; 
-        }
-        const comments = cu_chats.concat(diff.comments);
-        return owner_threads.concat(user_threads).concat(comments);
-    }
-
-    _getCommentDataProps(comment_data){
-        const threads = comment_data.filter(value => {
-            return Object.prototype.hasOwnProperty.call(value, "thread");
-        });
-        const owner_threads = threads.filter(value => {
-            return Object.prototype.hasOwnProperty.call(value.thread, "fork");
-        });
-        const user_threads = threads.filter(value => {
-            return !Object.prototype.hasOwnProperty.call(value.thread, "fork");
-        });
-        const comments = comment_data.filter(value => {
-            return Object.prototype.hasOwnProperty.call(value, "chat");
-        });
-
-        return {
-            owner_threads,
-            user_threads,
-            comments
-        };
+        return cur_comments.concat(comments);
     }
 
     async updateThumbnail(){
@@ -410,26 +383,10 @@ class NicoUpdate {
         return watch_data;
     }
 
-    async _getComments(nico_api, cur_comments){
+    async _getComments(nico_api){
         this.nico_comment = new NicoComment(nico_api);
-        const max_no = this._getMaxCommentNo(cur_comments);
-        const res_from = max_no===null?0:max_no+1;
-        const comments_diff = await this.nico_comment.getCommentDiff(res_from);
-        return comments_diff;
-    }
-
-    /**
-     * 
-     * @param {Array} comments 
-     */
-    _getMaxCommentNo(comments){
-        const no_list = comments.map(comment=>{
-            return comment.no;
-        });
-        if(no_list.length===0){
-            return null;
-        }
-        return Math.max.apply(null, no_list);
+        const comments = await this.nico_comment.getComment();
+        return comments;
     }
  
     _typeOf(obj) {

@@ -1,179 +1,118 @@
 const test = require("ava");
 const { NicoUpdate } = require("../src/lib/nico-update");
-const { jsonParser } = require("./helper/json_parser");
-const owner_data = require("./data/owner-comment.json");
-const no_owner_data = require("./data/no-owner-comment.json");
 
-const owner_data_diff = [
-    {ping: {content: "rs:0"}}, {ping: {content: "ps:0"}},
+const cu_cm1 = [
     {
-        thread: {
-            resultcode: 0,
-            thread: "1",
-            fork: 1,
-            server_time: 0,
-            last_res: 100,
-            ticket: "0x0",
-            revision: 1
-        }
-    },
-    {global_num_res: {thread: "1",num_res: 100}},
-    {
-        chat: {
-            thread: "1",
-            fork: 1,
-            no: 3,
-            vpos: 30,
-            date: 100,
-            premium: 1,
-            mail: "shita",
-            content: "owner comment1"
+        "chat": {
+            "thread": "1634187662",
+            "no": 1,
+            "vpos": 938,
+            "date": 1634194399,
+            "date_usec": 429564,
+            "anonymity": 1,
+            "user_id": "dJRZ0xdZS33s83MjiYDmIOBecsU",
+            "mail": "184",
+            "content": "つるぎのまい"
         }
     },
     {
-        thread: {
-            resultcode: 0,
-            thread: "2",
-            server_time: 0,
-            last_res: 100,
-            ticket: "0x0",
-            revision: 1
+        "chat": {
+            "thread": "1634187662",
+            "no": 2,
+            "vpos": 433,
+            "date": 1634205062,
+            "date_usec": 972169,
+            "premium": 1,
+            "anonymity": 1,
+            "user_id": "k1UsWqNxc7tkxIlPJL-UXruWR5A",
+            "mail": "184",
+            "content": "なにこれ・・・"
         }
     },
     {
-        chat: {
-            thread: "1",
-            no: 4,
-            vpos: 40,
-            date: 100,
-            date_usec: 0,
-            premium: 1,
-            anonymity: 1,
-            user_id: "user1",
-            mail: "184",
-            content: "user comment1"
+        "chat": {
+            "thread": "1634187662",
+            "no": 5,
+            "vpos": 79,
+            "date": 1634208867,
+            "date_usec": 960624,
+            "anonymity": 1,
+            "user_id": "-D19mqJdbNWRvAeJKoNkHrFMXRI",
+            "mail": "184 ",
+            "content": "カイロスじゃねーか！"
         }
-    },
-    {ping: {content: "pf:0"}}, {ping: {content: "rf:0"}}
+    }
 ];
 
-const no_owner_data_diff = [
-    {ping: {content: "rs:0"}}, {ping: {content: "ps:0"}},
-    {global_num_res: {thread: "1",num_res: 100}},
+const nw_cm1 = [
     {
-        thread: {
-            resultcode: 0,
-            thread: "1",
-            server_time: 0,
-            last_res: 100,
-            ticket: "0x0",
-            revision: 1
+        "chat": {
+            "thread": "1634187662",
+            "no": 1,
+            "vpos": 938,
+            "date": 1634194399,
+            "date_usec": 429564,
+            "anonymity": 1,
+            "user_id": "dJRZ0xdZS33s83MjiYDmIOBecsU",
+            "mail": "184",
+            "content": "つるぎのまい"
         }
     },
     {
-        chat: {
-            thread: "1",
-            no: 4,
-            vpos: 40,
-            date: 100,
-            date_usec: 0,
-            premium: 1,
-            anonymity: 1,
-            user_id: "user1",
-            mail: "184",
-            content: "user comment1"
+        "chat": {
+            "thread": "1634187662",
+            "no": 2,
+            "vpos": 433,
+            "date": 1634205062,
+            "date_usec": 972169,
+            "premium": 1,
+            "anonymity": 1,
+            "user_id": "k1UsWqNxc7tkxIlPJL-UXruWR5A",
+            "mail": "184",
+            "content": "なにこれ・・・"
         }
     },
-    {ping: {content: "pf:0"}}, {ping: {content: "rf:0"}}
+    {
+        "chat": {
+            "thread": "1634187662",
+            "no": 4,
+            "vpos": 79,
+            "date": 1634208867,
+            "date_usec": 960624,
+            "anonymity": 1,
+            "user_id": "-D19mqJdbNWRvAeJKoNkHrFMXRI",
+            "mail": "184 ",
+            "content": "カイロスじゃねーか！"
+        }
+    },
+    {
+        "chat": {
+            "thread": "1634187662",
+            "no": 6,
+            "vpos": 79,
+            "date": 1634208867,
+            "date_usec": 960624,
+            "anonymity": 1,
+            "user_id": "-D19mqJdbNWRvAeJKoNkHrFMXRI",
+            "mail": "184 ",
+            "content": "カイロスじゃねーか！"
+        }
+    }
 ];
 
-class TestNicoUpdate extends NicoUpdate {
-    constructor(current_comment_data, diff_comment_data){
-        super({data_type:"json", common_filename:"test"});
-        this.data = null;
-        this.current_comment_data = jsonParser(current_comment_data);
-        this.diff_comment_data = diff_comment_data;
-    }
-    _getCurrentCommentData(){
-        return this.current_comment_data;
-    }
-
-    async _getComments(api_data, cur_comments){ // eslint-disable-line no-unused-vars
-        return this.diff_comment_data;
-    }
-    
-    _writeFile(file_path, data){
-        this.data = data;
-    }
-}
-
-test("update no_owner+no_owner_data_diff", async(t) => {
-    const nico_update = new TestNicoUpdate(no_owner_data, no_owner_data_diff);
-    await nico_update._updateComment(null, {commentPath:""});
-
-    const threads = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "thread");
-    });
-    const comments = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "chat");
-    });
-
-    t.is(threads.length, 1);
-    t.is(comments.length, 3);
-
-    // update
-    t.is(threads[0].thread.thread, "1");
+test("update commnet1", async(t) => {
+    const nu = new NicoUpdate();
+    const m_cm = nu._margeCommentData(cu_cm1, cu_cm1);
+    t.is(0, m_cm.length);
 });
 
-test("update no_owner+owner_data_diff", async(t) => {
-    const nico_update = new TestNicoUpdate(no_owner_data, owner_data_diff);
-    await nico_update._updateComment(null, {commentPath:""});
-
-    const threads = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "thread");
+test("update commnet2", async(t) => {
+    const nu = new NicoUpdate();
+    const m_cm = nu._margeCommentData(cu_cm1, nw_cm1);
+    const no_list = m_cm.map(value=>{
+        return value.chat.no;
     });
-    const comments = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "chat");
-    });
-
-    t.is(threads.length, 2);
-    t.is(comments.length, 4);
-
-    t.true(Object.prototype.hasOwnProperty.call(threads[0].thread, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(threads[1].thread, "fork"));
-
-    t.false(Object.prototype.hasOwnProperty.call(comments[0].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[1].chat, "fork"));
-    t.true(Object.prototype.hasOwnProperty.call(comments[2].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[3].chat, "fork"));
-});
-
-test("update owner+owner_data_diff", async(t) => {
-    const nico_update = new TestNicoUpdate(owner_data, owner_data_diff);
-    await nico_update._updateComment(null, {commentPath:""});
-
-    const threads = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "thread");
-    });
-    const comments = nico_update.data.filter(value=>{
-        return Object.prototype.hasOwnProperty.call(value, "chat");
-    });
-
-    t.is(threads.length, 2);
-    t.is(comments.length, 7);
-
-    t.true(Object.prototype.hasOwnProperty.call(threads[0].thread, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(threads[1].thread, "fork"));
-
-    // update
-    t.is(threads[0].thread.thread, "1");
-    t.is(threads[1].thread.thread, "2");
-
-    t.true(Object.prototype.hasOwnProperty.call(comments[0].chat, "fork"));
-    t.true(Object.prototype.hasOwnProperty.call(comments[1].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[2].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[3].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[4].chat, "fork"));
-    t.true(Object.prototype.hasOwnProperty.call(comments[5].chat, "fork"));
-    t.false(Object.prototype.hasOwnProperty.call(comments[6].chat, "fork"));
+    t.deepEqual(
+        [1, 2, 5, 4, 6], 
+        no_list);
 });

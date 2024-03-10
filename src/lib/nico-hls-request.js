@@ -47,7 +47,7 @@ class NicoHls {
         } = await this.getHlsData(video_id, domand, watchTrackId);
 
         if(this._cancel){
-            return;
+            return false;
         }
 
         on_progress("manifest m3u8取得");
@@ -56,7 +56,7 @@ class NicoHls {
         await fs.promises.writeFile(m, manifest_m3u8_map.get("rep_text"));
         
         if(this._cancel){
-            return;
+            return false;
         }
 
         on_progress("video m3u8取得");
@@ -65,7 +65,7 @@ class NicoHls {
         await fs.promises.writeFile(v, video_m3u8_map.get("rep_text"));
 
         if(this._cancel){
-            return;
+            return false;
         }
 
         on_progress("audio m3u8取得");
@@ -75,14 +75,14 @@ class NicoHls {
         
         for (const key of key_data_map.keys()){
             if(this._cancel){
-                return;
+                return false;
             }
             const k = path.join(work_dir, key);
             await fs.promises.writeFile(k, key_data_map.get(key));
         }
 
         if(this._cancel){
-            return;
+            return false;
         }
 
         const video_keys = Array.from(video_m3u8_map.keys()).filter(key => {
@@ -94,7 +94,7 @@ class NicoHls {
         });
 
         if(this._cancel){
-            return;
+            return false;
         }
 
         const filenum = video_keys.length + audio_keys.length;
@@ -103,7 +103,7 @@ class NicoHls {
 
         for (const key of video_keys){
             if(this._cancel){
-                return;
+                return false;
             }
 
             const value = video_m3u8_map.get(key);
@@ -117,7 +117,7 @@ class NicoHls {
         }
         for (const key of audio_keys){
             if(this._cancel){
-                return;
+                return false;
             }
 
             const value = audio_m3u8_map.get(key);
@@ -132,6 +132,8 @@ class NicoHls {
 
         on_progress("ffmpeg");
         await this.ffmpeg(ffmpeg_path, m, dist_file_path);
+
+        return true;
     }
         
     async ffmpeg(ffmpeg_path, manifest_filepath, dist_file_path){

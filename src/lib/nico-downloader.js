@@ -93,7 +93,7 @@ class NicoDownloader {
 
             on_progress(DonwloadProgMsg.start_dmc);
             this.nico_hls = new NicoHls.NicoHls(this.tmp_dir);
-            await this.nico_hls.download(
+            const result = await this.nico_hls.download(
                 this.video_id, 
                 this._nico_api.getDomand(), 
                 this._nico_api.getwatchTrackId(),
@@ -101,6 +101,12 @@ class NicoDownloader {
                 path.join(this.tmp_dir, "_nicview-download-tmp"),
                 this.nico_json.videoPath,
                 on_progress);
+            if(!result){
+                return {
+                    type: DownloadResultType.cancel,
+                    reason: "cancel"
+                };
+            }
 
             on_progress(DonwloadProgMsg.write_data);
             this._writeJson(this.nico_json.thumbInfoPath, thumbInfo_data);

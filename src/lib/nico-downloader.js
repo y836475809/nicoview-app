@@ -133,9 +133,10 @@ class NicoDownloader {
     }
 
     async _getVideoInfo(){
+        const quality = NicoHls.getQuality(this._nico_api.getDomand());
         this.videoinfo = {
             server: "hls",
-            maxQuality: NicoHls.getQuality(this._nico_api.getDomand())
+            maxQuality: quality.is_max_quality
         };
     }
 

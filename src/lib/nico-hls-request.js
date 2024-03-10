@@ -265,8 +265,8 @@ const getQuality = (domand) => {
     /** @type {Array}  */
     const videos = domand.videos;
     videos.sort((a, b) => b.qualityLevel - a.qualityLevel);
+    const is_max_quality = videos[0].isAvailable;
     const avai_videos = videos.filter(v => v.isAvailable);
-    const is_max_quality = videos[0].qualityLevel == avai_videos[0].qualityLevel;
     const video = avai_videos[0];
 
     /** @type {Array}  */

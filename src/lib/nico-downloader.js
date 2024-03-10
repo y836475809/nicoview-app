@@ -98,7 +98,6 @@ class NicoDownloader {
                 this._nico_api.getDomand(), 
                 this._nico_api.getwatchTrackId(),
                 this.ffmpeg_path,
-                path.join(this.tmp_dir, "_nicview-download-tmp"),
                 this.nico_json.videoPath,
                 on_progress);
             if(!result){

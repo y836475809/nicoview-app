@@ -13,7 +13,8 @@ class NicoHls {
     constructor(tmp_dir){
         this._video_id = "";
         this._cancel = false;
-        this._tmp_dir = tmp_dir;
+        this._play_data_tmp_dir = path.join(tmp_dir, "_nicoview_tmp", "play_data");
+        this._download_tmp_dir = path.join(tmp_dir, "_nicoview_tmp", "download");
     }
 
     async getHlsData(video_id, domand, watchTrackId, on_progress=(msg) => {}){
@@ -32,9 +33,9 @@ class NicoHls {
     }
 
     async download(video_id, domand, watchTrackId, 
-        ffmpeg_path, tmp_dir_path, dist_file_path, on_progress=(msg) => {}){
+        ffmpeg_path, dist_file_path, on_progress=(msg) => {}){
         on_progress("start setupDowloadDir");
-        this.setupDowloadDir(tmp_dir_path);
+        this.setupDowloadDir();
         
         const  {
             content_url,
@@ -51,7 +52,7 @@ class NicoHls {
         }
 
         on_progress("manifest m3u8取得");
-        const work_dir = tmp_dir_path;
+        const work_dir = this._download_tmp_dir;
         const m = path.join(work_dir, "manifest.m3u8");
         await fs.promises.writeFile(m, manifest_m3u8_map.get("rep_text"));
         
@@ -165,10 +166,11 @@ class NicoHls {
         });
     }
 
-    async setupDowloadDir(dir_path){
-        if(!fs.existsSync(dir_path)){
-            await fs.promises.mkdir(dir_path, { recursive: true });
+    async setupDowloadDir(){
+        if(fs.existsSync(this._download_tmp_dir)){
+            await fs.promises.rmdir(this._download_tmp_dir, { recursive: true });
         }
+        await fs.promises.mkdir(this._download_tmp_dir, { recursive: true });
     }
 
     async getDataApiData(){
@@ -250,9 +252,12 @@ class NicoHls {
      * @param {Array} filenames 
      */
     async make_empyt_file(filenames){
+        if(!fs.existsSync(this._play_data_tmp_dir)){
+            await fs.promises.mkdir(this._play_data_tmp_dir, { recursive: true });
+        }
         const dict = new Map();
         filenames.forEach(fname => {
-            const filepath = path.join(this._tmp_dir, fname);
+            const filepath = path.join(this._play_data_tmp_dir, fname);
             dict.set(fname, `file:///${filepath}`);
             if(!fs.existsSync(filepath)){
                 fs.openSync(filepath, "w");

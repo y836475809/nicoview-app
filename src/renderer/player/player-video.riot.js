@@ -37,7 +37,7 @@ module.exports = {
         
         player_obs.on("player-video:set-play-data-library", async(data) => {
             if(this.modal_dialog.isOpend()){
-                return;
+                this.obs_modal_dialog.trigger("close");
             }
             this.obs_modal_dialog.trigger("show", {
                 message: "動画取得中...",
@@ -45,7 +45,7 @@ module.exports = {
             });
 
             await this.initVideo();
-            // this.video_elm.pause();
+            this.video_elm.pause();
             if(this._hls){
                 this._hls.stopLoad();
                 this._hls.detachMedia();
@@ -61,7 +61,7 @@ module.exports = {
         });
         player_obs.on("player-video:set-play-data-online", async(data) => {
             if(this.modal_dialog.isOpend()){
-                return;
+                this.obs_modal_dialog.trigger("close");
             }
             this.obs_modal_dialog.trigger("show", {
                 message: "動画取得中...",
@@ -69,7 +69,7 @@ module.exports = {
             });
 
             await this.initVideo();
-            // this.video_elm.pause();
+            this.video_elm.pause();
 
             if(this._hls){
                 this._hls.stopLoad();
@@ -105,8 +105,10 @@ module.exports = {
                 }
             };
             this._hls = new Hls(config);
+            this._hls.on(Hls.Events.MEDIA_ATTACHED, ()=>{ 
+                this._hls.loadSource(content_url);
+            });
             this._hls.attachMedia(this.video_elm);
-            this._hls.loadSource(content_url);
         });
 
         player_obs.onReturn("player-video:get-current-time-callback", () => { 

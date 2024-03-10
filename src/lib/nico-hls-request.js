@@ -396,6 +396,8 @@ class CustomLoader extends Hls.DefaultConfig.loader {
     constructor(config) {
         super(config);
         this.my_loader_data = config.my_loader_data;
+        // TODO 再読み込みなどで破棄している最中にエラーになるので対応
+        this.destroying = false;
 
         const load = this.load.bind(this);
         this.load = async (context, config, callbacks) => {
@@ -458,8 +460,19 @@ class CustomLoader extends Hls.DefaultConfig.loader {
                     };
                 }
             }
+            // TODO 破棄している最中の場合はそのまま抜ける
+            if(this.destroying){
+                return;
+            }
             return load(context, config, callbacks);
         };
+        // TODO destroyが呼ばれたらtrueにする
+        const destroy = this.destroy.bind(this);
+        this.destroy = () => {
+            this.destroying = true;
+            destroy();
+        };
+
     }
 }
 

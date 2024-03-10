@@ -3,24 +3,20 @@ const path = require("path");
 const zlib = require("zlib");
 
 const comment_data = require("./data/comment.json");
-const data_api_data = require("./data/api-data.json");
+const nvcomments_data = require("./data/nvcomments.json");
+const data_api_data = require("./data/data-api-data.json");
 const dmc_session_data = require("./data/dmc-session.json");
 
 /* eslint-disable no-console */
 
 const createApiData = (video_id) =>{
     const id = video_id.replace("sm", "");
-    const cp_data = JSON.parse(JSON.stringify(data_api_data));
+    const cp_data = JSON.parse(JSON.stringify(data_api_data)).data;
     const video = cp_data.video;
     video.id = video_id;
     video.thumbnail.url      = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
     video.thumbnail.largeUrl = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}.L`;
     video.registeredAt = "2018/01/01 01:00:00";
-
-    cp_data.media.delivery.movie.session.recipeId = `nicovideo-${video_id}`;
-    // HBの確認しやすいように2秒毎にHB
-    cp_data.media.delivery.movie.session.heartbeatLifetime = 2200;
-
     return cp_data;
 };
 
@@ -186,6 +182,42 @@ class NicoMockResponse {
         }else{
             this._writeJson(req, res, comment_data);
         }
+    }
+
+    contentUrlCookie(req, res){
+        const url1 = "https://delivery.domand.nicovideo.jp/hlsbid/12d/playlists/variants";
+        const url2 = "session=9535&Policy=eyJT&Signature=Q4R0f&Key-Pair-Id=K11";
+        const str = JSON.stringify({
+            meta: { status: 201 },
+            data: {
+                contentUrl:`${url1}/manifest.m3u8?${url2}` 
+            }});
+        this._writeString(req, res, str, "json", 200, "niconico=100");
+    }
+
+    nvComment(req, res){
+        const str = JSON.stringify(nvcomments_data);
+        this._writeString(req, res, str, "json", 200);
+    }
+
+    m3u8(req, res){
+        const pathname = new URL(req.url).pathname.split("/").pop();
+        if(pathname.endsWith(".m3u8")){
+            const m3u8 = fs.readFileSync(`${__dirname}/data/hls/${pathname}`, "utf-8");
+            this._writeString(req, res, m3u8, "text", 200);
+        }
+        if(pathname.endsWith(".key")){
+            const key = fs.readFileSync(`${__dirname}/data/hls/${pathname}`);
+            res.writeHead(200);
+            res.end(key, "binary");
+        }
+    }
+
+    hlsMedia(req, res){
+        const pathname = new URL(req.url).pathname.split("/").pop();
+        const key = fs.readFileSync(`${__dirname}/data/hls/${pathname}`);
+        res.writeHead(200);
+        res.end(key, "binary");
     }
 
     dmcSession(req, res, body){

@@ -1,0 +1,154 @@
+{
+    "meta": {
+        "status": 200
+    },
+    "data": {
+        "globalComments": [
+            {
+                "id": "1111",
+                "count": 16
+            }
+        ],
+        "threads": [
+            {
+                "id": "1111",
+                "fork": "owner",
+                "commentCount": 0,
+                "comments": []
+            },
+            {
+                "id": "1111",
+                "fork": "main",
+                "commentCount": 5,
+                "comments": [
+                    {
+                        "id": "117784",
+                        "no": 1,
+                        "vposMs": 631790,
+                        "body": "コメント1",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:KqCTDk",
+                        "isPremium": "False",
+                        "score": 0,
+                        "postedAt": "2023-11-27T18: 30: 12+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    },
+                    {
+                        "id": "113196",
+                        "no": 2,
+                        "vposMs": 75390,
+                        "body": "コメント2",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:eKImP4",
+                        "isPremium": "True",
+                        "score": 0,
+                        "postedAt": "2023-11-27T18: 40: 17+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    },
+                    {
+                        "id": "6651278",
+                        "no": 3,
+                        "vposMs": 184250,
+                        "body": "コメント3",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:Nz06pXDNnc",
+                        "isPremium": "True",
+                        "score": 0,
+                        "postedAt": "2023-11-27T20: 50: 25+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    },
+                    {
+                        "id": "119424",
+                        "no": 4,
+                        "vposMs": 211010,
+                        "body": "コメント4",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:F0NzpXNnc",
+                        "isPremium": "True",
+                        "score": 0,
+                        "postedAt": "2023-11-27T20: 55: 30+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    },
+                    {
+                        "id": "697024",
+                        "no": 5,
+                        "vposMs": 562810,
+                        "body": "コメント5",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:F0Nznc",
+                        "isPremium": "True",
+                        "score": 0,
+                        "postedAt": "2023-11-27T20: 59: 44+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    }
+                ]
+            },
+            {
+                "id": "2222",
+                "fork": "easy",
+                "commentCount": 2,
+                "comments": [
+                    {
+                        "id": "1234",
+                        "no": 1,
+                        "vposMs": 1680,
+                        "body": "おつ1",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:Xa-mMAU",
+                        "isPremium": "False",
+                        "score": 0,
+                        "postedAt": "2023-11-27T21: 33: 13+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    },
+                    {
+                        "id": "5678",
+                        "no": 2,
+                        "vposMs": 645390,
+                        "body": "おつ2",
+                        "commands": [
+                            "184"
+                        ],
+                        "userId": "nvc:Xa-mqZU",
+                        "isPremium": "False",
+                        "score": 0,
+                        "postedAt": "2023-11-27T21: 43: 56+09: 00",
+                        "nicoruCount": 0,
+                        "nicoruId": "None",
+                        "source": "trunk",
+                        "isMyPost": "False"
+                    }
+                ]
+            }
+        ]
+    }
+}

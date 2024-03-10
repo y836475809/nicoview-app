@@ -348,6 +348,10 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         const user_agent = process.env["user_agent"];
         session.defaultSession.setUserAgent(user_agent);
 
+        ipcMain.handle("get-temp-path", async (event, args) => {
+            return app.getPath("temp");
+        });
+
         // dialog
         ipcMain.handle("app:show-message-box", async (event, args) => {
             const { type, title, message, okcancel} = args;

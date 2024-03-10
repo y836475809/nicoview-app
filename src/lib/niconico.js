@@ -3,6 +3,7 @@ const { NicoClientRequest } = require("./nico-client-request");
 const { getWatchURL } = require("./nico-url");
 const { convToLegacyComments } = require("./nico-data-converter");
 const { logger } = require("./logger");
+const { getQuality } = require("./nico-hls-request");
 
 class NicoAPI {
     isDmc(){
@@ -17,8 +18,16 @@ class NicoAPI {
         return this._video.isDeleted;
     }
 
-    getVideoQuality(){
-        return this._video_quality;
+    isMaxQuality(){
+        return this._is_max_quality;
+    }
+
+    getDomand(){
+        return this._domand;
+    }
+
+    getwatchTrackId(){
+        return this._watch_track_id;
     }
 
     getTags(){
@@ -44,15 +53,11 @@ class NicoAPI {
         return this._user_threads;
     }
 
-    getSession(){
-        return this._session;
-    }
-
     parse(api_data){
         this._api_data = api_data;
         const video = this._api_data.video;
         const count = this._api_data.video.count;
-        const movie = this._api_data.media.delivery.movie;
+
         this._video = {
             id: video.id,
             title: video.title,
@@ -76,11 +81,6 @@ class NicoAPI {
             }
         };
 
-        this._video_quality = {
-            audios: movie.audios,
-            videos: movie.videos,
-        };
-
         const owner = this._api_data.owner;
         this._owner = {
             id: owner?owner.id:"", 
@@ -102,21 +102,9 @@ class NicoAPI {
             };
         });
 
-        const session = this._api_data.media.delivery.movie.session;
-        this._session = {
-            recipeId: session.recipeId,
-            contentId: session.contentId,
-            videos:session.videos,
-            audios:session.audios,
-            heartbeatLifetime:session.heartbeatLifetime,
-            token: session.token,
-            signature: session.signature,
-            contentKeyTimeout: session.contentKeyTimeout,
-            serviceUserId: session.serviceUserId,
-            playerId: session.playerId,
-            url: session.urls[0].url,
-            priority: session.priority,
-        };
+        this._domand = this._api_data.media.domand;
+        this._watch_track_id = this._api_data.client.watchTrackId;
+        this._is_max_quality = getQuality(this._domand).is_max_quality;
     }
 
     validate(){
@@ -328,24 +316,6 @@ class NicoVideo {
             clearInterval(this.heart_beat_id);
             this.heart_beat_id = null;
         }
-    }
-
-    isDMCMaxQuality(){
-        const { audios, videos } = this._nico_api.getVideoQuality();
-        const max_quality = { 
-            video: videos[0].id,
-            audio: audios[0].id
-        };
-    
-        const src_id_to_mux = 
-            this.dmc_session.session.content_src_id_sets[0].content_src_ids[0].src_id_to_mux;
-        const session_quality = { 
-            video: src_id_to_mux.video_src_ids[0],
-            audio: src_id_to_mux.audio_src_ids[0]
-        };
-    
-        return max_quality.video == session_quality.video
-            && max_quality.audio == session_quality.audio;
     }
 }
 

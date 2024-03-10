@@ -277,16 +277,11 @@ module.exports = {
     },
     /**
      * 
-     * @param {VideoElemProp} video_elem_prop 
      * @param {ThumbInfo} thumb_info 
      * @param {CommentItem[]} comments 
      * @param {VideoOption} video_option 
      */
-    async play_by_video_data(video_elem_prop, thumb_info, comments, video_option) { 
-        if(!/mp4/.test(video_elem_prop.type)){
-            throw new Error(`${video_elem_prop.type}形式は再生できません`);
-        }
-
+    async play_by_video_data(thumb_info, comments, video_option, func) { 
         const video = thumb_info.video;
         const play_time_sec = toTimeSec(video.duration);
 
@@ -304,11 +299,8 @@ module.exports = {
         const title = `${video.title}[${video.video_id}][${video.video_type}]`;
         document.title = title;
         player_obs.trigger("player-controls:set-state", "play"); 
-        player_obs.trigger("player-video:set-play-data", { 
-            video_elem_prop: video_elem_prop,
-            comments: filtered_comments,
-            video_option: video_option
-        });
+        func(filtered_comments);
+        
         player_obs.trigger("player-tag:set-tags", thumb_info.tags);
         player_obs.trigger("player-info:set-data", { 
             thumb_info: thumb_info, 
@@ -353,7 +345,14 @@ module.exports = {
             thumb_info.is_deleted = video_data.getIsDeleted();
 
             const comments = video_data.getComments();
-            await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);
+            await this.play_by_video_data(thumb_info, comments, video_option, 
+                (filtered_comments)=>{
+                    player_obs.trigger("player-video:set-play-data-library", { 
+                        video_elem_prop: video_elem_prop,
+                        comments: filtered_comments,
+                        video_option: video_option
+                    });
+                });
         } catch (error) {
             logger.error(`id=${video_item.video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
             await myapi.ipc.Dialog.showMessageBoxOK({
@@ -398,14 +397,9 @@ module.exports = {
                 throw error;
             });
 
-            const {is_economy, is_deleted, comments, thumb_info, video_url} = 
+            const {is_economy, is_deleted, comments, thumb_info, nico_api} = 
                 await this.nico_play.play(video_id);
-                
-            const video_elem_prop = {
-                src: video_url,
-                type: `video/${thumb_info.video.video_type}`,
-            };
-            
+
             thumb_info.is_economy = is_economy;
             thumb_info.is_deleted = is_deleted;
 
@@ -414,7 +408,15 @@ module.exports = {
                 if (a.vpos > b.vpos) return 1;
                 return 0;
             });
-            await this.play_by_video_data(video_elem_prop, thumb_info, comments, video_option);      
+            await this.play_by_video_data(thumb_info, comments, video_option, 
+                (filtered_comments) => {
+                    player_obs.trigger("player-video:set-play-data-online", { 
+                        video_id,
+                        nico_api: nico_api,
+                        comments: filtered_comments,
+                        video_option: video_option 
+                    });
+                });  
         } catch (error) {
             if(!error.cancel){
                 logger.error(`video_id=${video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);

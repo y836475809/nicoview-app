@@ -40,6 +40,14 @@ class NicoMockServer {
                             this.nico_mock_res.dmcSession(req, res, body);
                         }
                     }
+                    if(req.url.startsWith("https://nvapi.nicovideo.jp/v1/watch")){
+                        console.log("mock server: contentUrlCookie");
+                        this.nico_mock_res.contentUrlCookie(req, res);
+                    }
+                    if(req.url.startsWith("https://nv-comment.nicovideo.jp")){
+                        console.log("mock server: nvComment");
+                        this.nico_mock_res.nvComment(req, res);
+                    }
                 });
             }
             if(req.method.toLowerCase() == "options") {
@@ -72,6 +80,19 @@ class NicoMockServer {
                     console.log("mock server: downloadVideo");
                     this.nico_mock_res.downloadVideo(req, res);
                 }
+                if(req.url.startsWith("https://nvapi.nicovideo.jp/v1/watch")){
+                    console.log("mock server: nvapi watch");
+                    this.nico_mock_res.contentUrlCookie(req, res);
+                }
+                if(req.url.startsWith("https://delivery.domand.nicovideo.jp")){
+                    console.log("mock server: delivery.domand");
+                    this.nico_mock_res.m3u8(req, res);
+                }
+                if(req.url.startsWith("https://asset.domand.nicovideo.jp")){
+                    console.log("mock server: asset.domand");
+                    this.nico_mock_res.hlsMedia(req, res);
+                }
+
 
                 // img tag, video tag
                 if(!req.url.startsWith("https://")){

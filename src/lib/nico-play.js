@@ -1,5 +1,5 @@
 const EventEmitter = require("events");
-const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
+const { NicoWatch, NicoComment } = require("./niconico");
 const NicoDataParser = require("./nico-data-parser");
 
 class NicoPlay extends EventEmitter {
@@ -14,14 +14,7 @@ class NicoPlay extends EventEmitter {
         }
         if(this.nico_comment){
             this.nico_comment.cancel();
-        }
-        if(this.nico_video){
-            this.nico_video.cancel();
-        }      
-    }
-
-    stopHB(){
-        this.nico_video.stopHeartBeat();
+        }    
     }
 
     async play(video_id){
@@ -39,34 +32,18 @@ class NicoPlay extends EventEmitter {
         const cnved_comments = NicoDataParser.makeComments(comments);
         this.emit("changeState", "finishComment");
 
-        this.nico_video = new NicoVideo(nico_api, this.heart_beat_rate);
-
-        if(!this.nico_video.isDmc()){
-            throw new Error("nico play, Dmc is nill");
-        }
-        
-        await this.nico_video.postDmcSession();
-        await this.nico_video.optionsHeartBeat();
-
-        this.emit("changeState", "startHeartBeat");
-        this.nico_video.postHeartBeat((error)=>{
-            if(error.cancel){
-                this.emit("cancelHeartBeat");
-            }else{
-                this.emit("errorHeartBeat", error);
-            }
-        });
-
         this.emit("changeState", "startPlayVideo");
         const thumb_info = NicoDataParser.json_thumb_info(nico_api); 
-        const dmc_video_url = this.nico_video.DmcContentUri;
-        const is_economy = !this.nico_video.isDMCMaxQuality();
+        const is_economy = !nico_api.isMaxQuality();
         return {
             is_economy: is_economy,
             is_deleted: is_deleted,
             comments: cnved_comments,
             thumb_info: thumb_info,
-            video_url: dmc_video_url
+            nico_api: {
+                domand: nico_api.getDomand(),
+                watchTrackId: nico_api.getwatchTrackId()
+            }
         };
     }
 }

@@ -1,4 +1,5 @@
 const EventEmitter = require("events");
+const { ipcRenderer } = require("electron");
 const myapi = require("../../lib/my-api");
 const { NicoDownloader } = require("../../lib/nico-downloader");
 const { buttonFormatter } = require("../common/nico-grid-formatter");
@@ -356,6 +357,9 @@ module.exports = {
         /** @type {string} */
         let video_id = null;
         try {
+            const tmp_dir = await ipcRenderer.invoke("get-temp-path");
+            const ffmpeg_path = await myapi.ipc.Config.get("ffmpeg_path", "");
+
             this.cancel_download = false;
             /** @type {RegDownloadItem[]} */
             const donwload_items = await this.nico_grid_obs.triggerReturn("get-items");
@@ -391,7 +395,7 @@ module.exports = {
                     break;
                 }
                 
-                this.nico_down = new NicoDownloader(video_id, download_dir);
+                this.nico_down = new NicoDownloader(video_id, download_dir, tmp_dir, ffmpeg_path);
                 const result = await this.nico_down.download((progress)=>{
                     this.nico_grid_obs.trigger("update-item", {
                         id: video_id,

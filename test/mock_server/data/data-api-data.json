@@ -1,0 +1,514 @@
+{
+    "meta": {
+        "status": 200
+    },
+    "data": {
+        "ads": null,
+        "category": null,
+        "channel": null,
+        "client": {
+            "nicosid": "170.28",
+            "watchId": "sm12345678",
+            "watchTrackId": "wtid_12345"
+        },
+        "comment": {
+            "server": {
+                "url": ""
+            },
+            "keys": {
+                "userKey": ""
+            },
+            "layers": [
+                {
+                    "index": 0,
+                    "isTranslucent": false,
+                    "threadIds": [
+                        {
+                            "id": 12345,
+                            "fork": 1,
+                            "forkLabel": "owner"
+                        }
+                    ]
+                },
+                {
+                    "index": 1,
+                    "isTranslucent": false,
+                    "threadIds": [
+                        {
+                            "id": 12345,
+                            "fork": 0,
+                            "forkLabel": "main"
+                        },
+                        {
+                            "id": 12345,
+                            "fork": 2,
+                            "forkLabel": "easy"
+                        }
+                    ]
+                }
+            ],
+            "threads": [
+                {
+                    "id": 12345,
+                    "fork": 1,
+                    "forkLabel": "owner",
+                    "videoId": "sm12345678",
+                    "isActive": false,
+                    "isDefaultPostTarget": false,
+                    "isEasyCommentPostTarget": false,
+                    "isLeafRequired": false,
+                    "isOwnerThread": true,
+                    "isThreadkeyRequired": false,
+                    "threadkey": null,
+                    "is184Forced": false,
+                    "hasNicoscript": true,
+                    "label": "owner",
+                    "postkeyStatus": 0,
+                    "server": ""
+                },
+                {
+                    "id": 17064,
+                    "fork": 0,
+                    "forkLabel": "main",
+                    "videoId": "sm12345678",
+                    "isActive": true,
+                    "isDefaultPostTarget": true,
+                    "isEasyCommentPostTarget": false,
+                    "isLeafRequired": true,
+                    "isOwnerThread": false,
+                    "isThreadkeyRequired": false,
+                    "threadkey": null,
+                    "is184Forced": false,
+                    "hasNicoscript": false,
+                    "label": "default",
+                    "postkeyStatus": 0,
+                    "server": ""
+                },
+                {
+                    "id": 17084,
+                    "fork": 2,
+                    "forkLabel": "easy",
+                    "videoId": "sm12345678",
+                    "isActive": true,
+                    "isDefaultPostTarget": false,
+                    "isEasyCommentPostTarget": true,
+                    "isLeafRequired": true,
+                    "isOwnerThread": false,
+                    "isThreadkeyRequired": false,
+                    "threadkey": null,
+                    "is184Forced": false,
+                    "hasNicoscript": false,
+                    "label": "easy",
+                    "postkeyStatus": 0,
+                    "server": ""
+                }
+            ],
+            "ng": {
+                "ngScore": {
+                    "isDisabled": false
+                },
+                "channel": [],
+                "owner": [],
+                "viewer": null
+            },
+            "isAttentionRequired": false,
+            "nvComment": {
+                "threadKey": "nvComment12345",
+                "server": "https:\/\/nv-comment.nicovideo.jp",
+                "params": {
+                    "targets": [
+                        {
+                            "id": "17085",
+                            "fork": "owner"
+                        },
+                        {
+                            "id": "17085",
+                            "fork": "main"
+                        },
+                        {
+                            "id": "17085",
+                            "fork": "easy"
+                        }
+                    ],
+                    "language": "ja-jp"
+                }
+            }
+        },
+        "community": null,
+        "easyComment": {
+            "phrases": [
+                {
+                    "text": "うぽつ",
+                    "nicodic": {
+                        "title": "うぽつ",
+                        "viewTitle": "うぽつ",
+                        "summary": "うぽつとは",
+                        "link": "https:\/\/dic.nicovideo.jp\/a\/%E3%81%86%E3%81%BD%E3%81%A4"
+                    }
+                },
+                {
+                    "text": "www",
+                    "nicodic": {
+                        "title": "www",
+                        "viewTitle": "www",
+                        "summary": "wwwとは",
+                        "link": "https:\/\/dic.nicovideo.jp\/a\/www"
+                    }
+                }
+            ]
+        },
+        "external": null,
+        "genre": {
+            "key": "other",
+            "label": "その他",
+            "isImmoral": false,
+            "isDisabled": false,
+            "isNotSet": false
+        },
+        "marquee": null,
+        "media": {
+            "domand": {
+                "videos": [
+                    {
+                        "id": "video-h264-480p",
+                        "isAvailable": false,
+                        "label": "480p",
+                        "bitRate": 1662982,
+                        "width": 640,
+                        "height": 480,
+                        "qualityLevel": 2,
+                        "recommendedHighestAudioQualityLevel": 1
+                    },
+                    {
+                        "id": "video-h264-360p",
+                        "isAvailable": true,
+                        "label": "360p",
+                        "bitRate": 637597,
+                        "width": 480,
+                        "height": 360,
+                        "qualityLevel": 1,
+                        "recommendedHighestAudioQualityLevel": 1
+                    },
+                    {
+                        "id": "video-h264-144p",
+                        "isAvailable": true,
+                        "label": "144p",
+                        "bitRate": 157412,
+                        "width": 192,
+                        "height": 144,
+                        "qualityLevel": 0,
+                        "recommendedHighestAudioQualityLevel": 0
+                    }
+                ],
+                "audios": [
+                    {
+                        "id": "audio-aac-192kbps",
+                        "isAvailable": false,
+                        "bitRate": 214415,
+                        "samplingRate": 44100,
+                        "integratedLoudness": -17.67,
+                        "truePeak": -0.04,
+                        "qualityLevel": 1,
+                        "loudnessCollection": [
+                            {
+                                "type": "video",
+                                "value": 1
+                            },
+                            {
+                                "type": "pureAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "pureAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "pureAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "nicoadVideoIntroduce",
+                                "value": 0.65
+                            },
+                            {
+                                "type": "nicoadBillboard",
+                                "value": 1
+                            },
+                            {
+                                "type": "marquee",
+                                "value": 0.82
+                            }
+                        ]
+                    },
+                    {
+                        "id": "audio-aac-64kbps",
+                        "isAvailable": true,
+                        "bitRate": 68667,
+                        "samplingRate": 44100,
+                        "integratedLoudness": -17.67,
+                        "truePeak": -0.04,
+                        "qualityLevel": 0,
+                        "loudnessCollection": [
+                            {
+                                "type": "video",
+                                "value": 1
+                            },
+                            {
+                                "type": "pureAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdPreroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "pureAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdMidroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "pureAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "houseAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "networkAdPostroll",
+                                "value": 0.52
+                            },
+                            {
+                                "type": "nicoadVideoIntroduce",
+                                "value": 0.65
+                            },
+                            {
+                                "type": "nicoadBillboard",
+                                "value": 1
+                            },
+                            {
+                                "type": "marquee",
+                                "value": 0.82
+                            }
+                        ]
+                    }
+                ],
+                "isStoryboardAvailable": false,
+                "accessRightKey": "accessRightKey12345"
+            },
+            "delivery": null,
+            "deliveryLegacy": null
+        },
+        "okReason": "PURELY",
+        "owner": {
+            "id": 126888913,
+            "nickname": "owner1",
+            "iconUrl": "https:\/\/secure-dcdn.cdn.nimg.jp\/nicoaccount\/usericon\/12345\/12345.jpg?12345",
+            "channel": null,
+            "live": null,
+            "isVideosPublic": true,
+            "isMylistsPublic": true,
+            "videoLiveNotice": null,
+            "viewer": null
+        },
+        "payment": {
+            "video": {
+                "isPpv": false,
+                "isAdmission": false,
+                "isContinuationBenefit": false,
+                "isPremium": false,
+                "watchableUserType": "all",
+                "commentableUserType": "all",
+                "billingType": "free"
+            },
+            "preview": {
+                "ppv": {
+                    "isEnabled": false
+                },
+                "admission": {
+                    "isEnabled": false
+                },
+                "continuationBenefit": {
+                    "isEnabled": false
+                },
+                "premium": {
+                    "isEnabled": false
+                }
+            }
+        },
+        "pcWatchPage": null,
+        "player": {
+            "initialPlayback": null,
+            "comment": {
+                "isDefaultInvisible": false
+            },
+            "layerMode": 0
+        },
+        "ppv": null,
+        "ranking": {
+            "genre": {
+                "rank": 117,
+                "genre": "その他",
+                "dateTime": "2024-02-22T19:00:00+09:00"
+            },
+            "popularTag": [
+                {
+                    "tag": "tag1",
+                    "regularizedTag": "tag1",
+                    "rank": 98,
+                    "genre": "その他",
+                    "dateTime": "2024-02-22T19:00:00+09:00"
+                },
+                {
+                    "tag": "tag2",
+                    "regularizedTag": "tag2",
+                    "rank": 86,
+                    "genre": "その他",
+                    "dateTime": "2024-02-22T19:00:00+09:00"
+                }
+            ]
+        },
+        "series": null,
+        "smartphone": null,
+        "system": {
+            "serverTime": "2024-02-26T20:39:18+09:00",
+            "isPeakTime": true,
+            "isStellaAlive": true
+        },
+        "tag": {
+            "items": [
+                {
+                    "name": "tag1",
+                    "isCategory": false,
+                    "isCategoryCandidate": false,
+                    "isNicodicArticleExists": true,
+                    "isLocked": true
+                },
+                {
+                    "name": "tag2",
+                    "isCategory": false,
+                    "isCategoryCandidate": false,
+                    "isNicodicArticleExists": true,
+                    "isLocked": true
+                }
+            ],
+            "hasR18Tag": false,
+            "isPublishedNicoscript": false,
+            "edit": {
+                "isEditable": false,
+                "uneditableReason": "NEED_LOGIN",
+                "editKey": null
+            },
+            "viewer": null
+        },
+        "video": {
+            "id": "sm12345678",
+            "title": "テスト1234",
+            "description": "テスト動画",
+            "count": {
+                "view": 1373,
+                "comment": 28,
+                "mylist": 0,
+                "like": 62
+            },
+            "duration": 37,
+            "thumbnail": {
+                "url": "https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/12345\/12345.67890",
+                "middleUrl": "https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/12345\/12345.67890.M",
+                "largeUrl": "https:\/\/nicovideo.cdn.nimg.jp\/thumbnails\/12345\/12345.67890.L",
+                "player": "https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/12345\/12345.67890.original\/a960x540l?key=4120",
+                "ogp": "https:\/\/img.cdn.nimg.jp\/s\/nicovideo\/thumbnails\/12345\/12345.67890.original\/r1280x720l?key=dc7f"
+            },
+            "rating": {
+                "isAdult": false
+            },
+            "registeredAt": "2024-02-21T19:19:00+09:00",
+            "isPrivate": false,
+            "isDeleted": false,
+            "isNoBanner": false,
+            "isAuthenticationRequired": false,
+            "isEmbedPlayerAllowed": true,
+            "isGiftAllowed": true,
+            "viewer": null,
+            "watchableUserTypeForPayment": "all",
+            "commentableUserTypeForPayment": "all",
+            "9d091f87": false
+        },
+        "videoAds": {
+            "additionalParams": {
+                "videoId": "sm12345678",
+                "videoDuration": 37,
+                "isAdultRatingNG": false,
+                "isAuthenticationRequired": false,
+                "isR18": false,
+                "nicosid": "170.27318",
+                "lang": "ja-jp",
+                "watchTrackId": "wtid_12345",
+                "genre": "other"
+            },
+            "items": [
+                {
+                    "type": "preroll",
+                    "timingMs": null,
+                    "additionalParams": {
+                        "linearType": "preroll",
+                        "adIdx": 0,
+                        "skipType": 1,
+                        "skippableType": 1,
+                        "pod": 1
+                    }
+                },
+                {
+                    "type": "postroll",
+                    "timingMs": null,
+                    "additionalParams": {
+                        "linearType": "postroll",
+                        "adIdx": 0,
+                        "skipType": 1,
+                        "skippableType": 1,
+                        "pod": 2
+                    }
+                }
+            ],
+            "reason": "non_premium_user_ads"
+        },
+        "videoLive": null,
+        "viewer": null,
+        "waku": null
+    }
+}

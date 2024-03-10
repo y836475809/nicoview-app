@@ -1,12 +1,23 @@
+const { ipcRenderer } = require("electron");
+const Hls = require("hls.js");
 const myapi = require("../../lib/my-api");
 const { NicoCommentTimeLine, NicoScript } = require("../../lib/nico-comment-timeline");
-const { window_obs } = require("../../lib/my-observable");
+const { MyObservable, window_obs } = require("../../lib/my-observable");
+const { ModalDialog } = require("../../lib/modal-dialog");
 const { logger } = require("../../lib/logger");
+const NicoHls = require("../../lib/nico-hls-request.js");
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
 module.exports = {
+    _hls: null,
+    _hls_tmp_dir:"",
+    /** @type {MyObservable} */
+    obs_modal_dialog:null,
+    /** @type {ModalDialog} */
+    modal_dialog:null,
+
     /** @type {HTMLVideoElement} */
     video_elm:null,
 
@@ -20,19 +31,82 @@ module.exports = {
     comment_config:null,
     comment_sync_id:null,
     play_ended:false,
-    onBeforeMount() {
-        player_obs.on("player-video:set-play-data", async(data) => {
+    async onBeforeMount() {
+        this.obs_modal_dialog = new MyObservable();
+        this._hls_tmp_dir = await ipcRenderer.invoke("get-temp-path");
+        
+        player_obs.on("player-video:set-play-data-library", async(data) => {
+            if(this.modal_dialog.isOpend()){
+                return;
+            }
+            this.obs_modal_dialog.trigger("show", {
+                message: "動画取得中...",
+                buttons: undefined
+            });
+
             await this.initVideo();
-
+            // this.video_elm.pause();
+            if(this._hls){
+                this._hls.stopLoad();
+                this._hls.detachMedia();
+                this._hls.destroy();
+                this._hls = null;
+            }
             this.play_data = data;
-
             const {src, type} = this.play_data.video_elem_prop;
             this.video_elm.src = src;
             this.video_elm.type = type;
+            this.createTimeLine(this.play_data.comments);
+            this.video_elm.load();
+        });
+        player_obs.on("player-video:set-play-data-online", async(data) => {
+            if(this.modal_dialog.isOpend()){
+                return;
+            }
+            this.obs_modal_dialog.trigger("show", {
+                message: "動画取得中...",
+                buttons: undefined
+            });
 
+            await this.initVideo();
+            // this.video_elm.pause();
+
+            if(this._hls){
+                this._hls.stopLoad();
+                this._hls.detachMedia();
+                this._hls.destroy();
+                this._hls = null;
+            }
+
+            this.play_data = data;
             this.createTimeLine(this.play_data.comments);
 
-            this.video_elm.load();
+            const nico_api = this.play_data.nico_api;
+            const domand = nico_api.domand;
+            const watchTrackId = nico_api.watchTrackId;
+            const video_id = this.play_data.video_id;
+            const nico_hls = new NicoHls.NicoHls(this._hls_tmp_dir);
+            const hls_data = await nico_hls.getHlsData(video_id, domand, watchTrackId, 
+                (msg) => {
+                    this.obs_modal_dialog.trigger("update-message", msg);
+                });
+            const content_url = hls_data.content_url;
+            const config = {
+                debug: false,
+                autoStartLoad: true,
+                loader: NicoHls.CustomLoader,
+                my_loader_data: {
+                    cookie: hls_data.cookie,
+                    manifest_m3u8_text: hls_data.manifest_m3u8_map.get("rep_text"),
+                    video_m3u8_map: hls_data.video_m3u8_map,
+                    audio_m3u8_map: hls_data.audio_m3u8_map,
+                    key_data_map: hls_data.key_data_map,
+                    dummy_url: hls_data.dummy_url
+                }
+            };
+            this._hls = new Hls(config);
+            this._hls.attachMedia(this.video_elm);
+            this._hls.loadSource(content_url);
         });
 
         player_obs.onReturn("player-video:get-current-time-callback", () => { 
@@ -44,6 +118,11 @@ module.exports = {
                 width: this.video_elm.videoWidth,
                 height: this.video_elm.videoHeight
             };
+        });
+    },
+    async onMounted() {
+        this.modal_dialog = new ModalDialog(this.root, "player-video-md", {
+            obs:this.obs_modal_dialog
         });
     },
     async initVideo() {
@@ -120,6 +199,9 @@ module.exports = {
             logger.debug("playingによるイベント発火");
             this.play_ended = false;
             this.playVideoAndComment();
+            if(this.modal_dialog.isOpend()){
+                this.obs_modal_dialog.trigger("close");
+            }
         });
 
         this.video_elm.addEventListener("ended", () => {

@@ -1,15 +1,11 @@
 const fs = require("fs");
 const path = require("path");
-const { NicoWatch, NicoVideo, NicoComment } = require("./niconico");
+const { NicoWatch, NicoComment } = require("./niconico");
 const { NicoClientRequest } = require("./nico-client-request");
 const { NicoJsonFile } = require("./nico-data-file");
 const  NicoDataParser = require("./nico-data-parser");
+const  NicoHls = require("./nico-hls-request");
 const { logger } = require("./logger");
-
-const convertMB = (size_byte) => {
-    const mb = 1024**2;
-    return (size_byte/mb).toFixed(1);
-};
 
 const DonwloadProgMsg =  Object.freeze({   
     start_watch: "watch取得",
@@ -23,37 +19,6 @@ const DonwloadProgMsg =  Object.freeze({
     stop_hb: "HB停止",
 });
 
-class DownloadRequest {
-    /**
-     * 
-     * @param {String} url 
-     */
-    constructor(url){
-        this._url = url;
-        this._req = null;
-    }
-
-    cancel(){
-        if(this._req){
-            this._req.cancel();
-        }
-    }
-
-    async download(stream, on_progress=(state)=>{}){ // eslint-disable-line no-unused-vars
-        this._req = new NicoClientRequest();
-        await this._req.get(this._url, 
-            {
-                encoding:"binary",
-                stream:stream,
-                on_progress:(current, content_len)=>{
-                    const cur_per = Math.floor((current/content_len)*100);
-                    on_progress(`${convertMB(content_len)}MB ${cur_per}%`);
-                }
-            });
-        on_progress(DonwloadProgMsg.complete);
-    }
-}
-
 const DownloadResultType = Object.freeze({
     complete: "complete",
     cancel: "cancel",
@@ -62,9 +27,11 @@ const DownloadResultType = Object.freeze({
 });
 
 class NicoDownloader {
-    constructor(video_id, dist_dir, only_max_quality=true){
+    constructor(video_id, dist_dir, tmp_dir, ffmpeg_path, only_max_quality=true){
         this.video_id = video_id;
         this.dist_dir = dist_dir;
+        this.tmp_dir = tmp_dir;
+        this.ffmpeg_path = ffmpeg_path;
         this.only_max_quality = only_max_quality;
 
         this.nico_json = new NicoJsonFile(video_id);
@@ -78,8 +45,8 @@ class NicoDownloader {
         if(this.nico_watch){
             this.nico_watch.cancel();
         }
-        if(this.nico_video){
-            this.nico_video.cancel();
+        if(this.nico_hls){
+            this.nico_hls.cancel();
         }   
         if(this.nico_comment){
             this.nico_comment.cancel();
@@ -87,17 +54,17 @@ class NicoDownloader {
         if(this.img_request){
             this.img_request.cancel();
         }         
-        if(this.video_download){
-            this.video_download.cancel();
-        }
-    }
-
-    async _renameTmp(oldname, newname){
-        await fs.promises.rename(oldname, newname);
     }
 
     async download(on_progress){
         try {
+            if(this.ffmpeg_path == ""){
+                throw new Error("ffmpeg_pathが設定されていない");
+            }
+            if(!fs.existsSync(this.ffmpeg_path)){
+                throw new Error(`ffmpeg_path=${this.ffmpeg_path}が見つからない`);
+            }
+
             on_progress(DonwloadProgMsg.start_watch);
             await this._getWatchData(this.video_id);
             await this._getVideoInfo();
@@ -124,19 +91,21 @@ class NicoDownloader {
             const { thumbImg_data, thumbnail_size } = await this._getThumbImg();
             this.nico_json.thumbnailSize = thumbnail_size;
 
-            const tmp_video_path = this._getTmpVideoPath();
-            const stream = this._createStream(tmp_video_path);
-            stream.setDefaultEncoding("binary");
             on_progress(DonwloadProgMsg.start_dmc);
-            await this._getVideoDmc(stream, on_progress);
+            this.nico_hls = new NicoHls.NicoHls(this.tmp_dir);
+            await this.nico_hls.download(
+                this.video_id, 
+                this._nico_api.getDomand(), 
+                this._nico_api.getwatchTrackId(),
+                this.ffmpeg_path,
+                path.join(this.tmp_dir, "_nicview-download-tmp"),
+                this.nico_json.videoPath,
+                on_progress);
 
             on_progress(DonwloadProgMsg.write_data);
             this._writeJson(this.nico_json.thumbInfoPath, thumbInfo_data);
             this._writeJson(this.nico_json.commentPath, comment_data);
             this._writeBinary(this.nico_json.thumbImgPath, thumbImg_data);
-
-            on_progress(DonwloadProgMsg.rename_video_file);
-            await this._renameTmp(tmp_video_path, this.nico_json.videoPath);
 
             return {
                 type: DownloadResultType.complete,
@@ -164,16 +133,9 @@ class NicoDownloader {
     }
 
     async _getVideoInfo(){
-        this.nico_video = new NicoVideo(this._nico_api);
-
-        if(!this.nico_video.isDmc()){
-            throw new Error("_getVideoInfo, Dmc is null");
-        }
-
-        await this.nico_video.postDmcSession();
         this.videoinfo = {
-            server: "dmc",
-            maxQuality: this.nico_video.isDMCMaxQuality()
+            server: "hls",
+            maxQuality: NicoHls.getQuality(this._nico_api.getDomand())
         };
     }
 
@@ -196,33 +158,6 @@ class NicoDownloader {
         this.img_request = new NicoClientRequest();
         const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
         return { thumbImg_data: body, thumbnail_size: thumbnail_size };
-    }
-
-    _createStream(dist_path){
-        return fs.createWriteStream(dist_path);
-    }
-
-    async _getVideoDmc(stream, on_progress){
-        //cancel
-        await this.nico_video.optionsHeartBeat();
-        this.nico_video.postHeartBeat((error)=>{
-            logger.error("video dmc HeartBeat: ", error);
-            throw error;
-        });
-
-        const video_url = this.nico_video.DmcContentUri;
-
-        this.video_download = new DownloadRequest(video_url);
-        try {
-            await this.video_download.download(stream, on_progress);
-            this.nico_video.stopHeartBeat();
-            on_progress(DonwloadProgMsg.stop_hb);
-        } catch (error) {
-            this.nico_video.stopHeartBeat();
-            on_progress(DonwloadProgMsg.stop_hb);
-
-            throw error;
-        }
     }
 
     /**

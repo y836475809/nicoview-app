@@ -112,10 +112,6 @@ class NicoAPI {
             return false;
         }
 
-        if(this._typeOf(this._session)!="object"){
-            return false;
-        }
-
         if(this._typeOf(this._video)!="object"){
             return false;
         } 

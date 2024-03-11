@@ -400,7 +400,26 @@ class NicoUpdate {
         }
 
         if(comments.length>0){
-            if(this._typeOf(comments[0])!="object"){
+            const cm = comments[0];
+            if(cm.chat===undefined){
+                return false;
+            }
+            if(cm.chat.no===undefined){
+                return false;
+            }
+            if(cm.chat.vpos===undefined){
+                return false;
+            }
+            if(cm.chat.date===undefined){
+                return false;
+            }
+            if(cm.chat.user_id===undefined){
+                return false;
+            }
+            if(cm.chat.mail===undefined){
+                return false;
+            }
+            if(cm.chat.content===undefined){
                 return false;
             }
         }

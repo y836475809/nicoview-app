@@ -7,9 +7,6 @@ const { logger } = require("../../lib/logger");
 const main_obs = window_obs;
 
 module.exports = {
-    state:{
-        donwnload_item_num:0
-    },
     /** @type {MouseGesture} */
     mouse_gesture:null,
     async onBeforeMount() {
@@ -117,9 +114,8 @@ module.exports = {
             elm.style.display = "none";
         }else{
             elm.style.display = "";
+            elm.innerHTML = video_ids.length;
         }
-        this.state.donwnload_item_num = video_ids.length;
-        this.update();
     },
     changeClass(remove_query, add_query, class_name) {
         const elms = this.$$(remove_query);

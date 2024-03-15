@@ -412,7 +412,7 @@ module.exports = {
                     this.nico_grid_obs.trigger("update-item", {
                         id: video_id,
                         props:{
-                            progress: "終了", 
+                            progress: `終了: 画質${result.reason}`, 
                             state: DownloadState.complete
                         }
                     });

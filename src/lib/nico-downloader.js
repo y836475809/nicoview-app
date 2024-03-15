@@ -114,7 +114,7 @@ class NicoDownloader {
 
             return {
                 type: DownloadResultType.complete,
-                reason: ""
+                reason: this.videoinfo.label
             };
         } catch (error) {
             if(error.cancel){
@@ -141,6 +141,7 @@ class NicoDownloader {
         const quality = NicoHls.getQuality(this._nico_api.getDomand());
         this.videoinfo = {
             server: "hls",
+            label: quality.label,
             maxQuality: quality.is_max_quality
         };
     }

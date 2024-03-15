@@ -98,13 +98,14 @@ const convToLegacyComments = (nv_commnets) => {
 const convToLegacyComment = (nv_commnet) => {
     const date = new Date(nv_commnet.postedAt);
     const date_sec = date.getTime() / 1000;
+    const cmds = nv_commnet.commands.join(" ");
     return {
         "chat": {
             "no": nv_commnet.no,
             "vpos": nv_commnet.vposMs/10,
             "date": date_sec,
             "user_id": nv_commnet.userId,
-            "mail": nv_commnet.commands.join(" "),
+            "mail": cmds.toLowerCase(),
             "content": nv_commnet.body
         }
     };

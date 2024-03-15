@@ -1,3 +1,4 @@
+const { logger } = require("./logger");
 
 class FlowComment {
     constructor(row_num, view_width, duration=3000) {
@@ -47,7 +48,12 @@ class FlowComment {
         return comments.map((comment) => {
             const text = comment.content;
             // const scale = comment.font_scale;
-            const scale = scale_map.get(comment.font_size);
+            let scale = scale_map.get("middle");
+            if(scale_map.has(comment.font_size)){
+                scale = scale_map.get(comment.font_size);
+            }else{
+                logger.error(`scale_mapにfont_size=${comment.font_size}が存在しない。middleを使用する`)
+            }
 
             let half_num = 0;
             const half = text.match(/[\w\d !"#$%&'()*+\-.,/:;<=>?@[\\\]^`{|}~]/g);

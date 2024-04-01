@@ -1,7 +1,7 @@
 
 const NICO_URL =  Object.freeze({
     VIDEO: "https://www.nicovideo.jp",
-    SEARCH: "https://api.search.nicovideo.jp",
+    SEARCH: "https://snapshot.search.nicovideo.jp",
 });
 
 const getURLKind = (url) => {

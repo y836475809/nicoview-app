@@ -163,11 +163,17 @@ class NicoMockResponse {
     watch(req, res){
         const video_id = req.url.split("/").pop();
         const apt_data = createApiData(video_id);
-        const data_api_data = escapeHtml(JSON.stringify(apt_data));
+        const content = escapeHtml(JSON.stringify(
+            {
+                meta: { status: 200, code: "HTTP_200" },
+                data: { response: apt_data }
+            }));
         const body =  `<!DOCTYPE html>
         <html lang="ja">
+            <head>
+                <meta name="server-response" content="${content}"
+            </head>
             <body>
-            <div id="js-initial-watch-data" data-api-data="${data_api_data}"
             </body>
         </html>`;
         this._writeString(req, res, body, "text");

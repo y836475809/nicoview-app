@@ -152,11 +152,17 @@ class NicoWatch {
         this._req = new NicoClientRequest();
         const body = await this._req.get(url);
         const $ = cheerio.load(body);
-        const data_json = $("#js-initial-watch-data").attr("data-api-data");
-        if(!data_json){
-            throw new Error("not find data-api-data");
+        // const data_json = $("#js-initial-watch-data").attr("data-api-data");
+        // if(!data_json){
+        //     throw new Error("not find data-api-data");
+        // }
+        // const api_data = JSON.parse(data_json);
+        const content = $("head > meta[name='server-response']").attr("content");
+        if(!content){
+            throw new Error("not find api-data");
         }
-        const api_data = JSON.parse(data_json);
+        const json_data = JSON.parse(content);
+        const api_data = json_data.data.response;
         const nico_api = new NicoAPI();
         nico_api.parse(api_data);
 

@@ -52,6 +52,15 @@ const Config = {
     }
 };
 
+const NicoCookie = {
+    get: async () => {
+        return await ipcRenderer.invoke("get_cookie");     
+    },
+    set: async (cookie) => {
+        return await ipcRenderer.invoke("set_cookie", cookie);     
+    }
+};
+
 const Dialog = {
     /**
      * 
@@ -480,6 +489,8 @@ const myapi = {
         onPlayVideo,
         playerReady,
         showyPlayer,
+
+        NicoCookie,
 
         Config,
         Dialog,

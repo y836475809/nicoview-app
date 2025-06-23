@@ -1,5 +1,6 @@
 const https = require("https");
 const zlib = require("zlib");
+const querystring = require("querystring");
 
 const user_agent = process.env["user_agent"];
 const proxy_server = process.env["proxy_server"];
@@ -17,7 +18,9 @@ class NicoCookie {
             const ret = new RegExp(name + "=[^;]+").exec(c);
             if(ret){
                 value = ret[0].replace(name + "=", "");
-                return true;
+                if(value!="deleted"){
+                    return true;
+                }
             }
         });
         return value;
@@ -82,6 +85,84 @@ class NicoClientRequest {
 
         return this._request(url, options, (req)=>{
             req.write(json_str);
+        });
+    }
+
+    login(url, post_data){
+        this._resetParams();
+        this._timeout_msec = timeout_msec;
+
+        if(!post_data){
+            throw new Error(`post: post_data=${post_data}`);
+        }
+        const json_str = querystring.stringify(post_data);
+        const options = {
+            hostname: url.hostname,
+            port: 443,
+            path: `${url.pathname}${url.search}`,
+            method: "POST",
+            headers: {
+                "user-agent": user_agent,
+                "Content-Type": 'application/x-www-form-urlencoded',
+                "Content-Length": json_str.length,
+            },
+        };
+        return new Promise((resolve, reject) => {
+            const req = https.request(options, (res) => {
+                if(res.statusCode < 200 || res.statusCode > 303){
+                    const error = new Error(`${res.statusCode}: ${url.toString()}`);
+                    error.status = res.statusCode;
+                    reject(error);
+                    return;
+                }
+                const cookies = res.headers["set-cookie"];
+                resolve(cookies);
+            });
+            req.on("error", (e) => {
+                reject(e);
+            });
+            req.on("timeout", () => {
+                req.destroy(new Error(`timeout : ${url.toString()}`));
+            });
+            req.setTimeout(timeout_msec);
+            req.write(json_str);
+            req.end();
+        });
+    }
+
+    logout(url, cookie){
+        this._resetParams();
+        this._timeout_msec = timeout_msec;
+
+        const options = {
+            hostname: url.hostname,
+            port: 443,
+            path: `${url.pathname}${url.search}`,
+            method: "GET",
+            headers: {
+                "user-agent": user_agent,
+                "accept-encoding": "gzip",
+                "Cookie": cookie,
+            },
+        };
+        return new Promise((resolve, reject) => {
+            const req = https.request(options, (res) => {
+                if(res.statusCode !== 303){
+                    const error = new Error(`${res.statusCode}: ${url.toString()}`);
+                    error.status = res.statusCode;
+                    reject(error);
+                    return;
+                }
+                resolve();
+            });
+            req.on("error", (e) => {
+                reject(e);
+            });
+            req.on("timeout", () => {
+                req.destroy(new Error(`timeout : ${url.toString()}`));
+            });
+            req.setTimeout(timeout_msec);
+            req.end();
         });
     }
 

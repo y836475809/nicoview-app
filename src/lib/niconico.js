@@ -4,6 +4,7 @@ const { getWatchURL } = require("./nico-url");
 const { convToLegacyComments } = require("./nico-data-converter");
 const { logger } = require("./logger");
 const { getQuality } = require("./nico-hls-request");
+const NicoAuth = require("./nico-auth");
 
 class NicoAPI {
     isDmc(){
@@ -150,7 +151,8 @@ class NicoWatch {
     async watch(video_id){
         const url = getWatchURL(video_id);
         this._req = new NicoClientRequest();
-        const body = await this._req.get(url);
+        const cookie = await NicoAuth.get_cookie();
+        const body = await this._req.get(url, {cookie: cookie});
         const $ = cheerio.load(body);
         // const data_json = $("#js-initial-watch-data").attr("data-api-data");
         // if(!data_json){

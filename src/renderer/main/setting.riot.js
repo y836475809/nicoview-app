@@ -3,6 +3,7 @@ const { ImportFile } = require("../../lib/import-file");
 const { ImportNNDDSetting } = require("../../lib/import-nndd-setting");
 const { ModalDialog } = require("../../lib/modal-dialog");
 const { MyObservable, window_obs } = require("../../lib/my-observable");
+const NicoAuth = require("../../lib/nico-auth");
 const { logger } = require("../../lib/logger");
 
 /** @type {MyObservable} */
@@ -29,6 +30,16 @@ module.exports = {
         /** @type {HTMLInputElement} */
         const elm = this.$(selector);
         elm.value = value;
+    },
+    /**
+     * 
+     * @param {string} selector 
+     * @returns {string} 
+     */
+    getInputValue(selector) { 
+        /** @type {HTMLInputElement} */
+        const elm = this.$(selector);
+        return elm.value;
     },
     /**
      * 
@@ -238,5 +249,45 @@ module.exports = {
     async onclickChecUerIconCache(e) {
         const checked = e.target.checked;
         await myapi.ipc.Config.set("user_icon_cache", checked);
+    },
+
+    async onclickNicoLogin(e) {
+        const loin_id = this.getInputValue(".nico-login-id");
+        const loin_pw = this.getInputValue(".nico-login-pw");
+        if(loin_id === "" || loin_pw === ""){
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "error",
+                message: "IDまたはPWが空"
+            });
+            return;
+        }
+        try {
+            const cookie = await NicoAuth.login(loin_id, loin_pw);
+            await myapi.ipc.NicoCookie.set(cookie);
+            const elm = this.$(".auth_state_label");
+            elm.innerText = "ログイン";
+            this.setInputValue(".nico-login-id", "");
+            this.setInputValue(".nico-login-pw", "");
+        } catch (error) {
+            logger.error(error);
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "error",
+                message: `ログイン失敗:${error}`
+            });
+        }
+    },
+    async onclickNicoLogout(e) {
+        try {
+            await NicoAuth.logout();
+            await myapi.ipc.NicoCookie.set("");
+            const elm = this.$(".auth_state_label");
+            elm.innerText = "ログアウト";
+        } catch (error) {
+            logger.error(error);
+            await myapi.ipc.Dialog.showMessageBoxOK({
+                type: "error",
+                message: `ログアウト失敗:${error}`
+            });
+        }
     }
 };

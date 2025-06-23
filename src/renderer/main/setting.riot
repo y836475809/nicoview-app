@@ -17,7 +17,8 @@
             cursor: pointer;
         }
 
-        .setting input[type='text'] {
+        .setting input[type='text'],
+        .setting input[type='password'] {
             width: 40vw;
             height: 25px;
             border: solid 1px #ccc;
@@ -66,6 +67,28 @@
     </style>
 
     <div class="setting">
+        <div class="container">
+            <div class="center-v title">ニコニコ動画</div>
+            <div class="content">
+                <div style="display:flex; flex-direction:column; margin-bottom:5px;">
+                    <div>
+                        <label class="label" style="width:30px" >状態</label><label class="auth_state_label label">ログアウト</label>
+                    </div>
+                    <div>
+                        <div class="label" style="width:30px">ID</div>
+                        <input class="nico-login-id" style="width:200px; margin-bottom:5px;" type="text">
+                    </div>
+                    <div>
+                        <div class="label" style="width:30px;">PW</div>
+                        <input class="nico-login-pw" style="width:200px; margin-bottom:5px;" type="password">
+                    </div>
+                    <div>
+                        <button style="width:100px;" onclick={onclickNicoLogin}>ログイン</button>
+                        <button style="width:100px;" onclick={onclickNicoLogout}>ログアウト</button>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="container">
             <div class="center-v title">マウスジェスチャ設定</div>
             <div class="content" style="display: flex;">

@@ -35,6 +35,7 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         return await config.get("data_dir", "");
     });
     const user_icon_cache = new UserIconCache();
+    let nico_cookie = null;
 
     // ウィンドウオブジェクトをグローバル参照をしておくこと。
     // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -616,6 +617,17 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         ipcMain.handle("config:set", (event, args) => {
             const { key, value } = args;
             config.set(key, value);
+        });
+
+        ipcMain.handle("set_cookie", (event, args) => {
+            let cookie = args;
+            if(cookie === ""){
+                cookie = null;
+            }
+            nico_cookie = cookie;
+        });
+        ipcMain.handle("get_cookie", (event, args) => {
+            return nico_cookie;
         });
 
         user_icon_cache.setup(

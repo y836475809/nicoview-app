@@ -5,6 +5,7 @@ const https = require("https");
 const cheerio = require("cheerio");
 const Hls = require("hls.js");
 const { parseManifestM3u8, parseMediaM3u8 } = require('./nico-hls-parse-m3u8.js');
+const NicoAuth = require("./nico-auth");
 
 const user_agent = process.env["user_agent"];
 const proxy_server = process.env["proxy_server"];
@@ -354,8 +355,9 @@ const nicoHlsGet = (url, is_text, cookie) => {
     });
 };
 
-const nicoHlsPost = (url, right_key, json_data) => {
+const nicoHlsPost = async (url, right_key, json_data) => {
     let data = "";
+    const cookie = await NicoAuth.get_cookie();
     return new Promise((resolve, reject) => {
         const headers = {
             "User-Agent": user_agent,
@@ -365,6 +367,9 @@ const nicoHlsPost = (url, right_key, json_data) => {
             "x-frontend-version": "0",
             "x-request-with": "https://www.nicovideo.jp",
         };
+        if(cookie){
+            headers["Cookie"] = cookie;
+        }
         const _url = new URL(url);
         let options = {
             hostname: _url.hostname,

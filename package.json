@@ -21,7 +21,7 @@
   "license": "MIT",
   "devDependencies": {
     "ava": "^5.3.1",
-    "electron": "^29.1.1",
+    "electron": "^29.3.3",
     "electron-builder": "^24.13.3",
     "eslint": "^8.57.0",
     "eslint-plugin-html": "^8.0.0",

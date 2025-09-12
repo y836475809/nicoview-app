@@ -26,11 +26,17 @@ const login = async(longin_id, login_pw) => {
     const cookies = await req.login(url, post_data);
     const nicosid = NicoCookie.getValue(cookies, "nicosid");
     const user_session = NicoCookie.getValue(cookies, "user_session");
-    const user_session_secure = NicoCookie.getValue(cookies, "user_session_secure");
-    if(nicosid === null || user_session === null || user_session_secure === null){
-        throw new Error("Could not find user session");
+    let err_msg = "";
+    if(nicosid === null){
+        err_msg = err_msg + "nicosid,";
     }
-    return `nicosid=${nicosid}; user_session=${user_session}; user_session_secure=${user_session_secure}`;
+    if(user_session === null){
+        err_msg = err_msg + "user_session,";
+    }
+    if(err_msg != ""){
+        throw new Error("Could not find:" + err_msg);
+    }
+    return `nicosid=${nicosid}; user_session=${user_session}`;
 };
 
 const logout = async() => {

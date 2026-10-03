@@ -211,6 +211,16 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
                         }}
                     ]
                 },
+                { label: "ツール",  
+                    submenu: [
+                        { label: "ログイン", click() {
+                            NicoLogin.showLoginWindow();
+                        }},
+                        { label: "ログアウト", click() {
+                            NicoLogin.showLogoutWindow();
+                        }},
+                    ]
+                },
                 { label: "ヘルプ",  
                     submenu: [
                         { role: "reload" },

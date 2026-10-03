@@ -21,8 +21,6 @@
   "author": "y836475809",
   "license": "MIT",
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
     "ava": "^5.3.1",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
@@ -35,7 +33,7 @@
     "@fortawesome/fontawesome-free": "^6.4.2",
     "cheerio": "^1.0.0-rc.12",
     "electron-log": "^4.4.8",
-    "hls.js": "^1.5.7",
+    "hls.js": "^1.6.15",
     "riot": "^9.1.4",
     "sql.js": "^1.8.0"
   },
@@ -56,7 +54,10 @@
     ],
     "win": {
       "icon": "./icon/icon.png",
-      "target": "zip"
+      "target": "zip",
+      "sign": null,
+      "signAndEditExecutable": false,
+      "verifyUpdateCodeSignature": false
     }
   },
   "ava": {

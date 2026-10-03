@@ -1,11 +1,12 @@
 {
     "compilerOptions": {
+      "strict": true,
       "checkJs": true,
-      "moduleResolution": "node",
+      "module": "commonjs",
       "target": "es2020",
-      "baseUrl": "./",
+      "skipLibCheck": true,
       "paths": {
-        "@lib/*": ["src/lib/*"]
+        "@lib/*": ["./src/lib/*"]
       }
     },
     "exclude": [ 

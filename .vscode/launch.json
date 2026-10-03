@@ -12,11 +12,14 @@
                 "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
             },
             "runtimeArgs": [
-                "./test/test-main.js", 
-                "--test=main",
                 "--remote-debugging-port=9222"
             ],
-            "sourceMaps": true,
+            "args" : [
+                "${workspaceFolder}/src/main.js",
+                "--dev",
+                "--mock_server"
+            ],
+            "sourceMaps": true
         },
         {
             "name": "Electron: Renderer",
@@ -25,7 +28,17 @@
             "port": 9222,
             "webRoot": "${workspaceRoot}",
             "outputCapture": "std",
-            "timeout": 10000
+            "timeout": 10000,
+            "sourceMaps": true,
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "MockServer",
+            "cwd": "${workspaceRoot}",
+            "outputCapture": "std",
+            "program": "${workspaceFolder}/__mock_server__/server.js",
+            "sourceMaps": true,
         },
         {
             "type": "node",
@@ -48,9 +61,11 @@
         {
             "name": "Electron: All",
             "configurations": [
+                "MockServer",
                 "Electron: Main",
                 "Electron: Renderer"
-            ]
+            ],
+            "stopAll": true
         }
     ]
 }

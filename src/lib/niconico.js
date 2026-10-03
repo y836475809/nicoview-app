@@ -1,16 +1,11 @@
 const cheerio = require("cheerio");
-const { NicoClientRequest } = require("./nico-client-request");
+const { fetchGet, fetchPost } = require("./nico-fetch");
 const { getWatchURL } = require("./nico-url");
 const { convToLegacyComments } = require("./nico-data-converter");
 const { logger } = require("./logger");
 const { getQuality } = require("./nico-hls-request");
-const NicoAuth = require("./nico-auth");
 
 class NicoAPI {
-    isDmc(){
-        return this._api_data != null && this._api_data != undefined;
-    }
-
     getVideo(){
         return this._video;
     }
@@ -29,6 +24,10 @@ class NicoAPI {
 
     getwatchTrackId(){
         return this._watch_track_id;
+    }
+    
+    getaccessRightKey(){
+        return  this._domand.accessRightKey;
     }
 
     getTags(){
@@ -55,6 +54,7 @@ class NicoAPI {
     }
 
     parse(api_data){
+        // this._api_data = api_data.$watchV4.data;
         this._api_data = api_data;
         const video = this._api_data.video;
         const count = this._api_data.video.count;
@@ -139,26 +139,23 @@ class NicoAPI {
 
 class NicoWatch {
     constructor() { 
-        this._req = null;
+        /** @type {AbortController?} */
+        this._abort = null;
     }
 
     cancel(){   
-        if (this._req) {
-            this._req.cancel();
+        if (this._abort) {
+            this._abort.abort();
         }
     }
 
     async watch(video_id){
         const url = getWatchURL(video_id);
-        this._req = new NicoClientRequest();
-        const cookie = await NicoAuth.get_cookie();
-        const body = await this._req.get(url, {cookie: cookie});
+        this.cancel();
+        this._abort = new AbortController();
+        const res = await fetchGet(url, this._abort);
+        const body = await res.text();
         const $ = cheerio.load(body);
-        // const data_json = $("#js-initial-watch-data").attr("data-api-data");
-        // if(!data_json){
-        //     throw new Error("not find data-api-data");
-        // }
-        // const api_data = JSON.parse(data_json);
         const content = $("head > meta[name='server-response']").attr("content");
         if(!content){
             throw new Error("not find api-data");
@@ -177,7 +174,6 @@ class NicoVideo {
         this._nico_api = nico_api;  
 
         this._heart_beat_rate = heart_beat_rate;
-        this._heart_beat_id = null;
 
         this._req_session = null;
         this._req_hb_options = null;
@@ -196,130 +192,6 @@ class NicoVideo {
         if (this._req_hb_post) {
             this._req_hb_post.cancel();
         }
-
-        this.stopHeartBeat();
-    }
-
-    isDmc() {
-        return this._nico_api.isDmc();
-    }
-
-    get DmcSession() {
-        if (!this.isDmc()) {
-            return null;
-        }
-
-        const session_api = this._nico_api.getSession();
-        return {
-            session: {
-                recipe_id: session_api.recipeId,
-                content_id: session_api.contentId,
-                content_type: "movie",
-                content_src_id_sets: [{
-                    content_src_ids: [{
-                        src_id_to_mux: {
-                            video_src_ids: session_api.videos,
-                            audio_src_ids: session_api.audios
-                        }
-                    }]
-                }],
-                timing_constraint: "unlimited",
-                keep_method: {
-                    heartbeat: {
-                        lifetime: session_api.heartbeatLifetime
-                    }
-                },
-                protocol: {
-                    name: "http",
-                    parameters: {
-                        http_parameters: {
-                            parameters: {
-                                http_output_download_parameters: {
-                                    use_well_known_port: "yes",
-                                    use_ssl: "yes",
-                                    transfer_preset: ""
-                                }
-                            }
-                        }
-                    }
-                },
-                content_uri: "",
-                session_operation_auth: {
-                    session_operation_auth_by_signature: {
-                        token: session_api.token,
-                        signature: session_api.signature
-                    }
-                },
-                content_auth: {
-                    auth_type: "ht2",
-                    content_key_timeout: session_api.contentKeyTimeout,
-                    service_id: "nicovideo",
-                    service_user_id: session_api.serviceUserId
-                },
-                client_info: {
-                    player_id: session_api.playerId
-                },
-                priority: session_api.priority
-            }
-        };
-    }
-
-    async postDmcSession() {
-        if (!this.DmcSession) {
-            throw new Error(`dmc info is ${this.DmcSession}`);
-        }  
-
-        const session_url = this._nico_api.getSession().url;
-        const url = `${session_url}?_format=json`;
-        const json = this.DmcSession;
-
-        this._req_session = new NicoClientRequest();
-        const body = await this._req_session.post(url, {json:json});
-        this.dmc_session = body.data;
-    }
-
-    get DmcContentUri() {
-        return this.dmc_session.session.content_uri;
-    }
-
-    optionsHeartBeat() {
-        this.stopHeartBeat();
-
-        const id = this.dmc_session.session.id;
-        const session_url = this._nico_api.getSession().url;
-        const url = `${session_url}/${id}?_format=json&_method=PUT`;
-        
-        this._req_hb_options = new NicoClientRequest();
-        return this._req_hb_options.options(url);
-    }
-    
-    postHeartBeat(on_error) {
-        this.stopHeartBeat();
-
-        const id = this.dmc_session.session.id;
-        const session_url = this._nico_api.getSession().url;
-        const url = `${session_url}/${id}?_format=json&_method=PUT`;
-        const session = this.dmc_session;
-        const interval_ms = this._nico_api.getSession().heartbeatLifetime * this._heart_beat_rate;
-        this._req_hb_post = new NicoClientRequest();
-        this.heart_beat_id = setInterval(async () => {              
-            try {
-                await this._req_hb_post.post(url, {json:session});
-            } catch (error) {
-                this.stopHeartBeat();
-                on_error(error);
-            }
-            
-            logger.debug("nico video HeartBeat");
-        }, interval_ms);
-    }
-
-    stopHeartBeat() {
-        if (this.heart_beat_id) {
-            logger.debug("nico video stop HeartBeat");
-            clearInterval(this.heart_beat_id);
-            this.heart_beat_id = null;
-        }
     }
 }
 
@@ -333,12 +205,13 @@ class NicoComment {
         this._nico_api = nico_api;
         this._r_no = 0;
         this._p_no = 0;
-        this._req = null;
+        /** @type {AbortController?} */
+        this._abort = null;
     }
 
     cancel() {
-        if (this._req) {
-            this._req.cancel();
+        if (this._abort) {
+            this._abort.abort();
         }
     }
 
@@ -377,8 +250,14 @@ class NicoComment {
             "threadKey": nvComment["threadKey"]
         };
         const url = `${nvComment["server"]}/v1/threads`;
-        this._req = new NicoClientRequest();
-        return await this._req.post(url, {json:post_data});
+        const headers = new Headers([
+            ['X-Frontend-Id', '6'],
+            ['X-Frontend-Version', '0'],
+        ]);
+        this.cancel();
+        this._abort = new AbortController();
+        const res = await fetchPost(url, headers, post_data, this._abort);
+        return await res.json();
     }
 
     hasOwnerComment() {
@@ -567,16 +446,22 @@ class NicoComment {
 
 class NicoThumbnail {
     constructor() { 
-        this._req = null;
+        /** @type {AbortController?} */
+        this._abort = null;
     }
     cancel(){
-        if (this._req) {
-            this._req.cancel();
+        if (this._abort) {
+            this._abort.abort();
         }
     }  
-    getThumbImg(url){
-        this._req = new NicoClientRequest();
-        return this._req.get(url, {encoding:"binary"});   
+    async getThumbImg(url){
+        this.cancel();
+        this._abort = new AbortController();   
+        const res = await fetchGet(url, this._abort);
+        const arrsyBuf = await res.arrayBuffer();
+        const buf = Buffer.from(arrsyBuf);
+        const uint8Array = new Uint8Array(buf);
+        return uint8Array;
     }
 }
 

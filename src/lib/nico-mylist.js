@@ -1,14 +1,15 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
-const { NicoClientRequest } = require("./nico-client-request");
+const { fetchGet } = require("./nico-fetch");
 const { NICO_URL } = require("./nico-url");
 const { CacheStore } = require("./cache-store");
 const { logger } = require("./logger");
 
 class NicoMylist {
     constructor(){
-        this._req = null;
+        /** @type {AbortController?} */
+        this._abort = null;
 
         this.reader = new NicoMylistReader();
         this.mylist = null;
@@ -16,8 +17,8 @@ class NicoMylist {
     }
 
     cancel(){   
-        if (this._req) {
-            this._req.cancel();
+        if (this._abort) {
+            this._abort.abort();
         }
     }
 
@@ -47,9 +48,11 @@ class NicoMylist {
         return this.xml;
     }
 
-    _requestXML(url){
-        this._req = new NicoClientRequest();
-        return this._req.get(url);
+    async _requestXML(url){
+        this.cancel();
+        this._abort = new AbortController();
+        const res = await fetchGet(url, this._abort);
+        return await res.text();
     }
 
     _getURL(mylist_id){

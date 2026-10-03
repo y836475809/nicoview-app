@@ -1,10 +1,21 @@
+const { session, dialog, app, BrowserWindow, ipcMain, shell, Menu, protocol } = require("electron");
+const fs = require("fs");
+const fsPromises = fs.promises;
+const path = require("path");
+const NicoLogin = require("./nico-login");
+
+protocol.registerSchemesAsPrivileged([{ 
+    scheme: 'my-app', 
+    privileges: {
+        standard: true,
+        secure: true,
+        supportFetchAPI: true,
+        bypassCSP: true,
+        stream: true
+    } 
+}]);
 
 const setupMain = (main_html_path, player_html_path, preload_path, css_dir, config_filename) => {
-    const { session, dialog, app, BrowserWindow, ipcMain, shell, Menu } = require("electron");
-    const fs = require("fs");
-    const fsPromises = fs.promises;
-    const path = require("path");
-
     process.env["user_agent"] = `${app.name}/${app.getVersion()}`;
 
     const { Config } = require("./config");
@@ -35,7 +46,6 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
         return await config.get("data_dir", "");
     });
     const user_icon_cache = new UserIconCache();
-    let nico_cookie = null;
 
     // ウィンドウオブジェクトをグローバル参照をしておくこと。
     // しないと、ガベージコレクタにより自動的に閉じられてしまう。
@@ -619,22 +629,23 @@ const setupMain = (main_html_path, player_html_path, preload_path, css_dir, conf
             config.set(key, value);
         });
 
-        ipcMain.handle("set_cookie", (event, args) => {
-            let cookie = args;
-            if(cookie === ""){
-                cookie = null;
-            }
-            nico_cookie = cookie;
-        });
-        ipcMain.handle("get_cookie", (event, args) => {
-            return nico_cookie;
-        });
-
         user_icon_cache.setup(
             path.join(config.get("data_dir", ""), "user_icon"),
             config.get("user_icon_cache", false));
         
         createMainWindow();
+
+        protocol.handle('my-app', async (request) => {
+            const url = request.url.replace('my-app://', 'https://');
+            const mySesstion = session.fromPartition(NicoLogin.LOGIN_SESSTION_NAME);
+            const body = request.body ? JSON.stringify(await request.json()) : null;
+            return await mySesstion.fetch(url, {
+                headers: request.headers,
+                method: request.method,
+                signal: request.signal,
+                body: body
+            });
+        });
         
         setupContextmenu(main_win, player_win, config, history, store);
     });

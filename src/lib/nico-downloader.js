@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { NicoWatch, NicoComment } = require("./niconico");
-const { NicoClientRequest } = require("./nico-client-request");
+const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
 const { NicoJsonFile } = require("./nico-data-file");
 const  NicoDataParser = require("./nico-data-parser");
 const  NicoHls = require("./nico-hls-request");
@@ -51,8 +50,8 @@ class NicoDownloader {
         if(this.nico_comment){
             this.nico_comment.cancel();
         }  
-        if(this.img_request){
-            this.img_request.cancel();
+        if(this.nicoThumb){
+            this.nicoThumb.cancel();
         }         
     }
 
@@ -97,6 +96,7 @@ class NicoDownloader {
                 this.video_id, 
                 this._nico_api.getDomand(), 
                 this._nico_api.getwatchTrackId(),
+                this._nico_api.getaccessRightKey(),
                 this.ffmpeg_path,
                 this.nico_json.videoPath,
                 on_progress);
@@ -162,8 +162,8 @@ class NicoDownloader {
         const large_url = this._nico_api.getVideo().thumbnail.largeUrl;
         const { thumbnail_url, thumbnail_size } = this._getThumbnailData(large_url);
 
-        this.img_request = new NicoClientRequest();
-        const body = await this.img_request.get(thumbnail_url, {encoding:"binary"});
+        this.nicoThumb = new NicoThumbnail();
+        const body = await this.nicoThumb.getThumbImg(thumbnail_url);
         return { thumbImg_data: body, thumbnail_size: thumbnail_size };
     }
 

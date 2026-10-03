@@ -6,6 +6,7 @@ const { MyObservable, window_obs } = require("../../lib/my-observable");
 const { ModalDialog } = require("../../lib/modal-dialog");
 const { logger } = require("../../lib/logger");
 const NicoHls = require("../../lib/nico-hls-request.js");
+const { fetchContentUrl } = require("../../lib/nico-fetch");
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
@@ -84,25 +85,12 @@ module.exports = {
             const nico_api = this.play_data.nico_api;
             const domand = nico_api.domand;
             const watchTrackId = nico_api.watchTrackId;
+            const accessRightKey = domand.accessRightKey;
             const video_id = this.play_data.video_id;
-            const nico_hls = new NicoHls.NicoHls(this._hls_tmp_dir);
-            const hls_data = await nico_hls.getHlsData(video_id, domand, watchTrackId, 
-                (msg) => {
-                    this.obs_modal_dialog.trigger("update-message", msg);
-                });
-            const content_url = hls_data.content_url;
+            this.obs_modal_dialog.trigger("update-message", 'ContentUrl取得');
+            const content_url = await fetchContentUrl(video_id, watchTrackId, accessRightKey, domand); 
             const config = {
-                debug: false,
-                autoStartLoad: true,
-                loader: NicoHls.CustomLoader,
-                my_loader_data: {
-                    cookie: hls_data.cookie,
-                    manifest_m3u8_text: hls_data.manifest_m3u8_map.get("rep_text"),
-                    video_m3u8_map: hls_data.video_m3u8_map,
-                    audio_m3u8_map: hls_data.audio_m3u8_map,
-                    key_data_map: hls_data.key_data_map,
-                    dummy_url: hls_data.dummy_url
-                }
+                loader: NicoHls.NicoCustomLoader,
             };
             this._hls = new Hls(config);
             this._hls.on(Hls.Events.MEDIA_ATTACHED, ()=>{ 

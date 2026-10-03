@@ -15,7 +15,7 @@ const createApiData = (video_id) =>{
     const video = cp_data.video;
     video.id = video_id;
     video.thumbnail.url      = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
-    video.thumbnail.largeUrl = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}.L`;
+    video.thumbnail.large = `https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}.L`;
     video.registeredAt = "2018/01/01 01:00:00";
     return cp_data;
 };
@@ -108,8 +108,8 @@ const createSession = (video_id, is_low_quality) =>{
 };
 
 class NicoMockResponse {
-    search(req, res){
-        const sp = new URL(req.url).searchParams;
+    search(url, req, res){
+        const sp = new URL(url).searchParams;
         const text = sp.get("q");
         const limit = parseInt(sp.get("_limit"));
         const offset = parseInt(sp.get("_offset"));
@@ -148,8 +148,8 @@ class NicoMockResponse {
         this._writeJson(req, res, obj);
     }
 
-    mylist(req, res){
-        const id = new URL(req.url).pathname.replace("/mylist/", "");
+    mylist(url, req, res){
+        const id = new URL(url).pathname.replace("/mylist/", "");
         const file_path = path.join(__dirname, "data", `mylist${id}.xml`);
         try {
             fs.statSync(file_path);
@@ -160,8 +160,8 @@ class NicoMockResponse {
         }
     }
 
-    watch(req, res){
-        const video_id = req.url.split("/").pop();
+    watch(url, req, res){
+        const video_id = url.split("/").pop();
         const apt_data = createApiData(video_id);
         const content = escapeHtml(JSON.stringify(
             {
@@ -206,8 +206,8 @@ class NicoMockResponse {
         this._writeString(req, res, str, "json", 200);
     }
 
-    m3u8(req, res){
-        const pathname = new URL(req.url).pathname.split("/").pop();
+    m3u8(url, req, res){
+        const pathname = new URL(url).pathname.split("/").pop();
         if(pathname.endsWith(".m3u8")){
             const m3u8 = fs.readFileSync(`${__dirname}/data/hls/${pathname}`, "utf-8");
             this._writeString(req, res, m3u8, "text", 200);
@@ -219,27 +219,11 @@ class NicoMockResponse {
         }
     }
 
-    hlsMedia(req, res){
-        const pathname = new URL(req.url).pathname.split("/").pop();
+    hlsMedia(url, req, res){
+        const pathname = new URL(url).pathname.split("/").pop();
         const key = fs.readFileSync(`${__dirname}/data/hls/${pathname}`);
         res.writeHead(200);
         res.end(key, "binary");
-    }
-
-    dmcSession(req, res, body){
-        const data = JSON.parse(body);
-        const recipe_id = data.session.recipe_id;
-        const video_id = `sm${recipe_id.match(/\d+/)[0]}`;
-        const lowq = false; 
-        const dmc_session = createSession(video_id, lowq);
-        this._writeJson(req, res, {
-            meta: { status: 201, message: "created" },
-            data: dmc_session
-        });
-    }
-    
-    dmcHB(req, res){
-        this._writeJson(req, res, { status: 200, message: "ok" });
     }
     
     thumbnail(req, res){

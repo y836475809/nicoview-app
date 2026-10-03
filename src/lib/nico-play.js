@@ -42,7 +42,8 @@ class NicoPlay extends EventEmitter {
             thumb_info: thumb_info,
             nico_api: {
                 domand: nico_api.getDomand(),
-                watchTrackId: nico_api.getwatchTrackId()
+                watchTrackId: nico_api.getwatchTrackId(),
+                accessRightKey: nico_api.getaccessRightKey()
             }
         };
     }

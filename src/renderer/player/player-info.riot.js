@@ -74,7 +74,7 @@ module.exports = {
 
             this.video_id = video.video_id;
             this.title = video.title;
-            this.state.video_thumbnail_url = video.thumbnailURL;
+            this.state.video_thumbnail_url = video.largeThumbnailURL;
             this.first_retrieve = time_format.toDateString(video.postedDateTime);
             this.view_counter = video.viewCount;
             this.comment_counter = thread.commentCount;

@@ -1,6 +1,6 @@
-const { NicoClientRequest, NicoCookie } = require("./nico-client-request");
 const { NICO_URL } = require("./nico-url");
 const { logger } = require("./logger");
+const { fetchGet } = require("./nico-fetch");
 
 const sortNames = [
     "viewCounter",
@@ -207,16 +207,13 @@ class NicoSearchParams {
 
 class NicoSearch {
     constructor() { 
-        /** @type {NicoClientRequest} */
-        this._req = null;
-
-        /** @type {{}} */
-        this._cookie_html = null;
+        /** @type {AbortController?} */
+        this._abort = null;
     }
 
     cancel(){   
-        if (this._req) {
-            this._req.cancel();
+        if (this._abort) {
+            this._abort.abort();
         }
     }
 
@@ -233,11 +230,11 @@ class NicoSearch {
         for(const key in query_json){
             url.searchParams.append(key, query_json[key]);
         }
-        
-        this._req = new NicoClientRequest();
         try {
-            const body = await this._req.get(url.href);
-            const result = JSON.parse(body);
+            this.cancel();
+            this._abort = new AbortController();
+            const res = await fetchGet(url.href, this._abort);
+            const result = await res.json();
 
             const search_limit = params._limit;
 
@@ -285,28 +282,6 @@ class NicoSearch {
             }else{
                 throw error;     
             }
-        }
-    }
-
-    clearCookieHTML(){
-        this._cookie_html = null;
-    }
-
-    _getCookieHTML(){
-        const set_cookie = this._req.set_cookie;
-        if(!set_cookie){
-            return;
-        }
-        const nicosid = NicoCookie.getValue(set_cookie, "nicosid");
-        const nico_gc = NicoCookie.getValue(set_cookie, "nico_gc");
-        if(this._cookie_html === null){
-            this._cookie_html = {};
-        }
-        if(nicosid){
-            this._cookie_html["nicosid"] = nicosid;
-        }
-        if(nico_gc){
-            this._cookie_html["nico_gc"] = nico_gc;
         }
     }
 }

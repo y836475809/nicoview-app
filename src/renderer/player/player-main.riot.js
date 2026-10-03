@@ -311,7 +311,7 @@ module.exports = {
         
         myapi.ipc.History.addItem({
             video_id: video.video_id, 
-            thumb_img: video.thumbnailURL, 
+            thumb_img: video.largeThumbnailURL, 
             title: video.title,  
         });
     },

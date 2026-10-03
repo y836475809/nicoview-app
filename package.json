@@ -4,6 +4,7 @@
   "description": "electron製のニコニコ動画閲覧アプリ",
   "main": "src/main.js",
   "scripts": {
+    "test-preview": "electron ./test/test-preview.js --test=preview",
     "test-main": "electron ./test/test-main.js --test=main",
     "test-search": "electron ./test/test-main.js --test=search",
     "test-setting": "electron ./test/test-main.js --test=setting",

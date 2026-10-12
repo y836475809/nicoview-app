@@ -34,8 +34,10 @@
     </div>
 
     <player-setting-dialog></player-setting-dialog>
+    <modal-dialog if={ state.dialogEmitter }  emitter={ state.dialogEmitter } ></modal-dialog>
 
     <script>
-        export default window.NicoRiot["player-main.riot.js"];
+        import logic from './player-main.riot.js';
+        export default logic;
     </script>
 </player-main>

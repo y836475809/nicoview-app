@@ -1,9 +1,9 @@
-const myapi = require("../../lib/my-api");
-const { ListviewDragDrop } = require("./listview-drag-drop");
+import {myapi} from "@lib/my-api.js";
+import {ListviewDragDrop} from "@renderer/common/listview-drag-drop.js";
 
 const default_icon = "fas fa-square listview-item-default-icon";
 
-module.exports = {
+export default {
     state: {
         /** @type {ListItem[]} */
         items:[],

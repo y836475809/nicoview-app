@@ -1,16 +1,22 @@
-const myapi = require("../../lib/my-api");
-const { Command } = require("../../lib/command");
-const time_format = require("../../lib/time-format");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import {Command} from "@lib/command.js";
+import * as time_format from "@lib/time-format.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+
+import Listview from '@renderer/common/listview.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-module.exports = {
+export default {
     /** @type {MyObservable} */
     obs_listview:null,
     sb_button_icon:"fas fa-chevron-left",
     name: "bookmark",
+
+    components: {
+        'listview': Listview,
+    },
     /**
      * 
      * @param {BookmarkItem[]} items 

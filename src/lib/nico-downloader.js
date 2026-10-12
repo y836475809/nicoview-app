@@ -1,12 +1,11 @@
 const fs = require("fs");
 const path = require("path");
-const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
-const { NicoJsonFile } = require("./nico-data-file");
-const  NicoDataParser = require("./nico-data-parser");
-const  NicoHls = require("./nico-hls-request");
-const { logger } = require("./logger");
+import { NicoWatch, NicoComment, NicoThumbnail } from "@lib/niconico.js";
+import { NicoJsonFile } from "@lib/nico-data-file.js";
+import * as NicoDataParser from "@lib/nico-data-parser.js";
+import * as NicoHls from "@lib/nico-hls-request.js";
 
-const DonwloadProgMsg =  Object.freeze({   
+export const DonwloadProgMsg =  Object.freeze({   
     start_watch: "watch取得",
     start_thumbinfo: "thumbinfo取得",
     start_comment: "コメント取得",
@@ -25,7 +24,7 @@ const DownloadResultType = Object.freeze({
     error: "error"
 });
 
-class NicoDownloader {
+export class NicoDownloader {
     constructor(video_id, dist_dir, tmp_dir, ffmpeg_path, only_max_quality=true){
         this.video_id = video_id;
         this.dist_dir = dist_dir;
@@ -215,8 +214,3 @@ class NicoDownloader {
         fs.writeFileSync(file_path, data, "binary");
     }
 }
-
-module.exports = {
-    DonwloadProgMsg,
-    NicoDownloader
-};

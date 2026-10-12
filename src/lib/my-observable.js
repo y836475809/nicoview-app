@@ -1,4 +1,4 @@
-class MyObservable {
+export class MyObservable {
     constructor(){
         /** @type Map<string, Set> */
         this.callbacks = new Map();
@@ -41,9 +41,4 @@ class MyObservable {
 if(!global._nicoviewapp_window_obs){
     global._nicoviewapp_window_obs = new MyObservable();
 }
-const window_obs = global._nicoviewapp_window_obs;
-
-module.exports = {
-    MyObservable,
-    window_obs
-};
+export const window_obs = global._nicoviewapp_window_obs;

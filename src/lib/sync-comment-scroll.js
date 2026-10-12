@@ -1,4 +1,4 @@
-class SyncCommentScroll {
+export class SyncCommentScroll {
     /**
      * 
      * @param {CommentItem[]} comments 
@@ -52,7 +52,3 @@ class SyncCommentScroll {
         }       
     }
 }
-
-module.exports = {
-    SyncCommentScroll
-};

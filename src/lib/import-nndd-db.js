@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const initSqlJs = require('sql.js');
-const { getCommonNameFromFilename } = require("./nico-data-file");
+import { getCommonNameFromFilename } from "@lib/nico-data-file.js";
 
-class DBConverter {
+export class DBConverter {
     /**
      * 
      * @param {string} db_file_path 
@@ -115,16 +115,11 @@ class DBConverter {
     }
 }
 
-const importNNDDDB = async (db_file_path)=>{
+export const importNNDDDB = async (db_file_path)=>{
     const db_converter = new DBConverter();
     await db_converter.init(db_file_path);
     db_converter.read();
     const path_data_list = db_converter.get_dirpath();
     const video_data_list = db_converter.get_video();
     return { path_data_list, video_data_list };
-};
-
-module.exports = {
-    DBConverter,
-    importNNDDDB
 };

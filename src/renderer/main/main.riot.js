@@ -1,14 +1,48 @@
-const myapi = require("../../lib/my-api");
-const { MouseGesture } = require("../../lib/mouse-gesture");
-const { window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import {myapi} from "@lib/my-api.js";
+import { MouseGesture } from "@lib/mouse-gesture.js";
+import { window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import Sidebar from '../common/sidebar.riot';
+import DownloadList from './download-list.riot';
+import History from './history.riot';
+import Setting from './setting.riot';
+import Bookmark from './bookmark.riot';
+import PlayStack from './play-stack.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-module.exports = {
-    /** @type {MouseGesture} */
-    mouse_gesture:null,
+/**
+ * @typedef {import('riot').RiotComponent<{ message?: string }, { count: number }>} Base
+ * @typedef {{ 
+ *  mouse_gesture: MouseGesture
+ *  toggleRightSidebarClass(elm: Element, toggle_class: string, select_class: string): void
+ *  changeClass(remove_query: string, add_query: string, class_name: string): void
+ *  hideRightPage(): void
+ *  updateDownloadBadge(): void
+ *  select_page(page_name: string): void
+ * }} CustomMethods
+ * @typedef {Base & CustomMethods} Composite
+ * @typedef {Partial<Composite> & ThisType<Composite>} CounterComponent
+ */
+
+/**
+ * @type CounterComponent
+ */
+export default {
+    /** @type {MouseGesture?} */
+    mouse_gesture: null,
+
+    components: {
+        'sidebar': Sidebar,
+        'download-list': DownloadList,
+        'history': History,
+        'setting': Setting,
+        'bookmark': Bookmark,
+        'play-stack': PlayStack,
+    },
+
     async onBeforeMount() {
         this.mouse_gesture = new MouseGesture();
         this.mouse_gesture.enable = await myapi.ipc.Config.get("use_mouse_gesture", true);
@@ -123,7 +157,7 @@ module.exports = {
             elm.classList.remove(class_name);
         });
         const elm = this.$(add_query);
-        elm.classList.add(class_name);
+        elm?.classList.add(class_name);
     },
     /**
      * 
@@ -189,7 +223,6 @@ module.exports = {
      * @param {Event} e 
      */
     onclickTogglePage(page_name, e) {
-        /** @type {HTMLElement} */
         const page = this.$(`.${page_name}`);
         const page_zIndex = page.style.zIndex;
 

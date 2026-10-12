@@ -1,5 +1,3 @@
-const cheerio = require("cheerio");
-const { NicoAPI } = require("./niconico");
 
 const user_agent = process.env["user_agent"];
 
@@ -10,7 +8,7 @@ const user_agent = process.env["user_agent"];
  */
 const getCustomUrl = (url) => {
     return url.replace('https://', 'my-app://');
-}
+};
 
 const getVideoAudioPairs = (domand) => {
     const videos = domand.videos.filter((v) => v.isAvailable);
@@ -26,7 +24,7 @@ const getVideoAudioPairs = (domand) => {
         }
     }
     return videoAudioPairs;
-}
+};
 
 /**
  * 
@@ -35,7 +33,7 @@ const getVideoAudioPairs = (domand) => {
  * 
  * @returns {Promise<Response>}
  */
-const fetchGet = async (url, abort) => {
+export const fetchGet = async (url, abort) => {
     const cutomUrl = getCustomUrl(url);
     const headers = new Headers({'User-Agent': user_agent});
     return await fetch(cutomUrl, {
@@ -43,7 +41,7 @@ const fetchGet = async (url, abort) => {
         method: 'GET',
         signal: abort?.signal
     });
-}
+};
 
 /**
  * 
@@ -54,7 +52,7 @@ const fetchGet = async (url, abort) => {
  * 
  * @returns {Promise<Response>}
  */
-const fetchPost = async (url, headers, json, abort) => {
+export const fetchPost = async (url, headers, json, abort) => {
     const cutomUrl = getCustomUrl(url);
     const json_str = JSON.stringify(json);
     headers.append('User-Agent', user_agent);
@@ -66,7 +64,7 @@ const fetchPost = async (url, headers, json, abort) => {
         body: json_str,
         signal: abort?.signal
     });
-}
+};
 
 /**
  * 
@@ -75,7 +73,7 @@ const fetchPost = async (url, headers, json, abort) => {
  * @param {any} domand 
  * @returns {Promise<string>}
  */
-const fetchContentUrl = async (videoId, watchTrackId, accessRightKey, domand) => {
+export const fetchContentUrl = async (videoId, watchTrackId, accessRightKey, domand) => {
     // const right_key = domand.accessRightKey;
     const quality = getVideoAudioPairs(domand);
     const url = `https://nvapi.nicovideo.jp/v1/watch/${videoId}/access-rights/hls?actionTrackId=${watchTrackId}`;
@@ -93,11 +91,4 @@ const fetchContentUrl = async (videoId, watchTrackId, accessRightKey, domand) =>
     const resJson = await res.json();
     const content_url = resJson.data.contentUrl;
     return content_url;
-}
-
-
-module.exports = {
-    fetchGet,
-    fetchPost,
-    fetchContentUrl
 };

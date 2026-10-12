@@ -1,14 +1,14 @@
 
 const fs = require("fs");
 const fsPromises = fs.promises;
-const { deepCopy } = require("./deepcopy");
-const { logger } = require("./logger");
+import { deepCopy } from "@lib/deepcopy.js";
+import { logger } from "@lib/logger.js";
 
 /**
  * 設定
  * param1.param2
  */
-class Config {
+export class Config {
     setup(config_path){
         this.config_path = config_path;
         this._initJsonData();
@@ -110,7 +110,3 @@ class Config {
         }
     }
 }
-
-module.exports = {
-    Config
-};

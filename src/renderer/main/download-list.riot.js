@@ -1,13 +1,16 @@
 const EventEmitter = require("events");
 const { ipcRenderer } = require("electron");
-const myapi = require("../../lib/my-api");
-const { NicoDownloader } = require("../../lib/nico-downloader");
-const { buttonFormatter } = require("../common/nico-grid-formatter");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { Command } = require("../../lib/command");
-const { ScheduledTask } = require("../../lib/scheduled-task");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import {myapi} from "@lib/my-api.js";
+import { NicoDownloader } from "@lib/nico-downloader.js";
+import { buttonFormatter } from "@renderer/common/nico-grid-formatter.js";
+import {mountNicoGrid} from "@renderer/common/nico-grid-mount.js";
+import {Command} from "@lib/command.js";
+import { ScheduledTask } from "@lib/scheduled-task.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import DownloadSchedule from './download-schedule.riot';
+import NicoGrid from '@renderer/common/nico-grid.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
@@ -28,9 +31,14 @@ const message_map = new Map([
 
 const nico_grid_name = "download-nico-grid";
 
-module.exports = {
+export default {
+    components: {
+        'download-schedule': DownloadSchedule,
+        'nico-grid': NicoGrid,
+    },
+
     state:{
-        dl_disabled:""
+        dl_disabled:"",
     },
 
     /** @type {MyObservable} */
@@ -48,7 +56,8 @@ module.exports = {
     /** @type {NicoDownloader} */
     nico_down:null,
     cancel_download:false,
-    onBeforeMount() {
+    
+    async onBeforeMount() {
         this.obs_schedule = new MyObservable();
 
         this.event_em = new EventEmitter(); 
@@ -67,33 +76,6 @@ module.exports = {
 
         main_obs.on("download:delete-download-items", async (video_ids) => {
             await this.deleteDownloadItems(video_ids);
-        });
-    },
-    async onMounted() {
-        this.download_schedule = await myapi.ipc.Config.get("download.schedule", {
-            date: {hour:0, minute:0},
-            enable: false
-        });
-        this.obs_schedule.trigger("set-params", this.download_schedule);
-        this.obs_schedule.on("change-params", (args) => {
-            /** @type {{date:{hour:number, minute:number}, enable:boolean}} */
-            const { date, enable } = args;
-
-            myapi.ipc.Config.set("download.schedule", {
-                date: date,
-                enable: enable
-            }).then();
-
-            this.download_schedule.date = date;
-            this.download_schedule.enable = enable;
-
-            if(enable==true){
-                this.scheduled_task.stop();
-                this.scheduled_task = new ScheduledTask(this.download_schedule.date, this.startDownload);
-                this.scheduled_task.start();
-            }else{
-                this.scheduled_task.stop();
-            }
         });
 
         const infoFormatter = (id, value, data)=> {
@@ -126,8 +108,6 @@ module.exports = {
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-        
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -170,6 +150,37 @@ module.exports = {
                     return value.video_id;
                 });
                 await this.deleteDownloadItems(video_ids);
+            }
+        });
+        const gridData =mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
+        });
+    },
+    async onMounted() {
+        this.download_schedule = await myapi.ipc.Config.get("download.schedule", {
+            date: {hour:0, minute:0},
+            enable: false
+        });
+        this.obs_schedule.trigger("set-params", this.download_schedule);
+        this.obs_schedule.on("change-params", (args) => {
+            /** @type {{date:{hour:number, minute:number}, enable:boolean}} */
+            const { date, enable } = args;
+
+            myapi.ipc.Config.set("download.schedule", {
+                date: date,
+                enable: enable
+            }).then();
+
+            this.download_schedule.date = date;
+            this.download_schedule.enable = enable;
+
+            if(enable==true){
+                this.scheduled_task.stop();
+                this.scheduled_task = new ScheduledTask(this.download_schedule.date, this.startDownload);
+                this.scheduled_task.start();
+            }else{
+                this.scheduled_task.stop();
             }
         });
 

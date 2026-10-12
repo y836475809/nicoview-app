@@ -1,12 +1,12 @@
 const fs = require("fs");
 const path = require("path");
-const { NicoWatch, NicoComment, NicoThumbnail } = require("./niconico");
-const { NicoJsonFile, NicoXMLFile, NicoVideoData } = require("./nico-data-file");
-const { XMLDataConverter } = require("./nico-data-converter");
-const NicoDataParser = require("./nico-data-parser");
-const { deepCopy } = require("./deepcopy");
+import { NicoWatch, NicoComment, NicoThumbnail } from "@lib/niconico.js";
+import { NicoJsonFile, NicoXMLFile, NicoVideoData } from "@lib/nico-data-file.js";
+import { XMLDataConverter } from "@lib/nico-data-converter.js";
+import * as NicoDataParser from "@lib/nico-data-parser.js";
+import { deepCopy } from "@lib/deepcopy.js";
 
-class NicoUpdate {
+export class NicoUpdate {
     /**
      * 
      * @param {LibraryItem} [video_item] 
@@ -445,7 +445,3 @@ class NicoUpdate {
         return false;
     }
 }
-
-module.exports = {
-    NicoUpdate
-};

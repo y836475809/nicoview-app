@@ -1,11 +1,15 @@
-const myapi = require("../../lib/my-api");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { infoFormatter, tagsFormatter } = require("../common/nico-grid-formatter");
-const { Command } = require("../../lib/command");
-const { NicoSearchParams, NicoSearch, searchItems } = require("../../lib/nico-search");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import mitt from 'mitt';
+import {myapi} from "@lib/my-api.js";
+import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
+import { infoFormatter, tagsFormatter } from "@renderer/common/nico-grid-formatter.js";
+import { Command } from "@lib/command.js";
+import { NicoSearchParams, NicoSearch, searchItems } from "@lib/nico-search.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import Pagination from '@renderer/main/pagination.riot';
+import NicoGrid from '@renderer/common/nico-grid.riot';
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
@@ -48,10 +52,11 @@ const createEmptyItem = () => {
     };
 };
 
-module.exports = {
+export default {
     state:{
         sort_title:"",
         search_target_title:"",
+        dialogEmitter: mitt()
     },
 
     /** @type {NicoSearchSortItem[]} */
@@ -59,9 +64,6 @@ module.exports = {
 
     /** @type {NicoSearchTargetItem[]} */
     search_target_items:searchItems.searchTargetItems,
-
-    /** @type {MyObservable} */
-    obs_modal_dialog:null,
 
     /** @type {MyObservable} */
     pagination_obs:null,
@@ -72,10 +74,15 @@ module.exports = {
     /** @type {NicoSearch} */
     nico_search:null,
 
-    onBeforeMount() {
-        this.obs_modal_dialog = new MyObservable();
-        this.modal_dialog = null;
+    doSearch: false,
 
+    components: {
+        'pagination': Pagination,
+        'nico-grid': NicoGrid,
+        'modal-dialog': ModalDialog
+    },
+
+    async onBeforeMount() {
         this.pagination_obs = new MyObservable();
 
         const search_limit = 32;
@@ -180,8 +187,7 @@ module.exports = {
             }
             this.pagination_obs.trigger("back");
         });
-    },
-    async onMounted() {
+
         const seach_infoFormatter = infoFormatter.bind(this, 
             // eslint-disable-next-line no-unused-vars
             (id, value, data)=>{ 
@@ -209,8 +215,6 @@ module.exports = {
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -246,7 +250,12 @@ module.exports = {
             }
             await myapi.ipc.popupContextMenu("search", {items});
         });
-
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
+        });
+    },
+    async onMounted() {
         const { api, sort_item, search_target_item } = await this.loadSearchConfig();
         this.state.sort_title = sort_item.title;
         this.state.search_target_title = search_target_item.title;
@@ -257,11 +266,6 @@ module.exports = {
         this.nico_search_params.target(search_target_item.target);
 
         this.update();
-
-        this.modal_dialog = new ModalDialog(this.root, "search-md", {
-            obs:this.obs_modal_dialog,
-            oncancel: this.onCancelSearch
-        });
     },
     async loadSearchConfig() {
         const { api, sort, search_target } = await myapi.ipc.Config.get("search.condition",  {
@@ -339,7 +343,7 @@ module.exports = {
         return this.$(".input-container > input");
     },
     canSearch() {
-        return !this.modal_dialog.isOpend();
+        return !this.doSearch;
     },
     async search() {
         if(this.nico_search_params.isQueryEmpty()){
@@ -350,14 +354,15 @@ module.exports = {
             return;
         }
         
-        this.obs_modal_dialog.trigger("show", {
-            message: "検索中...",
-            buttons: ["cancel"],
-            cb: ()=>{
-                this.onCancelSearch();
-            }
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "検索中..."
         });
-
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            this.onCancelSearch();
+        });
+        this.doSearch = true;
         try {
             const search_result = await this.nico_search.search(this.nico_search_params);
             this.setData(search_result);
@@ -371,13 +376,15 @@ module.exports = {
             }
         }
         
-        this.obs_modal_dialog.trigger("close");
+        this.state.dialogEmitter.emit('dialog:close');
+        this.doSearch = false;
 
         const elm = this.getSearchInputElm();
         elm.focus();
     },
     onCancelSearch() {
         this.nico_search.cancel();
+        this.doSearch = false;
     },
     /**
      * 

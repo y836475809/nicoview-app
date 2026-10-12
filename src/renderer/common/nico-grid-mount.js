@@ -36,7 +36,7 @@ class NicoGridStateRestor {
  * @param {object[]} columns 
  * @param {object} options 
  */
-const mountNicoGrid = (selector, state, obs, columns, options) => {
+export const mountNicoGrid = (selector, state, obs, columns, options) => {
     const prop = {
         obs: obs,
         columns: [],
@@ -50,10 +50,5 @@ const mountNicoGrid = (selector, state, obs, columns, options) => {
     if(state != null && state.sort_param != null){
         prop.options.sort_param = state.sort_param;
     }
-
-    riot.mount(selector, prop, "nico-grid");
-};
-
-module.exports = {
-    mountNicoGrid
+    return prop;
 };

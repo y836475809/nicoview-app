@@ -1,4 +1,4 @@
-const myapi = require("../../lib/my-api");
+import {myapi} from "@lib/my-api.js";
 
 /**
  * 
@@ -11,7 +11,7 @@ const changeParams = async(name, value) => {
     await myapi.ipc.Config.set(`player.contextmenu.${name}`, value);
 };
 
-module.exports = {
+export default {
     menu_num_items:[5, 10, 20],
     /**
      * 

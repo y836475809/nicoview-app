@@ -3,7 +3,7 @@
  * ms or str
  * @param {number | string} time 
  */
-const toDateString = (time) => {
+export const toDateString = (time) => {
     const d = new Date(time);
     const year = d.getFullYear();
     // const month = d.getMonth() + 1;
@@ -22,7 +22,7 @@ const toDateString = (time) => {
  * @param {number} time_sec 秒
  * @returns {string} mm:ss表示
  */
-const toTimeString = (time_sec) => {
+export const toTimeString = (time_sec) => {
     const sec = Math.floor(time_sec % 60);
     const min = Math.floor(time_sec / 60);
 
@@ -36,7 +36,7 @@ const toTimeString = (time_sec) => {
  * time 01:00 or 60sec
  * @param {number | string} time 
  */
-const toTimeSec = (time) => {   
+export const toTimeSec = (time) => {   
     if(typeof time === "string"){
         let result_sec = 0;        
         const time_array = time.split(":");
@@ -53,10 +53,4 @@ const toTimeSec = (time) => {
         return time;
     }
     throw new Error(`${time} is wrong`);
-};
-
-module.exports = {
-    toDateString,
-    toTimeString,
-    toTimeSec
 };

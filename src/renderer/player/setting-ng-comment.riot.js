@@ -1,18 +1,24 @@
-const myapi = require("../../lib/my-api");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { NGType } = require("../../lib/comment-filter");
+import {myapi} from "@lib/my-api.js";
+import {mountNicoGrid} from "@renderer/common/nico-grid-mount.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { NGType } from "@lib/comment-filter.js";
+
+import NicoGrid from '@renderer/common/nico-grid.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
 const nico_grid_name = "player-ng-comment-nico-grid";
 
-module.exports = {
+export default {
     /** @type {MyObservable} */
     obs_dialog:null,
 
-    async onMounted() {
+    components: {
+        'nico-grid': NicoGrid
+    },
+
+    async onBeforeMount() {
         // eslint-disable-next-line no-unused-vars
         const wrapFormatter = (id, value, data) => { 
             const type = data.type;
@@ -42,8 +48,6 @@ module.exports = {
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-        
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -57,7 +61,13 @@ module.exports = {
                 this.deleteSelectedItems();
             }
         });
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
+        });
+    },
 
+    async onMounted() {
         player_obs.on("setting-ng-comment:set-items", async (
             /** @type {NGCommentItem[]}} */ args) => {
             await this.setup(args);

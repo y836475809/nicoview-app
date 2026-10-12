@@ -1,9 +1,9 @@
 const fs = require("fs");
 const path = require("path");
-const { deepCopy } = require("./deepcopy");
-const { logger } = require("./logger");
+import { deepCopy } from "@lib/deepcopy.js";
+import { logger } from "@lib/logger.js";
 
-class MapDB {
+export class MapDB {
     constructor({ filename = "./db.json", autonum = 10, use_log = true } = {}) {
         /** @type {number} */
         this.autonum = autonum;
@@ -380,7 +380,7 @@ class MapDB {
 /**
  * ライブラリ用DB
  */
-class LibraryDB {
+export class LibraryDB {
     constructor({ filename = "./db.json", autonum = 10 } = {}) {
         // autonum データ操作ログ保存数閾値
         /** @type {{filename:string,autonum:number}} */
@@ -540,8 +540,3 @@ class LibraryDB {
         throw new Error("maximum id value has been exceeded");
     }
 }
-
-module.exports = {
-    MapDB,
-    LibraryDB
-};

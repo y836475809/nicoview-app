@@ -1,10 +1,10 @@
-const myapi = require("../../lib/my-api");
-const { window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */ 
 const player_obs = window_obs;
 
-module.exports = {
+export default {
     state:{
         /** @type {VideoTag[]} */
         video_tags:[]

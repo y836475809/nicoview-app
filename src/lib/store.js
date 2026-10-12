@@ -1,6 +1,6 @@
 const EventEmitter = require("events");
 
-class Store extends EventEmitter {
+export class Store extends EventEmitter {
     constructor(){
         super();
         this._map = new Map();
@@ -31,7 +31,3 @@ class Store extends EventEmitter {
     //     this.emit("updateItems", { name, items });
     // }
 } 
-
-module.exports = {
-    Store,
-};

@@ -1,4 +1,7 @@
-const { window_obs } = require("../../lib/my-observable");
+import { window_obs } from "@lib/my-observable.js";
+
+import PlayerSeek from '@renderer/player/player-seek.riot';
+import Playervolume from '@renderer/player/player-volume.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
@@ -15,12 +18,18 @@ const state_button_map = new Map([
     ["stop", "play"]
 ]);
 
-module.exports = {
+export default {
     state:{
         play_disabled:true,
         button_class:""
     },
     current_state:"stop",
+
+    components: {
+        'player-seek': PlayerSeek,
+        'player-volume': Playervolume,
+    },
+
     onBeforeMount() {
         this.state.button_class = button_class_map.get(state_button_map.get("stop"));
 

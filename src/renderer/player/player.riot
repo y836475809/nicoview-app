@@ -1,4 +1,4 @@
-<player>
+<player-riot>
     <style>
         :host {
             --tags-height: 60px;
@@ -51,6 +51,7 @@
     </div>
 
     <script>
-        export default window.NicoRiot["player.riot.js"];
+        import logic from './player.riot.js';
+        export default logic;
     </script>    
-</player>
+</player-riot>

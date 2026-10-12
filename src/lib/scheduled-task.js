@@ -1,7 +1,7 @@
 
 const EventEmitter = require("events");
 
-class ScheduledTask extends EventEmitter{
+export class ScheduledTask extends EventEmitter{
     constructor(date, execution){
         super();
         this.scheduled_date = date;
@@ -53,7 +53,3 @@ class ScheduledTask extends EventEmitter{
         return (h*60*60 + m*60 + s)*1000;
     }
 }
-
-module.exports = {
-    ScheduledTask
-};

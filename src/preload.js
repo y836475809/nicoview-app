@@ -1,3 +1,8 @@
-const { setupPreload } = require("./lib/setup-preload");
+const { contextBridge, ipcRenderer } = require('electron');
 
-setupPreload();
+/** @type {IpcChannels} */
+const ppp = {
+    'library:getItems': async (event) => {
+        return [];
+    }
+};

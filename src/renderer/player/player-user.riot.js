@@ -1,9 +1,9 @@
-const myapi = require("../../lib/my-api");
-const { Command } = require("../../lib/command");
-const NicoURL = require("../../lib/nico-url");
-const { toTimeSec } = require("../../lib/time-format");
-const { window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import {myapi} from "@lib/my-api.js";
+import {Command} from "@lib/command.js";
+import * as NicoURL from "@lib/nico-url.js";
+import { toTimeSec } from "@lib/time-format.js";
+import { window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
 
 /** @type {MyObservable} */ 
 const player_obs = window_obs;
@@ -25,7 +25,7 @@ const getBase64 = (img) => {
     return data;
 };
 
-module.exports = {
+export default {
     state:{
         user_nickname:"",
         user_description_class:"text",

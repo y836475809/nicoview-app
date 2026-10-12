@@ -22,7 +22,7 @@ const send = (channel, args) => {
     win.webContents.send(channel, args);
 };
 
-class Command {
+export class Command {
     /**
      * 動画再生
      * @param {{video_id:string, time?:number}} item 
@@ -124,7 +124,3 @@ class Command {
         }
     }
 }
-
-module.exports = {
-    Command
-};

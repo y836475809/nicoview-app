@@ -99,10 +99,13 @@
         </div>
     </div>
     <div class="mylist-description">{state.mylist_description}</div>
-    <div class="mylist-grid-container" id="mylist-nico-grid">
+    <div class="mylist-grid-container">
+        <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
     </div>
-
+    <modal-dialog if={ state.dialogEmitter }  emitter={ state.dialogEmitter } ></modal-dialog>
+    
     <script>
-        export default window.NicoRiot["mylist-content.riot.js"];
+        import logic from './mylist-content.riot.js';
+        export default logic;
     </script>
 </mylist-content>

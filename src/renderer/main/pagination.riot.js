@@ -1,6 +1,7 @@
-const { MyObservable } =  require("../../lib/my-observable");
+import { MyObservable } from "@lib/my-observable.js";
+import SearchPageSelector from '@renderer/main/search-page-selector.riot';
 
-module.exports = {
+export default {
     state:{
         page_num:1,
         total_page_num:0,
@@ -12,6 +13,10 @@ module.exports = {
 
     /** @type {MyObservable} */
     obs_page_selector:null,
+
+    components: {
+        'search-page-selector': SearchPageSelector,
+    },
     onBeforeMount(props) {
         this.pagination_obs = props.obs;
         this.obs_page_selector = new MyObservable();

@@ -1,7 +1,7 @@
 /**
  * リストアイテムにドラッグドロップを設定
  */
-class ListviewDragDrop {
+export class ListviewDragDrop {
     /**
      * @param {string} name リストビューを識別するための名前
      * @param {(from:number, to:number)=>void} move_item_func stateのアイテムをindexのfromからtoに入れ替える
@@ -174,7 +174,3 @@ class ListviewDragDrop {
         });
     }
 }
-
-module.exports = {
-    ListviewDragDrop
-};

@@ -2,8 +2,8 @@ const fs = require("node:fs");
 const path = require("node:path");
 const { spawn } = require("child_process");
 const Hls = require("hls.js");
-const { parseManifestM3u8, parseMediaM3u8 } = require('./nico-hls-parse-m3u8.js');
-const { fetchGet, fetchContentUrl } = require("./nico-fetch");
+import { parseManifestM3u8, parseMediaM3u8 } from '@lib/nico-hls-parse-m3u8.js';
+import { fetchGet, fetchContentUrl } from "@lib/nico-fetch.js";
 
 async function getJson(url){
     const res = await fetchGet(url, null);
@@ -21,7 +21,7 @@ async function getBinary(url){
     return uint8Array;
 }
 
-class NicoHls {
+export class NicoHls {
     constructor(tmp_dir){
         this._video_id = "";
         this._cancel = false;
@@ -215,7 +215,7 @@ class NicoHls {
     }
 }
 
-const getQuality = (domand) => {
+export const getQuality = (domand) => {
     // const domand = data_api_data.media.domand;
     /** @type {Array}  */
     const videos = domand.videos;
@@ -242,15 +242,9 @@ const getQuality = (domand) => {
     };
 };
 
-class NicoCustomLoader extends Hls.DefaultConfig.loader {
+export class NicoCustomLoader extends Hls.DefaultConfig.loader {
     load(context, config, callbacks) {
         context.url = context.url.replace('https://', 'my-app://');
         super.load(context, config, callbacks);
     }
 }
-
-module.exports = {
-    getQuality,
-    NicoHls,
-    NicoCustomLoader
-};

@@ -1,6 +1,6 @@
 const { dialog } = require("electron");
 
-const showMessageBox = async (bw, type, title, message, okcancel) => {
+export const showMessageBox = async (bw, type, title, message, okcancel) => {
     const ret = await dialog.showMessageBox(bw, {
         type: type,
         title: title,
@@ -10,7 +10,7 @@ const showMessageBox = async (bw, type, title, message, okcancel) => {
     return ret.response == 0;
 };
 
-const selectFileDialog = async (bw, name, exts, multi_select)=>{
+export const selectFileDialog = async (bw, name, exts, multi_select)=>{
     const result = await dialog.showOpenDialog(bw, {
         properties: multi_select?["openFile", "multiSelections"]:["openFile"],
         title: "ファイルを選択",
@@ -26,7 +26,7 @@ const selectFileDialog = async (bw, name, exts, multi_select)=>{
     return multi_select?result.filePaths:result.filePaths[0];
 };
 
-const selectFolderDialog = async (bw)=>{
+export const selectFolderDialog = async (bw)=>{
     const result = await dialog.showOpenDialog(bw, {
         properties: ["openDirectory"],
         title: "フォルダを選択",
@@ -36,10 +36,4 @@ const selectFolderDialog = async (bw)=>{
         return null;
     }
     return result.filePaths[0];
-};
-
-module.exports = {
-    showMessageBox,
-    selectFileDialog,
-    selectFolderDialog,
 };

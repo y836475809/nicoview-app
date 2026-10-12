@@ -1,9 +1,9 @@
-const NGType = Object.freeze({
+export const NGType = Object.freeze({
     Text:"text",
     UserId:"user_id"
 });
 
-class NGComment {
+export class NGComment {
     constructor(){
         /** @type {NGCommentItem[]} */
         this._ng_commnet_items = [];
@@ -147,7 +147,7 @@ class NGComment {
  * 100comment/1minute
  * 10minute => 1000+900=1900
  */
-class CommentNumLimit {
+export class CommentNumLimit {
     /**
      * 
      * @param {Number} num_per_min 1分につき新着順に取得されるコメント数
@@ -309,7 +309,7 @@ class CommentNumLimit {
     }
 }
 
-class CommentFilter {
+export class CommentFilter {
     constructor(num_per_min=100){
         this.ng_comment = new NGComment();
         this._comment_num_limit = new CommentNumLimit(num_per_min);
@@ -363,10 +363,3 @@ class CommentFilter {
         }
     }
 }
-
-module.exports = {
-    NGComment,
-    NGType,
-    CommentNumLimit,
-    CommentFilter
-};

@@ -1,12 +1,12 @@
 const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
-const { fetchGet } = require("./nico-fetch");
-const { NICO_URL } = require("./nico-url");
-const { CacheStore } = require("./cache-store");
-const { logger } = require("./logger");
+import { fetchGet } from "@lib/nico-fetch.js";
+import { NICO_URL } from "@lib/nico-url.js";
+import { CacheStore } from "@lib/cache-store.js";
+import { logger } from "@lib/logger.js";
 
-class NicoMylist {
+export class NicoMylist {
     constructor(){
         /** @type {AbortController?} */
         this._abort = null;
@@ -68,7 +68,7 @@ class NicoMylist {
     }
 }
 
-class NicoMylistReader {
+export class NicoMylistReader {
     parse(mylist_id, xml){
         const $ = cheerio.load(xml, {xmlMode: true});
         
@@ -153,7 +153,7 @@ class NicoMylistReader {
     }
 }
 
-class NicoMylistStore {
+export class NicoMylistStore {
     constructor(get_dir_path){
         this.get_dir_path = get_dir_path;
         this.reader = new NicoMylistReader();
@@ -192,7 +192,7 @@ class NicoMylistStore {
     }
 }
 
-class NicoMylistImageCache {
+export class NicoMylistImageCache {
     constructor(dir_path){
         this._dir_path = dir_path;
 
@@ -342,10 +342,3 @@ class NicoMylistImageCache {
         return data;
     }
 }
-
-module.exports = {
-    NicoMylist,
-    NicoMylistReader,
-    NicoMylistStore,
-    NicoMylistImageCache
-};

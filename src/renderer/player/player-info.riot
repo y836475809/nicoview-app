@@ -167,11 +167,13 @@
                 </div>
             </div>
         </div>
-        <div class="comment-grid-container" id="player-comment-nico-grid">
+        <div class="comment-grid-container">
+            <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
         </div>
     </div>
     
     <script>
-        export default window.NicoRiot["player-info.riot.js"];
+        import logic from './player-info.riot.js';
+        export default logic;
     </script>
 </player-info>

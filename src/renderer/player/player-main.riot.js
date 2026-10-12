@@ -1,12 +1,17 @@
-const  myapi = require("../../lib/my-api");
-const { NicoPlay } = require("../../lib/nico-play");
-const { NicoUpdate } = require("../../lib/nico-update");
-const { CommentFilter } = require("../../lib/comment-filter");
-const { toTimeSec } = require("../../lib/time-format");
-const { NicoVideoData } = require("../../lib/nico-data-file");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import mitt from 'mitt';
+import {myapi} from "@lib/my-api.js";
+import { NicoPlay } from "@lib/nico-play.js";
+import { NicoUpdate } from "@lib/nico-update.js";
+import { CommentFilter } from "@lib/comment-filter.js";
+import { toTimeSec } from "@lib/time-format.js";
+import { NicoVideoData } from "@lib/nico-data-file.js";
+import { window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import Player from '@renderer/player/player.riot';
+import PlayerInfo from '@renderer/player/player-info.riot';
+import PlayerSettingDialog from '@renderer/player/player-setting-dialog.riot';
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
@@ -20,12 +25,18 @@ const play_msg_map = new Map([
     ["startHeartBeat", "HeartBeat開始"],
 ]);
 
-module.exports = {
+export default {
+    state:{
+        /** @type {import('@/types/events.js').DialogEmitter} */
+        dialogEmitter: mitt()
+    },
+
+
     /** @type {MyObservable} */
-    obs_modal_dialog:null,
+    // obs_modal_dialog:null,
 
     /** @type {ModalDialog} */
-    modal_dialog:null,
+    // modal_dialog:null,
 
     /** @type {CommentFilter} */
     comment_filter:null,
@@ -41,9 +52,15 @@ module.exports = {
     stop_resize_event:false,
     resize_begin:false,
     timer:null,
-    onBeforeMount() {
-        this.obs_modal_dialog = new MyObservable();
 
+    components: {
+        'player': Player,
+        'player-info': PlayerInfo,
+        'player-setting-dialog': PlayerSettingDialog,
+        'modal-dialog': ModalDialog
+    },
+
+    onBeforeMount() {
         myapi.ipc.onPlayVideo(async (args)=>{
             const { video_id, online, time, video_item } = args;
 
@@ -74,23 +91,19 @@ module.exports = {
         });
 
         player_obs.on("player-main:update-data", async(video_id, update_target) => {
-            if(this.modal_dialog.isOpend()){
-                return;
-            }
-
             logger.debug("player main update video_id=", video_id);
             const nico_update = new NicoUpdate();
 
-            this.obs_modal_dialog.trigger("show", {
-                message: "更新中...",
-                buttons: ["cancel"],
-                cb: ()=>{
-                    if(nico_update){
-                        nico_update.cancel();
-                    }
+            this.state.dialogEmitter.emit('dialog:open', {
+                showok: false,
+                showcancel: true,
+                message: "更新中..."
+            });
+            this.state.dialogEmitter.on('dialog:cancel', () => {
+                if(nico_update){
+                    nico_update.cancel();
                 }
             });
-
             try {   
                 const video_item = await myapi.ipc.Library.getItem(video_id);
                 nico_update.setVideoItem(video_item);
@@ -134,7 +147,7 @@ module.exports = {
                     });
                 }       
             }
-            this.obs_modal_dialog.trigger("close");
+            this.state.dialogEmitter.emit('dialog:close');
         });
 
         player_obs.on("player-main:add-ng-comment", async (args) => {
@@ -242,10 +255,6 @@ module.exports = {
                 message: `NGコメントリストの読み込み失敗\n${error.message}`
             });
         }
-
-        this.modal_dialog = new ModalDialog(this.root, "player-md", {
-            obs:this.obs_modal_dialog
-        });
 
         myapi.ipc.playerReady();
     },
@@ -362,10 +371,6 @@ module.exports = {
         }
     },
     async playVideoOnline(video_id, time, is_saved) {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-        
         this.cancelPlay();
 
         const video_option = { 
@@ -377,18 +382,20 @@ module.exports = {
         try {
             this.nico_play = new NicoPlay();
 
-            this.obs_modal_dialog.trigger("show", {
-                message: "...",
-                buttons: ["cancel"],
-                cb: ()=>{
-                    this.cancelPlay();
-                }
+            this.state.dialogEmitter.emit('dialog:open', {
+                showok: false,
+                showcancel: true,
+                message: "..."
             });
-
+            this.state.dialogEmitter.on('dialog:cancel', () => {
+                this.cancelPlay();
+            });
             this.nico_play.on("changeState", (state)=>{
                 logger.debug("player main changeState state=", state);
                 const msg = play_msg_map.get(state);
-                this.obs_modal_dialog.trigger("update-message", msg);
+                this.state.dialogEmitter.emit('dialog:update-message', {
+                    message: `${msg}`
+                });
             });
             this.nico_play.on("cancelHeartBeat", ()=>{
                 logger.debug("player main HeartBeat cancel");
@@ -427,7 +434,7 @@ module.exports = {
             }
         }
 
-        this.obs_modal_dialog.trigger("close");
+        this.state.dialogEmitter.emit('dialog:close');
     },
     async toggleInfoview() {
         const pe = this.$(".player-frame");

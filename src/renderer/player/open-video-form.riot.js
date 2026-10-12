@@ -1,5 +1,5 @@
-const { Command } = require("../../lib/command");
-const NICO_URL = require("../../lib/nico-url");
+import {Command} from "@lib/command.js";
+import { NICO_URL } from "@lib/nico-url.js";
 
 /**
  * 
@@ -22,7 +22,7 @@ const getVideoID = (value) => {
     }
 };
 
-module.exports = {
+export default {
     /**
      * 
      * @param {boolean} visible 

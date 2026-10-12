@@ -26,7 +26,7 @@ class LRUCache extends Map {
     }
 }
 
-class ImgElementCache {
+export class ImgElementCache {
     /**
      * 
      * @param {number} capacity 
@@ -78,6 +78,3 @@ class ImgElementCache {
     }
 }
 
-module.exports = {
-    ImgElementCache
-};

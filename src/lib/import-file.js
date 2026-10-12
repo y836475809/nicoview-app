@@ -1,10 +1,10 @@
 const path = require("path");
 const fs = require("fs");
-const { NicoVideoData, 
-    getIDFromFilename, getCommonNameFromFilename } = require("./nico-data-file");
-const { toTimeSec } = require("./time-format");
+import { NicoVideoData, 
+    getIDFromFilename, getCommonNameFromFilename } from "@lib/nico-data-file.js";
+import { toTimeSec } from "@lib/time-format.js";
 
-class ImportFile {
+export class ImportFile {
     constructor(video_filepath){
         this.video_filepath = video_filepath;
         this.dir = path.dirname(video_filepath);
@@ -114,7 +114,3 @@ class ImportFile {
         return await (await fs.promises.stat(file_path)).birthtime;
     }
 }
-
-module.exports = {
-    ImportFile,
-};

@@ -1,10 +1,10 @@
 
-const NICO_URL =  Object.freeze({
+export const NICO_URL =  Object.freeze({
     VIDEO: "https://www.nicovideo.jp",
     SEARCH: "https://snapshot.search.nicovideo.jp",
 });
 
-const getURLKind = (url) => {
+export const getURLKind = (url) => {
     if(/^https:\/\/www.nicovideo.jp\/mylist\//.test(url)){
         return "mylist";
     }
@@ -32,7 +32,7 @@ const getURLKind = (url) => {
  * @param {string} url 
  * @returns {string}
  */
-const getMylistID = (url) => {
+export const getMylistID = (url) => {
     const kind = getURLKind(url);
     if(kind=="mylist"){
         return url.match(/mylist\/\d+$/)[0];
@@ -48,7 +48,7 @@ const getMylistID = (url) => {
  * mylist_id: mylist/* or user/*
  * @param {string} mylist_id 
  */
-const getMylistURL = (mylist_id) => {
+export const getMylistURL = (mylist_id) => {
     if(/^mylist\/\d+/.test(mylist_id)){
         return `${NICO_URL.VIDEO}/${mylist_id}`;
     }
@@ -59,14 +59,6 @@ const getMylistURL = (mylist_id) => {
     throw new Error(`not find mylist id: url=${mylist_id}`);
 };
 
-const getWatchURL = (video_id) => {
+export const getWatchURL = (video_id) => {
     return `${NICO_URL.VIDEO}/watch/${video_id}`;
-};
-
-module.exports = {
-    getURLKind,
-    getMylistID,
-    getMylistURL,
-    getWatchURL,
-    NICO_URL,
 };

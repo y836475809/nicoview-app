@@ -11,7 +11,7 @@ const import_items = {
     "searchitems": { title: "検索項目", filename:"searchItems.xml" },
 };
 
-class ImportNNDDSetting {
+export class ImportNNDDSetting {
     constructor(nndd_system_dir, data_dir){
         this.nndd_system_dir = nndd_system_dir;
         this.data_dir = data_dir;
@@ -242,7 +242,3 @@ class ImportNNDDSetting {
         return { ng_texts, ng_user_ids };
     }
 }
-
-module.exports = {
-    ImportNNDDSetting
-};

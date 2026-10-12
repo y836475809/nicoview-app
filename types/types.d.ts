@@ -81,28 +81,7 @@
  * @property {MyListVideoItem[]} items
  */
 
-/**
- * ライブラリの動画情報
- * @typedef {Object} LibraryItem
- * @property {string} data_type
- * @property {string} title
- * @property {string} video_id
- * @property {string} video_type
- * @property {string} dirpath_id
- * @property {string} dirpath
- * @property {string} common_filename
- * @property {string} thumbnail_size
- * @property {string} [thumb_img]
- * @property {number} modification_date
- * @property {number} creation_date
- * @property {number} pub_date
- * @property {number} last_play_date
- * @property {number} play_count
- * @property {number} play_time
- * @property {string[]} tags
- * @property {boolean} is_economy
- * @property {boolean} is_deleted
- */
+
 
 /**
  * ライブラリ検索条件
@@ -379,3 +358,160 @@
  * @typedef {import("@lib/modal-dialog").ModalDialog} ModalDialog
  * @typedef {import("node_modules/riot/riot").RiotComponent} RiotComponent
  */
+
+interface ConfigColumn {
+    id: string;
+    width: number;
+};
+
+interface Config {
+    data_dir: string;
+    log: {
+        level: string;
+    };
+    mouse_gesture: {
+        search_page_back_page: string;
+        search_page_forward_page: string;
+        all_page_show_player: string;
+    };
+    user_icon_cache: boolean;
+    ffmpeg_path: string;
+    use_mouse_gesture: boolean;
+    main: {
+        window: {
+            state: {
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                maximized: boolean;
+            };
+        };
+    };
+    player: {
+        infoview_width: number;
+        sync_comment: boolean;
+        volume: number;
+        window: {
+            state: {
+                x: number;
+                y: number;
+                width: number;
+                height: number;
+                maximized: boolean;
+            };
+        };
+        infoview_show: boolean;
+        contextmenu: {
+            history_num: number;
+            stack_num: number;
+        };
+    };
+    search: {
+        condition: {
+        search_target: {
+            target: string;
+        };
+        sort: {
+            name: string;
+            order: string;
+        };
+        api: string;
+        };
+    };
+    comment: {
+        auto_sync_checked: boolean;
+        auto_sync_interval: number;
+        auto_sync_threshold:number;
+        fps: 10
+    };
+    nndd: {
+        librarydb: boolean;
+        history: boolean;
+        mylist: boolean;
+        nglist: boolean;
+        searchitems: boolean;
+        system_path: string;
+    };
+    nico_grid_library: {
+        columns: ConfigColumn[];
+    };
+    player_comment_nico_grid: {
+        columns: ConfigColumn[];
+    };
+    download_nico_grid: {
+        columns: ConfigColumn[];
+    };
+    mylist_nico_grid: {
+        columns: ConfigColumn[];
+    };
+    library_nico_grid: {
+        columns: ConfigColumn[];
+        sort_param: {
+            id: string;
+            asc: boolean;
+            enable: boolean;
+        };
+    };
+    history_nico_grid: {
+        columns: ConfigColumn[];
+    };
+    search_nico_grid: {
+        columns: ConfigColumn[];
+    };
+};
+
+interface HistoryItem {
+    thumb_img: string;
+    video_id: string;
+    title: string;
+    play_date: number;
+    time: number;
+};
+
+export const Status = {
+  wait: 0,
+  downloading: 1,
+  complete: 2,
+  error: 3
+} as const;
+
+interface DownloadItem {
+ video_id: string;
+ title: string;
+ state: Status;
+ thumb_img: string;
+};
+
+interface LibraryItem {
+    data_type: string;
+    title: string;
+    video_id: string;
+    video_type: string;
+    dirpath_id: string;
+    dirpath: string;
+    common_filename: string;
+    thumbnail_size: string;
+    thumb_img : string;
+    modification_date: number;
+    creation_date: number;
+    pub_date: number;
+    last_play_date: number;
+    play_count: number;
+    play_time: number;
+    tags: string[];
+    is_economy: boolean;
+    is_deleted: boolean;
+}
+
+interface APIInvoker {
+  getTempPath: (name: string) => Promise<string>;
+  getConfig: () => Promise<Config>;
+  historyGetItems: () => Promise<HistoryItem[]>;
+
+  downloadGetItems: () => Promise<DownloadItem[]>;
+//   historyOnAddItem: (func: (item: HistoryItem) => void) => void;
+  libraryGetItems: () => Promise<LibraryItem[]>;
+  libraryGetItem: (videoId: string) => Promise<LibraryItem>;
+//   libraryExistsItem: (videoId: string) => Promise<boolean>
+}

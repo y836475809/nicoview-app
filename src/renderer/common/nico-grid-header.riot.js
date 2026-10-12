@@ -1,7 +1,7 @@
 
 const resize_area_margin = 10;
 
-module.exports = {
+export default {
     state:{
         /** @type {string[]} */
         column_ids:[]

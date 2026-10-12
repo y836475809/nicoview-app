@@ -2,8 +2,13 @@
   "name": "nicoview-app",
   "version": "0.19.40",
   "description": "electron製のニコニコ動画閲覧アプリ",
-  "main": "src/main.js",
+  "main": "dist-electron/main.js", 
+  "type": "module",
   "scripts": {
+    "dev:vite": "vite",
+    "dev:electron": "electron . --dev",
+    "build:vite": "vite build",
+    "lint": "eslint .",
     "dev": "electron . --dev --mock_server",
     "preview": "electron . --dev",
     "start-server": "node ./__mock_server__/server.js",
@@ -16,19 +21,25 @@
   "author": "y836475809",
   "license": "MIT",
   "devDependencies": {
+    "@riotjs/compiler": "^10.0.4",
     "ava": "^5.3.1",
     "electron": "^29.1.1",
     "electron-builder": "^24.13.3",
-    "eslint": "^8.57.0",
-    "eslint-plugin-html": "^8.0.0",
+    "eslint": "^10.12.0",
+    "eslint-config-riot": "^6.0.1",
+    "eslint-plugin-html": "^8.2.1",
     "nock": "^13.5.4",
-    "sinon": "^17.0.1"
+    "rollup-plugin-riot": "^10.0.0",
+    "sinon": "^17.0.1",
+    "vite": "^8.3.2",
+    "vite-plugin-electron": "^1.1.2"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
     "cheerio": "^1.0.0-rc.12",
     "electron-log": "^4.4.8",
     "hls.js": "^1.6.15",
+    "mitt": "^3.0.1",
     "riot": "^9.1.4",
     "sql.js": "^1.8.0"
   },

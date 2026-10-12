@@ -186,10 +186,13 @@
         </div>
     </div>
     <pagination obs={pagination_obs}></pagination>
-    <div class="search-grid-container" id="search-nico-grid">
+    <div class="search-grid-container">
+        <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
     </div>
+    <modal-dialog if={ state.dialogEmitter }  emitter={ state.dialogEmitter } ></modal-dialog>
 
     <script>
-        export default window.NicoRiot["search-content.riot.js"];
+        import logic from './search-content.riot.js';
+        export default logic;
     </script>
 </search-content>

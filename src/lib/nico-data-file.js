@@ -1,8 +1,8 @@
 const path = require("path");
 const fs = require("fs");
-const NicoDataParser = require("./nico-data-parser");
+import * as NicoDataParser from "@lib/nico-data-parser.js";
 
-class NicoDataFile {
+export class NicoDataFile {
     /**
      * 
      * @param {string} video_id 
@@ -124,7 +124,7 @@ class NicoDataFile {
     }
 }
 
-class NicoXMLFile extends NicoDataFile {
+export class NicoXMLFile extends NicoDataFile {
     get commentFilename(){
         return `${this.common_filename}.xml`;
     }
@@ -210,7 +210,7 @@ class NicoXMLFile extends NicoDataFile {
     }
 }
 
-class NicoJsonFile extends NicoDataFile {   
+export class NicoJsonFile extends NicoDataFile {   
     get commentFilename(){
         return `${this.common_filename}[Comment].json`;
     }
@@ -257,7 +257,7 @@ class NicoJsonFile extends NicoDataFile {
     }
 }
 
-class NicoVideoData {
+export class NicoVideoData {
     /**
      * 
      * @param {LibraryItem} video_item 
@@ -351,7 +351,7 @@ class NicoVideoData {
     }
 }
 
-const getNicoDataFilePaths = (video_item) => {
+export const getNicoDataFilePaths = (video_item) => {
     const xml_item = new NicoXMLFile(video_item.video_id);
     xml_item.dirPath        = video_item.dirpath;
     xml_item.commonFilename = video_item.common_filename;
@@ -386,7 +386,7 @@ const getNicoDataFilePaths = (video_item) => {
  * *** - [(***)].***
  * @param {string} finename 
  */
-const getIDFromFilename = (finename) => {
+export const getIDFromFilename = (finename) => {
     const regexp = /\s-\s\[([a-z]*[\d]+|[\d]+)\]\.+/gi;
     let match = null;
     let id = null;
@@ -403,21 +403,11 @@ const getIDFromFilename = (finename) => {
  * (***) - [***].***
  * @param {string} finename 
  */
-const getCommonNameFromFilename = (finename) => {
+export const getCommonNameFromFilename = (finename) => {
     const regexp = /(.+)\s-\s\[[a-z]*[\d]+\]\.+/gi;
     const match = regexp.exec(finename);
     if(match==null){
         throw new Error(`cant get common name form ${finename}`);
     }
     return match[1];
-};
-
-module.exports = {
-    NicoDataFile,
-    NicoXMLFile,
-    NicoJsonFile,
-    NicoVideoData,
-    getNicoDataFilePaths,
-    getIDFromFilename,
-    getCommonNameFromFilename
 };

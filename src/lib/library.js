@@ -1,8 +1,8 @@
 const path = require("path");
 const EventEmitter = require("events");
-const { LibraryDB } = require("./db");
+import { LibraryDB } from "@lib/db.js";
 
-class Library extends EventEmitter {
+export class Library extends EventEmitter {
     constructor(){
         super();
     }
@@ -156,6 +156,3 @@ class Library extends EventEmitter {
     }
 }
 
-module.exports = {
-    Library
-};

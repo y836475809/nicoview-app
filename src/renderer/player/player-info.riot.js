@@ -1,16 +1,19 @@
-const  myapi = require("../../lib/my-api");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const time_format = require("../../lib/time-format");
-const { SyncCommentScroll } = require("../../lib/sync-comment-scroll");
-const { window_obs, MyObservable } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import {myapi} from "@lib/my-api.js";
+import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
+import * as time_format from "@lib/time-format.js";
+import { SyncCommentScroll } from "@lib/sync-comment-scroll.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import NicoGrid from '@renderer/common/nico-grid.riot';
+import PlayerUser from '@renderer/player/player-user.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
 const nico_grid_name = "player-comment-nico-grid";
 
-module.exports = {
+export default {
     state:{
         video_thumbnail_tooltip:"",
         video_thumbnail_url:"",
@@ -31,7 +34,12 @@ module.exports = {
     viode_seek_sec: 0,
     viode_curret_ms: 0,
 
-    onBeforeMount() {
+    components: {
+        'nico-grid': NicoGrid,
+        'player-user': PlayerUser
+    },
+
+    async onBeforeMount() {
         this.sync_comment_scroll = new SyncCommentScroll();
         
         player_obs.on("player-info:update-comments", async (args)=> {
@@ -136,8 +144,7 @@ module.exports = {
                 this.sync_comment_scroll.reset();
             }
         });
-    },
-    async onMounted() {
+
         // eslint-disable-next-line no-unused-vars
         const commentFormatter = (id, value, data) => {
             if(!value){
@@ -179,8 +186,6 @@ module.exports = {
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -212,7 +217,12 @@ module.exports = {
                 this.triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
             }
         });
-
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
+        });
+    },
+    async onMounted() {
         /** @type {HTMLInputElement} */
         const ch_elm = this.$(".comment-checkbox.comment-visible");
         ch_elm.checked = true; 

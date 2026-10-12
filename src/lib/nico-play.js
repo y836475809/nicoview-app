@@ -1,8 +1,8 @@
 const EventEmitter = require("events");
-const { NicoWatch, NicoComment } = require("./niconico");
-const NicoDataParser = require("./nico-data-parser");
+import { NicoWatch, NicoComment } from "@lib/niconico.js";
+import * as NicoDataParser from "@lib/nico-data-parser.js";
 
-class NicoPlay extends EventEmitter {
+export class NicoPlay extends EventEmitter {
     constructor(heart_beat_rate=0.9){
         super();
         this.heart_beat_rate = heart_beat_rate;
@@ -48,7 +48,3 @@ class NicoPlay extends EventEmitter {
         };
     }
 }
-
-module.exports = {
-    NicoPlay
-};

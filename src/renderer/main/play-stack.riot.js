@@ -1,12 +1,13 @@
-const myapi = require("../../lib/my-api");
-const { Command } = require("../../lib/command");
-const { toTimeString } = require("../../lib/time-format");
-const { window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import {Command} from "@lib/command.js";
+import { toTimeString } from "@lib/time-format.js";
+import { window_obs } from "@lib/my-observable.js";
+
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-module.exports = {
+export default {
     state:{
         /** @type {StackItem[]} */
         items:[]

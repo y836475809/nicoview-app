@@ -1,6 +1,6 @@
-const { logger } = require("./logger");
+import { logger } from "@lib/logger.js";
 
-class FlowComment {
+export class FlowComment {
     constructor(row_num, view_width, duration=3000) {
         this.row_num = row_num;
         this.view_width = view_width;
@@ -108,7 +108,3 @@ class FlowComment {
         return index;
     }
 }
-
-module.exports = {
-    FlowComment
-};

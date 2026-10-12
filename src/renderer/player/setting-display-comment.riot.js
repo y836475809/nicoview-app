@@ -1,5 +1,5 @@
-const  myapi = require("../../lib/my-api");
-const { window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
@@ -14,7 +14,7 @@ const default_comment_config = {
     auto_sync_threshold: 0.1
 };
 
-module.exports = {
+export default {
     duration_items:[3, 4, 5],
     fps_items:[10, 60],
     sync_interval_items:[10, 30, 60, 120],

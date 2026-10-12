@@ -1,16 +1,16 @@
-const { BrowserWindow } = require("electron");
+import { BrowserWindow } from "electron";
 
-const LOGIN_SESSTION_NAME = 'loginsession';
+export const LOGIN_SESSTION_NAME = 'loginsession';
 const baseUrl = 'https://account.nicovideo.jp/spa';
 const loginUrl = `${baseUrl}/login/index.html`;
 const logoutUrl = `${baseUrl}/logout/index.html`;
 
-const showLoginWindow = () => {
+export const showLoginWindow = () => {
     const win = createWindow(loginUrl);
     win.loadURL(loginUrl);
 };
 
-const showLogoutWindow = () => {
+export const showLogoutWindow = () => {
     const win = createWindow(logoutUrl);
     win.loadURL(logoutUrl);
 };
@@ -34,10 +34,4 @@ const createWindow = (url) => {
         win.close();
     });
     return win;
-};
-
-module.exports = {
-    LOGIN_SESSTION_NAME,
-    showLoginWindow,
-    showLogoutWindow,
 };

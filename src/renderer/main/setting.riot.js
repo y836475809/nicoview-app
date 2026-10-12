@@ -1,24 +1,26 @@
-const myapi = require("../../lib/my-api");
-const { ImportFile } = require("../../lib/import-file");
-const { ImportNNDDSetting } = require("../../lib/import-nndd-setting");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import mitt from 'mitt';
+import {myapi} from "@lib/my-api.js";
+import { ImportFile } from "@lib/import-file.js";
+import { ImportNNDDSetting } from "@lib/import-nndd-setting.js";
+import { window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-module.exports = {
+export default {
     state: {
         /** @type {{name:string, title:string}[]} */
         import_items:[],
+        /** @type {import('@/types/events.js').DialogEmitter} */
+        dialogEmitter: mitt()
     },
 
-    /** @type {ModalDialog} */
-    modal_dialog:null,
-    
-    /** @type {MyObservable} */
-    obs_modal_dialog:null,
+    components: {
+        'modal-dialog': ModalDialog
+    },
 
     /**
      * 
@@ -51,9 +53,6 @@ module.exports = {
         elm.checked = value;
     },
     onBeforeMount() {
-        this.obs_modal_dialog = new MyObservable();
-        this.modal_dialog = null;
-
         this.state.import_items = ImportNNDDSetting.getItems();
 
         this.mouse_gesture_text = () => {
@@ -77,11 +76,6 @@ module.exports = {
             const import_item = this.state.import_items[index];
             this.setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
         }
-    
-        this.modal_dialog = new ModalDialog(this.root, "setting-md", {
-            obs:this.obs_modal_dialog,
-            testname:"setting-md"
-        });
     },
     async onclickUseMg(e){
         const checked = e.target.checked;
@@ -132,10 +126,6 @@ module.exports = {
         await myapi.ipc.Config.set(`nndd.${item.name}`, checked);
     },
     async onclickExecNNDDImport(e) { // eslint-disable-line no-unused-vars
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-
         let data_dir = "";
         let nndd_system_dir = "";
         try {
@@ -157,14 +147,18 @@ module.exports = {
             }
         });
 
-        this.obs_modal_dialog.trigger("show", {
-            message: "インポート中...",
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: false,
+            message: "インポート中..."
         });
         try {
             const import_nndd = new ImportNNDDSetting(nndd_system_dir, data_dir);
             for (let index = 0; index < import_items.length; index++) {
                 const import_item = import_items[index];
-                this.obs_modal_dialog.trigger("update-message", `${import_item.title}をインポート`);
+                this.state.dialogEmitter.emit('dialog:update-message', {
+                    message: `${import_item.title}をインポート`
+                });
                 await import_nndd.call(import_item.name);
             }
 
@@ -183,14 +177,10 @@ module.exports = {
                 message: `インポート失敗\n${error.message}`
             });
         } finally {
-            this.obs_modal_dialog.trigger("close");
+            this.state.dialogEmitter.emit('dialog:close');
         }            
     },
     async onclickImportFiles() {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-        
         const file_paths = await myapi.ipc.Dialog.showSelectFileDialog({
             name: "avi",
             exts: ["mp4", "flv", "swf"],
@@ -201,13 +191,14 @@ module.exports = {
         }
 
         let cancel = false;
-        this.obs_modal_dialog.trigger("show", {
-            message: "インポート中...",
-            cb: ()=>{
-                cancel = true;
-            }
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "インポート中..."
         });
-
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            cancel = true;
+        });
         await new Promise(resolve => setTimeout(resolve, 100));
 
         const error_files = [];
@@ -227,8 +218,9 @@ module.exports = {
             }
 
             const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
-            this.obs_modal_dialog.trigger("update-message", message);
-
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: message
+            });
             await new Promise(resolve => setTimeout(resolve, 500));
         }
         
@@ -236,7 +228,7 @@ module.exports = {
             type: "info",
             message: `インポート完了\n失敗:${error_files.length}`
         });
-        this.obs_modal_dialog.trigger("close");
+        this.state.dialogEmitter.emit('dialog:close');
 
         if(error_files.length>0){
             await myapi.ipc.Dialog.showMessageBoxOK({

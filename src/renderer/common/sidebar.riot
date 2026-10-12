@@ -42,7 +42,23 @@
         </div>
     </div>
     <script>
+        import LibrarySidebar from '../main/library-sidebar.riot';
+        import SearchSidebar from '../main/search-sidebar.riot';
+        import MylistSidebar from '../main/mylist-sidebar.riot';
+        import LibraryContent from '../main/library-content.riot';
+        import SearchContent from '../main/search-content.riot';
+        import MylistContent from '../main/mylist-content.riot';
+
         export default {
+            components: {
+                'library-sidebar': LibrarySidebar,
+                'search-sidebar': SearchSidebar,
+                'mylist-sidebar': MylistSidebar,
+                'library-content': LibraryContent,
+                'search-content': SearchContent,
+                'mylist-content': MylistContent,
+            },
+
             onBeforeMount(prop) {
                 this.listview_name = `listview-${prop.page_name}`;
                 

@@ -1,5 +1,5 @@
 
-class FixedComment{
+export class FixedComment{
     constructor(row_num){
         this.row_num = row_num;
     }
@@ -75,7 +75,3 @@ class FixedComment{
         });
     }
 }
-
-module.exports = {
-    FixedComment
-};

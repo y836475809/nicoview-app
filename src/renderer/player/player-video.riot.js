@@ -1,23 +1,30 @@
 const { ipcRenderer } = require("electron");
-const Hls = require("hls.js");
-const myapi = require("../../lib/my-api");
-const { NicoCommentTimeLine, NicoScript } = require("../../lib/nico-comment-timeline");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { logger } = require("../../lib/logger");
-const NicoHls = require("../../lib/nico-hls-request.js");
-const { fetchContentUrl } = require("../../lib/nico-fetch");
+import mitt from 'mitt';
+import Hls from "hls.js";
+import {myapi} from "@lib/my-api.js";
+import { NicoCommentTimeLine, NicoScript } from "@lib/nico-comment-timeline.js";
+import { window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+import * as NicoHls from "@lib/nico-hls-request.js";
+import { fetchContentUrl } from "@lib/nico-fetch.js";
+
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
-module.exports = {
+export default {
+    state:{
+        /** @type {import('@/types/events.js').DialogEmitter} */
+        dialogEmitter: mitt()
+    },
+
     _hls: null,
     _hls_tmp_dir:"",
     /** @type {MyObservable} */
-    obs_modal_dialog:null,
+    // obs_modal_dialog:null,
     /** @type {ModalDialog} */
-    modal_dialog:null,
+    // modal_dialog:null,
 
     /** @type {HTMLVideoElement} */
     video_elm:null,
@@ -32,19 +39,22 @@ module.exports = {
     comment_config:null,
     comment_sync_id:null,
     play_ended:false,
+
+    components: {
+        'modal-dialog': ModalDialog
+    },
+
     async onBeforeMount() {
-        this.obs_modal_dialog = new MyObservable();
+        // this.obs_modal_dialog = new MyObservable();
         this._hls_tmp_dir = await ipcRenderer.invoke("get-temp-path");
         
         player_obs.on("player-video:set-play-data-library", async(data) => {
-            if(this.modal_dialog.isOpend()){
-                this.obs_modal_dialog.trigger("close");
-            }
-            this.obs_modal_dialog.trigger("show", {
-                message: "動画取得中...",
-                buttons: undefined
+            this.state.dialogEmitter.emit('dialog:close');
+            this.state.dialogEmitter.emit('dialog:open', {
+                showok: false,
+                showcancel: false,
+                message: "動画取得中..."
             });
-
             await this.initVideo();
             this.video_elm.pause();
             if(this._hls){
@@ -61,14 +71,12 @@ module.exports = {
             this.video_elm.load();
         });
         player_obs.on("player-video:set-play-data-online", async(data) => {
-            if(this.modal_dialog.isOpend()){
-                this.obs_modal_dialog.trigger("close");
-            }
-            this.obs_modal_dialog.trigger("show", {
-                message: "動画取得中...",
-                buttons: undefined
+            this.state.dialogEmitter.emit('dialog:close');
+            this.state.dialogEmitter.emit('dialog:open', {
+                showok: false,
+                showcancel: false,
+                message: "動画取得中..."
             });
-
             await this.initVideo();
             this.video_elm.pause();
 
@@ -87,7 +95,9 @@ module.exports = {
             const watchTrackId = nico_api.watchTrackId;
             const accessRightKey = domand.accessRightKey;
             const video_id = this.play_data.video_id;
-            this.obs_modal_dialog.trigger("update-message", 'ContentUrl取得');
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: 'ContentUrl取得'
+            });
             const content_url = await fetchContentUrl(video_id, watchTrackId, accessRightKey, domand); 
             const config = {
                 loader: NicoHls.NicoCustomLoader,
@@ -111,9 +121,6 @@ module.exports = {
         });
     },
     async onMounted() {
-        this.modal_dialog = new ModalDialog(this.root, "player-video-md", {
-            obs:this.obs_modal_dialog
-        });
     },
     async initVideo() {
         if(this.video_elm){
@@ -189,9 +196,7 @@ module.exports = {
             logger.debug("playingによるイベント発火");
             this.play_ended = false;
             this.playVideoAndComment();
-            if(this.modal_dialog.isOpend()){
-                this.obs_modal_dialog.trigger("close");
-            }
+            this.state.dialogEmitter.emit('dialog:close');
         });
 
         this.video_elm.addEventListener("ended", () => {

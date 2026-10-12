@@ -4,10 +4,10 @@ const fsPromises = fs.promises;
 const path = require("path");
 const url = require("url");
 const { dialog, Menu } = require("electron");
-const { logger } = require("./logger");
-const { CacheStore } = require("./cache-store");
+import { logger } from "@lib/logger.js";
+import { CacheStore } from "@lib/cache-store.js";
 
-class JsonStore { 
+export class JsonStore { 
     constructor(get_dir_func){
         this._get_dir_func = get_dir_func;
     }
@@ -54,7 +54,7 @@ class JsonStore {
     }
 }
 
-class UserCSS {
+export class UserCSS {
     constructor(){
     }
 
@@ -97,7 +97,7 @@ class UserCSS {
     }
 }
 
-const getWindowState = (w) => {
+export const getWindowState = (w) => {
     const bounds = w.getBounds(); 
     return {
         x: bounds.x, 
@@ -108,12 +108,12 @@ const getWindowState = (w) => {
     };
 };
 
-const setLogLevel = (level) => {
+export const setLogLevel = (level) => {
     process.env.LOG_LEVEL = level;
     logger.setLevel(level);
 };
 
-const popupInputContextMenu = (bw, props) => {
+export const popupInputContextMenu = (bw, props) => {
     const { inputFieldType, editFlags } = props;
     if (inputFieldType === "plainText") {
         const input_context_menu = Menu.buildFromTemplate([
@@ -148,7 +148,7 @@ const popupInputContextMenu = (bw, props) => {
     }
 };
 
-const selectFolder = (dir, title) => {
+export const selectFolder = (dir, title) => {
     const checkDir = (dir) => {
         if (!dir) {
             return false;
@@ -175,7 +175,7 @@ const selectFolder = (dir, title) => {
     return null;
 };
 
-class UserIconCache {
+export class UserIconCache {
     setup(dir, enable){
         this._dir = dir;
         this._enable = enable;
@@ -243,13 +243,3 @@ class UserIconCache {
         return url.pathToFileURL(path.join(this._dir, file_name));
     }
 }
-
-module.exports = {
-    JsonStore,
-    UserCSS,
-    UserIconCache,
-    getWindowState,
-    setLogLevel,
-    popupInputContextMenu,
-    selectFolder
-};

@@ -55,10 +55,11 @@
             <download-schedule obs={obs_schedule}></download-schedule>
         </div>
     </div>
-    <div class="download-grid-container" id="download-nico-grid">
-    </div>
-
+    <div class="download-grid-container">
+        <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
+    </div>    
     <script>
-        export default window.NicoRiot["download-list.riot.js"];
+        import logic from './download-list.riot.js';
+        export default logic;
     </script>
 </download-list>

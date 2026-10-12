@@ -7,7 +7,7 @@ const cheerio = require("cheerio");
  * @param {boolean} is_owner 
  * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
  */
-const xml_comment = (xml, is_owner) => {
+export const xml_comment = (xml, is_owner) => {
     let $ = cheerio.load(xml);
 
     let threads = [];
@@ -59,7 +59,7 @@ const xml_comment = (xml, is_owner) => {
     return {threads, chats};
 };
 
-const xml_thumb_info_tags = ($) => {
+export const xml_thumb_info_tags = ($) => {
     const tags = [];
     $("tag").each(function (i, el) {
         const item = $(el);
@@ -81,7 +81,7 @@ const xml_thumb_info_tags = ($) => {
  * 
  * @param {string} xml 
  */
-const xml_thumb_info  = (xml) => {
+export const xml_thumb_info  = (xml) => {
     let $ = cheerio.load(xml);
 
     const video_id = $("video_id").text();
@@ -135,7 +135,7 @@ const xml_thumb_info  = (xml) => {
     };
 };
 
-const json_thumb_info_tags = (nico_api_tags) => {
+export const json_thumb_info_tags = (nico_api_tags) => {
     return nico_api_tags.map((value) => {
         const tag = {
             name: value.name,
@@ -146,7 +146,7 @@ const json_thumb_info_tags = (nico_api_tags) => {
     });  
 };
 
-const json_thumb_info = (nico_api) => {
+export const json_thumb_info = (nico_api) => {
     const video = nico_api.getVideo();
     const owner = nico_api.getOwner();
     const tags = json_thumb_info_tags(nico_api.getTags());
@@ -180,7 +180,7 @@ const json_thumb_info = (nico_api) => {
  * @param {string} json_str 
  * @returns {{threads:CommentThreadData[], chats:CommentChatData[]}}
  */
-const json_comment = (json_str) => {
+export const json_comment = (json_str) => {
     const json_data = JSON.parse(json_str);
     
     /** @type {CommentThreadData[]} */
@@ -203,7 +203,7 @@ const json_comment = (json_str) => {
  * @param {CommentChatData[]} chats 
  * @returns {CommentItem[]}
  */
-const makeComments = (chats) => {
+export const makeComments = (chats) => {
     const comments = chats.filter(value => {
         return Object.prototype.hasOwnProperty.call(value, "chat") 
             && !Object.prototype.hasOwnProperty.call(value.chat, "deleted");
@@ -223,14 +223,4 @@ const makeComments = (chats) => {
         return 0;
     });
     return comments;
-};
-
-module.exports = { 
-    xml_comment,
-    xml_thumb_info_tags,
-    xml_thumb_info,
-    json_thumb_info_tags,
-    json_thumb_info,
-    json_comment,
-    makeComments,
 };

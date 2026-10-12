@@ -1,13 +1,16 @@
-const myapi = require("../../lib/my-api");
-const { buttonFormatter } = require("../common/nico-grid-formatter");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { NicoVideoData } = require("../../lib/nico-data-file");
-const { Command } = require("../../lib/command");
-const { NicoUpdate } = require("../../lib/nico-update");
-const { ConvertMP4, needConvertVideo } = require("../../lib/video-converter");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import mitt from 'mitt';
+import {myapi} from "@lib/my-api.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import {logger} from "@lib/logger.js";
+import { buttonFormatter } from "@renderer/common/nico-grid-formatter.js";
+import {mountNicoGrid} from "@renderer/common/nico-grid-mount.js";
+import { NicoVideoData } from "@lib/nico-data-file.js";
+import {Command} from "@lib/command.js";
+import {NicoUpdate} from "@lib/nico-update.js";
+import { ConvertMP4, needConvertVideo } from "@lib/video-converter.js";
+
+import NicoGrid from '@renderer/common/nico-grid.riot';
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
@@ -22,23 +25,143 @@ const wait = async (msec) => {
 
 const nico_grid_name = "library-nico-grid";
 
-module.exports = {
+export default {
     state:{
         num_filtered_items:0,
         num_items:0,
+        /** @type {import('@/types/events.js').DialogEmitter} */
+        dialogEmitter: mitt()
     },
 
     /** @type {{title:string, id:string}[]} */
     search_targets:[],
 
-    /** @type {MyObservable} */
-    obs_modal_dialog:null,
-
     /** @type {ModalDialog} */
     modal_dialog:null,
 
-    onBeforeMount(props) {
-        this.obs_modal_dialog = new MyObservable();
+    components: {
+        'nico-grid': NicoGrid,
+        'modal-dialog': ModalDialog
+    },
+
+    async onBeforeMount(props) {
+        const infoFormatter = (id, value, data)=> {
+            const video_id = data.video_id;
+            const video_type = data.video_type;
+            const video_quality = data.is_economy?"画質: エコノミー":"";
+            return `<div>
+                ID: ${video_id}<br>
+                動画形式: ${video_type}<br>
+                ${video_quality}
+                </div>`;
+        };
+        const columns = [
+            {id: "thumb_img", name: "サムネイル", width: 180},
+            {id: "title", name: "名前"},
+            {id: "command", name: "操作", 
+                ft: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
+            {id: "info", name: "情報", sortable: false, ft: infoFormatter},
+            {id: "creation_date", name: "作成日"},
+            {id: "pub_date", name: "投稿日"},
+            {id: "play_count", name: "再生回数"},
+            {id: "play_time", name: "時間"},
+            {id: "last_play_date", name: "最終再生日"},
+            {id: "state", name: "状況"}
+        ];
+        /** @type {NicoGridOptions} */
+        const options = {
+            filter_target_ids: [
+                "title", "tags", "video_id"
+            ],
+            sort_param: {
+                id: "",
+                asc: true,
+                enable: true
+            }
+        };
+        this.nico_grid_obs = new MyObservable();
+        this.nico_grid_obs.on("state-changed", async (args) => {
+            const { state } = args;
+            await myapi.ipc.Config.set(nico_grid_name, state);
+        });
+        this.nico_grid_obs.on("db-cliecked", async (args) => {
+            const { data } = args;
+            if(data.video_id){
+                await this.play(data, false);
+            }
+        });
+        this.nico_grid_obs.on("cmd", async (args) => {
+            const { cmd_id, data } = args;
+            if(cmd_id == "play"){
+                logger.debug("library onButtonClick data=", data);
+                await this.play(data, false);
+            }
+
+            if(cmd_id == "stack"){
+                Command.addStackItems(main_obs, [data]);
+            }
+
+            if(cmd_id == "bookmark"){
+                Command.addBookmarkItems(main_obs, [data]);
+            }
+        });
+        this.nico_grid_obs.on("show-contexmenu", async () => {
+            const sel_data_list = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            const items = sel_data_list.filter(value => {
+                return value.video_id!="";
+            });
+            if(items.length===0){
+                return;
+            }
+            const video_type = items[0].video_type;
+
+            if(video_type=="mp4"){
+                const menu_id = await myapi.ipc.popupContextMenu("library", {items});
+                if(!menu_id){
+                    return;
+                }
+
+                if(menu_id=="update-comment"){
+                    this.updateNicoData(items, async (nico_update)=>{
+                        return await nico_update.updateComment();
+                    });
+                }
+                if(menu_id=="update-thumbnail"){
+                    this.updateNicoData(items, async (nico_update)=>{
+                        return await nico_update.updateThumbnail();
+                    });
+                }
+                if(menu_id=="update-except-video"){
+                    this.updateNicoData(items, async (nico_update)=>{
+                        return await nico_update.update();
+                    });
+                }
+                if(menu_id=="delete"){
+                    const video_ids = items.map(item => item.video_id);
+                    const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+                        type: "info",
+                        message: "動画を削除しますか?"
+                    });
+                    if(!ret){
+                        return;
+                    }
+                    await this.deleteLibraryData(video_ids);
+                }
+            }else{
+                const menu_id = await myapi.ipc.popupContextMenu("library-convert-video", {items});
+                if(menu_id=="convert-video"){
+                    const video_id = items[0].video_id;
+                    await this.convertVideo(video_id);
+                }   
+            }
+        });
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            num_filtered_items: this.state.num_filtered_items,
+            num_items: this.state.num_items,
+            gridData:gridData
+        });
 
         /** @type {{title:string, id:string}[]} */
         this.search_targets = props.search_targets;
@@ -128,120 +251,6 @@ module.exports = {
         });
     },
     async onMounted() {
-        const infoFormatter = (id, value, data)=> {
-            const video_id = data.video_id;
-            const video_type = data.video_type;
-            const video_quality = data.is_economy?"画質: エコノミー":"";
-            return `<div>
-                ID: ${video_id}<br>
-                動画形式: ${video_type}<br>
-                ${video_quality}
-                </div>`;
-        };
-        const columns = [
-            {id: "thumb_img", name: "サムネイル", width: 180},
-            {id: "title", name: "名前"},
-            {id: "command", name: "操作", 
-                ft: buttonFormatter.bind(this,["play", "stack", "bookmark"])},
-            {id: "info", name: "情報", sortable: false, ft: infoFormatter},
-            {id: "creation_date", name: "作成日"},
-            {id: "pub_date", name: "投稿日"},
-            {id: "play_count", name: "再生回数"},
-            {id: "play_time", name: "時間"},
-            {id: "last_play_date", name: "最終再生日"},
-            {id: "state", name: "状況"}
-        ];
-        /** @type {NicoGridOptions} */
-        const options = {
-            filter_target_ids: [
-                "title", "tags", "video_id"
-            ],
-            sort_param: {
-                id: "",
-                asc: true,
-                enable: true
-            }
-        };
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
-        this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-        
-        this.nico_grid_obs.on("state-changed", async (args) => {
-            const { state } = args;
-            await myapi.ipc.Config.set(nico_grid_name, state);
-        });
-        this.nico_grid_obs.on("db-cliecked", async (args) => {
-            const { data } = args;
-            if(data.video_id){
-                await this.play(data, false);
-            }
-        });
-        this.nico_grid_obs.on("cmd", async (args) => {
-            const { cmd_id, data } = args;
-            if(cmd_id == "play"){
-                logger.debug("library onButtonClick data=", data);
-                await this.play(data, false);
-            }
-
-            if(cmd_id == "stack"){
-                Command.addStackItems(main_obs, [data]);
-            }
-
-            if(cmd_id == "bookmark"){
-                Command.addBookmarkItems(main_obs, [data]);
-            }
-        });
-        this.nico_grid_obs.on("show-contexmenu", async () => {
-            const sel_data_list = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
-            const items = sel_data_list.filter(value => {
-                return value.video_id!="";
-            });
-            if(items.length===0){
-                return;
-            }
-            const video_type = items[0].video_type;
-
-            if(video_type=="mp4"){
-                const menu_id = await myapi.ipc.popupContextMenu("library", {items});
-                if(!menu_id){
-                    return;
-                }
-
-                if(menu_id=="update-comment"){
-                    this.updateNicoData(items, async (nico_update)=>{
-                        return await nico_update.updateComment();
-                    });
-                }
-                if(menu_id=="update-thumbnail"){
-                    this.updateNicoData(items, async (nico_update)=>{
-                        return await nico_update.updateThumbnail();
-                    });
-                }
-                if(menu_id=="update-except-video"){
-                    this.updateNicoData(items, async (nico_update)=>{
-                        return await nico_update.update();
-                    });
-                }
-                if(menu_id=="delete"){
-                    const video_ids = items.map(item => item.video_id);
-                    const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
-                        type: "info",
-                        message: "動画を削除しますか?"
-                    });
-                    if(!ret){
-                        return;
-                    }
-                    await this.deleteLibraryData(video_ids);
-                }
-            }else{
-                const menu_id = await myapi.ipc.popupContextMenu("library-convert-video", {items});
-                if(menu_id=="convert-video"){
-                    const video_id = items[0].video_id;
-                    await this.convertVideo(video_id);
-                }   
-            }
-        });
-        
         try {
             await myapi.ipc.Library.load();
         } catch (error) {
@@ -252,10 +261,6 @@ module.exports = {
             });
             // loadLibraryItems([]);
         }
-        
-        this.modal_dialog = new ModalDialog(this.root, "library-md", {
-            obs:this.obs_modal_dialog
-        });
     },
     getSearchTargetElmID(id) {
         return `search-target-${id}`;
@@ -401,8 +406,6 @@ module.exports = {
             key_id: "video_id",
             items: items
         });
-
-        this.update();
     },
     /**
      * 
@@ -411,37 +414,37 @@ module.exports = {
      * @returns 
      */
     async updateNicoData(items, func) {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-
         let update_cancel = false;
+        /** @type {NicoUpdate | null} */
         let nico_update = null;
-        this.obs_modal_dialog.trigger("show", {
-            message: "...",
-            buttons: ["cancel"],
-            cb: ()=>{
-                if(nico_update){
-                    nico_update.cancel();
-                }
-                update_cancel = true;
-            }
+
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "..."
         });
-        
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            if(nico_update){
+                nico_update.cancel();
+            }
+            update_cancel = true;
+        });
+
         let cur_update = 0; 
         const error_items = [];
         try {
             
             for(let item of items) {
-                if(update_cancel===true){
+                if(update_cancel){
                     const error = new Error("cancel");
                     error.cancel=true;   
                     throw error;
                 }
                 
                 cur_update++;
-                this.obs_modal_dialog.trigger("update-message", 
-                    `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
+                this.state.dialogEmitter.emit('dialog:update-message', {
+                    message: `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`
+                });
                 this.nico_grid_obs.trigger("update-item", {
                     id: item.video_id,
                     props: { state: "更新中" }
@@ -485,15 +488,17 @@ module.exports = {
                 if(cur_update < items.length){
                     await wait(1000);
                 }
-                this.obs_modal_dialog.trigger("update-message", 
-                    `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`);
+                this.state.dialogEmitter.emit('dialog:update-message', {
+                    message: `更新中 ${cur_update}/${items.length} 失敗:${error_items.length}`
+                });
             }                
         } catch (error) {
-            this.obs_modal_dialog.trigger("update-message", "更新キャンセル");
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: "更新キャンセル"
+            });
         }
+        this.state.dialogEmitter.emit('dialog:close');
 
-        this.obs_modal_dialog.trigger("close");
-        
         if(error_items.length > 0){
             await myapi.ipc.Dialog.showMessageBoxOK({
                 type: "error",
@@ -512,26 +517,24 @@ module.exports = {
      * @returns 
      */
     async deleteLibraryData(video_ids) {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-
         let cancel = false;
-        this.obs_modal_dialog.trigger("show", {
-            message: "...",
-            buttons: ["cancel"],
-            cb: ()=>{
-                cancel = true;
-            }
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "..."
         });
-        
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            cancel = true;
+        });    
         const error_ids = [];
         for (let index = 0; index < video_ids.length; index++) {
             if(cancel===true){
                 break;
             }
             const video_id = video_ids[index];
-            this.obs_modal_dialog.trigger("update-message", `${video_id}を削除中`);
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: `${video_id}を削除中`
+            });
             const result = await myapi.ipc.Library.deleteItem(video_id);
             // await wait(3000);
             // await wait(3000);
@@ -550,7 +553,7 @@ module.exports = {
                 message: `${error_ids.length}個の削除に失敗\n詳細はログを参照`
             });
         }
-        this.obs_modal_dialog.trigger("close");
+        this.state.dialogEmitter.emit('dialog:close');
     },
     /**
      * 
@@ -575,14 +578,6 @@ module.exports = {
             const ffmpeg_path = await myapi.ipc.Config.get("ffmpeg_path", "");
             const cnv_mp4 = new ConvertMP4();
 
-            this.obs_modal_dialog.trigger("show", {
-                message: "mp4に変換中...",
-                buttons: ["cancel"],
-                cb: ()=>{
-                    cnv_mp4.cancel();
-                }
-            });
-
             cnv_mp4.on("cancel_error", async error=>{
                 logger.error(error);
                 await myapi.ipc.Dialog.showMessageBoxOK({
@@ -590,7 +585,14 @@ module.exports = {
                     message: `中断失敗\n${error.message}`
                 });
             });
-
+            this.state.dialogEmitter.emit('dialog:open', {
+                showok: false,
+                showcancel: true,
+                message: "mp4に変換中..."
+            });
+            this.state.dialogEmitter.on('dialog:cancel', () => {
+                cnv_mp4.cancel();
+            });  
             updateState("変換中");
 
             await cnv_mp4.convert(ffmpeg_path, video_data.getVideoPath());
@@ -619,8 +621,8 @@ module.exports = {
                 });
                 updateState("変換失敗");   
             }
-        }finally{
-            this.obs_modal_dialog.trigger("close");      
+        }finally{     
+            this.state.dialogEmitter.emit('dialog:close'); 
         }
     },
     /**

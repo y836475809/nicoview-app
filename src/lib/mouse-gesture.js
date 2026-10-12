@@ -1,5 +1,5 @@
 
-class MouseGesture {
+export class MouseGesture {
     constructor() {
         this._init();
         this._sensitivity = 50;
@@ -119,7 +119,3 @@ class MouseGesture {
         this._init();
     }
 }
-
-module.exports = {
-    MouseGesture,
-};

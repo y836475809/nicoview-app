@@ -1,24 +1,26 @@
-const { session, dialog, app, BrowserWindow, ipcMain, shell, Menu, protocol } = require("electron");
-const fs = require("fs");
+import { session, dialog, app, BrowserWindow, ipcMain, shell, Menu, protocol } from "electron";
+import fs from "fs";
 const fsPromises = fs.promises;
-const path = require("path");
-const NicoLogin = require("./lib/nico-login");
-const { Config } = require("./lib/config");
-const { Library } = require("./lib/library");
-const { History } = require("./lib/history");
-const { importNNDDDB } = require("./lib/import-nndd-db");
-const { getNicoDataFilePaths } = require("./lib/nico-data-file");
-const { logger } = require("./lib/logger");
-const { Store } = require("./lib/store");
-const { selectFileDialog, selectFolderDialog, showMessageBox } = require("./lib/dialog");
-const { setupContextmenu } = require("./lib/contextmenu");
-const { 
-    JsonStore, UserCSS, UserIconCache,
+import path from "path";
+import * as NicoLogin from "@lib/nico-login.js";
+import { Config } from "@lib/config.js";
+import { Library } from "@lib/library.js";
+import { History } from "@lib/history.js";
+import { importNNDDDB } from "@lib/import-nndd-db.js";
+import { getNicoDataFilePaths } from "@lib/nico-data-file.js";
+import { logger } from "@lib/logger.js";
+import { Store } from "@lib/store.js";
+import { selectFileDialog, selectFolderDialog, showMessageBox } from "@lib/dialog.js";
+import { setupContextmenu } from "@lib/contextmenu.js";
+import { 
+    JsonStore, UserIconCache,
     getWindowState,
     setLogLevel,
     popupInputContextMenu,
-    selectFolder } = require("./lib/util");
+    selectFolder } from "@lib/util.js";
+import { fileURLToPath } from 'url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 setupDev();
 
@@ -41,7 +43,7 @@ const config = new Config();
 const library = new Library();
 const history = new History();
 const store = new Store();
-const user_css = new UserCSS();
+// const user_css = new UserCSS();
 const json_store = new JsonStore(async ()=>{
     return await config.get("data_dir", "");
 });
@@ -58,7 +60,7 @@ let player_win = null;
 let do_app_quit = false;
 
 process.on("uncaughtException", (error) => {
-    logger.error("uncaught exception:", error);
+    // logger.error("uncaught exception:", error);
 
     dialog.showMessageBoxSync(BrowserWindow.getFocusedWindow(), {
         type: "error",
@@ -183,9 +185,10 @@ const createMainWindow = () => {
     state.title = `${app.name} ${app.getVersion()}`;
     state.webPreferences =  {
         backgroundThrottling: false,
-        nodeIntegration: false,
-        contextIsolation: false,
-        preload: path.join(__dirname, 'preload.js'),
+        webSecurity: false, // TODO
+        nodeIntegration: true, // TODO
+        contextIsolation: false, // TODO
+        preload: path.join(__dirname, 'preload.mjs'),
         spellcheck: false,
         sandbox: false
     };
@@ -199,10 +202,10 @@ const createMainWindow = () => {
             { label: "ログ",
                 submenu: [
                     { label: "ログファイルを開く", click() {
-                        shell.openExternal(logger.getPath());
+                        // shell.openExternal(logger.getPath());
                     }},
                     { label: "ログの場所を開く", click() {
-                        shell.showItemInFolder(logger.getPath());
+                        // shell.showItemInFolder(logger.getPath());
                     }},
                     { type: "separator" },
                     { id: "log-level", label: "debugレベルで取得", type: "checkbox", checked: false, click(e) {
@@ -252,7 +255,7 @@ const createMainWindow = () => {
     });
 
     main_win.webContents.once("dom-ready", async () => { 
-        user_css.apply(main_win);
+        // user_css.apply(main_win);
     });
 
     main_win.webContents.on("context-menu", (e, props) => {
@@ -260,7 +263,8 @@ const createMainWindow = () => {
     });
 
     // アプリケーションのindex.htmlの読み込み
-    main_win.loadURL(path.join(__dirname, 'public', 'index.html?window=main'));
+    main_win.loadURL('http://localhost:5173/src/index.html'); // Viteのデフォルトポート
+    // main_win.loadURL(path.join(__dirname, 'dist', 'index.html?window=main'));
 
     if(config.get("open_devtools", false)){
         // DevToolsを開く
@@ -300,15 +304,16 @@ const createMainWindow = () => {
 const createPlayerWindow = () => {
     return new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
         if(player_win !== null){
-            resolve();
+            resolve(null);
             return;
         }
         const state = config.get("player.window.state", { width: 800, height: 600 });
         state.webPreferences =  {
             backgroundThrottling: false,
-            nodeIntegration: false,
-            contextIsolation: false,
-            preload: path.join(__dirname, 'preload.js'),
+            webSecurity: false, // TODO
+            nodeIntegration: true, // TODO
+            contextIsolation: false, // TODO
+            preload: path.join(__dirname, 'preload.mjs'),
             spellcheck: false,
             sandbox: false
         };
@@ -316,7 +321,7 @@ const createPlayerWindow = () => {
         player_win.removeMenu();
         
         player_win.webContents.once("dom-ready", async () => { 
-            user_css.apply(player_win);
+            // user_css.apply(player_win);
         });
         
         player_win.webContents.on("context-menu", (e, props) => {
@@ -336,10 +341,12 @@ const createPlayerWindow = () => {
                 player_win = null;
             });
 
-            resolve();
+            resolve(null);
         });
 
-        player_win.loadURL(path.join(__dirname, 'public', 'player.html?window=player'));
+        player_win.loadURL('http://localhost:5173/src/player.html'); 
+        player_win.webContents.openDevTools();
+        // player_win.loadURL(path.join(__dirname, 'dist', 'player.html?window=player'));
 
         player_win.on("close", e => { // eslint-disable-line no-unused-vars
             if(player_win){
@@ -361,10 +368,10 @@ app.on("ready", async ()=>{
     const log_level = config.get("log.level", "info");
     setLogLevel(log_level);
 
-    const user_css_path = app.isPackaged?
-        path.join(process.resourcesPath, "user.css") // リリース時はリソースフォルダのuser.cssを使用
-        :path.join(__dirname, 'css', "user.css"); // 開発、デバッグ時はcss/user.cssを使用
-    await user_css.load(user_css_path);
+    // const user_css_path = app.isPackaged?
+    //     path.join(process.resourcesPath, "user.css") // リリース時はリソースフォルダのuser.cssを使用
+    //     :path.join(__dirname, 'css', "user.css"); // 開発、デバッグ時はcss/user.cssを使用
+    // await user_css.load(user_css_path);
 
     const user_agent = process.env["user_agent"];
     session.defaultSession.setUserAgent(user_agent);
@@ -508,6 +515,15 @@ app.on("ready", async ()=>{
     // library
     const data_dir = config.get("data_dir", "");
     library.setup(data_dir);
+
+    /** @type {MyIpcMain} */
+    const myIpcMain = ipcMain;
+    myIpcMain.handle('library:getItems', async (event) => {
+        // console.log(videoId);
+        await library.load();
+        return library.getItems();
+    });
+
     ipcMain.handle("library:addItem", async (event, args) => {
         const { item } = args;
         await library.addItem(item);
@@ -676,6 +692,8 @@ app.on("activate", () => {
 });
 
 function setupDev(){
+    console.log('process.argv=', process.argv);
+    // const isDev = !!process.env.VITE_DEV_SERVER_URL;
     if(process.argv.find((arg) => arg === '--dev')){
         app.setName("nicoview-app-dev");
         const userDataDir = path.join(path.dirname(__dirname), '__dev__', 'userData');

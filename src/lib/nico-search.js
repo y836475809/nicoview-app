@@ -1,6 +1,5 @@
-const { NICO_URL } = require("./nico-url");
-const { logger } = require("./logger");
-const { fetchGet } = require("./nico-fetch");
+import { NICO_URL } from "@lib/nico-url.js";
+import { fetchGet } from "@lib/nico-fetch.js";
 
 const sortNames = [
     "viewCounter",
@@ -12,7 +11,7 @@ const sortNames = [
 ];
 const sortOrders = [ "+","-"];
 
-const searchItems = Object.freeze({
+export const searchItems = Object.freeze({
     sortItems: [
         {title: "投稿日が新しい順", name:"startTime",order:"-"},
         {title: "再生数が多い順", name:"viewCounter",order:"-"},
@@ -30,7 +29,7 @@ const searchItems = Object.freeze({
 const search_max_offset = 100000;
 const search_max_limit = 100;
 
-class NicoSearchParams {
+export class NicoSearchParams {
     constructor(limit=32, context="electron-app"){
         this._api = "snapshot";
         this._service = "video";
@@ -205,7 +204,7 @@ class NicoSearchParams {
     }
 }
 
-class NicoSearch {
+export class NicoSearch {
     constructor() { 
         /** @type {AbortController?} */
         this._abort = null;
@@ -285,9 +284,3 @@ class NicoSearch {
         }
     }
 }
-
-module.exports = {
-    NicoSearchParams,
-    NicoSearch,
-    searchItems
-};

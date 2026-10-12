@@ -41,7 +41,8 @@
     <div class="setting-section"> 
         <div class="center-v title">NGコメント</div>
         <div class="setting-params">     
-            <div class="comment-ng-grid-container" id="player-ng-comment-nico-grid">
+            <div class="comment-ng-grid-container">
+                <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
             </div>
             <button type="button" class="delete-button" title="選択された項目を削除" 
                 onclick={onclickDelete}>削除</button>
@@ -49,6 +50,7 @@
     </div>
 
     <script>
-        export default window.NicoRiot["setting-ng-comment.riot.js"];
+        import logic from './setting-ng-comment.riot.js';
+        export default logic;
     </script>
 </setting-ng-comment>

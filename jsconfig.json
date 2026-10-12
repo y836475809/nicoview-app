@@ -1,16 +1,26 @@
 {
     "compilerOptions": {
+      "target": "ESNext",
+      "module": "NodeNext",
+      "moduleResolution": "NodeNext",
+      "allowSyntheticDefaultImports": true,
       "strict": true,
       "checkJs": true,
-      "module": "commonjs",
-      "target": "es2020",
       "skipLibCheck": true,
       "paths": {
-        "@lib/*": ["./src/lib/*"]
+        "@/*": ["./*"],
+        "@lib/*": ["./src/lib/*"],
+        "@renderer/*": ["./src/renderer/*"],
       }
     },
+    "include": [
+      "src/**/*",
+      "types/**/*.d.ts"
+    ],
     "exclude": [ 
       "node_modules", 
+      "dist",
+      "dist-electron",
       "data", 
       "build", 
       "tmp" 

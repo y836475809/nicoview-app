@@ -1,13 +1,26 @@
-const  myapi = require("../../lib/my-api");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+
+import PlayerTags from '@renderer/player/player-tags.riot';
+import PlayerVideo from '@renderer/player/player-video.riot';
+import OpenVideoForm from '@renderer/player/open-video-form.riot';
+import PlayerControls from '@renderer/player/player-controls.riot';
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
-module.exports = {
+export default {
     /** @type {MyObservable} */
     obs_open_video_form:null,
     contextmenu_show:false,
+
+    components: {
+        'player-tags': PlayerTags,
+        'player-video': PlayerVideo,
+        'open-video-form': OpenVideoForm,
+        'player-controls': PlayerControls,
+    },
+
     onBeforeMount() {
         this.obs_open_video_form = new MyObservable();
     },

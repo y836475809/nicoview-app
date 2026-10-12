@@ -1,78 +1,56 @@
+/**
+ * @typedef {import('@/types/events.js').DialogEmitter} DialogEmitter 
+ * @typedef {import('riot').RiotComponent<{ emitter: DialogEmitter}, { showok:boolean, showcancel:boolean, message:string }>} Base
+ * @typedef {{ 
+ *  onClickOK(): void
+ *  onClickCancel(): void
+ * }} DialogMethods
+ * @typedef {Base & DialogMethods} Composite
+ * @typedef {Partial<Composite> & ThisType<Composite>} DialogComponent
+ */
 
-module.exports = {
+/**
+ * @type DialogComponent
+ */
+export default {
     state: {
-        message:"",
         showok:false,
         showcancel:false,
-        btn_ok:"button",
-        btn_cancel:"button"
+        message:"",
     },
-
-    /** @type {MyObservable} */
-    obs_dialog: null,
-
-    /** @type {()=>void} */
-    on_cancel: null,
-
-    /** @type {(string)=>void} */
-    cb:null,
-    onBeforeMount(props) {
+    onBeforeMount(props, state) {
         this.state.message = "";
-        this.obs_dialog = props.obs;
-        this.on_cancel = props.oncancel;
     },
-    onMounted() {
-        this.obs_dialog.on("show", (args) => {
-            this.root.dataset.open = true;
-
-            const { message, buttons, cb } = args;
-            this.state.message = message;
-
-            if(buttons===undefined){
-                this.state.btn_ok = "button non";
-                this.state.btn_cancel = "button non";
-            }else{
-                const show_ok = buttons.includes("ok");
-                const show_cancel = buttons.includes("cancel");
-                if(show_ok && show_cancel){
-                    this.state.btn_ok ="button left";
-                    this.state.btn_cancel ="button right";
-                }else{
-                    this.state.btn_ok = show_ok?"button":"button non";
-                    this.state.btn_cancel = show_cancel?"button":"button non";
-                }
-            }
-            
-            this.cb = cb;
-
-            this.update();
-
-            /** @type {HTMLDialogElement} */
-            const dialog = this.$("dialog");
-            dialog.showModal();
+    onMounted(props, state) {
+        props.emitter.on('dialog:open', (data) => {
+            this.update({
+                showok: data.showok,
+                showcancel: data.showcancel,
+                message: data.message
+            });
+            this.$('#my-dialog')?.showModal();
         });
-
-        this.obs_dialog.on("update-message", (message) => {
-            this.state.message = message;
-            this.update();
+        props.emitter.on('dialog:update-message', (data) => {
+            this.update({
+                message: data.message
+            });
         });
-
-        this.obs_dialog.on("close", () => {
-            /** @type {HTMLDialogElement} */
-            const dialog = this.$("dialog");
-            dialog.close();
-            this.root.dataset.open = false;
+        props.emitter.on('dialog:close', () => {
+            this.$('#my-dialog')?.close();
         });
     },
-    onclickButton(result, e) { // eslint-disable-line no-unused-vars
-        if(this.cb){
-            this.cb(result);
+    onUnmounted(props, state) {
+        if (props.emitter) {
+            props.emitter.off('dialog:open');
+            props.emitter.off('dialog:update-message');
         }
     },
-    oncancel(e) {
-        if(this.on_cancel){
-            this.on_cancel();
-        }
-        e.preventDefault();
+    onClickOK(){
+        this.props.emitter.emit('dialog:ok');
+        this.props.emitter.off('dialog:ok'); 
+    },
+    onClickCancel(){
+        this.props.emitter.emit('dialog:cancel');
+        this.props.emitter.off('dialog:cancel'); 
     }
 };

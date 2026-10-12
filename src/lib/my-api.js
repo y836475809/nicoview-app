@@ -471,7 +471,7 @@ const UserIconCache = {
     },
 };
 
-const myapi = {
+export const myapi = {
     getUserAgent,
     
     ipc: {
@@ -495,5 +495,3 @@ const myapi = {
         UserIconCache,
     }
 };
-
-module.exports = myapi;

@@ -1,7 +1,7 @@
 const fsPromises = require("fs").promises;
-const NicoDataParser = require("./nico-data-parser");
+import * as NicoDataParser from "@lib/nico-data-parser.js";
 
-class XMLDataConverter {
+export class XMLDataConverter {
     async convertThumbInfo(nico_xml, nico_json){
         const thumbinfo_xml = await this._read(nico_xml.thumbInfoPath);
         await this._write(nico_json.thumbInfoPath, this._convertThumbinfo(thumbinfo_xml));
@@ -79,7 +79,7 @@ class XMLDataConverter {
  * @param {*} nv_commnets 
  * @returns {{chat:CommentItem}[]}
  */
-const convToLegacyComments = (nv_commnets) => {
+export const convToLegacyComments = (nv_commnets) => {
     const chats = [];
     const threads = nv_commnets.data.threads;
     threads.forEach(thread => {
@@ -109,9 +109,4 @@ const convToLegacyComment = (nv_commnet) => {
             "content": nv_commnet.body
         }
     };
-};
-
-module.exports = {
-    XMLDataConverter,
-    convToLegacyComments,
 };

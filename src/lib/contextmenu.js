@@ -1,9 +1,9 @@
 const { ipcMain, Menu, clipboard } = require("electron");
-const { toTimeString } = require("./time-format"); 
-const { getWatchURL } = require("./nico-url"); 
-const { Command } = require("./command"); 
+import { toTimeString } from "@lib/time-format.js";
+import { getWatchURL } from "@lib/nico-url.js";
+import {Command} from "@lib/command.js";
 
-const popup = (parent_win, menu_items, resolve, cb=(arg)=>{}) => { // eslint-disable-line no-unused-vars
+export const popup = (parent_win, menu_items, resolve, cb=(arg)=>{}) => { // eslint-disable-line no-unused-vars
     menu_items.forEach(menu_item => {
         if(menu_item.type != "separator"){
             if(!menu_item.click){         
@@ -30,7 +30,7 @@ const popup = (parent_win, menu_items, resolve, cb=(arg)=>{}) => { // eslint-dis
  * @param {CurrentPlayVideo} play_video 
  * @returns {boolean} true:menu_idの項目有効
  */
-const getMenuEnable = (menu_id, play_video) => {
+export const getMenuEnable = (menu_id, play_video) => {
     const { title, thumbnailURL } = play_video;
 
     if(menu_id == "show-open-video-form"){
@@ -50,7 +50,7 @@ const getMenuEnable = (menu_id, play_video) => {
     return true;
 };
 
-const player = (play_win) => {
+export const player = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player", async (event, args) => {
         const { play_video } = args;
         const { video_id, title, thumbnailURL, online } = play_video;
@@ -136,7 +136,7 @@ const player = (play_win) => {
     });
 };
 
-const player_history_stack = (play_win, store, history, config) => {
+export const player_history_stack = (play_win, store, history, config) => {
     ipcMain.handle("app:popup-contextmenu-player-history-stack", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const createMenuItems = (items) => {
@@ -174,7 +174,7 @@ const player_history_stack = (play_win, store, history, config) => {
     });
 };
 
-const player_ngcomment = (play_win) => {
+export const player_ngcomment = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player-ngcomment", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise((resolve, reject) => { // eslint-disable-line no-unused-vars
             const menu_items = [
@@ -193,7 +193,7 @@ const player_ngcomment = (play_win) => {
     });
 };
 
-const player_watch_link = (play_win) => {
+export const player_watch_link = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player-watch-link", async (event, args) => {
         const { video_id, url } = args;
         return await new Promise(resolve => {
@@ -217,7 +217,7 @@ const player_watch_link = (play_win) => {
     });
 };
 
-const player_mylist_link = (play_win) => {
+export const player_mylist_link = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player-mylist-link", async (event, args) => {
         const { mylist_id, url } = args;
         return await new Promise(resolve => {
@@ -237,7 +237,7 @@ const player_mylist_link = (play_win) => {
     });
 };
 
-const player_link = (play_win) => {
+export const player_link = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player-link", async (event, args) => {
         const { url } = args;
         return await new Promise(resolve => {
@@ -253,7 +253,7 @@ const player_link = (play_win) => {
     });
 };
 
-const player_text = (play_win) => {
+export const player_text = (play_win) => {
     ipcMain.handle("app:popup-contextmenu-player-text", async (event, args) => {
         const { text } = args;
         return await new Promise(resolve => {
@@ -269,7 +269,7 @@ const player_text = (play_win) => {
     });
 };
 
-const player_setting_ngcomment = (player_win) => {
+export const player_setting_ngcomment = (player_win) => {
     ipcMain.handle("app:popup-contextmenu-player-setting-ngcomment", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
@@ -284,7 +284,7 @@ const player_setting_ngcomment = (player_win) => {
     });
 };
 
-const player_tag = (play_win) => {
+export const player_tag = (play_win) => {
     // eslint-disable-next-line no-unused-vars
     ipcMain.handle("app:popup-contextmenu-player-tag", async (event, args) => {
         return await new Promise(resolve => {
@@ -299,7 +299,7 @@ const player_tag = (play_win) => {
     });
 };
 
-const getBookMarkMenuEnable = (type, items) => {
+export const getBookMarkMenuEnable = (type, items) => {
     if(items.length === 0) {
         return false;
     }
@@ -320,7 +320,7 @@ const getBookMarkMenuEnable = (type, items) => {
     return false;
 };
 
-const listview_bookmark = (main_win) => {
+export const listview_bookmark = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-listview-bookmark", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -369,7 +369,7 @@ const listview_bookmark = (main_win) => {
     });
 };
 
-const listview_toggle_mark = (main_win) => {
+export const listview_toggle_mark = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-listview-toggle-mark", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
@@ -384,7 +384,7 @@ const listview_toggle_mark = (main_win) => {
     });
 };
 
-const main_download = (main_win) => {
+export const main_download = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-download", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -426,7 +426,7 @@ const main_download = (main_win) => {
     });
 };
 
-const main_library = (main_win) => {
+export const main_library = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-library", async (event, args) => {
         const { items } = args;
         return await new Promise(resolve => {
@@ -474,7 +474,7 @@ const main_library = (main_win) => {
     });
 };
 
-const main_library_convert_video = (main_win) => {
+export const main_library_convert_video = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-library-convert-video", async (event, args) => { // eslint-disable-line no-unused-vars
         return await new Promise(resolve => {
             const menu_items = [
@@ -489,7 +489,7 @@ const main_library_convert_video = (main_win) => {
     });
 };
 
-const main_mylist = (main_win) => {
+export const main_mylist = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-mylist", async (event, args) => {
         const { context_menu_type, items } = args;
 
@@ -539,7 +539,7 @@ const main_mylist = (main_win) => {
     });
 };
 
-const main_history = (main_win) => {
+export const main_history = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-history", async (event, args) => {
         const { items } = args;
 
@@ -578,7 +578,7 @@ const main_history = (main_win) => {
     });
 };
 
-const main_search = (main_win) => {
+export const main_search = (main_win) => {
     ipcMain.handle("app:popup-contextmenu-search", async (event, args) => {
         const { items } = args;
 
@@ -617,7 +617,7 @@ const main_search = (main_win) => {
     });
 };
 
-const setupContextmenu = (main_win, player_win, config, history, store) => {
+export const setupContextmenu = (main_win, player_win, config, history, store) => {
     player(player_win);
     player_history_stack(player_win, store, history, config);
     player_ngcomment(player_win);
@@ -637,8 +637,4 @@ const setupContextmenu = (main_win, player_win, config, history, store) => {
     main_mylist(main_win);
     main_history(main_win);
     main_search(main_win);
-};
-
-module.exports = { 
-    setupContextmenu,
 };

@@ -1,7 +1,7 @@
 const path = require("path");
 const fs = require("fs");
 
-class CacheStore {
+export class CacheStore {
     /**
      * 
      * @param {string} dir_path 保存先ディレクトリパス
@@ -60,7 +60,3 @@ class CacheStore {
         fs.writeFileSync(this.file_path, json, "utf-8");       
     }
 }
-
-module.exports = {
-    CacheStore
-};

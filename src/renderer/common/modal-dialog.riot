@@ -56,19 +56,20 @@
            
     </style>
 
-    <dialog class="message-modal-dialog dialog-shadow" oncancel={oncancel}>
+    <dialog id="my-dialog" class="message-modal-dialog dialog-shadow" oncancel={oncancel}>
         <div class="container">
             <div class="center-hv">
                 <p class="message">{state.message}</p>
             </div>
             <div class="button-container">
-                <div class={state.btn_ok} onclick="{onclickButton.bind(this,'ok')}">OK</div>
-                <div class={state.btn_cancel} onclick="{onclickButton.bind(this,'cancel')}">Cancel</div>
+                <div if={ state.showok } class=button onclick={onClickOK}>OK</div>
+                <div if={ state.showcancel } class=button onclick={onClickCancel}>Cancel</div>
             </div>
         </div>
     </dialog>
 
     <script>
-        export default window.NicoRiot["modal-dialog.riot.js"];
+        import logic from './modal-dialog.riot.js';
+        export default logic;
     </script>
 </modal-dialog>

@@ -1,13 +1,20 @@
-const myapi = require("../../lib/my-api");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
+import {myapi} from "@lib/my-api.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+
+import Listview from '@renderer/common/listview.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-module.exports = {
+export default {
     /** @type {MyObservable} */
     obs_listview:null,
     name:"library-search",
+
+    components: {
+        'listview': Listview,
+    },
+
     onBeforeMount() {
         this.obs_listview = new MyObservable();
 

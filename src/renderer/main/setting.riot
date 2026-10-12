@@ -150,8 +150,10 @@
             </div>
         </div>
     </div>
+    <modal-dialog if={ state.dialogEmitter }  emitter={ state.dialogEmitter } ></modal-dialog>
 
     <script>
-        export default window.NicoRiot["setting.riot.js"];
+        import logic from './setting.riot.js';
+        export default logic;
     </script>
 </setting>

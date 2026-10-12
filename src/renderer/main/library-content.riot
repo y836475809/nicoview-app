@@ -150,10 +150,14 @@
             </div>
         </div>
     </div>
-    <div class="library-grid-container" id="library-nico-grid">
+    <div class="library-grid-container">
+        <nico-grid if={state.gridData} ...{state.gridData}>
+        </nico-grid>
     </div>
+    <modal-dialog if={ state.dialogEmitter }  emitter={ state.dialogEmitter } ></modal-dialog>
 
     <script>
-        export default window.NicoRiot["library-content.riot.js"];
+        import logic from './library-content.riot.js';
+        export default logic;
     </script>
 </library-content>

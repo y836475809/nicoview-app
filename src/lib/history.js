@@ -1,5 +1,5 @@
 
-class History {
+export class History {
     /**
      * 
      * @param {number} history_max 履歴保存最大数
@@ -67,7 +67,3 @@ class History {
         }
     } 
 }
-
-module.exports = {
-    History,
-};

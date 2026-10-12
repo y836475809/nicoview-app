@@ -1,6 +1,8 @@
-const { MyObservable } = require("../../lib/my-observable");
-const { ImgElementCache } = require("./nico-grid-img-cache");
-const { getFormatter } = require("./nico-grid-formatter");
+import { MyObservable } from "@lib/my-observable.js";
+import { ImgElementCache } from "@renderer/common/nico-grid-img-cache.js";
+import { getFormatter } from "@renderer/common/nico-grid-formatter.js";
+
+import NicoGridHeader from '@renderer/common/nico-grid-header.riot';
 
 const debounce = (fn, interval) => {
     let timer;
@@ -33,7 +35,7 @@ const getSortable = (column) => {
 const default_column_width = 150;
 const scroll_event_interval = 100;
 
-module.exports = {
+export default {
     state:{
         /** @type {number[]} */
         data_indexes:[],
@@ -63,6 +65,10 @@ module.exports = {
 
     /** @type {NicoGridOptions} */
     options:null,
+
+    components: {
+        'nico-grid-header': NicoGridHeader
+    },
 
     /**
      * 

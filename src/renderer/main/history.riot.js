@@ -1,17 +1,23 @@
-const myapi = require("../../lib/my-api");
-const { infoFormatter } = require("../common/nico-grid-formatter");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { Command } = require("../../lib/command");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import {myapi} from "@lib/my-api.js";
+import { infoFormatter } from "@renderer/common/nico-grid-formatter.js";
+import {mountNicoGrid} from "@renderer/common/nico-grid-mount.js";
+import {Command} from "@lib/command.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import NicoGrid from '@renderer/common/nico-grid.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
 const nico_grid_name = "history-nico-grid";
 
-module.exports = {
-    onBeforeMount() {
+export default {
+    components: {
+        'nico-grid': NicoGrid
+    },
+
+    async onBeforeMount() {
         myapi.ipc.Download.onUpdateItem(async ()=>{
             const video_ids = await myapi.ipc.Download.getIncompleteIDs();
             const items = await this.nico_grid_obs.triggerReturn("get-items");
@@ -54,8 +60,7 @@ module.exports = {
         main_obs.on("history:reload-items", async ()=>{
             await this.loadItems();
         });
-    },
-    async onMounted() {
+
         const histroy_infoFormatter =  infoFormatter.bind(this, (id, value, data) => { 
             return `<div>ID: ${data.video_id}</div>`;
         });
@@ -76,8 +81,6 @@ module.exports = {
         };
         const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -111,7 +114,12 @@ module.exports = {
             }
             await myapi.ipc.popupContextMenu("history", {items});  
         });
-
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
+        });
+    },
+    async onMounted() {
         await this.loadItems();
     },
     async setData(items, fix_scroll) {

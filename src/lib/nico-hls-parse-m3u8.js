@@ -19,7 +19,7 @@ const getQuality = (filename) => {
  * @param {string} text 
  * @returns {Map}
  */
-const parseManifestM3u8 = (text) => {
+export const parseManifestM3u8 = (text) => {
     const lines = text.split('\n');
     let rep_text = text;
     const dict = new Map();
@@ -68,7 +68,7 @@ const parseManifestM3u8 = (text) => {
  * @param {string} text 
  * @returns {Map}
  */
-const parseMediaM3u8 = (text) => {
+export const parseMediaM3u8 = (text) => {
     const lines = text.split('\n');
     let rep_text = text;
     const dict = new Map();
@@ -108,9 +108,4 @@ const parseMediaM3u8 = (text) => {
     }
     dict.set("rep_text", rep_text);
     return dict;
-};
-
-module.exports = {
-    parseManifestM3u8,
-    parseMediaM3u8,
 };

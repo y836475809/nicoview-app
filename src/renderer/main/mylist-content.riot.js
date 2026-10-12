@@ -1,12 +1,15 @@
-const myapi = require("../../lib/my-api");
-const { infoFormatter, wrapFormatter } = require("../common/nico-grid-formatter");
-const { mountNicoGrid } = require("../common/nico-grid-mount");
-const { Command } = require("../../lib/command");
-const { NicoMylist, NicoMylistStore, NicoMylistImageCache } = require("../../lib/nico-mylist");
-const { needConvertVideo } = require("../../lib/video-converter");
-const { ModalDialog } = require("../../lib/modal-dialog");
-const { MyObservable, window_obs } = require("../../lib/my-observable");
-const { logger } = require("../../lib/logger");
+import mitt from 'mitt';
+import {myapi} from "@lib/my-api.js";
+import { infoFormatter, wrapFormatter } from "@renderer/common/nico-grid-formatter.js";
+import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
+import { Command } from "@lib/command.js";
+import { NicoMylist, NicoMylistStore, NicoMylistImageCache } from "@lib/nico-mylist.js";
+import { needConvertVideo } from "@lib/video-converter.js";
+import { MyObservable, window_obs } from "@lib/my-observable.js";
+import { logger } from "@lib/logger.js";
+
+import NicoGrid from '@renderer/common/nico-grid.riot';
+import ModalDialog from '@renderer/common/modal-dialog.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;
@@ -43,9 +46,11 @@ const progressDailog = async (modal_dialog, dialog_obs, dailog_params, func) => 
     dialog_obs.trigger("close");
 };
 
-module.exports = {
+export default {
     state:{
-        mylist_description:""
+        mylist_description:"",
+        /** @type {import('@/types/events.js').DialogEmitter} */
+        dialogEmitter: mitt()
     },
 
     /** @type {MyObservable} */
@@ -86,7 +91,13 @@ module.exports = {
         const elm = this.$(".mylist-input");
         elm.value = id;
     },
-    onBeforeMount() {  
+
+    components: {
+        'nico-grid': NicoGrid,
+        'modal-dialog': ModalDialog
+    },
+
+    async onBeforeMount() {  
         this.obs_modal_dialog = new MyObservable();
 
         myapi.ipc.Download.onUpdateItem(async ()=>{
@@ -185,11 +196,6 @@ module.exports = {
             this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
             this.nico_mylist_image_cache.save();
         });
-    },
-    async onMounted() {
-        const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
-        this.nico_mylist_store = new NicoMylistStore(mylist_dir);
-        this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
 
         /**
          * 
@@ -233,9 +239,6 @@ module.exports = {
             }
         };
         this.nico_grid_obs = new MyObservable();
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
-        mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
-
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
             await myapi.ipc.Config.set(nico_grid_name, state);
@@ -294,11 +297,18 @@ module.exports = {
             if(menu_id=="convert-video"){
                 main_obs.trigger("library:convert-video", video_id); 
             }
-        });   
-
-        this.modal_dialog = new ModalDialog(this.root, "mylist-md", {
-            obs:this.obs_modal_dialog
+        }); 
+        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        // this.state.gridData = (`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        this.update({
+            gridData:gridData
         });
+    },
+    async onMounted() {
+        const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
+        this.nico_mylist_store = new NicoMylistStore(mylist_dir);
+        this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
     },
     /**
      * 
@@ -459,18 +469,15 @@ module.exports = {
         }
     },
     async updateMylist() {
-        if(this.modal_dialog.isOpend()){
-            return;
-        }
-        
-        this.obs_modal_dialog.trigger("show", {
-            message: "更新中...",
-            buttons: ["cancel"],
-            cb: ()=>{
-                this.onCancelUpdate();
-            }
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "更新中..."
         });
-        
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            this.onCancelUpdate();
+        });
+
         try {
             const mylist_id = this.getMylistID();
             await this.getMylist(mylist_id);
@@ -489,7 +496,7 @@ module.exports = {
             }
         }
 
-        this.obs_modal_dialog.trigger("close");
+        this.state.dialogEmitter.emit('dialog:close');
     },
     /**
      * 
@@ -511,20 +518,32 @@ module.exports = {
             return;
         }
 
-        await progressDailog(this.modal_dialog, this.obs_modal_dialog,
-            {
-                message:"更新中...",
-                cb:() => { this.onCancelUpdate(); }
-            },
-            async ()=>{
-                this.nico_mylist = new NicoMylist();
-                const mylist = await this.nico_mylist.getMylist(mylist_id);
-                await this.addMylist(mylist); // サイドバーのアイテムに追加
-                await this.setMylist(mylist, false); // データ設定してgird更新
-                this.cacheImage(mylist.mylist_id);
+        this.state.dialogEmitter.emit('dialog:open', {
+            showok: false,
+            showcancel: true,
+            message: "更新中..."
+        });
+        this.state.dialogEmitter.on('dialog:cancel', () => {
+            this.onCancelUpdate();
+        });
+        try {
+            this.nico_mylist = new NicoMylist();
+            const mylist = await this.nico_mylist.getMylist(mylist_id);
+            await this.addMylist(mylist); // サイドバーのアイテムに追加
+            await this.setMylist(mylist, false); // データ設定してgird更新
+            this.cacheImage(mylist.mylist_id);
 
-                this.is_current_fav = true;
-                this.update();
-            });
+            this.is_current_fav = true;
+            this.update();
+        } catch (error) {
+            if(!error.cancel){
+                logger.error(error);
+                await myapi.ipc.Dialog.showMessageBoxOK({
+                    type: "error",
+                    message: error.message
+                });
+            }
+        }
+        this.state.dialogEmitter.emit('dialog:close');
     }
 };

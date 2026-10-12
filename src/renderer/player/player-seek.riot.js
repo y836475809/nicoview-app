@@ -1,10 +1,10 @@
-const { toTimeString } = require("../../lib/time-format");
-const { window_obs } = require("../../lib/my-observable");
+import { toTimeString } from "@lib/time-format.js";
+import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */
 const player_obs = window_obs;
 
-module.exports = {
+export default {
     state:{
         fmt_current:"",
         fmt_duration:""

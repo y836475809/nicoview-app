@@ -13,10 +13,12 @@
         }
     </style>
     
-    <div class="history-grid-container" id="history-nico-grid">
+    <div class="history-grid-container">
+        <nico-grid if={state.gridData} ...{state.gridData}></nico-grid>
     </div>    
 
     <script>
-        export default window.NicoRiot["history.riot.js"];
+        import logic from './history.riot.js';
+        export default logic;
     </script>
 </history>

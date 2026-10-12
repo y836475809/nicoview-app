@@ -1,11 +1,10 @@
 const cheerio = require("cheerio");
-const { fetchGet, fetchPost } = require("./nico-fetch");
-const { getWatchURL } = require("./nico-url");
-const { convToLegacyComments } = require("./nico-data-converter");
-const { logger } = require("./logger");
-const { getQuality } = require("./nico-hls-request");
+import { fetchGet, fetchPost } from "@lib/nico-fetch.js";
+import { getWatchURL } from "@lib/nico-url.js";
+import { convToLegacyComments } from "@lib/nico-data-converter.js";
+import { getQuality } from "@lib/nico-hls-request.js";
 
-class NicoAPI {
+export class NicoAPI {
     getVideo(){
         return this._video;
     }
@@ -137,7 +136,7 @@ class NicoAPI {
     }
 }
 
-class NicoWatch {
+export class NicoWatch {
     constructor() { 
         /** @type {AbortController?} */
         this._abort = null;
@@ -169,7 +168,7 @@ class NicoWatch {
     }
 }
 
-class NicoVideo {
+export class NicoVideo {
     constructor(nico_api, heart_beat_rate=0.9) {
         this._nico_api = nico_api;  
 
@@ -195,7 +194,7 @@ class NicoVideo {
     }
 }
 
-class NicoComment {
+export class NicoComment {
     /**
      * 
      * @param {NicoAPI} nico_api 
@@ -444,7 +443,7 @@ class NicoComment {
     }
 }
 
-class NicoThumbnail {
+export class NicoThumbnail {
     constructor() { 
         /** @type {AbortController?} */
         this._abort = null;
@@ -464,11 +463,3 @@ class NicoThumbnail {
         return uint8Array;
     }
 }
-
-module.exports = {
-    NicoAPI,
-    NicoWatch,
-    NicoVideo,
-    NicoComment,
-    NicoThumbnail,
-};

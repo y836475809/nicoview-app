@@ -1,7 +1,7 @@
-const { FlowComment } = require("./flow-comment");
-const { FixedComment } = require("./fixed-comment");
+import { FlowComment } from "@lib/flow-comment.js";
+import { FixedComment } from "@lib/fixed-comment.js";
 
-class NicoScript {
+export class NicoScript {
     constructor(){
         const scripts = [
             "[@＠]デフォルト",
@@ -102,7 +102,7 @@ class NicoScript {
     }
 }
 
-class CommentOptionParser {
+export class CommentOptionParser {
     constructor(){
         this._default_color = "white";
 
@@ -409,7 +409,7 @@ class TimeLine {
     }
 }
 
-class NicoCommentTimeLine {
+export class NicoCommentTimeLine {
     constructor(parent_elm, duration_sec, row_num, comment_font_family){
         this.parent_elm = parent_elm;
         this.row_num = row_num;
@@ -758,9 +758,3 @@ class NicoCommentTimeLine {
         };
     }
 }
-
-module.exports = {
-    NicoCommentTimeLine,
-    CommentOptionParser,
-    NicoScript
-};

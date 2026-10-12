@@ -3,12 +3,12 @@ import { MouseGesture } from "@lib/mouse-gesture.js";
 import { window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
 
-import Sidebar from '../common/sidebar.riot';
-import DownloadList from './download-list.riot';
-import History from './history.riot';
-import Setting from './setting.riot';
-import Bookmark from './bookmark.riot';
-import PlayStack from './play-stack.riot';
+import Sidebar from '@renderer/common/sidebar.riot';
+import DownloadList from '@renderer/main/download-list.riot';
+import History from '@renderer/main/history.riot';
+import Setting from '@renderer/main/setting.riot';
+import Bookmark from '@renderer/main/bookmark.riot';
+import PlayStack from '@renderer/main/play-stack.riot';
 
 /** @type {MyObservable} */
 const main_obs = window_obs;

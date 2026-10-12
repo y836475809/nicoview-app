@@ -2,20 +2,19 @@
   "name": "nicoview-app",
   "version": "0.19.40",
   "description": "electron製のニコニコ動画閲覧アプリ",
-  "main": "dist-electron/main.js", 
+  "main": "./out/main/main.js", 
   "type": "module",
   "scripts": {
-    "dev:vite": "vite",
-    "dev:electron": "electron . --dev",
-    "build:vite": "vite build",
+    "dev": "electron-vite dev -- --dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
     "lint": "eslint .",
-    "dev": "electron . --dev --mock_server",
-    "preview": "electron . --dev",
+    "dev2": "electron . --dev --mock_server",
     "start-server": "node ./__mock_server__/server.js",
     "main": "electron .",
     "eslint": "eslint ./src/**/*.js ./src/public/*.html ./__tests__/**/*.js ./test/public/*.js ./test/public/*.html || exit 0",
     "test": "ava -v -s",
-    "build": "electron-builder --x64 --dir",
+    "build:win": "electron-vite build && electron-builder --win --dir",
     "build-zip": "electron-builder --x64"
   },
   "author": "y836475809",
@@ -23,20 +22,20 @@
   "devDependencies": {
     "@riotjs/compiler": "^10.0.4",
     "ava": "^5.3.1",
-    "electron": "^29.1.1",
-    "electron-builder": "^24.13.3",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.17.0",
+    "electron-vite": "^5.0.0",
     "eslint": "^10.12.0",
     "eslint-config-riot": "^6.0.1",
     "eslint-plugin-html": "^8.2.1",
     "nock": "^13.5.4",
     "rollup-plugin-riot": "^10.0.0",
     "sinon": "^17.0.1",
-    "vite": "^8.3.2",
-    "vite-plugin-electron": "^1.1.2"
+    "vite": "^7.3.7"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.4.2",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "^1.2.0",
     "electron-log": "^4.4.8",
     "hls.js": "^1.6.15",
     "mitt": "^3.0.1",
@@ -46,23 +45,16 @@
   "build": {
     "appId": "y836475809.app.nicoview-app",
     "directories": {
-      "output": "./build"
+      "output": "dist"
     },
     "files": [
-      "./src/**/*",
-      "./icon/**/*"
-    ],
-    "extraResources": [
-      {
-        "from": "./src/css/user.css",
-        "to": "user.css"
-      }
+      "out/**/*",
+      "package.json"
     ],
     "win": {
-      "icon": "./icon/icon.png",
-      "target": "zip",
-      "sign": null,
-      "signAndEditExecutable": false,
+      "target": ["nsis"],
+      "icon": "icon/icon.ico",
+      "signExecutable": false,
       "verifyUpdateCodeSignature": false
     }
   },

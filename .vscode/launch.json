@@ -7,29 +7,38 @@
             "name": "Electron: Main",
             "cwd": "${workspaceRoot}",
             "outputCapture": "std",
-            "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron",
-            "windows": {
-                "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron.cmd"
-            },
-            "runtimeArgs": [
-                "--remote-debugging-port=9222"
+            "runtimeExecutable": "electron-vite",
+            "args": [
+                "--sourcemap",
+                "--",
+                "--no-sandbox",
+                "--remote-debugging-port=9222",
+                "--dev"
             ],
-            "args" : [
-                "${workspaceFolder}/src/main.js",
-                "--dev",
-                "--mock_server"
-            ],
-            "sourceMaps": true
+            // "runtimeArgs": [
+            //     "--sourcemap",
+            // ],
+            // "env": {
+            //     "REMOTE_DEBUGGING_PORT": "9222"
+            // },
+            // "args" : [
+            //     "--dev",
+            //     // "--mock_server"
+            // ],
+            //"sourceMaps": true
         },
         {
             "name": "Electron: Renderer",
             "type": "chrome",
             "request": "attach",
             "port": 9222,
-            "webRoot": "${workspaceRoot}",
+            "webRoot": "${workspaceFolder}/src/renderer",
             "outputCapture": "std",
-            "timeout": 10000,
+            "timeout": 60000,
             "sourceMaps": true,
+            "presentation": {
+                "hidden": true
+            }
         },
         {
             "type": "node",
@@ -61,10 +70,13 @@
         {
             "name": "Electron: All",
             "configurations": [
-                "MockServer",
+                // "MockServer",
                 "Electron: Main",
                 "Electron: Renderer"
             ],
+            "presentation": {
+                "order": 1
+            },
             "stopAll": true
         }
     ]

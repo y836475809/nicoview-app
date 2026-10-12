@@ -10,7 +10,7 @@
       "paths": {
         "@/*": ["./*"],
         "@lib/*": ["./src/lib/*"],
-        "@renderer/*": ["./src/renderer/*"],
+        "@renderer/*": ["./src/renderer/src/*"],
       }
     },
     "include": [

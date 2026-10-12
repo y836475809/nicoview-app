@@ -2,7 +2,7 @@
 build/
 node_modules/
 dist/
-dist-electron/
+out/
 tmp/
 __dev__
 __mock_server__/data/hls/

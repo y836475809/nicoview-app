@@ -20,7 +20,7 @@ import {
     selectFolder } from "@lib/util.js";
 import { fileURLToPath } from 'url';
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 setupDev();
 
@@ -188,7 +188,7 @@ const createMainWindow = () => {
         webSecurity: false, // TODO
         nodeIntegration: true, // TODO
         contextIsolation: false, // TODO
-        preload: path.join(__dirname, 'preload.mjs'),
+        preload: path.join(__dirname, '../preload/preload.mjs'),
         spellcheck: false,
         sandbox: false
     };
@@ -263,7 +263,7 @@ const createMainWindow = () => {
     });
 
     // アプリケーションのindex.htmlの読み込み
-    main_win.loadURL('http://localhost:5173/src/index.html'); // Viteのデフォルトポート
+    main_win.loadURL('http://localhost:5173/index.html'); // Viteのデフォルトポート
     // main_win.loadURL(path.join(__dirname, 'dist', 'index.html?window=main'));
 
     if(config.get("open_devtools", false)){
@@ -313,7 +313,7 @@ const createPlayerWindow = () => {
             webSecurity: false, // TODO
             nodeIntegration: true, // TODO
             contextIsolation: false, // TODO
-            preload: path.join(__dirname, 'preload.mjs'),
+            preload: path.join(__dirname, '../preload/preload.mjs'),
             spellcheck: false,
             sandbox: false
         };
@@ -344,7 +344,7 @@ const createPlayerWindow = () => {
             resolve(null);
         });
 
-        player_win.loadURL('http://localhost:5173/src/player.html'); 
+        player_win.loadURL('http://localhost:5173/player.html'); 
         player_win.webContents.openDevTools();
         // player_win.loadURL(path.join(__dirname, 'dist', 'player.html?window=player'));
 
@@ -696,7 +696,8 @@ function setupDev(){
     // const isDev = !!process.env.VITE_DEV_SERVER_URL;
     if(process.argv.find((arg) => arg === '--dev')){
         app.setName("nicoview-app-dev");
-        const userDataDir = path.join(path.dirname(__dirname), '__dev__', 'userData');
+        const userDataDir = path.join(path.dirname(__dirname), '../__dev__/userData');
+        console.log('userDataDir=', userDataDir);
         app.setPath("userData", userDataDir);
     }
     if(process.argv.find((arg) => arg === '--mock_server')){

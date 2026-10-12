@@ -9,7 +9,7 @@ import { ScheduledTask } from "@lib/scheduled-task.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
 
-import DownloadSchedule from './download-schedule.riot';
+import DownloadSchedule from '@renderer/main/download-schedule.riot';
 import NicoGrid from '@renderer/common/nico-grid.riot';
 
 /** @type {MyObservable} */

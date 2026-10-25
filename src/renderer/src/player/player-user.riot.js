@@ -1,5 +1,3 @@
-import {myapi} from "@lib/my-api.js";
-import {Command} from "@lib/command.js";
 import * as NicoURL from "@lib/nico-url.js";
 import { toTimeSec } from "@lib/time-format.js";
 import { window_obs } from "@lib/my-observable.js";
@@ -75,10 +73,10 @@ export default {
         const paths = elm.href.split("/");
         const video_id = paths.pop();
 
-        Command.play({
-            video_id : video_id,
-            time : 0
-        }, false);
+        // Command.play({
+        //     video_id : video_id,
+        //     time : 0
+        // }, false);
         return false;
     },
     /**
@@ -96,10 +94,10 @@ export default {
         const video_id = paths.pop();
         
         if(e.button === 2){ 
-            await myapi.ipc.popupContextMenu("player-watch-link", {
-                video_id: video_id,
-                url: e.target.href
-            });
+            // await myapi.ipc.popupContextMenu("player-watch-link", {
+            //     video_id: video_id,
+            //     url: e.target.href
+            // });
         }      
         return false;
     },
@@ -108,14 +106,16 @@ export default {
      * @param {Event} e 
      * @returns {boolean}
      */
-    mylistLinkClick(e) {
+    async mylistLinkClick(e) {
         e.preventDefault(); 
         e.stopPropagation();
         
         /** @type {HTMLLinkElement} */
         const elm = e.target;
         const mylist_id = NicoURL.getMylistID(elm.href);
-        myapi.ipc.MyList.load(mylist_id);
+        // myapi.ipc.MyList.load(mylist_id);
+        // TODO
+        await window.electronAPI.invoke('mylist:loadPage', mylist_id);
         return false;
     },
     /**
@@ -131,10 +131,10 @@ export default {
         const elm = e.target;
         const mylist_id = NicoURL.getMylistID(elm.href);
         if(e.button === 2){
-            await myapi.ipc.popupContextMenu("player-mylist-link", {
-                mylist_id: mylist_id,
-                url: e.target.href
-            });
+            // await myapi.ipc.popupContextMenu("player-mylist-link", {
+            //     mylist_id: mylist_id,
+            //     url: e.target.href
+            // });
         }
         return false;
     },
@@ -150,9 +150,9 @@ export default {
         /** @type {HTMLLinkElement} */
         const elm = e.target;
         if(e.button === 2){
-            await myapi.ipc.popupContextMenu("player-link", {
-                url: elm.href
-            });
+            // await myapi.ipc.popupContextMenu("player-link", {
+            //     url: elm.href
+            // });
         }
         return false;
     },
@@ -213,10 +213,10 @@ export default {
         });
     },
     async setupUserIconCache(){
-        this.user_icon_cache_enable = await myapi.ipc.UserIconCache.enable();
-        if(!this.user_icon_cache_enable){
-            return;
-        }
+        // this.user_icon_cache_enable = await myapi.ipc.UserIconCache.enable();
+        // if(!this.user_icon_cache_enable){
+        //     return;
+        // }
 
         this.$(".user-thumbnail").onload = async (e) => {
             if(!this.is_saved){
@@ -225,9 +225,9 @@ export default {
             /** @type {HTMLImageElement} */
             const img = e.target;
             try {
-                if(!await myapi.ipc.UserIconCache.has(img.src)){
-                    myapi.ipc.UserIconCache.set(img.src, getBase64(img)); 
-                }
+                // if(!await myapi.ipc.UserIconCache.has(img.src)){
+                //     myapi.ipc.UserIconCache.set(img.src, getBase64(img)); 
+                // }
             } catch (error) {
                 logger.debug(`user_icon_cache.set, url=${img.src}, error=${error}`);
             }
@@ -244,11 +244,12 @@ export default {
 
         this.current_user_icon_url = url;
         
-        if(this.is_saved && this.user_icon_cache_enable){         
-            this.state.user_thumbnail_url = await myapi.ipc.UserIconCache.get(url);
-        }else{
-            this.state.user_thumbnail_url = url;
-        }
+        // if(this.is_saved && this.user_icon_cache_enable){         
+        //     this.state.user_thumbnail_url = await myapi.ipc.UserIconCache.get(url);
+        // }else{
+        //     this.state.user_thumbnail_url = url;
+        // }
+        this.state.user_thumbnail_url = url;
         this.update();
     },
     async onclickPopupDescription(e) { // eslint-disable-line no-unused-vars
@@ -287,22 +288,22 @@ export default {
     async popupDescriptionMenu(type, text) {
         if(type=="watch"){
             const video_id = text;
-            await myapi.ipc.popupContextMenu("player-watch-link", {
-                video_id: video_id,
-                url: NicoURL.getWatchURL(video_id)
-            });
+            // await myapi.ipc.popupContextMenu("player-watch-link", {
+            //     video_id: video_id,
+            //     url: NicoURL.getWatchURL(video_id)
+            // });
         }
         if(type=="mylist" || type=="user"){
             const mylist_id = text;
-            await myapi.ipc.popupContextMenu("player-mylist-link", {
-                mylist_id: mylist_id,
-                url: NicoURL.getMylistURL(mylist_id)
-            });
+            // await myapi.ipc.popupContextMenu("player-mylist-link", {
+            //     mylist_id: mylist_id,
+            //     url: NicoURL.getMylistURL(mylist_id)
+            // });
         }
         if(type=="text"){
-            await myapi.ipc.popupContextMenu("player-text", {
-                text: text
-            });
+            // await myapi.ipc.popupContextMenu("player-text", {
+            //     text: text
+            // });
         }
     },
     async oncontextmenu(e) {
@@ -337,6 +338,7 @@ export default {
         if(!this.user_id){
             return;
         }
-        myapi.ipc.MyList.load(`user/${this.user_id}`);
+        //TODO
+        // myapi.ipc.MyList.load(`user/${this.user_id}`);
     }
 };

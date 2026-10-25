@@ -1,5 +1,6 @@
 
-const cheerio = require("cheerio");
+// const cheerio = require("cheerio");
+import * as cheerio from 'cheerio';
 
 /**
  * 
@@ -163,6 +164,8 @@ export const json_thumb_info = (nico_api) => {
             mylistCount: video.count.mylist, 
             video_type: video.videoType
         },
+        is_deleted: false,
+        is_economy: false,
         thread: {
             commentCount: video.count.comment
         },
@@ -200,8 +203,8 @@ export const json_comment = (json_str) => {
 
 /**
  * 
- * @param {CommentChatData[]} chats 
- * @returns {CommentItem[]}
+ * @param {CommentChat[]} chats 
+ * @returns {Chat[]}
  */
 export const makeComments = (chats) => {
     const comments = chats.filter(value => {

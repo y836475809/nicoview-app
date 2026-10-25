@@ -1,7 +1,5 @@
-import {myapi} from "@lib/my-api.js";
 import { MouseGesture } from "@lib/mouse-gesture.js";
 import { window_obs } from "@lib/my-observable.js";
-import { logger } from "@lib/logger.js";
 
 import Sidebar from '@renderer/common/sidebar.riot';
 import DownloadList from '@renderer/main/download-list.riot';
@@ -45,7 +43,7 @@ export default {
 
     async onBeforeMount() {
         this.mouse_gesture = new MouseGesture();
-        this.mouse_gesture.enable = await myapi.ipc.Config.get("use_mouse_gesture", true);
+        this.mouse_gesture.enable = true;
         main_obs.on("main:update-mousegesture-config", (args)=>{
             const { use_mouse_gesture } = args;
             this.mouse_gesture.enable = use_mouse_gesture;
@@ -53,10 +51,6 @@ export default {
 
         this.mouse_gesture.onGesture((gesture)=>{
             const dir = this.mouse_gesture.gesture;
-            if(gesture == dir.up){
-                myapi.ipc.showyPlayer();
-                return;
-            }
             const items = [...this.$$(".page-container.left > *")];
             const cu_index = items.findIndex(item=>{
                 return item.style.zIndex > 0;
@@ -73,13 +67,11 @@ export default {
             }
         });
 
-        myapi.ipc.Download.onUpdateItem(async ()=>{
-            await this.updateDownloadBadge();
+        window.electronAPI.on('download:addMark', async (videoId, mark) => {
+            this.updateDownloadBadge();
         });
-
-        myapi.ipc.Setting.onChangeLogLevel((args) => {
-            const { level } = args;
-            logger.setLevel(level);
+        window.electronAPI.on('download:deleteMark', async (videoId, mark) => {
+            this.updateDownloadBadge();
         });
 
         main_obs.on("main:select-page", (
@@ -87,39 +79,24 @@ export default {
             this.select_page(page_name);
         });  
 
-        myapi.ipc.Search.onSearchTag((args)=>{
-            main_obs.trigger("main:select-page", "search");
-            main_obs.trigger("search:search-tag", args);
-        });
+        // myapi.ipc.Search.onSearchTag((args)=>{
+        //     main_obs.trigger("main:select-page", "search");
+        //     main_obs.trigger("search:search-tag", args);
+        // });
 
-        myapi.ipc.MyList.onLoad((args)=>{
+        // myapi.ipc.MyList.onLoad((args)=>{
+        //     main_obs.trigger("main:select-page", "mylist");
+        //     main_obs.trigger("mylist:load-mylist", args);
+        // });
+        window.electronAPI.on('mylist:loadPage', (mylistId) => {
             main_obs.trigger("main:select-page", "mylist");
-            main_obs.trigger("mylist:load-mylist", args);
+            main_obs.trigger("mylist:load-mylist", mylistId);
         });
-
-        myapi.ipc.Download.onAddItems((args)=>{
-            const items = args;
-            main_obs.trigger("download:add-download-items", items);
-        });
-        myapi.ipc.Download.onDeleteItems((args)=>{
-            const items = args;
-            main_obs.trigger("download:delete-download-items", items);
-        });
-
-        myapi.ipc.Stack.onAddItems((args)=>{
-            main_obs.trigger("play-stack:add-items", args);
-        });
-
-        myapi.ipc.Bookmark.onAddItems((args)=>{
-            const bk_items = args;
-            main_obs.trigger("bookmark:add-items", bk_items);
-        });
-
-        myapi.ipc.Library.onSearch((args)=>{
-            const { query } = args;
-            main_obs.trigger("main:select-page", "library");
-            main_obs.trigger("library:search", query);
-        });
+        // myapi.ipc.Library.onSearch((args)=>{
+        //     const { query } = args;
+        //     main_obs.trigger("main:select-page", "library");
+        //     main_obs.trigger("library:search", query);
+        // });
     },
     async onMounted() {
         this.select_page("library");
@@ -142,7 +119,8 @@ export default {
         this.mouse_gesture.mouseUp(e);
     },
     async updateDownloadBadge() {
-        const video_ids = await  myapi.ipc.Download.getIncompleteIDs();
+        const video_ids = await window.electronAPI.invoke('download:getMarkedIds');
+
         const elm = this.$(".download-badge > .item-num");
         if(video_ids.length === 0){
             elm.style.display = "none";

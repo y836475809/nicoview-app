@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+import fs from 'fs';
+import path  from 'path';
 import * as NicoDataParser from "@lib/nico-data-parser.js";
 
 export class NicoDataFile {
@@ -23,7 +23,7 @@ export class NicoDataFile {
 
     /**
      * 
-     * @returns {CommentItem[]}
+     * @returns {Chat[]}
      */
     getComments() {
         throw Error("not implement getComments");
@@ -147,7 +147,7 @@ export class NicoXMLFile extends NicoDataFile {
 
     /**
      * 
-     * @returns {CommentItem[]} comments 
+     * @returns {Chat[]} comments 
      */
     getComments() {
         const {chats} = this.getCommentData();
@@ -229,7 +229,7 @@ export class NicoJsonFile extends NicoDataFile {
 
     /**
      * 
-     * @returns {CommentItem[]}
+     * @returns {Chat[]}
      */
     getComments() {
         const {chats} = this.getCommentData();
@@ -411,3 +411,37 @@ export const getCommonNameFromFilename = (finename) => {
     }
     return match[1];
 };
+
+/**
+ * 
+ * @param {LibraryItem} item 
+ * @returns {PlayData}
+ */
+export function getPlayDataFromLibrary(item){
+    /** @type {NicoDataFile|null} */
+    let nico_data = null;
+    const data_type = item.data_type;
+    if(data_type=="xml"){
+        nico_data = new NicoXMLFile(item.video_id);
+    } else if(data_type=="json"){
+        nico_data = new NicoJsonFile(item.video_id);
+    }else{
+        throw new Error(`${data_type} is unkown`);
+    }
+    nico_data.dirPath = item.dirpath;
+    nico_data.commonFilename = item.common_filename;
+    nico_data.videoType = item.video_type;
+    nico_data.thumbnailSize = item.thumbnail_size;
+    nico_data.is_deleted = item.is_deleted;
+    nico_data.is_economy = item.is_economy;
+    const thumb_info = nico_data.getThumbInfo();
+    const thumPpath = nico_data.thumbImgPath;
+    thumb_info.video.thumbnailURL = thumPpath;
+    thumb_info.video.largeThumbnailURL = thumPpath;
+    return {
+        sourceUrl: nico_data.videoPath,
+        thumbInfo: thumb_info,
+        comments: nico_data.getComments(),
+    }
+}
+

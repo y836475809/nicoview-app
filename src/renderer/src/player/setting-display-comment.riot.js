@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */
@@ -37,9 +36,7 @@ export default {
         });
     },
     async onMounted() {
-        /** @type {CommentConfig} */
-        const comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
-        
+        const comment_config = (await window.electronAPI.invoke('config:get')).comment;
         this.setup("duration", this.duration_items, comment_config.duration_sec);
         this.setup("fps", this.fps_items, comment_config.fps);
 
@@ -60,9 +57,9 @@ export default {
      * @param {boolean} is_trigger 
      */
     async changeConfig(name, value, is_trigger=true){
-        const comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
+        const comment_config = (await window.electronAPI.invoke('config:get')).comment;
         comment_config[name] = value;
-        await myapi.ipc.Config.set(`comment.${name}`, value);
+        await window.electronAPI.invoke('config:set', 'comment', comment_config);
         if(is_trigger){
             player_obs.trigger("player-video:update-comment-display-params", comment_config);
         }
@@ -91,7 +88,9 @@ export default {
         /** @type {HTMLInputElement} */
         const elm = e.target;
         const do_limit = elm.checked;
-        await myapi.ipc.Config.set("comment.do_limit", do_limit);
+        const comment_config = (await window.electronAPI.invoke('config:get')).comment;
+        comment_config.do_limit = elm.checked;
+        await window.electronAPI.invoke('config:set', 'comment', comment_config);
         player_obs.trigger("player-main:update-comment-display-limit", {do_limit});
     },
     async onclickAutoSyncCheck(e) {

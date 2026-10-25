@@ -1,12 +1,9 @@
-const { ipcRenderer } = require("electron");
 import mitt from 'mitt';
 import Hls from "hls.js";
-import {myapi} from "@lib/my-api.js";
 import { NicoCommentTimeLine, NicoScript } from "@lib/nico-comment-timeline.js";
 import { window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
 import * as NicoHls from "@lib/nico-hls-request.js";
-import { fetchContentUrl } from "@lib/nico-fetch.js";
 
 import ModalDialog from '@renderer/common/modal-dialog.riot';
 
@@ -19,12 +16,9 @@ export default {
         dialogEmitter: mitt()
     },
 
+    /** @type {Hls|null} */
     _hls: null,
     _hls_tmp_dir:"",
-    /** @type {MyObservable} */
-    // obs_modal_dialog:null,
-    /** @type {ModalDialog} */
-    // modal_dialog:null,
 
     /** @type {HTMLVideoElement} */
     video_elm:null,
@@ -45,9 +39,6 @@ export default {
     },
 
     async onBeforeMount() {
-        // this.obs_modal_dialog = new MyObservable();
-        this._hls_tmp_dir = await ipcRenderer.invoke("get-temp-path");
-        
         player_obs.on("player-video:set-play-data-library", async(data) => {
             this.state.dialogEmitter.emit('dialog:close');
             this.state.dialogEmitter.emit('dialog:open', {
@@ -71,12 +62,6 @@ export default {
             this.video_elm.load();
         });
         player_obs.on("player-video:set-play-data-online", async(data) => {
-            this.state.dialogEmitter.emit('dialog:close');
-            this.state.dialogEmitter.emit('dialog:open', {
-                showok: false,
-                showcancel: false,
-                message: "動画取得中..."
-            });
             await this.initVideo();
             this.video_elm.pause();
 
@@ -89,22 +74,14 @@ export default {
 
             this.play_data = data;
             this.createTimeLine(this.play_data.comments);
-
-            const nico_api = this.play_data.nico_api;
-            const domand = nico_api.domand;
-            const watchTrackId = nico_api.watchTrackId;
-            const accessRightKey = domand.accessRightKey;
-            const video_id = this.play_data.video_id;
-            this.state.dialogEmitter.emit('dialog:update-message', {
-                message: 'ContentUrl取得'
-            });
-            const content_url = await fetchContentUrl(video_id, watchTrackId, accessRightKey, domand); 
+ 
+            const {src, type} = this.play_data.video_elem_prop;
             const config = {
                 loader: NicoHls.NicoCustomLoader,
             };
             this._hls = new Hls(config);
             this._hls.on(Hls.Events.MEDIA_ATTACHED, ()=>{ 
-                this._hls.loadSource(content_url);
+                this._hls.loadSource(src);
             });
             this._hls.attachMedia(this.video_elm);
         });
@@ -126,12 +103,11 @@ export default {
         if(this.video_elm){
             return;
         }
-
-        const default_comment_config = await player_obs.triggerReturn("setting-display-comment:get-default-commnet-config");
-        this.comment_config = await myapi.ipc.Config.get("comment", default_comment_config);
+        const config = await window.electronAPI.invoke('config:get');
+        this.comment_config = config.comment
         
         this.video_elm = this.$(".video-screen > video");
-        this.video_elm.volume = await myapi.ipc.Config.get("player.volume", 0.5);
+        this.video_elm.volume = config.player.volume;
 
         this.video_elm.addEventListener("loadedmetadata", (event) => { // eslint-disable-line no-unused-vars
             player_obs.trigger("player-seek:reload", this.video_elm.duration);

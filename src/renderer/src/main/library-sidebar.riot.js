@@ -1,4 +1,4 @@
-import {myapi} from "@lib/my-api.js";
+// import {myapi} from "@lib/my-api.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 
 import Listview from '@renderer/common/listview.riot';
@@ -61,7 +61,7 @@ export default {
         this.obs_listview.on("changed", async (args) => {
             /** @type {{items:LibrarySearchItem[]}} */
             const { items } = args;
-            await myapi.ipc.Library.updateSearchItems(items);
+            await window.electronAPI.invoke('library:updateSearchItems', items);
         });
 
         main_obs.on("library:sidebar:add-search-item", (args) => {
@@ -74,7 +74,7 @@ export default {
         });
     },
     async onMounted() {
-        const items = await myapi.ipc.Library.getSearchItems();
+        const items = await window.electronAPI.invoke('library:getSearchItems');
         this.obs_listview.trigger("loadData", { items });
     }
 };

@@ -1,4 +1,4 @@
-import {myapi} from "@lib/my-api.js";
+// import {myapi} from "@lib/my-api.js";
 import {ListviewDragDrop} from "@renderer/common/listview-drag-drop.js";
 
 const default_icon = "fas fa-square listview-item-default-icon";
@@ -209,10 +209,11 @@ export default {
         if(this.confirm.includes("delete") === false){
             return true;
         }
-        const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
-            type: "info",
-            message: "削除しますか?"
-        });
+        // const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
+        //     type: "info",
+        //     message: "削除しますか?"
+        // });
+        const ret = await window.electronAPI.invoke('showMsgBox', 'okCancel', '削除しますか?');
         return ret;
     },
     /**
@@ -351,13 +352,13 @@ export default {
             if(this.obs.hasReturnEvent("show-contextmenu")){
                 await this.obs.triggerReturn("show-contextmenu", e, { items });
             }else{
-                const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
-                if(menu_id=="toggle-mark"){
-                    items.forEach(item => {
-                        item.marked = !item.marked;
-                    });
-                    this.updateItemIcon();
-                }
+                // const menu_id = await myapi.ipc.popupContextMenu("listview-toggle-mark");
+                // if(menu_id=="toggle-mark"){
+                //     items.forEach(item => {
+                //         item.marked = !item.marked;
+                //     });
+                //     this.updateItemIcon();
+                // }
             }
             this.contextmenu_show = false;
         }

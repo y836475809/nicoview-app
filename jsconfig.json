@@ -3,12 +3,15 @@
       "target": "ESNext",
       "module": "NodeNext",
       "moduleResolution": "NodeNext",
+      "esModuleInterop": true,
       "allowSyntheticDefaultImports": true,
       "strict": true,
       "checkJs": true,
       "skipLibCheck": true,
+      "strictNullChecks": true,
       "paths": {
         "@/*": ["./*"],
+        "@main/*": ["./src/main/*"],
         "@lib/*": ["./src/lib/*"],
         "@renderer/*": ["./src/renderer/src/*"],
       }

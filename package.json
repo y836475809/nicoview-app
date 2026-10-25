@@ -2,14 +2,13 @@
   "name": "nicoview-app",
   "version": "0.19.40",
   "description": "electron製のニコニコ動画閲覧アプリ",
-  "main": "./out/main/main.js", 
+  "main": "./out/main/main.js",
   "type": "module",
   "scripts": {
-    "dev": "electron-vite dev -- --dev",
+    "dev": "electron-vite dev -- --dev --mock_server",
     "build": "electron-vite build",
     "preview": "electron-vite preview",
     "lint": "eslint .",
-    "dev2": "electron . --dev --mock_server",
     "start-server": "node ./__mock_server__/server.js",
     "main": "electron .",
     "eslint": "eslint ./src/**/*.js ./src/public/*.html ./__tests__/**/*.js ./test/public/*.js ./test/public/*.html || exit 0",
@@ -37,7 +36,7 @@
     "@fortawesome/fontawesome-free": "^6.4.2",
     "cheerio": "^1.2.0",
     "electron-log": "^4.4.8",
-    "hls.js": "^1.6.15",
+    "hls.js": "1.6.15",
     "mitt": "^3.0.1",
     "riot": "^9.1.4",
     "sql.js": "^1.8.0"
@@ -52,7 +51,9 @@
       "package.json"
     ],
     "win": {
-      "target": ["nsis"],
+      "target": [
+        "nsis"
+      ],
       "icon": "icon/icon.ico",
       "signExecutable": false,
       "verifyUpdateCodeSignature": false

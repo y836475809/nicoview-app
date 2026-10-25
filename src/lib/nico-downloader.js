@@ -1,9 +1,9 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path  from 'path';
 import { NicoWatch, NicoComment, NicoThumbnail } from "@lib/niconico.js";
 import { NicoJsonFile } from "@lib/nico-data-file.js";
 import * as NicoDataParser from "@lib/nico-data-parser.js";
-import * as NicoHls from "@lib/nico-hls-request.js";
+import * as NicoHls from "@lib/nico-hls-download.js";
 
 export const DonwloadProgMsg =  Object.freeze({   
     start_watch: "watch取得",
@@ -54,6 +54,11 @@ export class NicoDownloader {
         }         
     }
 
+    /**
+     * 
+     * @param {(message:string)=>void} on_progress 
+     * @returns 
+     */
     async download(on_progress){
         try {
             if(this.ffmpeg_path == ""){

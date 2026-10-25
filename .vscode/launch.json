@@ -9,23 +9,14 @@
             "outputCapture": "std",
             "runtimeExecutable": "electron-vite",
             "args": [
+                "dev",
                 "--sourcemap",
                 "--",
                 "--no-sandbox",
                 "--remote-debugging-port=9222",
-                "--dev"
-            ],
-            // "runtimeArgs": [
-            //     "--sourcemap",
-            // ],
-            // "env": {
-            //     "REMOTE_DEBUGGING_PORT": "9222"
-            // },
-            // "args" : [
-            //     "--dev",
-            //     // "--mock_server"
-            // ],
-            //"sourceMaps": true
+                "--dev",
+                "--mock_server"
+            ]
         },
         {
             "name": "Electron: Renderer",
@@ -70,9 +61,9 @@
         {
             "name": "Electron: All",
             "configurations": [
-                // "MockServer",
+                "MockServer",
                 "Electron: Main",
-                "Electron: Renderer"
+                "Electron: Renderer",
             ],
             "presentation": {
                 "order": 1

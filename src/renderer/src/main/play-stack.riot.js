@@ -1,5 +1,3 @@
-import {myapi} from "@lib/my-api.js";
-import {Command} from "@lib/command.js";
 import { toTimeString } from "@lib/time-format.js";
 import { window_obs } from "@lib/my-observable.js";
 
@@ -23,18 +21,8 @@ export default {
             const time = item.time?item.time:0;
             return toTimeString(time);
         };
-
-        main_obs.on("play-stack:add-items", async (args) => {
-            /** @type {{items:StackItem[]}} */
-            const { items } = args;
-
-            this.addItems(items);
-
-            const cp_items = JSON.parse(JSON.stringify(this.state.items));
-            cp_items.forEach(item => {
-                delete item.state;
-            });
-            await myapi.ipc.Stack.updateItems(cp_items);
+        window.electronAPI.on('stack:additem', async (item) => {
+            this.addItems([item]);
         });
 
         this.getItemClass = (item) => {
@@ -45,7 +33,7 @@ export default {
         const prop = getComputedStyle(this.root).getPropertyValue("--item-duration");
         this.item_duration = parseInt(prop);
 
-        const items = await myapi.ipc.Stack.getItems();
+        const items = await window.electronAPI.invoke('stack:getItems');
         this.state.items = items.concat(this.state.items);
         this.update();
     }, 
@@ -73,7 +61,7 @@ export default {
      * @param {Event} e 
      */
     onclickItem(item, e) { // eslint-disable-line no-unused-vars
-        Command.play(item, false);
+        window.electronAPI.invoke('player:play', item.video_id, false)
     },
     /**
      * 
@@ -84,7 +72,7 @@ export default {
         this.state.items[i].state = "stack-item-hide-anime";
         this.update();
 
-        setTimeout(() => { 
+        setTimeout(async () => { 
             this.state.items.splice(i, 1);
             this.state.items.forEach(item=>{
                 item.state = "";
@@ -95,7 +83,7 @@ export default {
             cp_items.forEach(item => {
                 delete item.state;
             });
-            myapi.ipc.Stack.updateItems(cp_items).then();
+            await window.electronAPI.invoke('stack:saveItems', cp_items);
         }, this.item_duration);   
     }
 };

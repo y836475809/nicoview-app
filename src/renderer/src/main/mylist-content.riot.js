@@ -1,50 +1,29 @@
 import mitt from 'mitt';
-import {myapi} from "@lib/my-api.js";
 import { infoFormatter, wrapFormatter } from "@renderer/common/nico-grid-formatter.js";
 import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
-import { Command } from "@lib/command.js";
-import { NicoMylist, NicoMylistStore, NicoMylistImageCache } from "@lib/nico-mylist.js";
-import { needConvertVideo } from "@lib/video-converter.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
 
 import NicoGrid from '@renderer/common/nico-grid.riot';
 import ModalDialog from '@renderer/common/modal-dialog.riot';
 
+const needConvertVideo = (value) => {
+    let video_type = "";
+    if(typeof value == "string"){
+        video_type = value;
+    }else if(value===null){
+        return false;
+    }else{
+        video_type = value.video_type;
+    }
+
+    return /mp4/.test(video_type)!==true;
+};
+
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
 const nico_grid_name = "mylist-nico-grid";
-
-/**
- * @param {ModalDialog} modal_dialog 
- * @param {MyObservable} dialog_obs 
- * @param {{message: String, cb:Function}} dailog_params
- * @param {()=>void} func 
- * @returns 
- */
-const progressDailog = async (modal_dialog, dialog_obs, dailog_params, func) => {
-    if(modal_dialog.isOpend()){
-        return;
-    }
-    dialog_obs.trigger("show", {
-        message: dailog_params.message,
-        buttons: ["cancel"],
-        cb: dailog_params.cb
-    });
-    try {
-        await func();
-    } catch (error) {
-        if(!error.cancel){
-            logger.error(error);
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: error.message
-            });
-        }
-    }
-    dialog_obs.trigger("close");
-};
 
 export default {
     state:{
@@ -52,21 +31,6 @@ export default {
         /** @type {import('@/types/events.js').DialogEmitter} */
         dialogEmitter: mitt()
     },
-
-    /** @type {MyObservable} */
-    obs_modal_dialog:null,
-
-    /** @type {ModalDialog} */
-    modal_dialog:null,
-
-    /** @type {NicoMylistImageCache} */
-    nico_mylist_image_cache:null,
-
-    /** @type {NicoMylistStore} */
-    nico_mylist_store:null,
-
-    /** @type {NicoMylist} */
-    nico_mylist:null,
 
     /** @type {string} */
     loaded_mylist_id:null,
@@ -98,38 +62,54 @@ export default {
     },
 
     async onBeforeMount() {  
-        this.obs_modal_dialog = new MyObservable();
-
-        myapi.ipc.Download.onUpdateItem(async ()=>{
-            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
-            const items = await this.nico_grid_obs.triggerReturn("get-items");
-            for (let i=0; i<items.length; i++) {
-                const item = items[i];
-                const video_id = item.video_id;
-                item.saved = await myapi.ipc.Library.hasItem(video_id);
-                item.reg_download = video_ids.includes(video_id);
-                this.nico_grid_obs.trigger("update-item", {
-                    id: video_id,
-                    props: item
-                });    
-            }
-        });
-
-        myapi.ipc.Library.onAddItem((args) => {
-            const {video_item} = args;
-            const video_id = video_item.video_id;
+        window.electronAPI.on('library:addItem', (item) => {
+            const video_id = item.video_id;
             this.nico_grid_obs.trigger("update-item", {
                 id: video_id,
                 props: { saved: true }
             });
         });
 
-        myapi.ipc.Library.onDeleteItem((args) => {
-            const { video_id } = args;
+        window.electronAPI.on('library:deleteItem', (item) => {
+            const video_id = item.video_id;
             this.nico_grid_obs.trigger("update-item", {
                 id: video_id,
                 props: { saved: false }
             });
+        });
+        window.electronAPI.on('download:addMark', async(videId, mark) => {
+            const items = await this.nico_grid_obs.triggerReturn("get-items");
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
+                const video_id = item.video_id;
+                if(mark==='downloaded'){
+                    item.saved = true;
+                }
+                if(mark==='reg'){
+                    item.reg_download = true;
+                }
+                this.nico_grid_obs.trigger("update-item", {
+                    id: video_id,
+                    props: item
+                });    
+            }
+        });
+        window.electronAPI.on('download:deleteMark', (videId, mark) => {
+            const items = this.nico_grid_obs.triggerReturn("get-items");
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
+                const video_id = item.video_id;
+                if(mark==='downloaded'){
+                    item.saved = false;
+                }
+                if(mark==='reg'){
+                    item.reg_download = false;
+                }
+                this.nico_grid_obs.trigger("update-item", {
+                    id: video_id,
+                    props: item
+                });    
+            }
         });
 
         main_obs.on("mylist:item-dlbclicked", async (item) => {
@@ -139,15 +119,12 @@ export default {
                 await this.updateMylist();
             }else{
                 try {
-                    const mylist = this.nico_mylist_store.load(mylist_id);
+                    const mylist = await window.electronAPI.invoke('mylist:getPage', mylist_id)
                     this.setMylistID(mylist_id);
                     await this.setMylist(mylist); 
                 } catch (error) {
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBoxOK({
-                        type: "error",
-                        message: error.message
-                    });
+                    await window.electronAPI.invoke('showErrorMsgBox', error.message);
                 }
             }
         });
@@ -156,7 +133,7 @@ export default {
             this.setMylistID(mylist_id);
             try {
                 if(await this.existMylist(mylist_id)){
-                    await this.setMylist(this.nico_mylist_store.load(mylist_id)); 
+                    await this.setMylist(await window.electronAPI.invoke('mylist:getPage', mylist_id)); 
                 }else{
                     await this.getMylist(mylist_id);
                 }
@@ -164,10 +141,7 @@ export default {
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBoxOK({
-                        type: "error",
-                        message: error.message
-                    });
+                    await window.electronAPI.invoke('showErrorMsgBox', error.message);
                 }
             }   
         });
@@ -177,8 +151,7 @@ export default {
             const { items } = args;
             items.forEach(item => {
                 const mylist_id = item.mylist_id;
-                this.nico_mylist_store.delete(mylist_id);
-                this.nico_mylist_image_cache.delete(mylist_id);
+                window.electronAPI.invoke('mylist:deletPage', mylist_id);
             }); 
 
             const mylist_id = this.getMylistID();
@@ -193,8 +166,7 @@ export default {
 
         window.addEventListener("beforeunload", async (event) => { // eslint-disable-line no-unused-vars
             const mylist_id_list = await this.getMylistIDList();
-            this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
-            this.nico_mylist_image_cache.save();
+            window.electronAPI.invoke('mylist:saveImageCache', mylist_id_list);
         });
 
         /**
@@ -204,11 +176,12 @@ export default {
          * @param {object} data 
          * @returns 
          */
-        const imageCacheFormatter = (id, value, data)=> {
+        const imageCacheFormatter = async (id, value, data)=> {
             /** @type {string} */
             const mylist_id = data.mylist_id;
             const url = value;
-            return `<div class="mylist-grid-img-holder">${this.nico_mylist_image_cache.getImageHtml(mylist_id, url)}</div>`;
+            const html = await window.electronAPI.invoke('mylist:getImageHtml', mylist_id, url);
+            return `<div class="mylist-grid-img-holder">${html}</div>`;
         };
 
         const htmlFormatter = (id, value, data)=> {
@@ -241,7 +214,7 @@ export default {
         this.nico_grid_obs = new MyObservable();
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
-            await myapi.ipc.Config.set(nico_grid_name, state);
+            await window.electronAPI.invoke('config:set', 'mylist_nico_grid', state);
         });
         this.nico_grid_obs.on("db-cliecked", async (args) => {
             const { data } = args;
@@ -250,19 +223,16 @@ export default {
             if(!video_id){
                 return;
             }
-            /** @type {LibraryItem} */
-            const video_item = await myapi.ipc.Library.getItem(video_id);
-            if(needConvertVideo(video_item)===true){      
-                const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
-                    type: "info",
-                    message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?"
-                });
+            const videoItem = await window.electronAPI.invoke('library:getItem', video_id);
+            if(needConvertVideo(videoItem)===true){      
+                const msg = '保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?';
+                const ret = await window.electronAPI.invoke('showMsgBox', 'okCancel', msg);
                 if(!ret){
                     return;
                 }
                 main_obs.trigger("library:convert-video", video_id);
             }else{
-                Command.play(data, false);
+                // Command.play(data, false);
             }
         });
         this.nico_grid_obs.on("cmd", async (args) => {
@@ -271,13 +241,13 @@ export default {
                 await this.play(data, false);
             }
             if(cmd_id == "stack"){
-                Command.addStackItems(main_obs, [data]);
+                // Command.addStackItems(main_obs, [data]);
             }
             if(cmd_id == "bookmark"){
-                Command.addBookmarkItems(main_obs, [data]);
+                // Command.addBookmarkItems(main_obs, [data]);
             }
             if(cmd_id == "download"){
-                Command.addDownloadItems(main_obs, [data]);
+                // Command.addDownloadItems(main_obs, [data]);
             }
         });
         
@@ -287,28 +257,29 @@ export default {
                 return;
             }
             const video_id = items[0].video_id;
-            const video_item = await myapi.ipc.Library.getItem(video_id);
-            const need_convert = needConvertVideo(video_item);
+            const videoItem = await window.electronAPI.invoke('library:getItem', video_id);
+            const need_convert = needConvertVideo(videoItem);
             const context_menu_type = need_convert?"convert-video":"main";
-            const menu_id = await myapi.ipc.popupContextMenu("mylist", {context_menu_type, items});
-            if(!menu_id){
-                return;
-            }
-            if(menu_id=="convert-video"){
-                main_obs.trigger("library:convert-video", video_id); 
-            }
+            // const menu_id = await myapi.ipc.popupContextMenu("mylist", {context_menu_type, items});
+            // if(!menu_id){
+            //     return;
+            // }
+            // if(menu_id=="convert-video"){
+            //     main_obs.trigger("library:convert-video", video_id); 
+            // }
         }); 
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
-        // this.state.gridData = (`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
+        const state = (await window.electronAPI.invoke('config:get')).mylist_nico_grid;
+        if(state.columns.length === 0){
+            state.columns = columns.map(col => {
+                return {id:col.id, width:100};
+            });
+        };
         const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
         this.update({
             gridData:gridData
         });
     },
     async onMounted() {
-        const mylist_dir = await myapi.ipc.MyList.getMyListDir();  
-        this.nico_mylist_store = new NicoMylistStore(mylist_dir);
-        this.nico_mylist_image_cache = new NicoMylistImageCache(mylist_dir);
     },
     /**
      * 
@@ -339,18 +310,16 @@ export default {
      */
     async play(item, online) {
         const video_id = item.video_id;
-        const video_item = await myapi.ipc.Library.getItem(video_id);
-        if(!online && needConvertVideo(video_item)){       
-            const ret = await myapi.ipc.Dialog.showMessageBoxOkCancel({
-                type: "info",
-                message: "保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?"
-            });
+        const libraryItem = await window.electronAPI.invoke('library:getItem', video_id);
+        if(!online && needConvertVideo(libraryItem)){       
+            const msg = '保存済み動画がmp4ではないため再生できません\nmp4に変換しますか?';
+            const ret = await window.electronAPI.invoke('showMsgBox', 'okCancel', msg);
             if(!ret){
                 return;
             }
             main_obs.trigger("library:convert-video", video_id);
         }else{
-            Command.play(item, online);
+            // Command.play(item, online);
         }
     },
     /**
@@ -379,8 +348,7 @@ export default {
 
         if(update_image_cache_id){
             const mylist_id_list = await this.getMylistIDList();
-            this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
-            this.nico_mylist_image_cache.loadCache(mylist.mylist_id);
+            await window.electronAPI.invoke('mylist:loadImageCache', mylist_id_list, mylist.mylist_id);
         }
 
         if(await this.hasMylistID(mylist.mylist_id)){
@@ -401,11 +369,11 @@ export default {
         this.loaded_mylist_id = mylist.mylist_id;
         
         const mylist_items = mylist.items;
-        const video_ids = await myapi.ipc.Download.getIncompleteIDs();
+        const video_ids = await window.electronAPI.invoke('download:getMarkedIds');
         for (let i=0; i<mylist_items.length; i++) {
             const item = mylist_items[i];
             const video_id = item.video_id;
-            item.saved = await myapi.ipc.Library.hasItem(video_id);
+            item.saved = await window.electronAPI.invoke('library:exists', video_id);
             item.reg_download = video_ids.includes(video_id);  
             item.mylist_id = mylist.mylist_id;
         }
@@ -419,8 +387,7 @@ export default {
      * @param {string} mylist_id 
      */
     async getMylist(mylist_id) {
-        this.nico_mylist = new NicoMylist();
-        const mylist = await this.nico_mylist.getMylist(mylist_id);
+        const mylist = await window.electronAPI.invoke('mylist:fetchPage', mylist_id);
         await this.setMylist(mylist);
     },
     /**
@@ -442,7 +409,7 @@ export default {
         // 保存済みmylist id一覧に新規保存のmylist idを追加してキャッシュに伝える
         const mylist_id_list = await this.getMylistIDList();
         mylist_id_list.push(mylist_id);
-        this.nico_mylist_image_cache.setExistLocalIDList(mylist_id_list);
+        await window.electronAPI.invoke('mylist:setImageIds', mylist_id_list);
 
         const item = {
             title: mylist.title,
@@ -450,7 +417,7 @@ export default {
             creator: mylist.creator
         };
         main_obs.trigger("mylist:sidebar:add-item", item);
-        this.nico_mylist_store.save(mylist_id, this.nico_mylist.xml);
+        await window.electronAPI.invoke('mylist:savePage', mylist_id);
     },
     /**
      * 
@@ -459,8 +426,8 @@ export default {
     cacheImage(mylist_id) {
         /** @type {HTMLImageElement[]} */
         const elms = this.$$(".mylist-img");
-        elms.forEach(elm => {
-            this.nico_mylist_image_cache.setImage(mylist_id, elm);
+        elms.forEach(async elm => {
+            await window.electronAPI.invoke('mylist:setImage', mylist_id, elm);
         });
     },
     onCancelUpdate() {
@@ -484,15 +451,12 @@ export default {
 
             const mylist_id_list = await this.getMylistIDList();
             if(mylist_id_list.includes(mylist_id)){
-                this.nico_mylist_store.save(mylist_id, this.nico_mylist.xml);
+                window.electronAPI.invoke('mylist:savePage', mylist_id);
             }
         } catch (error) {
             if(!error.cancel){
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: error.message
-                });
+                await window.electronAPI.invoke('showErrorMsgBox', error.message);
             }
         }
 
@@ -527,8 +491,7 @@ export default {
             this.onCancelUpdate();
         });
         try {
-            this.nico_mylist = new NicoMylist();
-            const mylist = await this.nico_mylist.getMylist(mylist_id);
+            const mylist = await window.electronAPI.invoke('mylist:fetchPage', mylist_id);
             await this.addMylist(mylist); // サイドバーのアイテムに追加
             await this.setMylist(mylist, false); // データ設定してgird更新
             this.cacheImage(mylist.mylist_id);
@@ -538,10 +501,7 @@ export default {
         } catch (error) {
             if(!error.cancel){
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: error.message
-                });
+                await window.electronAPI.invoke('showErrorMsgBox', error.message);
             }
         }
         this.state.dialogEmitter.emit('dialog:close');

@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
 import * as time_format from "@lib/time-format.js";
 import { SyncCommentScroll } from "@lib/sync-comment-scroll.js";
@@ -184,11 +183,10 @@ export default {
                 enable: false
             }
         };
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
-            await myapi.ipc.Config.set(nico_grid_name, state);
+            await window.electronAPI.invoke('config:set', 'player_comment_nico_grid', state);
         });
         this.nico_grid_obs.on("db-cliecked", (args) => {
             const { data } = args;
@@ -196,27 +194,33 @@ export default {
             player_obs.trigger("player-video:seek", sec);
         });
         this.nico_grid_obs.on("show-contexmenu", async () => {
-            const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
-            if(!menu_id){
-                return;
-            }
-            if(menu_id=="add-comment-ng=list"){
-                /** @type {CommentItem[]} */
-                const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
-                const texts = items.map(item=>{
-                    return item.content;
-                });
-                this.triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
-            }
-            if(menu_id=="add-uerid-ng=list"){
-                /** @type {CommentItem[]} */
-                const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
-                const user_ids = items.map(item=>{
-                    return item.user_id;
-                });
-                this.triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
-            }
+            // const menu_id = await myapi.ipc.popupContextMenu("player-ngcomment");
+            // if(!menu_id){
+            //     return;
+            // }
+            // if(menu_id=="add-comment-ng=list"){
+            //     /** @type {CommentItem[]} */
+            //     const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            //     const texts = items.map(item=>{
+            //         return item.content;
+            //     });
+            //     this.triggerAddNGComment({ ng_texts: texts, ng_user_ids: [] });
+            // }
+            // if(menu_id=="add-uerid-ng=list"){
+            //     /** @type {CommentItem[]} */
+            //     const items = await this.nico_grid_obs.triggerReturn("get-selected-data-list");
+            //     const user_ids = items.map(item=>{
+            //         return item.user_id;
+            //     });
+            //     this.triggerAddNGComment({ ng_texts: [], ng_user_ids: user_ids });
+            // }
         });
+        const state = (await window.electronAPI.invoke('config:get')).player_comment_nico_grid;
+        if(state.columns.length === 0){
+            state.columns = columns.map(col => {
+                return {id:col.id, width:100};
+            });
+        }
         const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
         this.update({
             gridData:gridData

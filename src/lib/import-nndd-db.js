@@ -1,6 +1,6 @@
-const fs = require("fs");
-const path = require("path");
-const initSqlJs = require('sql.js');
+import fs from 'fs';
+import path  from 'path';
+import initSqlJs from 'sql.js';
 import { getCommonNameFromFilename } from "@lib/nico-data-file.js";
 
 export class DBConverter {

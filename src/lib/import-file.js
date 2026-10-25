@@ -1,5 +1,5 @@
-const path = require("path");
-const fs = require("fs");
+import fs from 'fs';
+import path  from 'path';
 import { NicoVideoData, 
     getIDFromFilename, getCommonNameFromFilename } from "@lib/nico-data-file.js";
 import { toTimeSec } from "@lib/time-format.js";

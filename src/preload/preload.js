@@ -1,8 +1,18 @@
-const { contextBridge, ipcRenderer } = require('electron');
+import { contextBridge, ipcRenderer } from  'electron';
 
-/** @type {IpcChannels} */
-const ppp = {
-    'library:getItems': async (event) => {
-        return [];
-    }
+/** @type {api['invoke']} */
+const invokeIpc = (channel, ...args) => {
+    return ipcRenderer.invoke(channel, ...args);
 };
+
+/** @type {api['on']} */
+const onIpc = (channel, func) => {
+    ipcRenderer.on(channel, (event, ...args) => {
+        func(...args);
+    });
+};
+
+contextBridge.exposeInMainWorld('electronAPI', {
+    invoke: invokeIpc,
+    on: onIpc
+});

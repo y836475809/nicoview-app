@@ -1,4 +1,3 @@
-import {Command} from "@lib/command.js";
 import { NICO_URL } from "@lib/nico-url.js";
 
 /**
@@ -44,10 +43,10 @@ export default {
             return;
         }
         const online = false; // ローカル再生を優先
-        Command.play({
-            video_id: video_id,
-            time: 0
-        }, online);
+        // Command.play({
+        //     video_id: video_id,
+        //     time: 0
+        // }, online);
     },
     onBeforeMount(props) {
         /** @type {MyObservable} */

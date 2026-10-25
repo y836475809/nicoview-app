@@ -1,6 +1,6 @@
-const cheerio = require("cheerio");
-const fs = require("fs");
-const path = require("path");
+import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path  from 'path';
 import { fetchGet } from "@lib/nico-fetch.js";
 import { NICO_URL } from "@lib/nico-url.js";
 import { CacheStore } from "@lib/cache-store.js";

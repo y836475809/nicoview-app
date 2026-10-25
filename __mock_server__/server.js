@@ -1,7 +1,11 @@
-const https = require("https");
-const fs = require("fs");
-const path = require("path");
-const { MockResponse } = require("./mock-response");
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import { MockResponse } from './mock-response.js';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /* eslint-disable no-console */
 
@@ -54,6 +58,10 @@ const srever = https.createServer(options, async (req, res) => {
         if(orgUrl.startsWith("https://nicovideo.cdn.nimg.jp")){
             console.log("mock server: thumbnail");
             mock_res.thumbnail(req, res);
+        }
+        if(orgUrl.startsWith("https://secure-dcdn.cdn.nimg.jp")){
+            console.log("mock server: usericon");
+            mock_res.userIcon(req, res);
         }
         if(orgUrl.startsWith("https://nvapi.nicovideo.jp/v1/watch")){
             console.log("mock server: nvapi watch");

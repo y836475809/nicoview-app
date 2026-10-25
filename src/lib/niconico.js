@@ -1,8 +1,48 @@
-const cheerio = require("cheerio");
+import * as cheerio from 'cheerio';
 import { fetchGet, fetchPost } from "@lib/nico-fetch.js";
 import { getWatchURL } from "@lib/nico-url.js";
-import { convToLegacyComments } from "@lib/nico-data-converter.js";
 import { getQuality } from "@lib/nico-hls-request.js";
+import { fetchContentUrl } from "@lib/nico-fetch.js";
+import * as NicoDataParser from "@lib/nico-data-parser.js";
+
+/**
+ * コメント(json)を古いフォーマットに変換する
+ * @param {NvCommentMateData} nv_commnets 
+ * @returns {CommentChat[]}
+ */
+const convToLegacyComments = (nv_commnets) => {
+    /** @type {CommentChat[]} */
+    const legacyComments = [];
+    const threads = nv_commnets.data.threads;
+    threads.forEach(thread => {
+        const comments = thread.comments;
+        comments.forEach(commnet => {
+            legacyComments.push(convToLegacyComment(commnet));
+        });
+    });
+    return legacyComments;
+};
+
+/**
+ * コメント(json)を古いフォーマットに変換する
+ * @param {NvComment} nv_commnet
+ * @returns {CommentChat}
+ */
+const convToLegacyComment = (nv_commnet) => {
+    const date = new Date(nv_commnet.postedAt);
+    const date_sec = date.getTime() / 1000;
+    const cmds = nv_commnet.commands.join(" ");
+    return {
+        chat: {
+            no: nv_commnet.no,
+            vpos: nv_commnet.vposMs/10,
+            date: date_sec,
+            user_id: nv_commnet.userId,
+            mail: cmds.toLowerCase(),
+            content: nv_commnet.body
+        }
+    };
+};
 
 export class NicoAPI {
     getVideo(){
@@ -461,5 +501,53 @@ export class NicoThumbnail {
         const buf = Buffer.from(arrsyBuf);
         const uint8Array = new Uint8Array(buf);
         return uint8Array;
+    }
+}
+
+export class NicoPlayData {
+    /**
+     * 
+     * @param {string} videoId 
+     */
+    constructor(videoId){
+       this._videoId = videoId;
+    }
+
+    cancel(){
+        this._nico_watch?.cancel();
+        this._nico_comment?.cancel(); 
+    } 
+
+    async watch(){
+        this._nico_watch = new NicoWatch();
+        const { nico_api } = await this._nico_watch.watch(this._videoId);  
+        this._nico_api = nico_api;
+    }
+
+    async getSourceUrl(){
+        if(!this._nico_api){
+            throw new Error(`nico_api is null, videoId=${this._videoId}`);
+        }
+        const video_id = this._videoId;
+        const domand = this._nico_api?.getDomand();
+        const watchTrackId = this._nico_api?.getwatchTrackId();
+        const accessRightKey = this._nico_api?.getaccessRightKey();
+        const url = await fetchContentUrl(video_id, watchTrackId, accessRightKey, domand);
+        return url; 
+    }
+
+    async getComments(){
+        if(!this._nico_api){
+            throw new Error(`nico_api is null, videoId=${this._videoId}`);
+        }
+        this._nico_comment = new NicoComment(this._nico_api);
+        const comments = await this._nico_comment.getComment();
+        const cnved_comments = NicoDataParser.makeComments(comments);
+        return cnved_comments;
+    }
+
+    async getThumbInfo(){ 
+        const thumb_info = NicoDataParser.json_thumb_info(this._nico_api);
+        return thumb_info;
     }
 }

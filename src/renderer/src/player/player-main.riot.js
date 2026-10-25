@@ -1,10 +1,7 @@
 import mitt from 'mitt';
-import {myapi} from "@lib/my-api.js";
-import { NicoPlay } from "@lib/nico-play.js";
-import { NicoUpdate } from "@lib/nico-update.js";
+import { NicoPlayData } from "@lib/niconico.js";
 import { CommentFilter } from "@lib/comment-filter.js";
 import { toTimeSec } from "@lib/time-format.js";
-import { NicoVideoData } from "@lib/nico-data-file.js";
 import { window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
 
@@ -31,18 +28,9 @@ export default {
         dialogEmitter: mitt()
     },
 
-
-    /** @type {MyObservable} */
-    // obs_modal_dialog:null,
-
-    /** @type {ModalDialog} */
-    // modal_dialog:null,
-
     /** @type {CommentFilter} */
     comment_filter:null,
 
-    /** @type {NicoPlay} */
-    nico_play:null,
 
     /** @type {CurrentPlayVideo} */
     current_play_video:null,
@@ -61,29 +49,21 @@ export default {
     },
 
     onBeforeMount() {
-        myapi.ipc.onPlayVideo(async (args)=>{
-            const { video_id, online, time, video_item } = args;
-
+        window.electronAPI.on('player:play', async (videoId, online) => {
             this.current_play_video = { 
-                video_id: video_id, 
+                video_id: videoId, 
                 title: null,
                 thumbnailURL: null,
                 online: online
             };
+            document.title = videoId;
 
-            document.title = video_id;
-
-            if(!video_item || online){
-                const is_saved = video_item !== null;
-                await this.playVideoOnline(video_id, time, is_saved);
+            const time = 0;
+            if(online){
+                await this.playVideoOnline(videoId, time, false);
             }else{
-                await this.playVideoItem(video_item, time);
+                await this.playVideoItem(videoId, time);
             }
-        });
-
-        myapi.ipc.Setting.onChangeLogLevel((args) => {
-            const { level } = args;
-            logger.setLevel(level);
         });
 
         player_obs.onReturn("player-main:get-current-play-video", () => {
@@ -92,20 +72,19 @@ export default {
 
         player_obs.on("player-main:update-data", async(video_id, update_target) => {
             logger.debug("player main update video_id=", video_id);
-            const nico_update = new NicoUpdate();
-
             this.state.dialogEmitter.emit('dialog:open', {
                 showok: false,
                 showcancel: true,
                 message: "更新中..."
             });
             this.state.dialogEmitter.on('dialog:cancel', () => {
-                if(nico_update){
-                    nico_update.cancel();
-                }
+                // if(nico_update){
+                //     nico_update.cancel();
+                // }
             });
             try {   
-                const video_item = await myapi.ipc.Library.getItem(video_id);
+                // const video_item = await myapi.ipc.Library.getItem(video_id);
+                const video_item = await window.electronAPI.invoke('library:getItem', videoId);
                 nico_update.setVideoItem(video_item);
 
                 let result = null;
@@ -117,34 +96,34 @@ export default {
                     throw new Error(`${update_target} is unknown`);
                 }
                 if(result){
-                    await myapi.ipc.Library.updateItemProps(result.video_id, result.props);
-                    const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
-                    const video_data = new NicoVideoData(updated_video_item);
+                    // await myapi.ipc.Library.updateItemProps(result.video_id, result.props);
+                    // const updated_video_item = await myapi.ipc.Library.getItem(result.video_id);
+                    // const video_data = new NicoVideoData(updated_video_item);
 
-                    const thumb_info = video_data.getThumbInfo();
-                    thumb_info.is_economy = video_data.getIsEconomy();
-                    thumb_info.is_deleted = video_data.getIsDeleted();
+                    // const thumb_info = video_data.getThumbInfo();
+                    // thumb_info.is_economy = video_data.getIsEconomy();
+                    // thumb_info.is_deleted = video_data.getIsDeleted();
 
-                    const comments = video_data.getComments();
-                    this.comment_filter.setComments(comments);
-                    this.comment_filter.setPlayTime(updated_video_item.play_time);
-                    const filtered_comments = this.comment_filter.getCommnets();
+                    // const comments = video_data.getComments();
+                    // this.comment_filter.setComments(comments);
+                    // this.comment_filter.setPlayTime(updated_video_item.play_time);
+                    // const filtered_comments = this.comment_filter.getCommnets();
 
-                    player_obs.trigger("player-tag:set-tags", thumb_info.tags);
-                    player_obs.trigger("player-info:set-data", {
-                        thumb_info: thumb_info, 
-                        comments: filtered_comments,
-                        all_comment_num: comments.length,
-                    });
-                    player_obs.trigger("player-video:update-comments", filtered_comments);
+                    // player_obs.trigger("player-tag:set-tags", thumb_info.tags);
+                    // player_obs.trigger("player-info:set-data", {
+                    //     thumb_info: thumb_info, 
+                    //     comments: filtered_comments,
+                    //     all_comment_num: comments.length,
+                    // });
+                    // player_obs.trigger("player-video:update-comments", filtered_comments);
                 }   
             } catch (error) {
                 if(!error.cancel){
                     logger.error(error);
-                    await myapi.ipc.Dialog.showMessageBoxOK({
-                        type: "error",
-                        message: error.message
-                    });
+                    // await myapi.ipc.Dialog.showMessageBoxOK({
+                    //     type: "error",
+                    //     message: error.message
+                    // });
                 }       
             }
             this.state.dialogEmitter.emit('dialog:close');
@@ -156,15 +135,15 @@ export default {
 
             this.comment_filter.ng_comment.addNGTexts(ng_texts);
             this.comment_filter.ng_comment.addNGUserIDs(ng_user_ids);
-            try {
-                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
-            } catch (error) {
-                logger.error("player main save ng comment", error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: `NGコメントの保存に失敗\n${error.message}`
-                });
-            }
+            // try {
+            //     await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
+            // } catch (error) {
+            //     logger.error("player main save ng comment", error);
+            //     await myapi.ipc.Dialog.showMessageBoxOK({
+            //         type: "error",
+            //         message: `NGコメントの保存に失敗\n${error.message}`
+            //     });
+            // }
 
             const comments = this.comment_filter.getCommnets();
             player_obs.trigger("player-video:update-comments", comments);
@@ -176,15 +155,15 @@ export default {
 
             this.comment_filter.ng_comment.deleteNGTexts(ng_texts);
             this.comment_filter.ng_comment.deleteNGUserIDs(ng_user_ids);
-            try {
-                await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
-            } catch (error) {
-                logger.error("player main save comment ng", error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: `NGコメントの保存に失敗\n${error.message}`
-                });
-            }
+            // try {
+            //     await myapi.ipc.NGList.updateItems(this.comment_filter.getNGCommentItems());
+            // } catch (error) {
+            //     logger.error("player main save comment ng", error);
+            //     await myapi.ipc.Dialog.showMessageBoxOK({
+            //         type: "error",
+            //         message: `NGコメントの保存に失敗\n${error.message}`
+            //     });
+            // }
 
             const comments = this.comment_filter.getCommnets();
             player_obs.trigger("player-video:update-comments", comments);
@@ -229,11 +208,8 @@ export default {
         });
     },
     async onMounted() {
-        const params = await myapi.ipc.Config.get("player", {  
-            infoview_width: 200, 
-            infoview_show: true 
-        });
-            
+        const config = await window.electronAPI.invoke('config:get');
+        const params = config.player;
         const vw = params.infoview_show ? params.infoview_width : 0;
         const pe = this.$(".player-frame");
         const ve = this.$(".info-frame");
@@ -243,20 +219,17 @@ export default {
         this.player_default_size = { width: 854 ,height: 480 };
         
         try {
-            const do_limit = await myapi.ipc.Config.get("comment.do_limit", true);
-            const ng_commnet_items = await myapi.ipc.NGList.getItems();
+            const do_limit = config.comment.do_limit;
+            const ng_commnet_items = await window.electronAPI.invoke('ngList:getItems');
             this.comment_filter = new CommentFilter();
             this.comment_filter.setLimit(do_limit);
             this.comment_filter.setNGCommentItems(ng_commnet_items);
         } catch (error) {
             logger.error("player main load ng comment", error);
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: `NGコメントリストの読み込み失敗\n${error.message}`
-            });
+            await window.electronAPI.invoke(
+                'showErrorMsgBox', `NGコメントリストの読み込み失敗\n${error.message}`);
         }
-
-        myapi.ipc.playerReady();
+        window.electronAPI.invoke('player:moundted');
     },
     mousemove(e) {
         if(this.gutter){   
@@ -279,7 +252,9 @@ export default {
             player_obs.trigger("player-info:split-resized");
 
             const ve = this.$(".info-frame");
-            await myapi.ipc.Config.set("player.infoview_width", parseInt(ve.offsetWidth));
+            const configPlayer = (await window.electronAPI.invoke('config:get')).player;
+            configPlayer.infoview_width = parseInt(ve.offsetWidth);
+            await window.electronAPI.invoke('config:set', 'player', configPlayer);
         }
         this.gutter = false;
         this.gutter_move = false;
@@ -318,10 +293,12 @@ export default {
             video_option: video_option
         });   
         
-        myapi.ipc.History.addItem({
+        window.electronAPI.invoke('history:addItem', {
             video_id: video.video_id, 
             thumb_img: video.largeThumbnailURL, 
-            title: video.title,  
+            title: video.title, 
+            play_date: Date.now(), 
+            time: 0
         });
     },
     cancelPlay() {
@@ -331,10 +308,10 @@ export default {
     },
     /**
      * 
-     * @param {LibraryItem} video_item 
+     * @param {string} videoId 
      * @param {number} time 
      */
-    async playVideoItem(video_item, time=0) {
+    async playVideoItem(videoId, time=0) {
         this.cancelPlay();
 
         const video_option = { 
@@ -343,17 +320,17 @@ export default {
             time: time
         };
         try {
-            const video_data = new NicoVideoData(video_item);
+            const playData = await window.electronAPI.invoke('library:getPlayData', videoId);
+            if(!playData){
+                await window.electronAPI.invoke('showErrorMsgBox', `not found ${videoId}`);
+                return;
+            }
+            const thumb_info = playData.thumbInfo;
+            const comments = playData.comments;
             const video_elem_prop = {
-                src: video_data.getVideoPath(),
-                type: `video/${video_data.getVideoType()}`,
+                src: playData.sourceUrl,
+                type: `video/mp4`,
             };
-
-            const thumb_info = video_data.getThumbInfo();
-            thumb_info.is_economy = video_data.getIsEconomy();
-            thumb_info.is_deleted = video_data.getIsDeleted();
-
-            const comments = video_data.getComments();
             await this.play_by_video_data(thumb_info, comments, video_option, 
                 (filtered_comments)=>{
                     player_obs.trigger("player-video:set-play-data-library", { 
@@ -363,11 +340,8 @@ export default {
                     });
                 });
         } catch (error) {
-            logger.error(`id=${video_item.video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: error.message
-            });
+            logger.error(`id=${videoId}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
+            await window.electronAPI.invoke('showErrorMsgBox', error.message);
         }
     },
     async playVideoOnline(video_id, time, is_saved) {
@@ -380,8 +354,6 @@ export default {
         };
 
         try {
-            this.nico_play = new NicoPlay();
-
             this.state.dialogEmitter.emit('dialog:open', {
                 showok: false,
                 showcancel: true,
@@ -390,58 +362,48 @@ export default {
             this.state.dialogEmitter.on('dialog:cancel', () => {
                 this.cancelPlay();
             });
-            this.nico_play.on("changeState", (state)=>{
-                logger.debug("player main changeState state=", state);
-                const msg = play_msg_map.get(state);
-                this.state.dialogEmitter.emit('dialog:update-message', {
-                    message: `${msg}`
-                });
-            });
-            this.nico_play.on("cancelHeartBeat", ()=>{
-                logger.debug("player main HeartBeat cancel");
-            });
-            this.nico_play.on("errorHeartBeat", (error)=>{
-                throw error;
-            });
 
-            const {is_economy, is_deleted, comments, thumb_info, nico_api} = 
-                await this.nico_play.play(video_id);
-
-            thumb_info.is_economy = is_economy;
-            thumb_info.is_deleted = is_deleted;
-
-            comments.sort((a, b) => {
-                if (a.vpos < b.vpos) return -1;
-                if (a.vpos > b.vpos) return 1;
-                return 0;
+            const nicoPlaydata = new NicoPlayData(video_id);
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: 'watch取得'
             });
-            await this.play_by_video_data(thumb_info, comments, video_option, 
-                (filtered_comments) => {
+            await nicoPlaydata.watch();
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: 'ContentUrl取得'
+            });
+            const sourceUrl = await nicoPlaydata.getSourceUrl();
+            this.state.dialogEmitter.emit('dialog:update-message', {
+                message: 'Comment取得'
+            });
+            const comments = await nicoPlaydata.getComments();
+            const thumbInfo = await nicoPlaydata.getThumbInfo();
+            const video_elem_prop = {
+                src: sourceUrl,
+                type: `video/mp4`,
+            };
+            this.state.dialogEmitter.emit('dialog:close');
+            await this.play_by_video_data(thumbInfo, comments, video_option, 
+                (filtered_comments)=>{
                     player_obs.trigger("player-video:set-play-data-online", { 
-                        video_id,
-                        nico_api: nico_api,
+                        video_elem_prop: video_elem_prop,
                         comments: filtered_comments,
-                        video_option: video_option 
+                        video_option: video_option
                     });
-                });  
+                });
         } catch (error) {
             if(!error.cancel){
                 logger.error(`video_id=${video_id}, online=${video_option.is_online}, is_saved=${video_option.is_saved}`, error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: error.message
-                });
+                await window.electronAPI.invoke('showErrorMsgBox', error.message);
             }
-        }
-
-        this.state.dialogEmitter.emit('dialog:close');
+        } finally {
+            this.state.dialogEmitter.emit('dialog:close');
+        }  
     },
     async toggleInfoview() {
         const pe = this.$(".player-frame");
         const ve = this.$(".info-frame");
 
         const infoview_show = parseInt(ve.style.width) == 0;
-        await myapi.ipc.Config.set("player.infoview_show", infoview_show);
 
         // 動画情報の表示/非表示の切り替え時はウィンドウリサイズイベントを通知しない
         // (動画表示部分のサイズは変更されないのでリサイズイベント不要)
@@ -449,7 +411,7 @@ export default {
 
         if(infoview_show){
             // 表示
-            const infoview_width = await myapi.ipc.Config.get("player.infoview_width", 200);
+            const infoview_width = (await window.electronAPI.invoke('config:get')).player.infoview_width;
             // 動画サイズがウィンドウサイズに合わせて変化しないように
             // 動画の幅を固定してからウィンドウサイズ変更
             pe.style.width = pe.offsetWidth + "px";  

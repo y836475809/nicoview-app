@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path  from 'path';
 import { deepCopy } from "@lib/deepcopy.js";
 import { logger } from "@lib/logger.js";
 

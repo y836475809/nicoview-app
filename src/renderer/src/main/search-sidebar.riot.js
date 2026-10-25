@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import {searchItems} from "@lib/nico-search.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 
@@ -56,7 +55,7 @@ export default {
         this.obs_listview.on("changed", async (args) => {
             /** @type {{items:NicoSearchParamsItem[]}} */
             const { items } = args;
-            await myapi.ipc.Search.updateItems(items);
+            await window.electronAPI.invoke('nicoSearch:saveItems', items);
         });
 
         this.obs_listview.on("item-dlbclicked", (
@@ -78,7 +77,7 @@ export default {
         await this.loadItems();
     },
     async loadItems() {
-        const items = await myapi.ipc.Search.getItems();
+        const items = await window.electronAPI.invoke('nicoSearch:getItems');
         this.obs_listview.trigger("loadData", { items });
     }
 };

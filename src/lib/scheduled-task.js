@@ -1,17 +1,12 @@
 
-const EventEmitter = require("events");
-
-export class ScheduledTask extends EventEmitter{
+export class ScheduledTask {
     constructor(date, execution){
-        super();
         this.scheduled_date = date;
         this.execution = execution;
         this.timer = null;
     }
 
     start(){
-        this.emit("start");
-
         const rest = this._getRestMsec();
         this.timer = setTimeout(()=>{this._task();}, rest);
     }
@@ -20,15 +15,11 @@ export class ScheduledTask extends EventEmitter{
         if(this.timer){
             clearTimeout(this.timer);
             this.timer = null;  
-
-            this.emit("stop");
         }     
     }
 
     _task(){
         if(this.timer){
-            this.emit("execute");
-
             this.execution().then(()=>{
                 const rest = this._getRestMsec();
                 this.timer = setTimeout(()=>{this._task();}, rest);

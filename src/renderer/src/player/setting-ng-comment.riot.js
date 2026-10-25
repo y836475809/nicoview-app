@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import {mountNicoGrid} from "@renderer/common/nico-grid-mount.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 import { NGType } from "@lib/comment-filter.js";
@@ -46,21 +45,27 @@ export default {
                 enable: false
             }
         };
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
         this.nico_grid_obs = new MyObservable();
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
-            await myapi.ipc.Config.set(nico_grid_name, state);
+            // await myapi.ipc.Config.set(nico_grid_name, state);
+            await window.electronAPI.invoke('config:set', 'player_ng_comment_nico_grid', state);
         });
         this.nico_grid_obs.on("show-contexmenu", async () => {
-            const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
-            if(!menu_id){
-                return;
-            }
-            if(menu_id=="delete"){
-                this.deleteSelectedItems();
-            }
+            // const menu_id = await myapi.ipc.popupContextMenu("player-setting-ngcomment");
+            // if(!menu_id){
+            //     return;
+            // }
+            // if(menu_id=="delete"){
+            //     this.deleteSelectedItems();
+            // }
         });
+        const state = (await window.electronAPI.invoke('config:get')).player_ng_comment_nico_grid;
+        if(state.columns.length === 0){
+            state.columns = columns.map(col => {
+                return {id:col.id, width:100};
+            });
+        }
         const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
         this.update({
             gridData:gridData

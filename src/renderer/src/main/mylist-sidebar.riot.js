@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 
 import Listview from '@renderer/common/listview.riot';
@@ -40,8 +39,7 @@ export default {
             /** @type {{items:MyListIndexItem[]}} */
             const { items } = args;
             this.items = items;
-
-            await myapi.ipc.MyList.updateItems(items);
+            await window.electronAPI.invoke('mylist:saveItems', items);
         });
 
         this.obs_listview.on("item-dlbclicked", (item) => {
@@ -87,7 +85,7 @@ export default {
         await this.loadItems();
     },
     async loadItems() {
-        this.items = await myapi.ipc.MyList.getItems();
+        this.items = await window.electronAPI.invoke('mylist:getItems');
         this.obs_listview.trigger("loadData", { items:this.items });
     }
 };

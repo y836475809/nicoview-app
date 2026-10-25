@@ -1,10 +1,8 @@
 
-const user_agent = process.env["user_agent"];
-
 /**
  * 
  * @param {string} url 
- * @returns string
+ * @returns {string}
  */
 const getCustomUrl = (url) => {
     return url.replace('https://', 'my-app://');
@@ -35,9 +33,7 @@ const getVideoAudioPairs = (domand) => {
  */
 export const fetchGet = async (url, abort) => {
     const cutomUrl = getCustomUrl(url);
-    const headers = new Headers({'User-Agent': user_agent});
     return await fetch(cutomUrl, {
-        headers: headers,
         method: 'GET',
         signal: abort?.signal
     });
@@ -55,7 +51,6 @@ export const fetchGet = async (url, abort) => {
 export const fetchPost = async (url, headers, json, abort) => {
     const cutomUrl = getCustomUrl(url);
     const json_str = JSON.stringify(json);
-    headers.append('User-Agent', user_agent);
     headers.append('Content-Type', 'application/json');
     headers.append('Content-Length', `${json_str.length}`);
     return await fetch(cutomUrl, {
@@ -70,15 +65,14 @@ export const fetchPost = async (url, headers, json, abort) => {
  * 
  * @param {string} videoId 
  * @param {string} watchTrackId 
+ * @param {string} accessRightKey 
  * @param {any} domand 
  * @returns {Promise<string>}
  */
 export const fetchContentUrl = async (videoId, watchTrackId, accessRightKey, domand) => {
-    // const right_key = domand.accessRightKey;
     const quality = getVideoAudioPairs(domand);
     const url = `https://nvapi.nicovideo.jp/v1/watch/${videoId}/access-rights/hls?actionTrackId=${watchTrackId}`;
     const headers = new Headers([
-        ['User-Agent', user_agent],
         ['X-Access-Right-Key', accessRightKey],
         ['x-frontend-id', '6'],
         ['x-frontend-version', '0'],

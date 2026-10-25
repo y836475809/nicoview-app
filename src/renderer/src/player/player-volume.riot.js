@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */
@@ -13,7 +12,7 @@ export default {
         /** @type {HTMLElement} */
         let slider = this.$("div.slider");
         /** @type {number} */
-        const volume = await myapi.ipc.Config.get("player.volume", 0.5);
+        const volume = (await window.electronAPI.invoke('config:get')).player.volume;
         picker.style.left = volume * slider.clientWidth - 5 + "px";
 
     },
@@ -42,7 +41,7 @@ export default {
      * 
      * @param {number} pos 
      */
-    updateVolume(pos) {
+    async updateVolume(pos) {
         /** @type {HTMLElement} */
         let picker = this.$("div.picker");
         picker.style.left = (pos - 5) + "px";
@@ -51,9 +50,9 @@ export default {
         let slider = this.$("div.slider");
         const volume = pos / slider.clientWidth;
 
-        // TODO check
-        myapi.ipc.Config.set("player.volume", volume).then();
-
+        const configPlayer = (await window.electronAPI.invoke('config:get')).player;
+        configPlayer.volume = volume;
+        await window.electronAPI.invoke('config:set', 'player', configPlayer);
         player_obs.trigger("player-video:volume-changed", volume); 
     }
 };

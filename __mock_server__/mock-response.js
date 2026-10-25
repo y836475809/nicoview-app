@@ -1,9 +1,13 @@
-const fs = require("fs");
-const path = require("path");
-const zlib = require("zlib");
+import fs from 'fs';
+import path from 'path';
+import zlib from 'zlib';
+import { fileURLToPath } from 'url';
 
-const nvcomments_data = require("./data/nvcomments.json");
-const data_api_data = require("./data/data-api-data.json");
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+import nvcomments_data from './data/nvcomments.json' with { type: 'json' };
+import data_api_data from './data/data-api-data.json' with { type: 'json' };
 
 /* eslint-disable no-console */
 
@@ -29,19 +33,12 @@ const escapeHtml = (str) => {
     return str;
 };
 
-const base64_map = new Map();
-const createImg = (fname) => {
-    if(!base64_map.has(fname)){
-        const content = fs.readFileSync(path.join(__dirname, "data", fname));
-        const base64_data = content.toString( 'base64' );
-        base64_map.set(fname, base64_data);
-    }
-    const base64_data = base64_map.get(fname);
-    return Buffer.from(base64_data, "base64");
-};
+const thumbGZip = zlib.gzipSync(
+    fs.readFileSync(path.join(__dirname, 'data', 'sample.L.jpeg')));
+const userIconGZip = zlib.gzipSync(
+    fs.readFileSync(path.join(__dirname, 'data', 'user_icon.jpg')));
 
-
-class MockResponse {
+export class MockResponse {
     search(url, req, res){
         const sp = new URL(url).searchParams;
         const text = sp.get("q");
@@ -152,12 +149,31 @@ class MockResponse {
     thumbnail(req, res){
         //thumbnailURL https://nicovideo.cdn.nimg.jp/thumbnails/${id}/${id}`;
         //largeThumbnailURL https://img.cdn.nimg.jp/s/nicovideo/thumbnails/${id}/${id}`;
-        const img = createImg("sample.L.jpeg");
-        this._writeImage(req, res, img);
+        if (req.url.includes('thumbnails')) {
+            res.writeHead(200, {
+            'Content-Type': 'image/png',
+            'Content-Encoding': 'gzip',
+            'Content-Length': thumbGZip.length
+            });
+            res.end(thumbGZip);
+            return;
+        }
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
     }
     userIcon(req, res){
-        const img = createImg("user_icon.jpg");
-        this._writeImage(req, res, img);
+        // "https://secure-dcdn.cdn.nimg.jp/nicoaccount/usericon/11/11.jpg?11
+        if (req.url.includes('usericon')) {
+            res.writeHead(200, {
+            'Content-Type': 'image/png',
+            'Content-Encoding': 'gzip',
+            'Content-Length': userIconGZip.length
+            });
+            res.end(userIconGZip);
+            return;
+        }
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
     }
 
     _isgzip(req, res){ // eslint-disable-line no-unused-vars
@@ -225,7 +241,3 @@ class MockResponse {
         }
     }
 }
-
-module.exports = {
-    MockResponse,
-};

@@ -1,8 +1,6 @@
 import mitt from 'mitt';
-import {myapi} from "@lib/my-api.js";
 import { mountNicoGrid } from "@renderer/common/nico-grid-mount.js";
 import { infoFormatter, tagsFormatter } from "@renderer/common/nico-grid-formatter.js";
-import { Command } from "@lib/command.js";
 import { NicoSearchParams, NicoSearch, searchItems } from "@lib/nico-search.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 import { logger } from "@lib/logger.js";
@@ -14,7 +12,7 @@ import ModalDialog from '@renderer/common/modal-dialog.riot';
 /** @type {MyObservable} */
 const main_obs = window_obs;
 
-const nico_grid_name = "search-nico-grid";
+const nico_grid_name = "search_nico_grid";
 
 /**
  * 検索ページのグリッドテーブルに追加するアイテムを生成
@@ -86,7 +84,7 @@ export default {
         this.pagination_obs = new MyObservable();
 
         const search_limit = 32;
-        const search_context = myapi.getUserAgent();
+        const search_context = 'myapi.getUserAgent()'; // TODO
         this.nico_search_params = new NicoSearchParams(search_limit, search_context);
         this.nico_search = new NicoSearch();
 
@@ -96,36 +94,43 @@ export default {
             await this.search();
         });
 
-        myapi.ipc.Download.onUpdateItem(async ()=>{
-            const video_ids = await myapi.ipc.Download.getIncompleteIDs();
+        window.electronAPI.on('download:addMark', async (videoId, mark) => {
             const items = await this.nico_grid_obs.triggerReturn("get-items");
             for (let i=0; i<items.length; i++) {
                 const item = items[i];
-                const video_id = item.video_id;
-                item.saved = await myapi.ipc.Library.hasItem(video_id);
-                item.reg_download = video_ids.includes(video_id);
-                this.nico_grid_obs.trigger("update-item", {
-                    id: video_id,
-                    props: item
-                });
+                if(videoId===item.video_id){
+                    if(mark==='downloaded'){
+                        item.saved = true;
+                    }
+                    if(mark==='reg'){
+                        item.reg_download = true;
+                    }
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: videoId,
+                        props: item
+                    });
+                    break;
+                }
             }
         });
-
-        myapi.ipc.Library.onAddItem((args) => {
-            const {video_item} = args;
-            const video_id = video_item.video_id;
-            this.nico_grid_obs.trigger("update-item", {
-                id: video_id,
-                props: { saved:true }
-            });
-        });
-
-        myapi.ipc.Library.onDeleteItem((args) => {
-            const { video_id } = args;
-            this.nico_grid_obs.trigger("update-item", {
-                id: video_id,
-                props: { saved:false }
-            });
+        window.electronAPI.on('download:deleteMark', async (videoId, mark) => {
+            const items = await this.nico_grid_obs.triggerReturn("get-items");
+            for (let i=0; i<items.length; i++) {
+                const item = items[i];
+                if(videoId===item.video_id){
+                    if(mark==='downloaded'){
+                        item.saved = false;
+                    }
+                    if(mark==='reg'){
+                        item.reg_download = false;
+                    }
+                    this.nico_grid_obs.trigger("update-item", {
+                        id: videoId,
+                        props: item
+                    });
+                    break;
+                }
+            }
         });
 
         main_obs.on("search:item-dlbclicked", async (
@@ -213,31 +218,31 @@ export default {
                 enable: false
             }
         };
-        const state = await myapi.ipc.Config.get(nico_grid_name, null);
+        const appConfig = await window.electronAPI.invoke('config:get');
+        const state = appConfig.search_nico_grid;
+        if(state.columns.length === 0){
+            state.columns = columns.map(col => {
+                return {id:col.id, width:100};
+            });
+        }
         this.nico_grid_obs = new MyObservable();
         this.nico_grid_obs.on("state-changed", async (args) => {
             const { state } = args;
-            await myapi.ipc.Config.set(nico_grid_name, state);
+            await window.electronAPI.invoke('config:set', nico_grid_name, state);
         });
-        this.nico_grid_obs.on("db-cliecked", (args) => {
-            const { data } = args;
-            if(data.video_id){
-                Command.play(data, false);
-            }
-        });
-        this.nico_grid_obs.on("cmd", (args) => {
+        this.nico_grid_obs.on("cmd", async (args) => {
             const { cmd_id, data } = args;
             if(cmd_id == "play"){
-                Command.play(data, false);
+                window.electronAPI.invoke('player:play', data.video_id, true);
             }
             if(cmd_id == "stack"){
-                Command.addStackItems(main_obs, [data]);
+                // Command.addStackItems(main_obs, [data]);
             }
             if(cmd_id == "bookmark"){
-                Command.addBookmarkItems(main_obs, [data]);
+                // Command.addBookmarkItems(main_obs, [data]);
             }
             if(cmd_id == "download"){
-                Command.addDownloadItems(main_obs, [data]);
+                // Command.addDownloadItems(main_obs, [data]);
             }
         });
         this.nico_grid_obs.on("show-contexmenu", async () => {
@@ -248,7 +253,7 @@ export default {
             if(items.length===0){
                 return;
             }
-            await myapi.ipc.popupContextMenu("search", {items});
+            // await myapi.ipc.popupContextMenu("search", {items});
         });
         const gridData = mountNicoGrid(`#${nico_grid_name}`, state, this.nico_grid_obs, columns, options);
         this.update({
@@ -268,11 +273,8 @@ export default {
         this.update();
     },
     async loadSearchConfig() {
-        const { api, sort, search_target } = await myapi.ipc.Config.get("search.condition",  {
-            api:"snapshot",
-            sort:{ name:"startTime", order:"-" },
-            search_target:{ target:"tag" }
-        });
+        const appConfig = await window.electronAPI.invoke('config:get');
+        const { api, sort, search_target } = appConfig.search.condition;
         const sort_item = this.sort_items.find(item => {
             return item.name == sort.name 
                 && item.order == sort.order;
@@ -286,11 +288,13 @@ export default {
     async saveSearchConfig() {
         const api = this.nico_search_params.getAPI();
         const { sort_name, sort_order, search_target } = this.nico_search_params.getParams();
-        await myapi.ipc.Config.set("search.condition", {
+        const appConfig =  await window.electronAPI.invoke('config:get');
+        appConfig.search.condition = {
             api: api,
             sort:{ name:sort_name, order:sort_order },
-            search_target:{ target:search_target } 
-        });
+            search_target:{ target:search_target }
+        }
+        window.electronAPI.invoke('config:set', 'search', appConfig.search);
     },
     onclickToggleMenu(e) { // eslint-disable-line no-unused-vars
         /** @type {HTMLElement} */
@@ -369,10 +373,7 @@ export default {
         } catch (error) {
             if(!error.cancel){
                 logger.error(error);
-                await myapi.ipc.Dialog.showMessageBoxOK({
-                    type: "error",
-                    message: error.message
-                });
+                await window.electronAPI.invoke('showErrorMsgBox', error.message);
             }
         }
         
@@ -399,11 +400,11 @@ export default {
             page_num, total_page_num, search_result_num
         });
 
-        const video_ids = await myapi.ipc.Download.getIncompleteIDs();
+        const video_ids = await window.electronAPI.invoke('download:getMarkedIds');
         const items = await Promise.all(
             search_list.map(async value => {
                 const video_id = value.contentId;
-                const saved = await myapi.ipc.Library.hasItem(video_id);
+                const saved = await window.electronAPI.invoke('library:exists', video_id);
                 const reg_download = video_ids.includes(video_id);
                 return createItem(value, saved, reg_download);
             })

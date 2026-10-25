@@ -1,112 +1,188 @@
 
-const fs = require("fs");
+import fs from 'fs';
 const fsPromises = fs.promises;
-import { deepCopy } from "@lib/deepcopy.js";
-import { logger } from "@lib/logger.js";
 
 /**
  * 設定
- * param1.param2
  */
 export class Config {
-    setup(config_path){
-        this.config_path = config_path;
-        this._initJsonData();
+    constructor(){
+        /** @type {string|null} */
+        this._configPath = null;
+        /** @type {AppConfig} */
+        this._jsonData = this._getDefault();
     }
 
     /**
-     * キーの値を返す
-     * キーは"."で区切る
-     * @param {string} key キー 
-     * @param {any} value デフォルト値
-     * @returns {any}
+     * @param {string|null} value 
      */
-    get(key, value) {
-        const obj = this._getObj(key, this.json_data);
-        if (obj === null || obj === undefined) {
-            return value;
-        }
-        if(typeof(value)=="object"){
-            for (const key in value) {
-                if (!Object.prototype.hasOwnProperty.call(obj,  key)) {
-                    obj[key] = value[key];
-                }
-            }
-        }
-        return obj;
+    set configPath(value){
+        this._configPath = value;
+    }
+
+    get configPath(){
+        return this._configPath;
+    }
+
+    setDefault(){
+        this._jsonData = this._getDefault();
+    }
+
+    /**
+     * 
+     * @returns {AppConfig}
+     */
+    get() {
+        return JSON.parse(JSON.stringify(this._jsonData));;
     }
 
     /**
      * keyにvalueを設定する
-     * @param {string} key 
-     * @param {any} value 
+     * @template {keyof AppConfig} K
+     * @param {K} key 
+     * @param {AppConfig[K]} value 
      */
     set(key, value) {
-        this._setObj(key, value, this.json_data);
-    }
-
-    // update(key, value) {
-    //     this._setObj(key, value, this.json_data, true);
-    // }
-
-    clear() {
-        this._initJsonData();
+        this._jsonData[key] = value;
     }
 
     async load() {
-        this._initJsonData();
-        try {
-            await fsPromises.stat(this.config_path);
-        } catch (error) {
-            logger.debug(error);
+        if(!fs.existsSync(this._configPath)){
+            this.setDefault();
             return;
         }
-        
-        const data = await fsPromises.readFile(this.config_path, "utf-8");
-        Object.assign(this.json_data, JSON.parse(data));
+        const data = await fsPromises.readFile(this._configPath, "utf-8");
+        const jsonData = JSON.parse(data);
+        const defaultJsonData = this._getDefault();
+        for(const [key, value] of Object.entries(defaultJsonData)){
+            if(!Object.hasOwn(jsonData, key)){
+                jsonData[key] = value;
+            }
+        }
+        this._jsonData = jsonData;
     }
 
     async save() {
-        const json = JSON.stringify(this.json_data, null, "  ");
-        await fsPromises.writeFile(this.config_path, json, "utf-8");
+        const json = JSON.stringify(this._jsonData, null, "  ");
+        await fsPromises.writeFile(this._configPath, json, "utf-8");
     }
 
-    _initJsonData(){
-        this.json_data = {};
-        this.json_data.download = {};
-    }
-
-    _getObj(key, json_data){
-        let obj = deepCopy(json_data);
-        const props = key.split(".");
-        props.some(prop => {
-            if(obj[prop] === undefined){
-                obj = obj[prop];
-                return true;
-            }
-            obj = obj[prop];
-        });
-        return obj;
-    }
-
-    _setObj(key, value, json_data){
-        let obj = json_data;
-        const props = key.split(".");
-        for (let index = 0; index < props.length-1; index++) {
-            const prop = props[index];
-            if(obj[prop] === undefined){
-                obj[prop] = {};
-            }
-            if(typeof(obj[prop])!="object"){
-                obj[prop] = {};
-            }
-            obj = obj[prop];
-        }
-        const prop = props[props.length-1];
-        if(typeof(obj[prop])=="object" && typeof(value)=="object"){
-            Object.assign(obj[prop], value);
-        }else{
-            obj[prop] = value;
-        }
+    /**
+     * @returns {AppConfig}
+     */
+    _getDefault(){
+        return {
+            data_dir: null,
+            log: {
+                level: 'debug'
+            },
+            open_devtools: false,
+            mouse_gesture: {
+                search_page_back_page: 'left',
+                search_page_forward_page: 'right',
+                all_page_show_player: 'up',
+            },
+            user_icon_cache: true,
+            ffmpeg_path: null,
+            use_mouse_gesture: true,
+            main: {
+                window: {
+                    state: {
+                        x: 0,
+                        y: 0,
+                        width: 800,
+                        height: 600,
+                        maximized: false,
+                    },
+                },
+            },
+            player: {
+                infoview_width: 300,
+                sync_comment: true,
+                volume: 0.2,
+                window: {
+                    state: {
+                        x: 0,
+                        y: 0,
+                        width: 800,
+                        height: 600,
+                        maximized: false,
+                    },
+                },
+                infoview_show: true,
+                contextmenu: {
+                    history_num: 10,
+                    stack_num: 5,
+                },
+            },
+            download: {
+                dir: null,
+                schedule: {
+                    date: {
+                        hour: 5,
+                        minute: 0,
+                    },
+                    enable: false,
+                },
+                wait_time: 10,
+            },
+            search: {
+                condition: {
+                    search_target: {
+                        target: 'tag'
+                    },
+                    sort: {
+                        name: 'startTime',
+                        order: '-'
+                    },
+                    api: 'snapshot'
+                },
+            },
+            comment: {
+                auto_sync_checked: true,
+                auto_sync_interval: 30,
+                auto_sync_threshold: 0.05,
+                fps: 10,
+                duration_sec: 4,
+                do_limit: true
+            },
+            nndd: {
+                librarydb: false,
+                history: false,
+                mylist: false,
+                nglist: false,
+                searchitems: false,
+                system_path: null
+            },
+            nico_grid_library: {
+                columns: []
+            },
+            player_comment_nico_grid: {
+                columns: []
+            },
+            player_ng_comment_nico_grid: {
+                columns: []
+            },
+            download_nico_grid: {
+                columns: []
+            },
+            mylist_nico_grid: {
+                columns: []
+            },
+            library_nico_grid: {
+                columns: [],
+                sort_param: {
+                    id: 'creation_date',
+                    asc: false,
+                    enable: true
+                },
+            },
+            history_nico_grid: {
+                columns: []
+            },
+            search_nico_grid: {
+                columns: []
+            },
+        };
     }
 }

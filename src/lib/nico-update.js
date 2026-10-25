@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from 'fs';
+import path  from 'path';
 import { NicoWatch, NicoComment, NicoThumbnail } from "@lib/niconico.js";
 import { NicoJsonFile, NicoXMLFile, NicoVideoData } from "@lib/nico-data-file.js";
 import { XMLDataConverter } from "@lib/nico-data-converter.js";

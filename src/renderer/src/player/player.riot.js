@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { MyObservable, window_obs } from "@lib/my-observable.js";
 
 import PlayerTags from '@renderer/player/player-tags.riot';
@@ -48,6 +47,34 @@ export default {
         const dh = org_size.height - elm.offsetHeight;
         window.resizeBy(dw, dh);
     },
+
+    async showContextMenu(e) {
+        e.preventDefault();
+        const playData = await this.getCurrentPlayVideo();
+        if(!playData){
+            return;
+        }
+        const videoId = playData.video_id;
+        const cmd = await window.electronAPI.invoke('player:showContextMenu', videoId);  
+        if(cmd === 'bookMark'){
+            const current_time = await this.getCurrentPlayTime();
+            await window.electronAPI.invoke('bookmark:addItem',  {
+                title: playData.title,
+                video_id: playData.video_id,
+                marked: false,
+                time: 0
+            });
+        }
+        if(cmd === 'download'){
+            await window.electronAPI.invoke('download:addItem',  {
+                title: playData.title,
+                video_id: playData.video_id,
+                thumb_img: playData.thumbnailURL,
+                state: 0 // wait
+            });
+        }
+    },
+
     /**
      * 
      * @param {MouseEvent} e 
@@ -61,48 +88,46 @@ export default {
         if(e.button === 1){
             this.contextmenu_show = true;
 
-            await myapi.ipc.popupContextMenu("player-history-stack");
+            // await myapi.ipc.popupContextMenu("player-history-stack");
             
             this.contextmenu_show = false;
         }
 
         if(e.button===2){
             this.contextmenu_show = true;
-
             const play_video = await this.getCurrentPlayVideo(); 
-            const menu_id = await myapi.ipc.popupContextMenu("player", { play_video });
-            if(menu_id){
-                const { video_id, title, thumbnailURL, online } = play_video; // eslint-disable-line no-unused-vars
-                if(menu_id=="add-bookmark-time"){
-                    const current_time = await this.getCurrentPlayTime();
-                    const bk_item = {
-                        title: title,
-                        video_id: video_id,
-                        time: current_time
-                    };
-                    myapi.ipc.Bookmark.addItems([bk_item]);
-                }
-                if(menu_id=="add-stack-time"){
-                    const time = await this.getCurrentPlayTime();
-                    myapi.ipc.Stack.addItems([
-                        {
-                            video_id: video_id,
-                            title: title, 
-                            thumb_img:thumbnailURL,
-                            time: time
-                        }
-                    ]);
-                }
-                if(menu_id=="show-open-video-form"){
-                    this.obs_open_video_form.trigger("show");
-                }
-                if(menu_id=="change-movie-size"){
-                    /** @type {{height:number, width:number}} */
-                    const org_size = await player_obs.triggerReturn("player-video:get-video-size-callback");
-                    this.resizeVideo(org_size);
-                }
-            }
-
+            // const menu_id = await myapi.ipc.popupContextMenu("player", { play_video });
+            // if(menu_id){
+            //     const { video_id, title, thumbnailURL, online } = play_video; // eslint-disable-line no-unused-vars
+            //     if(menu_id=="add-bookmark-time"){
+            //         const current_time = await this.getCurrentPlayTime();
+            //         const bk_item = {
+            //             title: title,
+            //             video_id: video_id,
+            //             time: current_time
+            //         };
+            //         myapi.ipc.Bookmark.addItems([bk_item]);
+            //     }
+            //     if(menu_id=="add-stack-time"){
+            //         const time = await this.getCurrentPlayTime();
+            //         myapi.ipc.Stack.addItems([
+            //             {
+            //                 video_id: video_id,
+            //                 title: title, 
+            //                 thumb_img:thumbnailURL,
+            //                 time: time
+            //             }
+            //         ]);
+            //     }
+            //     if(menu_id=="show-open-video-form"){
+            //         this.obs_open_video_form.trigger("show");
+            //     }
+            //     if(menu_id=="change-movie-size"){
+            //         /** @type {{height:number, width:number}} */
+            //         const org_size = await player_obs.triggerReturn("player-video:get-video-size-callback");
+            //         this.resizeVideo(org_size);
+            //     }
+            // }
             this.contextmenu_show = false;
         }
     },

@@ -38,7 +38,8 @@ export class MyObservable {
     }
 }
 
-if(!global._nicoviewapp_window_obs){
-    global._nicoviewapp_window_obs = new MyObservable();
-}
-export const window_obs = global._nicoviewapp_window_obs;
+// if(!global._nicoviewapp_window_obs){
+//     global._nicoviewapp_window_obs = new MyObservable();
+// }
+// export const window_obs = global._nicoviewapp_window_obs;
+export const window_obs = new MyObservable();

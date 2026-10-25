@@ -1,24 +1,9 @@
-const EventEmitter = require("events");
-const { spawn } = require("child_process");
-const path = require("path");
-const fs = require("fs");
+import { spawn } from 'child_process';
+import fs from 'fs';
+import path  from 'path';
 
-export const needConvertVideo = (value) => {
-    let video_type = "";
-    if(typeof value == "string"){
-        video_type = value;
-    }else if(value===null){
-        return false;
-    }else{
-        video_type = value.video_type;
-    }
-
-    return /mp4/.test(video_type)!==true;
-};
-
-export class ConvertMP4 extends EventEmitter {
+export class ConvertMP4 {
     constructor(){
-        super();
         this.pocess = null;
 
         this._cancel = false;
@@ -62,7 +47,7 @@ export class ConvertMP4 extends EventEmitter {
 
             this.pocess.on("close", async (code) => { // eslint-disable-line no-unused-vars
                 if(this._cancel===false){
-                    resolve();
+                    resolve(null);
                     return;
                 }
 
@@ -86,7 +71,7 @@ export class ConvertMP4 extends EventEmitter {
         }
 
         if(this.canCencel===false){
-            this.emit("cancel_error", new Error("中断はwinowsのみ有効"));
+            // this.emit("cancel_error", new Error("中断はwinowsのみ有効"));
             return;
         }
 
@@ -97,7 +82,6 @@ export class ConvertMP4 extends EventEmitter {
         
         cancel_proc.on("error", (error)=>{
             this._cancel = false;
-            this.emit("cancel_error", error);
         });
         cancel_proc.on("close", async (code) => { // eslint-disable-line no-unused-vars
             this._canceled = true;

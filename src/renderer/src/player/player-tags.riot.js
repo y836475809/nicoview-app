@@ -1,4 +1,3 @@
-import {myapi} from "@lib/my-api.js";
 import { window_obs } from "@lib/my-observable.js";
 
 /** @type {MyObservable} */ 
@@ -17,10 +16,10 @@ export default {
          */          
         this.onclickTag = (item, e) => { // eslint-disable-line no-unused-vars
             const tag = item.name;
-            myapi.ipc.Search.searchTag({
-                query: tag,
-                search_target:"tag"
-            });
+            // myapi.ipc.Search.searchTag({
+            //     query: tag,
+            //     search_target:"tag"
+            // });
         };
 
         /**
@@ -34,12 +33,12 @@ export default {
             }
 
             const tag = item.name;
-            const menu_id = await myapi.ipc.popupContextMenu("player-tag", { tag });
-            if(menu_id == "search-library"){
-                myapi.ipc.Library.search({
-                    query: tag
-                });
-            }
+            // const menu_id = await myapi.ipc.popupContextMenu("player-tag", { tag });
+            // if(menu_id == "search-library"){
+            //     myapi.ipc.Library.search({
+            //         query: tag
+            //     });
+            // }
         },
 
         player_obs.on("player-tag:set-tags", (

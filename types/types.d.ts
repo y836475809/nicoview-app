@@ -1,13 +1,12 @@
 
-/**
- * 再生履歴
- * @typedef {Object} HistoryItem
- * @property {string} thumb_img 
- * @property {string} video_id
- * @property {string} title
- * @property {number} play_date
- * @property {number} time
- */
+
+// 再生履歴
+interface HistoryItem {
+    thumb_img: string;
+    video_id: string;
+    title: string;
+    play_date: number;
+}
 
 /**
  * サイドバーのリストアイテム
@@ -17,20 +16,29 @@
  * @property {boolean} marked true:アイコンを赤色にする
  */
 
-/**
- * @typedef {Object} DownloadSchedule 
- * @property {{hour:number, minute:number}} date
- * @property {boolean} enable
- */
+declare const DownloadState: {
+    readonly wait: 0,
+    readonly downloading: 1,
+    readonly complete: 2,
+    readonly error: 3
+};
 
-/**
- * ダウンロード
- * @typedef {Object} RegDownloadItem 
- * @property {string} video_id
- * @property {string} title
- * @property {number} state wait: 0,downloading: 1,complete: 2, error: 3
- * @property {string} thumb_img
- */
+declare const DownloadResult: {
+    readonly complete: 'complete',
+    readonly skip: 'skip',
+    readonly cancel: 'cancel',
+    readonly error: 'error'
+};
+
+// ダウンロード
+interface DownloadItem {
+    video_id: string;
+    title: string;
+    // TODO
+    // state: 'wait'|'run'|'complete'|'error';
+    state: number;
+    thumb_img: string;
+}
 
 /**
  *  ダウンロード完了時に通達されるダウンロードデータ
@@ -49,39 +57,35 @@
  */
  
  
-/**
- * mylistの見出し
- * @typedef {Object} MyListIndexItem 
- * @property {string} title
- * @property {string} mylist_id id
- * @property {string} creator
- */
 
-/**
- * mylistの動画
- * @typedef {Object} MyListVideoItem
- * @property {number} no
- * @property {string} title
- * @property {string} video_id
- * @property {string} link
- * @property {string} description
- * @property {string} thumb_img
- * @property {string} length
- * @property {string} date
- */
+// mylistの見出し
+interface MyListItem {
+    title: string;
+    mylist_id: string;
+    creator: string;
+}
 
-/**
- * mylist
- * @typedef {Object} MyListItem 
- * @property {string} title
- * @property {string} mylist_id
- * @property {string} link
- * @property {string} creator
- * @property {string} description
- * @property {MyListVideoItem[]} items
- */
+// mylistの動画
+interface MyListVideoItem {
+    no: number;
+    title: string;
+    video_id: string;
+    link: string;
+    description: string;
+    thumb_img: string;
+    length: string;
+    date: string;
+}
 
-
+// mylist
+interface MyListItem {
+    title: string;
+    mylist_id: string;
+    link: string;
+    creator: string;
+    description: string;
+    items: MyListVideoItem[];
+}
 
 /**
  * ライブラリ検索条件
@@ -119,6 +123,14 @@
  * @property {number} page
  */
 
+interface NicoSearchItem {
+    query: string;
+    sort_name: string;
+    sort_order: string;
+    search_target: string;
+    marked: boolean;
+}
+
 /**
  * ニコニコ動画検索結果の検索数、ページ数情報
  * @typedef {Object} NicoSearchResultPageItem 
@@ -155,24 +167,23 @@
  * @property {boolean} update_thumbnail
  */
 
-/**
- * ブックマーク
- * @typedef {Object} BookmarkItem 
- * @property {string} title
- * @property {string} video_id
- * @property {number} time
- * @property {boolean} [marked]
- */
 
-/**
- * 後で見る(スタック)
- * @typedef {Object} StackItem 
- * @property {string} title
- * @property {string} video_id
- * @property {string} thumb_img
- * @property {number} [time]
- * @property {string} [state]
- */
+// ブックマーク
+interface BookmarkItem {
+    title: string;
+    video_id: string;
+    time: number;
+    marked: boolean;
+}
+
+
+// 後で見る(スタック)
+interface StackItem {
+    title: string;
+    video_id: string;
+    thumb_img: string;
+    time: number;
+}
 
 /**
  * ニコニコ動画コメントのスレッド情報
@@ -224,49 +235,99 @@
  * @property {string} font_size フォントサイズ
  */
 
-/**
- * オーナー情報
- * @typedef {Object} Owner 
- * @property {string} iconURL
- * @property {string} id
- * @property {string} nickname
- */
 
-/**
- * 動画タグ
- * @typedef {Object} VideoTag 
- * @property {string} id
- * @property {boolean} isLocked
- * @property {string} name
- */
+// オーナー情報
+interface Owner {
+    iconURL: string;
+    id: string;
+    nickname: string;
+}
 
-/**
- * ニコニコ動画情報
- * 動画情報
- * @typedef {Object} ThumbVideo
- * @property {string} description
- * @property {string} duration 動画時間(mm:ssの形式)
- * @property {string} largeThumbnailURL
- * @property {number} mylistCount
- * @property {string} postedDateTime
- * @property {string} thumbnailURL
- * @property {string} title
- * @property {string} video_id
- * @property {string} video_type
- * @property {number} viewCount
- */
+// 動画タグ
+interface VideoTag {
+    id: string;
+    isLocked: boolean
+    name: string;
+}
 
-/**
- * ニコニコ動画情報
- * オーナー、タグ、動画情報
- * @typedef {Object} ThumbInfo 
- * @property {Owner} owner
- * @property {VideoTag[]} tags
- * @property {{commentCount:number}} thread
- * @property {ThumbVideo} video
- * @property {boolean} [is_deleted] true:動画がニコニコ動画から削除済み
- * @property {boolean} [is_economy] true:エコノミー動画
- */
+
+// ニコニコ動画情報
+// 動画情報
+interface ThumbVideo {
+    description: string;
+    duration: string;
+    largeThumbnailURL: string;
+    mylistCount
+    postedDateTime: string;
+    thumbnailURL: string;
+    title: string;
+    video_id: string;
+    video_type: string;
+    viewCount: number
+}
+
+
+// ニコニコ動画情報
+// オーナー、タグ、動画情報
+interface ThumbInfo {
+    owner: Owner;
+    tags: VideoTag[];
+    thread:{
+        commentCount:number;
+    };
+    video: ThumbVideo;
+    is_deleted: boolean;
+    is_economy: boolean;
+}
+
+interface NvComment {
+    id: string;
+    no: number;
+    vposMs: number;
+    body: string;
+    commands: string[];
+    userId: string;
+    isPremium: string;
+    score: number;
+    postedAt: string;
+    nicoruCount: number;
+    nicoruId: string;
+    source: string;
+    isMyPost: string;
+}
+
+interface NvCommentThread {
+  id: string;
+  fork: string;
+  commentCount: number;
+  comments: NvComment[];
+}
+
+interface NvCommentMateData {
+  meta: {
+    status: number;
+  };
+  data: {
+    globalComments: {
+      id: string;
+      count: number;
+    }[];
+    threads: NvCommentThread[];
+  };
+}
+
+interface Chat {
+  content: string;
+  date: number;
+  mail: string;
+  no: number;
+  user_id: string;
+  vpos: number;
+}
+
+interface CommentChat {
+  chat: Chat;
+}
 
 /**
  * 動画再生で使用するオプション
@@ -312,12 +373,12 @@
  * @property {number} duration_sec コメント表示時間
  */
 
-/**
- * NG comment item
- * @typedef {Object} NGCommentItem
- * @property {string} type text or user_id
- * @property {string} value
- */
+
+// NG comment item
+interface NGCommentItem {
+    type: 'text'|'user_id';
+    value: string;
+}
 
 
 /**
@@ -364,28 +425,31 @@ interface ConfigColumn {
     width: number;
 };
 
-interface Config {
-    data_dir: string;
+interface WindowState {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    maximized: boolean;
+}
+
+interface AppConfig {
+    data_dir: string|null;
     log: {
         level: string;
     };
+    open_devtools: boolean;
     mouse_gesture: {
         search_page_back_page: string;
         search_page_forward_page: string;
         all_page_show_player: string;
     };
     user_icon_cache: boolean;
-    ffmpeg_path: string;
+    ffmpeg_path: string|null;
     use_mouse_gesture: boolean;
     main: {
         window: {
-            state: {
-                x: number;
-                y: number;
-                width: number;
-                height: number;
-                maximized: boolean;
-            };
+            state: WindowState;
         };
     };
     player: {
@@ -393,13 +457,7 @@ interface Config {
         sync_comment: boolean;
         volume: number;
         window: {
-            state: {
-                x: number;
-                y: number;
-                width: number;
-                height: number;
-                maximized: boolean;
-            };
+            state: WindowState;
         };
         infoview_show: boolean;
         contextmenu: {
@@ -407,23 +465,36 @@ interface Config {
             stack_num: number;
         };
     };
+    download: {
+        dir: string|null;
+        schedule: {
+        date: {
+            hour: number;
+            minute: number;
+        };
+        enable: boolean;
+        };
+        wait_time: number;
+    };
     search: {
         condition: {
-        search_target: {
-            target: string;
-        };
-        sort: {
-            name: string;
-            order: string;
-        };
-        api: string;
+            search_target: {
+                target: string;
+            };
+            sort: {
+                name: string;
+                order: string;
+            };
+            api: string;
         };
     };
     comment: {
         auto_sync_checked: boolean;
         auto_sync_interval: number;
-        auto_sync_threshold:number;
-        fps: 10
+        auto_sync_threshold: number;
+        fps: number;
+        duration_sec: number;
+        do_limit: boolean;
     };
     nndd: {
         librarydb: boolean;
@@ -431,7 +502,7 @@ interface Config {
         mylist: boolean;
         nglist: boolean;
         searchitems: boolean;
-        system_path: string;
+        system_path: string|null;
     };
     nico_grid_library: {
         columns: ConfigColumn[];
@@ -439,6 +510,9 @@ interface Config {
     player_comment_nico_grid: {
         columns: ConfigColumn[];
     };
+    player_ng_comment_nico_grid: {
+        columns: ConfigColumn[];
+    }
     download_nico_grid: {
         columns: ConfigColumn[];
     };
@@ -469,7 +543,7 @@ interface HistoryItem {
     time: number;
 };
 
-export const Status = {
+const Status = {
   wait: 0,
   downloading: 1,
   complete: 2,
@@ -504,14 +578,27 @@ interface LibraryItem {
     is_deleted: boolean;
 }
 
-interface APIInvoker {
-  getTempPath: (name: string) => Promise<string>;
-  getConfig: () => Promise<Config>;
-  historyGetItems: () => Promise<HistoryItem[]>;
+// ライブラリ検索条件
+interface LibrarySearchItem {
+    title: string;
+    query: string;
+    target_ids: string[];
+    marked: boolean;
+}
 
-  downloadGetItems: () => Promise<DownloadItem[]>;
-//   historyOnAddItem: (func: (item: HistoryItem) => void) => void;
-  libraryGetItems: () => Promise<LibraryItem[]>;
-  libraryGetItem: (videoId: string) => Promise<LibraryItem>;
-//   libraryExistsItem: (videoId: string) => Promise<boolean>
+interface PlayData {
+    sourceUrl: string;
+    thumbInfo: ThumbInfo;
+    comments: Chat[];
+}
+
+type StoreMap = {
+    'bookmark': BookmarkItem;
+    'download': DownloadItem;
+    'history': HistoryItem;
+    'library-search': LibrarySearchItem;
+    'mylist': MyListItem;
+    'nglist': NGCommentItem;
+    'nico-search': NicoSearchItem;
+    'stack': StackItem;
 }

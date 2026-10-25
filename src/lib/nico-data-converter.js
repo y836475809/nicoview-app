@@ -1,4 +1,5 @@
-const fsPromises = require("fs").promises;
+import fs from 'fs';
+const fsPromises = fs.promises;
 import * as NicoDataParser from "@lib/nico-data-parser.js";
 
 export class XMLDataConverter {
@@ -73,40 +74,3 @@ export class XMLDataConverter {
         });
     }
 }
-
-/**
- * コメント(json)を古いフォーマットに変換する
- * @param {*} nv_commnets 
- * @returns {{chat:CommentItem}[]}
- */
-export const convToLegacyComments = (nv_commnets) => {
-    const chats = [];
-    const threads = nv_commnets.data.threads;
-    threads.forEach(thread => {
-        const comments = thread.comments;
-        comments.forEach(commnet => {
-            chats.push(convToLegacyComment(commnet));
-        });
-    });
-    return chats;
-};
-
-/**
- * コメント(json)を古いフォーマットに変換する
- * @returns {{chat:CommentItem}}
- */
-const convToLegacyComment = (nv_commnet) => {
-    const date = new Date(nv_commnet.postedAt);
-    const date_sec = date.getTime() / 1000;
-    const cmds = nv_commnet.commands.join(" ");
-    return {
-        "chat": {
-            "no": nv_commnet.no,
-            "vpos": nv_commnet.vposMs/10,
-            "date": date_sec,
-            "user_id": nv_commnet.userId,
-            "mail": cmds.toLowerCase(),
-            "content": nv_commnet.body
-        }
-    };
-};

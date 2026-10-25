@@ -1,3 +1,5 @@
+import { Emitter } from 'mitt';
+
 export interface DialogEventMap {
   'dialog:open': { showok: boolean; showcancel: boolean, message: string };
   'dialog:close': void;
@@ -5,6 +7,4 @@ export interface DialogEventMap {
   'dialog:ok': void;
   'dialog:cancel': void;
 }
-
-import { Emitter } from 'mitt';
 export type DialogEmitter = Emitter<DialogEventMap>;

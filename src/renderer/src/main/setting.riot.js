@@ -1,9 +1,5 @@
 import mitt from 'mitt';
-import {myapi} from "@lib/my-api.js";
-import { ImportFile } from "@lib/import-file.js";
-import { ImportNNDDSetting } from "@lib/import-nndd-setting.js";
 import { window_obs } from "@lib/my-observable.js";
-import { logger } from "@lib/logger.js";
 
 import ModalDialog from '@renderer/common/modal-dialog.riot';
 
@@ -53,8 +49,6 @@ export default {
         elm.checked = value;
     },
     onBeforeMount() {
-        this.state.import_items = ImportNNDDSetting.getItems();
-
         this.mouse_gesture_text = () => {
             return [
                 "右ボタン押しながら",
@@ -65,180 +59,56 @@ export default {
         };
     },
     async onMounted() {
-        this.setInputValue(".data-dir-input", await myapi.ipc.Config.get("data_dir", "")); 
-        this.setInputValue(".download-dir-input", await myapi.ipc.Config.get("download.dir", "")); 
-        this.setInputValue(".ffmpeg-path-input", await myapi.ipc.Config.get("ffmpeg_path", "")); 
-        this.setInputValue(".nndd-system-path-input", await myapi.ipc.Config.get("nndd.system_path", ""));
-        this.setCheckValue(".user_icon_cache", await myapi.ipc.Config.get("user_icon_cache", false));  
-        this.setCheckValue(".use_mouse_gesture", await myapi.ipc.Config.get("use_mouse_gesture", true));  
-
-        for (let index = 0; index < this.state.import_items.length; index++) {
-            const import_item = this.state.import_items[index];
-            this.setCheckValue(`.${import_item.name}`, await myapi.ipc.Config.get(`nndd.${import_item.name}`, false));
-        }
+        const config = await window.electronAPI.invoke('config:get');
+        this.setInputValue(".data-dir-input", config.data_dir); 
+        this.setInputValue(".download-dir-input", config.download.dir); 
+        this.setInputValue(".ffmpeg-path-input", config.ffmpeg_path); 
+        this.setInputValue(".nndd-system-path-input", config.nndd.system_path);
+        this.setCheckValue(".user_icon_cache", true);  
+        this.setCheckValue(".use_mouse_gesture", true);  
     },
     async onclickUseMg(e){
         const checked = e.target.checked;
         main_obs.trigger("main:update-mousegesture-config", { 
             use_mouse_gesture: checked
         });
-        await myapi.ipc.Config.set("use_mouse_gesture", checked);
     },
     async onclickSelectDataDir(e) { // eslint-disable-line no-unused-vars
-        const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
+        const dir = await window.electronAPI.invoke('showSelectFolderDialog');
         if(dir == null){
             return;
         }
         this.setInputValue(".data-dir-input", dir);
-        await myapi.ipc.Config.set("data_dir", dir);
+        await window.electronAPI.invoke('config:set', 'data_dir', dir);
     },
     async onclickSelectDownloadDir(e) { // eslint-disable-line no-unused-vars
-        const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
+        const dir = await window.electronAPI.invoke('showSelectFolderDialog');
         if(dir == null){
             return; 
         }
         this.setInputValue(".download-dir-input", dir);
-        await myapi.ipc.Config.set("download.dir", dir);
+        const configDownload = (await window.electronAPI.invoke('config:get')).download;
+        configDownload.dir = dir;
+        await window.electronAPI.invoke('config:set', 'download', configDownload);
     },
     async onclickSelectffmpegPath(e) { // eslint-disable-line no-unused-vars
-        const file_path = await myapi.ipc.Dialog.showSelectFileDialog({
-            name: "ffmpeg",
-            exts: ["*"],
-            multi_select: false
-        });
+        const file_path = await window.electronAPI.invoke('showSelectFileDialog');
         if(file_path == null){
             return;
         }
         this.setInputValue(".ffmpeg-path-input", file_path);
-        await myapi.ipc.Config.set("ffmpeg_path", file_path);
+        await window.electronAPI.invoke('config:set', 'ffmpeg_path', file_path);
     },
     async onclickNNDDSystemDir(e) { // eslint-disable-line no-unused-vars
-        const dir = await myapi.ipc.Dialog.showSelectFolderDialog();
-        if(dir == null){
-            return; 
-        }
-        this.setInputValue(".nndd-system-path-input", dir);
-        await myapi.ipc.Config.set("nndd.system_path", dir);
     },
     async onclickCheckNNDDImportItem(item, e) {  // eslint-disable-line no-unused-vars
         const ch_elm = this.$(`input[name='${item.name}']`);
         const checked = ch_elm.checked;
-        await myapi.ipc.Config.set(`nndd.${item.name}`, checked);
     },
-    async onclickExecNNDDImport(e) { // eslint-disable-line no-unused-vars
-        let data_dir = "";
-        let nndd_system_dir = "";
-        try {
-            data_dir = await myapi.ipc.Setting.getAppDataPath();
-            nndd_system_dir = await myapi.ipc.Setting.getNNDDSystemPath();
-        } catch (error) {
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: error.message
-            });
-            return;
-        }
-
-        const import_items = [];
-        this.state.import_items.forEach(item => {
-            const ch_elm = this.$(`input[name='${item.name}']`);
-            if(ch_elm.checked){
-                import_items.push(item);
-            }
-        });
-
-        this.state.dialogEmitter.emit('dialog:open', {
-            showok: false,
-            showcancel: false,
-            message: "インポート中..."
-        });
-        try {
-            const import_nndd = new ImportNNDDSetting(nndd_system_dir, data_dir);
-            for (let index = 0; index < import_items.length; index++) {
-                const import_item = import_items[index];
-                this.state.dialogEmitter.emit('dialog:update-message', {
-                    message: `${import_item.title}をインポート`
-                });
-                await import_nndd.call(import_item.name);
-            }
-
-            main_obs.trigger("search:sidebar:reload-items");
-            main_obs.trigger("history:reload-items");
-            main_obs.trigger("mylist:sidebar:reload-items");
-
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "info",
-                message: "インポート完了"
-            });
-        } catch (error) {
-            logger.error(error);
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: `インポート失敗\n${error.message}`
-            });
-        } finally {
-            this.state.dialogEmitter.emit('dialog:close');
-        }            
+    async onclickExecNNDDImport(e) { // eslint-disable-line no-unused-vars          
     },
     async onclickImportFiles() {
-        const file_paths = await myapi.ipc.Dialog.showSelectFileDialog({
-            name: "avi",
-            exts: ["mp4", "flv", "swf"],
-            multi_select: true
-        });
-        if(!file_paths){
-            return;
-        }
-
-        let cancel = false;
-        this.state.dialogEmitter.emit('dialog:open', {
-            showok: false,
-            showcancel: true,
-            message: "インポート中..."
-        });
-        this.state.dialogEmitter.on('dialog:cancel', () => {
-            cancel = true;
-        });
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        const error_files = [];
-        for (let index = 0; index < file_paths.length; index++) {
-            if(cancel===true){
-                break;
-            }
-            const file_path = file_paths[index];
-            try {
-                const import_file = new ImportFile(file_path);
-                const item = await import_file.createLibraryItem();
-                await myapi.ipc.Library.addItem(item);
-                await new Promise(resolve => setTimeout(resolve, 100));
-            } catch (error) {
-                logger.error(error);
-                error_files.push(file_path);
-            }
-
-            const message = `進歩:${index+1}/${file_paths.length} 失敗:${error_files.length}`;
-            this.state.dialogEmitter.emit('dialog:update-message', {
-                message: message
-            });
-            await new Promise(resolve => setTimeout(resolve, 500));
-        }
-        
-        await myapi.ipc.Dialog.showMessageBoxOK({
-            type: "info",
-            message: `インポート完了\n失敗:${error_files.length}`
-        });
-        this.state.dialogEmitter.emit('dialog:close');
-
-        if(error_files.length>0){
-            await myapi.ipc.Dialog.showMessageBoxOK({
-                type: "error",
-                message: `${error_files.length}個がインポートに失敗\n詳細はログを参照`
-            });
-        } 
     },
     async onclickChecUerIconCache(e) {
-        const checked = e.target.checked;
-        await myapi.ipc.Config.set("user_icon_cache", checked);
     }
 };
